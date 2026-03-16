@@ -487,7 +487,7 @@ bool ThemeManager::GetResFileData(const FilePath& resFilePath,
                                   FilePath* pResFileFullPath,
                                   std::vector<uint8_t>* pResFileData) const
 {
-    ASSERT(!resFilePath.IsEmpty() && _T("resFilePath 参数为空！"));
+    ASSERT(!resFilePath.IsEmpty() && _T("resFilePath is empty!"));
     if (resFilePath.IsEmpty()) {
         return false;
     }

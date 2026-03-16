@@ -193,7 +193,7 @@ Control* WindowBuilder::CreateControlByClass(const DString& strControlClass, Win
 
 bool WindowBuilder::ParseXmlData(const DString& xmlFileData, const FilePath& xmlFilePath)
 {
-    ASSERT(!xmlFileData.empty() && _T("xml 参数为空！"));
+    ASSERT(!xmlFileData.empty() && _T("xmlFileData is empty!"));
     if (xmlFileData.empty()) {
         return false;
     }
@@ -221,7 +221,7 @@ bool WindowBuilder::ParseXmlData(const DString& xmlFileData, const FilePath& xml
 
 bool WindowBuilder::ParseXmlData(const std::vector<unsigned char>& xmlFileData, const FilePath& xmlFilePath)
 {
-    ASSERT(!xmlFileData.empty() && _T("xml 参数为空！"));
+    ASSERT(!xmlFileData.empty() && _T("xmlFileData is empty!"));
     if (xmlFileData.empty()) {
         return false;
     }
@@ -240,7 +240,7 @@ bool WindowBuilder::ParseXmlData(const std::vector<unsigned char>& xmlFileData, 
 
 bool WindowBuilder::ParseXmlFile(const FilePath& xmlFilePath, const FilePath& windowResPath)
 {
-    ASSERT(!xmlFilePath.IsEmpty() && _T("xmlFilePath 参数为空！"));
+    ASSERT(!xmlFilePath.IsEmpty() && _T("xmlFilePath is empty!"));
     if (xmlFilePath.IsEmpty()) {
         return false;
     }

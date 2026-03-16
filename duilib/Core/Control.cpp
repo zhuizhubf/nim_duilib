@@ -607,7 +607,7 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         SetColumnSpan(StringUtil::StringToInt32(strValue));
     }
     else {
-        ASSERT(!"Control::SetAttribute失败: 发现不能识别的属性");
+        ASSERT(!"Control::SetAttribute failed: unknown attribute name!");
     }
 }
 
