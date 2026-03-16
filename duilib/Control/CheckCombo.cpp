@@ -612,10 +612,16 @@ bool CheckCombo::OnSelectItem(const ui::EventArgs& args)
     if (itemText.empty()) {
         return true;
     }
+    DString itemTextId = pCheckBox->GetTextId();
 
     Label* item = new Label(m_pList->GetWindow());
     SetAttributeList(item, m_selectedItemClass.c_str());
-    item->SetText(itemText);
+    if (!itemTextId.empty()) {
+        item->SetTextId(itemTextId);
+    }
+    else {
+        item->SetText(itemText);
+    }    
     m_pList->AddItem(item);
     UpdateSelectedListHeight();
     return true;

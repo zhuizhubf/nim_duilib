@@ -380,7 +380,7 @@ void FontManager::GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInf
 
 #ifdef DUILIB_BUILD_FOR_WIN
     if (::GetACP() == 936) {
-        //仅中文环境使用
+        //仅中文环境使用（不支持多语言版）
         fontSizeList.push_back({ _T("1英寸"), 95.6f, 0 });
         fontSizeList.push_back({ _T("大特号"), 83.7f, 0 });
         fontSizeList.push_back({ _T("特号"), 71.7f, 0 });

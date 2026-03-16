@@ -472,19 +472,19 @@ void MainForm::InitListCtrlEvents(ui::ListCtrl* pListCtrl)
     }
     //在列表头点击右键
     ui::ListCtrlHeader* pHeaderCtrl = pListCtrl->GetHeaderCtrl();
-    if (pHeaderCtrl != nullptr) {
-        pHeaderCtrl->AttachRClick([this](const ui::EventArgs&) {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-            if (::MessageBox(nullptr, _T("ListCtrlHeader RClick! 是否执行功能测试？"), _T(""), MB_YESNO) == IDYES) {
-                RunListCtrlTest();
-            }
-#else
-            ui::SystemUtil::ShowMessageBox(this, _T("开始执行功能测试"), _T("ListCtrlHeader RClick!"));
-            RunListCtrlTest();
-#endif
-            return true;
-            });
-    }
+//    if (pHeaderCtrl != nullptr) {
+//        pHeaderCtrl->AttachRClick([this](const ui::EventArgs&) {
+//#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+//            if (::MessageBox(nullptr, _T("ListCtrlHeader RClick! 是否执行功能测试？"), _T(""), MB_YESNO) == IDYES) {
+//                RunListCtrlTest();
+//            }
+//#else
+//            ui::SystemUtil::ShowMessageBox(this, _T("开始执行功能测试"), _T("ListCtrlHeader RClick!"));
+//            RunListCtrlTest();
+//#endif
+//            return true;
+//            });
+//    }
 
     //按比例设置各个列的宽度，使其充满整个视图
     ui::Button* pAutoStretchBtn = dynamic_cast<ui::Button*>(FindControl(_T("set_column_stretch")));

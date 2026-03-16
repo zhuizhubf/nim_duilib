@@ -118,7 +118,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Desktop");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("桌面");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_DESKTOP"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
@@ -130,7 +130,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Documents");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("文档");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_DOCUMENTS"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
@@ -142,7 +142,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Pictures");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("图片");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_PICTURES"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
@@ -154,7 +154,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Music");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("音乐");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_MUSIC"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
@@ -166,7 +166,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Videos");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("视频");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_VIDEOS"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
@@ -178,7 +178,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         filePath += _T("Downloads");
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
-            filePath += _T("下载");
+            filePath += GlobalManager::GetTextById(_T("STRID_PUBLIC_DIRECTORY_TREE_DOWNLOADS"));
         }
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;

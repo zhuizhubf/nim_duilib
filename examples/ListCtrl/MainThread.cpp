@@ -18,7 +18,7 @@ void MainThread::OnInit()
 
     //创建主窗口
     MainForm* pWindow = new MainForm();
-    pWindow->CreateWnd(nullptr, ui::WindowCreateParam(_T("ListCtrl控件测试程序"), true));
+    pWindow->CreateWnd(nullptr, ui::WindowCreateParam(_T("ListCtrl"), true));
     pWindow->PostQuitMsgWhenClosed(true);
     pWindow->ShowWindow(ui::kSW_SHOW_NORMAL);
 }

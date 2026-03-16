@@ -124,13 +124,14 @@ void ControlForm::OnInitWindow()
 
     ui::CheckCombo* check_combo = dynamic_cast<ui::CheckCombo*>(FindControl(_T("check_combo")));
     if (check_combo != nullptr) {
-        check_combo->AddTextItem(_T("星期一"));
-        check_combo->AddTextItem(_T("星期二"));
-        check_combo->AddTextItem(_T("星期三"));
-        check_combo->AddTextItem(_T("星期四"));
-        check_combo->AddTextItem(_T("星期五"));
-        check_combo->AddTextItem(_T("星期六"));
-        check_combo->AddTextItem(_T("星期日"));
+        // 星期下拉框选项 - 替换为语言ID
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_MONDAY"));    // 星期一
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_TUESDAY"));   // 星期二
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_WEDNESDAY")); // 星期三
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_THURSDAY"));  // 星期四
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_FRIDAY"));    // 星期五
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_SATURDAY"));  // 星期六
+        check_combo->AddTextIdItem(_T("STRID_CONTROLS_SUNDAY"));    // 星期日
     }
 
     //如果是zip模式，需要在主线程中执行
@@ -195,7 +196,7 @@ void ControlForm::OnInitWindow()
         pRichText->AttachLinkClick([this](const ui::EventArgs& args) {
             const DString::value_type* url = (const DString::value_type*)args.wParam;
             if (url != nullptr) {
-                ui::SystemUtil::ShowMessageBox(this, url, _T("RichText点击超链接"));
+                ui::SystemUtil::ShowMessageBox(this, url, _T("RichText"));
             }
             return true;
             });
@@ -207,7 +208,7 @@ void ControlForm::OnInitWindow()
         pHyperLink->AttachLinkClick([this](const ui::EventArgs& args) {
             const DString::value_type* url = (const DString::value_type*)args.wParam;
             if (url != nullptr) {
-                ui::SystemUtil::ShowMessageBox(this, url, _T("HyperLink点击超链接"));
+                ui::SystemUtil::ShowMessageBox(this, url, _T("HyperLink"));
             }
             return true;
             });
@@ -216,7 +217,7 @@ void ControlForm::OnInitWindow()
     pHyperLink = dynamic_cast<ui::HyperLink*>(FindControl(_T("hyper_link2")));
     if (pHyperLink != nullptr) {
         pHyperLink->AttachLinkClick([this](const ui::EventArgs& /*args*/) {
-            ui::SystemUtil::ShowMessageBox(this, _T("文字按钮事件响应"), _T("HyperLink点击"));
+            ui::SystemUtil::ShowMessageBox(this, _T("Text Button LinkClick Event!"), _T("HyperLink"));
             return true;
             });
     }
@@ -614,7 +615,7 @@ LRESULT ControlForm::OnHotKeyMsg(int32_t hotkeyId, ui::VirtualKeyCode vkCode, ui
     bHandled = true;
     if (hotkeyId == SYSTEM_HOTKEY_ID) {
         SetWindowForeground();
-        ui::SystemUtil::ShowMessageBox(this, _T("接收到系统热键命令"), _T("ControlForm::OnHotKeyMsg"));
+        ui::SystemUtil::ShowMessageBox(this, _T("Received system hotkey command"), _T("ControlForm::OnHotKeyMsg"));
     }
     return lResult;
 }
