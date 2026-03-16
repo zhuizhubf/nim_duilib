@@ -461,8 +461,9 @@ void CefForm::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame
     if (m_pCefControl != nullptr) {
         //显示MessageBox
         m_pCefControl->RegisterCppFunc(_T("ShowMessageBox"), ToWeakCallback([this](const std::string& params, ui::ReportResultFunction callback) {
+            //C++ 接收到 JavaScript 发来的消息
             DString value = ui::StringConvert::UTF8ToT(params);
-            ui::SystemUtil::ShowMessageBox(this, value.c_str(), _T("C++ 接收到 JavaScript 发来的消息"));
+            ui::SystemUtil::ShowMessageBox(this, value.c_str(), _T("C++ receives the message sent by JavaScript."));
             callback(false, R"({ "message": "Success." })");
             }));
 
@@ -477,7 +478,8 @@ void CefForm::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame
 
 void CefForm::OnDropFiles(const DString& jsonDropFileList)
 {
-    ui::SystemUtil::ShowMessageBox(this, jsonDropFileList.c_str(), _T("CefForm::OnDropFiles: C++ 接收到 JavaScript 发来的消息"));
+    //C++ 接收到 JavaScript 发来的消息
+    ui::SystemUtil::ShowMessageBox(this, jsonDropFileList.c_str(), _T("CefForm::OnDropFiles: C++ receives the message sent by JavaScript."));
     //业务处理
     //1. 解析json，从jsonDropFileList中解析出文件名和文件大小（网页端无法获取到文件的本地路径）
     //2. 比较两个文件列表（m_dropFileList, jsonDropFileList）中的文件是否一致（文件个数，文件名，文件大小）
