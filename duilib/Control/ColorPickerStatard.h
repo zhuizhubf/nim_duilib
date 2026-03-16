@@ -55,7 +55,7 @@ public:
 
     /** 获取当前鼠标所在点的颜色信息
     */
-    bool GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor) const;
+    bool GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const;
 
     /** 计算两点之间的距离
     */
@@ -81,6 +81,9 @@ private:
     {
         //颜色值
         UiColor color;
+
+        //颜色值的显示名称
+        UiString colorNameId;
 
         //该颜色的正六边形中心点坐标
         UiPointF centerPt;

@@ -62,7 +62,7 @@ public:
 
     /** 获取当前鼠标所在点的颜色信息
     */
-    bool GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor) const;
+    bool GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const;
 
     /** 计算两点之间的距离
     */
@@ -95,6 +95,9 @@ private:
         /** 正六边形的半径
         */
         int32_t m_radius;
+
+        //颜色名称资源ID
+        UiString m_colorNameId;
     };
     std::vector<ColorInfo> m_colorMap;
 

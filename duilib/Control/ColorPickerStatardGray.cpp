@@ -257,9 +257,13 @@ bool ColorPickerStatardGray::MouseMove(const EventArgs& msg)
     //更新ToolTip信息
     if (GetRect().ContainsPt(msg.ptMouse)) {
         UiColor color;
-        if (GetColorInfo(msg.ptMouse, color)) {
-            DString colorString = StringUtil::Printf(_T("#%02X%02X%02X%02X"), color.GetA(), color.GetR(), color.GetG(), color.GetB());
-            SetToolTipText(colorString);
+        DString colorNameId;
+        if (GetColorInfo(msg.ptMouse, color, colorNameId)) {
+            DString colorStringTip = GlobalManager::GetTextById(colorNameId);
+            colorStringTip += _T("(");
+            colorStringTip += StringUtil::Printf(_T("#%02X%02X%02X%02X"), color.GetA(), color.GetR(), color.GetG(), color.GetB());
+            colorStringTip += _T(")");
+            SetToolTipText(colorStringTip);
         }
         else {
             SetToolTipText(_T(""));
@@ -276,7 +280,8 @@ bool ColorPickerStatardGray::ButtonDown(const EventArgs& msg)
     }
     if (GetRect().ContainsPt(msg.ptMouse)) {
         UiColor color;
-        if (GetColorInfo(msg.ptMouse, color)) {
+        DString colorNameId;
+        if (GetColorInfo(msg.ptMouse, color, colorNameId)) {
             //选择了当前的颜色
             m_selectedColor = color;
             Invalidate();
@@ -289,12 +294,14 @@ bool ColorPickerStatardGray::ButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool ColorPickerStatardGray::GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor) const
+bool ColorPickerStatardGray::GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const
 {
     struct ColorPt
     {
         //颜色值
         UiColor color;
+        //颜色名称资源ID
+        DString m_colorNameId;
         //该颜色值对应的正六边形中心点与ptMouse之间的距离
         float distance;
         //比较函数，距离最近的排在前面
@@ -309,7 +316,7 @@ bool ColorPickerStatardGray::GetColorInfo(const UiPoint& ptMouse, UiColor& ptCol
         float distance = GetPointsDistance(colorInfo.centerPt,
                                             UiPointF((float)ptMouse.x, (float)ptMouse.y));
         if (distance <= colorInfo.m_radius) {
-            maybeColors.push_back({ colorInfo.color, distance });
+            maybeColors.push_back({ colorInfo.color, colorInfo.m_colorNameId.c_str(), distance});
         }
     }
 
@@ -319,6 +326,7 @@ bool ColorPickerStatardGray::GetColorInfo(const UiPoint& ptMouse, UiColor& ptCol
     else {
         std::sort(maybeColors.begin(), maybeColors.end()); //选取鼠标点距离正六边形中心点最近的那个颜色
         ptColor = maybeColors.front().color;
+        colorNameId = maybeColors.front().m_colorNameId;
         return true;
     }        
 }
@@ -334,22 +342,22 @@ float ColorPickerStatardGray::GetPointsDistance(const UiPointF& pt1, const UiPoi
 void ColorPickerStatardGray::InitColorMap()
 {
     m_colorMap = {
-        {UiColor(0xFFFFFFFF),UiPointF(),0},
-        {UiColor(0xFFDDDDDD),UiPointF(),0},
-        {UiColor(0xFFB2B2B2),UiPointF(),0},
-        {UiColor(0xFF808080),UiPointF(),0},
-        {UiColor(0xFF5F5F5F),UiPointF(),0},
-        {UiColor(0xFF333333),UiPointF(),0},
-        {UiColor(0xFF1C1C1C),UiPointF(),0},
-        {UiColor(0xFF080808),UiPointF(),0},
-        {UiColor(0xFFEAEAEA),UiPointF(),0},
-        {UiColor(0xFFC0C0C0),UiPointF(),0},
-        {UiColor(0xFF969696),UiPointF(),0},
-        {UiColor(0xFF777777),UiPointF(),0},
-        {UiColor(0xFF4D4D4D),UiPointF(),0},
-        {UiColor(0xFF292929),UiPointF(),0},
-        {UiColor(0xFF111111),UiPointF(),0},
-        {UiColor(0xFF000000),UiPointF(),0}
+        {UiColor(0xFFFFFFFF), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_WHITE")},          // 白色
+        {UiColor(0xFFDDDDDD), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_LIGHT_GRAY_1")},    // 浅灰1
+        {UiColor(0xFFB2B2B2), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_GRAY_1")},          // 中灰1
+        {UiColor(0xFF808080), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_MEDIUM_GRAY")},     // 中灰
+        {UiColor(0xFF5F5F5F), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_DARK_GRAY_1")},     // 深灰1
+        {UiColor(0xFF333333), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_DARK_GRAY_2")},     // 深灰2
+        {UiColor(0xFF1C1C1C), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_ALMOST_BLACK_1")},  // 近黑1
+        {UiColor(0xFF080808), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_ALMOST_BLACK_2")},  // 近黑2
+        {UiColor(0xFFEAEAEA), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_LIGHT_GRAY_2")},    // 浅灰2
+        {UiColor(0xFFC0C0C0), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_GRAY_2")},          // 中灰2
+        {UiColor(0xFF969696), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_GRAY_3")},          // 中灰3
+        {UiColor(0xFF777777), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_GRAY_4")},          // 中灰4
+        {UiColor(0xFF4D4D4D), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_DARK_GRAY_3")},     // 深灰3
+        {UiColor(0xFF292929), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_DARK_GRAY_4")},     // 深灰4
+        {UiColor(0xFF111111), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_ALMOST_BLACK_3")},  // 近黑3
+        {UiColor(0xFF000000), UiPointF(), 0, _T("STRID_PUBLIC_COLORPICKER_TIP4_BLACK")}            // 黑色
     };
     ASSERT(m_colorMap.size() == 16);
 }
