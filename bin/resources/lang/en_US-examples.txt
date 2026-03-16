@@ -326,6 +326,10 @@ STRID_RICHEDIT_FIND_CASE_SENSITIVE = Match Case
 STRID_RICHEDIT_FIND_MATCH_WHOLE_WORD = Match Whole Word
 STRID_RICHEDIT_FIND_CANCEL = Cancel
 
+STRID_RICHEDIT_ALL_FILES = All Files(*.*)
+STRID_RICHEDIT_TXT_FILES = Text Files(*.txt)
+STRID_RICHEDIT_RTF_FILES = RTF Files(*.rtf)
+
 # examples/ListCtrl
 # Window Basic
 STRID_LISTCTRL_TEST_TITLE = ListCtrl Test
@@ -563,6 +567,11 @@ STRID_RENDER_CTRL_ANI_NORMAL_CTRL = Normal Ctrl
 STRID_RENDER_BOX_SHADOW_TRANSPARENT_CTRL = Transparent ctrl
 STRID_RENDER_BOX_SHADOW_NOTES = box-shadow Notes:\n(1) X/Y extend: blur+spread+offset\n(2) Shadow beyond ctrl area as above\n(3) Reserve space (e.g. margin) to avoid shadow cover
 STRID_RENDER_BOX_SHADOW_SHOW_CTRL = Show ctrl on mouse enter
+
+STRID_RENDER_ALL_FILES = All Files(*.*)
+STRID_RENDER_TXT_FILES = Text Files(*.txt)
+STRID_RENDER_CSV_FILES = CSV Files(*.csv)
+STRID_RENDER_INI_FILES = INI Files(*.ini)
 
 # examples/layout
 STRID_LAYOUT_TEST_TITLE = Container Layout Test

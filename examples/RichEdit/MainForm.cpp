@@ -1131,10 +1131,10 @@ void MainForm::UpdateZoomValue()
 void MainForm::OnOpenFile()
 {
     std::vector<ui::FileDialog::FileType> fileTypes;
-    fileTypes.push_back({ _T("All Files(*.*)"), _T("*.*")});
-    fileTypes.push_back({ _T("Text Files(*.txt)"), _T("*.txt") });
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_ALL_FILES")), _T("*.*")});
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_TXT_FILES")), _T("*.txt") });
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    fileTypes.push_back({ _T("RTF Files(*.rtf)"), _T("*.rtf") });
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_RTF_FILES")), _T("*.rtf") });
 #endif
 
     DString defaultExt;
@@ -1174,10 +1174,10 @@ void MainForm::OnSaveFile()
 void MainForm::OnSaveAsFile()
 {
     std::vector<ui::FileDialog::FileType> fileTypes;
-    fileTypes.push_back({ _T("所有文件 (*.*)"), _T("*.*") });
-    fileTypes.push_back({ _T("文本文件 (*.txt)"), _T("*.txt") });
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_ALL_FILES")), _T("*.*") });
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_TXT_FILES")), _T("*.txt") });
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    fileTypes.push_back({ _T("RTF文件 (*.rtf)"), _T("*.rtf") });
+    fileTypes.push_back({ ui::GlobalManager::GetTextById(_T("STRID_RICHEDIT_RTF_FILES")), _T("*.rtf") });
 #endif
 
     DString defaultExt;

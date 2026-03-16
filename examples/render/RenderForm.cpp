@@ -149,19 +149,19 @@ void RenderForm::TestPropertyGrid()
     auto p80 = pPropertyGrid->AddFileProperty(pGroup, _T("文件路径"), _T("C:\\Test-Save.txt"), _T("描述信息：文件路径"), 0,
                                               false, 
                                               { 
-                                                  {_T("Text文件"), _T("*.txt")},
-                                                  {_T("CSV文件"), _T("*.csv")},
-                                                  {_T("INI文件"), _T("*.ini")},
-                                                  {_T("所有文件"), _T("*.*")}
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_TXT_FILES")), _T("*.txt")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_CSV_FILES")), _T("*.csv")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_INI_FILES")), _T("*.ini")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_ALL_FILES")), _T("*.*")}
                                               }, 
                                               0, _T("txt"));
     auto p81 = pPropertyGrid->AddFileProperty(pGroup, _T("文件路径"), _T("C:\\Test-Open.txt"), _T("描述信息：文件路径"), 0,
                                               true, 
                                               { 
-                                                  {_T("Text文件"), _T("*.txt")},
-                                                  {_T("CSV文件"), _T("*.csv")},
-                                                  {_T("INI文件"), _T("*.ini")},
-                                                  {_T("所有文件"), _T("*.*")}
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_TXT_FILES")), _T("*.txt")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_CSV_FILES")), _T("*.csv")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_INI_FILES")), _T("*.ini")},
+                                                  {ui::GlobalManager::GetTextById(_T("STRID_RENDER_ALL_FILES")), _T("*.*")}
                                               }, 
                                               0, _T("txt"));
 

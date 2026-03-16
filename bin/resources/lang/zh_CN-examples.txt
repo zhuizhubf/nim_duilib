@@ -327,6 +327,10 @@ STRID_RICHEDIT_FIND_CASE_SENSITIVE = 区分大小写
 STRID_RICHEDIT_FIND_MATCH_WHOLE_WORD = 全字匹配
 STRID_RICHEDIT_FIND_CANCEL = 取消
 
+STRID_RICHEDIT_ALL_FILES = 所有文件(*.*)
+STRID_RICHEDIT_TXT_FILES = 文本文件(*.txt)
+STRID_RICHEDIT_RTF_FILES = RTF文件(*.rtf)
+
 # examples/ListCtrl
 # 窗口基础
 STRID_LISTCTRL_TEST_TITLE = ListCtrl控件测试程序
@@ -568,6 +572,11 @@ STRID_RENDER_CTRL_ANI_NORMAL_CTRL = 普通控件
 STRID_RENDER_BOX_SHADOW_TRANSPARENT_CTRL = 这是一个半透明控件
 STRID_RENDER_BOX_SHADOW_NOTES = box-shadow使用注意事项：\n（1）X和Y方向扩展范围：blur_radius + spread_radius + offset \n（2）阴影绘制是超出控件范围的，超出控件矩形的扩展范围如上\n（3）设置布局属性时，需要在四周留出绘制空间（比如设置外边距），避免阴影被覆盖
 STRID_RENDER_BOX_SHADOW_SHOW_CTRL = 鼠标划入显示上方控件
+
+STRID_RENDER_ALL_FILES = 所有文件(*.*)
+STRID_RENDER_TXT_FILES = 文本文件(*.txt)
+STRID_RENDER_CSV_FILES = CSV文件(*.csv)
+STRID_RENDER_INI_FILES = INI文件(*.ini)
 
 # examples/layout
 STRID_LAYOUT_TEST_TITLE = 容器布局测试
