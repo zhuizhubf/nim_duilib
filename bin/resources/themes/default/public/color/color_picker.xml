@@ -145,7 +145,15 @@
                             <CheckBox class="checkbox_1" name="color_picker_choose_hide" height="20" border_round="3,3" text_id="STRID_PUBLIC_COLORPICKER_HIDE_WND" halign="center" margin="2,2,2,2" selected="true"/>
                         </VBox>
                         <VBox margin="2,6,2,2">
-                            <Label text_id="STRID_PUBLIC_COLORPICKER_NEW_COLOR" width="120" height="28" text_align="hcenter"/>
+                            <HBox height="28">
+                                <Label text_id="STRID_PUBLIC_COLORPICKER_NEW_COLOR" width="100%" height="28" text_align="hcenter"/>
+                                <Button class="btn_global" name="color_picker_copy2" width="20" height="20" border_round="2,2" 
+                                                        text="" valign="center" halign="center" margin="0,0,0,2"
+                                                        normal_color="" disabled_color=""
+                                                        normal_border_color="" disabled_border_color=""
+                                                        bkimage="file='copy_color.svg' width='14' height='14' halign='center' valign='center'"
+                                                        tooltip_text_id="STRID_PUBLIC_COLORPICKER_COPY_COLOR"/>
+                            </HBox>                            
                             <Box height="50%" bkcolor="bg_window_light">
                                 <ColorPreviewLabel name="color_picker_new_color" width="stretch" height="stretch" text_align="hcenter,bottom"/>
                             </Box>

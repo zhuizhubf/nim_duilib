@@ -7,6 +7,7 @@
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Utils/ScreenCapture.h"
+#include "duilib/Utils/Clipboard.h"
 
 namespace ui
 {
@@ -217,6 +218,21 @@ void ColorPicker::OnInitWindow()
     if (pButton != nullptr) {
         pButton->AttachClick([this](const ui::EventArgs& /*args*/) {
             OnPickColorFromScreen();
+            return true;
+            });
+    }
+
+    //复制颜色值按钮
+    ui::Button* pCopyBtn = dynamic_cast<Button*>(FindControl(_T("color_picker_copy2")));
+    if (pCopyBtn != nullptr) {
+        ControlPtrT<Label> pNewColorLabel = m_pNewColor;
+        pCopyBtn->AttachClick([pNewColorLabel](const ui::EventArgs&) {
+            if (pNewColorLabel != nullptr) {
+                DString colorValue = pNewColorLabel->GetText();
+                if (!colorValue.empty()) {
+                    Clipboard::SetClipboardText(colorValue);
+                }
+            }
             return true;
             });
     }

@@ -3,6 +3,7 @@
 
 #include "duilib/Utils/WinImplBase.h"
 #include "duilib/Control/Label.h"
+#include "duilib/Core/ControlPtrT.h"
 
 namespace ui
 {
@@ -85,11 +86,11 @@ private:
 private:
     /** 新选择的颜色控件接口
     */
-    Label* m_pNewColor;
+    ControlPtrT<Label> m_pNewColor;
 
     /** 原来的颜色控件接口
     */
-    Label* m_pOldColor;
+    ControlPtrT<Label> m_pOldColor;
 
     /** 常用颜色控件接口
     */
