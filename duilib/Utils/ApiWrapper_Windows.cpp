@@ -389,6 +389,83 @@ bool IsDragWindowContentsEnabled()
     return bEnabled;
 }
 
+bool IsSystemThemeDarkMode()
+{
+    bool bDarkMode = false; //默认不是Dark模式
+    typedef LONG(WINAPI* PFUNC_RegOpenKeyExW)(
+        HKEY hKey,
+        LPCWSTR lpSubKey,
+        DWORD ulOptions,
+        REGSAM samDesired,
+        PHKEY phkResult
+        );
+
+    typedef LONG(WINAPI* PFUNC_RegQueryValueExW)(
+        HKEY hKey,
+        LPCWSTR lpValueName,
+        LPDWORD lpReserved,
+        LPDWORD lpType,
+        LPBYTE lpData,
+        LPDWORD lpcbData
+        );
+
+    typedef LONG(WINAPI* PFUNC_RegCloseKey)(
+        HKEY hKey
+        );
+
+    HMODULE hModAdvapi32 = LoadLibraryW(L"Advapi32.dll");
+    if (NULL == hModAdvapi32) {
+        return bDarkMode;
+    }
+
+    // 获取注册表API的函数地址
+    PFUNC_RegOpenKeyExW pfnRegOpenKeyExW = (PFUNC_RegOpenKeyExW)GetProcAddress(hModAdvapi32, "RegOpenKeyExW");
+    PFUNC_RegQueryValueExW pfnRegQueryValueExW = (PFUNC_RegQueryValueExW)GetProcAddress(hModAdvapi32, "RegQueryValueExW");
+    PFUNC_RegCloseKey pfnRegCloseKey = (PFUNC_RegCloseKey)GetProcAddress(hModAdvapi32, "RegCloseKey");
+
+    if (NULL == pfnRegOpenKeyExW || NULL == pfnRegQueryValueExW || NULL == pfnRegCloseKey) {
+        FreeLibrary(hModAdvapi32);
+        return bDarkMode;
+    }
+
+    HKEY hKey = NULL;
+    LONG lResult = ERROR_SUCCESS;
+
+    // 打开注册表项
+    lResult = pfnRegOpenKeyExW(
+        HKEY_CURRENT_USER,
+        L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        0,
+        KEY_READ,
+        &hKey
+    );
+
+    if (lResult != ERROR_SUCCESS) {
+        if (hKey) {
+            pfnRegCloseKey(hKey);
+        }
+        FreeLibrary(hModAdvapi32);      // 释放DLL句柄
+        return bDarkMode;
+    }
+
+    DWORD dwType = REG_DWORD;
+    DWORD value = ~0U;
+    DWORD length = sizeof(value);
+
+    //读取注册表键值：1=浅色，0=深色
+    lResult = pfnRegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, &dwType, (LPBYTE)&value, &length);
+    if (lResult == ERROR_SUCCESS) {
+        bDarkMode = (value == 0);
+    }
+
+    // 关闭注册表句柄
+    pfnRegCloseKey(hKey);
+
+    //释放已加载的DLL
+    FreeLibrary(hModAdvapi32);
+    return bDarkMode;
+}
+
 } //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

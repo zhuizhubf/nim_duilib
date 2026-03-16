@@ -102,7 +102,7 @@ public:
     */
     void RemoveThemeChangeCallback(ThemeChangedCallback callback, size_t callbackId = 0);
 
-    /** 获取主题资源信息列表
+    /** 获取主题资源信息列表(获取的主题内容，不包括默认主题)
     * @param [in] themePathList 需要获取的主题路径（比如"color_dark"）列表，如果为空则获取主题根目录下的所有可用主题列表
     * @param [out] themeInfoList 返回所有的主题资源信息列表
     */
@@ -198,6 +198,21 @@ public:
     */
     void Clear();
 
+public:
+    /** 获取与系统相同颜色的主题路径（深色主题或者浅色主题）
+    */
+    FilePath GetSystemColorThemePath();
+
+    /** 设置默认的浅色主题路径, 仅在GetSystemColorThemePath中使用
+     *  如果不使用默认值，该函数需要在GlobalManager::Startup函数前调用，启动时的主题颜色跟随系统功能才能生效
+     */
+    void SetLightColorPath(const DString& lightColorPath);
+
+    /** 设置默认的深色主题路径, 仅在GetSystemColorThemePath中使用
+     *  如果不使用默认值，该函数需要在GlobalManager::Startup函数前调用，启动时的主题颜色跟随系统功能才能生效
+     */
+    void SetDarkColorPath(const DString& darkColorPath);
+
 private:
     /** 检查图片文件路径是否存在
     * @param [in,out] imageFullPath 如果不存在清空，如果存在保留
@@ -290,6 +305,14 @@ private:
     /** 当前选择的图标主题信息
     */
     ThemeInfo m_iconThemeInfo;
+
+    /** 默认的浅色主题路径
+    */
+    DString m_lightColorPath;
+
+    /** 默认的深色主题路径
+    */
+    DString m_darkColorPath;
 
     /** 当前正在切换主题
     */

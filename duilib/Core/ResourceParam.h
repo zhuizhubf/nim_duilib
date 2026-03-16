@@ -24,15 +24,23 @@ enum class ResourceType
 
 /** 默认的资源目录名（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_RESOURCE_DIR     _T("resources/")
+#define DUILIB_RESOURCE_DIR         _T("resources/")
 
 /** 默认的资源压缩包名（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_RESOURCE_ZIP     _T("resources.zip")
+#define DUILIB_RESOURCE_ZIP         _T("resources.zip")
 
 /** 公共资源的子目录名称（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_PUBLIC_RES_DIR   _T("public")
+#define DUILIB_PUBLIC_RES_DIR       _T("public")
+
+/** 浅色主题的子目录路径名称(位于主题根目录)
+*/
+#define DUILIB_LIGHT_COLOR_PATH     _T("color_light")
+
+/** 深色主题的子目录路径名称(位于主题根目录)
+*/
+#define DUILIB_DARK_COLOR_PATH      _T("color_dark")
 
 /** 加载全局资源所需的基本参数（基类，使用时需要使用子类，见下方定义）
 */
@@ -81,7 +89,7 @@ public:
 
     /** 颜色主题资源路径（在themeRootPath中的相对路径）
      *  当需要切换主题风格时（比如浅色主题或者深色主题），可以通过切换颜色主题来实现；
-     *  该值可以为空
+     *  该值可以为空，如果为空则跟随系统
      */
     FilePath colorThemePath = FilePath(_T(""));//比如："color_dark" 为启动时默认设置为深色主题
 

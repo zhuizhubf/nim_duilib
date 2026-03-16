@@ -50,6 +50,9 @@ namespace ui
 
     // 检测「拖动窗口时显示窗口内容」是否开启
     bool IsDragWindowContentsEnabled();
+
+    //获取当前系统主题是否为深色主题：返回true表示深色主题，返回false表示为浅色主题
+    bool IsSystemThemeDarkMode();
 }
 
 #endif //DUILIB_BUILD_FOR_WIN

@@ -6,10 +6,18 @@
 #include "duilib/Utils/StringUtil.h"
 #include <unordered_set>
 
+#if defined DUILIB_BUILD_FOR_WIN && !defined DUILIB_BUILD_FOR_SDL
+    #include "duilib/Utils/ApiWrapper_Windows.h"
+#else
+    #include "SDL3/SDL.h"
+#endif
+
 namespace ui 
 {
 ThemeManager::ThemeManager():
-    m_bSwitchingTheme(false)
+    m_bSwitchingTheme(false),
+    m_lightColorPath(DUILIB_LIGHT_COLOR_PATH),
+    m_darkColorPath(DUILIB_DARK_COLOR_PATH)
 {
     m_defaultThemeInfo.m_bDefaultTheme = true;
     m_defaultThemeInfo.m_bSelectedTheme = false;
@@ -118,7 +126,7 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
     }
     if ((m_defaultThemePath == themePath)) {
         //默认主题
-        destThemeType = ThemeType::kCombined;
+        destThemeType = ThemeType::kUnknown;
     }
     else {
         //颜色主题或者图标主题
@@ -193,7 +201,7 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
         m_defaultThemeInfo.m_bSelectedTheme = false;
         themeInfo = m_iconThemeInfo;
     }
-    else if (destThemeType == ThemeType::kCombined) {
+    else if (m_defaultThemePath == themePath) {
         //默认主题
         ASSERT(m_defaultThemePath == themePath);
         m_defaultThemeInfo.m_bSelectedTheme = true;
@@ -282,6 +290,18 @@ bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
             }
             });
     }
+
+    //移除默认的主题(默认主题，当前不可选择切换)
+    auto iter = themeInfoList.begin();
+    while (iter != themeInfoList.end()) {
+        if (iter->m_themePath != m_defaultThemePath) {
+            ++iter;
+        }
+        else {
+            iter = themeInfoList.erase(iter);
+        }
+    }
+
     return !themeInfoList.empty();
 }
 
@@ -821,6 +841,34 @@ void ThemeManager::RemoveThemeChangeCallback(ThemeChangedCallback callback, size
 void ThemeManager::Clear()
 {
     m_themeChangedCallbacks.clear();
+}
+
+void ThemeManager::SetLightColorPath(const DString& lightColorPath)
+{
+    m_lightColorPath = lightColorPath;
+}
+
+void ThemeManager::SetDarkColorPath(const DString& darkColorPath)
+{
+    m_darkColorPath = darkColorPath;
+}
+
+FilePath ThemeManager::GetSystemColorThemePath()
+{
+    bool bDarkMode = false;
+#if defined DUILIB_BUILD_FOR_WIN && !defined DUILIB_BUILD_FOR_SDL
+    //Windows SDK
+    bDarkMode = IsSystemThemeDarkMode();
+#else
+    //SDL
+    bDarkMode = (SDL_GetSystemTheme() == SDL_SystemTheme::SDL_SYSTEM_THEME_DARK);
+#endif
+    if (bDarkMode) {
+        return FilePath(m_darkColorPath);
+    }
+    else {
+        return FilePath(m_lightColorPath);
+    }
 }
 
 } // namespace ui

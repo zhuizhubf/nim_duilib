@@ -495,9 +495,15 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
             ASSERT(!"Load icon theme failed!");
         }
     }
-    if (!resParam.colorThemePath.IsEmpty()) {
+
+    //选择颜色主题
+    FilePath colorThemePath = resParam.colorThemePath;
+    if (colorThemePath.IsEmpty()) {
+        colorThemePath = Theme().GetSystemColorThemePath();
+    }
+    if (!colorThemePath.IsEmpty()) {
         //加载颜色主题资源
-        if (!Theme().SwitchColorTheme(resParam.colorThemePath)) {
+        if (!Theme().SwitchColorTheme(colorThemePath)) {
             ASSERT(!"Load color theme failed!");
         }
     }
