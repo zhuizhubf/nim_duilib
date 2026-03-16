@@ -433,6 +433,14 @@ private:
     */
     bool LoadLanguageFile(const FilePath& languagePath, const DString& languageFileName);
 
+    /** 根据系统语言，获取默认的语言文件名
+    */
+    DString GetDefaultLanguageFileName() const;
+
+    /** 获取系统语言字符串
+    */
+    DString GetSystemLanguage() const;
+
     /** 从缓存中删除所有图片
      */
     void RemoveAllImages();

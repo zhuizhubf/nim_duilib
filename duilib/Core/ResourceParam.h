@@ -98,9 +98,9 @@ public:
     */
     FilePath languagePath = FilePath(_T("lang"));
 
-    /** 当前使用语言文件的文件名（不含路径）
+    /** 当前使用语言文件的文件名（不含路径），如果为空则根据系统语言自动检测
     */
-    DString languageFileName = _T("zh_CN.txt");
+    DString languageFileName = _T("");
 
 public:
     /** 外部字体文件所在路径（在资源目录中的相对路径）

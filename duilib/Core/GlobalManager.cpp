@@ -1,5 +1,6 @@
 #include "GlobalManager.h"
 #include "duilib/Utils/StringUtil.h"
+#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
 #include "duilib/Core/Window.h"
@@ -29,6 +30,7 @@
 
 #include <filesystem>
 #include <unordered_set>
+#include <cstdlib>
 
 namespace ui 
 {
@@ -470,12 +472,16 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
     SetFontFilePath(FilePathUtil::JoinFilePath(resourcePath, resParam.fontFilePath));
 
     //加载多语言文件(可选)
-    if (!resParam.languagePath.IsEmpty() && !resParam.languageFileName.empty()) {
-        FilePath languagePath = FilePathUtil::JoinFilePath(resourcePath, resParam.languagePath);
-        ReloadLanguage(languagePath, resParam.languageFileName, false);
-    }
-    else if (!resParam.languagePath.IsEmpty()) {
+    if (!resParam.languagePath.IsEmpty()) {
         SetLanguagePath(FilePathUtil::JoinFilePath(resourcePath, resParam.languagePath));
+    }
+    DString languageFileName = resParam.languageFileName;
+    if (languageFileName.empty()) {
+        //根据系统语言，获取默认的语言文件名
+        languageFileName = GetDefaultLanguageFileName();
+    }
+    if (!languageFileName.empty()) {
+        ReloadLanguage(FilePath(), languageFileName, false);
     }
 
     //加载默认主题资源
@@ -747,6 +753,104 @@ bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& la
         }
     }
     return true;
+}
+
+DString GlobalManager::GetDefaultLanguageFileName() const
+{
+    std::vector<DString> langFilePrefixList;
+    DString systemFileName = GetSystemLanguage();
+    if (!systemFileName.empty()) {
+        langFilePrefixList.push_back(systemFileName);
+    }
+    //默认语言文件的扩展名
+    const DString langFileExt = _T(".txt");
+
+    //将默认的语言添加到最后
+    DString defaultLangFileName = _T("en_US");
+#ifdef DUILIB_BUILD_FOR_WIN
+    if (::GetACP() == 936) {
+        //中文系统
+        langFilePrefixList.push_back(_T("zh_CN"));
+        langFilePrefixList.push_back(_T("en_US"));
+        defaultLangFileName = _T("zh_CN");
+    }
+    else {
+        langFilePrefixList.push_back(_T("en_US"));
+        langFilePrefixList.push_back(_T("zh_CN"));
+    }
+#else
+    langFilePrefixList.push_back(_T("en_US"));
+    langFilePrefixList.push_back(_T("zh_CN"));
+#endif
+    defaultLangFileName += langFileExt;
+
+    //开始搜索语言文件名
+    FilePath languagePath = GetLanguagePath();
+    if (languagePath.IsEmpty()) {
+        return defaultLangFileName;
+    }
+
+    for (const DString& langFilePrefix : langFilePrefixList) {
+        const DString fileName = langFilePrefix + langFileExt;
+        FilePath filePath = FilePathUtil::JoinFilePath(languagePath, FilePath(fileName));
+        if (filePath.IsAbsolutePath()) {
+            if (filePath.IsExistsFile()) {
+                defaultLangFileName = fileName;
+                break;
+            }
+        }
+        else if (m_zipManager.IsUseZip()) {
+            if (m_zipManager.IsZipResExist(filePath)) {
+                defaultLangFileName = fileName;
+                break;
+            }
+        }
+    }
+    return defaultLangFileName;
+}
+
+DString GlobalManager::GetSystemLanguage() const
+{
+    DString systemLang;
+#ifdef _WIN32
+    wchar_t locale_buf[LOCALE_NAME_MAX_LENGTH] = { 0 };
+    BOOL success = ::GetUserDefaultLocaleName(locale_buf, LOCALE_NAME_MAX_LENGTH);
+    if (success) {
+        systemLang = StringConvert::WStringToT(locale_buf);
+    }
+    else {
+        // API 调用失败，降级获取备用语言
+        LCID lcid = GetUserDefaultLCID();
+        wchar_t lang_buf[64] = { 0 };
+        if (GetLocaleInfoW(lcid, LOCALE_SNAME, lang_buf, 64)) {
+            systemLang = StringConvert::WStringToT(locale_buf);
+        }
+    }
+
+#elif __APPLE__ || __linux__ || __FreeBSD__
+    // Linux/macOS/FreeBSD：读取环境变量（优先级 LC_ALL > LC_MESSAGES > LANG）
+    const char* lang = getenv("LC_ALL");
+    if (!lang || strlen(lang) == 0) {
+        lang = getenv("LC_MESSAGES");
+    }
+    if (!lang || strlen(lang) == 0) {
+        lang = getenv("LANG");
+    }
+    if (lang && strlen(lang) > 0) {
+        std::string lang_str(lang);
+        // 统一格式：将 zh_CN.UTF-8 → zh_CN，en_US.UTF-8 → en_US
+        size_t dot_pos = lang_str.find('.');
+        if (dot_pos != std::string::npos) {
+            lang_str = lang_str.substr(0, dot_pos);
+        }
+        systemLang = StringConvert::UTF8ToT(lang_str);
+    }
+#endif
+    if (!systemLang.empty()) {
+        StringUtil::Trim(systemLang);
+        StringUtil::ReplaceAll(_T("-"), _T("_"), systemLang);
+    }
+    return systemLang;
 }
 
 FilePath GlobalManager::GetExistsResFullPath(const FilePath& windowResPath, const FilePath& windowXmlPath, const FilePath& resPath)
