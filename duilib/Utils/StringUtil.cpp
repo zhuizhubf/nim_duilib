@@ -1032,6 +1032,16 @@ float StringUtil::StringToFloat(const char* str, char** pEndPtr)
     return ::strtof(str, pEndPtr);
 }
 
+float StringUtil::StringToFloat(const wchar_t* str)
+{
+    return StringToFloat(str, nullptr);
+}
+
+float StringUtil::StringToFloat(const char* str)
+{
+    return StringToFloat(str, nullptr);
+}
+
 int32_t StringUtil::StringCopy(wchar_t* dest, size_t destSize, const wchar_t* src)
 {
     if ((dest == nullptr) || (destSize == 0) || (src == nullptr)) {

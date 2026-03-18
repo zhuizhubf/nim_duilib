@@ -160,7 +160,7 @@
     <TextColor name="bg_property_grid_propterty" value="#FFFFFFFF"/>         <!-- 属性背景：纯白，突出可编辑区域 -->    
     <TextColor name="bg_property_grid_propterty_name" value="#FFFFFFFF"/>    <!-- 属性名列背景：纯白，与值列统一 -->    
     <TextColor name="bg_property_grid_propterty_value" value="#FFFFFFFF"/>   <!-- 属性值列背景：纯白，可编辑区域底色 -->    
-    <TextColor name="bg_property_grid_line" value="#FFA9A9A9"/>              <!-- 网格分割线：中灰，与表头分割线一致 -->
+    <TextColor name="bg_property_grid_line" value="#FFD1D5DB"/>              <!-- 网格分割线：浅灰 -->
     <!-- ===================== 颜色配置（Windows 11 浅色主题）结束 ===================== -->
     
 </Global>

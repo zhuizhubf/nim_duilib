@@ -20,12 +20,12 @@ PropertyGrid::PropertyGrid(Window* pWindow):
     m_pDescriptionAreaSplit(nullptr),
     m_pTreeView(nullptr),
     m_nLeftColumnWidth(0),
-    m_nRowGridLineWidth(0),
-    m_nColumnGridLineWidth(0)
+    m_fRowGridLineWidth(0),
+    m_fColumnGridLineWidth(0)
 {
     SetLeftColumnWidth(130, true);
-    SetRowGridLineWidth(1, true);
-    SetColumnGridLineWidth(1, true);
+    SetRowGridLineWidth(1.0f, true);
+    SetColumnGridLineWidth(1.0f, true);
 
     //设置属性值默认字体
     m_proptertyNormalFontId = _T("system_regular_14");
@@ -42,13 +42,13 @@ void PropertyGrid::SetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if (strName == _T("row_grid_line_width")) {
-        SetRowGridLineWidth(StringUtil::StringToInt32(strValue), true);
+        SetRowGridLineWidth(StringUtil::StringToFloat(strValue.c_str()), true);
     }
     else if (strName == _T("row_grid_line_color")) {
         SetRowGridLineColor(strValue);
     }
     else if (strName == _T("column_grid_line_width")) {
-        SetColumnGridLineWidth(StringUtil::StringToInt32(strValue), true);
+        SetColumnGridLineWidth(StringUtil::StringToFloat(strValue.c_str()), true);
     }
     else if (strName == _T("column_grid_line_color")) {
         SetColumnGridLineColor(strValue);
@@ -90,13 +90,13 @@ void PropertyGrid::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     if (!Dpi().CheckDisplayScaleFactor(nNewDpiScale)) {
         return;
     }
-    int32_t iValue = GetRowGridLineWidth();
-    iValue = Dpi().GetScaleInt(iValue, nOldDpiScale);
-    SetRowGridLineWidth(iValue, false);
+    float fValue = GetRowGridLineWidth();
+    fValue = Dpi().GetScaleFloat(fValue, nOldDpiScale);
+    SetRowGridLineWidth(fValue, false);
 
-    iValue = GetColumnGridLineWidth();
-    iValue = Dpi().GetScaleInt(iValue, nOldDpiScale);
-    SetColumnGridLineWidth(iValue, false);
+    fValue = GetColumnGridLineWidth();
+    fValue = Dpi().GetScaleFloat(fValue, nOldDpiScale);
+    SetColumnGridLineWidth(fValue, false);
 
     if (!IsInited() || (m_pHeaderLeft == nullptr)) {
         m_nLeftColumnWidth = Dpi().GetScaleInt(m_nLeftColumnWidth, nOldDpiScale);
@@ -199,8 +199,8 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
     if ((m_pTreeView == nullptr) || (pRender == nullptr)) {
         return;
     }
-    int32_t nColumnLineWidth = GetColumnGridLineWidth();//纵向边线宽度        
-    int32_t nRowLineWidth = GetRowGridLineWidth();   //横向边线宽度
+    float fColumnLineWidth = GetColumnGridLineWidth();//纵向边线宽度        
+    float fRowLineWidth = GetRowGridLineWidth();   //横向边线宽度
     UiColor columnLineColor;
     UiColor rowLineColor;
     DString color = GetColumnGridLineColor();
@@ -212,7 +212,7 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
         rowLineColor = GetUiColor(color);
     }
 
-    if ((nColumnLineWidth > 0) && !columnLineColor.IsEmpty()) {
+    if ((fColumnLineWidth > 0.01) && !columnLineColor.IsEmpty()) {
         //绘制纵向网格线
         UiRect viewRect = m_pTreeView->GetRect();
         UiPoint viewScrollPos = m_pTreeView->GetScrollOffsetInScrollBox();
@@ -238,10 +238,10 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
             //横坐标位置放在每个子项控件的右侧部            
             UiPointF pt1(xPos, yTop);
             UiPointF pt2(xPos, viewRect.bottom);
-            pRender->DrawLine(pt1, pt2, columnLineColor, (float)nColumnLineWidth);
+            pRender->DrawLine(pt1, pt2, columnLineColor, fColumnLineWidth);
         }
     }
-    if ((nRowLineWidth > 0) && !rowLineColor.IsEmpty()) {
+    if ((fRowLineWidth > 0.01) && !rowLineColor.IsEmpty()) {
         //绘制横向网格线
         UiRect viewRect = m_pTreeView->GetRect();
         UiPoint viewScrollPos = m_pTreeView->GetScrollOffsetInScrollBox();
@@ -299,7 +299,7 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
             }
             UiPointF pt1(leftRect.left, yPos);
             UiPointF pt2(rightRect.right, yPos);
-            pRender->DrawLine(pt1, pt2, rowLineColor, (float)nRowLineWidth);
+            pRender->DrawLine(pt1, pt2, rowLineColor, fRowLineWidth);
         }
     }
 }
@@ -423,23 +423,23 @@ int32_t PropertyGrid::GetDescriptionAreaHeight() const
     return nHeight;
 }
 
-void PropertyGrid::SetRowGridLineWidth(int32_t nLineWidth, bool bNeedDpiScale)
+void PropertyGrid::SetRowGridLineWidth(float fLineWidth, bool bNeedDpiScale)
 {
     if (bNeedDpiScale) {
-        Dpi().ScaleInt(nLineWidth);
+        fLineWidth = Dpi().GetScaleFloat(fLineWidth);
     }
-    if (nLineWidth < 0) {
-        nLineWidth = 0;
+    if (fLineWidth < 0) {
+        fLineWidth = 0;
     }
-    if (m_nRowGridLineWidth != nLineWidth) {
-        m_nRowGridLineWidth = nLineWidth;
+    if (m_fRowGridLineWidth != fLineWidth) {
+        m_fRowGridLineWidth = fLineWidth;
         Invalidate();
     }
 }
 
-int32_t PropertyGrid::GetRowGridLineWidth() const
+float PropertyGrid::GetRowGridLineWidth() const
 {
-    return m_nRowGridLineWidth;
+    return m_fRowGridLineWidth;
 }
 
 void PropertyGrid::SetRowGridLineColor(const DString& color)
@@ -455,23 +455,23 @@ DString PropertyGrid::GetRowGridLineColor() const
     return m_rowGridLineColor.c_str();
 }
 
-void PropertyGrid::SetColumnGridLineWidth(int32_t nLineWidth, bool bNeedDpiScale)
+void PropertyGrid::SetColumnGridLineWidth(float fLineWidth, bool bNeedDpiScale)
 {
     if (bNeedDpiScale) {
-        Dpi().ScaleInt(nLineWidth);
+        fLineWidth = Dpi().GetScaleFloat(fLineWidth);
     }
-    if (nLineWidth < 0) {
-        nLineWidth = 0;
+    if (fLineWidth < 0) {
+        fLineWidth = 0;
     }
-    if (m_nColumnGridLineWidth != nLineWidth) {
-        m_nColumnGridLineWidth = nLineWidth;
+    if (m_fColumnGridLineWidth != fLineWidth) {
+        m_fColumnGridLineWidth = fLineWidth;
         Invalidate();
     }
 }
 
-int32_t PropertyGrid::GetColumnGridLineWidth() const
+float PropertyGrid::GetColumnGridLineWidth() const
 {
-    return m_nColumnGridLineWidth;
+    return m_fColumnGridLineWidth;
 }
 
 void PropertyGrid::SetColumnGridLineColor(const DString& color)

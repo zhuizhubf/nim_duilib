@@ -137,6 +137,8 @@ public:
     */
     static float StringToFloat(const wchar_t* str, wchar_t** pEndPtr);
     static float StringToFloat(const char* str, char** pEndPtr);
+    static float StringToFloat(const wchar_t* str);
+    static float StringToFloat(const char* str);
 
     /** 复制字符串
     */

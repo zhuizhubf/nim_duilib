@@ -731,10 +731,10 @@ ListCtrl 控件的各个视图继承了 `ListBox` 属性，更多可用属性请
 | 属性名称 | 默认值 | 参数类型 | 用途 |
 | :--- | :--- | :--- | :--- |
 | property_grid_xml | | string | 配置文件XML，如果为空，默认为："public/property_grid/property_grid.xml" |
-| row_grid_line_width | | int | 横向网格线的宽度|
-| row_grid_line_color | | int | 横向网格线的颜色|
-| column_grid_line_width | | int | 纵向网格线的宽度|
-| column_grid_line_color | | int | 纵向网格线的颜色|
+| row_grid_line_width | 1.0 | float | 横向网格线的宽度|
+| row_grid_line_color | | string | 横向网格线的颜色|
+| column_grid_line_width | 1.0| float | 纵向网格线的宽度|
+| column_grid_line_color | | string | 纵向网格线的颜色|
 | header_class | | string | 表头的Class属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
 | group_class | | string | 分组的ClassClass属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
 | propterty_class | | string | 属性的ClassClass属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
