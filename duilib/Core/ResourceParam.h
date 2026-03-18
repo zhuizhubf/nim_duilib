@@ -90,6 +90,7 @@ public:
     /** 颜色主题资源路径（在themeRootPath中的相对路径）
      *  当需要切换主题风格时（比如浅色主题或者深色主题），可以通过切换颜色主题来实现；
      *  该值可以为空，如果为空则跟随系统
+     *  取值示例："color_dark" (启动时默认设置为深色主题)，或者 "color_light" (启动时默认设置为浅色主题)
      */
     FilePath colorThemePath = FilePath(_T(""));//比如："color_dark" 为启动时默认设置为深色主题
 
@@ -101,13 +102,14 @@ public:
 
 public:
     /** 语言文件所在路径，可以是相对路径或者是绝对路径（多语言版时，所有的语言文件都放在这个目录中）
-    *   如果是绝对路径，则在这个绝对路径中查找语言文件
-    *   如果是相对路径，则根据resType和resourcePath决定的资源路径下，按相对路径查找资源文件
-    */
+     *   如果是绝对路径，则在这个绝对路径中查找语言文件
+     *   如果是相对路径，则根据resType和resourcePath决定的资源路径下，按相对路径查找资源文件
+     */
     FilePath languagePath = FilePath(_T("lang"));
 
     /** 当前使用语言文件的文件名（不含路径），如果为空则根据系统语言自动检测
-    */
+     *   可以取值示例："zh_CN.txt" (表示中文)，或者 "en_US.txt" (表示英文)
+     */
     DString languageFileName = _T("");
 
 public:

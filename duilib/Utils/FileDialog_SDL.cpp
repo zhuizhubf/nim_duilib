@@ -1,5 +1,6 @@
 #include "FileDialog.h"
 #include "duilib/Core/Window.h"
+#include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/StringUtil.h"
 
@@ -191,7 +192,11 @@ bool FileDialog::BrowseForFile(Window* pWindow,
     if (!fileTypes.empty()) {
         FileTypeA fileTypeA;
         for (const FileType& fileType : fileTypes) {
-            fileTypeA.szNameA = StringConvert::TToUTF8(fileType.szName);
+            DString name = fileType.szName;
+            if (!fileType.szNameId.empty()) {
+                name = GlobalManager::GetTextById(fileType.szNameId);
+            }
+            fileTypeA.szNameA = StringConvert::TToUTF8(name);
             fileTypeA.szExtA = StringConvert::TToUTF8(fileType.szExt);
             //将"*.txt"格式的转换为"txt"格式
             StringUtil::ReplaceAll("*.", "", fileTypeA.szExtA);
@@ -275,7 +280,11 @@ bool FileDialog::BrowseForFiles(Window* pWindow,
     if (!fileTypes.empty()) {
         FileTypeA fileTypeA;
         for (const FileType& fileType : fileTypes) {
-            fileTypeA.szNameA = StringConvert::TToUTF8(fileType.szName);
+            DString name = fileType.szName;
+            if (!fileType.szNameId.empty()) {
+                name = GlobalManager::GetTextById(fileType.szNameId);
+            }
+            fileTypeA.szNameA = StringConvert::TToUTF8(name);
             fileTypeA.szExtA = StringConvert::TToUTF8(fileType.szExt);
             //将"*.txt"格式的转换为"txt"格式
             StringUtil::ReplaceAll("*.", "", fileTypeA.szExtA);

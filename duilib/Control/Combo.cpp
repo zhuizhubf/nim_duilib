@@ -694,7 +694,10 @@ bool Combo::SetCurSel(size_t iIndex)
     OnSelectedItemChanged();
     if (m_iCurSel != iOldSel) {
         Invalidate();
-    }
+
+        //触发选择变化事件
+        SendEvent(kEventSelect, m_iCurSel, iOldSel);
+    }  
     return bRet;
 }
 

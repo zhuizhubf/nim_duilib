@@ -112,7 +112,7 @@ public:
      */
     size_t GetCurSel() const;
 
-    /** 选择一个子项, 不触发选择事件
+    /** 选择一个子项, 触发选择变化事件
      * @param[in] iIndex 要选择的子项索引
      * @return 返回 true 表示成功，否则为 false
      */

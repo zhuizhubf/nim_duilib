@@ -105,7 +105,11 @@ public:
     */
     void GetFontNameList(std::vector<DString>& fontNameList) const;
 
-    /** 获取字体大小列表
+    /** 设置默认的字体大小列表（可以覆盖内置的默认列表），字体大小值未进行DPI缩放
+    */
+    void SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList);
+
+    /** 获取默认的字体大小列表
     * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
     * @param [out] fontSizeList 字体大小信息
     */
@@ -132,6 +136,10 @@ private:
     /** 默认字体列表
     */
     std::vector<DString> m_defaultFontFamilyNames;
+
+    /** 默认的字体大小列表
+    */
+    std::vector<FontSizeInfo> m_fontSizeList;
 
     /** 默认字体列表是否已经完成初始化
     */

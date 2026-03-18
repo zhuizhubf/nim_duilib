@@ -357,51 +357,54 @@ void FontManager::GetFontNameList(std::vector<DString>& fontNameList) const
     }
 }
 
+void FontManager::SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList)
+{
+    m_fontSizeList = fontSizeList;
+}
+
 void FontManager::GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const
 {
-    fontSizeList.clear();
-    fontSizeList.push_back({ _T("8"),  8.0f, 0 });
-    fontSizeList.push_back({ _T("9"),  9.0f, 0 });
-    fontSizeList.push_back({ _T("10"), 10.0f, 0 });
-    fontSizeList.push_back({ _T("11"), 11.0f, 0 });
-    fontSizeList.push_back({ _T("12"), 12.0f, 0 });
-    fontSizeList.push_back({ _T("14"), 14.0f, 0 });
-    fontSizeList.push_back({ _T("16"), 16.0f, 0 });
-    fontSizeList.push_back({ _T("18"), 18.0f, 0 });
-    fontSizeList.push_back({ _T("20"), 20.0f, 0 });
-    fontSizeList.push_back({ _T("22"), 22.0f, 0 });
-    fontSizeList.push_back({ _T("24"), 24.0f, 0 });
-    fontSizeList.push_back({ _T("26"), 26.0f, 0 });
-    fontSizeList.push_back({ _T("28"), 28.0f, 0 });
-    fontSizeList.push_back({ _T("32"), 32.0f, 0 });
-    fontSizeList.push_back({ _T("36"), 36.0f, 0 });
-    fontSizeList.push_back({ _T("48"), 48.0f, 0 });
-    fontSizeList.push_back({ _T("72"), 72.0f, 0 });
+    fontSizeList = m_fontSizeList; //默认以外部设置的字体大小列表为最高优先级
+    if (fontSizeList.empty()) {
+        fontSizeList.push_back({ _T("8"),  8.0f, 0 });
+        fontSizeList.push_back({ _T("9"),  9.0f, 0 });
+        fontSizeList.push_back({ _T("10"), 10.0f, 0 });
+        fontSizeList.push_back({ _T("11"), 11.0f, 0 });
+        fontSizeList.push_back({ _T("12"), 12.0f, 0 });
+        fontSizeList.push_back({ _T("14"), 14.0f, 0 });
+        fontSizeList.push_back({ _T("16"), 16.0f, 0 });
+        fontSizeList.push_back({ _T("18"), 18.0f, 0 });
+        fontSizeList.push_back({ _T("20"), 20.0f, 0 });
+        fontSizeList.push_back({ _T("22"), 22.0f, 0 });
+        fontSizeList.push_back({ _T("24"), 24.0f, 0 });
+        fontSizeList.push_back({ _T("26"), 26.0f, 0 });
+        fontSizeList.push_back({ _T("28"), 28.0f, 0 });
+        fontSizeList.push_back({ _T("32"), 32.0f, 0 });
+        fontSizeList.push_back({ _T("36"), 36.0f, 0 });
+        fontSizeList.push_back({ _T("48"), 48.0f, 0 });
+        fontSizeList.push_back({ _T("72"), 72.0f, 0 });
 
-#ifdef DUILIB_BUILD_FOR_WIN
-    if (::GetACP() == 936) {
-        //仅中文环境使用（不支持多语言版）
-        fontSizeList.push_back({ _T("1英寸"), 95.6f, 0 });
-        fontSizeList.push_back({ _T("大特号"), 83.7f, 0 });
-        fontSizeList.push_back({ _T("特号"), 71.7f, 0 });
-        fontSizeList.push_back({ _T("初号"), 56.0f, 0 });
-        fontSizeList.push_back({ _T("小初"), 48.0f, 0 });
-        fontSizeList.push_back({ _T("一号"), 34.7f, 0 });
-        fontSizeList.push_back({ _T("小一"), 32.0f, 0 });
-        fontSizeList.push_back({ _T("二号"), 29.3f, 0 });
-        fontSizeList.push_back({ _T("小二"), 24.0f, 0 });
-        fontSizeList.push_back({ _T("三号"), 21.3f, 0 });
-        fontSizeList.push_back({ _T("小三"), 20.0f, 0 });
-        fontSizeList.push_back({ _T("四号"), 18.7f, 0 });
-        fontSizeList.push_back({ _T("小四"), 16.0f, 0 });
-        fontSizeList.push_back({ _T("五号"), 14.0f, 0 });
-        fontSizeList.push_back({ _T("小五"), 12.0f, 0 });
-        fontSizeList.push_back({ _T("六号"), 10.0f, 0 });
-        fontSizeList.push_back({ _T("小六"), 8.7f, 0 });
-        fontSizeList.push_back({ _T("七号"), 7.3f, 0 });
-        fontSizeList.push_back({ _T("八号"), 6.7f, 0 });
+        //获取中文的字体大小列表
+        //1英寸,95.6;大特号,83.7;特号,71.7;初号,56.0;小初,48.0;一号,34.7;小一,32.0;二号,29.3;小二,24.0;三号,21.3;小三,20.0;四号,18.7;小四,16.0;五号,14.0;小五,12.0;六号,10.0;小六,8.7;七号,7.3;八号,6.7
+        DString fontSizeListString = GlobalManager::GetTextById(_T("STRID_PUBLIC_FONT_SIZE_LIST"));
+        if (!fontSizeListString.empty()) {
+            std::list<DString> fontSizePairList = StringUtil::Split(fontSizeListString, _T(";"));
+            for (const DString& fontSizePair : fontSizePairList) {
+                std::list<DString> fontSizeName = StringUtil::Split(fontSizePair, _T(","));
+                if (fontSizeName.size() != 2) {
+                    continue;
+                }
+                DString name = *fontSizeName.begin();
+                DString value = *fontSizeName.rbegin();
+                StringUtil::Trim(name);
+                StringUtil::Trim(value);
+                if (!name.empty() && !value.empty()) {
+                    float fValue = StringUtil::StringToFloat(value.c_str(), nullptr);
+                    fontSizeList.push_back({ name, fValue, 0 });
+                }
+            }
+        }
     }
-#endif
 
     //更新DPI自适应值
     for (FontSizeInfo& fontSize : fontSizeList) {
