@@ -388,27 +388,30 @@ public:
     * @param [in] name 变量名称
     * @param [in] value 变量对应的取值
     */
-    void AddDefine(const DString& name, const DString& value);
+    void AddVar(const DString& name, const DString& value);
 
     /** 删除变量
     * @param [in] name 变量名称
     */
-    void RemoveDefine(const DString& name);
+    void RemoveVar(const DString& name);
 
     /** 获取变量定义的值
     * @param [in] name 变量名称
     * @return 返回变量的取值，如果不包含变量则返回空
     */
-    DString GetDefineValue(const DString& name) const;
+    DString GetVarValue(const DString& name) const;
 
     /** 清除所有变量定义
     */
-    void ClearDefine();
+    void ClearVars();
 
     /** 函数功能：如果varValue中有Define定义的变量，替换为对应的值
-    * @param [in,out] varValue 需要展开变量的字符串
-    */
-    void ExpandDefinePlaceholders(DString& varValue) const;
+     *   用法举例：假设在globle.xml中增加一行变量定义：<Define name="SIZE_ICON_SMALL" value="16"/>
+     *   属性字符串中可以这样使用这个变量：width='${SIZE_ICON_SMALL}'
+     *   使用该函数展开后，变量的取值变成了：width='16'
+     * @param [in,out] varValue 需要展开变量的字符串
+     */
+    void ExpandVarStrings(DString& varValue) const;
 
 public:
     /** 清除主题相关的缓存（切换主题后，立即生效）

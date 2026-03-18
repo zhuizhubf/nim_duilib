@@ -466,7 +466,7 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
     RemoveAllImages();
     RemoveAllClasss();
     ClearAlias();
-    ClearDefine();
+    ClearVars();
 
     //保存字体文件所在路径
     SetFontFilePath(FilePathUtil::JoinFilePath(resourcePath, resParam.fontFilePath));
@@ -1309,21 +1309,21 @@ void GlobalManager::ClearAlias()
     m_aliasMap.clear();
 }
 
-void GlobalManager::AddDefine(const DString& name, const DString& value)
+void GlobalManager::AddVar(const DString& name, const DString& value)
 {
     if (!name.empty() && !value.empty()) {
         m_defineMap[name] = value;
     }
 }
 
-void GlobalManager::RemoveDefine(const DString& name)
+void GlobalManager::RemoveVar(const DString& name)
 {
     if (!m_defineMap.empty() && !name.empty()) {
         m_defineMap.erase(name);
     }
 }
 
-DString GlobalManager::GetDefineValue(const DString& name) const
+DString GlobalManager::GetVarValue(const DString& name) const
 {
     if (!m_defineMap.empty()) {
         auto iter = m_defineMap.find(name);
@@ -1334,12 +1334,12 @@ DString GlobalManager::GetDefineValue(const DString& name) const
     return DString();
 }
 
-void GlobalManager::ClearDefine()
+void GlobalManager::ClearVars()
 {
     m_defineMap.clear();
 }
 
-void GlobalManager::ExpandDefinePlaceholders(DString& varValue) const
+void GlobalManager::ExpandVarStrings(DString& varValue) const
 {
     if (m_defineMap.empty() || varValue.empty()) {
         return;
