@@ -31,7 +31,7 @@ void TabBox::SetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if ((strName == _T("fade_switch")) || (strName == _T("fadeswitch"))) {
-        if (strValue == _T("true")) {
+        if (StringUtil::IsValueTrue(strValue)) {
             SetFadeSwitch(true);
         }
         else if (strValue == _T("false")) {

@@ -47,10 +47,10 @@ DString ListBox::GetType() const { return _T("ListBox"); }
 void ListBox::SetAttribute(const DString& strName, const DString& strValue)
 {
     if (strName == _T("multi_select")) {
-        SetMultiSelect(strValue == _T("true"));
+        SetMultiSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("paint_selected_colors")) {
-        if (strValue == _T("true")) {
+        if (StringUtil::IsValueTrue(strValue)) {
             m_uPaintSelectedColors = PAINT_SELECTED_COLORS_YES;
         }
         else {
@@ -58,13 +58,13 @@ void ListBox::SetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if ((strName == _T("scroll_select")) || (strName == _T("scrollselect"))) {
-        SetScrollSelect(strValue == _T("true"));
+        SetScrollSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("select_next_when_active_removed")) {
-        SetSelectNextWhenActiveRemoved(strValue == _T("true"));
+        SetSelectNextWhenActiveRemoved(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("frame_selection")) {
-        SetEnableFrameSelection(strValue == _T("true"));
+        SetEnableFrameSelection(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("frame_selection_color")) {
         SetFrameSelectionColor(strValue);
@@ -79,10 +79,10 @@ void ListBox::SetAttribute(const DString& strName, const DString& strValue)
         SetFrameSelectionBorderColor(strValue);
     }
     else if (strName == _T("select_none_when_click_blank")) {
-        SetSelectNoneWhenClickBlank(strValue == _T("true"));
+        SetSelectNoneWhenClickBlank(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("select_like_list_ctrl")) {
-        SetSelectLikeListCtrl(strValue == _T("true"));
+        SetSelectLikeListCtrl(StringUtil::IsValueTrue(strValue));
     }
     else {
         ScrollBox::SetAttribute(strName, strValue);

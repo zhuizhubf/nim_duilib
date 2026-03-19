@@ -43,7 +43,7 @@ void Box::SetAttribute(const DString& strName, const DString& strValue)
         return;
     }
     else if ((strName == _T("mouse_child")) || (strName == _T("mousechild"))) {
-        SetMouseChildEnabled(strValue == _T("true"));
+        SetMouseChildEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("drag_out_id")) {
         uint8_t nValue = ui::TruncateToUInt8(StringUtil::StringToInt32(strValue));

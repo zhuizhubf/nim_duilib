@@ -307,7 +307,7 @@ void CheckCombo::SetAttribute(const DString& strName, const DString& strValue)
         SetDropBoxSize(szDropBoxSize, true);
     }
     else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
-        SetPopupTop(strValue == _T("true"));
+        SetPopupTop(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("height")) {
         BaseClass::SetAttribute(strName, strValue);

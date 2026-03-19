@@ -20,7 +20,7 @@ DString Line::GetType() const { return DUI_CTR_LINE; }
 void Line::SetAttribute(const DString& strName, const DString& strValue)
 {
     if (strName == _T("vertical")) {
-        SetLineVertical(strValue == _T("true"));
+        SetLineVertical(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("line_color")) {
         SetLineColor(strValue);

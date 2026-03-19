@@ -393,7 +393,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(WindowCreateAttributes& createAt
             }
         }
         else if (strName == _T("use_system_caption")) {
-            createAttributes.m_bUseSystemCaption = (strValue == _T("true"));
+            createAttributes.m_bUseSystemCaption = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bUseSystemCaptionDefined = true;
         }
         else if ((strName == _T("size_box")) || (strName == _T("sizebox"))) {
@@ -405,11 +405,11 @@ bool WindowBuilder::ParseWindowCreateAttributes(WindowCreateAttributes& createAt
             createAttributes.m_bCaptionDefined = true;
         }
         else if ((strName == _T("shadow_attached")) || (strName == _T("shadowattached"))) {
-            createAttributes.m_bShadowAttached = (strValue == _T("true"));
+            createAttributes.m_bShadowAttached = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bShadowAttachedDefined = true;
         }
         else if ((strName == _T("layered_window")) || (strName == _T("layeredwindow"))) {
-            createAttributes.m_bIsLayeredWindow = (strValue == _T("true"));
+            createAttributes.m_bIsLayeredWindow = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bIsLayeredWindowDefined = true;
         }
         else if (strName == _T("alpha")) {
@@ -436,7 +436,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(WindowCreateAttributes& createAt
         }
         else if (strName == _T("size_contain_shadow")) {
             //窗口配置的size是否包含阴影
-            bSizeContainShadow = (strValue == _T("true"));
+            bSizeContainShadow = (StringUtil::IsValueTrue(strValue));
         }
         else if ((strName == _T("min_size")) || (strName == _T("mininfo"))) {
             AttributeUtil::ParseSizeValue(strValue.c_str(), szMinSize);
@@ -450,7 +450,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(WindowCreateAttributes& createAt
         }
         else if ((strName == _T("shadow_attached")) || (strName == _T("shadowattached"))) {
             //设置是否支持窗口阴影（阴影实现有两种：分层窗口和普通窗口）
-            bShadowAttached = (strValue == _T("true"));
+            bShadowAttached = (StringUtil::IsValueTrue(strValue));
             bHasShadowAttached = true;
         }
         else if (strName == _T("shadow_type")) {
@@ -592,7 +592,7 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         }
         else if (strName == _T("use_system_caption")) {
             knownNames.insert(strName);
-            pWindow->SetUseSystemCaption(strValue == _T("true"));
+            pWindow->SetUseSystemCaption(StringUtil::IsValueTrue(strValue));
         }
     }
     //窗口配置的size是否包含阴影
@@ -621,11 +621,11 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         }
         else if (strName == _T("snap_layout_menu")) {
             knownNames.insert(strName);
-            pWindow->SetEnableSnapLayoutMenu(strValue == _T("true"));
+            pWindow->SetEnableSnapLayoutMenu(StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("sys_menu")) {
             knownNames.insert(strName);
-            pWindow->SetEnableSysMenu(strValue == _T("true"));
+            pWindow->SetEnableSysMenu(StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("sys_menu_rect")) {
             knownNames.insert(strName);
@@ -663,12 +663,12 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         else if (strName == _T("size_contain_shadow")) {
             knownNames.insert(strName);
             //窗口配置的size是否包含阴影
-            bSizeContainShadow = (strValue == _T("true"));
+            bSizeContainShadow = (StringUtil::IsValueTrue(strValue));
         }
         else if ((strName == _T("shadow_attached")) || (strName == _T("shadowattached"))) {
             knownNames.insert(strName);
             //设置是否支持窗口阴影（阴影实现有两种：分层窗口和普通窗口）
-            bShadowAttached = (strValue == _T("true"));
+            bShadowAttached = (StringUtil::IsValueTrue(strValue));
             bHasShadowAttached = true;            
         }
         else if (strName == _T("shadow_type")) {
@@ -712,13 +712,13 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         else if (strName == _T("shadow_snap")) {
             knownNames.insert(strName);
             //设置阴影是否支持窗口贴边操作
-            pWindow->SetEnableShadowSnap(strValue == _T("true"));
+            pWindow->SetEnableShadowSnap(StringUtil::IsValueTrue(strValue));
         }
         else if ((strName == _T("layered_window")) || (strName == _T("layeredwindow"))) {
             knownNames.insert(strName);
             //设置是否设置分层窗口属性（分层窗口还是普通窗口）
             if (!pWindow->IsUseSystemCaption()) {
-                pWindow->SetLayeredWindow(strValue == _T("true"), false);
+                pWindow->SetLayeredWindow(StringUtil::IsValueTrue(strValue), false);
             }
         }
         else if (strName == _T("alpha")) {
@@ -732,7 +732,7 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         }
         else if (strName == _T("drag_drop")) {
             knownNames.insert(strName);
-            pWindow->SetEnableDragDrop(strValue == _T("true"));
+            pWindow->SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
         }
     }
 
@@ -1033,19 +1033,19 @@ void WindowBuilder::ParseFontXmlNode(const pugi::xml_node& xmlNode)
             size = StringUtil::StringToInt32(strValue);
         }
         else if (strName == _T("bold")) {
-            bold = (strValue == _T("true"));
+            bold = (StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("underline")) {
-            underline = (strValue == _T("true"));
+            underline = (StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("strikeout")) {
-            strikeout = (strValue == _T("true"));
+            strikeout = (StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("italic")) {
-            italic = (strValue == _T("true"));
+            italic = (StringUtil::IsValueTrue(strValue));
         }
         else if (strName == _T("default")) {
-            isDefault = (strValue == _T("true"));
+            isDefault = (StringUtil::IsValueTrue(strValue));
         }
     }
     if (!strFontName.empty() && !strFontId.empty()) {

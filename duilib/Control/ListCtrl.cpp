@@ -122,7 +122,7 @@ void ListCtrl::SetAttribute(const DString& strName, const DString& strValue)
         SetHeaderSplitControlClass(strValue);
     }
     else if (strName == _T("enable_header_drag_order")) {
-        SetEnableHeaderDragOrder(strValue == _T("true"));
+        SetEnableHeaderDragOrder(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("check_box_class")) {
         SetCheckBoxClass(strValue);
@@ -157,22 +157,22 @@ void ListCtrl::SetAttribute(const DString& strName, const DString& strValue)
         SetDataItemHeight(StringUtil::StringToInt32(strValue), true);
     }
     else if (strName == _T("show_header")) {
-        SetHeaderVisible(strValue == _T("true"));
+        SetHeaderVisible(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("multi_select")) {
-        SetMultiSelect(strValue == _T("true"));
+        SetMultiSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("enable_column_width_auto")) {
-        SetEnableColumnWidthAuto(strValue == _T("true"));
+        SetEnableColumnWidthAuto(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("auto_check_select")) {
-        SetAutoCheckSelect(strValue == _T("true"));
+        SetAutoCheckSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("show_header_checkbox")) {
-        SetHeaderShowCheckBox(strValue == _T("true"));
+        SetHeaderShowCheckBox(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("show_data_item_checkbox")) {
-        SetDataItemShowCheckBox(strValue == _T("true"));
+        SetDataItemShowCheckBox(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("type")) {
         if (strValue == _T("report")) {
@@ -210,7 +210,7 @@ void ListCtrl::SetAttribute(const DString& strName, const DString& strValue)
         SetListViewItemLabelClass(strValue);
     }
     else if (strName == _T("enable_item_edit")) {
-        SetEnableItemEdit(strValue == _T("true"));
+        SetEnableItemEdit(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("list_ctrl_richedit_class")) {
         SetRichEditClass(strValue);

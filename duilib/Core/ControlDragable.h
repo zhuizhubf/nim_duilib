@@ -301,14 +301,14 @@ void ControlDragableT<T>::SetAttribute(const DString& strName, const DString& st
 {
     if (strName == _T("drag_order")) {
         //是否支持拖动调整顺序（在同一个容器内）
-        SetEnableDragOrder(strValue == _T("true"));
+        SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("drag_alpha")) {
         SetDragAlpha((uint8_t)StringUtil::StringToInt32(strValue));
     }
     else if (strName == _T("drag_out")) {
         //是否支持拖出操作（在相同窗口的不同容器内）
-        SetEnableDragOut(strValue == _T("true"));
+        SetEnableDragOut(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);

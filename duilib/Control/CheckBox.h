@@ -403,24 +403,24 @@ template<typename InheritType>
 void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue)
 {
     if (strName == _T("selected")) {
-        Selected(strValue == _T("true"), true);
+        Selected(StringUtil::IsValueTrue(strValue), true);
     }
     else if ((strName == _T("switch_select")) || (strName == _T("switchselect"))) {
         Selected(!IsSelected());
     }
     else if (strName == _T("support_check_Mode")) {
-        SetSupportCheckMode(strValue == _T("true"));
+        SetSupportCheckMode(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("auto_check_select")) {
         //设置当选择状态变化时，是否自动同步到勾选状态，保持勾选状态与选择状态一致(Select->Check)
-        SetAutoCheckSelect(strValue == _T("true"));
+        SetAutoCheckSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("auto_select_check")) {
         //设置当勾选状态变化时，是否自动同步到选择状态，保持选择状态与勾选状态一致(Check -> Select)
-        SetAutoSelectCheck(strValue == _T("true"));
+        SetAutoSelectCheck(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("normal_first")) || (strName == _T("normalfirst"))) {
-        SetPaintNormalFirst(strValue == _T("true"));
+        SetPaintNormalFirst(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("selected_normal_image")) || (strName == _T("selectednormalimage"))) {
         SetSelectedStateImage(kControlStateNormal, strValue);

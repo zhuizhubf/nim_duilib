@@ -121,16 +121,16 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
         SetMultiLine(strValue != _T("true"));
     }
     else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
-        SetMultiLine(strValue == _T("true"));
+        SetMultiLine(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("readonly")) {
-        SetReadOnly(strValue == _T("true"));
+        SetReadOnly(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("password")) {
-        SetPasswordMode(strValue == _T("true"));
+        SetPasswordMode(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("show_password")) {
-        SetShowPassword(strValue == _T("true"));
+        SetShowPassword(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("password_char")) {
         if (!strValue.empty()) {
@@ -138,10 +138,10 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if (strName == _T("flash_password_char")) {
-        SetFlashPasswordChar(strValue == _T("true"));
+        SetFlashPasswordChar(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("number_only")) || (strName == _T("number"))) {
-        SetNumberOnly(strValue == _T("true"));
+        SetNumberOnly(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("max_number")) {
         SetMaxNumber(StringUtil::StringToInt32(strValue));
@@ -192,7 +192,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if ((strName == _T("prompt_mode")) || (strName == _T("promptmode"))) {
         //提示模式
-        SetPromptMode(strValue == _T("true"));
+        SetPromptMode(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("prompt_color")) || (strName == _T("promptcolor"))) {
         //提示文字的颜色
@@ -219,13 +219,13 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
         SetTextId(strValue);
     }
     else if ((strName == _T("want_tab")) || (strName == _T("wanttab"))) {
-        SetWantTab(strValue == _T("true"));
+        SetWantTab(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("want_return")) || (strName == _T("want_return_msg")) || (strName == _T("wantreturnmsg"))) {
-        SetWantReturn(strValue == _T("true"));
+        SetWantReturn(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("want_ctrl_return")) || (strName == _T("return_msg_want_ctrl")) || (strName == _T("returnmsgwantctrl"))) {
-        SetWantCtrlReturn(strValue == _T("true"));
+        SetWantCtrlReturn(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("limit_text")) || (strName == _T("max_char")) || (strName == _T("maxchar"))) {
         //限制最多字符数
@@ -237,7 +237,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("word_wrap")) {
         //是否自动换行
-        SetWordWrap(strValue == _T("true"));
+        SetWordWrap(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("no_caret_readonly")) {
         //只读模式，不显示光标
@@ -245,7 +245,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("default_context_menu")) {
         //是否使用默认的右键菜单
-        SetEnableDefaultContextMenu(strValue == _T("true"));
+        SetEnableDefaultContextMenu(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("spin_class")) {
         SetSpinClass(strValue);
@@ -258,11 +258,11 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("wheel_zoom")) {
         //设置是否允许Ctrl + 滚轮来调整缩放比例
-        SetEnableWheelZoom(strValue == _T("true"));
+        SetEnableWheelZoom(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("hide_selection")) {
         //当控件处于非激活状态时，是否隐藏选择内容
-        SetHideSelection(strValue == _T("true"));
+        SetHideSelection(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("focus_bottom_border_size")) {
         //焦点状态时，底部边框的大小
@@ -324,7 +324,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("select_all_on_focus")) {
         //获取焦点的时候，是否全选
-        SetSelAllOnFocus(strValue == _T("true"));
+        SetSelAllOnFocus(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("selection_bkcolor")) {
         //选择文本的背景色（焦点状态），如果设置为空，则不显示

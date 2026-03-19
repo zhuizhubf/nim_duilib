@@ -144,7 +144,7 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         SetPadding(rcPadding, true);
     }
     else if (strName == _T("control_padding")) {
-        SetEnableControlPadding(strValue == _T("true"));
+        SetEnableControlPadding(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("bkcolor")) {
         //背景色
@@ -202,7 +202,7 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("borders_on_top")) {
         //边框是否在顶层（即先绘制子控件，后绘制边框，避免边框被子控件覆盖）
-        SetBordersOnTop(strValue == _T("true"));
+        SetBordersOnTop(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("border_round")) || (strName == _T("borderround"))) {
         //圆角大小
@@ -456,25 +456,25 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         SetUserDataID(StringUtil::StringToInt32(strValue));
     }
     else if (strName == _T("enabled")) {
-        SetEnabled(strValue == _T("true"));
+        SetEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("mouse_enabled")) || (strName == _T("mouse"))) {
-        SetMouseEnabled(strValue == _T("true"));
+        SetMouseEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("keyboard_enabled")) || (strName == _T("keyboard"))) {
-        SetKeyboardEnabled(strValue == _T("true"));
+        SetKeyboardEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("visible")) {
-        SetVisible(strValue == _T("true"));
+        SetVisible(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("fade_visible")) || (strName == _T("fadevisible"))) {
-        SetFadeVisible(strValue == _T("true"));
+        SetFadeVisible(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("float")) {
-        SetFloat(strValue == _T("true"));
+        SetFloat(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("keep_float_pos")) {
-        SetKeepFloatPos(strValue == _T("true"));
+        SetKeepFloatPos(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("cache")) {
         //忽略该选项：对应功能已经删除
@@ -520,7 +520,7 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         GetAnimationManager().SetFadeAlpha(bFadeVisible, nEndAlpha);
     }
     else if ((strName == _T("fade_hot")) || (strName == _T("fadehot"))) {
-        SetFadeHot(strValue == _T("true"));
+        SetFadeHot(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("fade_hot_frame_interval_ms")) {
         SetFadeHotFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
@@ -532,25 +532,25 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         SetFadeHotEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
     }
     else if ((strName == _T("fade_width")) || (strName == _T("fadewidth"))) {
-        GetAnimationManager().SetFadeWidth(strValue == _T("true"));
+        GetAnimationManager().SetFadeWidth(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("fade_height")) || (strName == _T("fadeheight"))) {
-        GetAnimationManager().SetFadeHeight(strValue == _T("true"));
+        GetAnimationManager().SetFadeHeight(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("fade_size")) {
-        GetAnimationManager().SetFadeSize(strValue == _T("true"));
+        GetAnimationManager().SetFadeSize(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("fade_in_out_x_from_left")) || (strName == _T("fadeinoutxfromleft"))) {
-        GetAnimationManager().SetFadeInOutX(strValue == _T("true"), false);
+        GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), false);
     }
     else if ((strName == _T("fade_in_out_x_from_right")) || (strName == _T("fadeinoutxfromright"))) {
-        GetAnimationManager().SetFadeInOutX(strValue == _T("true"), true);
+        GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), true);
     }
     else if ((strName == _T("fade_in_out_y_from_top")) || (strName == _T("fadeinoutyfromtop"))) {
-        GetAnimationManager().SetFadeInOutY(strValue == _T("true"), false);
+        GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), false);
     }
     else if ((strName == _T("fade_in_out_y_from_bottom")) || (strName == _T("fadeinoutyfrombottom"))) {
-        GetAnimationManager().SetFadeInOutY(strValue == _T("true"), true);
+        GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), true);
     }
     else if (strName == _T("fade_frame_interval_ms")) {
         GetAnimationManager().SetFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
@@ -562,13 +562,13 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
         GetAnimationManager().SetEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
     }
     else if ((strName == _T("tab_stop")) || (strName == _T("tabstop"))) {
-        SetTabStop(strValue == _T("true"));
+        SetTabStop(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("loading")) {
         SetLoadingAttribute(strValue);
     }
     else if (strName == _T("show_focus_rect")) {
-        SetShowFocusRect(strValue == _T("true"));
+        SetShowFocusRect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("focus_rect_color")) {
         SetFocusRectColor(strValue);
@@ -588,11 +588,11 @@ void Control::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("enable_drag_drop")) {
         //是否允许拖放操作
-        SetEnableDragDrop(strValue == _T("true"));
+        SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("enable_drop_file")) {
         //是否允许拖放文件操作
-        SetEnableDropFile(strValue == _T("true"));
+        SetEnableDropFile(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("drop_file_types")) {
         //拖放文件的扩展名列表

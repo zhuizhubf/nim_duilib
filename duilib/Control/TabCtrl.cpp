@@ -28,7 +28,7 @@ void TabCtrl::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("drag_order")) {
         //是否支持拖动调整顺序（在同一个标签内），默认是开启的
-        SetEnableDragOrder(strValue == _T("true"));
+        SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);
@@ -288,7 +288,7 @@ void TabCtrlItem::SetAttribute(const DString& strName, const DString& strValue)
         SetHotPadding(rcPadding, true);
     }
     else if (strName == _T("auto_hide_close_button")) {
-        SetAutoHideCloseButton(strValue == _T("true"));
+        SetAutoHideCloseButton(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);

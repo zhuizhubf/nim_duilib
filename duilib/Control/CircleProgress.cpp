@@ -29,7 +29,7 @@ DString CircleProgress::GetType() const { return DUI_CTR_CIRCLEPROGRESS; }
 void CircleProgress::SetAttribute(const DString& srName, const DString& strValue)
 {
     if (srName == _T("circular")) {
-        SetCircular(strValue == _T("true"));
+        SetCircular(StringUtil::IsValueTrue(strValue));
     }
     else if ((srName == _T("circle_width")) || (srName == _T("circlewidth"))) {
         int32_t iValue = StringUtil::StringToInt32(strValue);
@@ -39,7 +39,7 @@ void CircleProgress::SetAttribute(const DString& srName, const DString& strValue
         SetIndicator(strValue);
     }
     else if (srName == _T("clockwise")) {
-        SetClockwiseRotation(strValue == _T("true"));
+        SetClockwiseRotation(StringUtil::IsValueTrue(strValue));
     }
     else if (srName == _T("bgcolor")) {
         SetBackgroudColor(strValue);

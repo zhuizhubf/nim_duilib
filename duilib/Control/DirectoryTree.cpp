@@ -65,10 +65,10 @@ void DirectoryTree::SetAttribute(const DString& strName, const DString& strValue
         SetLargeIconSize(StringUtil::StringToInt32(strValue));
     }
     else if (strName == _T("show_hiden_files")) {
-        SetShowHidenFiles(strValue == _T("true"));
+        SetShowHidenFiles(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("show_system_files")) {
-        SetShowSystemFiles(strValue == _T("true"));
+        SetShowSystemFiles(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);

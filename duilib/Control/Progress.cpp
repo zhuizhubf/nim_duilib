@@ -145,7 +145,7 @@ void Progress::SetProgressColor(const DString& strProgressColor)
 void Progress::SetAttribute(const DString& srName, const DString& strValue)
 {
     if ((srName == _T("horizontal")) || (srName == _T("hor"))){
-        SetHorizontal(strValue == _T("true"));
+        SetHorizontal(StringUtil::IsValueTrue(strValue));
     }
     else if (srName == _T("min")) {
         SetMinValue(StringUtil::StringToInt32(strValue));
@@ -160,13 +160,13 @@ void Progress::SetAttribute(const DString& srName, const DString& strValue)
         SetProgressImage(strValue);
     }
     else if ((srName == _T("stretch_fore_image")) || (srName == _T("is_stretch_fore")) || (srName == _T("isstretchfore"))){
-        SetStretchForeImage(strValue == _T("true"));
+        SetStretchForeImage(StringUtil::IsValueTrue(strValue));
     }
     else if ((srName == _T("progress_color")) || (srName == _T("progresscolor"))) {
         SetProgressColor(strValue);
     }
     else if (srName == _T("marquee")) {
-        SetMarquee(strValue == _T("true"));
+        SetMarquee(StringUtil::IsValueTrue(strValue));
     }
     else if ((srName == _T("marquee_width")) || (srName == _T("marqueewidth"))){
         SetMarqueeWidth(StringUtil::StringToInt32(strValue), true);
@@ -175,7 +175,7 @@ void Progress::SetAttribute(const DString& srName, const DString& strValue)
         SetMarqueeStep(StringUtil::StringToInt32(strValue), true);
     }
     else if (srName == _T("reverse")) {
-        SetReverse(strValue == _T("true"));
+        SetReverse(StringUtil::IsValueTrue(strValue));
     }
     else {
         Label::SetAttribute(srName, strValue);

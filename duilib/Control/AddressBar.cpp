@@ -34,16 +34,16 @@ DString AddressBar::GetType() const { return DUI_CTR_ADDRESS_BAR; }
 void AddressBar::SetAttribute(const DString& strName, const DString& strValue)
 {
     if (strName == _T("path_tooltip")) {
-        SetEnablePathTooltip(strValue == _T("true"));
+        SetEnablePathTooltip(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("return_update_ui")) {
-        SetReturnUpdateUI(strValue == _T("true"));
+        SetReturnUpdateUI(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("esc_update_ui")) {
-        SetEscUpdateUI(strValue == _T("true"));
+        SetEscUpdateUI(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("kill_focus_update_ui")) {
-        SetKillFocusUpdateUI(strValue == _T("true"));
+        SetKillFocusUpdateUI(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("rich_edit_class")) {
         SetRichEditClass(strValue);

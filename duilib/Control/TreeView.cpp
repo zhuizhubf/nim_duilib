@@ -1158,7 +1158,7 @@ void TreeView::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("multi_select")) {
         //多选，默认是单选，在基类实现
-        SetMultiSelect(strValue == _T("true"));
+        SetMultiSelect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("check_box_class")) {
         //是否显示CheckBox
@@ -1170,7 +1170,7 @@ void TreeView::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("show_icon")) {
         //是否显示图标
-        SetEnableIcon(strValue == _T("true"));
+        SetEnableIcon(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);

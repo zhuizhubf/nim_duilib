@@ -88,13 +88,13 @@ void BitmapControl::SetAttribute(const DString& strName, const DString& strValue
         SetBitmapMargin(rcMargin, true);
     }
     else if (strName == _T("bitmap_adaptive_dest_rect")) {
-        SetAdaptiveDestRect(strValue == _T("true"));
+        SetAdaptiveDestRect(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("bitmap_stretch")) {
-        SetStretchedDrawing(strValue == _T("true"));
+        SetStretchedDrawing(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("bitmap_multi_thread")) {
-        SetSupportMultiThread(strValue == _T("true"));
+        SetSupportMultiThread(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("bitmap_file")) {
         //设置关联的图片文件：主要用于测试

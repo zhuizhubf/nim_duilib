@@ -32,19 +32,19 @@ void WebView2Control::SetAttribute(const DString& strName, const DString& strVal
     }
     else if (strName == _T("url_is_local_file")) {
         //初始化加载的URL是否为本地文件
-        SetInitUrlIsLocalFile(strValue == _T("true"));
+        SetInitUrlIsLocalFile(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("devtools_enabled")) {
         //是否允许打开开发者工具
-        SetAreDevToolsEnabled(strValue == _T("true"));
+        SetAreDevToolsEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("F12")) {
         //是否允许按F12打开开发者工具
-        SetEnableF12(strValue == _T("true"));
+        SetEnableF12(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("F11")) {
         //是否允许F11快捷键(页面全屏/页面退出全屏)
-        SetEnableF11(strValue == _T("true"));
+        SetEnableF11(StringUtil::IsValueTrue(strValue));
     }
     else {
         BaseClass::SetAttribute(strName, strValue);

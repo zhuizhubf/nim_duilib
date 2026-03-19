@@ -360,7 +360,7 @@ void Combo::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
         //下拉列表是否向上弹出
-        SetPopupTop(strValue == _T("true"));
+        SetPopupTop(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("combo_tree_view_class")) {
         SetComboTreeClass(strValue);

@@ -130,7 +130,7 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue)
         SetBkStateImage(kControlStateDisabled, strValue);
     }
     else if ((strName == _T("horizontal")) || (strName == _T("hor"))) {
-        SetHorizontal(strValue == _T("true"));
+        SetHorizontal(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("line_size")) || (strName == _T("linesize"))) {
         SetLineSize(StringUtil::StringToInt32(strValue), true);
@@ -145,13 +145,13 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue)
         SetScrollPos(StringUtil::StringToInt32(strValue));
     }
     else if ((strName == _T("show_button1")) || (strName == _T("showbutton1"))) {
-        SetShowButton1(strValue == _T("true"));
+        SetShowButton1(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("show_button2")) || (strName == _T("showbutton2"))) {
-        SetShowButton2(strValue == _T("true"));
+        SetShowButton2(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("auto_hide_scroll")) || (strName == _T("autohidescroll"))) {
-        SetAutoHideScroll(strValue == _T("true"));
+        SetAutoHideScroll(StringUtil::IsValueTrue(strValue));
     }
     else {
         Control::SetAttribute(strName, strValue);

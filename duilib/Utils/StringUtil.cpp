@@ -1131,4 +1131,9 @@ size_t StringUtil::StringLen(const char* str)
     }
 }
 
+bool StringUtil::IsValueTrue(const DString& value)
+{
+    return (value == _T("true")) || (value == _T("1"));
+}
+
 } // namespace ui

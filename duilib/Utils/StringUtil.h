@@ -164,6 +164,10 @@ public:
     */
     static size_t StringLen(const wchar_t* str);
     static size_t StringLen(const char* str);
+
+    /** 字符串是否为真
+    */
+    static bool IsValueTrue(const DString& value);
 };
 
 }

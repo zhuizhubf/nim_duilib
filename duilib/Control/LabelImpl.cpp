@@ -110,7 +110,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if ((strName == _T("end_ellipsis")) || (strName == _T("endellipsis"))) {
-        if (strValue == _T("true")) {
+        if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_END_ELLIPSIS;
         }
         else {
@@ -118,7 +118,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if ((strName == _T("path_ellipsis")) || (strName == _T("pathellipsis"))) {
-        if (strValue == _T("true")) {
+        if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_PATH_ELLIPSIS;
         }
         else {
@@ -126,7 +126,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
-        SetSingleLine(strValue == _T("true"));
+        SetSingleLine(StringUtil::IsValueTrue(strValue));
     }
     else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
         SetSingleLine(strValue != _T("true"));
@@ -138,7 +138,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         SetTextId(strValue);
     }
     else if ((strName == _T("auto_tooltip")) || (strName == _T("autotooltip"))) {
-        SetAutoShowToolTipEnabled(strValue == _T("true"));
+        SetAutoShowToolTipEnabled(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("font")) {
         SetFontId(strValue);
@@ -162,7 +162,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("replace_newline")) {
         // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
-        SetReplaceNewline(strValue == _T("true"));
+        SetReplaceNewline(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("spacing_mul")) {
         // 设置行间距倍数
@@ -182,7 +182,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("vertical_text")) {
         // 设置是否为纵向文本
-        SetVerticalText(strValue == _T("true"));
+        SetVerticalText(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("word_spacing")) {
         // 设置两个相邻的字符之间的间隔（像素）
@@ -190,15 +190,15 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("use_font_height")) {
         // 设置当纵向绘制文本时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
-        SetUseFontHeight(strValue == _T("true"));
+        SetUseFontHeight(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("ascii_rotate_90")) {
         // 设置当纵向绘制文本时，对于字母数字等，顺时针旋转90度显示
-        SetRotate90ForAscii(strValue == _T("true"));
+        SetRotate90ForAscii(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("rich_text")) {
         // 设置文本内容是否为RichText
-        SetRichText(strValue == _T("true"));
+        SetRichText(StringUtil::IsValueTrue(strValue));
     }
     else {
         return false;

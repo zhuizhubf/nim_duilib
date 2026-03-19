@@ -88,11 +88,11 @@ bool RichTextImpl::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("link_font_underline")) {
         //超级链接：是否使用带下划线的字体
-        m_bLinkUnderlineFont = (strValue == _T("true"));
+        m_bLinkUnderlineFont = (StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("replace_brace")) {
         //对text属性，是否允许替换花括号
-        m_bReplaceBrace = strValue == _T("true");
+        m_bReplaceBrace = StringUtil::IsValueTrue(strValue);
     }
     else if (strName == _T("text")) {
         //允许使用'{'代替'<'，'}'代替'>' (m_bReplaceBrace变量为开关)
@@ -126,7 +126,7 @@ bool RichTextImpl::SetAttribute(const DString& strName, const DString& strValue)
         }
     }
     else if (strName == _T("word_wrap")) {
-        SetWordWrap(strValue == _T("true"));
+        SetWordWrap(StringUtil::IsValueTrue(strValue));
     }
     else {
         return false;

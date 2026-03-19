@@ -52,15 +52,15 @@ void Window::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("shadow_attached")) {
         //是否开启阴影
-        SetShadowAttached(strValue == _T("true"));
+        SetShadowAttached(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("drag_drop")) {
         //是否允许拖放操作
-        SetEnableDragDrop(strValue == _T("true"));
+        SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("layered_window")) {
         //是否为分层窗口
-        SetLayeredWindow(strValue == _T("true"), true);
+        SetLayeredWindow(StringUtil::IsValueTrue(strValue), true);
     }
     else if (strName == _T("layered_window_alpha")) {
         //分层窗口的透明度
