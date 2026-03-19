@@ -126,7 +126,7 @@ public:
     * @param [out] languageList 返回语言文件和显示名称的列表
     */
     bool GetLanguageList(std::vector<std::pair<DString, DString>>& languageList,
-                         const DString& languageNameID = _T("LANGUAGE_DISPLAY_NAME")) const;
+                         const DString& languageNameID = DUILIB_LANGUAGE_DISPLAY_NAME) const;
 
 public:
     /** 添加一个全局 Class 属性
@@ -446,6 +446,7 @@ private:
     DString GetDefaultLanguageFileName() const;
 
     /** 获取系统语言字符串
+    * @return 返回系统语言字符串，示例：如"zh_CN"、"en_US"等
     */
     DString GetSystemLanguage() const;
 

@@ -42,6 +42,14 @@ enum class ResourceType
 */
 #define DUILIB_DARK_COLOR_PATH      _T("color_dark")
 
+/** 语言文件中，语言名称的字符串ID
+*/
+#define DUILIB_LANGUAGE_NAME         _T("LANGUAGE_NAME")
+
+/** 语言文件中，语言显示名称的字符串ID
+*/
+#define DUILIB_LANGUAGE_DISPLAY_NAME _T("LANGUAGE_DISPLAY_NAME")
+
 /** 加载全局资源所需的基本参数（基类，使用时需要使用子类，见下方定义）
 */
 class UILIB_API ResourceParam
