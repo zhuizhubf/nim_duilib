@@ -153,9 +153,9 @@
 
     <!-- Property Grid分组属性-->
     <TextColor name="bg_property_grid_group" value="#FF1E1E1E"/>         <!-- 分组背景 -->
-    <TextColor name="bg_property_grid_propterty" value="#FF252525"/>     <!-- 属性背景 -->
-    <TextColor name="bg_property_grid_propterty_name" value="#FF252525"/> <!-- 属性名背景 -->
-    <TextColor name="bg_property_grid_propterty_value" value="#FF252525"/> <!-- 属性值背景 -->
+    <TextColor name="bg_property_grid_property" value="#FF252525"/>     <!-- 属性背景 -->
+    <TextColor name="bg_property_grid_property_name" value="#FF252525"/> <!-- 属性名背景 -->
+    <TextColor name="bg_property_grid_property_value" value="#FF252525"/> <!-- 属性值背景 -->
     <TextColor name="bg_property_grid_line" value="#FF3D3D3D"/>          <!-- 网格线 -->
     <!-- ===================== 颜色配置（Windows 11 浅色主题）结束 ===================== -->
     

@@ -157,9 +157,9 @@
 
     <!-- Property Grid分组属性-->
     <TextColor name="bg_property_grid_group" value="#FFEFEFEF"/>             <!-- 分组背景：加深，与属性行区分（修正对比度不足） -->
-    <TextColor name="bg_property_grid_propterty" value="#FFFFFFFF"/>         <!-- 属性背景：纯白，突出可编辑区域 -->    
-    <TextColor name="bg_property_grid_propterty_name" value="#FFFFFFFF"/>    <!-- 属性名列背景：纯白，与值列统一 -->    
-    <TextColor name="bg_property_grid_propterty_value" value="#FFFFFFFF"/>   <!-- 属性值列背景：纯白，可编辑区域底色 -->    
+    <TextColor name="bg_property_grid_property" value="#FFFFFFFF"/>         <!-- 属性背景：纯白，突出可编辑区域 -->    
+    <TextColor name="bg_property_grid_property_name" value="#FFFFFFFF"/>    <!-- 属性名列背景：纯白，与值列统一 -->    
+    <TextColor name="bg_property_grid_property_value" value="#FFFFFFFF"/>   <!-- 属性值列背景：纯白，可编辑区域底色 -->    
     <TextColor name="bg_property_grid_line" value="#FFD1D5DB"/>              <!-- 网格分割线：浅灰 -->
     <!-- ===================== 颜色配置（Windows 11 浅色主题）结束 ===================== -->
     

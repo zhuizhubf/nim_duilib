@@ -14,9 +14,9 @@
 
     <Class name="property_grid_group" height="28" bkcolor="bg_property_grid_group" show_focus_rect="true"/>
     <Class name="property_grid_group_label" normal_text_color="text_default" disabled_text_color="text_disabled"/>
-    <Class name="property_grid_propterty" height="28" bkcolor="bg_property_grid_propterty"/>
-    <Class name="property_grid_propterty_name_label" bkcolor="bg_property_grid_propterty_name"/>
-    <Class name="property_grid_propterty_value_label" bkcolor="bg_property_grid_propterty_value" text_padding="2,0,0,0"/>
+    <Class name="property_grid_propterty" height="28" bkcolor="bg_property_grid_property"/>
+    <Class name="property_grid_propterty_name_label" bkcolor="bg_property_grid_property_name"/>
+    <Class name="property_grid_propterty_value_label" bkcolor="bg_property_grid_property_value" text_padding="2,0,0,0"/>
     <Class name="property_grid_propterty_edit" bkcolor="bg_richedit" width="100%" height="100%"
                                                text_align="vcenter,left" text_padding="2,0,2,0" multi_line="false"
                                                auto_hscroll="true" want_return_msg="false" want_ctrl_return="false" want_tab="false"
