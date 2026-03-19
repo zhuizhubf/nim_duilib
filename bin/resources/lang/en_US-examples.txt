@@ -684,6 +684,11 @@ STRID_RENDER_PROPGRID_LABEL_VERTICAL_TEXT_TIP=Vertical text test, the following 
 STRID_RENDER_PROPGRID_LABEL_VERTICAL_TEXT_CONTENT=Vertical text test:\nTest whether it can be displayed normally in the scroll bar.
 STRID_RENDER_PROPGRID_LABEL_GRADIENT_BG_TIP=This demonstrates the gradient background color function
 
+STRID_RENDER_IMAGE_TITLE_01 = Test 1: Original image (width 48, height 48), the control's width is set to auto and height to auto, the image is not stretched. This test mainly verifies the impact of dpi_scale on various properties.
+STRID_RENDER_IMAGE_TITLE_02 = Test 2: Original image (width 48, height 48), combined testing of various usage scenarios.
+STRID_RENDER_IMAGE_TITLE_03 = Test 3: Nine-patch rendering, combined testing of other usage scenarios.
+STRID_RENDER_IMAGE_TITLE_04 = Test 4: Nine-patch rendering, test of stretching and tiling for the center area; only the center part needs to be checked.
+
 # examples/layout
 STRID_LAYOUT_TEST_TITLE = Container Layout Test
 STRID_LAYOUT_TABBOX_DESC = : The TabBox contains an embedded TabBox control

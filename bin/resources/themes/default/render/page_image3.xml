@@ -4,7 +4,7 @@
     <Class name="page_image3_text"  width="128" height="auto" multi_line="true" replace_newline="true" text_align="left,vcenter" />
     <Class name="page_image3_case"  width="128" height="auto" multi_line="true" replace_newline="true" text_align="hcenter,vcenter" />
     <VScrollBox vscrollbar="true" hscrollbar="false" bkcolor="bg_window_light">
-        <Label class="page_image3_text" text="测试1：原图(宽48 高48)，控件宽auto 高为auto，图片无拉伸，主要测试dpi_scale对各个属性的影响" width="100%" margin="0,4,0,0" font="system_bold_14"/>
+        <Label class="page_image3_text" text_id="STRID_RENDER_IMAGE_TITLE_01" width="100%" margin="0,4,0,0" font="system_bold_14"/>
         <HFlowScrollBox width="auto" height="auto" child_margin_x="2" child_margin_y="2" padding="2,2,2,2">
             <VBox width="auto" height="auto">
                 <Control class="page_image3_image" bkimage="file='svg_test.png' dpi_scale='false' halign='center' valign='center'"/>
@@ -130,7 +130,7 @@
 
         <Line class="splitline_hor_level1" margin="4,4,4,4"/>
 
-        <Label class="page_image3_text" text="测试2：原图(宽48 高48)，各种使用场景的组合测试" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
+        <Label class="page_image3_text" text_id="STRID_RENDER_IMAGE_TITLE_02" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
         <HFlowScrollBox width="auto" height="auto" child_margin_x="2" child_margin_y="2" padding="2,2,2,2">
             <!-- 分组1 -->
             <VBox width="auto" height="auto">
@@ -350,7 +350,7 @@
 
         <Line class="splitline_hor_level1" margin="4,4,4,4"/>
 
-        <Label class="page_image3_text" text="测试3：九宫格绘制，其他使用场景的组合测试" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
+        <Label class="page_image3_text" text_id="STRID_RENDER_IMAGE_TITLE_03" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
         <HFlowScrollBox width="auto" height="auto" child_margin_x="2" child_margin_y="2" padding="2,2,2,2">
             <VBox width="auto" height="auto">
                 <Control class="page_image3_image" width="auto" height="auto"  bkimage="file='nine-patch.png' dpi_scale='false'"/>
@@ -406,7 +406,7 @@
 
         <Line class="splitline_hor_level1" margin="4,4,4,4"/>
 
-        <Label class="page_image3_text" text="测试4：九宫格绘制，中间部分拉伸和平铺的测试，只看中间部分即可" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
+        <Label class="page_image3_text" text_id="STRID_RENDER_IMAGE_TITLE_04" width="100%" margin="0,4,0,0"  font="system_bold_14"/>
         <HFlowScrollBox width="auto" height="auto" child_margin_x="2" child_margin_y="2" padding="2,2,2,2" bkcolor='bg_window_light'>
             <!-- 原图 48*48 中间部分宽度和高度都是20，边框大小为14-->
             <VBox width="auto" height="auto">
