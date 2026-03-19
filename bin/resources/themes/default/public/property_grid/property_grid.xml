@@ -19,7 +19,7 @@
     <Class name="property_grid_propterty_value_label" bkcolor="bg_property_grid_propterty_value" text_padding="2,0,0,0"/>
     <Class name="property_grid_propterty_edit" bkcolor="bg_richedit" width="100%" height="100%"
                                                text_align="vcenter,left" text_padding="2,0,2,0" multi_line="false"
-                                               auto_hscroll="true" want_return_msg="true" want_tab="false"
+                                               auto_hscroll="true" want_return_msg="false" want_ctrl_return="false" want_tab="false"
                                                rich_text="false" default_context_menu="true"
                                                normal_text_color="text_default" disabled_text_color="text_disabled"/>
 

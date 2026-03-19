@@ -405,7 +405,7 @@ namespace ui
         kEventLinkClick,            //RichEdit类、RichText类：当点击到超级链接的数据上时触发, 可以通过WPARAM获取点击的URL，类型为const DStringW::value_type*
 
         kEventScrollPosChanged,     //ScrollBox类：当滚动条位置发生变化时触发
-        kEventValueChanged,         //DateTime、Slider类：当值发生变化时触发, Slider类：WPARAM是新值，LPARAM是旧值
+        kEventValueChanged,         //DateTime、Slider类、PropertyGridProperty：当值发生变化时触发, Slider类：WPARAM是新值，LPARAM是旧值
         kEventPosChanged,           //Control类：当控件的位置发生变化时触发
         kEventSizeChanged,          //Control类：当控件的大小发生变化时触发
         kEventVisibleChanged,       //Control类：当控件的Visible属性发生变化时触发, WPARAM是新状态(1表示可见，0表示不可见)

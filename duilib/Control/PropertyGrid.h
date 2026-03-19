@@ -1077,6 +1077,12 @@ public:
     */
     PropertyGrid* GetPropertyGrid() const;
 
+    /** 监听属性值变化事件（以文本形式通知属性值的变化）
+    * @param [in] callback 要绑定的回调函数，wParam是(WPARAM)&oldText，lParam是(LPARAM)&newText，oldText和newText变量类型都是DString
+    * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
+    */
+    void AttachValueChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventValueChanged, callback, callbackID); }
+
 protected:
     /** 初始化函数
      */
@@ -1089,13 +1095,21 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool /*bShow*/) { return nullptr; }
+    virtual Control* ShowEditControl(bool /*bShow*/, bool /*bCancel*/) { return nullptr; }
 
     /** 旧的属性值发生了变化
     */
     virtual void OnPropertyValueChanged() {}
+
+    /** 属性值发生了变化（编辑触发）
+    * @param [in] oldText 旧的文本内容
+    * @param [in] newText 新的文本内容
+    * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
+    */
+    virtual bool OnPropertyTextChanged(const DString& /*oldText*/, const DString& /*newText*/) { return true; }
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1109,8 +1123,9 @@ protected:
     /** 设置属性值的文本(显示控件)，用于编辑属性后更新显示控件的文本内容
     * @param [in] text 文本内容
     * @param [in] bChanged 是否标记为变化
+    * @param [in] bTriggerEvent 是否触发变化事件（回调函数）
     */
-    void SetPropertyText(const DString& text, bool bChanged);
+    void SetPropertyText(const DString& text, bool bChanged, bool bTriggerEvent = true);
 
     /** 获取属性值文本(显示控件)
     */
@@ -1275,8 +1290,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 语言发生变化，刷新界面文字显示相关的内容
     * @param [in] bRedraw true表示需要内部实现重绘，否则控件内部不需要重绘，由外部调用重绘
@@ -1291,6 +1308,10 @@ private:
     /** 编辑框控件(用于修改属性)
     */
     ControlPtrT<RichEdit> m_pRichEdit;
+
+    /** 编辑前的旧值
+    */
+    UiString m_oldText;
 
     /** 密码模式
     */
@@ -1388,6 +1409,11 @@ public:
     */
     size_t GetOptionData(size_t nIndex) const;
 
+    /** 获取是否包含子项关联的数据
+    * @param [in] nIndex 子项的下标值，有效范围：[0, GetOptionCount())
+    */
+    bool HasOptionData(size_t nIndex) const;
+
     /** 删除指定的子项
     * @param [in] nIndex 子项的下标值，有效范围：[0, GetOptionCount())
     */
@@ -1402,16 +1428,26 @@ public:
      */
     size_t GetCurSel() const;
 
-    /** 选择一个子项, 不触发选择事件
-     * @param[in] nIndex 要选择的子项索引，有效范围：[0, GetOptionCount())
+    /** 选择一个子项, 触发选择事件
+     * @param [in] nIndex 要选择的子项索引，有效范围：[0, GetOptionCount())
+     * @param [in] bTriggerEvent true表示触发变化事件，false表示不触发变化事件
      * @return 返回 true 表示成功，否则为 false
      */
-    bool SetCurSel(size_t nIndex);
+    bool SetCurSel(size_t nIndex, bool bTriggerEvent = true);
 
     /** 设置为列表模式
     * @param [in] bListMode true表示不支持编辑文本，只能从下拉表中选择；false表示允许编辑，允许选择
     */
     void SetComboListMode(bool bListMode);
+
+    /** 同步列表选项内容到显示文本（保持选择与显示一致）
+    * @param [in] bTriggerEvent 当属性值相比原值变化时，是否触发属性值变化事件
+    */
+    void UpdateEditText(bool bTriggerEvent);
+
+    /** 当前是否正在编辑状态
+    */
+    bool IsComboEditing() const;
 
     /** 获取下拉框接口
     */
@@ -1425,8 +1461,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1446,9 +1484,21 @@ private:
     */
     ControlPtrT<Combo> m_pCombo;
 
+    /** 编辑前，原来的显示文本（以支持取消编辑）
+    */
+    UiString m_oldText;
+
+    /** 编辑前，原来选择的列表项
+    */
+    size_t m_oldSelItem;
+
     /** 是否触发编辑操作
     */
     bool m_bComboEdited;
+
+    /** 当前是否正在编辑状态
+    */
+    bool m_bComboEditing;
 };
 
 /** 设置字体名称的属性
@@ -1506,11 +1556,36 @@ public:
     */
     virtual DString GetPropertyNewValue() const override;
 
+    /** 是否校验字体名称是否合理（在列表中的字体名称为合法值，其他为非法值）
+    * @param [in] bValidation true表示检查新值是否合理（默认值），false表示不检查
+    */
+    void SetFontNameValidation(bool bValidation);
+
 protected:
 
     /** 初始化函数
      */
     virtual void OnInit() override;
+
+    /** 属性值发生了变化（编辑触发）
+    * @param [in] oldText 旧的文本内容
+    * @param [in] newText 新的文本内容
+    * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
+    */
+    virtual bool OnPropertyTextChanged(const DString& oldText, const DString& newText) override;
+
+private:
+    /** 字体列表
+    */
+    std::vector<DString> m_fontNameList;
+
+    /** 当前是否正在校验属性值的有效性
+    */
+    bool m_bCheckingNewValue;
+
+    /** 是否检查字体名称是否合法
+    */
+    bool m_bFontNameValidation;
 };
 
 /** 设置字体大小的属性
@@ -1568,6 +1643,32 @@ public:
     */
     virtual DString GetPropertyNewValue() const override;
 
+public:
+    /** 设置字体大小列表（可以覆盖内置的默认列表），字体大小值未进行DPI缩放
+    * @param [in] fontSizeList 字体大小列表
+    */
+    void SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList);
+
+    /** 获取字体大小列表，字体大小值未进行DPI缩放
+    * @param [out] fontSizeList 字体大小列表
+    */
+    void GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const;
+
+    /** 获取字体大小列表，字体大小值已经完成进行DPI缩放
+    * @param [out] fontSizeList 字体大小列表
+    */
+    void GetDpiFontSizeList(std::vector<FontSizeInfo>& dpiFontSizeList) const;
+
+    /** 重新填充字体列表（删除原有的值，填充新的值）
+    */
+    void UpdateFontSizeOptionList();
+
+    /** 是否校验字体大小是否合理（在列表中的字体大小为合法值，其他为非法值）
+    * @param [in] bValidation true表示检查新值是否合理（默认值），false表示不检查
+    */
+    void SetFontSizeValidation(bool bValidation);
+
+public:
     /** 获取字体大小值，浮点数，未做DPI自适应值
     * @return 如果从列表中选择，返回值为非空；如果未能从列表中选择，则返回空
     */
@@ -1604,10 +1705,40 @@ protected:
      */
     virtual void OnInit() override;
 
-private:
-    /** 字体大小
+    /** 语言发生变化，刷新界面文字显示相关的内容
+    * @param [in] bRedraw true表示需要内部实现重绘，否则控件内部不需要重绘，由外部调用重绘
     */
-    std::vector<FontSizeInfo> m_fontSizeList;
+    virtual void OnLanguageChanged(bool bRedraw) override;
+
+    /** DPI发生变化，更新控件大小和布局
+    * @param [in] nOldDpiScale 旧的DPI缩放百分比
+    * @param [in] nNewDpiScale 新的DPI缩放百分比，与Dpi().GetScale()的值一致
+    */
+    virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;
+
+    /** 属性值发生了变化（编辑触发）
+    * @param [in] oldText 旧的文本内容
+    * @param [in] newText 新的文本内容
+    * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
+    */
+    virtual bool OnPropertyTextChanged(const DString& oldText, const DString& newText) override;
+
+private:
+    /** 字体大小(填充到List)
+    */
+    std::vector<FontSizeInfo> m_fillFontSizeList;
+
+    /** 字体大小(外部设置)
+    */
+    std::vector<FontSizeInfo> m_externfontSizeList;
+
+    /** 当前是否正在校验属性值的有效性
+    */
+    bool m_bCheckingNewValue;
+
+    /** 是否检查字体大小是否合法
+    */
+    bool m_bFontSizeValidation;
 };
 
 /** 设置颜色的属性
@@ -1672,8 +1803,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1696,6 +1829,10 @@ private:
     /** 颜色选择控件
     */
     ControlPtrT<ComboButton> m_pComboButton;
+
+    /** 旧值
+    */
+    UiString m_oldColor;
 };
 
 /** 设置日期时间的属性(仅Windows平台提供此功能)
@@ -1767,8 +1904,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1851,8 +1990,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
 private:
     /** IP地址控件
@@ -1922,8 +2063,10 @@ protected:
 
     /** 显示或者隐藏编辑框控件
     * @param [in] bShow 表示显示编辑控件，false表示隐藏编辑控件
+    * @param [in] bCancel true表示取消编辑，false表示应用编辑
+    * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow) override;
+    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
 
 private:
     /** 热键控件

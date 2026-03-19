@@ -591,7 +591,8 @@ void Combo::OnInit()
         m_pButtonControl->AttachClick(UiBind(&Combo::OnButtonClicked, this, std::placeholders::_1));
     }
     if (m_pEditControl != nullptr) {
-        m_pEditControl->SetWantReturn(true);
+        m_pEditControl->SetWantReturn(false);
+        m_pEditControl->SetWantCtrlReturn(false);
         m_pEditControl->AttachButtonDown(UiBind(&Combo::OnEditButtonDown, this, std::placeholders::_1));
         m_pEditControl->AttachButtonUp(UiBind(&Combo::OnEditButtonUp, this, std::placeholders::_1));
         m_pEditControl->AttachEvent(kEventKeyDown, UiBind(&Combo::OnEditKeyDown, this, std::placeholders::_1), 0);
@@ -686,7 +687,7 @@ size_t Combo::GetCurSel() const
     return m_treeView.GetCurSel();
 }
 
-bool Combo::SetCurSel(size_t iIndex)
+bool Combo::SetCurSel(size_t iIndex, bool bTriggerEvent)
 {
     size_t iOldSel = m_iCurSel;
     bool bRet = m_treeView.SelectItem(iIndex, false, false);
@@ -696,7 +697,9 @@ bool Combo::SetCurSel(size_t iIndex)
         Invalidate();
 
         //触发选择变化事件
-        SendEvent(kEventSelect, m_iCurSel, iOldSel);
+        if (bTriggerEvent) {
+            SendEvent(kEventSelect, m_iCurSel, iOldSel);
+        }        
     }  
     return bRet;
 }
@@ -709,6 +712,16 @@ size_t Combo::GetItemData(size_t iIndex) const
         return pControl->GetUserDataID();
     }
     return 0;
+}
+
+bool Combo::HasItemData(size_t iIndex) const
+{
+    Control* pControl = m_treeView.GetItemAt(iIndex);
+    if (pControl != nullptr) {
+        ASSERT(dynamic_cast<TreeNode*>(pControl) != nullptr);
+        return true;
+    }
+    return false;
 }
 
 bool Combo::SetItemData(size_t iIndex, size_t itemData)
@@ -856,6 +869,7 @@ bool Combo::DeleteItem(size_t iIndex)
 
 void Combo::DeleteAllItems()
 {
+    m_iCurSel = Box::InvalidIndex;
     m_treeView.GetRootNode()->RemoveAllChildNodes();
     OnSelectedItemChanged();
 }

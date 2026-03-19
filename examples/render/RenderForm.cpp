@@ -159,13 +159,15 @@ void RenderForm::TestPropertyGrid()
     p11->SetCurSel(0);
 
     // 分组五（字体）
+    DString fontName = ui::GlobalManager::GetTextById(_T("STRID_RENDER_PROPGRID_FONT_ARIAL"));
     pGroup = pPropertyGrid->AddGroupById(
         _T("STRID_RENDER_PROPGRID_GROUP_5"),   // 分组五
         _T("STRID_RENDER_PROPGRID_DESC_GROUP_5_FONT"));  // 描述信息五：字体
     auto p20 = pPropertyGrid->AddFontPropertyById(pGroup,
         _T("STRID_RENDER_PROPGRID_FONT"),  // 字体
-        _T("STRID_RENDER_PROPGRID_FONT_SIMSUN"),  // 宋体
-        _T("STRID_RENDER_PROPGRID_DESC_SET_FONT_NAME"));  // 描述信息：设置字体名称
+        fontName,  // Arial(不使用多语言ID)
+        _T("STRID_RENDER_PROPGRID_DESC_SET_FONT_NAME"), // 描述信息：设置字体名称
+        0, false);  
     auto p21 = pPropertyGrid->AddFontSizePropertyById(pGroup,
         _T("STRID_RENDER_PROPGRID_FONT_SIZE"),  // 字号
         _T("STRID_RENDER_PROPGRID_FONT_SIZE_5"),  // 五号

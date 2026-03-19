@@ -1665,7 +1665,7 @@ void PropertyGridProperty::OnInit()
     //挂载鼠标左键按下事件
     m_pLabelBoxRight->AttachButtonDown([this](const EventArgs&) {
         if (!IsReadOnly() && IsEnabled()) {
-            Control* pControl = ShowEditControl(true);
+            Control* pControl = ShowEditControl(true, false);
             if (pControl != nullptr) {
                 int32_t nWidth = GetEditControlMarginRight();
                 UiMargin rcMargin = pControl->GetMargin();
@@ -1706,10 +1706,12 @@ int32_t PropertyGridProperty::GetEditControlMarginRight() const
     return nWidth;
 }
 
-void PropertyGridProperty::SetPropertyText(const DString& text, bool bChanged)
+void PropertyGridProperty::SetPropertyText(const DString& text, bool bChanged, bool bTriggerEvent)
 {
+    DString oldText;
     ASSERT(m_pLabelBoxRight != nullptr);
     if (m_pLabelBoxRight != nullptr) {
+        oldText = m_pLabelBoxRight->GetText();
         m_pLabelBoxRight->SetText(text);
         m_pLabelBoxRight->SetTextId(_T("")); //需要清空文本ID，因为文本值为空时，会取文本ID的值
         if (bChanged) {
@@ -1731,6 +1733,14 @@ void PropertyGridProperty::SetPropertyText(const DString& text, bool bChanged)
             if (!proptertyNormalFontId.empty()) {
                 m_pLabelBoxRight->SetFontId(proptertyNormalFontId);
             }            
+        }
+    }
+
+    if (bTriggerEvent && bChanged && (text != oldText)) {
+        //回调函数，供子类使用
+        if (OnPropertyTextChanged(oldText, text)) {
+            //触发事件，供应用层使用
+            SendEvent(kEventValueChanged, (WPARAM)&oldText, (LPARAM)&text);
         }
     }
 }
@@ -1951,7 +1961,7 @@ void PropertyGridTextProperty::EnableEditControl(bool bEnable)
         return true;
         });
     m_pRichEdit->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        ShowEditControl(false, false);
         return true;
         });
 }
@@ -1983,7 +1993,7 @@ void PropertyGridTextProperty::OnPropertyValueChanged()
     }
 }
 
-Control* PropertyGridTextProperty::ShowEditControl(bool bShow)
+Control* PropertyGridTextProperty::ShowEditControl(bool bShow, bool bCancel)
 {
     if (IsReadOnly() || (m_pRichEdit == nullptr)) {
         return nullptr;
@@ -1991,10 +2001,15 @@ Control* PropertyGridTextProperty::ShowEditControl(bool bShow)
 
     if (bShow) {
         m_bTextEdited = true;
+        m_oldText = m_pRichEdit->GetText();
         m_pRichEdit->SetVisible(true);
         m_pRichEdit->SetFocus();
     }
     else {
+        if (bCancel) {
+            //取消编辑
+            m_pRichEdit->SetText(m_oldText.c_str());
+        }
         DString newText = m_pRichEdit->GetText();
         bool bChanged = newText != GetPropertyValue(); //相对原值，是否有修改
         if (IsPasswordMode()) {
@@ -2085,7 +2100,9 @@ PropertyGridComboProperty::PropertyGridComboProperty(Window* pWindow,
                                                      size_t nPropertyData) :
     PropertyGridProperty(pWindow, propertyName, propertyValue, description, nPropertyData),
     m_pCombo(nullptr),
-    m_bComboEdited(false)
+    m_bComboEdited(false),
+    m_bComboEditing(false),
+    m_oldSelItem(Box::InvalidIndex)
 {
 }
 
@@ -2102,14 +2119,18 @@ PropertyGridComboProperty::PropertyGridComboProperty(Window* pWindow,
                          bDescriptionId, description,
                          nPropertyData),
     m_pCombo(nullptr),
-    m_bComboEdited(false)
+    m_bComboEdited(false),
+    m_bComboEditing(false),
+    m_oldSelItem(Box::InvalidIndex)
 {
 }
 
 PropertyGridComboProperty::PropertyGridComboProperty(Window* pWindow, const PropertyGridParam& param):
     PropertyGridProperty(pWindow, param),
     m_pCombo(nullptr),
-    m_bComboEdited(false)
+    m_bComboEdited(false),
+    m_bComboEditing(false),
+    m_oldSelItem(Box::InvalidIndex)
 {
 }
 
@@ -2138,29 +2159,57 @@ void PropertyGridComboProperty::EnableEditControl(bool bEnable)
     m_pCombo->SetText(GetPropertyText());
     m_pCombo->SetVisible(false);
 
-    //挂载回车和焦点切换事件
+    //挂载事件
     m_pCombo->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        //失去焦点后，隐藏组合框
+        ShowEditControl(false, false);
         return true;
         });
     m_pCombo->AttachSelect([this](const EventArgs&) {
-        ShowEditControl(false);
+        //选中列表项后，隐藏组合框
+        ShowEditControl(false, false);
         return true;
         });
+    RichEdit* pRichEdit = m_pCombo->GetEditControl();
+    if (pRichEdit != nullptr) {
+        pRichEdit->AttachReturn([this](const EventArgs&) {
+            //按回车键后，隐藏组合框
+            ShowEditControl(false, false);
+            return true;
+            });
+        pRichEdit->AttachEsc([this](const EventArgs&) {
+            //按ESC键后，隐藏组合框，同时取消编辑
+            ShowEditControl(false, true);
+            return true;
+            });
+    }
 }
 
-Control* PropertyGridComboProperty::ShowEditControl(bool bShow)
+Control* PropertyGridComboProperty::ShowEditControl(bool bShow, bool bCancel)
 {
     if (IsReadOnly() || (m_pCombo == nullptr)) {
         return nullptr;
     }
 
     if (bShow) {
+        m_bComboEditing = true;
         m_bComboEdited = true;
         m_pCombo->SetVisible(true);
         m_pCombo->SetFocus();
+        m_oldSelItem = m_pCombo->GetCurSel();
+        m_oldText = m_pCombo->GetText();
     }
     else {
+        //取消
+        if (bCancel) {
+            m_pCombo->SetCurSel(m_oldSelItem, false);
+            if (m_pCombo->GetCurSel() != m_oldSelItem) {
+                m_pCombo->SetText(m_oldText.c_str());
+            }            
+            m_oldText.clear();
+            m_oldSelItem = Box::InvalidIndex;
+        }
+
         DString newText = m_pCombo->GetText();
         bool bChanged = newText != GetPropertyValue(); //相对原值，是否有修改
         SetPropertyText(newText, bChanged);
@@ -2168,6 +2217,7 @@ Control* PropertyGridComboProperty::ShowEditControl(bool bShow)
         if (!bChanged) {
             m_bComboEdited = false;
         }
+        m_bComboEditing = false; //需要放在最后
     }
     return m_pCombo.get();
 }
@@ -2258,6 +2308,14 @@ size_t PropertyGridComboProperty::GetOptionData(size_t nIndex) const
     return nOptionData;
 }
 
+bool PropertyGridComboProperty::HasOptionData(size_t nIndex) const
+{
+    if (m_pCombo != nullptr) {
+        return m_pCombo->HasItemData(nIndex);
+    }
+    return false;
+}
+
 size_t PropertyGridComboProperty::GetOptionCount() const
 {
     size_t nCount = 0;
@@ -2306,12 +2364,12 @@ size_t PropertyGridComboProperty::GetCurSel() const
     return nIndex;
 }
 
-bool PropertyGridComboProperty::SetCurSel(size_t nIndex)
+bool PropertyGridComboProperty::SetCurSel(size_t nIndex, bool bTriggerEvent)
 {
     bool bRet = false;
     ASSERT(m_pCombo != nullptr);
     if (m_pCombo != nullptr) {
-        bRet = m_pCombo->SetCurSel(nIndex);
+        bRet = m_pCombo->SetCurSel(nIndex, bTriggerEvent);
     }
     return bRet;
 }
@@ -2324,6 +2382,21 @@ void PropertyGridComboProperty::SetComboListMode(bool bListMode)
     }
 }
 
+void PropertyGridComboProperty::UpdateEditText(bool bTriggerEvent)
+{
+    if (m_pCombo != nullptr) {
+        DString newText = m_pCombo->GetItemText(GetCurSel());
+        m_pCombo->SetText(newText);
+        bool bChanged = newText != GetPropertyValue(); //相对原值，是否有修改
+        SetPropertyText(newText, bChanged, bTriggerEvent);
+    }
+}
+
+bool PropertyGridComboProperty::IsComboEditing() const
+{
+    return m_bComboEditing;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 ///
 PropertyGridFontProperty::PropertyGridFontProperty(Window* pWindow, 
@@ -2331,7 +2404,9 @@ PropertyGridFontProperty::PropertyGridFontProperty(Window* pWindow,
                                                    const DString& propertyValue,
                                                    const DString& description,
                                                    size_t nPropertyData) :
-    PropertyGridComboProperty(pWindow, propertyName, propertyValue, description, nPropertyData)
+    PropertyGridComboProperty(pWindow, propertyName, propertyValue, description, nPropertyData),
+    m_bCheckingNewValue(false),
+    m_bFontNameValidation(true)
 {
 }
 
@@ -2346,12 +2421,16 @@ PropertyGridFontProperty::PropertyGridFontProperty(Window* pWindow,
     PropertyGridComboProperty(pWindow, bPropertyNameId, propertyName,
                               bPropertyValueId, propertyValue,
                               bDescriptionId, description,
-                              nPropertyData)
+                              nPropertyData),
+    m_bCheckingNewValue(false),
+    m_bFontNameValidation(true)
 {
 }
 
 PropertyGridFontProperty::PropertyGridFontProperty(Window* pWindow, const PropertyGridParam& param):
-    PropertyGridComboProperty(pWindow, param)
+    PropertyGridComboProperty(pWindow, param),
+    m_bCheckingNewValue(false),
+    m_bFontNameValidation(true)
 {
 }
 
@@ -2366,11 +2445,112 @@ void PropertyGridFontProperty::OnInit()
         return;
     }
     BaseClass::OnInit();
-    std::vector<DString> fontList; 
-    GlobalManager::Instance().Font().GetFontNameList(fontList);
-    for (const DString& fontName : fontList) {
-        AddOption(fontName);
+    if (m_fontNameList.empty()) {
+        size_t nSelItemIndex = Box::InvalidIndex;
+        DString defaultFontName = GetPropertyValue();
+        GlobalManager::Instance().Font().GetFontNameList(m_fontNameList);
+        const size_t nCount = m_fontNameList.size();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            const DString& fontName = m_fontNameList[nIndex];
+            size_t nItem = AddOption(fontName);
+            SetOptionData(nItem, nIndex);
+            if (fontName == defaultFontName) {
+                nSelItemIndex = nIndex;
+            }
+        }
+        if (nSelItemIndex != Box::InvalidIndex) {
+            SetCurSel(nSelItemIndex, false);
+            UpdateEditText(false); //强制同步选项与显示保持一致
+        }
     }
+}
+
+void PropertyGridFontProperty::SetFontNameValidation(bool bValidation)
+{
+    m_bFontNameValidation = bValidation;
+}
+
+bool PropertyGridFontProperty::OnPropertyTextChanged(const DString& /*oldText*/, const DString& newText)
+{
+    //属性值变化时，校验其值是否有效
+    bool bRet = true;
+    if (m_bCheckingNewValue) {
+        //函数避免重入
+        return bRet;
+    }
+    struct AutoCheckFlag
+    {
+        explicit AutoCheckFlag(bool* bFlag) : m_bFlag(bFlag) {
+            *m_bFlag = true;
+        }
+        ~AutoCheckFlag() {
+            *m_bFlag = false;
+        }
+        bool* m_bFlag;
+    };
+    AutoCheckFlag checkFlag(&m_bCheckingNewValue);
+
+    //校验新的值，是否合法
+    size_t nNewItemIndex = Box::InvalidIndex;
+    const size_t nCount = m_fontNameList.size();
+    for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+        if (m_fontNameList[nIndex] == newText) {
+            nNewItemIndex = nIndex;
+            break;
+        }
+    }
+    if (nNewItemIndex != Box::InvalidIndex) {
+        //合法值，选择对应的列表项，然后退出
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (GetOptionData(nIndex) == nNewItemIndex) {
+                SetCurSel(nIndex, false);
+                break;
+            }
+        }
+        return bRet;
+    }
+
+    if (!m_bFontNameValidation) {
+        //禁止校验，退出
+        return bRet;
+    }
+    /////////////////////////////
+
+    //旧的选项内容
+    DString oldFontName;
+    const size_t nOldSelItem = GetCurSel();
+    if (Box::IsValidItemIndex(nOldSelItem) && HasOptionData(nOldSelItem)) {
+        size_t nOldSelIndex = GetOptionData(nOldSelItem);
+        if (nOldSelIndex < m_fontNameList.size()) {
+            oldFontName = m_fontNameList[nOldSelIndex];
+        }
+    }
+    if (oldFontName.empty()) {
+        oldFontName = GetPropertyValue();
+    }
+    size_t nSelectedIndex = Box::InvalidIndex;
+    for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+        if (m_fontNameList[nIndex] == oldFontName) {
+            //名字相同，选择该项
+            nSelectedIndex = nIndex;
+            break;
+        }
+    }
+    bool bChecked = false;
+    if (nSelectedIndex != Box::InvalidIndex) {
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (GetOptionData(nIndex) == nSelectedIndex) {
+                SetCurSel(nIndex, false);
+                UpdateEditText(false); //强制同步选项与显示保持一致
+                bChecked = true;
+                break;
+            }
+        }
+    }
+    if (bChecked) {
+        bRet = false;//拦截事件
+    }
+    return bRet;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -2380,7 +2560,9 @@ PropertyGridFontSizeProperty::PropertyGridFontSizeProperty(Window* pWindow,
                                                            const DString& propertyValue,
                                                            const DString& description,
                                                            size_t nPropertyData) :
-    PropertyGridComboProperty(pWindow, propertyName, propertyValue, description, nPropertyData)
+    PropertyGridComboProperty(pWindow, propertyName, propertyValue, description, nPropertyData),
+    m_bCheckingNewValue(false),
+    m_bFontSizeValidation(true)
 {
 }
 
@@ -2395,12 +2577,16 @@ PropertyGridFontSizeProperty::PropertyGridFontSizeProperty(Window* pWindow,
     PropertyGridComboProperty(pWindow, bPropertyNameId, propertyName,
                               bPropertyValueId, propertyValue,
                               bDescriptionId, description,
-                              nPropertyData)
+                              nPropertyData),
+    m_bCheckingNewValue(false),
+    m_bFontSizeValidation(true)
 {
 }
 
 PropertyGridFontSizeProperty::PropertyGridFontSizeProperty(Window* pWindow, const PropertyGridParam& param):
-    PropertyGridComboProperty(pWindow, param)
+    PropertyGridComboProperty(pWindow, param),
+    m_bCheckingNewValue(false),
+    m_bFontSizeValidation(true)
 {
 }
 
@@ -2409,20 +2595,218 @@ DString PropertyGridFontSizeProperty::GetPropertyNewValue() const
     return BaseClass::GetPropertyNewValue();
 }
 
+void PropertyGridFontSizeProperty::SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList)
+{
+    m_externfontSizeList = fontSizeList;
+}
+
+void PropertyGridFontSizeProperty::GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const
+{
+    if (!m_externfontSizeList.empty()) {
+        fontSizeList = m_externfontSizeList;
+    }
+    else {
+        GlobalManager::Instance().Font().GetFontSizeList(fontSizeList);
+    }
+}
+
+void PropertyGridFontSizeProperty::GetDpiFontSizeList(std::vector<FontSizeInfo>& dpiFontSizeList) const
+{
+    GetFontSizeList(dpiFontSizeList);
+    GlobalManager::Instance().Font().DpiScaleFontSizeList(dpiFontSizeList, Dpi());
+}
+
+void PropertyGridFontSizeProperty::UpdateFontSizeOptionList()
+{
+    //记录旧的选项内容
+    FontSizeInfo oldSelSizeInfo;
+    const size_t nOldSelItem = GetCurSel();
+    if (Box::IsValidItemIndex(nOldSelItem) && HasOptionData(nOldSelItem)) {
+        size_t nOldSelIndex = GetOptionData(nOldSelItem);
+        if (nOldSelIndex < m_fillFontSizeList.size()) {
+            oldSelSizeInfo = m_fillFontSizeList[nOldSelIndex];
+        }
+    }
+    DString propValue = GetPropertyNewValue();
+    if (!oldSelSizeInfo.fontSizeName.empty() && (propValue == oldSelSizeInfo.fontSizeName)) {
+        propValue.clear();
+    }
+
+    //删除所有旧的选项内容
+    RemoveAllOptions();
+
+    //默认选择项
+    size_t nSelItem = Box::InvalidIndex;
+
+    std::vector<FontSizeInfo> dpiFontSizeList;
+    GetDpiFontSizeList(dpiFontSizeList);
+    const size_t nCount = dpiFontSizeList.size();
+    for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+        size_t nItem = AddOption(dpiFontSizeList[nIndex].fontSizeName);
+        SetOptionData(nItem, nIndex);
+        if (!propValue.empty() && (dpiFontSizeList[nIndex].fontSizeName == propValue)) {
+            nSelItem = nItem;
+        }
+    }
+    m_fillFontSizeList = dpiFontSizeList;
+
+    //设置列表选择
+    if (nSelItem != Box::InvalidIndex) {
+        SetCurSel(nSelItem, false);
+        UpdateEditText(false);
+    }
+    else if (!oldSelSizeInfo.fontSizeName.empty()) {
+        size_t nSelectedIndex = Box::InvalidIndex;
+        for (int32_t nIndex = (int32_t)nCount - 1; nIndex >= 0; --nIndex) {
+            //按倒序匹配
+            if (std::abs(dpiFontSizeList[nIndex].fFontSize - oldSelSizeInfo.fFontSize) < 0.001f) {
+                //字号相同，选择该项
+                nSelectedIndex = nIndex;
+                break;
+            }
+        }
+
+        if (nSelectedIndex != Box::InvalidIndex) {
+            for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+                if (GetOptionData(nIndex) == nSelectedIndex) {
+                    SetCurSel(nIndex, false);
+                    UpdateEditText(false);
+                }
+            }
+        }
+    }
+}
+
+void PropertyGridFontSizeProperty::SetFontSizeValidation(bool bValidation)
+{
+    m_bFontSizeValidation = bValidation;
+}
+
 void PropertyGridFontSizeProperty::OnInit()
 {
     if (IsInited()) {
         return;
     }
     BaseClass::OnInit();
-    if (m_fontSizeList.empty()) {
-        ui::GlobalManager::Instance().Font().GetFontSizeList(Dpi(), m_fontSizeList);
-        const size_t nCount = m_fontSizeList.size();
-        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-            size_t nItem = AddOption(m_fontSizeList[nIndex].fontSizeName);
-            SetOptionData(nItem, nIndex);
+
+    //初始化字体列表
+    UpdateFontSizeOptionList();
+}
+
+void PropertyGridFontSizeProperty::OnLanguageChanged(bool /*bRedraw*/)
+{
+    //重新填充字体列表
+    UpdateFontSizeOptionList();
+}
+
+void PropertyGridFontSizeProperty::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
+{
+    BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
+    if (!m_fillFontSizeList.empty()) {
+        //更新字体大小的DPI缩放值
+        GlobalManager::Instance().Font().DpiScaleFontSizeList(m_fillFontSizeList, Dpi());
+    }
+}
+
+bool PropertyGridFontSizeProperty::OnPropertyTextChanged(const DString& /*oldText*/, const DString& newText)
+{
+    //属性值变化时，校验其值是否有效
+    bool bRet = true;
+    if (m_fillFontSizeList.empty()) {
+        return bRet;
+    }
+    if (m_bCheckingNewValue) {
+        //函数避免重入
+        return bRet;
+    }
+    struct AutoCheckFlag
+    {
+        explicit AutoCheckFlag(bool* bFlag) : m_bFlag(bFlag) {
+            *m_bFlag = true;
         }
-    }    
+        ~AutoCheckFlag() {
+            *m_bFlag = false;
+        }
+        bool* m_bFlag;
+    };
+    AutoCheckFlag checkFlag(&m_bCheckingNewValue);
+
+    //校验新的值，是否合法
+    size_t nNewItemIndex = Box::InvalidIndex;
+    const size_t nCount = m_fillFontSizeList.size();
+    for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+        if (m_fillFontSizeList[nIndex].fontSizeName == newText) {
+            nNewItemIndex = nIndex;
+            break;
+        }
+    }
+    if (nNewItemIndex != Box::InvalidIndex) {
+        //合法值，选择对应的列表项，然后退出
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (GetOptionData(nIndex) == nNewItemIndex) {
+                SetCurSel(nIndex, false);
+                break;
+            }
+        }
+        return bRet;
+    }
+
+    if (!m_bFontSizeValidation) {
+        //禁止校验，退出
+        return bRet;
+    }
+
+    //旧的选项内容
+    FontSizeInfo oldSelSizeInfo;
+    const size_t nOldSelItem = GetCurSel();
+    if (Box::IsValidItemIndex(nOldSelItem) && HasOptionData(nOldSelItem)) {
+        size_t nOldSelIndex = GetOptionData(nOldSelItem);
+        if (nOldSelIndex < m_fillFontSizeList.size()) {
+            oldSelSizeInfo = m_fillFontSizeList[nOldSelIndex];
+        }
+    }
+    size_t nSelectedIndex = Box::InvalidIndex;
+    if (IsComboEditing() && !oldSelSizeInfo.fontSizeName.empty()) {
+        //编辑状态下，优先匹配字体名称
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (m_fillFontSizeList[nIndex].fontSizeName == oldSelSizeInfo.fontSizeName) {
+                //名字相同，选择该项
+                nSelectedIndex = nIndex;
+                break;
+            }
+        }
+    }
+    if (nSelectedIndex == Box::InvalidIndex) {
+        for (int32_t nIndex = (int32_t)nCount - 1; nIndex >= 0; --nIndex) {
+            //按倒序匹配
+            if (std::abs(m_fillFontSizeList[nIndex].fFontSize - oldSelSizeInfo.fFontSize) < 0.001f) {
+                //字号相同，选择该项
+                nSelectedIndex = nIndex;
+                break;
+            }
+        }
+    }
+    if (nSelectedIndex == Box::InvalidIndex) {
+        const DString oldPropValue = GetPropertyValue();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (m_fillFontSizeList[nIndex].fontSizeName == oldPropValue) {
+                //选择原值
+                nSelectedIndex = nIndex;
+                break;
+            }
+        }
+    }
+    if (nSelectedIndex != Box::InvalidIndex) {
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            if (GetOptionData(nIndex) == nSelectedIndex) {
+                SetCurSel(nIndex, false);
+                UpdateEditText(false); //强制同步选项与显示保持一致
+                bRet = false;//拦截事件
+                break;
+            }
+        }
+    }
+    return bRet;
 }
 
 DString PropertyGridFontSizeProperty::GetFontSize() const
@@ -2431,8 +2815,8 @@ DString PropertyGridFontSizeProperty::GetFontSize() const
     size_t nCurSel = GetCurSel();
     if (nCurSel != Box::InvalidIndex) {
         size_t nIndex = GetOptionData(nCurSel);
-        if (nIndex < m_fontSizeList.size()) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fFontSize);
+        if (nIndex < m_fillFontSizeList.size()) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fFontSize);
         }
     }
     if (fontSize.empty()) {
@@ -2447,8 +2831,8 @@ DString PropertyGridFontSizeProperty::GetDpiFontSize() const
     size_t nCurSel = GetCurSel();
     if (nCurSel != Box::InvalidIndex) {
         size_t nIndex = GetOptionData(nCurSel);
-        if (nIndex < m_fontSizeList.size()) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fDpiFontSize);
+        if (nIndex < m_fillFontSizeList.size()) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fDpiFontSize);
         }
     }
     if (fontSize.empty()) {
@@ -2460,10 +2844,10 @@ DString PropertyGridFontSizeProperty::GetDpiFontSize() const
 DString PropertyGridFontSizeProperty::GetFontSize(const DString& fontSizeName) const
 {
     DString fontSize;
-    const size_t nCount = m_fontSizeList.size();
+    const size_t nCount = m_fillFontSizeList.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        if (m_fontSizeList[nIndex].fontSizeName == fontSizeName) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fFontSize);
+        if (m_fillFontSizeList[nIndex].fontSizeName == fontSizeName) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fFontSize);
             break;
         }
     }
@@ -2474,10 +2858,10 @@ DString PropertyGridFontSizeProperty::GetFontSizeById(const DString& fontSizeNam
 {
     DString fontSizeName = ui::GlobalManager::GetTextById(fontSizeNameId);
     DString fontSize;
-    const size_t nCount = m_fontSizeList.size();
+    const size_t nCount = m_fillFontSizeList.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        if (m_fontSizeList[nIndex].fontSizeName == fontSizeName) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fFontSize);
+        if (m_fillFontSizeList[nIndex].fontSizeName == fontSizeName) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fFontSize);
             break;
         }
     }
@@ -2487,10 +2871,10 @@ DString PropertyGridFontSizeProperty::GetFontSizeById(const DString& fontSizeNam
 DString PropertyGridFontSizeProperty::GetDpiFontSize(const DString& fontSizeName) const
 {
     DString fontSize;
-    const size_t nCount = m_fontSizeList.size();
+    const size_t nCount = m_fillFontSizeList.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        if (m_fontSizeList[nIndex].fontSizeName == fontSizeName) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fDpiFontSize);
+        if (m_fillFontSizeList[nIndex].fontSizeName == fontSizeName) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fDpiFontSize);
             break;
         }
     }
@@ -2501,10 +2885,10 @@ DString PropertyGridFontSizeProperty::GetDpiFontSizeById(const DString& fontSize
 {
     DString fontSizeName = ui::GlobalManager::GetTextById(fontSizeNameId);
     DString fontSize;
-    const size_t nCount = m_fontSizeList.size();
+    const size_t nCount = m_fillFontSizeList.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        if (m_fontSizeList[nIndex].fontSizeName == fontSizeName) {
-            fontSize = StringUtil::Printf(_T("%.01f"), m_fontSizeList[nIndex].fDpiFontSize);
+        if (m_fillFontSizeList[nIndex].fontSizeName == fontSizeName) {
+            fontSize = StringUtil::Printf(_T("%.01f"), m_fillFontSizeList[nIndex].fDpiFontSize);
             break;
         }
     }
@@ -2581,27 +2965,43 @@ void PropertyGridColorProperty::EnableEditControl(bool bEnable)
 
     //挂载回车和焦点切换事件
     m_pComboButton->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        ShowEditControl(false, false);
         return true;
         });
+    m_pComboButton->AttachEvent(ui::kEventKeyDown, [this](const EventArgs& args) {
+        if (args.vkCode == ui::kVK_ESCAPE) {
+            //取消
+            ShowEditControl(false, true);
+        }        
+        return true;
+        }, 0);
 
     InitColorCombo();
 }
 
-Control* PropertyGridColorProperty::ShowEditControl(bool bShow)
+Control* PropertyGridColorProperty::ShowEditControl(bool bShow, bool bCancel)
 {
     if (IsReadOnly() || (m_pComboButton == nullptr)) {
         return nullptr;
     }
 
     if (bShow) {
+        m_oldColor.clear();
+        Label* pColorLabel = m_pComboButton->GetLabelTop();
+        if (pColorLabel != nullptr) {
+            m_oldColor = pColorLabel->GetText();
+        }
         m_pComboButton->SetVisible(true);
         m_pComboButton->SetFocus();
     }
     else {
+        if (bCancel) {
+            //取消
+            OnSelectColor(m_oldColor.c_str());
+        }
         DString newText;
         Label* pColorLabel = m_pComboButton->GetLabelTop();
-        if (pColorLabel != nullptr) {
+        if (pColorLabel != nullptr) {            
             newText = pColorLabel->GetText();
         }
         bool bChanged = newText != GetPropertyValue(); //相对原值，是否有修改
@@ -2807,12 +3207,12 @@ void PropertyGridDateTimeProperty::EnableEditControl(bool bEnable)
 
     //挂载焦点切换事件
     m_pDateTime->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        ShowEditControl(false, false);
         return true;
         });
 }
 
-Control* PropertyGridDateTimeProperty::ShowEditControl(bool bShow)
+Control* PropertyGridDateTimeProperty::ShowEditControl(bool bShow, bool /*bCancel*/)
 {
     if (IsReadOnly() || (m_pDateTime == nullptr)) {
         return nullptr;
@@ -2901,12 +3301,12 @@ void PropertyGridIPAddressProperty::EnableEditControl(bool bEnable)
 
     //挂载回车和焦点切换事件
     m_pIPAddress->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        ShowEditControl(false, false);
         return true;
         });
 }
 
-Control* PropertyGridIPAddressProperty::ShowEditControl(bool bShow)
+Control* PropertyGridIPAddressProperty::ShowEditControl(bool bShow, bool /*bCancel*/)
 {
     if (IsReadOnly() || (m_pIPAddress == nullptr)) {
         return nullptr;
@@ -2995,12 +3395,12 @@ void PropertyGridHotKeyProperty::EnableEditControl(bool bEnable)
 
     //挂载回车和焦点切换事件
     m_pHotKey->AttachKillFocus([this](const EventArgs&) {
-        ShowEditControl(false);
+        ShowEditControl(false, false);
         return true;
         });
 }
 
-Control* PropertyGridHotKeyProperty::ShowEditControl(bool bShow)
+Control* PropertyGridHotKeyProperty::ShowEditControl(bool bShow, bool /*bCancel*/)
 {
     if (IsReadOnly() || (m_pHotKey == nullptr)) {
         return nullptr;

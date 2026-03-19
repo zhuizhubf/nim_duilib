@@ -362,7 +362,7 @@ void FontManager::SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList)
     m_fontSizeList = fontSizeList;
 }
 
-void FontManager::GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const
+void FontManager::GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const
 {
     fontSizeList = m_fontSizeList; //默认以外部设置的字体大小列表为最高优先级
     if (fontSizeList.empty()) {
@@ -404,8 +404,20 @@ void FontManager::GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInf
                 }
             }
         }
-    }
+    }    
+}
 
+void FontManager::GetDpiFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const
+{
+    //获取默认的字体列表，未DPI缩放的值
+    GetFontSizeList(fontSizeList);
+
+    //更新DPI自适应值
+    DpiScaleFontSizeList(fontSizeList, dpi);
+}
+
+void FontManager::DpiScaleFontSizeList(std::vector<FontSizeInfo>& fontSizeList, const DpiManager& dpi) const
+{
     //更新DPI自适应值
     for (FontSizeInfo& fontSize : fontSizeList) {
         int32_t nSize = static_cast<int32_t>(fontSize.fFontSize * 1000);
@@ -414,4 +426,4 @@ void FontManager::GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInf
     }
 }
 
-}
+}// namespace ui

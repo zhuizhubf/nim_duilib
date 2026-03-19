@@ -109,11 +109,22 @@ public:
     */
     void SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList);
 
-    /** 获取默认的字体大小列表
-    * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
+    /** 获取默认的字体大小列表，字体大小值未进行DPI缩放
     * @param [out] fontSizeList 字体大小信息
     */
-    void GetFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const;
+    void GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const;
+
+    /** 获取默认的字体大小列表(执行DPI缩放)
+    * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
+    * @param [in,out] fontSizeList 字体大小信息
+    */
+    void GetDpiFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const;
+
+    /** 对字体列表执行DPI缩放
+    * @param [in,out] fontSizeList 字体大小信息
+    * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
+    */
+    void DpiScaleFontSizeList(std::vector<FontSizeInfo>& fontSizeList, const DpiManager& dpi) const;
 
 private:
     /** 获取DPI缩放后实际的字体ID
