@@ -67,8 +67,9 @@ void ScrollBar::SetOwner(ScrollBox* pOwner)
 
 DString ScrollBar::GetType() const { return DUI_CTR_SCROLLBAR; }
 
-void ScrollBar::SetAttribute(const DString& strName, const DString& strValue)
+void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if ((strName == _T("button1_normal_image")) || (strName == _T("button1normalimage"))) {
         SetButton1StateImage(kControlStateNormal, strValue);
     }

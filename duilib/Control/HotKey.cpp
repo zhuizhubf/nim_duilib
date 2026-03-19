@@ -263,8 +263,9 @@ HotKey::~HotKey()
 
 DString HotKey::GetType() const { return DUI_CTR_HOTKEY; }
 
-void HotKey::SetAttribute(const DString& strName, const DString& strValue)
+void HotKey::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("default_text")) {
         if (m_pRichEdit != nullptr) {
             m_pRichEdit->SetDefaultText(strValue);

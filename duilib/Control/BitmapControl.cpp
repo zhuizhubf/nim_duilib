@@ -28,8 +28,9 @@ BitmapControl::~BitmapControl()
 
 DString BitmapControl::GetType() const { return DUI_CTR_BITMAP_CONTROL; }
 
-void BitmapControl::SetAttribute(const DString& strName, const DString& strValue)
+void BitmapControl::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("bitmap_halign")) {
         ASSERT((strValue == _T("left")) || (strValue == _T("center")) || (strValue == _T("right")));
         if (strValue == _T("center")) {

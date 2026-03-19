@@ -1339,10 +1339,10 @@ void GlobalManager::ClearVars()
     m_defineMap.clear();
 }
 
-void GlobalManager::ExpandVarStrings(DString& varValue) const
+DString& GlobalManager::ExpandVarStrings(DString& varValue) const
 {
     if (m_defineMap.empty() || varValue.empty()) {
-        return;
+        return varValue;
     }
 
     bool hasPlaceholder = true;
@@ -1380,6 +1380,14 @@ void GlobalManager::ExpandVarStrings(DString& varValue) const
             hasPlaceholder = true; // 仍有占位符未处理，继续循环
         }
     }
+    return varValue;
+}
+
+DString GlobalManager::GetExpandVarStrings(const DString& varValue) const
+{
+    DString tempValue = varValue;
+    ExpandVarStrings(tempValue);
+    return tempValue;
 }
 
 } // namespace ui

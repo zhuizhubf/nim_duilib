@@ -335,8 +335,9 @@ Combo::~Combo()
 
 DString Combo::GetType() const { return DUI_CTR_COMBO; }
 
-void Combo::SetAttribute(const DString& strName, const DString& strValue)
+void Combo::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("combo_type")) {
         if (strValue == _T("drop_list")) {
             SetComboType(kCombo_DropList);

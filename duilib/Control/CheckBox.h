@@ -400,8 +400,9 @@ template<>
 inline DString CheckBoxTemplate<VBox>::GetType() const { return DUI_CTR_CHECKBOXVBOX; }
 
 template<typename InheritType>
-void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue)
+void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("selected")) {
         Selected(StringUtil::IsValueTrue(strValue), true);
     }

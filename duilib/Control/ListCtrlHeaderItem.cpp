@@ -37,8 +37,9 @@ ListCtrlHeaderItem::~ListCtrlHeaderItem()
  
 DString ListCtrlHeaderItem::GetType() const { return _T("ListCtrlHeaderItem"); }
 
-void ListCtrlHeaderItem::SetAttribute(const DString& strName, const DString& strValue)
+void ListCtrlHeaderItem::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("sorted_up_image")) {
         SetSortedUpImage(strValue);
     }

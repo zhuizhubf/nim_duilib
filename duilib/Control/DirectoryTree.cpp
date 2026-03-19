@@ -55,8 +55,9 @@ void DirectoryTree::DeleteFolderStatus(FolderStatus* pFolderStatus)
 
 DString DirectoryTree::GetType() const { return DUI_CTR_DIRECTORY_TREE; }
 
-void DirectoryTree::SetAttribute(const DString& strName, const DString& strValue)
+void DirectoryTree::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
     if (strName == _T("small_icon_size")) {
         SetSmallIconSize(StringUtil::StringToInt32(strValue));

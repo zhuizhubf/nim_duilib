@@ -297,8 +297,9 @@ template<>
 inline DString ControlDragableT<VBox>::GetType() const { return DUI_CTR_VBOX_DRAGABLE; }
 
 template<typename T>
-void ControlDragableT<T>::SetAttribute(const DString& strName, const DString& strValue)
+void ControlDragableT<T>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("drag_order")) {
         //是否支持拖动调整顺序（在同一个容器内）
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));

@@ -31,8 +31,9 @@ AddressBar::AddressBar(Window* pWindow):
 
 DString AddressBar::GetType() const { return DUI_CTR_ADDRESS_BAR; }
 
-void AddressBar::SetAttribute(const DString& strName, const DString& strValue)
+void AddressBar::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("path_tooltip")) {
         SetEnablePathTooltip(StringUtil::IsValueTrue(strValue));
     }

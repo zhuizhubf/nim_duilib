@@ -26,8 +26,9 @@ CircleProgress::~CircleProgress()
 
 DString CircleProgress::GetType() const { return DUI_CTR_CIRCLEPROGRESS; }
 
-void CircleProgress::SetAttribute(const DString& srName, const DString& strValue)
+void CircleProgress::SetAttribute(const DString& srName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (srName == _T("circular")) {
         SetCircular(StringUtil::IsValueTrue(strValue));
     }

@@ -24,8 +24,9 @@ WebView2Control::~WebView2Control()
 
 DString WebView2Control::GetType() const { return DUI_CTR_WEBVIEW2; }
 
-void WebView2Control::SetAttribute(const DString& strName, const DString& strValue)
+void WebView2Control::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("url")) {
         //初始化加载的URL
         SetInitURL(strValue);

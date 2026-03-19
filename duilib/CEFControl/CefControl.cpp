@@ -34,8 +34,9 @@ CefControl::~CefControl(void)
 
 DString CefControl::GetType() const { return DUI_CTR_CEF; }
 
-void CefControl::SetAttribute(const DString& strName, const DString& strValue)
+void CefControl::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("url")) {
         //初始化加载的URL
         SetInitURL(strValue);

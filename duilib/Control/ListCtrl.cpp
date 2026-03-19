@@ -107,8 +107,9 @@ ImageListPtr ListCtrl::GetImageList(ListCtrlType type) const
     }
 }
 
-void ListCtrl::SetAttribute(const DString& strName, const DString& strValue)
+void ListCtrl::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("header_class")) {
         SetHeaderClass(strValue);
     }

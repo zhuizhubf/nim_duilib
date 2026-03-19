@@ -44,8 +44,9 @@ ListBox::~ListBox()
 
 DString ListBox::GetType() const { return _T("ListBox"); }
 
-void ListBox::SetAttribute(const DString& strName, const DString& strValue)
+void ListBox::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("multi_select")) {
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
     }

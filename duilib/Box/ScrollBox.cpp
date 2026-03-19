@@ -30,62 +30,63 @@ ScrollBox::~ScrollBox()
 
 DString ScrollBox::GetType() const { return DUI_CTR_SCROLLBOX; }//ScrollBox
 
-void ScrollBox::SetAttribute(const DString& pstrName, const DString& pstrValue)
+void ScrollBox::SetAttribute(const DString& strName, const DString& strValue2)
 {
-    if (pstrName == _T("vscrollbar")) {
-        EnableScrollBar(pstrValue == _T("true"), GetHScrollBar() != nullptr);
+    DString strValue = GetExpandVarStrings(strValue2);
+    if (strName == _T("vscrollbar")) {
+        EnableScrollBar(StringUtil::IsValueTrue(strValue), GetHScrollBar() != nullptr);
     }
-    else if ((pstrName == _T("vscrollbar_style")) || (pstrName == _T("vscrollbarstyle"))) {
+    else if ((strName == _T("vscrollbar_style")) || (strName == _T("vscrollbarstyle"))) {
         EnableScrollBar(true, GetHScrollBar() != nullptr);
         if (GetVScrollBar() != nullptr) {
-            GetVScrollBar()->ApplyAttributeList(pstrValue);
+            GetVScrollBar()->ApplyAttributeList(strValue);
         }
     }
-    else if (pstrName == _T("vscrollbar_class")) {
+    else if (strName == _T("vscrollbar_class")) {
         EnableScrollBar(true, GetHScrollBar() != nullptr);
         if (GetVScrollBar() != nullptr) {
-            GetVScrollBar()->SetClass(pstrValue);
+            GetVScrollBar()->SetClass(strValue);
         }
     }
-    else if (pstrName == _T("hscrollbar")) {
-        EnableScrollBar(GetVScrollBar() != nullptr, pstrValue == _T("true"));
+    else if (strName == _T("hscrollbar")) {
+        EnableScrollBar(GetVScrollBar() != nullptr, StringUtil::IsValueTrue(strValue));
     }
-    else if ((pstrName == _T("hscrollbar_style")) || (pstrName == _T("hscrollbarstyle"))) {
+    else if ((strName == _T("hscrollbar_style")) || (strName == _T("hscrollbarstyle"))) {
         EnableScrollBar(GetVScrollBar() != nullptr, true);
         if (GetHScrollBar() != nullptr) {
-            GetHScrollBar()->ApplyAttributeList(pstrValue);
+            GetHScrollBar()->ApplyAttributeList(strValue);
         }
     }
-    else if (pstrName == _T("hscrollbar_class")) {
+    else if (strName == _T("hscrollbar_class")) {
         EnableScrollBar(GetVScrollBar() != nullptr, true);
         if (GetHScrollBar() != nullptr) {
-            GetHScrollBar()->SetClass(pstrValue);
+            GetHScrollBar()->SetClass(strValue);
         }
     }
-    else if ((pstrName == _T("scrollbar_padding")) || (pstrName == _T("scrollbarpadding"))) {
+    else if ((strName == _T("scrollbar_padding")) || (strName == _T("scrollbarpadding"))) {
         UiPadding rcScrollbarPadding;
-        AttributeUtil::ParsePaddingValue(pstrValue.c_str(), rcScrollbarPadding);
+        AttributeUtil::ParsePaddingValue(strValue.c_str(), rcScrollbarPadding);
         SetScrollBarPadding(rcScrollbarPadding, true);
     }
-    else if ((pstrName == _T("vscroll_unit")) || (pstrName == _T("vscrollunit"))) {
-        int32_t iValue = StringUtil::StringToInt32(pstrValue);
+    else if ((strName == _T("vscroll_unit")) || (strName == _T("vscrollunit"))) {
+        int32_t iValue = StringUtil::StringToInt32(strValue);
         SetVerScrollUnitPixels(iValue, true);
     }
-    else if ((pstrName == _T("hscroll_unit")) || (pstrName == _T("hscrollunit"))) {
-        int32_t iValue = StringUtil::StringToInt32(pstrValue);
+    else if ((strName == _T("hscroll_unit")) || (strName == _T("hscrollunit"))) {
+        int32_t iValue = StringUtil::StringToInt32(strValue);
         SetHorScrollUnitPixels(iValue, true);
     }
-    else if ((pstrName == _T("scrollbar_float")) || (pstrName == _T("scrollbarfloat"))) {
-        SetScrollBarFloat(pstrValue == _T("true"));
+    else if ((strName == _T("scrollbar_float")) || (strName == _T("scrollbarfloat"))) {
+        SetScrollBarFloat(StringUtil::IsValueTrue(strValue));
     }
-    else if ((pstrName == _T("vscrollbar_left")) || (pstrName == _T("vscrollbarleft"))) {
-        SetVScrollBarAtLeft(pstrValue == _T("true"));
+    else if ((strName == _T("vscrollbar_left")) || (strName == _T("vscrollbarleft"))) {
+        SetVScrollBarAtLeft(StringUtil::IsValueTrue(strValue));
     }
-    else if ((pstrName == _T("hold_end")) || (pstrName == _T("holdend"))) {
-        SetHoldEnd(pstrValue == _T("true"));
+    else if ((strName == _T("hold_end")) || (strName == _T("holdend"))) {
+        SetHoldEnd(StringUtil::IsValueTrue(strValue));
     }
     else {
-        Box::SetAttribute(pstrName, pstrValue);
+        Box::SetAttribute(strName, strValue);
     }
 }
 

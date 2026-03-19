@@ -160,8 +160,9 @@ void Slider::HandleEvent(const EventArgs& msg)
     Progress::HandleEvent(msg);
 }
 
-void Slider::SetAttribute(const DString& strName, const DString& strValue)
+void Slider::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("step")) {
         SetChangeStep(StringUtil::StringToInt32(strValue));
     }

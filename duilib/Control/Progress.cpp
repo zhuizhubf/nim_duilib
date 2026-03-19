@@ -142,8 +142,9 @@ void Progress::SetProgressColor(const DString& strProgressColor)
     Invalidate();
 }
 
-void Progress::SetAttribute(const DString& srName, const DString& strValue)
+void Progress::SetAttribute(const DString& srName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if ((srName == _T("horizontal")) || (srName == _T("hor"))){
         SetHorizontal(StringUtil::IsValueTrue(strValue));
     }

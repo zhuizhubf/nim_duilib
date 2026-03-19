@@ -200,8 +200,9 @@ void ColorPickerRegular::SetColumns(int32_t nColumns)
     }
 }
 
-void ColorPickerRegular::SetAttribute(const DString& strName, const DString& strValue)
+void ColorPickerRegular::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("color_type")) {
         if (strValue == _T("basic")) {
             //使用基本颜色

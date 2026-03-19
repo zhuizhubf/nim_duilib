@@ -115,8 +115,9 @@ RichEdit::~RichEdit()
 
 DString RichEdit::GetType() const { return DUI_CTR_RICHEDIT; }
 
-void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
+void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
         SetMultiLine(strValue != _T("true"));
     }

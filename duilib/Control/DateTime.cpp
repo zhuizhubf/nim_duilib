@@ -35,8 +35,9 @@ DateTime::~DateTime()
 
 DString DateTime::GetType() const { return DUI_CTR_DATETIME; }
 
-void DateTime::SetAttribute(const DString& strName, const DString& strValue)
+void DateTime::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("format")) {
         SetStringFormat(strValue);
     }

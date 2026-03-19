@@ -166,8 +166,9 @@ UiColor GroupBoxTemplate<InheritType>::GetFadeColor(UiColor color, uint8_t nFade
 }
 
 template<typename InheritType>
-void GroupBoxTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue)
+void GroupBoxTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("corner_size")) {
         //圆角大小
         UiSize cxyRound;

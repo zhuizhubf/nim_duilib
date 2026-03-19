@@ -212,8 +212,9 @@ template<>
 inline DString ControlResizableT<VBox>::GetType() const { return DUI_CTR_VBOX_RESIZABLE; }
 
 template<typename T>
-void ControlResizableT<T>::SetAttribute(const DString& strName, const DString& strValue)
+void ControlResizableT<T>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("enable_resize")) {
         SetEnableResize(StringUtil::IsValueTrue(strValue));
     }

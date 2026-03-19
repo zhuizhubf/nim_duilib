@@ -219,8 +219,9 @@ template<>
 inline DString RichTextT<VBox>::GetType() const { return DUI_CTR_RICHTEXT_VBOX; }
 
 template<typename T>
-void RichTextT<T>::SetAttribute(const DString& strName, const DString& strValue)
+void RichTextT<T>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (!m_impl->SetAttribute(strName, strValue)) {
         BaseClass::SetAttribute(strName, strValue);
     }

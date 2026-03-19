@@ -404,8 +404,9 @@ public:
 
     /** 设置控件指定属性
      */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override
+    virtual void SetAttribute(const DString& strName, const DString& strValue2) override
     {
+        DString strValue = GetExpandVarStrings(strValue2);
         if (strName == _T("cursor_file")) {
             m_cursorFile = strValue;
         }

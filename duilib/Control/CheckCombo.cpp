@@ -288,8 +288,9 @@ CheckCombo::~CheckCombo()
 
 DString CheckCombo::GetType() const { return DUI_CTR_CHECK_COMBO; }
 
-void CheckCombo::SetAttribute(const DString& strName, const DString& strValue)
+void CheckCombo::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("dropbox")) {
         SetDropBoxAttributeList(strValue);
     }

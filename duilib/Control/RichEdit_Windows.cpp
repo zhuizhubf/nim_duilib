@@ -395,8 +395,9 @@ RichEdit::~RichEdit()
     m_pLimitChars.reset();
 }
 
-void RichEdit::SetAttribute(const DString& strName, const DString& strValue)
+void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("vscrollbar")) {
         //纵向滚动条
         if (StringUtil::IsValueTrue(strValue)) {

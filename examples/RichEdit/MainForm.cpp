@@ -253,7 +253,7 @@ void MainForm::OnInitWindow()
     }
     ui::Combo* pFontSizeCombo = dynamic_cast<ui::Combo*>(FindControl(_T("combo_font_size")));
     if (pFontSizeCombo != nullptr) {
-        ui::GlobalManager::Instance().Font().GetFontSizeList(Dpi(), m_fontSizeList);
+        ui::GlobalManager::Instance().Font().GetDpiFontSizeList(Dpi(), m_fontSizeList);
         for (size_t nIndex = 0; nIndex < m_fontSizeList.size(); ++nIndex) {
             const ui::FontSizeInfo& fontSize = m_fontSizeList[nIndex];
             size_t nItemIndex = pFontSizeCombo->AddTextItem(fontSize.fontSizeName);

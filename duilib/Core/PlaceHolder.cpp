@@ -25,7 +25,8 @@ PlaceHolder::PlaceHolder(Window* pWindow) :
     m_bEnableControlPadding(true),
     m_bInited(false),
     m_bReEstimateSize(true),
-    m_pEstResult(nullptr)
+    m_pEstResult(nullptr),
+    m_bEnableVars(true)
 {
     //控件的高度和宽度值，默认设置为拉伸
     m_cxyFixed.cx.SetStretch();
@@ -762,6 +763,32 @@ bool PlaceHolder::IsControlRelated(const PlaceHolder* pAncestor, const PlaceHold
 const DpiManager& PlaceHolder::Dpi() const
 {
     return (m_pWindow != nullptr) ? m_pWindow->Dpi() : GlobalManager::Instance().Dpi();
+}
+
+void PlaceHolder::SetEnableVars(bool bEnableVars)
+{
+    m_bEnableVars = bEnableVars;
+}
+
+bool PlaceHolder::IsEnableVars() const
+{
+    return m_bEnableVars;
+}
+
+DString& PlaceHolder::ExpandVarStrings(DString& varValue) const
+{
+    if (IsEnableVars()) {
+        GlobalManager::Instance().ExpandVarStrings(varValue);
+    }
+    return varValue;
+}
+
+DString PlaceHolder::GetExpandVarStrings(const DString& varValue) const
+{
+    if (IsEnableVars()) {
+        return GlobalManager::Instance().GetExpandVarStrings(varValue);
+    }
+    return varValue;
 }
 
 }

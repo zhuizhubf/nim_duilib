@@ -43,8 +43,9 @@ TreeNode::~TreeNode()
 
 DString TreeNode::GetType() const { return DUI_CTR_TREENODE; }
 
-void TreeNode::SetAttribute(const DString& strName, const DString& strValue)
+void TreeNode::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("expand_normal_image")) {
         SetExpandStateImage(kControlStateNormal, strValue);
     }
@@ -1149,8 +1150,9 @@ TreeView::~TreeView()
 
 DString TreeView::GetType() const { return DUI_CTR_TREEVIEW; }
 
-void TreeView::SetAttribute(const DString& strName, const DString& strValue)
+void TreeView::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
     if (strName == _T("indent")) {
         //树节点的缩进（每层节点缩进一个indent单位）

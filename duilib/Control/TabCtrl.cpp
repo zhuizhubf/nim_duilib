@@ -14,8 +14,9 @@ TabCtrl::TabCtrl(Window* pWindow):
 
 DString TabCtrl::GetType() const { return DUI_CTR_TAB_CTRL; }
 
-void TabCtrl::SetAttribute(const DString& strName, const DString& strValue)
+void TabCtrl::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("selected_id")) {
         int32_t nValue = StringUtil::StringToInt32(strValue);
         if (nValue >= 0) {
@@ -246,8 +247,9 @@ TabCtrlItem::TabCtrlItem(Window* pWindow):
 
 DString TabCtrlItem::GetType() const { return DUI_CTR_TAB_CTRL_ITEM; }
 
-void TabCtrlItem::SetAttribute(const DString& strName, const DString& strValue)
+void TabCtrlItem::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("tab_box_item_index")) {
         SetTabBoxItemIndex((size_t)StringUtil::StringToInt32(strValue));
     }

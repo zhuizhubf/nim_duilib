@@ -17,8 +17,9 @@ Line::Line(Window* pWindow):
 
 DString Line::GetType() const { return DUI_CTR_LINE; }
 
-void Line::SetAttribute(const DString& strName, const DString& strValue)
+void Line::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("vertical")) {
         SetLineVertical(StringUtil::IsValueTrue(strValue));
     }

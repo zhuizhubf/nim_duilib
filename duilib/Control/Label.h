@@ -284,8 +284,9 @@ template<>
 inline DString LabelTemplate<VBox>::GetType() const { return DUI_CTR_LABELVBOX; }
 
 template<typename T>
-void LabelTemplate<T>::SetAttribute(const DString& strName, const DString& strValue)
+void LabelTemplate<T>::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = this->GetExpandVarStrings(strValue2);
     if (!m_impl->OnSetAttribute(strName, strValue)) {
         BaseClass::SetAttribute(strName, strValue);
     }

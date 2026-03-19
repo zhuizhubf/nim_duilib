@@ -17,8 +17,9 @@ public:
     }
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override { return DUI_CTR_HYPER_LINK; }
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override
+    virtual void SetAttribute(const DString& strName, const DString& strValue2) override
     {
+        DString strValue = GetExpandVarStrings(strValue2);
         if (strName == _T("url")) {
             m_url = strValue;
         }

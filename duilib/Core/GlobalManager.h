@@ -410,8 +410,13 @@ public:
      *   属性字符串中可以这样使用这个变量：width='${SIZE_ICON_SMALL}'
      *   使用该函数展开后，变量的取值变成了：width='16'
      * @param [in,out] varValue 需要展开变量的字符串
+     * @return 返回varValue
      */
-    void ExpandVarStrings(DString& varValue) const;
+    DString& ExpandVarStrings(DString& varValue) const;
+
+    /** 函数功能：如果varValue中有Define定义的变量，替换为对应的值（功能同上）
+    */
+    DString GetExpandVarStrings(const DString& varValue) const;
 
 public:
     /** 清除主题相关的缓存（切换主题后，立即生效）

@@ -1,5 +1,6 @@
 #include "Box.h"
 #include "duilib/Core/Window.h"
+#include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringUtil.h"
 
 namespace ui
@@ -37,8 +38,9 @@ Box::~Box()
 
 DString Box::GetType() const { return DUI_CTR_BOX; }
 
-void Box::SetAttribute(const DString& strName, const DString& strValue)
+void Box::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (m_pLayout->SetAttribute(strName, strValue, Dpi())) {
         return;
     }

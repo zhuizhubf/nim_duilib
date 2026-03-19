@@ -289,8 +289,9 @@ ComboButton::~ComboButton()
 
 DString ComboButton::GetType() const { return DUI_CTR_COMBO_BUTTON; }
 
-void ComboButton::SetAttribute(const DString& strName, const DString& strValue)
+void ComboButton::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize")) ) {
         //设置下拉列表的大小（宽度和高度）
         UiSize szDropBoxSize;

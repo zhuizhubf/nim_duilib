@@ -77,11 +77,17 @@ Control::~Control()
 
 DString Control::GetType() const { return DUI_CTR_CONTROL; }
 
-void Control::SetAttribute(const DString& strName, const DString& strValue)
+void Control::SetAttribute(const DString& strName, const DString& strValue2)
 {
     ASSERT(GetWindow() != nullptr);//由于需要做DPI感知功能，所以必须先设置关联窗口
+
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("class")) {
         SetClass(strValue);
+    }
+    else if (strName == _T("enable_vars")) {
+        //属性值中是否支持变量展开
+        SetEnableVars(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("halign")) {
         if (strValue == _T("left")) {

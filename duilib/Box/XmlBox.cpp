@@ -24,8 +24,9 @@ XmlBox::~XmlBox()
 
 DString XmlBox::GetType() const { return DUI_CTR_XMLBOX; }
 
-void XmlBox::SetAttribute(const DString& strName, const DString& strValue)
+void XmlBox::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("xml_file_path")) {
         SetXmlFilePath(FilePath(strValue));
     }

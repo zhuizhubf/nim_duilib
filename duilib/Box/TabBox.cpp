@@ -19,8 +19,9 @@ TabBox::TabBox(Window* pWindow, Layout* pLayout):
 
 DString TabBox::GetType() const { return DUI_CTR_TABBOX; }
 
-void TabBox::SetAttribute(const DString& strName, const DString& strValue)
+void TabBox::SetAttribute(const DString& strName, const DString& strValue2)
 {
+    DString strValue = GetExpandVarStrings(strValue2);
     if ((strName == _T("selected_id")) || (strName == _T("selectedid"))) {
         size_t iSel = (size_t)StringUtil::StringToInt32(strValue);
         if (IsInited()) {

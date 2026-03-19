@@ -11,6 +11,7 @@
 | 属性名称 | 默认值 | 参数类型 |关联[Control.h](../duilib/Core/Control.h)中的函数| 用途 |
 | :--- | :--- | :--- | :---| :--- |
 | class |  | string | SetClass|控件样式,用样式里面的属性值来设置本控件的属性,如(btn_default),可以同时指定多个样式,各个样式之间用空格分隔,需要写在第一个属性位置 |
+| enable_vars | true | bool | SetEnableVars| 属性值中是否支持变量展开。<br> 用法举例：假设在globle.xml中增加一行变量定义：`<Define name="SIZE_ICON_SMALL" value="16"/>` <br> XML中的控件属性字符串中可以这样使用这个变量：`width="${SIZE_ICON_SMALL}"` <br> 代码中也可以这样调用函数设置属性代码：`Control::SetAttribute(_T("width"), _T("${SIZE_ICON_SMALL}"));`|
 | name |  | string | SetName|控件名字,同一窗口建议保持唯一，否则影响查询效率，也可能查询不到正确的结果 |
 | width | stretch | int / string | SetFixedWidth|可以设置int或string类型的值.当值为int是则设置控件的宽度值,如(100);当值为string时,stretch代表由父容器计算控件宽度,auto代表根据内容情况自动计算宽度,如果为百分比值"50%"，代表该控件的宽度期望值为父控件宽度的50% |
 | height | stretch | int / string | SetFixedHeight|可以设置int或string类型的值.当值为int是则设置控件的高度值,如(100);当值为string时,stretch代表由父容器计算控件高度,auto代表根据内容情况自动计算高度,如果为百分比值"30%"，代表该控件的宽度期望值为父控件高度的30%  |
