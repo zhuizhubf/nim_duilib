@@ -372,7 +372,7 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
 
         subItemData.nTextFormat = ui::DrawStringFormat::TEXT_HCENTER | ui::DrawStringFormat::TEXT_VCENTER;
 
-        subItemData.text = GlobalManager::GetTextById(GetDeviceTypeStringId(diskInfo.m_deviceType));
+        subItemData.text = ui::GlobalManager::GetTextById(GetDeviceTypeStringId(diskInfo.m_deviceType));
         nColumnId = GetColumnId(ComputerViewColumn::kType);
         m_pComputerListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //设备类型
 

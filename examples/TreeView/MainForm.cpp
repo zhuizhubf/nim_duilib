@@ -132,7 +132,7 @@ void MainForm::OnInitWindow()
 
     //显示虚拟路径
     m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kUserHome, _T("STRID_TREEVIEW_NODE_USER_HOME"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDesktop, _T("STRID_TREEVIEW_NODE_DESKTOP"));
+    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDesktop, _T("STRID_TREEVIEW_NODE_DESKTOP"), true);
     ui::TreeNode* pDocumentsNode = m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDocuments, _T("STRID_TREEVIEW_NODE_DOCUMENTS"), true);
     m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kPictures, _T("STRID_TREEVIEW_NODE_PICTURES"), true);
     m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kMusic, _T("STRID_TREEVIEW_NODE_MUSIC"), true);
