@@ -5,150 +5,150 @@
 
     <!-- ===================== 基础灰度体系（Win11 25H2 深色标准） ===================== -->
     <!-- 核心：按明度分级，适配深色控件底层，避免过亮/过暗导致视觉疲劳 -->
-    <TextColor name="color_white" value="#FFFFFFFF"/>        <!-- 纯白：高亮文本/按钮文字 -->
-    <TextColor name="color_black" value="#FF1E1E1E"/>        <!-- 近黑：深色模式底层背景 -->
-    <TextColor name="color_gray" value="#FF9CA3AF"/>         <!-- 中性灰：次要文本/辅助说明 -->
-    <TextColor name="color_gray_light" value="#FF2D2D30"/>   <!-- 浅灰：边框/一级分割线 -->
-    <TextColor name="color_gray_dark" value="#FF4B5563"/>    <!-- 深灰：禁用/次要背景 -->
-    <TextColor name="color_gray_deep" value="#FF111827"/>    <!-- 极深灰：最深层背景 -->
-    <TextColor name="color_gray_light_deep" value="#FF6B7280"/> <!-- 浅深灰：禁用文本 -->
+    <TextColor name="color_white" value="#FFFFFFFF" comment_cn="高亮文本/按钮文字" comment_en="Highlight text/button text"/>
+    <TextColor name="color_black" value="#FF1E1E1E" comment_cn="深色模式底层背景" comment_en="Dark mode base background"/>
+    <TextColor name="color_gray" value="#FF9CA3AF" comment_cn="次要文本/辅助说明" comment_en="Secondary text/auxiliary description"/>
+    <TextColor name="color_gray_light" value="#FF2D2D30" comment_cn="边框/一级分割线" comment_en="Border/level 1 split line"/>
+    <TextColor name="color_gray_dark" value="#FF4B5563" comment_cn="禁用/次要背景" comment_en="Disabled/secondary background"/>
+    <TextColor name="color_gray_deep" value="#FF111827" comment_cn="最深层背景" comment_en="Deepest layer background"/>
+    <TextColor name="color_gray_light_deep" value="#FF6B7280" comment_cn="禁用文本" comment_en="Disabled text"/>
 
     <!-- ===================== 主题强调色体系（Win11 25H2 深色交互） ===================== -->
-    <TextColor name="color_green" value="#FF10B981"/>        <!-- 系统绿：成功/完成状态 -->
-    <TextColor name="color_green_light" value="#FF34D399"/>  <!-- 浅绿：绿色系hover -->
-    <TextColor name="color_blue" value="#FF3B82F6"/>         <!-- 主蓝：聚焦/选中/核心强调 -->
-    <TextColor name="color_red" value="#FFEF4444"/>          <!-- 系统红：错误/警告/关闭按钮 -->
-    <TextColor name="color_red_light" value="#FF6B7280"/>    <!-- 浅红：红色系hover -->
-    <TextColor name="color_red_deep" value="#FFDC2626"/>     <!-- 深红：红色系pressed -->
-    <TextColor name="color_blue_light" value="#FF60A5FA"/>   <!-- 浅蓝：蓝色系hover -->
-    <TextColor name="color_blue_deep" value="#FF2563EB"/>    <!-- 深蓝：蓝色系pressed -->
+    <TextColor name="color_green" value="#FF10B981" comment_cn="成功/完成状态" comment_en="Success/completed status"/>
+    <TextColor name="color_green_light" value="#FF34D399" comment_cn="绿色系hover" comment_en="Green hover state"/>
+    <TextColor name="color_blue" value="#FF3B82F6" comment_cn="聚焦/选中/核心强调" comment_en="Focus/selected/core emphasis"/>
+    <TextColor name="color_red" value="#FFEF4444" comment_cn="错误/警告/关闭按钮" comment_en="Error/warning/close button"/>
+    <TextColor name="color_red_light" value="#FF6B7280" comment_cn="红色系hover" comment_en="Red hover state"/>
+    <TextColor name="color_red_deep" value="#FFDC2626" comment_cn="红色系pressed" comment_en="Red pressed state"/>
+    <TextColor name="color_blue_light" value="#FF60A5FA" comment_cn="蓝色系hover" comment_en="Blue hover state"/>
+    <TextColor name="color_blue_deep" value="#FF2563EB" comment_cn="蓝色系pressed" comment_en="Blue pressed state"/>
 
     <!-- ===================== 文本颜色（Win11 深色文本层级） ===================== -->
-    <TextColor name="text_default" value="#FFE5E7EB"/>       <!-- 主要文本：浅灰白（核心可读） -->
-    <TextColor name="text_disabled" value="#FF6B7280"/>      <!-- 禁用文本：弱化显示 -->
-    <TextColor name="text_link_normal" value="#FF3B82F6"/>   <!-- 链接：默认 -->
-    <TextColor name="text_link_hover" value="#FF60A5FA"/>    <!-- 链接：悬浮 -->
-    <TextColor name="text_link_pressed" value="#FF2563EB"/>  <!-- 链接：点击中 -->
-    <TextColor name="text_menu_bar" value="#FFE5E7EB"/>      <!-- 菜单栏文本：同主要文本 -->
+    <TextColor name="text_default" value="#FFE5E7EB" comment_cn="主要文本/浅灰白" comment_en="Primary text/light gray white"/>
+    <TextColor name="text_disabled" value="#FF6B7280" comment_cn="禁用文本/弱化显示" comment_en="Disabled text/weak display"/>
+    <TextColor name="text_link_normal" value="#FF3B82F6" comment_cn="链接默认状态" comment_en="Link normal state"/>
+    <TextColor name="text_link_hover" value="#FF60A5FA" comment_cn="链接悬浮状态" comment_en="Link hover state"/>
+    <TextColor name="text_link_pressed" value="#FF2563EB" comment_cn="链接点击状态" comment_en="Link pressed state"/>
+    <TextColor name="text_menu_bar" value="#FFE5E7EB" comment_cn="菜单栏文本" comment_en="Menu bar text"/>
 
     <!-- ===================== 背景颜色（深色层级划分） ===================== -->
-    <TextColor name="border_window" value="#FF444444"/>      <!-- 窗口边框：深灰，避免融于背景 -->
-    <TextColor name="bg_window_dark" value="#FF1A1A1A"/>     <!-- 窗口背景：主窗口/面板（最深） -->
-    <TextColor name="bg_window_light" value="#FF202020"/>    <!-- 窗口背景：卡片/弹窗（浅一级） -->
-    <TextColor name="bg_titlebar" value="#FF1A1A1A"/>        <!-- 标题栏背景：同主窗口 -->
-    <TextColor name="bg_menu" value="#FF252525"/>            <!-- 菜单背景：下拉/右键菜单 -->
-    <TextColor name="bg_menu_item_hover" value="#FF333333"/> <!-- 菜单项：悬浮 -->
-    <TextColor name="bg_menu_item_selected" value="#FF3A3A3A"/> <!-- 菜单项：选中 -->
-    <TextColor name="bg_list_item_hover" value="#FF333333"/> <!-- 列表项：悬浮（同菜单项） -->
-    <TextColor name="bg_list_item_selected" value="#FF3A3A3A"/> <!-- 列表项：选中（同菜单项） -->
-    <TextColor name="bg_menu_bar" value="#FF1A1A1A"/>        <!-- 菜单栏背景：同主窗口 -->
-    <TextColor name="bg_menu_bar_hover" value="#FF333333"/>  <!-- 菜单栏项：悬浮 -->
-    <TextColor name="bg_menu_bar_pressed" value="#FF3A3A3A"/> <!-- 菜单栏项：点击 -->
+    <TextColor name="border_window" value="#FF444444" comment_cn="窗口边框/深灰" comment_en="Window border/dark gray"/>
+    <TextColor name="bg_window_dark" value="#FF1A1A1A" comment_cn="主窗口/面板背景" comment_en="Main window/panel background"/>
+    <TextColor name="bg_window_light" value="#FF202020" comment_cn="卡片/弹窗背景" comment_en="Card/popup background"/>
+    <TextColor name="bg_titlebar" value="#FF1A1A1A" comment_cn="标题栏背景" comment_en="Title bar background"/>
+    <TextColor name="bg_menu" value="#FF252525" comment_cn="下拉/右键菜单背景" comment_en="Dropdown/context menu background"/>
+    <TextColor name="bg_menu_item_hover" value="#FF333333" comment_cn="菜单项悬浮" comment_en="Menu item hover"/>
+    <TextColor name="bg_menu_item_selected" value="#FF3A3A3A" comment_cn="菜单项选中" comment_en="Menu item selected"/>
+    <TextColor name="bg_list_item_hover" value="#FF333333" comment_cn="列表项悬浮" comment_en="List item hover"/>
+    <TextColor name="bg_list_item_selected" value="#FF3A3A3A" comment_cn="列表项选中" comment_en="List item selected"/>
+    <TextColor name="bg_menu_bar" value="#FF1A1A1A" comment_cn="菜单栏背景" comment_en="Menu bar background"/>
+    <TextColor name="bg_menu_bar_hover" value="#FF333333" comment_cn="菜单栏项悬浮" comment_en="Menu bar item hover"/>
+    <TextColor name="bg_menu_bar_pressed" value="#FF3A3A3A" comment_cn="菜单栏项点击" comment_en="Menu bar item pressed"/>
 
     <!-- ===================== 通用控件颜色 ===================== -->
-    <TextColor name="color_progress" value="#FF3B82F6"/>     <!-- 进度条：填充/滑块主色 -->
-    <TextColor name="color_splitline_level1" value="#FF2D2D30"/> <!-- 一级分割线：主要区域分隔 -->
-    <TextColor name="color_splitline_level2" value="#FF202020"/> <!-- 二级分割线：次要区域分隔 -->
-    <TextColor name="color_splitline_group_box" value="#FF444444"/> <!-- 分组框分割线 -->
+    <TextColor name="color_progress" value="#FF3B82F6" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
+    <TextColor name="color_splitline_level1" value="#FF2D2D30" comment_cn="一级分割线/主要区域分隔" comment_en="Level 1 split line/main area separator"/>
+    <TextColor name="color_splitline_level2" value="#FF202020" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/secondary area separator"/>
+    <TextColor name="color_splitline_group_box" value="#FF444444" comment_cn="分组框分割线" comment_en="Group box split line"/>
     
     <!-- Split分割线/拖动条 -->
-    <TextColor name="bg_split_normal" value="#FF2D2D30"/>    <!-- 静态 -->
-    <TextColor name="bg_split_hover" value="#FF444444"/>     <!-- 悬浮 -->
-    <TextColor name="bg_split_pressed" value="#FF555555"/>   <!-- 拖动中 -->
-    <TextColor name="bg_split_disabled" value="#FF2D2D30"/>  <!-- 禁用（同静态） -->
+    <TextColor name="bg_split_normal" value="#FF2D2D30" comment_cn="分割线静态状态" comment_en="Split line normal state"/>
+    <TextColor name="bg_split_hover" value="#FF444444" comment_cn="分割线悬浮状态" comment_en="Split line hover state"/>
+    <TextColor name="bg_split_pressed" value="#FF555555" comment_cn="分割线拖动状态" comment_en="Split line dragging state"/>
+    <TextColor name="bg_split_disabled" value="#FF2D2D30" comment_cn="分割线禁用状态" comment_en="Split line disabled state"/>
 
     <!-- 编辑框（Win11深色规范：暗边框+聚焦蓝下划线） -->
-    <TextColor name="bg_richedit" value="#FF252525"/>        <!-- 背景：输入框默认 -->
-    <TextColor name="bg_richedit_caret" value="#FFE5E7EB"/>  <!-- 光标：浅灰白（保证可见） -->
-    <TextColor name="text_richedit_prompt" value="#FF6B7280"/> <!-- 占位符文本 -->
-    <TextColor name="border_richedit_normal" value="#FF2D2D30"/> <!-- 边框：默认 -->
-    <TextColor name="border_richedit_hover" value="#FF444444"/> <!-- 边框：悬浮 -->
-    <TextColor name="border_richedit_focus" value="#FF2D2D30"/> <!-- 边框：聚焦（不变） -->
-    <TextColor name="border_richedit_focus_bottom" value="#FF3B82F6"/> <!-- 聚焦下划线：主蓝 -->
-    <TextColor name="bg_richedit_btn_normal" value="#FF252525"/> <!-- 编辑框按钮：默认 -->
-    <TextColor name="bg_richedit_btn_hover" value="#FF333333"/> <!-- 编辑框按钮：悬浮 -->
-    <TextColor name="bg_richedit_btn_pressed" value="#FF3A3A3A"/> <!-- 编辑框按钮：点击 -->
-    <TextColor name="border_richedit_btn" value="#FF2D2D30"/> <!-- 编辑框按钮：边框 -->
+    <TextColor name="bg_richedit" value="#FF252525" comment_cn="编辑框默认背景" comment_en="RichEdit default background"/>
+    <TextColor name="bg_richedit_caret" value="#FFE5E7EB" comment_cn="编辑框光标颜色" comment_en="RichEdit caret color"/>
+    <TextColor name="text_richedit_prompt" value="#FF6B7280" comment_cn="编辑框占位符文本" comment_en="RichEdit prompt text"/>
+    <TextColor name="border_richedit_normal" value="#FF2D2D30" comment_cn="编辑框默认边框" comment_en="RichEdit normal border"/>
+    <TextColor name="border_richedit_hover" value="#FF444444" comment_cn="编辑框悬浮边框" comment_en="RichEdit hover border"/>
+    <TextColor name="border_richedit_focus" value="#FF2D2D30" comment_cn="编辑框聚焦边框" comment_en="RichEdit focus border"/>
+    <TextColor name="border_richedit_focus_bottom" value="#FF3B82F6" comment_cn="编辑框聚焦下划线" comment_en="RichEdit focus bottom line"/>
+    <TextColor name="bg_richedit_btn_normal" value="#FF252525" comment_cn="编辑框按钮默认背景" comment_en="RichEdit button normal bg"/>
+    <TextColor name="bg_richedit_btn_hover" value="#FF333333" comment_cn="编辑框按钮悬浮背景" comment_en="RichEdit button hover bg"/>
+    <TextColor name="bg_richedit_btn_pressed" value="#FF3A3A3A" comment_cn="编辑框按钮点击背景" comment_en="RichEdit button pressed bg"/>
+    <TextColor name="border_richedit_btn" value="#FF2D2D30" comment_cn="编辑框按钮边框" comment_en="RichEdit button border"/>
 
     <!-- 窗口标题栏按钮（最小化/最大化/关闭） -->
-    <TextColor name="bg_btn_window_hover" value="#FF333333"/> <!-- 通用按钮：悬浮 -->
-    <TextColor name="bg_btn_window_pressed" value="#FF3A3A3A"/> <!-- 通用按钮：点击 -->
-    <TextColor name="bg_btn_window_close_hover" value="#FFEF4444"/> <!-- 关闭按钮：悬浮 -->
-    <TextColor name="bg_btn_window_close_pressed" value="#FFDC2626"/> <!-- 关闭按钮：点击 -->
+    <TextColor name="bg_btn_window_hover" value="#FF333333" comment_cn="窗口按钮悬浮背景" comment_en="Window button hover bg"/>
+    <TextColor name="bg_btn_window_pressed" value="#FF3A3A3A" comment_cn="窗口按钮点击背景" comment_en="Window button pressed bg"/>
+    <TextColor name="bg_btn_window_close_hover" value="#FFEF4444" comment_cn="关闭按钮悬浮背景" comment_en="Close button hover bg"/>
+    <TextColor name="bg_btn_window_close_pressed" value="#FFDC2626" comment_cn="关闭按钮点击背景" comment_en="Close button pressed bg"/>
 
     <!-- ===================== 按钮颜色（次要按钮：无强调色） ===================== -->
-    <TextColor name="text_btn_normal" value="#FFE5E7EB"/>    <!-- 文本：默认 -->
-    <TextColor name="text_btn_disabled" value="#FF6B7280"/>   <!-- 文本：禁用（弱化） -->
-    <TextColor name="bg_btn_normal" value="#FF252525"/>      <!-- 背景：默认（暗灰） -->
-    <TextColor name="bg_btn_hover" value="#FF333333"/>       <!-- 背景：悬浮（亮一点） -->
-    <TextColor name="bg_btn_pressed" value="#FF3A3A3A"/>     <!-- 背景：点击（更亮） -->
-    <TextColor name="bg_btn_disabled" value="#FF252525"/>    <!-- 背景：禁用（同默认，仅文本变灰） -->
-    <TextColor name="border_btn_normal" value="#FF2D2D30"/>  <!-- 边框：默认 -->
-    <TextColor name="border_btn_hover" value="#FF444444"/>   <!-- 边框：悬浮 -->
-    <TextColor name="border_btn_pressed" value="#FF555555"/> <!-- 边框：点击 -->
-    <TextColor name="border_btn_disabled" value="#FF2A2A2A"/> <!-- 边框：禁用（浅于默认） -->
+    <TextColor name="text_btn_normal" value="#FFE5E7EB" comment_cn="次要按钮默认文本" comment_en="Secondary button normal text"/>
+    <TextColor name="text_btn_disabled" value="#FF6B7280" comment_cn="次要按钮禁用文本" comment_en="Secondary button disabled text"/>
+    <TextColor name="bg_btn_normal" value="#FF252525" comment_cn="次要按钮默认背景" comment_en="Secondary button normal bg"/>
+    <TextColor name="bg_btn_hover" value="#FF333333" comment_cn="次要按钮悬浮背景" comment_en="Secondary button hover bg"/>
+    <TextColor name="bg_btn_pressed" value="#FF3A3A3A" comment_cn="次要按钮点击背景" comment_en="Secondary button pressed bg"/>
+    <TextColor name="bg_btn_disabled" value="#FF252525" comment_cn="次要按钮禁用背景" comment_en="Secondary button disabled bg"/>
+    <TextColor name="border_btn_normal" value="#FF2D2D30" comment_cn="次要按钮默认边框" comment_en="Secondary button normal border"/>
+    <TextColor name="border_btn_hover" value="#FF444444" comment_cn="次要按钮悬浮边框" comment_en="Secondary button hover border"/>
+    <TextColor name="border_btn_pressed" value="#FF555555" comment_cn="次要按钮点击边框" comment_en="Secondary button pressed border"/>
+    <TextColor name="border_btn_disabled" value="#FF2A2A2A" comment_cn="次要按钮禁用边框" comment_en="Secondary button disabled border"/>
 
     <!-- ===================== 按钮颜色（主要按钮：强调色） ===================== -->
-    <TextColor name="text_primary_btn_normal" value="#FFFFFFFF"/>    <!-- 文本：默认（纯白） -->
-    <TextColor name="text_primary_btn_disabled" value="#FF94BFFF"/>   <!-- 文本：禁用（浅蓝白） -->
-    <TextColor name="bg_primary_btn_normal" value="#FF3B82F6"/>      <!-- 背景：默认（主蓝） -->
-    <TextColor name="bg_primary_btn_hover" value="#FF4A90F6"/>       <!-- 背景：悬浮（亮一点） -->
-    <TextColor name="bg_primary_btn_pressed" value="#FF2563EB"/>     <!-- 背景：点击（深一点） -->
-    <TextColor name="bg_primary_btn_disabled" value="#FF2E456B"/>    <!-- 背景：禁用（低饱和蓝） -->
-    <TextColor name="border_primary_btn_normal" value="#FF2563EB"/>   <!-- 边框：默认（深蓝） -->
-    <TextColor name="border_primary_btn_hover" value="#FF2563EB"/>    <!-- 边框：悬浮（同默认） -->
-    <TextColor name="border_primary_btn_pressed" value="#FF1E57D9"/>  <!-- 边框：点击（更深） -->
-    <TextColor name="border_primary_btn_disabled" value="#FF2E456B"/> <!-- 边框：禁用（同背景） -->
+    <TextColor name="text_primary_btn_normal" value="#FFFFFFFF" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
+    <TextColor name="text_primary_btn_disabled" value="#FF94BFFF" comment_cn="主要按钮禁用文本" comment_en="Primary button disabled text"/>
+    <TextColor name="bg_primary_btn_normal" value="#FF3B82F6" comment_cn="主要按钮默认背景" comment_en="Primary button normal bg"/>
+    <TextColor name="bg_primary_btn_hover" value="#FF4A90F6" comment_cn="主要按钮悬浮背景" comment_en="Primary button hover bg"/>
+    <TextColor name="bg_primary_btn_pressed" value="#FF2563EB" comment_cn="主要按钮点击背景" comment_en="Primary button pressed bg"/>
+    <TextColor name="bg_primary_btn_disabled" value="#FF2E456B" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>
+    <TextColor name="border_primary_btn_normal" value="#FF2563EB" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
+    <TextColor name="border_primary_btn_hover" value="#FF2563EB" comment_cn="主要按钮悬浮边框" comment_en="Primary button hover border"/>
+    <TextColor name="border_primary_btn_pressed" value="#FF1E57D9" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
+    <TextColor name="border_primary_btn_disabled" value="#FF2E456B" comment_cn="主要按钮禁用边框" comment_en="Primary button disabled border"/>
 
     <!-- ===================== 专用控件颜色 ===================== -->
     <!-- 全屏按钮 -->
-    <TextColor name="bg_btn_exit_fullscreen" value="#FF3B82F6"/> <!-- 背景：主蓝 -->
-    <TextColor name="text_btn_exit_fullscreen" value="#FFFFFFFF"/> <!-- 文本：纯白 -->
+    <TextColor name="bg_btn_exit_fullscreen" value="#FF3B82F6" comment_cn="退出全屏按钮背景" comment_en="Exit fullscreen button bg"/>
+    <TextColor name="text_btn_exit_fullscreen" value="#FFFFFFFF" comment_cn="退出全屏按钮文本" comment_en="Exit fullscreen button text"/>
 
     <!-- 下拉框（ComboBox） -->
-    <TextColor name="bg_combo" value="#FF252525"/>           <!-- 背景：默认 -->
-    <TextColor name="border_combo_normal" value="#FF2D2D30"/> <!-- 边框：默认 -->
-    <TextColor name="border_combo_hover" value="#FF444444"/> <!-- 边框：悬浮 -->
-    <TextColor name="bg_combo_btn_hover" value="#FF333333"/> <!-- 下拉按钮：悬浮 -->
-    <TextColor name="bg_combo_btn_pressed" value="#FF3A3A3A"/> <!-- 下拉按钮：点击 -->
+    <TextColor name="bg_combo" value="#FF252525" comment_cn="下拉框默认背景" comment_en="ComboBox normal background"/>
+    <TextColor name="border_combo_normal" value="#FF2D2D30" comment_cn="下拉框默认边框" comment_en="ComboBox normal border"/>
+    <TextColor name="border_combo_hover" value="#FF444444" comment_cn="下拉框悬浮边框" comment_en="ComboBox hover border"/>
+    <TextColor name="bg_combo_btn_hover" value="#FF333333" comment_cn="下拉按钮悬浮背景" comment_en="Combo button hover bg"/>
+    <TextColor name="bg_combo_btn_pressed" value="#FF3A3A3A" comment_cn="下拉按钮点击背景" comment_en="Combo button pressed bg"/>
 
     <!-- 列表控件（ListCtrl） -->
-    <TextColor name="bg_list_ctrl_header" value="#FF202020"/> <!-- 表头：背景 -->
-    <TextColor name="bg_list_ctrl_header_hover" value="#FF333333"/> <!-- 表头：悬浮 -->
-    <TextColor name="bg_list_ctrl_header_pressed" value="#FF3A3A3A"/> <!-- 表头：点击 -->
-    <TextColor name="bg_list_ctrl_header_split" value="#FF444444"/> <!-- 表头：分割线 -->
-    <TextColor name="bg_list_ctrl_view_split" value="#FF444444"/> <!-- 表格：分割线 -->
-    <TextColor name="bg_list_ctrl_view" value="#FF252525"/>   <!-- 视图：背景 -->
-    <TextColor name="bg_list_ctrl_frame_selected" value="#FF416385"/> <!-- 选中项：外框背景 -->
-    <TextColor name="border_list_ctrl_frame_selected" value="#FF3B82F6"/> <!-- 选中项：外框边框 -->
-    <TextColor name="bg_list_ctrl_item_hover" value="#FF434343"/> <!-- 列表项：悬浮（加深，提升辨识度） -->
-    <TextColor name="bg_list_ctrl_item_pressed" value="#FF3A3A3A"/> <!-- 列表项：点击 -->
-    <TextColor name="bg_list_ctrl_item_selected" value="#FF4A4A4A"/> <!-- 列表项：选中 -->
+    <TextColor name="bg_list_ctrl_header" value="#FF202020" comment_cn="列表控件表头背景" comment_en="ListCtrl header background"/>
+    <TextColor name="bg_list_ctrl_header_hover" value="#FF333333" comment_cn="列表表头悬浮背景" comment_en="List header hover bg"/>
+    <TextColor name="bg_list_ctrl_header_pressed" value="#FF3A3A3A" comment_cn="列表表头点击背景" comment_en="List header pressed bg"/>
+    <TextColor name="bg_list_ctrl_header_split" value="#FF444444" comment_cn="列表表头分割线" comment_en="List header split line"/>
+    <TextColor name="bg_list_ctrl_view_split" value="#FF444444" comment_cn="表格分割线" comment_en="Table split line"/>
+    <TextColor name="bg_list_ctrl_view" value="#FF252525" comment_cn="列表视图背景" comment_en="List view background"/>
+    <TextColor name="bg_list_ctrl_frame_selected" value="#FF416385" comment_cn="列表选中项外框背景" comment_en="List selected frame bg"/>
+    <TextColor name="border_list_ctrl_frame_selected" value="#FF3B82F6" comment_cn="列表选中项外框边框" comment_en="List selected frame border"/>
+    <TextColor name="bg_list_ctrl_item_hover" value="#FF434343" comment_cn="列表项悬浮背景" comment_en="List item hover bg"/>
+    <TextColor name="bg_list_ctrl_item_pressed" value="#FF3A3A3A" comment_cn="列表项点击背景" comment_en="List item pressed bg"/>
+    <TextColor name="bg_list_ctrl_item_selected" value="#FF4A4A4A" comment_cn="列表项选中背景" comment_en="List item selected bg"/>
 
     <!-- 标签页（TabCtrl） -->
-    <TextColor name="bg_tab_ctrl" value="#FF1A1A1A"/>        <!-- 背景：整体 -->
-    <TextColor name="bg_tab_ctrl_item_hover" value="#FF3F3F3F"/> <!-- 标签项：悬浮 -->
-    <TextColor name="bg_tab_ctrl_item_pressed" value="#FF3A3A3A"/> <!-- 标签项：点击 -->
-    <TextColor name="bg_tab_ctrl_item_selected" value="#FF333333"/> <!-- 标签项：选中 -->
-    <TextColor name="bg_tab_ctrl_item_close_hover" value="#FF3F3F3F"/> <!-- 关闭按钮：悬浮 -->
-    <TextColor name="bg_tab_ctrl_item_close_pressed" value="#FF3A3A3A"/> <!-- 关闭按钮：点击 -->
-    <TextColor name="border_tab_ctrl_item" value="#FF2D2D30"/> <!-- 标签项：边框 -->
+    <TextColor name="bg_tab_ctrl" value="#FF1A1A1A" comment_cn="标签页整体背景" comment_en="TabCtrl background"/>
+    <TextColor name="bg_tab_ctrl_item_hover" value="#FF3F3F3F" comment_cn="标签项悬浮背景" comment_en="Tab item hover bg"/>
+    <TextColor name="bg_tab_ctrl_item_pressed" value="#FF3A3A3A" comment_cn="标签项点击背景" comment_en="Tab item pressed bg"/>
+    <TextColor name="bg_tab_ctrl_item_selected" value="#FF333333" comment_cn="选中标签背景" comment_en="Selected tab background"/>
+    <TextColor name="bg_tab_ctrl_item_close_hover" value="#FF3F3F3F" comment_cn="标签关闭按钮悬浮" comment_en="Tab close button hover"/>
+    <TextColor name="bg_tab_ctrl_item_close_pressed" value="#FF3A3A3A" comment_cn="标签关闭按钮点击" comment_en="Tab close button pressed"/>
+    <TextColor name="border_tab_ctrl_item" value="#FF2D2D30" comment_cn="标签项边框" comment_en="Tab item border"/>
 
     <!-- 地址栏（AddressBar） -->
-    <TextColor name="border_address_bar" value="#FF2D2D30"/>     <!-- 边框：默认 -->
-    <TextColor name="bg_address_bar" value="#FF252525"/>         <!-- 背景：默认 -->    
-    <TextColor name="bg_address_bar_btn_hover" value="#FF333333"/> <!-- 按钮：悬浮 -->
-    <TextColor name="bg_address_bar_btn_pressed" value="#FF3A3A3A"/> <!-- 按钮：点击 -->
+    <TextColor name="border_address_bar" value="#FF2D2D30" comment_cn="地址栏默认边框" comment_en="AddressBar normal border"/>
+    <TextColor name="bg_address_bar" value="#FF252525" comment_cn="地址栏默认背景" comment_en="AddressBar normal background"/>
+    <TextColor name="bg_address_bar_btn_hover" value="#FF333333" comment_cn="地址栏按钮悬浮" comment_en="AddressBar button hover"/>
+    <TextColor name="bg_address_bar_btn_pressed" value="#FF3A3A3A" comment_cn="地址栏按钮点击" comment_en="AddressBar button pressed"/>
 
     <!-- 属性页（PropertyGrid） -->
-    <TextColor name="bg_property_grid_header" value="#FF252525"/>            <!-- 分组表头：背景 -->    
-    <TextColor name="bg_property_grid_header_split" value="#FF3D3D3D"/>      <!-- 分组表头：分割线 -->
-    <TextColor name="border_property_grid_header" value="#FF2D2D30"/>        <!-- 分组表头：边框 -->    
-    <TextColor name="text_property_grid_header" value="#FFE5E7EB"/>          <!-- 分组表头：文本（默认） -->
-    <TextColor name="text_property_grid_header_disabled" value="#FF6B7280"/> <!-- 分组表头：文本（禁用） -->
-    <TextColor name="bg_property_grid_group" value="#FF1E1E1E"/>             <!-- 分组：背景（最深，区分行） -->
-    <TextColor name="bg_property_grid_property" value="#FF252525"/>         <!-- 属性行：背景 -->    
-    <TextColor name="bg_property_grid_property_name" value="#FF252525"/>    <!-- 属性名：背景（同值列） -->    
-    <TextColor name="bg_property_grid_property_value" value="#FF252525"/>   <!-- 属性值：背景 -->    
-    <TextColor name="bg_property_grid_line" value="#FF3D3D3D"/>              <!-- 网格：分割线 -->
+    <TextColor name="bg_property_grid_header" value="#FF252525" comment_cn="属性页分组表头背景" comment_en="PropertyGrid header bg"/>
+    <TextColor name="bg_property_grid_header_split" value="#FF3D3D3D" comment_cn="属性表头分割线" comment_en="Property header split line"/>
+    <TextColor name="border_property_grid_header" value="#FF2D2D30" comment_cn="属性表头边框" comment_en="Property header border"/>
+    <TextColor name="text_property_grid_header" value="#FFE5E7EB" comment_cn="属性表头默认文本" comment_en="Property header normal text"/>
+    <TextColor name="text_property_grid_header_disabled" value="#FF6B7280" comment_cn="属性表头禁用文本" comment_en="Property header disabled text"/>
+    <TextColor name="bg_property_grid_group" value="#FF1E1E1E" comment_cn="属性分组背景" comment_en="Property group background"/>
+    <TextColor name="bg_property_grid_property" value="#FF252525" comment_cn="属性行背景" comment_en="Property row background"/>
+    <TextColor name="bg_property_grid_property_name" value="#FF252525" comment_cn="属性名列背景" comment_en="Property name column bg"/>
+    <TextColor name="bg_property_grid_property_value" value="#FF252525" comment_cn="属性值列背景" comment_en="Property value column bg"/>
+    <TextColor name="bg_property_grid_line" value="#FF3D3D3D" comment_cn="属性页网格分割线" comment_en="PropertyGrid grid line"/>
 </Global>

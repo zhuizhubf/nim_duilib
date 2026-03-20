@@ -1,0 +1,699 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win11 主题配色编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .header {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #0078D4;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: #005A9E;
+        }
+        .btn-secondary {
+            background-color: #6B7280;
+        }
+        .btn-secondary:hover {
+            background-color: #4B5563;
+        }
+        .btn-generate {
+            background-color: #10B981;
+        }
+        .btn-generate:hover {
+            background-color: #059669;
+        }
+        .btn-reset {
+            background-color: #F59E0B;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-reset:hover {
+            background-color: #D97706;
+        }
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 15px;
+        }
+        .color-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .color-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+        .color-preview-compare {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40%;
+            height: 100%;
+            border-left: 1px dashed #999;
+            background-color: #eee;
+        }
+        .color-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .color-label {
+            font-weight: 600;
+            color: #1E1E1E;
+        }
+        .color-code-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-code {
+            color: #6B7280;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+        .color-code.original {
+            color: #9CA3AF;
+        }
+        .color-code.current {
+            color: #0078D4;
+            font-weight: 500;
+        }
+        .color-comment {
+            font-size: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .comment-cn {
+            color: #0078D4;
+        }
+        .comment-en {
+            color: #6B7280;
+            font-style: italic;
+        }
+        .color-edit-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .color-picker {
+            width: 40px;
+            height: 34px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+            background-color: transparent;
+        }
+        .color-input {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+        .generate-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .generate-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .generate-option {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .generate-option label {
+            font-size: 14px;
+            color: #1E1E1E;
+        }
+        .generate-option select, .generate-option input {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            min-width: 150px;
+        }
+        .hidden {
+            display: none;
+        }
+        #fileInput {
+            display: none;
+        }
+        .theme-info {
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+        .theme-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1E1E1E;
+        }
+        .theme-style {
+            font-size: 14px;
+            color: #6B7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="btn" id="openFileBtn">打开XML主题文件</button>
+        <input type="file" id="fileInput" accept=".xml">
+        <button class="btn btn-secondary" id="saveFileBtn" disabled>保存修改</button>
+        <button class="btn btn-generate" id="generateSchemeBtn">生成新配色方案</button>
+    </div>
+
+    <div class="theme-info hidden" id="themeInfo">
+        <div class="theme-name" id="themeName"></div>
+        <div class="theme-style" id="themeStyle"></div>
+    </div>
+
+    <div class="generate-panel hidden" id="generatePanel">
+        <div class="generate-options">
+            <div class="generate-option">
+                <label for="baseColor">基础主色</label>
+                <input type="color" id="baseColor" value="#3B82F6">
+            </div>
+            <div class="generate-option">
+                <label for="schemeType">配色类型</label>
+                <select id="schemeType">
+                    <option value="monochromatic">单色系（同色系深浅）</option>
+                    <option value="complementary">互补色（对比色）</option>
+                    <option value="analogous">邻近色（相似色）</option>
+                </select>
+            </div>
+            <div class="generate-option">
+                <label for="brightnessStep">亮度步长</label>
+                <input type="number" id="brightnessStep" value="15" min="5" max="30">
+            </div>
+        </div>
+        <button class="btn btn-generate" id="applyGenerateBtn">应用配色方案</button>
+    </div>
+
+    <div class="color-grid" id="colorGrid"></div>
+
+    <script>
+        // 全局变量
+        let currentXmlText = '';
+        let currentXmlDoc = null;
+        let currentColorMap = new Map(); // 存储name -> {value, originalValue, commentCn, commentEn}
+        let currentThemeInfo = null;
+
+        // DOM元素
+        const openFileBtn = document.getElementById('openFileBtn');
+        const fileInput = document.getElementById('fileInput');
+        const saveFileBtn = document.getElementById('saveFileBtn');
+        const generateSchemeBtn = document.getElementById('generateSchemeBtn');
+        const generatePanel = document.getElementById('generatePanel');
+        const applyGenerateBtn = document.getElementById('applyGenerateBtn');
+        const colorGrid = document.getElementById('colorGrid');
+        const themeInfo = document.getElementById('themeInfo');
+        const themeName = document.getElementById('themeName');
+        const themeStyle = document.getElementById('themeStyle');
+
+        // 1. 打开XML文件功能
+        openFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                currentXmlText = await file.text();
+                parseXmlTheme(currentXmlText);
+                saveFileBtn.disabled = false;
+                themeInfo.classList.remove('hidden');
+                generatePanel.classList.add('hidden');
+            } catch (err) {
+                alert('XML文件解析失败：' + err.message);
+            }
+        });
+
+        // 2. 解析XML主题文件
+        function parseXmlTheme(xmlText) {
+            const parser = new DOMParser();
+            currentXmlDoc = parser.parseFromString(xmlText, 'text/xml');
+            
+            const parseError = currentXmlDoc.querySelector('parsererror');
+            if (parseError) {
+                throw new Error('无效的XML格式');
+            }
+
+            // 获取主题信息
+            const themeNode = currentXmlDoc.querySelector('Theme');
+            currentThemeInfo = {
+                name: themeNode.getAttribute('name') || '未知主题',
+                type: themeNode.getAttribute('type') || 'Color',
+                style: themeNode.getAttribute('style') || 'Unknown'
+            };
+
+            themeName.textContent = `主题名称：${currentThemeInfo.name}`;
+            themeStyle.textContent = `主题样式：${currentThemeInfo.style} (${currentThemeInfo.type})`;
+
+            // 构建颜色映射表
+            currentColorMap.clear();
+            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
+            colorNodes.forEach(node => {
+                const name = node.getAttribute('name');
+                const originalValue = node.getAttribute('value') || '';
+                currentColorMap.set(name, {
+                    value: originalValue, // 当前值
+                    originalValue: originalValue, // 原始值（永久保留）
+                    commentCn: node.getAttribute('comment_cn') || '无注释',
+                    commentEn: node.getAttribute('comment_en') || 'No comment'
+                });
+            });
+
+            renderColorCards();
+        }
+
+        // 工具函数：ARGB转RGBA（浏览器显示用）
+        function argbToRgbaCss(argb) {
+            if (!argb || !/^#([0-9A-F]{8})$/.test(argb.toUpperCase())) {
+                return '#FFFFFF';
+            }
+            
+            const argbUpper = argb.toUpperCase();
+            const alphaHex = argbUpper.slice(1, 3); 
+            const redHex = argbUpper.slice(3, 5);   
+            const greenHex = argbUpper.slice(5, 7); 
+            const blueHex = argbUpper.slice(7, 9);  
+
+            const alpha = parseInt(alphaHex, 16) / 255 || 1;
+            const red = parseInt(redHex, 16) || 255;
+            const green = parseInt(greenHex, 16) || 255;
+            const blue = parseInt(blueHex, 16) || 255;
+
+            return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+        }
+
+        // 工具函数：ARGB转6位RGB（颜色选择器用）
+        function argbToRgbHex(argb) {
+            if (!argb || !/^#([0-9A-F]{8})$/.test(argb.toUpperCase())) {
+                return '#FFFFFF';
+            }
+            return `#${argb.toUpperCase().slice(3)}`;
+        }
+
+        // 工具函数：6位RGB转ARGB（保留原Alpha）
+        function rgbHexToArgb(rgbHex, originalArgb) {
+            if (!rgbHex || !/^#([0-9A-F]{6})$/.test(rgbHex.toUpperCase()) || 
+                !originalArgb || !/^#([0-9A-F]{8})$/.test(originalArgb.toUpperCase())) {
+                return originalArgb || '#FFFFFFFF';
+            }
+            const alphaHex = originalArgb.toUpperCase().slice(1, 3);
+            const rgbHexPart = rgbHex.toUpperCase().slice(1);
+            return `#${alphaHex}${rgbHexPart}`;
+        }
+
+        // 3. 渲染颜色卡片（核心：新增恢复原值+对比显示）
+        function renderColorCards() {
+            colorGrid.innerHTML = '';
+
+            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
+            colorNodes.forEach((node, index) => {
+                const name = node.getAttribute('name');
+                const colorData = currentColorMap.get(name);
+                if (!colorData) return;
+
+                const card = document.createElement('div');
+                card.className = 'color-card';
+                
+                // 当前颜色和原始颜色的显示值
+                const currentDisplayColor = argbToRgbaCss(colorData.value);
+                const originalDisplayColor = argbToRgbaCss(colorData.originalValue);
+                const currentRgbHex = argbToRgbHex(colorData.value);
+
+                // 卡片HTML（新增对比区+恢复按钮）
+                card.innerHTML = `
+                    <div class="color-preview" style="background-color: ${currentDisplayColor}">
+                        <div class="color-preview-compare" style="background-color: ${originalDisplayColor}" 
+                             title="原始颜色：${colorData.originalValue}"></div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-label">${name}</div>
+                        <div class="color-code-group">
+                            <div class="color-code current">当前值：${colorData.value}</div>
+                            <div class="color-code original">原始值：${colorData.originalValue}</div>
+                        </div>
+                        <div class="color-comment">
+                            <span class="comment-cn">【中文】${colorData.commentCn}</span>
+                            <span class="comment-en">【English】${colorData.commentEn}</span>
+                        </div>
+                        <div class="color-edit-group">
+                            <input type="color" class="color-picker" value="${currentRgbHex}" data-name="${name}">
+                            <input type="text" class="color-input" value="${colorData.value}" 
+                                   data-name="${name}" placeholder="输入8位ARGB颜色值（如#FFFFFFFF）">
+                            <button class="btn btn-reset" data-name="${name}">恢复原值</button>
+                        </div>
+                    </div>
+                `;
+                colorGrid.appendChild(card);
+
+                // ========== 颜色选择器事件 ==========
+                const picker = card.querySelector('.color-picker');
+                picker.addEventListener('input', (e) => {
+                    const name = e.target.dataset.name;
+                    const rgbHex = e.target.value;
+                    const colorData = currentColorMap.get(name);
+                    if (colorData) {
+                        const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
+                        // 实时更新预览
+                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
+                        card.querySelector('.color-input').value = newArgb;
+                        card.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
+                    }
+                });
+
+                picker.addEventListener('change', (e) => {
+                    const name = e.target.dataset.name;
+                    const rgbHex = e.target.value;
+                    const colorData = currentColorMap.get(name);
+                    if (colorData) {
+                        const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
+                        colorData.value = newArgb;
+                        currentColorMap.set(name, colorData);
+                        // 更新显示
+                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
+                        card.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
+                    }
+                });
+
+                // ========== 手动输入框事件 ==========
+                const input = card.querySelector('.color-input');
+                input.addEventListener('input', (e) => {
+                    const newValue = e.target.value.trim().toUpperCase();
+                    if (/^#([0-9A-F]{8})$/.test(newValue)) {
+                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
+                        card.querySelector('.color-picker').value = argbToRgbHex(newValue);
+                        card.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
+                    }
+                });
+
+                input.addEventListener('change', (e) => {
+                    const name = e.target.dataset.name;
+                    const newValue = e.target.value.trim().toUpperCase();
+                    
+                    if (/^#([0-9A-F]{8})$/.test(newValue)) {
+                        const colorData = currentColorMap.get(name);
+                        if (colorData) {
+                            colorData.value = newValue;
+                            currentColorMap.set(name, colorData);
+                        }
+                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
+                        card.querySelector('.color-picker').value = argbToRgbHex(newValue);
+                        card.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
+                    } else {
+                        alert('请输入有效的8位ARGB颜色值（格式：#FFFFFFFF）');
+                        const colorData = currentColorMap.get(name);
+                        e.target.value = colorData ? colorData.value : '#FFFFFFFF';
+                        card.querySelector('.color-picker').value = argbToRgbHex(colorData ? colorData.value : '#FFFFFFFF');
+                    }
+                });
+
+                // ========== 恢复原值按钮事件（核心新增） ==========
+                const resetBtn = card.querySelector('.btn-reset');
+                resetBtn.addEventListener('click', (e) => {
+                    const name = e.target.dataset.name;
+                    const colorData = currentColorMap.get(name);
+                    if (colorData) {
+                        // 恢复为原始值
+                        colorData.value = colorData.originalValue;
+                        currentColorMap.set(name, colorData);
+                        
+                        // 更新所有显示元素
+                        const originalRgba = argbToRgbaCss(colorData.originalValue);
+                        const originalRgbHex = argbToRgbHex(colorData.originalValue);
+                        
+                        card.querySelector('.color-preview').style.backgroundColor = originalRgba;
+                        card.querySelector('.color-preview-compare').style.backgroundColor = originalRgba;
+                        card.querySelector('.color-input').value = colorData.originalValue;
+                        card.querySelector('.color-picker').value = originalRgbHex;
+                        card.querySelector('.color-code.current').textContent = `当前值：${colorData.originalValue}`;
+                    }
+                });
+            });
+        }
+
+        // 4. 保存修改后的XML
+        saveFileBtn.addEventListener('click', () => {
+            if (!currentXmlDoc || !currentColorMap.size) return;
+
+            // 替换颜色值
+            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
+            colorNodes.forEach(node => {
+                const name = node.getAttribute('name');
+                const colorData = currentColorMap.get(name);
+                if (colorData) {
+                    node.setAttribute('value', colorData.value);
+                    if (colorData.commentCn) node.setAttribute('comment_cn', colorData.commentCn);
+                    if (colorData.commentEn) node.setAttribute('comment_en', colorData.commentEn);
+                }
+            });
+
+            // 序列化并修复格式
+            const serializer = new XMLSerializer();
+            let xmlContent = serializer.serializeToString(currentXmlDoc);
+            xmlContent = xmlContent.replace(
+                '<\?xml version="1.0" encoding="UTF-8"\?>', 
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+            );
+
+            // 下载文件
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentThemeInfo.name}_modified.xml`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // 5. 配色方案生成功能
+        generateSchemeBtn.addEventListener('click', () => {
+            if (!currentColorMap.size) {
+                alert('请先打开一个XML主题文件');
+                return;
+            }
+            generatePanel.classList.toggle('hidden');
+        });
+
+        // 6. 应用配色方案
+        applyGenerateBtn.addEventListener('click', () => {
+            if (!currentColorMap.size) return;
+
+            const baseColor = document.getElementById('baseColor').value;
+            const schemeType = document.getElementById('schemeType').value;
+            const brightnessStep = parseInt(document.getElementById('brightnessStep').value) || 15;
+
+            try {
+                updateColorScheme(baseColor, schemeType, brightnessStep);
+                renderColorCards();
+                alert('配色方案已生成并应用！');
+            } catch (err) {
+                alert('生成配色失败：' + err.message);
+            }
+        });
+
+        // ========== 配色生成核心算法 ==========
+        function updateColorScheme(baseColor, schemeType, brightnessStep) {
+            const baseArgb = rgbToArgb(baseColor);
+            const baseRgb = argbToRgb(baseArgb);
+            const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+
+            let mainHue = baseHsl.h;
+            let secondaryHue = 0;
+
+            switch (schemeType) {
+                case 'monochromatic':
+                    mainHue = baseHsl.h;
+                    break;
+                case 'complementary':
+                    mainHue = (baseHsl.h + 180) % 360;
+                    break;
+                case 'analogous':
+                    mainHue = (baseHsl.h + 30) % 360;
+                    secondaryHue = (baseHsl.h - 30 + 360) % 360;
+                    break;
+            }
+
+            currentColorMap.forEach((colorData, name) => {
+                if (!colorData.originalValue || !/^#([0-9A-F]{8})$/.test(colorData.originalValue)) {
+                    return;
+                }
+
+                const originalRgb = argbToRgb(colorData.originalValue);
+                const originalHsl = rgbToHsl(originalRgb.r, originalRgb.g, originalRgb.b);
+                
+                let newHsl = {
+                    h: isNaN(originalHsl.h) ? 0 : originalHsl.h,
+                    s: isNaN(originalHsl.s) ? 0 : originalHsl.s,
+                    l: isNaN(originalHsl.l) ? 0.5 : originalHsl.l
+                };
+
+                if (name.includes('blue')) {
+                    newHsl.h = mainHue;
+                    newHsl.s = Math.max(0, Math.min(1, baseHsl.s));
+                } else if (name.includes('green')) {
+                    newHsl.h = secondaryHue || (mainHue + 120) % 360;
+                    newHsl.s = Math.max(0, Math.min(1, baseHsl.s * 0.9));
+                } else if (name.includes('red')) {
+                    newHsl.h = secondaryHue || (mainHue + 240) % 360;
+                    newHsl.s = Math.max(0, Math.min(1, baseHsl.s * 0.9));
+                } else if (name.startsWith('color_gray') || name.startsWith('bg_') || name.startsWith('border_')) {
+                    newHsl.l = adjustBrightness(newHsl.l, brightnessStep);
+                    newHsl.s = 0;
+                } else if (name.startsWith('text_')) {
+                    newHsl.l = adjustBrightness(newHsl.l, brightnessStep / 2);
+                }
+
+                newHsl.h = Math.max(0, Math.min(360, newHsl.h));
+                newHsl.s = Math.max(0, Math.min(1, newHsl.s));
+                newHsl.l = Math.max(0, Math.min(1, newHsl.l));
+
+                const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
+                const originalAlpha = colorData.originalValue.slice(1, 3);
+                const newArgb = `#${originalAlpha}${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
+
+                colorData.value = newArgb;
+                currentColorMap.set(name, colorData);
+            });
+        }
+
+        // ========== 通用工具函数 ==========
+        function rgbToArgb(rgbHex) {
+            if (!rgbHex || !/^#([0-9A-F]{6})$/.test(rgbHex.toUpperCase())) {
+                return '#FF3B82F6';
+            }
+            return `#FF${rgbHex.toUpperCase().slice(1)}`;
+        }
+
+        function argbToRgb(argb) {
+            if (!argb || !/^#([0-9A-F]{8})$/.test(argb.toUpperCase())) {
+                return { r: 59, g: 130, b: 246 };
+            }
+            const argbUpper = argb.toUpperCase();
+            return {
+                r: parseInt(argbUpper.slice(3, 5), 16) || 0,
+                g: parseInt(argbUpper.slice(5, 7), 16) || 0,
+                b: parseInt(argbUpper.slice(7, 9), 16) || 0
+            };
+        }
+
+        function rgbToHex(value) {
+            const num = Math.max(0, Math.min(255, parseInt(value) || 0));
+            const hex = num.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r = Math.max(0, Math.min(255, r)) / 255;
+            g = Math.max(0, Math.min(255, g)) / 255;
+            b = Math.max(0, Math.min(255, b)) / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h = 0, s = 0, l = (max + min) / 2;
+
+            if (max !== min) {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                
+                if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+                else if (max === g) h = (b - r) / d + 2;
+                else if (max === b) h = (r - g) / d + 4;
+                
+                h *= 60;
+            }
+
+            return { h, s, l };
+        }
+
+        function hslToRgb(h, s, l) {
+            h = Math.max(0, Math.min(360, h));
+            s = Math.max(0, Math.min(1, s));
+            l = Math.max(0, Math.min(1, l));
+
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    t = t < 0 ? t + 1 : t > 1 ? t - 1 : t;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                const hNormalized = h / 360;
+
+                r = hue2rgb(p, q, hNormalized + 1/3);
+                g = hue2rgb(p, q, hNormalized);
+                b = hue2rgb(p, q, hNormalized - 1/3);
+            }
+
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
+        }
+
+        function adjustBrightness(lightness, step) {
+            const stepNormalized = Math.max(5, Math.min(30, step)) / 100;
+            const direction = lightness > 0.5 ? -1 : 1;
+            const newL = lightness + (stepNormalized * direction);
+            return Math.max(0, Math.min(1, newL));
+        }
+    </script>
+</body>
+</html>
