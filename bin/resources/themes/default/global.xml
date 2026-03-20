@@ -132,7 +132,7 @@
     <Class name="btn_global_base" fade_hot="true"/>
     
     <!-- 编辑框基类 -->
-    <Class name="richedit_base" bkcolor="bg_richedit" caret_color="bg_richedit_caret" multi_line="false" auto_hscroll="true" rich_text="false"
+    <Class name="richedit_base" bkcolor="bg_richedit" caret_color="border_richedit_caret" multi_line="false" auto_hscroll="true" rich_text="false"
                                 want_return="false" want_ctrl_return="false" want_tab="false" 
                                 text_align="left,vcenter" normal_text_color="text_default" disabled_text_color="text_disabled"/>
     
@@ -593,7 +593,7 @@
                                         sorted_up_image="file='${PATH_LISTCTRL}/arrow-sorted-up.svg' width='10' height='10' valign='center' halign='left'" 
                                         sorted_down_image="file='${PATH_LISTCTRL}/arrow-sorted-down.svg' width='10' height='10' valign='center' halign='left'"/>
     <Class name="list_ctrl_header_split_box" width="3" height="100%" enable_split_single="true"/>
-    <Class name="list_ctrl_header_split_control" width="1" height="100%" margin="0,4,0,2" bkcolor="bg_list_ctrl_header_split" halign="right"/>
+    <Class name="list_ctrl_header_split_control" width="1" height="100%" margin="0,4,0,2" bkcolor="border_list_ctrl_header_split" halign="right"/>
     
     <!-- ListCtrl复选框 -->
     <Class name="list_ctrl_checkbox" valign="center" halign="left"
@@ -713,9 +713,9 @@
     <!-- Property Grid控件，部分属性在default/public/property_grid/property_grid.xml中定义-->
     <Class name="property_grid" left_column_width="130"
                                 row_grid_line_width="1"
-                                row_grid_line_color="bg_property_grid_line"
+                                row_grid_line_color="border_property_grid_line"
                                 column_grid_line_width="1"
-                                column_grid_line_color="bg_property_grid_line"
+                                column_grid_line_color="border_property_grid_line"
                                 header_class="property_grid_header"
                                 group_class="property_grid_group"
                                 group_label_class="property_grid_group_label"
