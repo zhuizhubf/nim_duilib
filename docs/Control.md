@@ -738,8 +738,13 @@ ListCtrl 控件的各个视图继承了 `ListBox` 属性，更多可用属性请
 | column_grid_line_color | | string | 纵向网格线的颜色|
 | header_class | | string | 表头的Class属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
 | group_class | | string | 分组的ClassClass属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
-| propterty_class | | string | 属性的ClassClass属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
+| group_label_class | | string | 分组的文本控件Class|
+| property_class | | string | 属性的ClassClass属性，定义方法请参考`global.xml` 中的对应内容和示例程序|
+| property_name_label_class | | string | 属性的名称文本控件Class|
+| property_value_label_class | | string | 属性的值文本控件Class|
 | left_column_width | | int | 左侧一列的宽度|
+| property_font_normal | | string | 设置属性值的字体Id（正常状态）|
+| property_font_modified | | string | 设置属性值的字体Id（已修改状态）|
 
 PropertyGrid 控件继承了 `VBox` 属性，更多可用属性请参考`VBox`的属性
 

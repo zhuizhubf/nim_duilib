@@ -28,8 +28,8 @@ PropertyGrid::PropertyGrid(Window* pWindow):
     SetColumnGridLineWidth(1.0f, true);
 
     //设置属性值默认字体
-    m_proptertyNormalFontId = _T("system_regular_14");
-    m_proptertyModifiedFontId = _T("system_bold_14");
+    m_propertyNormalFontId = _T("system_regular_14");
+    m_propertyModifiedFontId = _T("system_bold_14");
 }
 
 DString PropertyGrid::GetType() const { return DUI_CTR_PROPERTY_GRID; }
@@ -63,22 +63,22 @@ void PropertyGrid::SetAttribute(const DString& strName, const DString& strValue2
     else if (strName == _T("group_label_class")) {
         SetGroupLabelClass(strValue);
     }
-    else if (strName == _T("propterty_class")) {
+    else if (strName == _T("property_class")) {
         SetPropertyClass(strValue);
     }
-    else if (strName == _T("propterty_name_label_class")) {
+    else if (strName == _T("property_name_label_class")) {
         SetPropertyNameLabelClass(strValue);
     }
-    else if (strName == _T("propterty_value_label_class")) {
+    else if (strName == _T("property_value_label_class")) {
         SetPropertyValueLabelClass(strValue);
     }
     else if (strName == _T("left_column_width")) {
         SetLeftColumnWidth(StringUtil::StringToInt32(strValue), true);
     }
-    else if (strName == _T("propterty_font_normal")) {
+    else if (strName == _T("property_font_normal")) {
         SetProptertyNormalFontId(strValue);
     }
-    else if (strName == _T("propterty_font_modified")) {
+    else if (strName == _T("property_font_modified")) {
         SetProptertyModifiedFontId(strValue);
     }
     else {
@@ -1204,22 +1204,22 @@ int32_t PropertyGrid::GetLeftColumnWidthValue() const
 
 void PropertyGrid::SetProptertyNormalFontId(const DString& fontId)
 {
-    m_proptertyNormalFontId = fontId;
+    m_propertyNormalFontId = fontId;
 }
 
 DString PropertyGrid::GetProptertyNormalFontId() const
 {
-    return m_proptertyNormalFontId.c_str();
+    return m_propertyNormalFontId.c_str();
 }
 
 void PropertyGrid::SetProptertyModifiedFontId(const DString& fontId)
 {
-    m_proptertyModifiedFontId = fontId;
+    m_propertyModifiedFontId = fontId;
 }
 
 DString PropertyGrid::GetProptertyModifiedFontId() const
 {
-    return m_proptertyModifiedFontId.c_str();
+    return m_propertyModifiedFontId.c_str();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1654,13 +1654,13 @@ void PropertyGridProperty::OnInit()
     m_pLabelBoxRight->SetText(m_propertyValue.c_str());
     m_pLabelBoxRight->SetTextId(m_propertyValueId.c_str());
 
-    DString proptertyNormalFontId;
+    DString propertyNormalFontId;
     ASSERT(m_pPropertyGrid != nullptr);
     if (m_pPropertyGrid != nullptr) {
-        proptertyNormalFontId = m_pPropertyGrid->GetProptertyNormalFontId();
+        propertyNormalFontId = m_pPropertyGrid->GetProptertyNormalFontId();
     }
-    if (!proptertyNormalFontId.empty()) {
-        m_pLabelBoxRight->SetFontId(proptertyNormalFontId.c_str());
+    if (!propertyNormalFontId.empty()) {
+        m_pLabelBoxRight->SetFontId(propertyNormalFontId.c_str());
     }    
 
     //挂载鼠标左键按下事件
@@ -1716,23 +1716,23 @@ void PropertyGridProperty::SetPropertyText(const DString& text, bool bChanged, b
         m_pLabelBoxRight->SetText(text);
         m_pLabelBoxRight->SetTextId(_T("")); //需要清空文本ID，因为文本值为空时，会取文本ID的值
         if (bChanged) {
-            DString proptertyModifiedFontId;
+            DString propertyModifiedFontId;
             ASSERT(m_pPropertyGrid != nullptr);
             if (m_pPropertyGrid != nullptr) {
-                proptertyModifiedFontId = m_pPropertyGrid->GetProptertyModifiedFontId();
+                propertyModifiedFontId = m_pPropertyGrid->GetProptertyModifiedFontId();
             }
-            if (!proptertyModifiedFontId.empty()) {
-                m_pLabelBoxRight->SetFontId(proptertyModifiedFontId);
+            if (!propertyModifiedFontId.empty()) {
+                m_pLabelBoxRight->SetFontId(propertyModifiedFontId);
             }
         }
         else {
-            DString proptertyNormalFontId;
+            DString propertyNormalFontId;
             ASSERT(m_pPropertyGrid != nullptr);
             if (m_pPropertyGrid != nullptr) {
-                proptertyNormalFontId = m_pPropertyGrid->GetProptertyNormalFontId();
+                propertyNormalFontId = m_pPropertyGrid->GetProptertyNormalFontId();
             }
-            if (!proptertyNormalFontId.empty()) {
-                m_pLabelBoxRight->SetFontId(proptertyNormalFontId);
+            if (!propertyNormalFontId.empty()) {
+                m_pLabelBoxRight->SetFontId(propertyNormalFontId);
             }            
         }
     }
@@ -1941,7 +1941,7 @@ void PropertyGridTextProperty::EnableEditControl(bool bEnable)
     }
     m_bTextEdited = false;
     m_pRichEdit = new PropertyGridRichEdit(GetWindow());
-    m_pRichEdit->SetClass(_T("property_grid_propterty_edit"));
+    m_pRichEdit->SetClass(_T("property_grid_property_edit"));
     if (!AddPropertySubItem(m_pRichEdit.get())) {
         delete m_pRichEdit.get();
         m_pRichEdit = nullptr;

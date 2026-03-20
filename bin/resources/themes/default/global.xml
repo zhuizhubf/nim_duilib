@@ -488,15 +488,15 @@
     <!-- 富文本Spin按钮 -->
     <Class name="rich_edit_spin" spin_class="rich_edit_spin_box,rich_edit_spin_btn_up,rich_edit_spin_btn_down" 
                                  bkcolor="bg_richedit" number_only="true" height="28" width="64" 
-                                 text_padding="0, 0, 18, 0" text_align="vcenter,hcenter"/>
-    <Class name="rich_edit_spin_box" width="18" halign="right" nofocus="true"/>
-    <Class name="rich_edit_spin_btn_up" height="50%" width="100%" nofocus="true" padding="1,0,0,0" border_size="1,0,0,0" 
+                                 text_padding="0,0,18,0" text_align="vcenter,hcenter"/>
+    <Class name="rich_edit_spin_box" width="18" halign="right" no_focus="true"/>
+    <Class name="rich_edit_spin_btn_up" height="50%" width="100%" no_focus="true" padding="1,0,0,0" border_size="1,0,0,0" 
                                  border_color="border_richedit_btn" 
                                  normal_image="file='${PATH_BUTTON}/arrow-up.svg' width='10' height='10' valign='center' halign='center'" 
                                  normal_color="bg_richedit_btn_normal" 
                                  hot_color="bg_richedit_btn_hover" 
                                  pushed_color="bg_richedit_btn_pressed"/>
-    <Class name="rich_edit_spin_btn_down" height="50%" width="100%" nofocus="true" padding="1,1,0,0" border_size="1,1,0,0" 
+    <Class name="rich_edit_spin_btn_down" height="50%" width="100%" no_focus="true" padding="1,1,0,0" border_size="1,1,0,0" 
                                  border_color="border_richedit_btn"
                                  normal_image="file='${PATH_BUTTON}/arrow-down.svg' width='10' height='10' valign='center' halign='center'" 
                                  normal_color="bg_richedit_btn_normal" 
@@ -506,14 +506,14 @@
     <!-- 富文本Spin按钮（全边框） -->
     <Class name="rich_edit_spin2" spin_class="rich_edit_spin_box,rich_edit_spin_btn_up2,rich_edit_spin_btn_down2" 
                                   bkcolor="bg_richedit" number_only="true" height="28" width="64" 
-                                  text_padding="0, 0, 18, 0" text_align="vcenter,hcenter"/>
-    <Class name="rich_edit_spin_btn_up2" height="50%" width="100%" nofocus="true" padding="1,1,1,1" border_size="1,1,1,1" 
+                                  text_padding="0,0,18,0" text_align="vcenter,hcenter"/>
+    <Class name="rich_edit_spin_btn_up2" height="50%" width="100%" no_focus="true" padding="1,1,1,1" border_size="1,1,1,1" 
                                   border_color="border_richedit_btn" 
                                   normal_image="file='${PATH_BUTTON}/arrow-up.svg' width='10' height='10' valign='center' halign='center'" 
                                   normal_color="bg_richedit_btn_normal" 
                                   hot_color="bg_richedit_btn_hover" 
                                   pushed_color="bg_richedit_btn_pressed"/>
-    <Class name="rich_edit_spin_btn_down2" height="50%" width="100%" nofocus="true" padding="1,0,1,1" border_size="1,0,1,1" 
+    <Class name="rich_edit_spin_btn_down2" height="50%" width="100%" no_focus="true" padding="1,0,1,1" border_size="1,0,1,1" 
                                   border_color="border_richedit_btn" 
                                   normal_image="file='${PATH_BUTTON}/arrow-down.svg' width='10' height='10' valign='center' halign='center'" 
                                   normal_color="bg_richedit_btn_normal" 
@@ -719,10 +719,10 @@
                                 header_class="property_grid_header"
                                 group_class="property_grid_group"
                                 group_label_class="property_grid_group_label"
-                                propterty_class="property_grid_propterty"
-                                propterty_name_label_class="property_grid_propterty_name_label"
-                                propterty_value_label_class="property_grid_propterty_value_label"
-                                propterty_font_normal="system_regular_14"
-                                propterty_font_modified="system_bold_14"/>
+                                property_class="property_grid_property"
+                                property_name_label_class="property_grid_property_name_label"
+                                property_value_label_class="property_grid_property_value_label"
+                                property_font_normal="system_regular_14"
+                                property_font_modified="system_bold_14"/>
     
 </Global>

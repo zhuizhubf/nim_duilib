@@ -738,11 +738,11 @@ private:
 private:
     /** 属性值的字体Id（正常状态）
     */
-    UiString m_proptertyNormalFontId;
+    UiString m_propertyNormalFontId;
 
     /** 属性值的字体Id（已修改状态）
     */
-    UiString m_proptertyModifiedFontId;
+    UiString m_propertyModifiedFontId;
 
 private:
     /** 横向网格线的宽度
