@@ -50,6 +50,12 @@
     <TextColor name="color_splitline_level2" value="#FFF5F5F5" type="split_line" category="border_color" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/secondary area separator"/>
     <TextColor name="color_splitline_group_box" value="#FFE0E0E0" type="split_line" category="border_color" comment_cn="分组框分割线" comment_en="Group box split line"/>
     
+    <!-- ===================== 通用控件边框体系 ===================== -->
+    <TextColor name="border_control_normal" value="#FFD1D5DB" type="common" category="border_color" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
+    <TextColor name="border_control_hover" value="#FF9CA3AF" type="common" category="border_color" comment_cn="通用控件悬浮边框" comment_en="General control hover border"/>
+    <TextColor name="border_control_focus" value="#FF0078D4" type="common" category="border_color" comment_cn="通用控件聚焦高亮边框" comment_en="General control focus border"/>
+    <TextColor name="border_control_disabled" value="#FFE5E7EB" type="common" category="border_color" comment_cn="通用控件禁用边框" comment_en="General control disabled border"/>
+
     <!-- Split分割线/拖动条 -->
     <TextColor name="bg_split_normal" value="#FFE5E7EB" type="split_line" category="bg_color" comment_cn="分割线静态状态" comment_en="Split line normal state"/>
     <TextColor name="bg_split_hover" value="#FFD1D5DB" type="split_line" category="bg_color" comment_cn="分割线悬浮状态" comment_en="Split line hover state"/>
