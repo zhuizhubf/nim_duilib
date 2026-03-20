@@ -47,7 +47,7 @@
     <!-- ===================== 通用控件颜色 ===================== -->
     <TextColor name="color_progress" value="#FF0078D4" type="progress" category="basic_color" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
     <TextColor name="color_splitline_level1" value="#FFE5E7EB" type="split_line" category="border_color" comment_cn="一级分割线/主要区域分隔" comment_en="Level 1 split line/main area separator"/>
-    <TextColor name="color_splitline_level2" value="#FFF5F5F5" type="split_line" category="border_color" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/secondary area separator"/>
+    <TextColor name="color_splitline_level2" value="#FFF5F5F5" type="split_line" category="border_color" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/main area separator"/>
     <TextColor name="color_splitline_group_box" value="#FFE0E0E0" type="split_line" category="border_color" comment_cn="分组框分割线" comment_en="Group box split line"/>
     
     <!-- ===================== 通用控件边框体系 ===================== -->
@@ -64,7 +64,7 @@
 
     <!-- 编辑框（Win11规范：灰边框+聚焦蓝下划线） -->
     <TextColor name="bg_richedit" value="#FFFFFFFF" type="richedit" category="bg_color" comment_cn="编辑框默认背景" comment_en="RichEdit default background"/>
-    <TextColor name="border_richedit_caret" value="#FF1E1E1E" type="richedit" category="text_color" comment_cn="编辑框光标颜色" comment_en="RichEdit caret color"/>
+    <TextColor name="bg_richedit_caret" value="#FF1E1E1E" type="richedit" category="text_color" comment_cn="编辑框光标颜色" comment_en="RichEdit caret color"/>
     <TextColor name="text_richedit_prompt" value="#FF888888" type="richedit" category="text_color" comment_cn="编辑框占位符文本" comment_en="RichEdit prompt text"/>
     <TextColor name="border_richedit_normal" value="#FFD1D5DB" type="richedit" category="border_color" comment_cn="编辑框默认边框" comment_en="RichEdit normal border"/>
     <TextColor name="border_richedit_hover" value="#FF9CA3AF" type="richedit" category="border_color" comment_cn="编辑框悬浮边框" comment_en="RichEdit hover border"/>
@@ -121,7 +121,7 @@
     <TextColor name="bg_list_ctrl_header" value="#FFF5F5F5" type="list_ctrl" category="bg_color" comment_cn="列表控件表头背景" comment_en="ListCtrl header background"/>
     <TextColor name="bg_list_ctrl_header_hover" value="#FFE6F0FF" type="list_ctrl" category="bg_color" comment_cn="列表表头悬浮背景" comment_en="List header hover bg"/>
     <TextColor name="bg_list_ctrl_header_pressed" value="#FFCCE5FF" type="list_ctrl" category="bg_color" comment_cn="列表表头点击背景" comment_en="List header pressed bg"/>
-    <TextColor name="border_list_ctrl_header_split" value="#FFE5E7EB" type="list_ctrl" category="border_color" comment_cn="列表表头分割线" comment_en="List header split line"/>
+    <TextColor name="bg_list_ctrl_header_split" value="#FFE5E7EB" type="list_ctrl" category="border_color" comment_cn="列表表头分割线" comment_en="List header split line"/>
     <TextColor name="bg_list_ctrl_view_split" value="#FFE5E7EB" type="list_ctrl" category="border_color" comment_cn="表格分割线" comment_en="Table split line"/>
     <TextColor name="bg_list_ctrl_view" value="#FFFFFFFF" type="list_ctrl" category="bg_color" comment_cn="列表视图背景" comment_en="List view background"/>
     <TextColor name="bg_list_ctrl_frame_selected" value="#FF88BDEE" type="list_ctrl" category="bg_color" comment_cn="列表选中项外框背景" comment_en="List selected frame bg"/>
@@ -147,7 +147,7 @@
 
     <!-- 属性页（PropertyGrid） -->
     <TextColor name="bg_property_grid_header" value="#FFE0E0E0" type="property_grid" category="bg_color" comment_cn="属性页分组表头背景" comment_en="PropertyGrid header bg"/>
-    <TextColor name="border_property_grid_header_split" value="#FFA9A9A9" type="property_grid" category="border_color" comment_cn="属性表头分割线" comment_en="Property header split line"/>
+    <TextColor name="bg_property_grid_header_split" value="#FFA9A9A9" type="property_grid" category="border_color" comment_cn="属性表头分割线" comment_en="Property header split line"/>
     <TextColor name="border_property_grid_header" value="#FFD1D5DB" type="property_grid" category="border_color" comment_cn="属性表头边框" comment_en="Property header border"/>
     <TextColor name="text_property_grid_header" value="#FF1E1E1E" type="property_grid" category="text_color" comment_cn="属性表头默认文本" comment_en="Property header normal text"/>
     <TextColor name="text_property_grid_header_disabled" value="#FF707070" type="property_grid" category="text_color" comment_cn="属性表头禁用文本" comment_en="Property header disabled text"/>
@@ -155,5 +155,5 @@
     <TextColor name="bg_property_grid_property" value="#FFFFFFFF" type="property_grid" category="bg_color" comment_cn="属性行背景" comment_en="Property row background"/>
     <TextColor name="bg_property_grid_property_name" value="#FFFFFFFF" type="property_grid" category="bg_color" comment_cn="属性名列背景" comment_en="Property name column bg"/>
     <TextColor name="bg_property_grid_property_value" value="#FFFFFFFF" type="property_grid" category="bg_color" comment_cn="属性值列背景" comment_en="Property value column bg"/>
-    <TextColor name="border_property_grid_line" value="#FFD1D5DB" type="property_grid" category="border_color" comment_cn="属性页网格分割线" comment_en="PropertyGrid grid line"/>
+    <TextColor name="bg_property_grid_line" value="#FFD1D5DB" type="property_grid" category="border_color" comment_cn="属性页网格分割线" comment_en="PropertyGrid grid line"/>
 </Global>
