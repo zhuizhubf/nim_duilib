@@ -423,8 +423,8 @@ public:
     */
     bool IsEnableVars() const;
 
-    /** 函数功能：如果varValue中有Define定义的变量，替换为对应的值
-     *   用法举例：假设在globle.xml中增加一行变量定义：<Define name="SIZE_ICON_SMALL" value="16"/>
+    /** 函数功能：如果varValue中有Var定义的变量，替换为对应的值
+     *   用法举例：假设在globle.xml中增加一行变量定义：<Var name="SIZE_ICON_SMALL" value="16"/>
      *   属性字符串中可以这样使用这个变量：width='${SIZE_ICON_SMALL}'
      *   使用该函数展开后，变量的取值变成了：width='16'
      * @param [in,out] varValue 需要展开变量的字符串

@@ -5,28 +5,28 @@
         
     <!-- ===================== 全局变量定义 ===================== -->
     <!-- 尺寸变量 -->
-    <Define name="SIZE_SCROLLBAR_WIDTH" value="12"/>
-    <Define name="SIZE_SCROLLBAR_HEIGHT" value="12"/>
-    <Define name="SIZE_BTN_EXIT_FULLSCREEN_WIDTH" value="180"/>
-    <Define name="SIZE_BTN_EXIT_FULLSCREEN_HEIGHT" value="36"/>
-    <Define name="SIZE_BTN_GLOBAL_DEFAULT" value="80x30"/>
-    <Define name="SIZE_ICON_SMALL" value="16"/>
-    <Define name="SIZE_ICON_LARGE" value="24"/>
+    <Var name="SIZE_SCROLLBAR_WIDTH" value="12"/>
+    <Var name="SIZE_SCROLLBAR_HEIGHT" value="12"/>
+    <Var name="SIZE_BTN_EXIT_FULLSCREEN_WIDTH" value="180"/>
+    <Var name="SIZE_BTN_EXIT_FULLSCREEN_HEIGHT" value="36"/>
+    <Var name="SIZE_BTN_GLOBAL_DEFAULT" value="80x30"/>
+    <Var name="SIZE_ICON_SMALL" value="16"/>
+    <Var name="SIZE_ICON_LARGE" value="24"/>
     
     <!-- 路径变量 -->
-    <Define name="PATH_SCROLLBAR_SIMPLE" value="public/scrollbar01"/>
-    <Define name="PATH_SCROLLBAR_STANDARD" value="public/scrollbar02"/>
-    <Define name="PATH_BUTTON" value="public/button"/>
-    <Define name="PATH_CHECKBOX" value="public/checkbox"/>
-    <Define name="PATH_OPTION" value="public/option"/>
-    <Define name="PATH_TREE" value="public/tree"/>
-    <Define name="PATH_LISTCTRL" value="public/listctrl"/>
-    <Define name="PATH_ADDRESS_BAR" value="public/address_bar"/>
-    <Define name="PATH_PROGRESS" value="public/progress"/>
-    <Define name="PATH_SLIDER" value="public/slider"/>
-    <Define name="PATH_CAPTION" value="public/caption"/>
-    <Define name="PATH_COMBO" value="public/combo"/>
-    <Define name="PATH_MENU" value="public/menu"/>
+    <Var name="PATH_SCROLLBAR_SIMPLE" value="public/scrollbar01"/>
+    <Var name="PATH_SCROLLBAR_STANDARD" value="public/scrollbar02"/>
+    <Var name="PATH_BUTTON" value="public/button"/>
+    <Var name="PATH_CHECKBOX" value="public/checkbox"/>
+    <Var name="PATH_OPTION" value="public/option"/>
+    <Var name="PATH_TREE" value="public/tree"/>
+    <Var name="PATH_LISTCTRL" value="public/listctrl"/>
+    <Var name="PATH_ADDRESS_BAR" value="public/address_bar"/>
+    <Var name="PATH_PROGRESS" value="public/progress"/>
+    <Var name="PATH_SLIDER" value="public/slider"/>
+    <Var name="PATH_CAPTION" value="public/caption"/>
+    <Var name="PATH_COMBO" value="public/combo"/>
+    <Var name="PATH_MENU" value="public/menu"/>
     
     <!-- ===================== 字体配置 ===================== -->
     <!--默认字体名称，列表形式，依次匹配，直到发现第一个有效字体作为默认字体名称，多个字体名称用逗号分隔-->
@@ -87,8 +87,8 @@
     <FontFile file="RobotoMono-Italic.ttf" desc="字体名称：Roboto Mono，斜体"/>
     <FontFile file="RobotoMono-BoldItalic.ttf" desc="字体名称：Roboto Mono，粗斜体"/>
 
-    <Define name="border_primary_btn_size" value="0"/> <!-- 主要按默认边框：边框大小 -->
-    <Define name="border_btn_size" value="1"/> <!-- 次要按钮默认边框：边框大小 -->
+    <Var name="border_primary_btn_size" value="0"/> <!-- 主要按默认边框：边框大小 -->
+    <Var name="border_btn_size" value="1"/> <!-- 次要按钮默认边框：边框大小 -->
     
     <!-- ===================== 完整兼容别名（旧属性名 → 新属性名） ===================== -->
     <!-- 1. 颜色属性兼容别名 -->
@@ -316,7 +316,7 @@
                                         pushed_color="#B71D22"/>
     
     <!-- 窗口按钮 -->
-    <Define name="SIZE_WND_ICON" value="20"/>
+    <Var name="SIZE_WND_ICON" value="20"/>
     <Class name="btn_wnd_base" class="btn_global_base" hot_color="bg_btn_window_hover" pushed_color="bg_btn_window_pressed"/>
     <Class name="btn_wnd_min_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_MIN"
                                  normal_image="file='${PATH_BUTTON}/window-minimize.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center'"/>

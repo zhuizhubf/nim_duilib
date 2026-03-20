@@ -384,7 +384,7 @@ public:
     void ClearAlias();
 
 public:
-    /** 添加变量: <Define name="SIZE_SCROLLBAR_WIDTH" value="12"/>
+    /** 添加变量: <Var name="SIZE_SCROLLBAR_WIDTH" value="12"/>
     * @param [in] name 变量名称
     * @param [in] value 变量对应的取值
     */
@@ -405,8 +405,8 @@ public:
     */
     void ClearVars();
 
-    /** 函数功能：如果varValue中有Define定义的变量，替换为对应的值
-     *   用法举例：假设在globle.xml中增加一行变量定义：<Define name="SIZE_ICON_SMALL" value="16"/>
+    /** 函数功能：如果varValue中有Var定义的变量，替换为对应的值
+     *   用法举例：假设在globle.xml中增加一行变量定义：<Var name="SIZE_ICON_SMALL" value="16"/>
      *   属性字符串中可以这样使用这个变量：width='${SIZE_ICON_SMALL}'
      *   使用该函数展开后，变量的取值变成了：width='16'
      * @param [in,out] varValue 需要展开变量的字符串
@@ -414,7 +414,7 @@ public:
      */
     DString& ExpandVarStrings(DString& varValue) const;
 
-    /** 函数功能：如果varValue中有Define定义的变量，替换为对应的值（功能同上）
+    /** 函数功能：如果varValue中有Var定义的变量，替换为对应的值（功能同上）
     */
     DString GetExpandVarStrings(const DString& varValue) const;
 

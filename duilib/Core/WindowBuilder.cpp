@@ -323,7 +323,7 @@ Control* WindowBuilder::CreateControls(Window* pWindow, CreateControlCallback pC
              (strClass == _T("TextColor"))      ||
              (strClass == _T("Theme"))         ||
              (strClass == _T("Alias"))          ||
-             (strClass == _T("Define")) ) {
+             (strClass == _T("Var")) ) {
             //忽略这几个属性
 
         }
@@ -974,7 +974,7 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
             DString aliasValue = node.attribute(_T("value")).as_string();
             GlobalManager::Instance().AddAlias(aliasName, aliasValue);
         }
-        else if (strClass == _T("Define")) {
+        else if (strClass == _T("Var")) {
             DString defineName = node.attribute(_T("name")).as_string();
             DString defineValue = node.attribute(_T("value")).as_string();
             GlobalManager::Instance().AddVar(defineName, defineValue);
@@ -1077,7 +1077,7 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             (strClass == _T("TextColor")) ||
             (strClass == _T("Theme"))     ||
             (strClass == _T("Alias"))     ||
-            (strClass == _T("Define"))) {
+            (strClass == _T("Var"))) {
             continue;
         }
 
