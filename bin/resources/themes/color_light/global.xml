@@ -45,7 +45,7 @@
     <TextColor name="bg_menu_bar_pressed" value="#FFCCE5FF" type="menu_bar" category="bg_color" comment_cn="菜单栏项点击" comment_en="Menu bar item pressed"/>
 
     <!-- ===================== 通用控件颜色 ===================== -->
-    <TextColor name="color_progress" value="#FF0078D4" type="progress" category="basic_color" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
+    <TextColor name="color_progress" value="#FF0078D4" type="progress" category="bg_color" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
     <TextColor name="color_splitline_level1" value="#FFE5E7EB" type="split_line" category="border_color" comment_cn="一级分割线/主要区域分隔" comment_en="Level 1 split line/main area separator"/>
     <TextColor name="color_splitline_level2" value="#FFF5F5F5" type="split_line" category="border_color" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/main area separator"/>
     <TextColor name="color_splitline_group_box" value="#FFE0E0E0" type="split_line" category="border_color" comment_cn="分组框分割线" comment_en="Group box split line"/>
@@ -94,16 +94,16 @@
     <TextColor name="border_btn_disabled" value="#FFE5E7EB" type="button" category="border_color" comment_cn="次要按钮禁用边框" comment_en="Secondary button disabled border"/>
 
     <!-- ===================== 按钮颜色（主要按钮：强调色） ===================== -->
-    <TextColor name="text_primary_btn_normal" value="#FFFFFFFF" type="primary_button" category="text_color" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
-    <TextColor name="text_primary_btn_disabled" value="#FFBFD7FF" type="primary_button" category="text_color" comment_cn="主要按钮禁用文本" comment_en="Primary button disabled text"/>
-    <TextColor name="bg_primary_btn_normal" value="#FF0078D4" type="primary_button" category="bg_color" comment_cn="主要按钮默认背景" comment_en="Primary button normal bg"/>
-    <TextColor name="bg_primary_btn_hover" value="#FF1084E3" type="primary_button" category="bg_color" comment_cn="主要按钮悬浮背景" comment_en="Primary button hover bg"/>
-    <TextColor name="bg_primary_btn_pressed" value="#FF0066B2" type="primary_button" category="bg_color" comment_cn="主要按钮点击背景" comment_en="Primary button pressed bg"/>
-    <TextColor name="bg_primary_btn_disabled" value="#FF78A3D1" type="primary_button" category="bg_color" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>
-    <TextColor name="border_primary_btn_normal" value="#FF005A9E" type="primary_button" category="border_color" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
-    <TextColor name="border_primary_btn_hover" value="#FF0063B0" type="primary_button" category="border_color" comment_cn="主要按钮悬浮边框" comment_en="Primary button hover border"/>
-    <TextColor name="border_primary_btn_pressed" value="#FF004F8A" type="primary_button" category="border_color" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
-    <TextColor name="border_primary_btn_disabled" value="#FF78A3D1" type="primary_button" category="border_color" comment_cn="主要按钮禁用边框" comment_en="Primary button disabled border"/>
+    <TextColor name="text_primary_btn_normal" value="#FFFFFFFF" type="button_primary" category="text_color" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
+    <TextColor name="text_primary_btn_disabled" value="#FFBFD7FF" type="button_primary" category="text_color" comment_cn="主要按钮禁用文本" comment_en="Primary button disabled text"/>
+    <TextColor name="bg_primary_btn_normal" value="#FF0078D4" type="button_primary" category="bg_color" comment_cn="主要按钮默认背景" comment_en="Primary button normal bg"/>
+    <TextColor name="bg_primary_btn_hover" value="#FF1084E3" type="button_primary" category="bg_color" comment_cn="主要按钮悬浮背景" comment_en="Primary button hover bg"/>
+    <TextColor name="bg_primary_btn_pressed" value="#FF0066B2" type="button_primary" category="bg_color" comment_cn="主要按钮点击背景" comment_en="Primary button pressed bg"/>
+    <TextColor name="bg_primary_btn_disabled" value="#FF78A3D1" type="button_primary" category="bg_color" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>
+    <TextColor name="border_primary_btn_normal" value="#FF005A9E" type="button_primary" category="border_color" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
+    <TextColor name="border_primary_btn_hover" value="#FF0063B0" type="button_primary" category="border_color" comment_cn="主要按钮悬浮边框" comment_en="Primary button hover border"/>
+    <TextColor name="border_primary_btn_pressed" value="#FF004F8A" type="button_primary" category="border_color" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
+    <TextColor name="border_primary_btn_disabled" value="#FF78A3D1" type="button_primary" category="border_color" comment_cn="主要按钮禁用边框" comment_en="Primary button disabled border"/>
 
     <!-- ===================== 专用控件颜色 ===================== -->
     <!-- 全屏按钮 -->
