@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Win11 主题配色编辑器</title>
+    <title>nim_duilib主题配色编辑器</title>
     <style>
         * {
             margin: 0;
@@ -23,6 +23,26 @@
             gap: 15px;
             align-items: center;
             flex-wrap: wrap;
+        }
+        /* 新增分组切换按钮样式 */
+        .group-switch {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+        .group-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #e5e7eb;
+            color: #1E1E1E;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .group-btn.active {
+            background-color: #0078D4;
+            color: white;
         }
         .btn {
             padding: 8px 16px;
@@ -57,16 +77,74 @@
         .btn-reset:hover {
             background-color: #D97706;
         }
+        .btn-collapse {
+            background-color: #8B5CF6;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .btn-collapse:hover {
+            background-color: #7C3AED;
+        }
+        /* 分类容器样式 */
+        .color-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .color-category {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .category-header {
+            padding: 12px 15px;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .category-title {
+            font-weight: 600;
+            color: #1E1E1E;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-badge {
+            background-color: #0078D4;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .category-toggle {
+            font-size: 18px;
+            color: #6B7280;
+            transition: transform 0.2s;
+        }
+        .category-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
         .color-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 15px;
+            gap: 10px;
+            padding: 15px;
         }
         .color-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #fefefe;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+            transition: box-shadow 0.2s;
+        }
+        .color-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .color-preview {
             width: 100%;
@@ -93,6 +171,13 @@
         .color-label {
             font-weight: 600;
             color: #1E1E1E;
+            font-size: 14px;
+        }
+        /* 新增type/category显示 */
+        .color-meta {
+            font-size: 12px;
+            color: #8B5CF6;
+            margin: 4px 0;
         }
         .color-code-group {
             display: flex;
@@ -116,6 +201,7 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin-top: 4px;
         }
         .comment-cn {
             color: #0078D4;
@@ -145,6 +231,12 @@
             border: 1px solid #e5e7eb;
             border-radius: 4px;
             font-family: Consolas, monospace;
+            transition: border-color 0.2s;
+        }
+        .color-input:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
         }
         .generate-panel {
             background-color: white;
@@ -173,8 +265,16 @@
             border-radius: 4px;
             border: 1px solid #e5e7eb;
             min-width: 150px;
+            transition: border-color 0.2s;
+        }
+        .generate-option select:focus, .generate-option input:focus {
+            outline: none;
+            border-color: #0078D4;
         }
         .hidden {
+            display: none;
+        }
+        .collapsed-content {
             display: none;
         }
         #fileInput {
@@ -186,6 +286,7 @@
             border-radius: 4px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             margin-bottom: 10px;
+            border-left: 4px solid #0078D4;
         }
         .theme-name {
             font-size: 18px;
@@ -196,6 +297,39 @@
             font-size: 14px;
             color: #6B7280;
         }
+        /* 分组专属配色（按type/category） */
+        .category-type .category-header {
+            border-left: 4px solid #0078D4;
+        }
+        .category-category .category-header {
+            border-left: 4px solid #10B981;
+        }
+        .category-original .category-header {
+            border-left: 4px solid #8B5CF6;
+        }
+        /* 提示框样式 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: #1E1E1E;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 9999;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .toast.success {
+            background-color: #10B981;
+        }
+        .toast.error {
+            background-color: #EF4444;
+        }
     </style>
 </head>
 <body>
@@ -204,6 +338,13 @@
         <input type="file" id="fileInput" accept=".xml">
         <button class="btn btn-secondary" id="saveFileBtn" disabled>保存修改</button>
         <button class="btn btn-generate" id="generateSchemeBtn">生成新配色方案</button>
+        <!-- 新增分组切换按钮 -->
+        <div class="group-switch" id="groupSwitch" style="display: none;">
+            <button class="group-btn active" data-group="original">原始顺序</button>
+            <button class="group-btn" data-group="type">按Type分组</button>
+            <button class="group-btn" data-group="category">按Category分组</button>
+        </div>
+        <button class="btn btn-collapse" id="toggleAllBtn">全部折叠</button>
     </div>
 
     <div class="theme-info hidden" id="themeInfo">
@@ -233,14 +374,26 @@
         <button class="btn btn-generate" id="applyGenerateBtn">应用配色方案</button>
     </div>
 
-    <div class="color-grid" id="colorGrid"></div>
+    <!-- 颜色分类容器 -->
+    <div class="color-categories" id="colorCategories"></div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast"></div>
 
     <script>
         // 全局变量
         let currentXmlText = '';
         let currentXmlDoc = null;
-        let currentColorMap = new Map(); // 存储name -> {value, originalValue, commentCn, commentEn}
+        let currentColorMap = new Map(); // 存储name -> {value, originalValue, commentCn, commentEn, type, category}
         let currentThemeInfo = null;
+        let allColorItems = []; // 存储所有颜色项（原始顺序）
+        let currentGroupType = "original"; // 默认原始顺序
+        // 分组数据（动态生成）
+        let groupedData = {
+            original: { name: '原始顺序', count: 0, items: [], className: 'category-original' },
+            type: {}, // 按type分组：key=type值，value={name: type值, count:0, items:[], className:'category-type'}
+            category: {} // 按category分组：key=category值，value={name: category值, count:0, items:[], className:'category-category'}
+        };
 
         // DOM元素
         const openFileBtn = document.getElementById('openFileBtn');
@@ -249,17 +402,53 @@
         const generateSchemeBtn = document.getElementById('generateSchemeBtn');
         const generatePanel = document.getElementById('generatePanel');
         const applyGenerateBtn = document.getElementById('applyGenerateBtn');
-        const colorGrid = document.getElementById('colorGrid');
+        const colorCategoriesEl = document.getElementById('colorCategories');
         const themeInfo = document.getElementById('themeInfo');
         const themeName = document.getElementById('themeName');
         const themeStyle = document.getElementById('themeStyle');
+        const toggleAllBtn = document.getElementById('toggleAllBtn');
+        const groupSwitch = document.getElementById('groupSwitch');
+        const toast = document.getElementById('toast');
 
-        // 1. 打开XML文件功能
-        openFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
+        // 全部展开/折叠状态
+        let isAllExpanded = true;
 
-        fileInput.addEventListener('change', async (e) => {
+        // 初始化
+        init();
+
+        function init() {
+            // 绑定基础事件
+            openFileBtn.addEventListener('click', () => { fileInput.click(); });
+            fileInput.addEventListener('change', handleFileSelect);
+            saveFileBtn.addEventListener('click', saveModifiedXml);
+            generateSchemeBtn.addEventListener('click', toggleGeneratePanel);
+            applyGenerateBtn.addEventListener('click', applyColorScheme);
+            toggleAllBtn.addEventListener('click', toggleAllCategories);
+            
+            // 绑定分组切换事件
+            document.querySelectorAll('.group-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentGroupType = this.dataset.group;
+                    renderColorCategories();
+                    showToast(`已切换为：${this.textContent}`);
+                });
+            });
+        }
+
+        // 显示提示框
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 处理文件选择
+        async function handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -268,13 +457,15 @@
                 parseXmlTheme(currentXmlText);
                 saveFileBtn.disabled = false;
                 themeInfo.classList.remove('hidden');
+                groupSwitch.style.display = 'flex';
                 generatePanel.classList.add('hidden');
+                showToast(`成功加载：${file.name}`);
             } catch (err) {
-                alert('XML文件解析失败：' + err.message);
+                showToast(`XML解析失败：${err.message}`, 'error');
             }
-        });
+        }
 
-        // 2. 解析XML主题文件
+        // 解析XML主题文件
         function parseXmlTheme(xmlText) {
             const parser = new DOMParser();
             currentXmlDoc = parser.parseFromString(xmlText, 'text/xml');
@@ -287,29 +478,84 @@
             // 获取主题信息
             const themeNode = currentXmlDoc.querySelector('Theme');
             currentThemeInfo = {
-                name: themeNode.getAttribute('name') || '未知主题',
-                type: themeNode.getAttribute('type') || 'Color',
-                style: themeNode.getAttribute('style') || 'Unknown'
+                name: themeNode?.getAttribute('name') || '未知主题',
+                type: themeNode?.getAttribute('type') || 'Color',
+                style: themeNode?.getAttribute('style') || 'Unknown'
             };
 
             themeName.textContent = `主题名称：${currentThemeInfo.name}`;
             themeStyle.textContent = `主题样式：${currentThemeInfo.style} (${currentThemeInfo.type})`;
 
-            // 构建颜色映射表
+            // 重置数据
             currentColorMap.clear();
+            allColorItems = [];
+            groupedData = {
+                original: { name: '原始顺序', count: 0, items: [], className: 'category-original' },
+                type: {},
+                category: {}
+            };
+            
+            // 解析所有TextColor节点
             const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
             colorNodes.forEach(node => {
                 const name = node.getAttribute('name');
-                const originalValue = node.getAttribute('value') || '';
-                currentColorMap.set(name, {
-                    value: originalValue, // 当前值
-                    originalValue: originalValue, // 原始值（永久保留）
+                if (!name) return; // 跳过无名称的节点
+                
+                // 提取核心属性
+                const originalValue = node.getAttribute('value') || '#FFFFFFFF';
+                const type = node.getAttribute('type') || 'unknown';
+                const category = node.getAttribute('category') || 'unknown';
+                const colorData = {
+                    name,
+                    value: originalValue,
+                    originalValue: originalValue,
+                    type,
+                    category,
                     commentCn: node.getAttribute('comment_cn') || '无注释',
                     commentEn: node.getAttribute('comment_en') || 'No comment'
-                });
+                };
+                
+                // 存入映射表和原始数组
+                currentColorMap.set(name, colorData);
+                allColorItems.push(colorData);
+                
+                // 填充原始顺序分组
+                groupedData.original.items.push(colorData);
+                
+                // 填充按type分组
+                if (!groupedData.type[type]) {
+                    groupedData.type[type] = {
+                        name: `Type: ${type}`,
+                        count: 0,
+                        items: [],
+                        className: 'category-type'
+                    };
+                }
+                groupedData.type[type].items.push(colorData);
+                
+                // 填充按category分组
+                if (!groupedData.category[category]) {
+                    groupedData.category[category] = {
+                        name: `Category: ${category}`,
+                        count: 0,
+                        items: [],
+                        className: 'category-category'
+                    };
+                }
+                groupedData.category[category].items.push(colorData);
             });
 
-            renderColorCards();
+            // 计算各分组数量
+            groupedData.original.count = allColorItems.length;
+            Object.keys(groupedData.type).forEach(key => {
+                groupedData.type[key].count = groupedData.type[key].items.length;
+            });
+            Object.keys(groupedData.category).forEach(key => {
+                groupedData.category[key].count = groupedData.category[key].items.length;
+            });
+
+            // 渲染分类
+            renderColorCategories();
         }
 
         // 工具函数：ARGB转RGBA（浏览器显示用）
@@ -351,137 +597,271 @@
             return `#${alphaHex}${rgbHexPart}`;
         }
 
-        // 3. 渲染颜色卡片（核心：新增恢复原值+对比显示）
-        function renderColorCards() {
-            colorGrid.innerHTML = '';
+        // 渲染分类颜色卡片
+        function renderColorCategories() {
+            colorCategoriesEl.innerHTML = '';
 
-            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
-            colorNodes.forEach((node, index) => {
-                const name = node.getAttribute('name');
+            // 根据当前分组类型渲染
+            if (currentGroupType === 'original') {
+                // 原始顺序（单个分组）
+                const category = groupedData.original;
+                const categoryEl = createCategoryElement(category);
+                colorCategoriesEl.appendChild(categoryEl);
+            } else if (currentGroupType === 'type') {
+                // 按Type分组（多个子分组）
+                Object.keys(groupedData.type).sort().forEach(key => {
+                    const category = groupedData.type[key];
+                    const categoryEl = createCategoryElement(category);
+                    colorCategoriesEl.appendChild(categoryEl);
+                });
+            } else if (currentGroupType === 'category') {
+                // 按Category分组（多个子分组）
+                Object.keys(groupedData.category).sort().forEach(key => {
+                    const category = groupedData.category[key];
+                    const categoryEl = createCategoryElement(category);
+                    colorCategoriesEl.appendChild(categoryEl);
+                });
+            }
+        }
+
+        // 创建分类元素
+        function createCategoryElement(category) {
+            // 创建分类容器
+            const categoryEl = document.createElement('div');
+            categoryEl.className = `color-category ${category.className}`;
+            categoryEl.dataset.category = category.name;
+
+            // 分类头部
+            const headerEl = document.createElement('div');
+            headerEl.className = 'category-header';
+            headerEl.innerHTML = `
+                <div class="category-title">
+                    ${category.name}
+                    <span class="category-badge">${category.count}</span>
+                </div>
+                <div class="category-toggle">▶</div>
+            `;
+
+            // 分类内容（颜色网格）
+            const contentEl = document.createElement('div');
+            contentEl.className = 'color-grid';
+
+            // 渲染该分类下的所有颜色卡片
+            category.items.forEach(colorItem => {
+                const cardEl = createColorCard(colorItem);
+                contentEl.appendChild(cardEl);
+            });
+
+            // 组装分类元素
+            categoryEl.appendChild(headerEl);
+            categoryEl.appendChild(contentEl);
+
+            // 绑定分类折叠/展开事件
+            headerEl.addEventListener('click', () => {
+                toggleCategory(categoryEl);
+            });
+
+            return categoryEl;
+        }
+
+        // 创建单个颜色卡片（新增type/category显示）
+        function createColorCard(colorItem) {
+            const { name, value, originalValue, type, category, commentCn, commentEn } = colorItem;
+            
+            // 当前颜色和原始颜色的显示值
+            const currentDisplayColor = argbToRgbaCss(value);
+            const originalDisplayColor = argbToRgbaCss(originalValue);
+            const currentRgbHex = argbToRgbHex(value);
+
+            // 创建卡片元素
+            const cardEl = document.createElement('div');
+            cardEl.className = 'color-card';
+            cardEl.dataset.name = name;
+
+            // 卡片HTML（新增type/category显示）
+            cardEl.innerHTML = `
+                <div class="color-preview" style="background-color: ${currentDisplayColor}">
+                    <div class="color-preview-compare" style="background-color: ${originalDisplayColor}" 
+                         title="原始颜色：${originalValue}"></div>
+                </div>
+                <div class="color-info">
+                    <div class="color-label">${name}</div>
+                    <div class="color-meta">Type: ${type} | Category: ${category}</div>
+                    <div class="color-code-group">
+                        <div class="color-code current">当前值：${value}</div>
+                        <div class="color-code original">原始值：${originalValue}</div>
+                    </div>
+                    <div class="color-comment">
+                        <span class="comment-cn">【中文】${commentCn}</span>
+                        <span class="comment-en">【English】${commentEn}</span>
+                    </div>
+                    <div class="color-edit-group">
+                        <input type="color" class="color-picker" value="${currentRgbHex}" data-name="${name}">
+                        <input type="text" class="color-input" value="${value}" 
+                               data-name="${name}" placeholder="输入8位ARGB颜色值（如#FFFFFFFF）">
+                        <button class="btn btn-reset" data-name="${name}">恢复原值</button>
+                    </div>
+                </div>
+            `;
+
+            // ========== 绑定颜色选择器事件 ==========
+            const picker = cardEl.querySelector('.color-picker');
+            picker.addEventListener('input', (e) => {
+                const name = e.target.dataset.name;
+                const rgbHex = e.target.value;
                 const colorData = currentColorMap.get(name);
-                if (!colorData) return;
+                if (colorData) {
+                    const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
+                    // 实时更新预览
+                    cardEl.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
+                    cardEl.querySelector('.color-input').value = newArgb;
+                    cardEl.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
+                }
+            });
 
-                const card = document.createElement('div');
-                card.className = 'color-card';
+            picker.addEventListener('change', (e) => {
+                const name = e.target.dataset.name;
+                const rgbHex = e.target.value;
+                const colorData = currentColorMap.get(name);
+                if (colorData) {
+                    const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
+                    colorData.value = newArgb;
+                    currentColorMap.set(name, colorData);
+                    // 更新显示
+                    cardEl.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
+                    cardEl.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
+                    // 更新所有分组中的值
+                    updateAllGroupedValues(name, newArgb);
+                    showToast(`已更新 ${name} 的颜色值`);
+                }
+            });
+
+            // ========== 绑定手动输入框事件 ==========
+            const input = cardEl.querySelector('.color-input');
+            input.addEventListener('input', (e) => {
+                const newValue = e.target.value.trim().toUpperCase();
+                if (/^#([0-9A-F]{8})$/.test(newValue)) {
+                    cardEl.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
+                    cardEl.querySelector('.color-picker').value = argbToRgbHex(newValue);
+                    cardEl.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
+                }
+            });
+
+            input.addEventListener('change', (e) => {
+                const name = e.target.dataset.name;
+                const newValue = e.target.value.trim().toUpperCase();
                 
-                // 当前颜色和原始颜色的显示值
-                const currentDisplayColor = argbToRgbaCss(colorData.value);
-                const originalDisplayColor = argbToRgbaCss(colorData.originalValue);
-                const currentRgbHex = argbToRgbHex(colorData.value);
-
-                // 卡片HTML（新增对比区+恢复按钮）
-                card.innerHTML = `
-                    <div class="color-preview" style="background-color: ${currentDisplayColor}">
-                        <div class="color-preview-compare" style="background-color: ${originalDisplayColor}" 
-                             title="原始颜色：${colorData.originalValue}"></div>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-label">${name}</div>
-                        <div class="color-code-group">
-                            <div class="color-code current">当前值：${colorData.value}</div>
-                            <div class="color-code original">原始值：${colorData.originalValue}</div>
-                        </div>
-                        <div class="color-comment">
-                            <span class="comment-cn">【中文】${colorData.commentCn}</span>
-                            <span class="comment-en">【English】${colorData.commentEn}</span>
-                        </div>
-                        <div class="color-edit-group">
-                            <input type="color" class="color-picker" value="${currentRgbHex}" data-name="${name}">
-                            <input type="text" class="color-input" value="${colorData.value}" 
-                                   data-name="${name}" placeholder="输入8位ARGB颜色值（如#FFFFFFFF）">
-                            <button class="btn btn-reset" data-name="${name}">恢复原值</button>
-                        </div>
-                    </div>
-                `;
-                colorGrid.appendChild(card);
-
-                // ========== 颜色选择器事件 ==========
-                const picker = card.querySelector('.color-picker');
-                picker.addEventListener('input', (e) => {
-                    const name = e.target.dataset.name;
-                    const rgbHex = e.target.value;
+                if (/^#([0-9A-F]{8})$/.test(newValue)) {
                     const colorData = currentColorMap.get(name);
                     if (colorData) {
-                        const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
-                        // 实时更新预览
-                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
-                        card.querySelector('.color-input').value = newArgb;
-                        card.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
-                    }
-                });
-
-                picker.addEventListener('change', (e) => {
-                    const name = e.target.dataset.name;
-                    const rgbHex = e.target.value;
-                    const colorData = currentColorMap.get(name);
-                    if (colorData) {
-                        const newArgb = rgbHexToArgb(rgbHex, colorData.originalValue);
-                        colorData.value = newArgb;
+                        colorData.value = newValue;
                         currentColorMap.set(name, colorData);
-                        // 更新显示
-                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newArgb);
-                        card.querySelector('.color-code.current').textContent = `当前值：${newArgb}`;
                     }
-                });
+                    cardEl.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
+                    cardEl.querySelector('.color-picker').value = argbToRgbHex(newValue);
+                    cardEl.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
+                    // 更新所有分组中的值
+                    updateAllGroupedValues(name, newValue);
+                    showToast(`已更新 ${name} 的颜色值`);
+                } else {
+                    showToast('请输入有效的8位ARGB颜色值（格式：#FFFFFFFF）', 'error');
+                    const colorData = currentColorMap.get(name);
+                    e.target.value = colorData ? colorData.value : '#FFFFFFFF';
+                    cardEl.querySelector('.color-picker').value = argbToRgbHex(colorData ? colorData.value : '#FFFFFFFF');
+                }
+            });
 
-                // ========== 手动输入框事件 ==========
-                const input = card.querySelector('.color-input');
-                input.addEventListener('input', (e) => {
-                    const newValue = e.target.value.trim().toUpperCase();
-                    if (/^#([0-9A-F]{8})$/.test(newValue)) {
-                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
-                        card.querySelector('.color-picker').value = argbToRgbHex(newValue);
-                        card.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
-                    }
-                });
-
-                input.addEventListener('change', (e) => {
-                    const name = e.target.dataset.name;
-                    const newValue = e.target.value.trim().toUpperCase();
+            // ========== 绑定恢复原值按钮事件 ==========
+            const resetBtn = cardEl.querySelector('.btn-reset');
+            resetBtn.addEventListener('click', (e) => {
+                const name = e.target.dataset.name;
+                const colorData = currentColorMap.get(name);
+                if (colorData) {
+                    // 恢复为原始值
+                    const originalVal = colorData.originalValue;
+                    colorData.value = originalVal;
+                    currentColorMap.set(name, colorData);
                     
-                    if (/^#([0-9A-F]{8})$/.test(newValue)) {
-                        const colorData = currentColorMap.get(name);
-                        if (colorData) {
-                            colorData.value = newValue;
-                            currentColorMap.set(name, colorData);
-                        }
-                        card.querySelector('.color-preview').style.backgroundColor = argbToRgbaCss(newValue);
-                        card.querySelector('.color-picker').value = argbToRgbHex(newValue);
-                        card.querySelector('.color-code.current').textContent = `当前值：${newValue}`;
-                    } else {
-                        alert('请输入有效的8位ARGB颜色值（格式：#FFFFFFFF）');
-                        const colorData = currentColorMap.get(name);
-                        e.target.value = colorData ? colorData.value : '#FFFFFFFF';
-                        card.querySelector('.color-picker').value = argbToRgbHex(colorData ? colorData.value : '#FFFFFFFF');
-                    }
-                });
+                    // 更新所有显示元素
+                    const originalRgba = argbToRgbaCss(originalVal);
+                    const originalRgbHex = argbToRgbHex(originalVal);
+                    
+                    cardEl.querySelector('.color-preview').style.backgroundColor = originalRgba;
+                    cardEl.querySelector('.color-preview-compare').style.backgroundColor = originalRgba;
+                    cardEl.querySelector('.color-input').value = originalVal;
+                    cardEl.querySelector('.color-picker').value = originalRgbHex;
+                    cardEl.querySelector('.color-code.current').textContent = `当前值：${originalVal}`;
+                    
+                    // 更新所有分组中的值
+                    updateAllGroupedValues(name, originalVal);
+                    showToast(`已恢复 ${name} 的原始颜色值`);
+                }
+            });
 
-                // ========== 恢复原值按钮事件（核心新增） ==========
-                const resetBtn = card.querySelector('.btn-reset');
-                resetBtn.addEventListener('click', (e) => {
-                    const name = e.target.dataset.name;
-                    const colorData = currentColorMap.get(name);
-                    if (colorData) {
-                        // 恢复为原始值
-                        colorData.value = colorData.originalValue;
-                        currentColorMap.set(name, colorData);
-                        
-                        // 更新所有显示元素
-                        const originalRgba = argbToRgbaCss(colorData.originalValue);
-                        const originalRgbHex = argbToRgbHex(colorData.originalValue);
-                        
-                        card.querySelector('.color-preview').style.backgroundColor = originalRgba;
-                        card.querySelector('.color-preview-compare').style.backgroundColor = originalRgba;
-                        card.querySelector('.color-input').value = colorData.originalValue;
-                        card.querySelector('.color-picker').value = originalRgbHex;
-                        card.querySelector('.color-code.current').textContent = `当前值：${colorData.originalValue}`;
-                    }
-                });
+            return cardEl;
+        }
+
+        // 更新所有分组中的颜色值（保持数据同步）
+        function updateAllGroupedValues(name, newValue) {
+            // 更新原始数组
+            const originalIndex = allColorItems.findIndex(item => item.name === name);
+            if (originalIndex !== -1) {
+                allColorItems[originalIndex].value = newValue;
+            }
+            
+            // 更新type分组
+            Object.keys(groupedData.type).forEach(key => {
+                const typeGroup = groupedData.type[key];
+                const itemIndex = typeGroup.items.findIndex(item => item.name === name);
+                if (itemIndex !== -1) {
+                    typeGroup.items[itemIndex].value = newValue;
+                }
+            });
+            
+            // 更新category分组
+            Object.keys(groupedData.category).forEach(key => {
+                const categoryGroup = groupedData.category[key];
+                const itemIndex = categoryGroup.items.findIndex(item => item.name === name);
+                if (itemIndex !== -1) {
+                    categoryGroup.items[itemIndex].value = newValue;
+                }
             });
         }
 
-        // 4. 保存修改后的XML
-        saveFileBtn.addEventListener('click', () => {
+        // 切换单个分类的展开/折叠状态
+        function toggleCategory(categoryEl) {
+            const contentEl = categoryEl.querySelector('.color-grid');
+            const toggleEl = categoryEl.querySelector('.category-toggle');
+            
+            contentEl.classList.toggle('collapsed-content');
+            toggleEl.classList.toggle('collapsed');
+        }
+
+        // 全部展开/折叠
+        function toggleAllCategories() {
+            const allCategories = document.querySelectorAll('.color-category');
+            const allToggles = document.querySelectorAll('.category-toggle');
+            const allContents = document.querySelectorAll('.color-grid');
+            
+            isAllExpanded = !isAllExpanded;
+            
+            if (isAllExpanded) {
+                // 展开所有
+                allToggles.forEach(toggle => toggle.classList.remove('collapsed'));
+                allContents.forEach(content => content.classList.remove('collapsed-content'));
+                toggleAllBtn.textContent = '全部折叠';
+                showToast('已展开所有分类');
+            } else {
+                // 折叠所有
+                allToggles.forEach(toggle => toggle.classList.add('collapsed'));
+                allContents.forEach(content => content.classList.add('collapsed-content'));
+                toggleAllBtn.textContent = '全部展开';
+                showToast('已折叠所有分类');
+            }
+        }
+
+        // 保存修改后的XML
+        function saveModifiedXml() {
             if (!currentXmlDoc || !currentColorMap.size) return;
 
             // 替换颜色值
@@ -499,32 +879,35 @@
             // 序列化并修复格式
             const serializer = new XMLSerializer();
             let xmlContent = serializer.serializeToString(currentXmlDoc);
-            xmlContent = xmlContent.replace(
-                '<\?xml version="1.0" encoding="UTF-8"\?>', 
-                '<?xml version="1.0" encoding="UTF-8"?>\n'
-            );
+            // 修复XML声明和格式化
+            xmlContent = xmlContent.replace(/<\?xml version="1.0"\?>/, '<?xml version="1.0" encoding="UTF-8"?>\n');
+            // 美化XML格式（简单缩进）
+            xmlContent = xmlContent.replace(/></g, '>\n<');
 
             // 下载文件
-            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const blob = new Blob([xmlContent], { type: 'application/xml; charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `${currentThemeInfo.name}_modified.xml`;
             a.click();
             URL.revokeObjectURL(url);
-        });
+            
+            showToast(`已保存修改后的主题文件：${currentThemeInfo.name}_modified.xml`);
+        }
 
-        // 5. 配色方案生成功能
-        generateSchemeBtn.addEventListener('click', () => {
+        // 切换配色生成面板显示/隐藏
+        function toggleGeneratePanel() {
             if (!currentColorMap.size) {
-                alert('请先打开一个XML主题文件');
+                showToast('请先打开一个XML主题文件', 'error');
                 return;
             }
             generatePanel.classList.toggle('hidden');
-        });
+            showToast(generatePanel.classList.contains('hidden') ? '已关闭配色生成面板' : '已打开配色生成面板');
+        }
 
-        // 6. 应用配色方案
-        applyGenerateBtn.addEventListener('click', () => {
+        // 应用配色方案
+        function applyColorScheme() {
             if (!currentColorMap.size) return;
 
             const baseColor = document.getElementById('baseColor').value;
@@ -533,12 +916,13 @@
 
             try {
                 updateColorScheme(baseColor, schemeType, brightnessStep);
-                renderColorCards();
-                alert('配色方案已生成并应用！');
+                // 重新渲染分类
+                renderColorCategories();
+                showToast('配色方案已生成并应用！');
             } catch (err) {
-                alert('生成配色失败：' + err.message);
+                showToast(`生成配色失败：${err.message}`, 'error');
             }
-        });
+        }
 
         // ========== 配色生成核心算法 ==========
         function updateColorScheme(baseColor, schemeType, brightnessStep) {
@@ -576,19 +960,20 @@
                     l: isNaN(originalHsl.l) ? 0.5 : originalHsl.l
                 };
 
-                if (name.includes('blue')) {
+                // 按关键词调整配色逻辑（保留原有逻辑）
+                if (name.toLowerCase().includes('blue')) {
                     newHsl.h = mainHue;
                     newHsl.s = Math.max(0, Math.min(1, baseHsl.s));
-                } else if (name.includes('green')) {
+                } else if (name.toLowerCase().includes('green')) {
                     newHsl.h = secondaryHue || (mainHue + 120) % 360;
                     newHsl.s = Math.max(0, Math.min(1, baseHsl.s * 0.9));
-                } else if (name.includes('red')) {
+                } else if (name.toLowerCase().includes('red')) {
                     newHsl.h = secondaryHue || (mainHue + 240) % 360;
                     newHsl.s = Math.max(0, Math.min(1, baseHsl.s * 0.9));
-                } else if (name.startsWith('color_gray') || name.startsWith('bg_') || name.startsWith('border_')) {
+                } else if (name.startsWith('color_gray') || name.toLowerCase().includes('bg') || name.toLowerCase().includes('border')) {
                     newHsl.l = adjustBrightness(newHsl.l, brightnessStep);
                     newHsl.s = 0;
-                } else if (name.startsWith('text_')) {
+                } else if (name.toLowerCase().includes('text') || name.toLowerCase().includes('font')) {
                     newHsl.l = adjustBrightness(newHsl.l, brightnessStep / 2);
                 }
 
@@ -602,6 +987,8 @@
 
                 colorData.value = newArgb;
                 currentColorMap.set(name, colorData);
+                // 更新所有分组中的值
+                updateAllGroupedValues(name, newArgb);
             });
         }
 
