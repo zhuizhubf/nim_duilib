@@ -104,12 +104,7 @@ void Window::ApplyAttributeList(const DString& strList)
         return;
     }
     std::vector<std::pair<DString, DString>> attributeList;
-    if (strList.find(_T('\"')) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strList, _T('\"'), attributeList);
-    }
-    else if (strList.find(_T('\'')) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strList, _T('\''), attributeList);
-    }
+    AttributeUtil::ParseAttributeList(strList, attributeList);
     for (const auto& attribute : attributeList) {
         SetAttribute(attribute.first, attribute.second);
     }
