@@ -271,6 +271,52 @@
             outline: none;
             border-color: #0078D4;
         }
+        /* 新增灰度模式开关样式 */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 220px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #0078D4;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
         .hidden {
             display: none;
         }
@@ -370,6 +416,14 @@
                 <label for="brightnessStep">亮度步长</label>
                 <input type="number" id="brightnessStep" value="15" min="5" max="30">
             </div>
+            <!-- 新增灰度模式控制开关 -->
+            <div class="generate-option toggle-switch">
+                <label for="disableGrayscale">取消强制灰度模式</label>
+                <label class="switch">
+                    <input type="checkbox" id="disableGrayscale" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
         <button class="btn btn-generate" id="applyGenerateBtn">应用配色方案</button>
     </div>
@@ -409,6 +463,8 @@
         const toggleAllBtn = document.getElementById('toggleAllBtn');
         const groupSwitch = document.getElementById('groupSwitch');
         const toast = document.getElementById('toast');
+        // 新增灰度模式开关DOM
+        const disableGrayscaleSwitch = document.getElementById('disableGrayscale');
 
         // 全部展开/折叠状态
         let isAllExpanded = true;
@@ -434,6 +490,12 @@
                     renderColorCategories();
                     showToast(`已切换为：${this.textContent}`);
                 });
+            });
+
+            // 绑定灰度模式开关事件
+            disableGrayscaleSwitch.addEventListener('change', function() {
+                const mode = this.checked ? '取消强制灰度' : '保留灰度逻辑';
+                showToast(`已切换为${mode}模式`);
             });
         }
 
@@ -913,19 +975,22 @@
             const baseColor = document.getElementById('baseColor').value;
             const schemeType = document.getElementById('schemeType').value;
             const brightnessStep = parseInt(document.getElementById('brightnessStep').value) || 15;
+            // 获取灰度模式开关状态
+            const disableGrayscale = disableGrayscaleSwitch.checked;
 
             try {
-                updateColorScheme(baseColor, schemeType, brightnessStep);
+                updateColorScheme(baseColor, schemeType, brightnessStep, disableGrayscale);
                 // 重新渲染分类
                 renderColorCategories();
-                showToast('配色方案已生成并应用！');
+                const modeText = disableGrayscale ? '取消强制灰度' : '保留灰度逻辑';
+                showToast(`配色方案已生成并应用（${modeText}）！`);
             } catch (err) {
                 showToast(`生成配色失败：${err.message}`, 'error');
             }
         }
 
-        // ========== 配色生成核心算法（取消强制灰度） ==========
-        function updateColorScheme(baseColor, schemeType, brightnessStep) {
+        // ========== 配色生成核心算法（支持灰度模式切换） ==========
+        function updateColorScheme(baseColor, schemeType, brightnessStep, disableGrayscale) {
             const baseArgb = rgbToArgb(baseColor);
             const baseRgb = argbToRgb(baseArgb);
             const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
@@ -960,23 +1025,45 @@
                     l: isNaN(originalHsl.l) ? 0.5 : originalHsl.l
                 };
 
-                // ========== 核心修改：取消强制灰度，全量基于基础色生成 ==========
-                // 1. 功能色（blue/green/red）：使用基础色的色相，保留合理饱和度
-                if (name.toLowerCase().includes('blue')) {
-                    newHsl.h = mainHue;
-                    newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s)); // 限制饱和度范围，避免过艳
-                } else if (name.toLowerCase().includes('green')) {
-                    newHsl.h = secondaryHue || (mainHue + 120) % 360;
-                    newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s * 0.9));
-                } else if (name.toLowerCase().includes('red')) {
-                    newHsl.h = secondaryHue || (mainHue + 240) % 360;
-                    newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s * 0.9));
-                } 
-                // 2. 通用色（bg/border/gray/text）：保留基础色的色相，降低饱和度（避免过艳）
-                else if (name.startsWith('color_gray') || name.toLowerCase().includes('bg') || 
-                         name.toLowerCase().includes('border') || name.toLowerCase().includes('text')) {
-                    newHsl.h = mainHue; // 使用基础色的色相
-                    newHsl.s = baseHsl.s * 0.15; // 低饱和度（15%），保证柔和
+                // ========== 核心修改：支持灰度模式切换 ==========
+                if (disableGrayscale) {
+                    // 模式1：取消强制灰度（原有逻辑）
+                    // 1. 功能色（blue/green/red）：使用基础色的色相，保留合理饱和度
+                    if (name.toLowerCase().includes('blue')) {
+                        newHsl.h = mainHue;
+                        newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s)); // 限制饱和度范围，避免过艳
+                    } else if (name.toLowerCase().includes('green')) {
+                        newHsl.h = secondaryHue || (mainHue + 120) % 360;
+                        newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s * 0.9));
+                    } else if (name.toLowerCase().includes('red')) {
+                        newHsl.h = secondaryHue || (mainHue + 240) % 360;
+                        newHsl.s = Math.max(0.2, Math.min(0.8, baseHsl.s * 0.9));
+                    } 
+                    // 2. 通用色（bg/border/gray/text）：保留基础色的色相，降低饱和度（避免过艳）
+                    else if (name.startsWith('color_gray') || name.toLowerCase().includes('bg') || 
+                             name.toLowerCase().includes('border') || name.toLowerCase().includes('text')) {
+                        newHsl.h = mainHue; // 使用基础色的色相
+                        newHsl.s = baseHsl.s * 0.15; // 低饱和度（15%），保证柔和
+                    }
+                } else {
+                    // 模式2：保留灰度逻辑（传统灰度配色）
+                    // 1. 功能色（blue/green/red）：使用基础色的色相
+                    if (name.toLowerCase().includes('blue')) {
+                        newHsl.h = mainHue;
+                        newHsl.s = baseHsl.s;
+                    } else if (name.toLowerCase().includes('green')) {
+                        newHsl.h = secondaryHue || (mainHue + 120) % 360;
+                        newHsl.s = baseHsl.s * 0.8;
+                    } else if (name.toLowerCase().includes('red')) {
+                        newHsl.h = secondaryHue || (mainHue + 240) % 360;
+                        newHsl.s = baseHsl.s * 0.8;
+                    }
+                    // 2. 通用色（bg/border/gray/text）：强制灰度（饱和度为0）
+                    else if (name.startsWith('color_gray') || name.toLowerCase().includes('bg') || 
+                             name.toLowerCase().includes('border') || name.toLowerCase().includes('text')) {
+                        newHsl.h = 0; // 灰度（色相无意义）
+                        newHsl.s = 0; // 饱和度为0（纯灰度）
+                    }
                 }
 
                 // 3. 统一调整亮度（根据类型适配步长）
