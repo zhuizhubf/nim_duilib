@@ -839,16 +839,8 @@ void Control::SetClass(const DString& strClass)
 void Control::ApplyAttributeList(const DString& strList)
 {
     //属性列表，先解析，然后再应用
-    if (strList.empty()) {
-        return;
-    }
     std::vector<std::pair<DString, DString>> attributeList;
-    if (strList.find(_T('\"')) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strList, _T('\"'), attributeList);
-    }    
-    else if (strList.find(_T('\'')) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strList, _T('\''), attributeList);
-    }
+    AttributeUtil::ParseAttributeList(strList, attributeList);
     for (const auto& attribute : attributeList) {
         SetAttribute(attribute.first, attribute.second);
     }

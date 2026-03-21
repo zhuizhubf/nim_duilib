@@ -206,7 +206,7 @@ void ImageAttribute::ModifyAttribute(const DString& strImageString, const DpiMan
         return;
     }
     std::vector<std::pair<DString, DString>> attributeList;
-    AttributeUtil::ParseAttributeList(strImageString, _T('\''), attributeList);
+    AttributeUtil::ParseAttributeList(strImageString, attributeList);
 
     ImageAttribute& imageAttribute = *this;
     imageAttribute.m_bImageDpiScaleEnabled = true;

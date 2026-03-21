@@ -219,35 +219,35 @@
     
     <!-- 下拉框 -->
     <Class name="combo" class="combo_base"
-                        combo_button_class="height={stretch} width={auto} margin={1,0,0,0} padding={1,0,0,0} border_size={1,0,0,0} valign={center} 
-                                            hot_border_color={border_combo_hover} 
-                                            pushed_border_color={border_combo_hover}
-                                            hot_color={bg_combo_btn_hover} 
-                                            pushed_color={bg_combo_btn_pressed} 
+                        combo_button_class="height='stretch' width='auto' margin='1,0,0,0' padding='1,0,0,0' border_size='1,0,0,0' valign='center' 
+                                            hot_border_color='border_combo_hover' 
+                                            pushed_border_color='border_combo_hover'
+                                            hot_color='bg_combo_btn_hover' 
+                                            pushed_color='bg_combo_btn_pressed' 
                                             normal_image={file='${PATH_COMBO}/arrow_normal.svg' valign='center'} 
                                             hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
     <Class name="filter_combo" class="combo_base"/>
     <Class name="check_combo" border_size="1" border_color="border_combo_normal" 
                               dropbox="padding='0,0,0,0' bkcolor='bg_window_light' border_size='0,0,0,0' vscrollbar='true'"
-                              dropbox_item_class="width={stretch} height={24} text_padding={20,0,2,1} text_align={left,vcenter} 
+                              dropbox_item_class="width='stretch' height='24' text_padding='20,0,2,1' text_align='left,vcenter' 
                                                   normal_image={file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' valign='center'} 
                                                   selected_normal_image={file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' valign='center'}" 
-                              selected_item_class="width={auto} height={22} margin={4,2,4,2} bkcolor={bg_menu_item_selected} text_padding={2,1,2,1}"/>
+                              selected_item_class="width='auto' height='22' margin='4,2,4,2' bkcolor='bg_menu_item_selected' text_padding='2,1,2,1'"/>
     <Class name="combo_button" padding="1,1,1,1" border_size="1" hot_border_color="border_combo_hover" 
                                hot_color="bg_combo_btn_hover" pushed_color="bg_combo_btn_pressed"
                                combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_window_light'" 
-                               left_button_class="height={stretch} width={stretch} padding={0,0,1,0} border_size={0,0,1,0} valign={center} 
-                                                  hot_border_color={border_combo_hover} 
-                                                  pushed_border_color={border_combo_hover}                                                   
-                                                  hot_color={bg_combo_btn_hover} 
-                                                  pushed_color={bg_combo_btn_pressed} " 
-                               left_button_top_label_class="width={stretch} height={20} margin={1,0,1,0} font={system_bold_14} text_align={bottom,hcenter}" 
-                               left_button_bottom_label_class="width={stretch} height={stretch} margin={6,0,6,2} bkcolor={color_black}" 
-                               right_button_class="height={stretch} width={auto} padding={1,0,0,0} border_size={1,0,0,0} valign={center} 
-                                                   hot_border_color={border_combo_hover} 
-                                                   pushed_border_color={border_combo_hover}                                                    
-                                                   hot_color={bg_combo_btn_hover} 
-                                                   pushed_color={bg_combo_btn_pressed} 
+                               left_button_class="height='stretch' width='stretch' padding='0,0,1,0' border_size='0,0,1,0' valign='center' 
+                                                  hot_border_color='border_combo_hover' 
+                                                  pushed_border_color='border_combo_hover'                                                   
+                                                  hot_color='bg_combo_btn_hover' 
+                                                  pushed_color='bg_combo_btn_pressed'" 
+                               left_button_top_label_class="width='stretch' height='20' margin='1,0,1,0' font='system_bold_14' text_align='bottom,hcenter'" 
+                               left_button_bottom_label_class="width='stretch' height='stretch' margin='6,0,6,2' bkcolor='color_black'" 
+                               right_button_class="height='stretch' width='auto' padding='1,0,0,0' border_size='1,0,0,0' valign='center' 
+                                                   hot_border_color='border_combo_hover' 
+                                                   pushed_border_color='border_combo_hover'                                                    
+                                                   hot_color='bg_combo_btn_hover' 
+                                                   pushed_color='bg_combo_btn_pressed' 
                                                    normal_image={file='${PATH_COMBO}/arrow_normal.svg' valign='center'} 
                                                    hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
     

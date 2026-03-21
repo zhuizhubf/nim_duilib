@@ -544,24 +544,6 @@ Shadow::ShadowType CheckCombo::GetComboWndShadowType() const
     return m_nShadowType;
 }
 
-void CheckCombo::ParseAttributeList(const DString& strList,
-                                    std::vector<std::pair<DString, DString>>& attributeList) const
-{
-    if (strList.empty()) {
-        return;
-    }
-    DString strValue = strList;
-    //这个是手工写入的属性，以花括号{}代替双引号，编写的时候就不需要转义字符了；
-    StringUtil::ReplaceAll(_T("{"), _T("\""), strValue);
-    StringUtil::ReplaceAll(_T("}"), _T("\""), strValue);
-    if (strValue.find(_T("\"")) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strValue, _T('\"'), attributeList);
-    }
-    else if (strValue.find(_T("\'")) != DString::npos) {
-        AttributeUtil::ParseAttributeList(strValue, _T('\''), attributeList);
-    }
-}
-
 void CheckCombo::SetAttributeList(Control* pControl, const DString& classValue)
 {
     ASSERT(pControl != nullptr);
@@ -569,7 +551,7 @@ void CheckCombo::SetAttributeList(Control* pControl, const DString& classValue)
         return;
     }
     std::vector<std::pair<DString, DString>> attributeList;
-    ParseAttributeList(classValue, attributeList);
+    AttributeUtil::ParseAttributeList(classValue, attributeList);
     if (!attributeList.empty()) {
         //按属性列表设置
         for (const auto& attribute : attributeList) {

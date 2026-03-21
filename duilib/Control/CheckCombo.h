@@ -136,11 +136,6 @@ private:
     bool OnListButtonDown(const ui::EventArgs& args);
 
 private:
-    /** 解析属性列表
-    */
-    void ParseAttributeList(const DString& strList,
-                            std::vector<std::pair<DString, DString>>& attributeList) const;
-
     /** 设置控件的属性列表
     */
     void SetAttributeList(Control* pControl, const DString& classValue);
