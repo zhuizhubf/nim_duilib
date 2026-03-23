@@ -39,19 +39,39 @@ public:
     virtual void* GetTrayHandle() const override;
 
 private:
+    struct TraySurfaceData
+    {
+        /** 当前图标表面
+        */
+        SDL_Surface* m_pIconSurface = nullptr;
+
+        /** 当前图标表面关联的数据
+        */
+        std::shared_ptr<IBitmap> m_pBitmap;
+
+        /** 清理资源
+        */
+        void Clear()
+        {
+            if (m_pIconSurface != nullptr) {
+                SDL_DestroySurface(m_pIconSurface);
+                m_pIconSurface = nullptr;
+            }
+            m_pBitmap.reset();
+        }
+    };
+
     /** 从文件加载图标为SDL_Surface
     * @param [in] pWindow 关联的窗口
     * @param [in] iconFilePath 图标文件路径
-    * @return SDL_Surface指针，失败返回nullptr
     */
-    SDL_Surface* LoadSDLSurfaceFromFile(const Window* pWindow, const DString& iconFilePath);
+    TraySurfaceData LoadSDLSurfaceFromFile(const Window* pWindow, const DString& iconFilePath);
 
     /** 从文件数据加载图标为SDL_Surface
     * @param [in] fileData 文件数据
     * @param [in] iconFilePath 文件路径
-    * @return SDL_Surface指针，失败返回nullptr
     */
-    SDL_Surface* LoadSDLSurfaceFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath);
+    TraySurfaceData LoadSDLSurfaceFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath);
 
     /** 鼠标点击回调事件(左键，右键，中键点击)
     */
@@ -76,7 +96,7 @@ private:
 
     /** 当前图标表面
     */
-    SDL_Surface* m_iconSurface;
+    TraySurfaceData m_iconSurface;
 
     /** 提示文本
     */
@@ -117,10 +137,10 @@ bool TrayIconImpl::Initialize(const Window* pWindow, const DString& iconFilePath
     return Show();
 }
 
-SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFile(const Window* pWindow, const DString& iconFilePath)
+TrayIconImpl::TraySurfaceData TrayIconImpl::LoadSDLSurfaceFromFile(const Window* pWindow, const DString& iconFilePath)
 {
     if (iconFilePath.empty()) {
-        return nullptr;
+        return TraySurfaceData();
     }
 
     FilePath windowResPath;
@@ -132,7 +152,7 @@ SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFile(const Window* pWindow, const D
     FilePath iconFullPath = GlobalManager::Instance().GetExistsResFullPath(windowResPath, windowXmlPath, FilePath(iconFilePath));
     ASSERT(!iconFullPath.IsEmpty());
     if (iconFullPath.IsEmpty()) {
-        return nullptr;
+        return TraySurfaceData();
     }
 
     std::vector<uint8_t> fileData;
@@ -151,11 +171,11 @@ SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFile(const Window* pWindow, const D
     return LoadSDLSurfaceFromFileData(fileData, iconFullPath.ToString());
 }
 
-SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath)
+TrayIconImpl::TraySurfaceData TrayIconImpl::LoadSDLSurfaceFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath)
 {
     ASSERT(!fileData.empty());
     if (fileData.empty()) {
-        return nullptr;
+        return TraySurfaceData();
     }
 
     ImageDecoderFactory& imageDecoders = GlobalManager::Instance().ImageDecoders();
@@ -166,18 +186,18 @@ SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFileData(const std::vector<uint8_t>
     decodeParam.m_pFileData = std::make_shared<std::vector<uint8_t>>(fileData);
     std::shared_ptr<IBitmap> pBitmap = imageDecoders.DecodeImageData(decodeParam);
     if (pBitmap == nullptr) {
-        return nullptr;
+        return TraySurfaceData();
     }
     uint32_t nWidth = pBitmap->GetWidth();
     uint32_t nHeight = pBitmap->GetHeight();
     if ((nWidth < 1) || (nHeight < 1)) {
-        return nullptr;
+        return TraySurfaceData();
     }
 
     void* pPixelBits = pBitmap->LockPixelBits();
     ASSERT(pPixelBits != nullptr);
     if (pPixelBits == nullptr) {
-        return nullptr;
+        return TraySurfaceData();
     }
 
 #ifdef DUILIB_BUILD_FOR_WIN
@@ -187,7 +207,10 @@ SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFileData(const std::vector<uint8_t>
 #endif
     SDL_Surface* iconSurface = SDL_CreateSurfaceFrom(pBitmap->GetWidth(), pBitmap->GetHeight(), format, pPixelBits, pBitmap->GetWidth() * sizeof(uint32_t));
     ASSERT(iconSurface != nullptr);
-    return iconSurface;
+    TraySurfaceData surfaceData;
+    surfaceData.m_pIconSurface = iconSurface;
+    surfaceData.m_pBitmap = pBitmap;
+    return surfaceData;
 }
 
 bool TrayIconImpl::SetIcon(const Window* pWindow, const DString& iconFilePath)
@@ -197,16 +220,13 @@ bool TrayIconImpl::SetIcon(const Window* pWindow, const DString& iconFilePath)
     }
 
     // 释放旧图标
-    if (m_iconSurface != nullptr) {
-        SDL_DestroySurface(m_iconSurface);
-        m_iconSurface = nullptr;
-    }
+    m_iconSurface.Clear();
 
     // 加载新图标
     m_iconSurface = LoadSDLSurfaceFromFile(pWindow, iconFilePath);
 
     // 设置托盘图标
-    SDL_SetTrayIcon(m_sdlTray, m_iconSurface);
+    SDL_SetTrayIcon(m_sdlTray, m_iconSurface.m_pIconSurface);
     return true;
 }
 
@@ -251,7 +271,7 @@ bool TrayIconImpl::Show()
         std::string tooltipUTF8 = StringConvert::TToUTF8(m_tooltip);
 
         SDL_PropertiesID props = SDL_CreateProperties();
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface.m_pIconSurface);
         SDL_SetStringProperty(props, SDL_PROP_TRAY_CREATE_TOOLTIP_STRING, tooltipUTF8.c_str());
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_USERDATA_POINTER, this);
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayLeftClickCallback);
@@ -271,16 +291,11 @@ bool TrayIconImpl::IsTrayVisible() const
 
 bool TrayIconImpl::Remove()
 {
-    if (m_iconSurface != nullptr) {
-        SDL_DestroySurface(m_iconSurface);
-        m_iconSurface = nullptr;
-    }
-
     if (m_sdlTray != nullptr) {
         SDL_DestroyTray(m_sdlTray);
         m_sdlTray = nullptr;
     }
-
+    m_iconSurface.Clear();
     m_bHidden = true;
     return true;
 }
