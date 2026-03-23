@@ -1,8 +1,9 @@
 @echo OFF
-@REM Windows 平台编译脚本，编译器：Visual Studio 2022
+@REM Windows 平台编译脚本，编译器：Visual Studio 2022 / Visual Studio 2026
 
 @REM 确保本机已经安装了camke(最低版本号: v3.21)
-@REM 可使用 cmake --version 查看版本信息（本机: cmake version 4.0.2）
+@REM 如果使用Visual Studio 2026 则cmake的最低版本需要 v4.2
+@REM 可使用 cmake --version 查看版本信息（本机: cmake version 4.3.0）
 
 @for %%i in ("%~dp0..\") do set "bat_parent_dir=%%~fi"
 SET DUILIB_SRC_ROOT_DIR=%bat_parent_dir%
@@ -12,10 +13,18 @@ echo DUILIB_SRC_ROOT_DIR: "%DUILIB_SRC_ROOT_DIR%"
 SET SKIA_SRC_ROOT_DIR=%bat_parent_dir%
 echo SKIA_SRC_ROOT_DIR: "%SKIA_SRC_ROOT_DIR%"
 
+@REM # 检测VS版本
+call detect_vs_version.bat
+
 @REM # 设置编译器
 SET DUILIB_COMPILER_ID=msvc
 
-SET DUILIB_CMAKE=cmake --fresh -G"Visual Studio 17 2022"
+if "%VS_VERSION%"=="vs2026" (
+    SET DUILIB_CMAKE=cmake --fresh -G"Visual Studio 18 2026"
+) else (
+    SET DUILIB_CMAKE=cmake --fresh -G"Visual Studio 17 2022"
+)
+
 SET DUILIB_MAKE=cmake --build
 SET DUILIB_BUILD_TYPE=Release
 SET DUILIB_BUILD_PARAM=--config %DUILIB_BUILD_TYPE%

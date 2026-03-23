@@ -24,6 +24,14 @@
         <IntDir>$(SolutionDir)\build_temp\$(PlatformName)\$(ProjectName)\$(Configuration)\</IntDir>
         <TargetName>$(ProjectName)_d</TargetName>
     </PropertyGroup>
+    
+    <!-- duilib项目，所有工程的支持VS2026(v145)和VS2022(v143) -->
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == '18.0'" Label="Configuration">
+        <PlatformToolset>v145</PlatformToolset>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == '17.0'" Label="Configuration">
+        <PlatformToolset>v143</PlatformToolset>
+    </PropertyGroup>
 
     <!-- duilib项目，所有工程的编译选项配置 -->
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
