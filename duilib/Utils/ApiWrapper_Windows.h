@@ -50,6 +50,15 @@ namespace ui
 
     // 检测「拖动窗口时显示窗口内容」是否开启
     bool IsDragWindowContentsEnabled();
+
+    /** 从图标文件数据，生成两个图标（大图标和小图标）, 图标句柄由外部负责释放
+    * @param [in] iconFileData 图标数据，格式为ICO格式
+    * @param [in] uDpiScaleFactor 当前界面缩放百分比因子（举例：100代表缩放百分比为100%，无缩放）
+    * @param [out] hSmallIcon 小图标句柄，图标句柄由外部负责释放
+    * @param [out] hBigIcon 小图标句柄，图标句柄由外部负责释放
+    */
+    bool CreateIconsFromData(const std::vector<uint8_t>& iconFileData, uint32_t uDpiScaleFactor,
+                             HICON* hSmallIcon, HICON* hBigIcon);
 }
 
 #endif //DUILIB_BUILD_FOR_WIN
