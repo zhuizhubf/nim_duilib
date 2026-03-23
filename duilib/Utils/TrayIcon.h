@@ -16,12 +16,12 @@ class Window;
 enum class TrayIconMessageType
 {
     kLeftClick,        // 左键单击
-    kLeftDoubleClick,  // 左键双击
+    kLeftDoubleClick,  // 左键双击      (非Windows平台，使用SDL时，无此消息)
     kRightClick,       // 右键单击
-    kRightDoubleClick, // 右键双击
+    kRightDoubleClick, // 右键双击      (非Windows平台，使用SDL时，无此消息)
     kMiddleClick,      // 中键单击
-    kMouseMove,        // 鼠标移动
-    kShowBalloon,      // 气泡提示被点击
+    kMouseMove,        // 鼠标移动      (非Windows平台，使用SDL时，无此消息)
+    kShowBalloon,      // 气泡提示被点击 (非Windows平台，使用SDL时，无此消息)
 };
 
 /** 托盘图标消息回调函数

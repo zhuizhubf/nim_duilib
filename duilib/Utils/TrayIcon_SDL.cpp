@@ -53,15 +53,19 @@ private:
     */
     SDL_Surface* LoadSDLSurfaceFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath);
 
-    /** 创建托盘菜单（用于接收事件）
+    /** 鼠标点击回调事件(左键，右键，中键点击)
     */
-    void CreateTrayMenu();
+    static bool SDLCALL OnSDLTrayLeftClickCallback(void* userdata, SDL_Tray* tray);
+    static bool SDLCALL OnSDLTrayRightClickCallback(void* userdata, SDL_Tray* tray);
+    static bool SDLCALL OnSDLTrayMiddleClickCallback(void* userdata, SDL_Tray* tray);
 
-    /** 托盘事件回调函数
+    /** 鼠标点击回调事件(左键，右键，中键点击)
     */
-    static void SDLCALL TrayEntryCallback(void* userdata, SDL_TrayEntry* entry);
+    bool OnTrayLeftClickCallback(SDL_Tray* tray);
+    bool OnTrayRightClickCallback(SDL_Tray* tray);
+    bool OnTrayMiddleClickCallback(SDL_Tray* tray);
 
-    /** 获取当前鼠标位置
+    /** 获取当前鼠标位置(屏幕坐标)
     */
     void GetMousePosition(int32_t& x, int32_t& y);
 
@@ -69,10 +73,6 @@ private:
     /** SDL托盘对象指针
     */
     SDL_Tray* m_sdlTray;
-
-    /** SDL托盘菜单指针
-    */
-    SDL_TrayMenu* m_sdlTrayMenu;
 
     /** 当前图标表面
     */
@@ -82,10 +82,6 @@ private:
     */
     DString m_tooltip;
 
-    /** 图标文件路径
-    */
-    DString m_iconFilePath;
-
     /** 是否隐藏
     */
     bool m_bHidden;
@@ -93,24 +89,13 @@ private:
     /** 关联的窗口指针
     */
     const Window* m_pWindow;
-
-    /** 最后一次点击的时间
-    */
-    uint64_t m_lastClickTime;
-
-    /** 点击计数（用于检测双击）
-    */
-    int32_t m_clickCount;
 };
 
 TrayIconImpl::TrayIconImpl() :
     m_sdlTray(nullptr),
-    m_sdlTrayMenu(nullptr),
     m_iconSurface(nullptr),
     m_bHidden(false),
-    m_pWindow(nullptr),
-    m_lastClickTime(0),
-    m_clickCount(0)
+    m_pWindow(nullptr)
 {
 }
 
@@ -123,86 +108,13 @@ bool TrayIconImpl::Initialize(const Window* pWindow, const DString& iconFilePath
 {
     m_pWindow = pWindow;
     m_tooltip = tooltip;
-    m_iconFilePath = iconFilePath;
     m_bHidden = false;
-    m_lastClickTime = 0;
-    m_clickCount = 0;
 
     // 加载图标
     m_iconSurface = LoadSDLSurfaceFromFile(pWindow, iconFilePath);
-    //auto iconSurface = SDL_LoadBMP("public\\caption\\logo.bmp");
 
     // 创建SDL托盘图标
-    std::string tooltipUTF8 = StringConvert::TToUTF8(tooltip);
-    m_sdlTray = SDL_CreateTray(m_iconSurface, tooltipUTF8.c_str());
-
-    if (m_sdlTray != nullptr) {
-        // 创建托盘菜单用于事件处理
-        //CreateTrayMenu();
-        return true;
-    }
-
-    return false;
-}
-
-void TrayIconImpl::CreateTrayMenu()
-{
-    if (m_sdlTray == nullptr) {
-        return;
-    }
-
-    // 创建托盘菜单
-    m_sdlTrayMenu = SDL_CreateTrayMenu(m_sdlTray);
-    if (m_sdlTrayMenu == nullptr) {
-        return;
-    }
-
-    // 添加一个默认菜单项，用于接收托盘点击事件
-    // 注意：SDL的托盘API是通过菜单项的回调来处理事件的
-    // 这里我们创建菜单项来模拟托盘图标的点击事件
-    SDL_TrayEntry* entry = SDL_InsertTrayEntryAt(m_sdlTrayMenu, -1, StringConvert::TToUTF8(m_tooltip).c_str(), SDL_TRAYENTRY_BUTTON);
-    if (entry != nullptr) {
-        SDL_SetTrayEntryCallback(entry, TrayEntryCallback, this);
-    }
-}
-
-void SDLCALL TrayIconImpl::TrayEntryCallback(void* userdata, SDL_TrayEntry* /*entry*/)
-{
-    TrayIconImpl* pThis = static_cast<TrayIconImpl*>(userdata);
-    if (pThis == nullptr) {
-        return;
-    }
-
-    // 获取鼠标位置
-    int32_t x = 0, y = 0;
-    pThis->GetMousePosition(x, y);
-
-    // 检测双击（300ms内点击两次）
-    uint64_t currentTime = SDL_GetTicks();
-    if ((currentTime - pThis->m_lastClickTime) < 300) {
-        // 双击事件
-        pThis->m_clickCount = 0;
-        pThis->NotifyMessage(TrayIconMessageType::kLeftDoubleClick, x, y);
-    }
-    else {
-        // 单击事件
-        pThis->m_clickCount = 1;
-        pThis->NotifyMessage(TrayIconMessageType::kLeftClick, x, y);
-    }
-    pThis->m_lastClickTime = currentTime;
-}
-
-void TrayIconImpl::GetMousePosition(int32_t& x, int32_t& y)
-{
-    float fx = 0.0f, fy = 0.0f;
-    if (SDL_GetMouseState(&fx, &fy)) {
-        x = static_cast<int32_t>(fx);
-        y = static_cast<int32_t>(fy);
-    }
-    else {
-        x = 0;
-        y = 0;
-    }
+    return Show();
 }
 
 SDL_Surface* TrayIconImpl::LoadSDLSurfaceFromFile(const Window* pWindow, const DString& iconFilePath)
@@ -290,8 +202,6 @@ bool TrayIconImpl::SetIcon(const Window* pWindow, const DString& iconFilePath)
         m_iconSurface = nullptr;
     }
 
-    m_iconFilePath = iconFilePath;
-
     // 加载新图标
     m_iconSurface = LoadSDLSurfaceFromFile(pWindow, iconFilePath);
 
@@ -324,16 +234,11 @@ bool TrayIconImpl::ShowBalloon(const DString& title, const DString& content, uin
 
 bool TrayIconImpl::Hide()
 {
-    if (m_bHidden || m_sdlTray == nullptr) {
-        return true;
-    }
-
     // SDL的托盘API没有隐藏功能，只能销毁后重建
     // 注意：销毁托盘会同时销毁菜单和菜单项
     if (m_sdlTray != nullptr) {
         SDL_DestroyTray(m_sdlTray);
         m_sdlTray = nullptr;
-        m_sdlTrayMenu = nullptr;
     }
     m_bHidden = true;
     return true;
@@ -341,21 +246,22 @@ bool TrayIconImpl::Hide()
 
 bool TrayIconImpl::Show()
 {
-    if (!m_bHidden) {
-        return true;
-    }
-
     // 重建托盘图标
-    std::string tooltipUTF8 = StringConvert::TToUTF8(m_tooltip);
-    m_sdlTray = SDL_CreateTray(m_iconSurface, tooltipUTF8.c_str());
-    m_bHidden = false;
+    if (m_sdlTray == nullptr) {
+        std::string tooltipUTF8 = StringConvert::TToUTF8(m_tooltip);
 
-    if (m_sdlTray != nullptr) {
-        //CreateTrayMenu();
-        return true;
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface);
+        SDL_SetStringProperty(props, SDL_PROP_TRAY_CREATE_TOOLTIP_STRING, tooltipUTF8.c_str());
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_USERDATA_POINTER, this);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayLeftClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_RIGHTCLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayRightClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_MIDDLECLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayMiddleClickCallback);
+        m_sdlTray = SDL_CreateTrayWithProperties(props);
+        SDL_DestroyProperties(props);
     }
-
-    return false;
+    m_bHidden = false;
+    return m_sdlTray != nullptr;
 }
 
 bool TrayIconImpl::IsTrayVisible() const
@@ -373,7 +279,6 @@ bool TrayIconImpl::Remove()
     if (m_sdlTray != nullptr) {
         SDL_DestroyTray(m_sdlTray);
         m_sdlTray = nullptr;
-        m_sdlTrayMenu = nullptr;
     }
 
     m_bHidden = true;
@@ -383,6 +288,78 @@ bool TrayIconImpl::Remove()
 void* TrayIconImpl::GetTrayHandle() const
 {
     return (void*)m_sdlTray;
+}
+
+void TrayIconImpl::GetMousePosition(int32_t& x, int32_t& y)
+{
+    float fx = 0.0f;
+    float fy = 0.0f;
+    SDL_GetGlobalMouseState(&fx, &fy);
+    x = static_cast<int32_t>(fx);
+    y = static_cast<int32_t>(fy);
+}
+
+bool SDLCALL TrayIconImpl::OnSDLTrayLeftClickCallback(void* userdata, SDL_Tray* tray)
+{
+    TrayIconImpl* pThis = (TrayIconImpl*)userdata;
+    if (pThis != nullptr) {
+        return pThis->OnTrayLeftClickCallback(tray);
+    }
+    return false;
+}
+
+bool SDLCALL TrayIconImpl::OnSDLTrayRightClickCallback(void* userdata, SDL_Tray* tray)
+{
+    TrayIconImpl* pThis = (TrayIconImpl*)userdata;
+    if (pThis != nullptr) {
+        return pThis->OnTrayRightClickCallback(tray);
+    }
+    return false;
+}
+
+bool SDLCALL TrayIconImpl::OnSDLTrayMiddleClickCallback(void* userdata, SDL_Tray* tray)
+{
+    TrayIconImpl* pThis = (TrayIconImpl*)userdata;
+    if (pThis != nullptr) {
+        return pThis->OnTrayMiddleClickCallback(tray);
+    }
+    return false;
+}
+
+bool TrayIconImpl::OnTrayLeftClickCallback(SDL_Tray* tray)
+{
+    ASSERT(tray == m_sdlTray);
+    if (tray == m_sdlTray) {
+        int32_t x = 0;
+        int32_t y = 0;
+        GetMousePosition(x, y);
+        NotifyMessage(TrayIconMessageType::kLeftClick, x, y);
+    }
+    return false;//返回false，不显示SDL内置菜单
+}
+
+bool TrayIconImpl::OnTrayRightClickCallback(SDL_Tray* tray)
+{
+    ASSERT(tray == m_sdlTray);
+    if (tray == m_sdlTray) {
+        int32_t x = 0;
+        int32_t y = 0;
+        GetMousePosition(x, y);
+        NotifyMessage(TrayIconMessageType::kRightClick, x, y);
+    }
+    return false;//返回false，不显示SDL内置菜单
+}
+
+bool TrayIconImpl::OnTrayMiddleClickCallback(SDL_Tray* tray)
+{
+    ASSERT(tray == m_sdlTray);
+    if (tray == m_sdlTray) {
+        int32_t x = 0;
+        int32_t y = 0;
+        GetMousePosition(x, y);
+        NotifyMessage(TrayIconMessageType::kMiddleClick, x, y);
+    }
+    return false;//返回false，不显示SDL内置菜单
 }
 
 // TrayIcon 基类的Create函数，SDL平台实现
