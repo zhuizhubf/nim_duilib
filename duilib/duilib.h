@@ -13,6 +13,7 @@
 #include "Utils/ShadowWnd.h"
 #include "Utils/Clipboard.h"
 #include "Utils/FileTime.h"
+#include "Utils/TrayIcon.h"
 
 #include "Image/Image.h"
 #include "Image/ImageAttribute.h"
