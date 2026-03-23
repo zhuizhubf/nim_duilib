@@ -685,7 +685,8 @@ void ControlForm::OnTrayIconMessage(ui::TrayIconMessageType msgType, int32_t x, 
 
 void ControlForm::ShowTrayMenu(int32_t x, int32_t y)
 {
-    ui::Menu* menu = new ui::Menu(this, nullptr);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    ui::Window* pParentWnd = IsWindowVisible() ? this : nullptr;//窗口隐藏时，不设置父窗口，避免菜单不显示
+    ui::Menu* menu = new ui::Menu(pParentWnd, nullptr);
     menu->SetSkinFolder(GetResourcePath().ToString());
     DString xml(_T("menu/tray_menu.xml"));
     menu->ShowMenu(xml, ui::UiPoint(x, y));
