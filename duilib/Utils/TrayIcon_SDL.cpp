@@ -275,9 +275,9 @@ bool TrayIconImpl::Show()
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface.m_pIconSurface);
         SDL_SetStringProperty(props, SDL_PROP_TRAY_CREATE_TOOLTIP_STRING, tooltipUTF8.c_str());
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_USERDATA_POINTER, this);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayLeftClickCallback);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_RIGHTCLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayRightClickCallback);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_MIDDLECLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayMiddleClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, (void*)&TrayIconImpl::OnSDLTrayLeftClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_RIGHTCLICK_CALLBACK_POINTER, (void*)&TrayIconImpl::OnSDLTrayRightClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_MIDDLECLICK_CALLBACK_POINTER, (void*)&TrayIconImpl::OnSDLTrayMiddleClickCallback);
         m_sdlTray = SDL_CreateTrayWithProperties(props);
         SDL_DestroyProperties(props);
     }
