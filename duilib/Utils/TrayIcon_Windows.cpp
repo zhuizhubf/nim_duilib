@@ -202,11 +202,11 @@ HICON TrayIconImpl::LoadIconFromFile(const Window* pWindow, const DString& iconF
     }
 }
 
-HICON TrayIconImpl::LoadIconFromFileData(const std::vector<uint8_t>& fileData, const DString& /*iconFilePath*/)
+HICON TrayIconImpl::LoadIconFromFileData(const std::vector<uint8_t>& fileData, const DString& iconFilePath)
 {
     uint32_t uDpiScaleFactor = ui::GlobalManager::Instance().Dpi().GetDisplayScaleFactor();
     HICON hSmallIcon = nullptr;
-    CreateIconsFromData(fileData, uDpiScaleFactor, nullptr, &hSmallIcon);
+    CreateIconsFromData(fileData, iconFilePath, uDpiScaleFactor, nullptr, &hSmallIcon);
     return hSmallIcon;
 }
 

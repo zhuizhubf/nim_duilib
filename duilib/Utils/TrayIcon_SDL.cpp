@@ -113,7 +113,6 @@ private:
 
 TrayIconImpl::TrayIconImpl() :
     m_sdlTray(nullptr),
-    m_iconSurface(nullptr),
     m_bHidden(false),
     m_pWindow(nullptr)
 {
@@ -184,6 +183,8 @@ TrayIconImpl::TraySurfaceData TrayIconImpl::LoadSDLSurfaceFromFileData(const std
     decodeParam.m_imageFilePath = iconFilePath;
     decodeParam.m_fImageSizeScale = fImageSizeScale;
     decodeParam.m_pFileData = std::make_shared<std::vector<uint8_t>>(fileData);
+    decodeParam.m_rcMaxDestRectSize.cx = (int32_t)std::round(32 * fImageSizeScale);
+    decodeParam.m_rcMaxDestRectSize.cy = decodeParam.m_rcMaxDestRectSize.cx;
     std::shared_ptr<IBitmap> pBitmap = imageDecoders.DecodeImageData(decodeParam);
     if (pBitmap == nullptr) {
         return TraySurfaceData();
@@ -274,9 +275,9 @@ bool TrayIconImpl::Show()
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface.m_pIconSurface);
         SDL_SetStringProperty(props, SDL_PROP_TRAY_CREATE_TOOLTIP_STRING, tooltipUTF8.c_str());
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_USERDATA_POINTER, this);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayLeftClickCallback);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_RIGHTCLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayRightClickCallback);
-        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_MIDDLECLICK_CALLBACK_POINTER, TrayIconImpl::OnSDLTrayMiddleClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_LEFTCLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayLeftClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_RIGHTCLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayRightClickCallback);
+        SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_MIDDLECLICK_CALLBACK_POINTER, &TrayIconImpl::OnSDLTrayMiddleClickCallback);
         m_sdlTray = SDL_CreateTrayWithProperties(props);
         SDL_DestroyProperties(props);
     }

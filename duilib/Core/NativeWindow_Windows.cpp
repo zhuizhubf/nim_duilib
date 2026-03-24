@@ -1,5 +1,6 @@
 #include "NativeWindow_Windows.h"
 #include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/FileUtil.h"
 #include "duilib/Core/GlobalManager.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
@@ -1272,6 +1273,20 @@ bool NativeWindow_Windows::MoveWindow(int32_t X, int32_t Y, int32_t nWidth, int3
 
 bool NativeWindow_Windows::SetWindowIcon(const FilePath& iconFilePath)
 {
+    if (SetWindowIconByIcoFile(iconFilePath)) {
+        return true;
+    }
+    std::vector<uint8_t> fileData;
+    bool bRet = FileUtil::ReadFileData(iconFilePath, fileData);
+    ASSERT(bRet);
+    if (bRet) {
+        bRet = SetWindowIcon(fileData, iconFilePath.ToString());
+    }
+    return bRet;
+}
+
+bool NativeWindow_Windows::SetWindowIconByIcoFile(const FilePath& iconFilePath)
+{
     ASSERT(::IsWindow(m_hWnd));
     if (!::IsWindow(m_hWnd)) {
         return false;
@@ -1284,7 +1299,9 @@ bool NativeWindow_Windows::SetWindowIcon(const FilePath& iconFilePath)
     int32_t cxIcon = GetSystemMetricsForDpiWrapper(SM_CXICON, uDpi);
     int32_t cyIcon = GetSystemMetricsForDpiWrapper(SM_CYICON, uDpi);
     HICON hIcon = (HICON)::LoadImage(nullptr, iconFilePath.NativePath().c_str(), IMAGE_ICON, cxIcon, cyIcon, LR_DEFAULTCOLOR | LR_LOADFROMFILE | LR_SHARED);
-    ASSERT(hIcon != nullptr);
+    if (StringUtil::IsEqualNoCase(iconFilePath.GetFileExtension(), _T(".ico"))) {
+        ASSERT(hIcon != nullptr);
+    }    
     if (hIcon != nullptr) {
         ::SendMessage(m_hWnd, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
     }
@@ -1296,7 +1313,9 @@ bool NativeWindow_Windows::SetWindowIcon(const FilePath& iconFilePath)
     cxIcon = GetSystemMetricsForDpiWrapper(SM_CXSMICON, uDpi);
     cyIcon = GetSystemMetricsForDpiWrapper(SM_CYSMICON, uDpi);
     hIcon = (HICON)::LoadImage(nullptr, iconFilePath.NativePath().c_str(), IMAGE_ICON, cxIcon, cyIcon, LR_DEFAULTCOLOR | LR_LOADFROMFILE | LR_SHARED);
-    ASSERT(hIcon != nullptr);
+    if (StringUtil::IsEqualNoCase(iconFilePath.GetFileExtension(), _T(".ico"))) {
+        ASSERT(hIcon != nullptr);
+    }
     if (hIcon != nullptr) {
         ::SendMessage(m_hWnd, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
     }
@@ -1306,12 +1325,12 @@ bool NativeWindow_Windows::SetWindowIcon(const FilePath& iconFilePath)
     return true;
 }
 
-bool NativeWindow_Windows::SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& /*iconFileName*/)
+bool NativeWindow_Windows::SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName)
 {
     uint32_t uDpiScaleFactor = m_pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
     HICON hSmallIcon = nullptr;
     HICON hBigIcon = nullptr;
-    if (CreateIconsFromData(iconFileData, uDpiScaleFactor, &hSmallIcon, &hBigIcon)) {
+    if (CreateIconsFromData(iconFileData, iconFileName, uDpiScaleFactor, &hSmallIcon, &hBigIcon)) {
         ::SendMessage(m_hWnd, WM_SETICON, (WPARAM)TRUE, (LPARAM)hBigIcon);
         ::SendMessage(m_hWnd, WM_SETICON, (WPARAM)FALSE, (LPARAM)hSmallIcon);
         return true;
