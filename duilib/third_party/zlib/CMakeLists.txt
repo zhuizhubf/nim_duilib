@@ -15,7 +15,7 @@ endif()
 
 project(zlib C)
 
-set(VERSION "1.3.1")
+set(VERSION "1.3.2")
 
 include(CheckTypeSize)
 include(CheckFunctionExists)
