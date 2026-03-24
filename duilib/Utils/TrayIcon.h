@@ -45,7 +45,7 @@ public:
 
     /** 创建托盘图标实例
     * @param [in] pWindow 关联的窗口指针
-    * @param [in] iconFilePath 图标文件路径（支持ico格式）
+    * @param [in] iconFilePath 图标文件路径（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     * @param [in] tooltip 托盘提示文本
     * @return 托盘图标实例指针，创建失败返回nullptr
     */
@@ -54,7 +54,7 @@ public:
 public:
     /** 设置托盘图标
     * @param [in] pWindow 关联的窗口指针(用于查找图片资源)
-    * @param [in] iconFilePath 图标文件路径（支持ico格式）
+    * @param [in] iconFilePath 图标文件路径（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     * @return 设置成功返回true，失败返回false
     */
     virtual bool SetIcon(const Window* pWindow, const DString& iconFilePath) = 0;
