@@ -264,13 +264,13 @@ public:
 
     /** @} */
 
-    /** 设置窗口图标（支持*.ico格式）
-    *  @param [in] iconFilePath ico文件的路径（绝对路径）
+    /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
+    *  @param [in] iconFilePath 图标文件的路径（绝对路径）
     */
     bool SetWindowIcon(const FilePath& iconFilePath);
 
-    /** 设置窗口图标（支持*.ico格式）
-    *  @param [in] iconFileData ico文件的数据
+    /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
+    *  @param [in] iconFileData 图标文件的数据
     *  @param [in] iconFileName 包含扩展名的文件名，用于识别图片类型
     */
     bool SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName);

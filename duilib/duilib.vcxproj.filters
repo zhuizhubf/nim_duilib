@@ -876,6 +876,15 @@
     <ClCompile Include="Core\ThemeManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\TrayIcon_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\TrayIcon_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\TrayIcon.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1819,6 +1828,9 @@
     </ClInclude>
     <ClInclude Include="Core\ThemeManager.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\TrayIcon.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

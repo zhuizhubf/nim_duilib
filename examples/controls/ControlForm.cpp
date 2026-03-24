@@ -295,6 +295,29 @@ void ControlForm::OnInitWindow()
             return true;
             });
     }
+
+    //托盘图标功能
+    ui::CheckBox* pTrayIconCheckBox = dynamic_cast<ui::CheckBox*>(FindControl(_T("checkbox_tray_icon")));
+    if (pTrayIconCheckBox != nullptr) {
+        pTrayIconCheckBox->AttachSelect([this](const ui::EventArgs&) {
+            //开启
+            ShowTrayIcon(true);
+            return true;
+            });
+        pTrayIconCheckBox->AttachUnSelect([this](const ui::EventArgs&) {
+            //关闭
+            ShowTrayIcon(false);
+            return true;
+        });
+    }
+}
+
+void ControlForm::OnCloseWindow()
+{
+    //关闭TrayIcon
+    ShowTrayIcon(false);
+
+    BaseClass::OnCloseWindow();
 }
 
 void ControlForm::AttachRichEditEvents(ui::RichEdit* edit)
@@ -618,4 +641,105 @@ LRESULT ControlForm::OnHotKeyMsg(int32_t hotkeyId, ui::VirtualKeyCode vkCode, ui
         ui::SystemUtil::ShowMessageBox(this, _T("Received system hotkey command"), _T("ControlForm::OnHotKeyMsg"));
     }
     return lResult;
+}
+
+void ControlForm::ShowTrayIcon(bool bShow)
+{
+    if (bShow) {
+        // 创建托盘图标
+        m_pTrayIcon = ui::TrayIcon::Create(this, _T("public/caption/logo.ico"), _T("controls(nim_duilib)"));
+        if (m_pTrayIcon != nullptr) {
+            // 设置消息回调
+            m_pTrayIcon->SetMessageCallback([this](ui::TrayIconMessageType msgType, int32_t x, int32_t y)
+                {
+                    OnTrayIconMessage(msgType, x, y);
+                });
+
+            // 显示欢迎气泡
+            m_pTrayIcon->ShowBalloon(_T("提示"), _T("应用已启动！"), 3000);
+        }
+
+    }
+    else {
+        m_pTrayIcon.reset();
+    }
+}
+
+void ControlForm::OnTrayIconMessage(ui::TrayIconMessageType msgType, int32_t x, int32_t y)
+{
+    switch (msgType)
+    {
+    case ui::TrayIconMessageType::kLeftClick:
+        // 左键单击：显示/隐藏窗口
+        if (IsWindowVisible()) {
+            ShowWindow(ui::ShowWindowCommands::kSW_HIDE);
+        }
+        else {
+            ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);
+            SetWindowForeground();
+        }
+        break;
+
+    case ui::TrayIconMessageType::kLeftDoubleClick:
+        // 左键双击：显示窗口
+        ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);
+        SetWindowForeground();
+        break;
+
+    case ui::TrayIconMessageType::kRightClick:
+        // 右键单击：显示右键菜单
+        ShowTrayMenu(x, y);
+        break;
+    case ui::TrayIconMessageType::kShowBalloon:
+        // 气泡被点击
+        break;
+    default:
+        break;
+    }
+}
+
+void ControlForm::ShowTrayMenu(int32_t x, int32_t y)
+{
+    ui::Window* pParentWnd = IsWindowVisible() ? this : nullptr;//窗口隐藏时，不设置父窗口，避免菜单不显示
+    ui::Menu* menu = new ui::Menu(pParentWnd, nullptr);
+    menu->SetSkinFolder(GetResourcePath().ToString());
+    DString xml(_T("menu/tray_menu.xml"));
+    menu->ShowMenu(xml, ui::UiPoint(x, y));
+
+    //菜单项点击响应
+    ui::MenuItem* pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_1")));
+    if (pMenuItem != nullptr) {
+        pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
+            ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_1 clicked!"), _T("TrayIconTest"));
+            return true;
+            });
+    }
+    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_2")));
+    if (pMenuItem != nullptr) {
+        pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
+            ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_2 clicked!"), _T("TrayIconTest"));
+            return true;
+            });
+    }
+    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_3")));
+    if (pMenuItem != nullptr) {
+        pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
+            ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_3 clicked!"), _T("TrayIconTest"));
+            return true;
+            });
+    }
+    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_4")));
+    if (pMenuItem != nullptr) {
+        pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
+            ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_4 clicked!"), _T("TrayIconTest"));
+            return true;
+            });
+    }
+    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_exit")));
+    if (pMenuItem != nullptr) {
+        pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
+            this->CloseWnd();
+            return true;
+            });
+    }
 }

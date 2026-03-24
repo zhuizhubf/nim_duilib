@@ -53,6 +53,18 @@ namespace ui
 
     //获取当前系统主题是否为深色主题：返回true表示深色主题，返回false表示为浅色主题
     bool IsSystemThemeDarkMode();
+    
+    /** 从图标文件数据，生成两个图标（大图标和小图标）, 图标句柄由外部负责释放
+    * @param [in] iconFileData 图标数据，格式为所有支持的图片格式，但最好用ico格式，效果最好
+    * @param [in] imageFilePath 图片的路径，用于判断图片类型
+    * @param [in] uDpiScaleFactor 当前界面缩放百分比因子（举例：100代表缩放百分比为100%，无缩放）
+    * @param [out] hSmallIcon 小图标句柄，图标句柄由外部负责释放
+    * @param [out] hBigIcon 小图标句柄，图标句柄由外部负责释放
+    */
+    bool CreateIconsFromData(const std::vector<uint8_t>& iconFileData,
+                             const DString& imageFilePath,
+                             uint32_t uDpiScaleFactor,
+                             HICON* hSmallIcon, HICON* hBigIcon);
 }
 
 #endif //DUILIB_BUILD_FOR_WIN

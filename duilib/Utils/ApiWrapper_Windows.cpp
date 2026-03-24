@@ -3,6 +3,9 @@
 #ifdef DUILIB_BUILD_FOR_WIN
 
 #include <VersionHelpers.h>
+#include <map>
+#include "duilib/Core/GlobalManager.h"
+#include "duilib/Render/IRender.h"
 
 namespace ui
 {
@@ -464,6 +467,476 @@ bool IsSystemThemeDarkMode()
     //释放已加载的DLL
     FreeLibrary(hModAdvapi32);
     return bDarkMode;
+}
+
+// 辅助函数：将宽度和高度转为唯一键（处理0表示256px的情况）
+static DWORD GetIconSizeKey(BYTE bWidth, BYTE bHeight)
+{
+    // 高位存宽度，低位存高度；0转为256
+    UINT width = (bWidth == 0) ? 256 : bWidth;
+    UINT height = (bHeight == 0) ? 256 : bHeight;
+    return (width << 16) | height;
+}
+
+/** 从图标数据中，查找指定大小的图标资源所在位置
+* @param [in] pIconData ico图标数据起始地址（对应于*.ico文件的数据）
+* @param [in] nDataSize 图标数据的长度
+* @param [in] targetWidth 目标图标的宽度
+* @param [in] targetHeight 目标图标的高度
+* @param [out] outResSize 返回图标数据的长度
+* @return 返回图标资源数据的起始地址
+*/
+static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
+                                       int32_t targetWidth, int32_t targetHeight, DWORD& outResSize)
+{
+#pragma pack(push, 1)
+    typedef struct
+    {
+        WORD idReserved;   // 保留字段，必须为0
+        WORD idType;       // 资源类型：1=图标，2=光标
+        WORD idCount;      // 图标/光标数量
+    } ICONDIR;
+
+    typedef struct
+    {
+        BYTE bWidth;       // 图标宽度（0表示256px）
+        BYTE bHeight;      // 图标高度（0表示256px）
+        BYTE bColorCount;  // 颜色数（0表示>=8bpp）
+        BYTE bReserved;    // 保留字段，必须为0
+        WORD wPlanes;      // 位面数（图标固定为1）
+        WORD wBitCount;    // 每像素位数
+        DWORD dwBytesInRes;// 该图标资源的字节大小
+        DWORD dwImageOffset;// 该图标资源在文件中的偏移量
+    } ICONDIRENTRY;
+#pragma pack(pop)
+
+    outResSize = 0;
+    if ((pIconData == nullptr) || (nDataSize == 0)) {
+        return nullptr;
+    }
+
+    // 解析ICO文件头
+    const ICONDIR* pIconDir = (const ICONDIR*)pIconData;
+    if ((pIconDir->idReserved != 0 || pIconDir->idType != 1 || pIconDir->idCount == 0)) {
+        return nullptr;
+    }
+
+    // 遍历所有图标项，初步筛选图标数据：相同尺寸的图标，只保留位深(wBitCount)最大的图标
+    const ICONDIRENTRY* pFirstEntry = (const ICONDIRENTRY*)(pIconData + sizeof(ICONDIR));
+    // 用map分组：key=宽度+高度的组合键，value=该尺寸下的所有图标条目
+    std::map<DWORD, std::vector<ICONDIRENTRY>> iconGroups;
+    for (UINT i = 0; i < pIconDir->idCount; i++) {
+        const ICONDIRENTRY* pEntry = &pFirstEntry[i];
+        DWORD sizeKey = GetIconSizeKey(pEntry->bWidth, pEntry->bHeight);
+        iconGroups[sizeKey].push_back(*pEntry);
+    }
+    //遍历每个分组，筛选位深最大的图标，剔除其他图标数据，图标按尺寸由小到大排序
+    std::vector<ICONDIRENTRY> allIconList;
+    for (auto& group : iconGroups) {
+        auto& entries = group.second;
+        // 找到该分组中wBitCount最大的条目
+        auto maxEntryIt = std::max_element(entries.begin(), entries.end(),
+            [](const ICONDIRENTRY& a, const ICONDIRENTRY& b) {
+                return a.wBitCount < b.wBitCount;
+            });
+
+        // 将最大位深的条目加入结果容器
+        if (maxEntryIt != entries.end()) {
+            allIconList.push_back(*maxEntryIt);
+        }
+    }
+    if (allIconList.empty()) {
+        return nullptr;
+    }
+
+    //筛选出匹配度最高的那个图标
+    ICONDIRENTRY bestEntry = allIconList.back(); //默认选择尺寸最大的图标
+    for (size_t nIndex = 0; nIndex < allIconList.size(); ++nIndex) {
+        const ICONDIRENTRY& entry = allIconList[nIndex];
+        int entryWidth = (entry.bWidth == 0) ? 256 : entry.bWidth;
+        int entryHeight = (entry.bHeight == 0) ? 256 : entry.bHeight;
+        bool isSizeQualified = (entryWidth >= targetWidth) && (entryHeight >= targetHeight);
+        if (!isSizeQualified) {
+            continue;
+        }
+        //尺寸达标
+        if ((entryWidth == targetWidth) && (entryHeight == targetHeight)) {
+            //尺寸精确满足需要：直接选择
+            bestEntry = allIconList[nIndex];
+        }
+        else if (nIndex == 0) {
+            //首个图标满足需要：直接选择
+            bestEntry = allIconList[nIndex];
+        }
+        else {
+            //非首个图标满足需要：比较哪个更合适（缩放时图标失真度更小）
+            const ICONDIRENTRY& preEntry = allIconList[nIndex - 1];
+            int preEntryWidth = (preEntry.bWidth == 0) ? 256 : preEntry.bWidth;
+            int preEntryHeight = (preEntry.bHeight == 0) ? 256 : preEntry.bHeight;
+            float wRatio = (float)(targetWidth - preEntryWidth) / (float)preEntryWidth;
+            float hRatio = (float)(targetHeight - preEntryHeight) / (float)preEntryHeight;
+            float preRatio = std::max(wRatio, hRatio);
+
+            wRatio = (float)(entryWidth - targetWidth) / (float)entryWidth;
+            hRatio = (float)(entryHeight - targetHeight) / (float)entryHeight;
+            float curRatio = std::max(wRatio, hRatio);
+            if (curRatio < preRatio) {
+                bestEntry = allIconList[nIndex];            //选择尺寸大的
+            }
+            else {
+                const float minRatio = 0.20f; //设置最小放大比例
+                if (preRatio < minRatio) {
+                    bestEntry = allIconList[nIndex - 1];    //选择尺寸小的
+                }
+                else {
+                    bestEntry = allIconList[nIndex];        //选择尺寸大的
+                }
+            }
+        }
+        break;
+    }
+
+    // 校验资源偏移和大小
+    if ((bestEntry.dwImageOffset + bestEntry.dwBytesInRes) > nDataSize) {
+        return nullptr;
+    }
+    // 输出结果
+    outResSize = bestEntry.dwBytesInRes;
+    if (outResSize == 0) {
+        return nullptr;
+    }
+    return pIconData + bestEntry.dwImageOffset;
+}
+
+/** 支持ICO格式
+*/
+static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uint32_t uDpiScaleFactor,
+                                   HICON* hSmallIcon, HICON* hBigIcon)
+{
+    if (iconFileData.empty()) {
+        return false;
+    }
+    if ((hSmallIcon == nullptr) && (hBigIcon == nullptr)) {
+        return false;
+    }
+    if (hSmallIcon != nullptr) {
+        *hSmallIcon = nullptr;
+    }
+    if (hBigIcon != nullptr) {
+        *hBigIcon = nullptr;
+    }
+    //Little Endian Only
+    int16_t test = 1;
+    bool bLittleEndianHost = (*((char*)&test) == 1);
+    ASSERT_UNUSED_VARIABLE(bLittleEndianHost);
+
+    bool bValidIcoFile = false;
+    std::vector<uint8_t> fileData = iconFileData;
+    fileData.resize(fileData.size() + 1024); //填充空白
+    typedef struct tagIconDir {
+        uint16_t idReserved;
+        uint16_t idType;
+        uint16_t idCount;
+    } ICONHEADER;
+    typedef struct tagIconDirectoryEntry {
+        uint8_t  bWidth;
+        uint8_t  bHeight;
+        uint8_t  bColorCount;
+        uint8_t  bReserved;
+        uint16_t  wPlanes;
+        uint16_t  wBitCount;
+        uint32_t dwBytesInRes;
+        uint32_t dwImageOffset;
+    } ICONDIRENTRY;
+
+    ICONHEADER* icon_header = (ICONHEADER*)fileData.data();
+    if ((icon_header->idReserved == 0) && (icon_header->idType == 1)) {
+        bValidIcoFile = true;
+        for (int32_t c = 0; c < icon_header->idCount; ++c) {
+            size_t nDataOffset = sizeof(ICONHEADER) + sizeof(ICONDIRENTRY) * c;
+            if (nDataOffset >= fileData.size()) {
+                bValidIcoFile = false;
+                break;
+            }
+            ICONDIRENTRY* pIconDir = (ICONDIRENTRY*)((uint8_t*)fileData.data() + nDataOffset);
+            if (pIconDir->dwImageOffset >= iconFileData.size()) {
+                bValidIcoFile = false;
+                break;
+            }
+            else if ((pIconDir->dwImageOffset + pIconDir->dwBytesInRes) > iconFileData.size()) {
+                bValidIcoFile = false;
+                break;
+            }
+        }
+    }
+    //ASSERT(bValidIcoFile);
+    if (!bValidIcoFile) {
+        return false;
+    }
+
+    if (uDpiScaleFactor == 0) {
+        uDpiScaleFactor = 100;
+    }
+    uint32_t uDpi = DpiManager::MulDiv(uDpiScaleFactor, 96u, 100u);
+    struct TWinIconInfo
+    {
+        BOOL bLargeIcon;
+        int32_t cxIcon;
+        int32_t cyIcon;
+    };
+    std::vector<TWinIconInfo> iconInfos;
+
+    //大图标
+    if (hBigIcon != nullptr) {
+        int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXICON, uDpi);
+        int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYICON, uDpi);
+        iconInfos.push_back({ TRUE, cxBestIcon, cyBestIcon });
+    }
+
+    //小图标
+    if (hSmallIcon != nullptr) {
+        int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXSMICON, uDpi);
+        int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYSMICON, uDpi);
+        iconInfos.push_back({ FALSE, cxBestIcon, cyBestIcon });
+    }
+
+    for (const TWinIconInfo& iconInfo : iconInfos) {
+        DWORD nIconDataSize = 0;
+        const BYTE* pIconData = ExtractIconResource((const BYTE*)fileData.data(), (DWORD)fileData.size(), iconInfo.cxIcon, iconInfo.cyIcon, nIconDataSize);
+        if (pIconData == nullptr) {
+            int32_t offset = ::LookupIconIdFromDirectoryEx((PBYTE)fileData.data(), TRUE, iconInfo.cxIcon, iconInfo.cyIcon, LR_DEFAULTCOLOR | LR_SHARED);
+            if (offset > 0) {
+                pIconData = (PBYTE)fileData.data() + offset;
+                nIconDataSize = (DWORD)fileData.size() - (DWORD)offset;
+            }
+        }
+        if (pIconData != nullptr) {
+            HICON hIcon = ::CreateIconFromResourceEx((PBYTE)pIconData, nIconDataSize, TRUE, 0x00030000, iconInfo.cxIcon, iconInfo.cyIcon, LR_DEFAULTCOLOR | LR_SHARED);
+            ASSERT(hIcon != nullptr);
+            if (hIcon != nullptr) {
+                if (iconInfo.bLargeIcon) {
+                    //大图标
+                    ASSERT(hBigIcon != nullptr);
+                    if (hBigIcon != nullptr) {
+                        *hBigIcon = hIcon;
+                    }
+                }
+                else {
+                    //小图标
+                    ASSERT(hSmallIcon != nullptr);
+                    if (hSmallIcon != nullptr) {
+                        *hSmallIcon = hIcon;
+                    }
+                }
+            }
+        }
+    }
+    bool bRet = true;
+    if (hSmallIcon != nullptr) {
+        if (*hSmallIcon == nullptr) {
+            bRet = false;
+        }
+    }
+    if (hBigIcon != nullptr) {
+        if (*hBigIcon == nullptr) {
+            bRet = false;
+        }
+    }
+    if (!bRet) {
+        if (hSmallIcon != nullptr) {
+            if (*hSmallIcon != nullptr) {
+                ::DestroyIcon(*hSmallIcon);
+            }
+            *hSmallIcon = nullptr;
+        }
+        if (hBigIcon != nullptr) {
+            if (*hBigIcon != nullptr) {
+                ::DestroyIcon(*hBigIcon);
+            }
+            *hBigIcon = nullptr;
+        }
+    }
+    return bRet;
+}
+
+/** 支持所有图片格式
+*/
+static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
+                                     const FilePath& imageFilePath,
+                                     uint32_t uDpiScaleFactor,                                     
+                                     HICON* hSmallIcon, HICON* hBigIcon)
+{
+    if (iconFileData.empty()) {
+        return false;
+    }
+    if ((hSmallIcon == nullptr) && (hBigIcon == nullptr)) {
+        return false;
+    }
+    if (hSmallIcon != nullptr) {
+        *hSmallIcon = nullptr;
+    }
+    if (hBigIcon != nullptr) {
+        *hBigIcon = nullptr;
+    }
+
+    if (uDpiScaleFactor == 0) {
+        uDpiScaleFactor = 100;
+    }
+    uint32_t uDpi = DpiManager::MulDiv(uDpiScaleFactor, 96u, 100u);
+    struct TWinIconInfo
+    {
+        BOOL bLargeIcon;
+        int32_t cxIcon;
+        int32_t cyIcon;
+    };
+    std::vector<TWinIconInfo> iconInfos;
+
+    //大图标
+    if (hBigIcon != nullptr) {
+        int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXICON, uDpi);
+        int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYICON, uDpi);
+        iconInfos.push_back({ TRUE, cxBestIcon, cyBestIcon });
+    }
+
+    //小图标
+    if (hSmallIcon != nullptr) {
+        int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXSMICON, uDpi);
+        int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYSMICON, uDpi);
+        iconInfos.push_back({ FALSE, cxBestIcon, cyBestIcon });
+    }
+
+    for (const TWinIconInfo& winIconInfo : iconInfos) {
+        //按图像数据加载
+        ImageDecoderFactory& imageDecoders = GlobalManager::Instance().ImageDecoders();
+        float fImageSizeScale = uDpiScaleFactor / 100.0f;
+        ImageDecodeParam decodeParam;
+        decodeParam.m_imageFilePath = imageFilePath;
+        decodeParam.m_fImageSizeScale = fImageSizeScale;
+        decodeParam.m_pFileData = std::make_shared<std::vector<uint8_t>>(iconFileData);
+        decodeParam.m_rcMaxDestRectSize = UiSize(winIconInfo.cxIcon, winIconInfo.cyIcon);
+        std::shared_ptr<IBitmap> pBitmap = imageDecoders.DecodeImageData(decodeParam);
+        if (pBitmap == nullptr) {
+            continue;
+        }
+        int32_t nWidth = (int32_t)pBitmap->GetWidth();
+        int32_t nHeight = (int32_t)pBitmap->GetHeight();
+        if ((nWidth < 1) || (nHeight < 1)) {
+            continue;
+        }
+
+        void* pPixelBits = pBitmap->LockPixelBits();
+        ASSERT(pPixelBits != nullptr);
+        if (pPixelBits == nullptr) {
+            continue;
+        }
+
+        //创建图标
+        BITMAPINFO bmpInfo;
+        memset(&bmpInfo, 0, sizeof(BITMAPINFO));
+        bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bmpInfo.bmiHeader.biWidth = nWidth;
+        bmpInfo.bmiHeader.biHeight = -nHeight; /* Top-down bitmap */
+        bmpInfo.bmiHeader.biPlanes = 1;
+        bmpInfo.bmiHeader.biBitCount = 32;
+        bmpInfo.bmiHeader.biCompression = BI_RGB;
+
+        HDC hdc = ::GetDC(NULL);
+        void* pBits = NULL;
+        HBITMAP hBitmap = ::CreateDIBSection(hdc, &bmpInfo, DIB_RGB_COLORS, &pBits, NULL, 0);
+        if (hBitmap == nullptr) {
+            ::ReleaseDC(NULL, hdc);
+            continue;
+        }
+        memcpy(pBits, pPixelBits, nWidth * nHeight * 4);
+        HBITMAP hMask = ::CreateBitmap(nWidth, nHeight, 1, 1, NULL);
+        if (hMask == nullptr) {
+            ::DeleteObject(hBitmap);
+            ::ReleaseDC(NULL, hdc);
+            continue;
+        }
+
+        HDC hdcMem = ::CreateCompatibleDC(hdc);
+        HGDIOBJ oldBitmap = ::SelectObject(hdcMem, hMask);
+
+        for (int y = 0; y < nHeight; y++) {
+            for (int x = 0; x < nWidth; x++) {
+                BYTE* pixel = (BYTE*)pBits + (y * nWidth + x) * 4;
+                BYTE alpha = pixel[3];
+                COLORREF maskColor = (alpha == 0) ? RGB(0, 0, 0) : RGB(255, 255, 255);
+                ::SetPixel(hdcMem, x, y, maskColor);
+            }
+        }
+
+        ICONINFO iconInfo;
+        iconInfo.fIcon = TRUE;
+        iconInfo.xHotspot = 0;
+        iconInfo.yHotspot = 0;
+        iconInfo.hbmMask = hMask;
+        iconInfo.hbmColor = hBitmap;
+
+        HICON hIcon = ::CreateIconIndirect(&iconInfo);
+        ASSERT(hIcon != nullptr);
+        if (hIcon != nullptr) {
+            if (winIconInfo.bLargeIcon) {
+                //大图标
+                ASSERT(hBigIcon != nullptr);
+                if (hBigIcon != nullptr) {
+                    *hBigIcon = hIcon;
+                }
+            }
+            else {
+                //小图标
+                ASSERT(hSmallIcon != nullptr);
+                if (hSmallIcon != nullptr) {
+                    *hSmallIcon = hIcon;
+                }
+            }
+        }
+
+        ::SelectObject(hdcMem, oldBitmap);
+        ::DeleteDC(hdcMem);
+        ::DeleteObject(hBitmap);
+        ::DeleteObject(hMask);
+        ::ReleaseDC(NULL, hdc);
+    }
+
+    bool bRet = true;
+    if (hSmallIcon != nullptr) {
+        if (*hSmallIcon == nullptr) {
+            bRet = false;
+        }
+    }
+    if (hBigIcon != nullptr) {
+        if (*hBigIcon == nullptr) {
+            bRet = false;
+        }
+    }
+    if (!bRet) {
+        if (hSmallIcon != nullptr) {
+            if (*hSmallIcon != nullptr) {
+                ::DestroyIcon(*hSmallIcon);
+            }
+            *hSmallIcon = nullptr;
+        }
+        if (hBigIcon != nullptr) {
+            if (*hBigIcon != nullptr) {
+                ::DestroyIcon(*hBigIcon);
+            }
+            *hBigIcon = nullptr;
+        }
+    }
+    return bRet;
+}
+
+bool CreateIconsFromData(const std::vector<uint8_t>& iconFileData,
+                         const DString& imageFilePath,
+                         uint32_t uDpiScaleFactor,
+                         HICON* hSmallIcon, HICON* hBigIcon)
+{
+    if (CreateIconsFromIcoData(iconFileData, uDpiScaleFactor, hSmallIcon, hBigIcon)) {
+        return true;
+    }
+    return CreateIconsFromImageData(iconFileData, FilePath(imageFilePath), uDpiScaleFactor, hSmallIcon, hBigIcon);
 }
 
 } //namespace ui

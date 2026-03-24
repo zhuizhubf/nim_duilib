@@ -90,8 +90,8 @@ public:
     */
     RenderBackendType GetRenderBackendType() const;
 
-    /** 设置窗口图标（支持*.ico格式）
-    *  @param [in] iconFilePath ico文件的路径（在资源根目录内的相对路径）
+    /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
+    *  @param [in] iconFilePath 图标文件的路径（在资源根目录内的相对路径）
     */
     bool SetWindowIcon(const DString& iconFilePath);
 

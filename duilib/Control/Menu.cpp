@@ -104,6 +104,10 @@ void Menu::ShowMenu(const DString& xml, const UiPoint& point, MenuPopupPosType p
     WindowCreateParam createWndParam;
     createWndParam.m_dwStyle = kWS_POPUP;
     createWndParam.m_dwExStyle = kWS_EX_TOPMOST | kWS_EX_LAYERED;
+    if (m_pParentWindow == nullptr) {
+        //父窗口为空时，设置ToolWindow属性，避免在状态栏出现
+        createWndParam.m_dwExStyle |= kWS_EX_TOOLWINDOW;
+    }
     //设置初始位置，避免菜单初次显示时出现黑屏现象
     createWndParam.m_nX = point.x;
     createWndParam.m_nY = point.y;

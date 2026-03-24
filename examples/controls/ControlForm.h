@@ -22,6 +22,10 @@ public:
     */
     virtual void OnInitWindow() override;
 
+    /** 当窗口已经被关闭时调用此函数，供子类中做一些收尾工作
+    */
+    virtual void OnCloseWindow() override;
+
 private:
 
     /** 显示菜单
@@ -75,6 +79,27 @@ private:
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
     virtual LRESULT OnHotKeyMsg(int32_t hotkeyId, ui::VirtualKeyCode vkCode, uint32_t modifierKey, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+
+private:
+    /** 显示/隐藏托盘图标
+    */
+    void ShowTrayIcon(bool bShow);
+
+    /** 托盘图标消息回调函数
+     * @param [in] msgType 消息类型
+     * @param [in] x 鼠标X坐标（屏幕坐标）
+     * @param [in] y 鼠标Y坐标（屏幕坐标）
+     */
+    void OnTrayIconMessage(ui::TrayIconMessageType msgType, int32_t x, int32_t y);
+
+    /** 显示托盘图标的菜单
+    */
+    void ShowTrayMenu(int32_t x, int32_t y);
+
+private:
+    /** 托盘图标的接口
+    */
+    std::unique_ptr<ui::TrayIcon> m_pTrayIcon;
 };
 
 #endif //EXAMPLES_CONTROLS_FORM_H_

@@ -134,7 +134,21 @@ std::shared_ptr<IBitmap> ImageDecoderFactory::DecodeImageData(const ImageDecodeP
             std::shared_ptr<ISvgImage> pSvgImage = pImage->GetImageSvg();
             ASSERT(pSvgImage != nullptr);
             if (pSvgImage != nullptr) {
-                pBitmap = pSvgImage->GetBitmap(UiSize(pImage->GetWidth(), pImage->GetHeight()));
+                UiSize szImageSize(pImage->GetWidth(), pImage->GetHeight());                
+                float fRealScaleX = 1.0f;
+                float fRealScaleY = 1.0f;
+                if ((newDecodeParam.m_rcMaxDestRectSize.cx > 0) && (pImage->GetWidth() > 0)) {
+                    fRealScaleX = (float)newDecodeParam.m_rcMaxDestRectSize.cx / (float)pImage->GetWidth();
+                }
+                if (newDecodeParam.m_rcMaxDestRectSize.cy > 0) {
+                    fRealScaleY = (float)newDecodeParam.m_rcMaxDestRectSize.cy / (float)pImage->GetHeight();
+                }
+                float fRealScale = std::max(fRealScaleX, fRealScaleY);
+                if (!ui::IsFloatEqual(fRealScale, 1.0f)) {
+                    szImageSize.cx = (int32_t)std::round(szImageSize.cx * fRealScale);
+                    szImageSize.cy = (int32_t)std::round(szImageSize.cy * fRealScale);
+                }
+                pBitmap = pSvgImage->GetBitmap(szImageSize);
             }
         }
     }
