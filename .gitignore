@@ -354,3 +354,4 @@ healthchecksdb
 /duilib/third_party/libpag/windows/lib-vc-x64
 /duilib/third_party/libpag/windows/lib-vc-x86
 /bin/libpag.dll
+/.temp

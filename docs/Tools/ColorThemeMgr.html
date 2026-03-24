@@ -765,7 +765,7 @@
                 const originalValue = node.getAttribute('value') || '#FFFFFFFF';
                 const type = node.getAttribute('type') || 'unknown';
                 const category = node.getAttribute('category') || 'unknown';
-                const supportAccent = node.getAttribute('support_accent') === 'true';
+                const supportAccent = node.getAttribute('fixed') === 'true';
                 const colorData = {
                     name,
                     value: originalValue,
