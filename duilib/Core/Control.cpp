@@ -5246,8 +5246,13 @@ UiColor Control::GetUiColor(const DString& colorName) const
     return color;
 }
 
-UiColor Control::GetUiColorByName(const DString& colorName) const
+UiColor Control::GetUiColorByName(const DString& colorName2) const
 {
+    //别名优先，由于需要保留历史兼容性问题(比如原代码中使用了"red"这种颜色值，需要被覆盖掉)
+    DString colorName = GlobalManager::Instance().GetAliasValue(colorName2);
+    if (colorName.empty()) {
+        colorName = colorName2;
+    }
     UiColor color;
     if (colorName.empty()) {
         return color;
@@ -5270,13 +5275,6 @@ UiColor Control::GetUiColorByName(const DString& colorName) const
     if (color.GetARGB() == 0) {
         //优先级4：直接指定预定义的颜色别名
         color = GlobalManager::Instance().Color().GetStandardColor(colorName);
-    }
-    if (color.GetARGB() == 0) {
-        //优先级5：按别名获取
-        DString aliasValue = GlobalManager::Instance().GetAliasValue(colorName);
-        if (!aliasValue.empty()) {
-            color = GlobalManager::Instance().Color().GetColor(aliasValue);
-        }
     }
     ASSERT(color.GetARGB() != 0);
     return color;

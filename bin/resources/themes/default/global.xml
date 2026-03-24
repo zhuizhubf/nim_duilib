@@ -103,6 +103,7 @@
     <Alias name="light_green" value="color_green_light"/>
     <Alias name="blue" value="color_blue"/>
     <Alias name="red" value="color_red"/>
+    
     <!-- 2. 历史兼容别名（原有保留） -->
     <Alias name="bk_wnd_darkcolor" value="bg_window_dark"/>
     <Alias name="bk_wnd_lightcolor" value="bg_window_light"/>

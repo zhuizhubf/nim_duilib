@@ -1293,6 +1293,17 @@ void GlobalManager::RemoveAlias(const DString& name)
     }
 }
 
+bool GlobalManager::HasAliasValue(const DString& name) const
+{
+    if (!m_aliasMap.empty()) {
+        auto iter = m_aliasMap.find(name);
+        if (iter != m_aliasMap.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 DString GlobalManager::GetAliasValue(const DString& name) const
 {
     if (!m_aliasMap.empty()) {

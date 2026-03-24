@@ -125,14 +125,16 @@ void ColorManager::AddColor(const DString& strName, UiColor argb)
     m_colorMap.AddColor(strName, argb);
 }
 
-UiColor ColorManager::GetColor(const DString& strName) const
+UiColor ColorManager::GetColor(const DString& strName2) const
 {
+    //别名优先，由于需要保留历史兼容性问题(比如原代码中使用了"red"这种颜色值，需要被覆盖掉)
+    DString strName = GlobalManager::Instance().GetAliasValue(strName2);
+    if (strName.empty()) {
+        strName = strName2;
+    }
     UiColor color = m_colorMap.GetColor(strName);
-    if (color.GetARGB() == 0) {
-        DString aliasName = ui::GlobalManager::Instance().GetAliasValue(strName);
-        if (!aliasName.empty()) {
-            color = m_colorMap.GetColor(aliasName);
-        }
+    if (color.IsEmpty() && (strName != strName2)){
+        color = m_colorMap.GetColor(strName2);
     }
     return color;
 }

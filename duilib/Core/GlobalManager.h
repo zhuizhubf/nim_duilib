@@ -374,6 +374,11 @@ public:
     */
     void RemoveAlias(const DString& name);
 
+    /** 判断一个名字是否有别名
+    * @param [in] name 名字
+    */
+    bool HasAliasValue(const DString& name) const;
+
     /** 获取别名对应的值
     * @param [in] name 名字
     */
