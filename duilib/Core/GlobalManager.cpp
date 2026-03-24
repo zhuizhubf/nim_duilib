@@ -1244,7 +1244,7 @@ Box* GlobalManager::CreateBoxForXmlPreview(Window* pWindow,
             xmlPreviewAttributes.m_windowAttributes.clear();
             builder.ParseWindowAttributes(xmlPreviewAttributes.m_windowAttributes);
             xmlPreviewAttributes.m_windowClassList = builder.GetWindowClassList();
-            xmlPreviewAttributes.m_windowTextColorList = builder.GetWindowTextColorList();
+            xmlPreviewAttributes.m_windowThemeColorList = builder.GetWindowThemeColorList();
             xmlPreviewAttributes.m_globalFontIdList = builder.GetGlobalFontIdList();
         }
     }

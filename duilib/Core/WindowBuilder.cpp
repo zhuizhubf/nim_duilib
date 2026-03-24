@@ -321,7 +321,8 @@ Control* WindowBuilder::CreateControls(Window* pWindow, CreateControlCallback pC
              (strClass == _T("Font"))           ||
              (strClass == _T("Class"))          ||
              (strClass == _T("TextColor"))      ||
-             (strClass == _T("Theme"))         ||
+             (strClass == _T("ThemeColor"))     ||
+             (strClass == _T("Theme"))          ||
              (strClass == _T("Alias"))          ||
              (strClass == _T("Var")) ) {
             //忽略这几个属性
@@ -865,7 +866,7 @@ void WindowBuilder::ParseWindowShareAttributes(Window* pWindow, const pugi::xml_
                 m_windowClassList.push_back(strClassName);
             }
         }
-        else if (strClass == _T("TextColor")) {
+        else if ((strClass == _T("ThemeColor")) || (strClass == _T("TextColor"))) {
             DString strColorName;
             DString strColor;
             for (pugi::xml_attribute attr : node.attributes()) {
@@ -880,8 +881,8 @@ void WindowBuilder::ParseWindowShareAttributes(Window* pWindow, const pugi::xml_
                 }
             }
             if (!strColorName.empty()) {
-                pWindow->AddTextColor(strColorName, strColor);
-                m_windowTextColorList.push_back(strColorName);
+                pWindow->AddThemeColor(strColorName, strColor);
+                m_windowThemeColorList.push_back(strColorName);
             }
         }
         else if (strClass == _T("Font")) {
@@ -954,7 +955,7 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
                 GlobalManager::Instance().AddClass(strClassName, strAttribute);
             }
         }
-        else if (strClass == _T("TextColor")) {
+        else if ((strClass == _T("ThemeColor")) || (strClass == _T("TextColor"))) {
             DString colorName = node.attribute(_T("name")).as_string();
             DString colorValue = node.attribute(_T("value")).as_string();
             if (!colorName.empty() && !colorValue.empty()) {
@@ -1073,8 +1074,9 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
         if( (strClass == _T("DefaultFontFamilyNames")) ||
             (strClass == _T("Font"))      ||
             (strClass == _T("FontFile"))  ||
-            (strClass == _T("Class"))     || 
+            (strClass == _T("Class"))     ||
             (strClass == _T("TextColor")) ||
+            (strClass == _T("ThemeColor"))||
             (strClass == _T("Theme"))     ||
             (strClass == _T("Alias"))     ||
             (strClass == _T("Var"))) {
@@ -1480,9 +1482,9 @@ const std::vector<DString>& WindowBuilder::GetWindowClassList() const
     return m_windowClassList;
 }
 
-const std::vector<DString>& WindowBuilder::GetWindowTextColorList() const
+const std::vector<DString>& WindowBuilder::GetWindowThemeColorList() const
 {
-    return m_windowTextColorList;
+    return m_windowThemeColorList;
 }
 
 const std::vector<DString>& WindowBuilder::GetGlobalFontIdList() const

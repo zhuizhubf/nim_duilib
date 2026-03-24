@@ -376,11 +376,11 @@ void XmlBox::ClearLoadedXmlData(const XmlPreviewAttributes& xmlPreviewAttributes
             pWindow->RemoveClass(className);
         }
 
-        std::vector<DString> oldWindowTextColorList;
-        oldWindowTextColorList.swap(m_pXmlPreviewAttributes->m_windowTextColorList);
-        RemoveValuesInNewList(oldWindowTextColorList, xmlPreviewAttributesNew.m_windowTextColorList);
-        for (const DString& textColor : oldWindowTextColorList) {
-            pWindow->RemoveTextColor(textColor);
+        std::vector<DString> oldWindowThemeColorList;
+        oldWindowThemeColorList.swap(m_pXmlPreviewAttributes->m_windowThemeColorList);
+        RemoveValuesInNewList(oldWindowThemeColorList, xmlPreviewAttributesNew.m_windowThemeColorList);
+        for (const DString& textColor : oldWindowThemeColorList) {
+            pWindow->RemoveThemeColor(textColor);
         }
     }
 

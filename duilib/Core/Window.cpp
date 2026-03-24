@@ -574,22 +574,22 @@ void Window::RemoveAllClass()
     m_defaultAttrHash.clear();
 }
 
-void Window::AddTextColor(const DString& strName, const DString& strValue)
+void Window::AddThemeColor(const DString& strName, const DString& strValue)
 {
     m_colorMap.AddColor(strName, strValue);
 }
 
-void Window::AddTextColor(const DString& strName, UiColor argb)
+void Window::AddThemeColor(const DString& strName, UiColor argb)
 {
     m_colorMap.AddColor(strName, argb);
 }
 
-UiColor Window::GetTextColor(const DString& strName) const
+UiColor Window::GetThemeColor(const DString& strName) const
 {
     return m_colorMap.GetColor(strName);
 }
 
-void Window::RemoveTextColor(const DString& strName)
+void Window::RemoveThemeColor(const DString& strName)
 {
     m_colorMap.RemoveColor(strName);
 }

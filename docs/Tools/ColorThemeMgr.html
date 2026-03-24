@@ -756,8 +756,8 @@
                 category: {}
             };
             
-            // 解析所有TextColor节点
-            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
+            // 解析所有ThemeColor节点
+            const colorNodes = currentXmlDoc.querySelectorAll('ThemeColor');
             colorNodes.forEach(node => {
                 const name = node.getAttribute('name');
                 if (!name) return; // 跳过无名称的节点
@@ -1212,7 +1212,7 @@
             if (!currentXmlDoc || !currentColorMap.size) return;
 
             // 替换颜色值
-            const colorNodes = currentXmlDoc.querySelectorAll('TextColor');
+            const colorNodes = currentXmlDoc.querySelectorAll('ThemeColor');
             colorNodes.forEach(node => {
                 const name = node.getAttribute('name');
                 const colorData = currentColorMap.get(name);

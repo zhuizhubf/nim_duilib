@@ -350,24 +350,24 @@ public:
     * @param [in] strName 颜色名称（如 white）
     * @param [in] strValue 颜色具体数值（如 #FFFFFFFF）
     */
-    void AddTextColor(const DString& strName, const DString& strValue);
+    void AddThemeColor(const DString& strName, const DString& strValue);
 
     /** 添加一个颜色值提供窗口内使用
     * @param [in] strName 颜色名称（如 white）
     * @param [in] argb 颜色具体数值, 以ARGB格式表示
     */
-    void AddTextColor(const DString& strName, UiColor argb);
+    void AddThemeColor(const DString& strName, UiColor argb);
 
     /** 根据名称获取一个颜色的具体数值
     * @param [in] strName 要获取的颜色名称
     * @return 返回 DWORD 格式的颜色描述值
     */
-    UiColor GetTextColor(const DString& strName) const;
+    UiColor GetThemeColor(const DString& strName) const;
 
     /** 删除指定名称的颜色属性
     * @param [in] strName 要删除的颜色名称
     */
-    void RemoveTextColor(const DString& strName);
+    void RemoveThemeColor(const DString& strName);
 
     /** 添加一个选项组
     * @param [in] strGroupName 组名称

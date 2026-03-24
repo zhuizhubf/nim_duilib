@@ -5264,12 +5264,12 @@ UiColor Control::GetUiColorByName(const DString& colorName2) const
     if (color.GetARGB() == 0) {
         Window* pWindow = GetWindow();
         if (pWindow != nullptr) {
-            //优先级2：获取在配置XML中的<Window>节点中定义子节点<TextColor>指定的颜色
-            color = pWindow->GetTextColor(colorName);
+            //优先级2：获取在配置XML中的<Window>节点中定义子节点<ThemeColor>指定的颜色
+            color = pWindow->GetThemeColor(colorName);
         }
     }
     if (color.GetARGB() == 0) {
-        //优先级3：获取在global.xml中的<Global>节点中定义子节点<TextColor>指定的颜色
+        //优先级3：获取在global.xml中的<Global>节点中定义子节点<ThemeColor>指定的颜色
         color = GlobalManager::Instance().Color().GetColor(colorName);
     }
     if (color.GetARGB() == 0) {

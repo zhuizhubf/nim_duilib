@@ -37,9 +37,9 @@ struct XmlPreviewAttributes
     */
     std::vector<DString> m_windowClassList;
 
-    /** 本次解析在窗口下添加的TextColor属性列表
+    /** 本次解析在窗口下添加的ThemeColor属性列表
     */
-    std::vector<DString> m_windowTextColorList;
+    std::vector<DString> m_windowThemeColorList;
 
     /** 本次解析在全局属性中添加的FontId属性列表
     */
@@ -110,9 +110,9 @@ public:
     */
     const std::vector<DString>& GetWindowClassList() const;
 
-    /** 获取本次解析在窗口下添加的TextColor属性列表
+    /** 获取本次解析在窗口下添加的ThemeColor属性列表
     */
-    const std::vector<DString>& GetWindowTextColorList() const;
+    const std::vector<DString>& GetWindowThemeColorList() const;
 
     /** 获取本次解析在全局属性中添加的FontId属性列表
     */
@@ -195,9 +195,9 @@ private:
     */
     std::vector<DString> m_windowClassList;
 
-    /** 本次解析在窗口下添加的TextColor属性列表
+    /** 本次解析在窗口下添加的ThemeColor属性列表
     */
-    std::vector<DString> m_windowTextColorList;
+    std::vector<DString> m_windowThemeColorList;
 
     /** 本次解析在全局属性中添加的FontId属性列表
     */
