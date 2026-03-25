@@ -685,7 +685,8 @@
                                      halign="right" valign="center" mouse_enabled="false"/>
     
     <!-- AddressBar控件 -->
-    <Class name="address_bar" width="stretch" height="36" border_size="1" border_color="border_address_bar" border_round="4,4" bkcolor="bg_address_bar"
+    <Class name="address_bar" width="stretch" height="36" border_size="1" border_color="border_address_bar" border_round="4,4" 
+                              bkcolor="bg_address_bar"
                               path_tooltip="true" return_update_ui="true" esc_update_ui="true" kill_focus_update_ui="true"
                               rich_edit_class="address_bar_edit" 
                               rich_edit_clear_btn_class="rich_edit_clear_btn"
