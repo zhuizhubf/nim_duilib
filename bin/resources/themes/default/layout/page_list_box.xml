@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window>
-    <Class name="page_list_box" margin="4,4,4,4" padding="0,4,0,4" bkcolor="bg_window_light" vscrollbar="true" hscrollbar="true" scroll_select="false" border_size="1" border_color="red"/>
+    <Class name="page_list_box" margin="4,4,4,4" padding="0,4,0,4" bkcolor="bg_window_card" vscrollbar="true" hscrollbar="true" scroll_select="false" border_size="1" border_color="red"/>
     <Class name="page_list_box_item" margin="8,2,8,2"
                 text_padding="20,6,10,6"
                 hot_color="bg_list_item_hover"

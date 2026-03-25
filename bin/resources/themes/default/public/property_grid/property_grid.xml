@@ -28,20 +28,20 @@
     <Class name="property_grid_spin_btn_up" height="50%" width="100%" nofocus="true" padding="1,1,1,1"
                                             border_size="1,1,1,1" border_color="border_richedit_btn"
                                             normal_image="file='public/button/arrow-up.svg' width='10' height='10' valign='center' halign='center'"
-                                            normal_color="bg_window_dark"
+                                            normal_color="bg_window_base"
                                             hot_color="bg_richedit_btn_hover"
                                             pushed_color="bg_richedit_btn_pressed"/>
     <Class name="property_grid_spin_btn_down" height="50%" width="100%" nofocus="true" padding="1,0,1,1"
                                             border_size="1,0,1,1" border_color="border_richedit_btn"
                                             normal_image="file='public/button/arrow-down.svg' width='10' height='10' valign='center' halign='center'"
-                                            normal_color="bg_window_dark"
+                                            normal_color="bg_window_base"
                                             hot_color="bg_richedit_btn_hover"
                                             pushed_color="bg_richedit_btn_pressed"/>
     <!--下拉框-->
     <Class name="property_grid_combo" bkcolor="bg_combo" dropbox_size="0,200" padding="1,1,1,1"
                         border_size="1" border_color="border_combo_normal"
                         hot_border_color="border_combo_hover"
-                        combo_tree_view_class="padding='0,0,0,0' bkcolor='bg_window_light' indent='20' class='tree_view'"
+                        combo_tree_view_class="padding='0,0,0,0' bkcolor='bg_window_card' indent='20' class='tree_view'"
                         combo_tree_node_class="tree_node"
                         combo_icon_class=""
                         combo_edit_class="bkcolor='bg_richedit' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"

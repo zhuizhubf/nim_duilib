@@ -125,7 +125,7 @@ def scan_and_replace(root_dir, replacement_rules):
         sys.exit(1)
     
     # 要处理的文件后缀
-    target_extensions = ('.cpp', '.h', '.xml', '.txt')
+    target_extensions = ('.cpp', '.h', '.xml', '.txt', '.html', '.htm')
     
     print(f"\n开始扫描目录：{root_dir}")
     print(f"将处理的文件类型：{', '.join(target_extensions)}")

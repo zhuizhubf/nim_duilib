@@ -176,6 +176,10 @@ private:
     */
     void ParseFontXmlNode(const pugi::xml_node& xmlNode);
 
+    /** 判断是否为忽略的节点名称
+    */
+    bool IsIgnoreNodeName(const DString& nodeName) const;
+
 private:
     
     /** 当前解析的XML文档对象

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="85%,85%" min_size="80,50" use_system_caption="false" caption="0,0,0,36" shadow_attached="true" layered_window="true" size_box="4,4,4,4">
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->
@@ -26,7 +26,7 @@
 
 
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
-        <VBox bkcolor="bg_window_light" >
+        <VBox bkcolor="bg_window_card" >
             <HBox height="auto">
                 <Label text_id="STRID_LISTCTRL_TABLE_TYPE" valign="center" margin="2,0,2,0"/>
                 <Combo class="combo" name="list_ctrl_type_combo" combo_type="drop_list" dropbox_size="0,300" combo_icon_class="" height="26" width="80" margin="0,0,0,1" valign="center">

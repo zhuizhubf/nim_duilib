@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="700,500" caption="0,0,0,36" shadow_type="default" shadow_attached="true" layered_window="true" size_box="4,4,4,4">
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <Label name="page_title" width="stretch" height="32" text_align="left,vcenter" text_padding="8,2,5,0" mouse_enabled="false"/>
@@ -29,7 +29,7 @@
             <Button class="btn_global_blue_80x30" name="btn_navigate" text_id="STRID_WEBVIEW2_BROWSER_BROWSE_TO" width="60" margin="5"/>
             <Button class="btn_global_blue_80x30" name="btn_refresh" text_id="STRID_WEBVIEW2_BROWSER_REFRESH" width="60" margin="5"/>
         </HBox>
-        <VBox bkcolor="bg_window_light" margin="0,2,0,0">
+        <VBox bkcolor="bg_window_card" margin="0,2,0,0">
             <WebView2Control name="webview2_control" url="https://www.baidu.com" F12="true" margin="2,0,2,2"/>
         </VBox>
     </VBox>

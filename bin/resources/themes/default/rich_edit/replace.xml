@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="500,248" caption="0,0,0,35" text_id="STRID_RICHEDIT_REPLACE_TITLE" use_system_caption="false" shadow_attached="true" layered_window="true">
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <HBox name="window_title_bar" width="stretch" height="35" bkcolor="bg_titlebar">
             <Control width="18" height="18" bkimage="public/caption/logo.svg" valign="center" margin="8"/>
             <Label text_id="STRID_RICHEDIT_REPLACE_TITLE" valign="center" margin="8"/>

@@ -4,7 +4,7 @@
         shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
         alpha="255" size_box="4,4,4,4" icon="public/caption/logo.ico">
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->
@@ -25,7 +25,7 @@
         <!-- 标题栏区域结束 -->
 
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
-        <Box bkcolor="bg_window_light">
+        <Box bkcolor="bg_window_card">
             <VBox margin="0,0,0,0" valign="center" halign="center">
                 <Label name="tooltip" text_id="STRID_BASIC_TEXT" height="100%" width="100%" text_align="hcenter,vcenter"/>
             </VBox>

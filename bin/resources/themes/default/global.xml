@@ -95,7 +95,7 @@
     <Alias name="white" value="color_white"/>
     <Alias name="black" value="color_black"/>
     <Alias name="darkcolor" value="color_gray_deep"/>    
-    <Alias name="lightcolor" value="color_gray_light_deep"/>
+    <Alias name="lightcolor" value="color_gray_muted"/>
     <Alias name="gray" value="color_gray"/>
     <Alias name="light_gray" value="color_gray_light"/>
     <Alias name="dark_gray" value="color_gray_dark"/>
@@ -105,10 +105,10 @@
     <Alias name="red" value="color_red"/>
     
     <!-- 2. 历史兼容别名（原有保留） -->
-    <Alias name="bk_wnd_darkcolor" value="bg_window_dark"/>
-    <Alias name="bk_wnd_lightcolor" value="bg_window_light"/>
-    <Alias name="splitline_level1" value="color_splitline_level1"/>
-    <Alias name="splitline_level2" value="color_splitline_level2"/>
+    <Alias name="bk_wnd_darkcolor" value="bg_window_base"/>
+    <Alias name="bk_wnd_lightcolor" value="bg_window_card"/>
+    <Alias name="splitline_level1" value="border_split_level1"/>
+    <Alias name="splitline_level2" value="border_split_level2"/>
     <Alias name="bk_menuitem_hovered" value="bg_menu_item_hover"/>
     <Alias name="bk_menuitem_selected" value="bg_menu_item_selected"/>
     <Alias name="bk_listitem_hovered" value="bg_list_item_hover"/>
@@ -119,7 +119,7 @@
     <Alias name="default_link_font_color" value="text_link_normal"/>
     <Alias name="hover_link_font_color" value="text_link_hover"/>
     <Alias name="mouse_down_link_font_color" value="text_link_pressed"/>
-    <Alias name="bk_progress_progress" value="color_progress"/>
+    <Alias name="bk_progress_progress" value="bg_progress"/>
     <Alias name="richedit_border_color" value="border_richedit_normal"/>
     <Alias name="richedit_hot_border_color" value="border_richedit_hover"/>
     <Alias name="richedit_focus_border_color" value="border_richedit_focus"/>
@@ -229,14 +229,14 @@
                                             hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
     <Class name="filter_combo" class="combo_base"/>
     <Class name="check_combo" border_size="1" border_color="border_combo_normal" 
-                              dropbox="padding='0,0,0,0' bkcolor='bg_window_light' border_size='0,0,0,0' vscrollbar='true'"
+                              dropbox="padding='0,0,0,0' bkcolor='bg_window_card' border_size='0,0,0,0' vscrollbar='true'"
                               dropbox_item_class="width='stretch' height='24' text_padding='20,0,2,1' text_align='left,vcenter' 
                                                   normal_image={file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' valign='center'} 
                                                   selected_normal_image={file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' valign='center'}" 
                               selected_item_class="width='auto' height='22' margin='4,2,4,2' bkcolor='bg_menu_item_selected' text_padding='2,1,2,1'"/>
     <Class name="combo_button" padding="1,1,1,1" border_size="1" hot_border_color="border_combo_hover" 
                                hot_color="bg_combo_btn_hover" pushed_color="bg_combo_btn_pressed"
-                               combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_window_light'" 
+                               combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_window_card'" 
                                left_button_class="height='stretch' width='stretch' padding='0,0,1,0' border_size='0,0,1,0' valign='center' 
                                                   hot_border_color='border_combo_hover' 
                                                   pushed_border_color='border_combo_hover'                                                   
@@ -357,14 +357,14 @@
                               disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' fade='80'"/>
     
     <!-- 列表控件 -->
-    <Class name="list" bkcolor="bg_window_light" vscrollbar="true"/>
+    <Class name="list" bkcolor="bg_window_card" vscrollbar="true"/>
     <Class name="list_item" hot_color="bg_list_item_hover" 
                             pushed_color="bg_list_item_selected" 
                             selected_normal_color="bg_list_item_selected"
                             fade_hot="false"/>
     
     <!-- 树形控件 -->
-    <Class name="tree_view" bkcolor="bg_window_light" vscrollbar="true"/>
+    <Class name="tree_view" bkcolor="bg_window_card" vscrollbar="true"/>
     <Class name="tree_node" height="28" hot_color="bg_list_item_hover" 
                                         pushed_color="bg_list_item_selected" 
                                         selected_normal_color="bg_list_item_selected" 
@@ -397,12 +397,12 @@
     <Class name="slider_horizontal_green" width="stretch" height="14" margin="4,0,0,0" valign="center" 
                                           thumb_size="14,14" min="0" max="255" 
                                           progress_bar_padding="0,6,0,6" 
-                                          progress_color="color_progress" 
+                                          progress_color="bg_progress" 
                                           bkimage="file='${PATH_SLIDER}/slider_hor_bk.png' valign='center' height='3' width='1200'" 
                                           thumb_normal_image="file='${PATH_SLIDER}/slider_thumb.svg' width='14' height='14'"/>
     <Class name="slider_vertical_green"   width="stretch" height="14" margin="4,0,0,0" valign="center" thumb_size="14,14" min="0" max="255" 
                                           progress_bar_padding="0,6,0,6" 
-                                          progress_color="color_progress" 
+                                          progress_color="bg_progress" 
                                           bkimage="file='${PATH_SLIDER}/slider_ver_bk.png' halign='center' width='3' height='1200'" 
                                           thumb_normal_image="file='${PATH_SLIDER}/slider_thumb.svg' width='14' height='14'"/>
     
@@ -417,7 +417,7 @@
     <Class name="menu_text" valign="center" text_align="vcenter"/>
     <Class name="menu_text_shortcut" valign="center" text_align="vcenter"/>
     <Class name="menu_split_box" height="auto" padding="16,0,16,0" margin="0,4,0,4"/>
-    <Class name="menu_split_line" bkcolor="color_splitline_level1" height="1" />
+    <Class name="menu_split_line" bkcolor="border_split_level1" height="1" />
     <Class name="menu_checkbox" height="auto" valign="center" text_padding="20,0,0,0"
                                 normal_image="" 
                                 disabled_image="" 
@@ -452,9 +452,9 @@
                                   pushed_color="bg_menu_bar_pressed"/>
     
     <!-- 分割线 -->
-    <Class name="splitline_hor_level1" bkcolor="color_splitline_level1" height="1"/>
-    <Class name="splitline_hor_level2" bkcolor="color_splitline_level2" height="1"/>
-    <Class name="splitline_ver_level1" bkcolor="color_splitline_level1" width="1"/>
+    <Class name="splitline_hor_level1" bkcolor="border_split_level1" height="1"/>
+    <Class name="splitline_hor_level2" bkcolor="border_split_level2" height="1"/>
+    <Class name="splitline_ver_level1" bkcolor="border_split_level1" width="1"/>
     
     <!-- Split 分割线 -->
     <Class name="split_vertical" width="5"  state_color_min_width="1"
@@ -469,8 +469,8 @@
                                    disabled_color_margin="0,2,0,2" disabled_color="bg_split_disabled" />
 
     <!-- 分组框 -->
-    <Class name="group_box" line_width="1.0" line_color="color_splitline_group_box"/>
-    <Class name="group_box_round" line_width="1.0" line_color="color_splitline_group_box" corner_size="3,3"/>
+    <Class name="group_box" line_width="1.0" line_color="border_group_box"/>
+    <Class name="group_box_round" line_width="1.0" line_color="border_group_box" corner_size="3,3"/>
     
     <!-- 富文本编辑框 -->
     <Class name="simple" class="richedit_base"/>

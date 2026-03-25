@@ -19,7 +19,7 @@
                                       pushed_color="bg_btn_pressed" />
 
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->
@@ -46,7 +46,7 @@
         <!-- 显示区域 -->
         <HBox>
             <!-- 左侧区域 -->
-            <VScrollBox width="360" vscrollbar="true" minwidth="60" bkcolor="bg_window_light" border_size="1,1,1,1" border_color="border_window" border_round="4,4">
+            <VScrollBox width="360" vscrollbar="true" minwidth="60" bkcolor="bg_window_card" border_size="1,1,1,1" border_color="border_window" border_round="4,4">
                 <GroupVBox margin="6,6,6,6" text_id="STRID_RICHEDIT_PASSWORD_FUNC" height="auto" corner_size="4,4">
                     <HBox height="36" margin="8,16,8,0">
                         <Label text_id="STRID_RICHEDIT_PASSWORD_INPUT" valign="center"/>
@@ -148,7 +148,7 @@
             <Split class="split_vertical"/>
             <!-- 右侧区域 -->
             <VBox>
-                <VBox bkcolor="bg_window_dark" height="auto" minheight="40" >
+                <VBox bkcolor="bg_window_base" height="auto" minheight="40" >
                     <HBox height="auto" margin="0,2,2,0">
                         <Label text_id="STRID_RICHEDIT_FILE" valign="center" margin="8,0,8,0"/>
                         <Button class="btn_global" name="open_file" width="100" height="28" text_id="STRID_RICHEDIT_OPEN_FILE" borderround="2,2" valign="center" margin="4,0,4,0"/>
@@ -223,7 +223,7 @@
                 <!-- 横向分割条，用于调整上下区域大小 -->
                 <Split class="split_horizontal"/>
                 <HBox bkcolor="Pink" border_size="1" border_color="border_window" border_round="4,4" min_width="60">
-                    <RichEdit name="rich_edit" enable_drag_drop="true" zoom="0,0" wheel_zoom="true" multi_line="true" want_return="true" word_wrap="true" rich_text="false" default_context_menu="true" save_selection="true" hide_selection="false" word_wrap="true" vscrollbar="true" auto_vscroll="true" bkcolor="bg_window_light"/>
+                    <RichEdit name="rich_edit" enable_drag_drop="true" zoom="0,0" wheel_zoom="true" multi_line="true" want_return="true" word_wrap="true" rich_text="false" default_context_menu="true" save_selection="true" hide_selection="false" word_wrap="true" vscrollbar="true" auto_vscroll="true" bkcolor="bg_window_card"/>
                 </HBox>
             </VBox>
         </HBox>

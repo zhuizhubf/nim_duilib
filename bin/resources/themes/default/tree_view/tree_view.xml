@@ -14,7 +14,7 @@
                                    disabled_image="file='../tree_view/refresh.svg' width='16' height='16' valign='center' halign='center' fade='128'"/>
 
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->
@@ -39,7 +39,7 @@
         <!-- 标题栏区域结束 -->
 
         <!-- 显示区域 -->
-        <VBox bkcolor="bg_window_dark">
+        <VBox bkcolor="bg_window_base">
             <HBox minheight="18" height="auto">
                 <Label text_id="STRID_TREEVIEW_FUNCTION_CONTROL" valign="center" margin="12,0,10,0"/>
                 <CheckBox class="checkbox_2" text_id="STRID_TREEVIEW_SHOW_EXPAND_ICON" selected="true" valign="center" margin="10,4,0,2">
@@ -86,13 +86,13 @@
                 <AddressBar class="address_bar" name="file_path" width="stretch" height="28" valign="center" margin="8,0,10,0"
                                                 kill_focus_update_ui="false"/>
             </HBox>
-            <HBox minheight="60" bkcolor="bg_window_light" border_size="0,1,0,0" border_color="border_address_bar" padding="0,2,0,0">
+            <HBox minheight="60" bkcolor="bg_window_card" border_size="0,1,0,0" border_color="border_address_bar" padding="0,2,0,0">
                 <HBox width="300" minwidth="60">
                     <DirectoryTree class="tree_view" name="tree" multi_select="false" check_box_class="tree_node_checkbox" expand_image_class="tree_node_expand" padding="5,3,5,3" indent="20"/>
                 </HBox>
                 <!-- 纵向分割条，用于调整左右区域大小 -->
                 <Split class="split_vertical"/>
-                <TabBox name="main_view_tab_box" bkcolor="bg_window_light" selected_id="0">
+                <TabBox name="main_view_tab_box" bkcolor="bg_window_card" selected_id="0">
                     <VirtualVTileListBox class="list" name="simple_file_view" columns="auto" item_size="200,120" multi_select="false" vscrollbar="true" hscrollbar="true" child_halign="left"/>
                     <ListCtrl class="list_ctrl" name="explorer_view"
                               show_header_checkbox="false" show_data_item_checkbox="false" enable_item_edit="false"

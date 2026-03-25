@@ -3,7 +3,7 @@
     <HBox>
         <PropertyGrid class="property_grid" name="property_grid_test" width="320" margin="1,1,1,1"/>
         <Split class="split_vertical"/>
-        <VBox bkcolor="bg_window_light" >
+        <VBox bkcolor="bg_window_card" >
             <HBox height="80" margin="0,4,0,0">
                 <TabCtrl class="tab_ctrl" name="tab_list1" margin="10,10,10,10" drag_order="true" drag_out_id="1">
                     <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_PROPGRID_TAB_1_1" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签1-1 -->

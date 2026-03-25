@@ -316,17 +316,8 @@ Control* WindowBuilder::CreateControls(Window* pWindow, CreateControlCallback pC
 
     for (pugi::xml_node node : root.children()) {
         DString strClass = node.name();
-        if ( (strClass == _T("Image"))          ||
-             (strClass == _T("FontResource"))   ||
-             (strClass == _T("Font"))           ||
-             (strClass == _T("Class"))          ||
-             (strClass == _T("TextColor"))      ||
-             (strClass == _T("ThemeColor"))     ||
-             (strClass == _T("Theme"))          ||
-             (strClass == _T("Alias"))          ||
-             (strClass == _T("Var")) ) {
+        if (IsIgnoreNodeName(strClass)) {
             //忽略这几个属性
-
         }
         else {
             if (pUserDefinedBox == nullptr) {
@@ -981,9 +972,28 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
             GlobalManager::Instance().AddVar(defineName, defineValue);
         }
         else if (strClass == _T("Theme")) {
-            //跳过
+            //跳过(主题名称，在其他地方解析)
         }
     }
+}
+
+bool WindowBuilder::IsIgnoreNodeName(const DString& nodeName) const
+{
+    //这些是公共资源的标签名字，有些是旧名（已废弃）
+    if ((nodeName == _T("DefaultFontFamilyNames")) ||
+        (nodeName == _T("Font")) ||
+        (nodeName == _T("FontFile")) ||
+        (nodeName == _T("FontResource")) ||
+        (nodeName == _T("Class")) ||
+        (nodeName == _T("TextColor")) ||
+        (nodeName == _T("ThemeColor")) ||
+        (nodeName == _T("ThemeMeta")) ||
+        (nodeName == _T("Theme")) ||
+        (nodeName == _T("Alias")) ||
+        (nodeName == _T("Var"))) {
+        return true;
+    }
+    return false;
 }
 
 bool WindowBuilder::ParseThemeInfo(DString& themeName, DString& themeType, DString& themeStyle) const
@@ -1071,15 +1081,7 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
     Control* pReturn = nullptr;
     for (pugi::xml_node node : xmlNode.children()) {
         DString strClass = node.name();
-        if( (strClass == _T("DefaultFontFamilyNames")) ||
-            (strClass == _T("Font"))      ||
-            (strClass == _T("FontFile"))  ||
-            (strClass == _T("Class"))     ||
-            (strClass == _T("TextColor")) ||
-            (strClass == _T("ThemeColor"))||
-            (strClass == _T("Theme"))     ||
-            (strClass == _T("Alias"))     ||
-            (strClass == _T("Var"))) {
+        if(IsIgnoreNodeName(strClass)) {
             continue;
         }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="85%,95%" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" shadow_attached="true" layered_window="true" size_box="4,4,4,4" text_id="STRID_RENDER_WINDOW_TITLE">
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_dark">
+    <VBox bkcolor="bg_window_base">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->
@@ -42,7 +42,7 @@
                 <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_TAB_CONTROL_TEST" close_button_class="" tab_box_item_index="11"/>
                 <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_TAB_CONTROL_ANI" close_button_class="" tab_box_item_index="12"/>
             </TabCtrl>
-            <TabBox name="main_view_tab" bkcolor="bg_window_light" selected_id="0" margin="4,4,4,4" padding="3,3,3,3"
+            <TabBox name="main_view_tab" bkcolor="bg_window_card" selected_id="0" margin="4,4,4,4" padding="3,3,3,3"
                     border_size="1" border_color="border_window" border_round="3,3"
                     fade_switch_type="FadeInOut"
                     fade_switch_frame_interval_ms="16"
