@@ -3619,6 +3619,9 @@ void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
         UiRect::Intersect(m_rcPaint, rcPaint, GetRect()); //设置m_rcPaint的值
     }
     else {
+        //清除临时的Render(当使用Hot动画时，会出现使用Alpha的情况，结束后应清除并释放内存)
+        m_pTempRender.reset();
+
         //本控件未设置透明度，不使用缓存绘制，直接在目标render上绘制本控件（若为容器，则也包含子控件）        
         UiPoint ptOldOrg = pRender->OffsetWindowOrg(renderOffset);//控件的位置偏移，显示为动画效果
 

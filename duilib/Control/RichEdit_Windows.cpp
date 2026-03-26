@@ -2527,17 +2527,56 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
     const int32_t nRight = std::min(rcUpdate.right, rc.Width());
     const int32_t nWidth = rc.Width();
 
-
     constexpr const int32_t nColorBits = sizeof(uint32_t); //每个颜色点所占字节数
     uint8_t* pRowStart = nullptr; //每行Alpha通道值起始的位置
     uint8_t* pRowEnd = nullptr;   //每行Alpha通道值结束的位置
 
+    std::vector<uint8_t> alphaValues; //记住该区域内原来的Alpha值
+    int32_t nEstSize = (nBottom - nTop) * (nRight - nLeft);
+    if (nEstSize > 0) {
+        alphaValues.reserve(nEstSize);
+    }
+    bool bHasBkClolor = false; //标记是否设置了背景色
     for (int32_t i = nTop; i < nBottom; ++i) {
         pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
         pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
-        while (pRowStart < pRowEnd) {
+        while (pRowStart < pRowEnd) {            
+            alphaValues.push_back(*pRowStart);
+            if (!bHasBkClolor && (*pRowStart != 0)) {
+                bHasBkClolor = true;
+            }
             *pRowStart = 0;
             pRowStart += 4;
+        }
+    }
+    if (!bHasBkClolor && IsAlpha()) {
+        //如果控件设置了透明度，并且未设置背景，直接绘制文字会无法正常显示，自动处理背景色问题
+        DString bkColor = GetBkColor();
+        if (bkColor.empty()) {
+            Control* pParent = GetParent();
+            while ((pParent != nullptr) && bkColor.empty()) {
+                bkColor = pParent->GetBkColor();
+                pParent = pParent->GetParent();
+            }
+        }
+        UiColor bkColorValue;
+        if (!bkColor.empty()) {
+            bkColorValue = GetUiColor(bkColor);
+        }
+        if (!bkColorValue.IsEmpty()) {
+            alphaValues.clear();
+            for (int32_t i = nTop; i < nBottom; ++i) {
+                pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
+                pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
+                while (pRowStart < pRowEnd) {
+                    alphaValues.push_back(bkColorValue.GetA());
+                    *pRowStart = 0;
+                    *(pRowStart + 1) = bkColorValue.GetB();
+                    *(pRowStart + 2) = bkColorValue.GetG();
+                    *(pRowStart + 3) = bkColorValue.GetR();
+                    pRowStart += 4;
+                }
+            }
         }
     }
 
@@ -2604,14 +2643,23 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
                             0);                 // What view of the object
 
     //恢复Alpha(绘制过程中，会导致绘制区域部分的Alpha通道出现异常)
+    size_t nAlpaIndex = 0;
     for (int32_t i = nTop; i < nBottom; ++i) {
         pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
         pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
         while (pRowStart < pRowEnd) {
             if (*pRowStart == 0) {
-                *pRowStart = 255;
+                //Alpha值为0，绘制穿透背景了，需要恢复原Alpha值
+                ASSERT(nAlpaIndex < alphaValues.size());
+                if (nAlpaIndex < alphaValues.size()) {
+                    *pRowStart = alphaValues[nAlpaIndex]; //优先使用原Alpha值
+                }
+                else {
+                    *pRowStart = 255; //容错
+                }
             }
             pRowStart += 4;
+            ++nAlpaIndex;
         }
     }
 
