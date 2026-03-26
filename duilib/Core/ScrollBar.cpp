@@ -569,7 +569,7 @@ void ScrollBar::HandleEvent(const EventArgs& msg)
             }
         }
 
-        ButtonDown(msg);
+        BaseClass::HandleEvent(msg);
         return;
     }
     else if ((msg.eventType == kEventMouseButtonUp) || (msg.eventType == kEventWindowKillFocus) ){
@@ -610,7 +610,7 @@ void ScrollBar::HandleEvent(const EventArgs& msg)
                 Invalidate();
             }
         }
-        ButtonUp(msg);//这里的msg.eventType不对
+        BaseClass::HandleEvent(msg);
         return;
     }
     else if (msg.eventType == kEventMouseEnter) {
