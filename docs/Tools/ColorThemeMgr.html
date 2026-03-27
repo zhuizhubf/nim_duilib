@@ -116,6 +116,15 @@
         .btn-reset:hover {
             background-color: #D97706;
         }
+        .btn-derivation {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .btn-derivation:hover {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+        }
         .btn-collapse {
             background-color: #8B5CF6;
             padding: 6px 12px;
@@ -895,6 +904,62 @@
             background-color: #EF4444;
             color: white;
         }
+        
+        /* 颜色角色徽章样式 */
+        .role-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 4px;
+            text-transform: lowercase;
+        }
+        .role-primary { background-color: #3B82F6; color: white; }
+        .role-primary_light { background-color: #60A5FA; color: white; }
+        .role-primary_dark { background-color: #1D4ED8; color: white; }
+        .role-neutral { background-color: #6B7280; color: white; }
+        .role-semantic_success { background-color: #10B981; color: white; }
+        .role-semantic_success_light { background-color: #34D399; color: white; }
+        .role-semantic_error { background-color: #EF4444; color: white; }
+        .role-semantic_error_light { background-color: #F87171; color: white; }
+        .role-semantic_error_dark { background-color: #DC2626; color: white; }
+        .role-semantic_warning { background-color: #F59E0B; color: white; }
+        .role-semantic_info { background-color: #06B6D4; color: white; }
+        
+        /* 派生关系徽章样式 */
+        .derived-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+            margin-left: 4px;
+            background-color: #8B5CF6;
+            color: white;
+            cursor: help;
+        }
+        
+        /* 调整公式徽章样式 */
+        .adjust-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+            margin-left: 4px;
+            background-color: #EC4899;
+            color: white;
+            cursor: help;
+        }
+        
+        /* 徽章容器 */
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
         .contrast-warning {
             background-color: #F59E0B;
             color: white;
@@ -1111,6 +1176,440 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+        
+        /* 派生关系编辑器样式 */
+        .derivation-edit-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 10000;  /* 提高层级，确保在最前面 */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .derivation-edit-panel.hidden {
+            display: none;
+        }
+        .derivation-edit-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .derivation-edit-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .derivation-edit-close:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .derivation-edit-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .derivation-current-color {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background-color: #F8FAFC;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .derivation-color-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid #E2E8F0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .derivation-color-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1E1E1E;
+            margin-bottom: 4px;
+        }
+        .derivation-color-value {
+            font-size: 13px;
+            color: #6B7280;
+            font-family: monospace;
+        }
+        .derivation-form-group {
+            margin-bottom: 20px;
+        }
+        .derivation-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4B5563;
+            margin-bottom: 6px;
+        }
+        .derivation-form-group select,
+        .derivation-form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .derivation-form-group select:focus,
+        .derivation-form-group input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .adjustment-builder {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #F8FAFC;
+        }
+        .adjustment-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .adjustment-row select,
+        .adjustment-row input {
+            flex: 1;
+            min-width: 80px;
+        }
+        .adjust-unit {
+            font-size: 12px;
+            color: #6B7280;
+            min-width: 20px;
+        }
+        .adjustment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-small {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
+        .formula-preview {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #1E1E1E;
+            border-radius: 6px;
+        }
+        .formula-preview small {
+            color: #9CA3AF;
+        }
+        .formula-preview code {
+            color: #10B981;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin-left: 8px;
+        }
+        .formula-hint {
+            margin-top: 6px;
+            color: #9CA3AF;
+        }
+        .derivation-preview-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #F8FAFC;
+            border-radius: 8px;
+        }
+        .derivation-preview-item {
+            text-align: center;
+        }
+        .preview-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+        .preview-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px solid #E2E8F0;
+            margin: 0 auto 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .preview-value {
+            font-size: 12px;
+            font-family: monospace;
+            color: #4B5563;
+        }
+        .derivation-preview-arrow {
+            font-size: 24px;
+            color: #9CA3AF;
+            font-weight: 300;
+        }
+        .derivation-edit-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 10px;
+            border-top: 1px solid #E2E8F0;
+        }
+        .derivation-edit-panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999;  /* 对应面板层级调整 */
+        }
+        .derivation-edit-panel-overlay.hidden {
+            display: none;
+        }
+        
+        /* 派生链可视化面板样式 */
+        .derivation-tree-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            min-width: 500px;
+            min-height: 300px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1002;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .derivation-tree-panel.dragging {
+            user-select: none;
+            cursor: move;
+        }
+        .derivation-tree-panel.resizing {
+            user-select: none;
+        }
+        /* 拖拽手柄 - 右下角 */
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 20px;
+            height: 20px;
+            cursor: se-resize;
+            z-index: 10;
+        }
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid rgba(0,0,0,0.2);
+            border-bottom: 2px solid rgba(0,0,0,0.2);
+        }
+        .derivation-tree-panel.hidden {
+            display: none;
+        }
+        .derivation-tree-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: move;
+            user-select: none;
+        }
+        .derivation-tree-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .derivation-tree-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .derivation-tree-close:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .derivation-tree-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            background-color: #FAFAFA;
+        }
+        .derivation-tree-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        .derivation-tree-overlay.hidden {
+            display: none;
+        }
+        
+        /* 派生树节点样式 */
+        .derivation-tree-node {
+            margin-bottom: 8px;
+        }
+        .derivation-tree-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background-color: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .derivation-tree-header:hover {
+            border-color: #3B82F6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+        .derivation-tree-header.has-children {
+            cursor: pointer;
+        }
+        .derivation-tree-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #6B7280;
+            margin-right: 8px;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .derivation-tree-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+        .derivation-tree-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 2px solid #E2E8F0;
+            margin-right: 12px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .derivation-tree-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .derivation-tree-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1E1E1E;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .derivation-tree-meta {
+            font-size: 11px;
+            color: #6B7280;
+            font-family: monospace;
+            margin-top: 2px;
+        }
+        .derivation-tree-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .derivation-tree-children {
+            margin-left: 36px;
+            margin-top: 4px;
+            padding-left: 12px;
+            border-left: 2px dashed #E2E8F0;
+        }
+        .derivation-tree-children.collapsed {
+            display: none;
+        }
+        .derivation-tree-empty {
+            text-align: center;
+            padding: 40px;
+            color: #6B7280;
+            font-size: 14px;
+        }
+        .derivation-tree-stats {
+            padding: 12px 20px;
+            background-color: #F8FAFC;
+            border-top: 1px solid #E2E8F0;
+            font-size: 12px;
+            color: #6B7280;
+            display: flex;
+            gap: 20px;
+        }
+        .derivation-tree-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .derivation-tree-stat-value {
+            font-weight: 600;
+            color: #3B82F6;
+        }
+        
+        /* 智能建议标签样式 */
+        .suggestion-badge {
+            background-color: #FEF3C7;
+            color: #D97706;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .locked-badge {
+            background-color: #DBEAFE;
+            color: #1D4ED8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -1471,6 +1970,131 @@
                 <div class="analytics-value" id="analyticsAccent">0</div>
                 <div class="analytics-subtext">个支持强调色的颜色</div>
             </div>
+            <div class="analytics-card">
+                <div class="analytics-label">角色颜色</div>
+                <div class="analytics-value" id="analyticsRole">0</div>
+                <div class="analytics-subtext">个定义了role的颜色</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-label">派生关系</div>
+                <div class="analytics-value" id="analyticsDerived">0</div>
+                <div class="analytics-subtext">个派生颜色定义</div>
+            </div>
+            <div class="analytics-card" style="cursor: pointer; transition: all 0.2s;" onclick="openDerivationTreePanel()" 
+                 onmouseover="this.style.backgroundColor='#e8f0fe'; this.style.borderLeftColor='#3B82F6';"
+                 onmouseout="this.style.backgroundColor='#f8fafc'; this.style.borderLeftColor='#0078D4';">
+                <div class="analytics-label">🌳 派生关系网络</div>
+                <div class="analytics-value" style="color: #3B82F6; font-size: 14px;">点击查看 →</div>
+                <div class="analytics-subtext">可视化颜色派生图谱</div>
+            </div>
+            <div class="analytics-card" style="cursor: pointer; transition: all 0.2s;" onclick="showDerivationSuggestions()" 
+                 onmouseover="this.style.backgroundColor='#FEF3C7'; this.style.borderLeftColor='#F59E0B';"
+                 onmouseout="this.style.backgroundColor='#f8fafc'; this.style.borderLeftColor='#0078D4';">
+                <div class="analytics-label">💡 智能派生建议</div>
+                <div class="analytics-value" style="color: #D97706; font-size: 14px;">点击获取 →</div>
+                <div class="analytics-subtext">AI识别派生关系</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 派生关系编辑面板 -->
+    <div class="derivation-edit-panel hidden" id="derivationEditPanel">
+        <div class="derivation-edit-title">
+            <span>派生关系编辑器</span>
+            <button class="derivation-edit-close" onclick="closeDerivationPanel()">×</button>
+        </div>
+        <div class="derivation-edit-content">
+            <div class="derivation-current-color">
+                <div class="derivation-color-preview" id="derivationColorPreview"></div>
+                <div class="derivation-color-info">
+                    <div class="derivation-color-name" id="derivationColorName">未选择颜色</div>
+                    <div class="derivation-color-value" id="derivationColorValue">-</div>
+                </div>
+            </div>
+            
+            <div class="derivation-form">
+                <div class="derivation-form-group">
+                    <label for="derivationSource">派生自 (Derived From)</label>
+                    <select id="derivationSource">
+                        <option value="">- 无（锚点颜色）-</option>
+                    </select>
+                </div>
+                
+                <div class="derivation-form-group">
+                    <label for="derivationRole">颜色角色 (Role)</label>
+                    <select id="derivationRole">
+                        <option value="">- 未定义 -</option>
+                        <option value="primary">primary (主色调)</option>
+                        <option value="primary_light">primary_light (主色调亮)</option>
+                        <option value="primary_dark">primary_dark (主色调暗)</option>
+                        <option value="neutral">neutral (中性色)</option>
+                        <option value="semantic_success">semantic_success (成功)</option>
+                        <option value="semantic_success_light">semantic_success_light (成功亮)</option>
+                        <option value="semantic_error">semantic_error (错误)</option>
+                        <option value="semantic_error_light">semantic_error_light (错误亮)</option>
+                        <option value="semantic_error_dark">semantic_error_dark (错误暗)</option>
+                        <option value="semantic_warning">semantic_warning (警告)</option>
+                        <option value="semantic_info">semantic_info (信息)</option>
+                    </select>
+                </div>
+                
+                <div class="derivation-form-group">
+                    <label>派生调整公式 (Adjust Formula)</label>
+                    <div class="adjustment-builder">
+                        <div class="adjustment-row">
+                            <select class="adjust-property">
+                                <option value="lightness">亮度 (lightness)</option>
+                                <option value="saturation">饱和度 (saturation)</option>
+                                <option value="hue">色相 (hue)</option>
+                                <option value="alpha">透明度 (alpha)</option>
+                            </select>
+                            <select class="adjust-operator">
+                                <option value="+">+ 增加</option>
+                                <option value="-">- 减少</option>
+                                <option value="*">× 乘以</option>
+                                <option value="=">= 设置为</option>
+                            </select>
+                            <input type="number" class="adjust-value" value="15" min="-100" max="360" step="1">
+                            <span class="adjust-unit">%</span>
+                        </div>
+                        <div class="adjustment-actions">
+                            <button class="btn btn-small btn-secondary" onclick="addAdjustmentRow()">+ 添加调整</button>
+                            <button class="btn btn-small" onclick="clearAdjustments()">清空</button>
+                        </div>
+                    </div>
+                    <div class="formula-preview">
+                        <small>公式预览: </small>
+                        <code id="formulaPreview">-</code>
+                    </div>
+                    <div class="formula-hint">
+                        <small>支持: lightness:+15, saturation:-10, alpha:*0.8, hue:30</small>
+                    </div>
+                </div>
+                
+                <div class="derivation-form-group">
+                    <label>派生预览</label>
+                    <div class="derivation-preview-container">
+                        <div class="derivation-preview-item">
+                            <div class="preview-label">源颜色</div>
+                            <div class="preview-swatch" id="sourcePreviewSwatch"></div>
+                            <div class="preview-value" id="sourcePreviewValue">-</div>
+                        </div>
+                        <div class="derivation-preview-arrow">→</div>
+                        <div class="derivation-preview-item">
+                            <div class="preview-label">计算结果</div>
+                            <div class="preview-swatch" id="resultPreviewSwatch"></div>
+                            <div class="preview-value" id="resultPreviewValue">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="derivation-edit-buttons">
+                <button class="btn btn-generate" onclick="applyDerivationChanges()">应用更改</button>
+                <button class="btn btn-secondary" onclick="breakDerivationLink()">断开派生链接</button>
+                <button class="btn btn-secondary" id="toggleLockBtn" onclick="toggleDerivationLock()">🔒 锁定颜色</button>
+                <button class="btn btn-secondary" onclick="closeDerivationPanel()">取消</button>
+            </div>
         </div>
     </div>
 
@@ -1678,6 +2302,124 @@
         </div>
         <div class="history-list" id="historyList"></div>
     </div>
+
+    <!-- 派生编辑器遮罩层 -->
+    <div class="derivation-edit-panel-overlay hidden" id="derivationOverlay" onclick="closeDerivationPanel()"></div>
+
+    <!-- 派生链可视化面板 -->
+    <div class="derivation-tree-panel hidden" id="derivationTreePanel">
+        <div class="derivation-tree-title" id="derivationTreeTitle">
+            <span>派生关系网络</span>
+            <div class="derivation-tree-actions">
+                <button class="btn btn-small btn-secondary" onclick="expandAllDerivationNodes()">全部展开</button>
+                <button class="btn btn-small btn-secondary" onclick="collapseAllDerivationNodes()">全部折叠</button>
+                <button class="derivation-tree-close" onclick="closeDerivationTreePanel()">×</button>
+            </div>
+        </div>
+        <div class="derivation-tree-content" id="derivationTreeContent">
+            <!-- 派生树内容将动态生成 -->
+        </div>
+        <div class="resize-handle" id="derivationTreeResizeHandle"></div>
+    </div>
+    <div class="derivation-tree-overlay hidden" id="derivationTreeOverlay" onclick="closeDerivationTreePanel()"></div>
+
+    <!-- 批量派生向导弹窗 -->
+    <div class="derivation-edit-panel hidden" id="batchDerivationWizard" style="max-width: 700px;">
+        <div class="derivation-edit-title" style="background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);">
+            <span>⚡ 快速批量派生</span>
+            <button class="derivation-edit-close" onclick="closeBatchDerivationWizard()">×</button>
+        </div>
+        <div class="derivation-edit-content" style="padding: 20px;">
+            
+            <!-- 使用说明 -->
+            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                <div style="font-weight: 600; color: #1E40AF; margin-bottom: 5px;">💡 如何使用</div>
+                <div style="font-size: 12px; color: #3B82F6; line-height: 1.5;">
+                    1. 选择一个<strong>源颜色</strong>（如：<code>border_control_normal</code>）<br>
+                    2. 选择要派生的<strong>目标颜色</strong>（如：<code>border_control_hover</code>）<br>
+                    3. 选择一个<strong>调整模板</strong>（或手动调整），然后点击「开始派生」
+                </div>
+            </div>
+
+            <!-- 1. 选择源颜色 -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    🎯 第一步：选择<strong style="color: #8B5CF6;">源颜色</strong>
+                </label>
+                <select id="batchSourceColor" style="width: 100%; padding: 10px 12px; border: 2px solid #E2E8F0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                    <option value="">- 请选择一个颜色作为派生基准 -</option>
+                </select>
+                <div id="selectedSourceInfo" style="margin-top: 10px; padding: 10px; background: #F5F3FF; border-radius: 8px; display: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div id="batchSourcePreview" style="width: 36px; height: 36px; border-radius: 6px; border: 2px solid #C4B5FD; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                        <div>
+                            <div id="batchSourceName" style="font-weight: 600; color: #5B21B6;">-</div>
+                            <div id="batchSourceValue" style="font-family: monospace; font-size: 11px; color: #7C3AED;">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 选择目标颜色 -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    🎯 第二步：选择要派生的<strong style="color: #059669;">目标颜色</strong>
+                </label>
+                <!-- 快捷筛选按钮 -->
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;">
+                    <button class="btn btn-small btn-secondary" onclick="filterBatchTargets('all')" style="background: #F3F4F6;">全部</button>
+                    <button class="btn btn-small btn-secondary" onclick="filterBatchTargets('same_prefix')" style="background: #D1FAE5; color: #047857;">同前缀</button>
+                    <button class="btn btn-small btn-secondary" onclick="filterBatchTargets('state')" style="background: #FEF3C7; color: #B45309;">状态变体</button>
+                    <button class="btn btn-small btn-secondary" onclick="selectAllBatchTargets()">全选</button>
+                    <button class="btn btn-small btn-secondary" onclick="clearAllBatchTargets()">清空</button>
+                </div>
+                <div id="batchTargetColors" style="max-height: 160px; overflow-y: auto; border: 2px solid #E2E8F0; border-radius: 8px; padding: 10px; background: #FAFAFA;">
+                    <!-- 目标颜色列表将动态生成 -->
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #6B7280;">
+                    已选择: <span id="selectedCount" style="font-weight: 600; color: #059669;">0</span> 个颜色
+                </div>
+            </div>
+
+            <!-- 3. 设置调整规则 -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    🎯 第三步：选择<strong style="color: #D97706;">调整规则</strong>（点击模板可快速应用）
+                </label>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('hover')" style="background: #DBEAFE; color: #1E40AF; border: none; padding: 6px 12px;">🖱️ Hover (+亮8%)</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('pressed')" style="background: #FEE2E2; color: #991B1B; border: none; padding: 6px 12px;">👆 Pressed (-暗8%)</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('disabled')" style="background: #F3F4F6; color: #4B5563; border: none; padding: 6px 12px;">🚫 Disabled (半透)</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('light')" style="background: #FEF9C3; color: #713F12; border: none; padding: 6px 12px;">☀️ 变亮+15%</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('dark')" style="background: #1F2937; color: #F9FAFB; border: none; padding: 6px 12px;">🌑 变暗-15%</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('muted')" style="background: #E0E7FF; color: #3730A3; border: none; padding: 6px 12px;">🎨 柔和</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('transparent')" style="background: #ECFDF5; color: #047857; border: none; padding: 6px 12px;">👻 70%透</button>
+                </div>
+                <!-- 当前公式显示 -->
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px;">
+                    <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;">当前调整公式:</div>
+                    <code id="batchFormulaPreview" style="display: block; padding: 8px; background: white; border-radius: 4px; font-size: 13px; color: #059669; font-weight: 600;">lightness:+8</code>
+                </div>
+            </div>
+
+            <!-- 4. 预览和执行 -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    👁️ 效果预览
+                </label>
+                <div id="batchDerivationPreview" style="max-height: 120px; overflow-y: auto; background: #F8FAFC; border: 2px solid #E2E8F0; border-radius: 8px; padding: 12px;">
+                    <div style="color: #9CA3AF; font-size: 12px; text-align: center;">选择源颜色和目标颜色后将显示预览</div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeBatchDerivationWizard()" style="padding: 10px 24px;">取消</button>
+                <button class="btn btn-generate" onclick="executeBatchDerivation()" style="padding: 10px 32px; font-size: 15px;">🚀 开始派生</button>
+            </div>
+        </div>
+    </div>
+    <div class="derivation-edit-panel-overlay hidden" id="batchDerivationOverlay" onclick="closeBatchDerivationWizard()"></div>
 
     <div id="toast" class="toast"></div>
 
@@ -2023,6 +2765,11 @@
                 const supportAccent = (node.getAttribute('support_accent') || node.getAttribute('fixed') || 'false') === 'true';
                 const commentCn = node.getAttribute('comment_cn') || '';
                 const commentEn = node.getAttribute('comment_en') || '';
+                // 颜色派生系统字段
+                const role = node.getAttribute('role') || '';
+                const derivedFrom = node.getAttribute('derived_from') || '';
+                const adjust = node.getAttribute('adjust') || '';
+                const locked = (node.getAttribute('locked') || 'false') === 'true';
 
                 const colorItem = {
                     name,
@@ -2032,7 +2779,11 @@
                     category,
                     supportAccent,
                     commentCn,
-                    commentEn
+                    commentEn,
+                    role,
+                    derivedFrom,
+                    adjust,
+                    locked
                 };
 
                 currentColorMap.set(name, colorItem);
@@ -2397,7 +3148,10 @@
                         config.colors[item.name] = {
                             value: item.value,
                             originalValue: item.originalValue,
-                            isChanged: item.value !== item.originalValue
+                            isChanged: item.value !== item.originalValue,
+                            role: item.role || '',
+                            derivedFrom: item.derivedFrom || '',
+                            adjust: item.adjust || ''
                         };
                     });
                     content = JSON.stringify(config, null, 2);
@@ -2802,6 +3556,1509 @@
             return Math.max(0, Math.min(1, lightness + stepNormalized));
         }
 
+        // ========== 派生公式系统 (Derivation System) ==========
+        /**
+         * 解析派生公式
+         * 支持的公式格式:
+         * - lightness:+15 (亮度增加15%)
+         * - saturation:-10 (饱和度减少10%)
+         * - alpha:*0.8 (透明度乘以0.8)
+         * - hue:30 (色相旋转30度)
+         * - 多个公式用逗号分隔: lightness:+10,saturation:-5
+         */
+        function parseDerivationFormula(formula) {
+            if (!formula || typeof formula !== 'string') return [];
+            
+            const operations = [];
+            const parts = formula.split(',');
+            
+            parts.forEach(part => {
+                part = part.trim();
+                if (!part) return;
+                
+                const match = part.match(/^(lightness|luminance|saturation|alpha|hue)\s*([\+\-\*\/:])\s*(-?\d+\.?\d*)$/);
+                if (match) {
+                    operations.push({
+                        property: match[1] === 'luminance' ? 'lightness' : match[1],
+                        operator: match[2] === ':' ? '=' : match[2],
+                        value: parseFloat(match[3])
+                    });
+                }
+            });
+            
+            return operations;
+        }
+
+        /**
+         * 根据派生公式计算颜色
+         * @param {string} sourceArgb - 源颜色 (ARGB格式)
+         * @param {string} formula - 派生公式
+         * @returns {string} 计算后的颜色 (ARGB格式)
+         */
+        function computeDerivedColor(sourceArgb, formula) {
+            if (!sourceArgb || !/^#([0-9A-F]{8})$/i.test(sourceArgb)) {
+                return sourceArgb;
+            }
+            
+            const operations = parseDerivationFormula(formula);
+            if (operations.length === 0) return sourceArgb;
+            
+            // 解析ARGB
+            const alpha = parseInt(sourceArgb.slice(1, 3), 16) / 255;
+            const rgb = argbToRgb(sourceArgb);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            let currentAlpha = alpha;
+            let currentHsl = { h: hsl.h, s: hsl.s, l: hsl.l };
+            
+            operations.forEach(op => {
+                switch (op.property) {
+                    case 'lightness':
+                        if (op.operator === '+') currentHsl.l += op.value / 100;
+                        else if (op.operator === '-') currentHsl.l -= op.value / 100;
+                        else if (op.operator === '*') currentHsl.l *= op.value;
+                        else if (op.operator === '=') currentHsl.l = op.value / 100;
+                        currentHsl.l = Math.max(0, Math.min(1, currentHsl.l));
+                        break;
+                        
+                    case 'saturation':
+                        if (op.operator === '+') currentHsl.s += op.value / 100;
+                        else if (op.operator === '-') currentHsl.s -= op.value / 100;
+                        else if (op.operator === '*') currentHsl.s *= op.value;
+                        else if (op.operator === '=') currentHsl.s = op.value / 100;
+                        currentHsl.s = Math.max(0, Math.min(1, currentHsl.s));
+                        break;
+                        
+                    case 'hue':
+                        if (op.operator === '+' || op.operator === '=') currentHsl.h += op.value;
+                        else if (op.operator === '-') currentHsl.h -= op.value;
+                        currentHsl.h = ((currentHsl.h % 360) + 360) % 360;
+                        break;
+                        
+                    case 'alpha':
+                        if (op.operator === '+') currentAlpha += op.value;
+                        else if (op.operator === '-') currentAlpha -= op.value;
+                        else if (op.operator === '*') currentAlpha *= op.value;
+                        else if (op.operator === '=') currentAlpha = op.value;
+                        currentAlpha = Math.max(0, Math.min(1, currentAlpha));
+                        break;
+                }
+            });
+            
+            // 转换回RGB
+            const newRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+            const newAlphaHex = Math.round(currentAlpha * 255).toString(16).padStart(2, '0');
+            const newRgbHex = rgbToHex(newRgb.r) + rgbToHex(newRgb.g) + rgbToHex(newRgb.b);
+            
+            return `#${newAlphaHex}${newRgbHex}`.toUpperCase();
+        }
+
+        /**
+         * 获取派生关系链
+         * @param {string} colorName - 颜色名称
+         * @returns {Array} 派生链 [源颜色1, 源颜色2, ...]
+         */
+        function getDerivationChain(colorName) {
+            const chain = [];
+            const visited = new Set();
+            let current = colorName;
+            
+            while (current && !visited.has(current)) {
+                visited.add(current);
+                const colorItem = currentColorMap.get(current);
+                if (!colorItem || !colorItem.derivedFrom) break;
+                chain.push(colorItem.derivedFrom);
+                current = colorItem.derivedFrom;
+            }
+            
+            return chain;
+        }
+
+        /**
+         * 获取所有派生自某颜色的子颜色
+         * @param {string} sourceName - 源颜色名称
+         * @returns {Array} 子颜色列表
+         */
+        function getDerivedColors(sourceName) {
+            const children = [];
+            allColorItems.forEach(item => {
+                if (item.derivedFrom === sourceName) {
+                    children.push(item);
+                }
+            });
+            return children;
+        }
+
+        /**
+         * 重新计算所有派生颜色
+         * @param {string} rootSource - 可选，只重新计算派生自某根源的颜色
+         */
+        function recomputeDerivedColors(rootSource = null) {
+            // 按派生链的层级顺序处理
+            const processed = new Set();
+            let hasChanges = false;
+            
+            // 构建依赖关系图
+            const dependencyMap = new Map();
+            allColorItems.forEach(item => {
+                if (item.derivedFrom && item.adjust) {
+                    if (!dependencyMap.has(item.derivedFrom)) {
+                        dependencyMap.set(item.derivedFrom, []);
+                    }
+                    dependencyMap.get(item.derivedFrom).push(item);
+                }
+            });
+            
+            // 广度优先遍历处理派生颜色
+            const processQueue = [];
+            
+            // 确定起始点
+            if (rootSource) {
+                processQueue.push(rootSource);
+            } else {
+                // 找到所有没有派生源但有派生关系的根节点
+                allColorItems.forEach(item => {
+                    if (!item.derivedFrom || !item.adjust) {
+                        // 这是一个根节点（锚点颜色）
+                        processQueue.push(item.name);
+                    }
+                });
+            }
+            
+            while (processQueue.length > 0) {
+                const current = processQueue.shift();
+                if (processed.has(current)) continue;
+                processed.add(current);
+                
+                const children = dependencyMap.get(current) || [];
+                children.forEach(child => {
+                    // 跳过锁定的颜色
+                    if (child.locked) {
+                        console.log(`🔒 颜色 ${child.name} 已锁定，跳过派生计算`);
+                        return;
+                    }
+                    
+                    if (child.adjust) {
+                        const sourceColor = currentColorMap.get(current);
+                        if (sourceColor && sourceColor.value) {
+                            const oldValue = child.value;
+                            const newValue = computeDerivedColor(sourceColor.value, child.adjust);
+                            if (oldValue !== newValue) {
+                                child.value = newValue;
+                                currentColorMap.set(child.name, child);
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                    processQueue.push(child.name);
+                });
+            }
+            
+            if (hasChanges) {
+                renderColorCategories();
+                updatePreview();
+                updateContrastResults();
+                updateAnalytics();
+            }
+            
+            return hasChanges;
+        }
+
+        // ========== 派生编辑器交互函数 ==========
+        let currentEditingColor = null;
+
+        function openDerivationEditor(colorName) {
+            const colorItem = currentColorMap.get(colorName);
+            if (!colorItem) return;
+
+            currentEditingColor = colorName;
+            
+            // 更新面板显示
+            document.getElementById('derivationColorName').textContent = colorName;
+            document.getElementById('derivationColorValue').textContent = colorItem.value;
+            document.getElementById('derivationColorPreview').style.backgroundColor = argbToRgbaCss(colorItem.value);
+            
+            // 填充派生源下拉框
+            const sourceSelect = document.getElementById('derivationSource');
+            sourceSelect.innerHTML = '<option value="">- 无（锚点颜色）-</option>';
+            allColorItems.forEach(item => {
+                if (item.name !== colorName) {
+                    const option = document.createElement('option');
+                    option.value = item.name;
+                    option.textContent = `${item.name} (${item.value})`;
+                    if (item.derivedFrom === colorName) {
+                        option.disabled = true;
+                        option.textContent += ' ⚠️ 循环引用';
+                    }
+                    sourceSelect.appendChild(option);
+                }
+            });
+            
+            // 设置当前值
+            sourceSelect.value = colorItem.derivedFrom || '';
+            document.getElementById('derivationRole').value = colorItem.role || '';
+            
+            // 解析并填充调整公式
+            populateAdjustmentRows(colorItem.adjust);
+            
+            // 更新公式预览
+            updateFormulaPreview();
+            
+            // 更新派生预览
+            updateDerivationPreview();
+            
+            // 更新锁定按钮状态
+            const lockBtn = document.getElementById('toggleLockBtn');
+            if (lockBtn) {
+                if (colorItem.locked) {
+                    lockBtn.innerHTML = '🔓 解锁颜色';
+                    lockBtn.style.backgroundColor = '#10B981';
+                    lockBtn.style.color = 'white';
+                } else {
+                    lockBtn.innerHTML = '🔒 锁定颜色';
+                    lockBtn.style.backgroundColor = '';
+                    lockBtn.style.color = '';
+                }
+            }
+            
+            // 显示面板
+            document.getElementById('derivationEditPanel').classList.remove('hidden');
+            document.getElementById('derivationOverlay').classList.remove('hidden');
+            
+            // 绑定调整行变更事件
+            bindAdjustmentEvents();
+        }
+
+        function toggleDerivationLock() {
+            if (!currentEditingColor) return;
+            
+            const colorItem = currentColorMap.get(currentEditingColor);
+            if (!colorItem) return;
+            
+            // 切换锁定状态
+            colorItem.locked = !colorItem.locked;
+            currentColorMap.set(currentEditingColor, colorItem);
+            
+            // 更新按钮状态
+            const lockBtn = document.getElementById('toggleLockBtn');
+            if (lockBtn) {
+                if (colorItem.locked) {
+                    lockBtn.innerHTML = '🔓 解锁颜色';
+                    lockBtn.style.backgroundColor = '#10B981';
+                    lockBtn.style.color = 'white';
+                    showToast(`已锁定 ${currentEditingColor}，派生计算时将跳过`, 'success');
+                } else {
+                    lockBtn.innerHTML = '🔒 锁定颜色';
+                    lockBtn.style.backgroundColor = '';
+                    lockBtn.style.color = '';
+                    showToast(`已解锁 ${currentEditingColor}`, 'success');
+                }
+            }
+            
+            // 更新UI
+            renderColorCategories();
+        }
+        window.toggleDerivationLock = toggleDerivationLock;
+
+        function closeDerivationPanel() {
+            document.getElementById('derivationEditPanel').classList.add('hidden');
+            document.getElementById('derivationOverlay').classList.add('hidden');
+            currentEditingColor = null;
+        }
+
+        function populateAdjustmentRows(formula) {
+            const builder = document.querySelector('.adjustment-builder');
+            const rows = builder.querySelectorAll('.adjustment-row');
+            rows.forEach((row, index) => {
+                if (index > 0) row.remove();
+            });
+
+            const operations = parseDerivationFormula(formula);
+            
+            if (operations.length === 0) {
+                const firstRow = builder.querySelector('.adjustment-row');
+                if (firstRow) {
+                    firstRow.querySelector('.adjust-property').value = 'lightness';
+                    firstRow.querySelector('.adjust-operator').value = '+';
+                    firstRow.querySelector('.adjust-value').value = '15';
+                }
+            } else {
+                operations.forEach((op, index) => {
+                    let row = builder.querySelectorAll('.adjustment-row')[index];
+                    if (!row) {
+                        row = addAdjustmentRow();
+                    }
+                    row.querySelector('.adjust-property').value = op.property;
+                    row.querySelector('.adjust-operator').value = op.operator;
+                    row.querySelector('.adjust-value').value = op.value;
+                    
+                    const unit = row.querySelector('.adjust-unit');
+                    unit.textContent = op.property === 'alpha' ? '' : (op.property === 'hue' ? '°' : '%');
+                });
+            }
+        }
+
+        function addAdjustmentRow() {
+            const builder = document.querySelector('.adjustment-builder');
+            const templateRow = builder.querySelector('.adjustment-row');
+            const newRow = templateRow.cloneNode(true);
+            
+            // 清空新行的值
+            newRow.querySelector('.adjust-value').value = '0';
+            
+            // 添加删除按钮
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-small';
+            deleteBtn.style.backgroundColor = '#EF4444';
+            deleteBtn.textContent = '×';
+            deleteBtn.onclick = function() {
+                if (builder.querySelectorAll('.adjustment-row').length > 1) {
+                    newRow.remove();
+                    updateFormulaPreview();
+                    updateDerivationPreview();
+                }
+            };
+            newRow.appendChild(deleteBtn);
+            
+            builder.insertBefore(newRow, document.querySelector('.adjustment-actions'));
+            
+            // 绑定事件
+            const selects = newRow.querySelectorAll('select');
+            const input = newRow.querySelector('input');
+            selects.forEach(select => {
+                select.addEventListener('change', () => {
+                    updateFormulaPreview();
+                    updateDerivationPreview();
+                    updateUnitDisplay(newRow);
+                });
+            });
+            input.addEventListener('input', () => {
+                updateFormulaPreview();
+                updateDerivationPreview();
+            });
+            
+            return newRow;
+        }
+
+        function clearAdjustments() {
+            const builder = document.querySelector('.adjustment-builder');
+            const rows = builder.querySelectorAll('.adjustment-row');
+            rows.forEach((row, index) => {
+                if (index > 0) {
+                    row.remove();
+                } else {
+                    row.querySelector('.adjust-property').value = 'lightness';
+                    row.querySelector('.adjust-operator').value = '+';
+                    row.querySelector('.adjust-value').value = '0';
+                }
+            });
+            updateFormulaPreview();
+            updateDerivationPreview();
+        }
+
+        function bindAdjustmentEvents() {
+            const builder = document.querySelector('.adjustment-builder');
+            
+            // 源颜色选择变更
+            document.getElementById('derivationSource').addEventListener('change', () => {
+                updateDerivationPreview();
+            });
+            
+            // 调整行变更
+            const rows = builder.querySelectorAll('.adjustment-row');
+            rows.forEach(row => {
+                const selects = row.querySelectorAll('select');
+                const input = row.querySelector('input');
+                
+                selects.forEach(select => {
+                    select.addEventListener('change', () => {
+                        updateFormulaPreview();
+                        updateDerivationPreview();
+                        updateUnitDisplay(row);
+                    });
+                });
+                
+                input.addEventListener('input', () => {
+                    updateFormulaPreview();
+                    updateDerivationPreview();
+                });
+            });
+        }
+
+        function updateUnitDisplay(row) {
+            const property = row.querySelector('.adjust-property').value;
+            const unit = row.querySelector('.adjust-unit');
+            if (property === 'alpha') {
+                unit.textContent = '';
+            } else if (property === 'hue') {
+                unit.textContent = '°';
+            } else {
+                unit.textContent = '%';
+            }
+        }
+
+        function updateFormulaPreview() {
+            const rows = document.querySelectorAll('.adjustment-row');
+            const formulas = [];
+            
+            rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+                const operator = row.querySelector('.adjust-operator').value;
+                const value = row.querySelector('.adjust-value').value;
+                
+                if (value !== '' && value !== '0') {
+                    formulas.push(`${property}${operator}${value}`);
+                }
+            });
+            
+            const formulaStr = formulas.join(', ') || '-';
+            document.getElementById('formulaPreview').textContent = formulaStr;
+        }
+
+        function updateDerivationPreview() {
+            const sourceName = document.getElementById('derivationSource').value;
+            const sourceColor = sourceName ? currentColorMap.get(sourceName) : null;
+            
+            if (sourceColor && sourceColor.value) {
+                document.getElementById('sourcePreviewSwatch').style.backgroundColor = argbToRgbaCss(sourceColor.value);
+                document.getElementById('sourcePreviewValue').textContent = sourceColor.value;
+                
+                // 计算派生颜色
+                const rows = document.querySelectorAll('.adjustment-row');
+                const formulas = [];
+                
+                rows.forEach(row => {
+                    const property = row.querySelector('.adjust-property').value;
+                    const operator = row.querySelector('.adjust-operator').value;
+                    const value = row.querySelector('.adjust-value').value;
+                    
+                    if (value !== '') {
+                        formulas.push(`${property}${operator}${value}`);
+                    }
+                });
+                
+                const formulaStr = formulas.join(',');
+                if (formulaStr) {
+                    const resultColor = computeDerivedColor(sourceColor.value, formulaStr);
+                    document.getElementById('resultPreviewSwatch').style.backgroundColor = argbToRgbaCss(resultColor);
+                    document.getElementById('resultPreviewValue').textContent = resultColor;
+                } else {
+                    document.getElementById('resultPreviewSwatch').style.backgroundColor = argbToRgbaCss(sourceColor.value);
+                    document.getElementById('resultPreviewValue').textContent = sourceColor.value;
+                }
+            } else {
+                const currentColor = currentEditingColor ? currentColorMap.get(currentEditingColor) : null;
+                const displayColor = currentColor ? currentColor.value : '#FFFFFFFF';
+                document.getElementById('sourcePreviewSwatch').style.backgroundColor = argbToRgbaCss(displayColor);
+                document.getElementById('sourcePreviewValue').textContent = displayColor;
+                document.getElementById('resultPreviewSwatch').style.backgroundColor = argbToRgbaCss(displayColor);
+                document.getElementById('resultPreviewValue').textContent = displayColor;
+            }
+        }
+
+        function applyDerivationChanges() {
+            if (!currentEditingColor) return;
+            
+            const colorItem = currentColorMap.get(currentEditingColor);
+            if (!colorItem) return;
+            
+            // 更新派生关系
+            colorItem.derivedFrom = document.getElementById('derivationSource').value;
+            colorItem.role = document.getElementById('derivationRole').value;
+            
+            // 构建调整公式
+            const rows = document.querySelectorAll('.adjustment-row');
+            const formulas = [];
+            
+            rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+                const operator = row.querySelector('.adjust-operator').value;
+                const value = row.querySelector('.adjust-value').value;
+                
+                if (value !== '' && value !== '0') {
+                    formulas.push(`${property}${operator}${value}`);
+                }
+            });
+            
+            colorItem.adjust = formulas.join(',');
+            
+            // 如果有源颜色且有调整公式，自动计算并应用颜色
+            if (colorItem.derivedFrom && colorItem.adjust) {
+                const sourceColor = currentColorMap.get(colorItem.derivedFrom);
+                if (sourceColor && sourceColor.value) {
+                    const resultColor = computeDerivedColor(sourceColor.value, colorItem.adjust);
+                    colorItem.value = resultColor;
+                }
+            }
+            
+            currentColorMap.set(currentEditingColor, colorItem);
+            
+            // 更新UI
+            renderColorCategories();
+            updatePreview();
+            updateContrastResults();
+            updateAnalytics();
+            
+            closeDerivationPanel();
+            showToast(`已更新 ${currentEditingColor} 的派生关系`, 'success');
+        }
+
+        function breakDerivationLink() {
+            if (!currentEditingColor) return;
+            
+            const colorItem = currentColorMap.get(currentEditingColor);
+            if (!colorItem) return;
+            
+            // 清除派生关系
+            colorItem.derivedFrom = '';
+            colorItem.adjust = '';
+            
+            currentColorMap.set(currentEditingColor, colorItem);
+            
+            // 更新UI
+            renderColorCategories();
+            updatePreview();
+            updateContrastResults();
+            updateAnalytics();
+            
+            closeDerivationPanel();
+            showToast(`已断开 ${currentEditingColor} 的派生链接`, 'success');
+        }
+
+        // ========== 派生链可视化功能 ==========
+        function openDerivationTreePanel() {
+            if (!currentColorMap || currentColorMap.size === 0) {
+                showToast('请先加载主题文件', 'warning');
+                return;
+            }
+            
+            renderDerivationTree();
+            document.getElementById('derivationTreePanel').classList.remove('hidden');
+            document.getElementById('derivationTreeOverlay').classList.remove('hidden');
+        }
+        window.openDerivationTreePanel = openDerivationTreePanel;
+
+        function closeDerivationTreePanel() {
+            document.getElementById('derivationTreePanel').classList.add('hidden');
+            document.getElementById('derivationTreeOverlay').classList.add('hidden');
+            // 关闭面板时清除快速派生状态
+            quickDeriveSourceColor = null;
+            clearQuickDeriveHighlight();
+            // 重置面板位置和大小
+            resetDerivationTreePanelPosition();
+        }
+        window.closeDerivationTreePanel = closeDerivationTreePanel;
+
+        // ========== 派生树面板拖拽与调整大小功能 ==========
+        let isDragging = false;
+        let isResizing = false;
+        let dragOffset = { x: 0, y: 0 };
+        let resizeStart = { x: 0, y: 0, width: 0, height: 0 };
+
+        // 初始化拖拽功能
+        function initDerivationTreeDrag() {
+            const panel = document.getElementById('derivationTreePanel');
+            const titleBar = document.getElementById('derivationTreeTitle');
+            const resizeHandle = document.getElementById('derivationTreeResizeHandle');
+
+            if (!panel || !titleBar || !resizeHandle) return;
+
+            // 拖拽移动
+            titleBar.addEventListener('mousedown', (e) => {
+                // 点击按钮时不触发拖拽
+                if (e.target.tagName === 'BUTTON') return;
+                
+                isDragging = true;
+                panel.classList.add('dragging');
+                
+                // 获取当前面板位置（需要移除transform偏移来计算真实位置）
+                const rect = panel.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+
+                // 清除transform，改用top/left定位
+                panel.style.transform = 'none';
+                panel.style.top = rect.top + 'px';
+                panel.style.left = rect.left + 'px';
+                panel.style.width = rect.width + 'px';
+                panel.style.height = rect.height + 'px';
+            });
+
+            // 调整大小
+            resizeHandle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                isResizing = true;
+                panel.classList.add('resizing');
+                
+                const rect = panel.getBoundingClientRect();
+                resizeStart = {
+                    x: e.clientX,
+                    y: e.clientY,
+                    width: rect.width,
+                    height: rect.height
+                };
+            });
+
+            // 全局鼠标移动事件
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    panel.style.left = (e.clientX - dragOffset.x) + 'px';
+                    panel.style.top = (e.clientY - dragOffset.y) + 'px';
+                }
+                
+                if (isResizing) {
+                    const deltaX = e.clientX - resizeStart.x;
+                    const deltaY = e.clientY - resizeStart.y;
+                    
+                    const minWidth = 500;
+                    const minHeight = 300;
+                    
+                    panel.style.width = Math.max(minWidth, resizeStart.width + deltaX) + 'px';
+                    panel.style.height = Math.max(minHeight, resizeStart.height + deltaY) + 'px';
+                }
+            });
+
+            // 全局鼠标释放事件
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    panel.classList.remove('dragging');
+                }
+                if (isResizing) {
+                    isResizing = false;
+                    panel.classList.remove('resizing');
+                }
+            });
+        }
+
+        // 重置面板位置和大小
+        function resetDerivationTreePanelPosition() {
+            const panel = document.getElementById('derivationTreePanel');
+            if (panel) {
+                panel.style.transform = 'translate(-50%, -50%)';
+                panel.style.top = '50%';
+                panel.style.left = '50%';
+                panel.style.width = '90%';
+                panel.style.height = 'auto';
+                panel.style.maxWidth = '900px';
+                panel.style.maxHeight = '85vh';
+            }
+            isDragging = false;
+            isResizing = false;
+        }
+
+        // 页面加载时初始化拖拽
+        document.addEventListener('DOMContentLoaded', initDerivationTreeDrag);
+
+        function renderDerivationTree() {
+            const content = document.getElementById('derivationTreeContent');
+            if (!content) return;
+
+            // 构建派生关系树
+            const tree = buildDerivationTree();
+            const stats = calculateDerivationStats();
+            
+            let html = '';
+            
+            // 添加统计信息
+            html += `
+                <div class="derivation-tree-stats">
+                    <div class="derivation-tree-stat-item">
+                        <span>🔗 派生关系链:</span>
+                        <span class="derivation-tree-stat-value">${stats.derivationChains}</span>
+                    </div>
+                    <div class="derivation-tree-stat-item">
+                        <span>📊 已派生颜色:</span>
+                        <span class="derivation-tree-stat-value">${stats.derivedColors} / ${stats.totalColors}</span>
+                    </div>
+                    <div class="derivation-tree-stat-item">
+                        <span>🌳 最深层级:</span>
+                        <span class="derivation-tree-stat-value">${stats.maxDepth}</span>
+                    </div>
+                    <div class="derivation-tree-stat-item">
+                        <span>💡 可优化建议:</span>
+                        <span class="derivation-tree-stat-value">${stats.suggestions}</span>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <button class="btn btn-small btn-derivation" style="font-size: 11px; padding: 4px 10px;" onclick="openBatchDerivationWizard()">
+                            ⚡ 批量派生向导
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (tree.roots.length === 0) {
+                html += '<div class="derivation-tree-empty">暂无派生关系。点击颜色卡片的「🔗 派生」按钮建立派生链接！</div>';
+            } else {
+                // 渲染每个根节点的树
+                tree.roots.forEach(root => {
+                    html += renderDerivationTreeNode(root, 0, true);
+                });
+            }
+
+            content.innerHTML = html;
+        }
+
+        function buildDerivationTree() {
+            const roots = [];
+            const childrenMap = new Map();
+
+            // 构建 children 映射
+            allColorItems.forEach(item => {
+                if (item.derivedFrom && item.derivedFrom.trim() !== '') {
+                    if (!childrenMap.has(item.derivedFrom)) {
+                        childrenMap.set(item.derivedFrom, []);
+                    }
+                    childrenMap.get(item.derivedFrom).push(item);
+                }
+            });
+
+            // 找出所有根节点（没有派生源或派生源不存在的颜色）
+            allColorItems.forEach(item => {
+                if (!item.derivedFrom || item.derivedFrom.trim() === '') {
+                    roots.push({
+                        ...item,
+                        children: childrenMap.get(item.name) || []
+                    });
+                } else if (!currentColorMap.has(item.derivedFrom)) {
+                    // 派生源不存在，也作为根节点显示
+                    roots.push({
+                        ...item,
+                        children: childrenMap.get(item.name) || [],
+                        orphan: true
+                    });
+                }
+            });
+
+            // 递归构建树结构
+            function buildTree(item) {
+                const children = childrenMap.get(item.name) || [];
+                return {
+                    ...item,
+                    children: children.map(child => buildTree(child))
+                };
+            }
+
+            return {
+                roots: roots.map(root => buildTree(root)),
+                childrenMap
+            };
+        }
+
+        function renderDerivationTreeNode(node, depth, isRoot = false) {
+            const hasChildren = node.children && node.children.length > 0;
+            const colorItem = currentColorMap.get(node.name);
+            const displayColor = colorItem ? colorItem.value : '#FFFFFFFF';
+            const isLocked = colorItem && colorItem.locked;
+            
+            // 构建徽章HTML
+            let badgesHtml = '';
+            if (node.role) {
+                badgesHtml += `<span class="role-badge role-${node.role.replace(/[^a-zA-Z0-9_]/g, '_')}" style="font-size: 10px; padding: 1px 4px;">${node.role}</span>`;
+            }
+            if (node.derivedFrom) {
+                badgesHtml += `<span class="derived-badge" style="font-size: 10px; padding: 1px 4px;">🔗 ${node.derivedFrom}</span>`;
+            }
+            if (node.adjust) {
+                badgesHtml += `<span class="adjust-badge" style="font-size: 10px; padding: 1px 4px;">📐 ${node.adjust}</span>`;
+            }
+            if (node.orphan) {
+                badgesHtml += `<span class="suggestion-badge">⚠️ 源颜色不存在</span>`;
+            }
+            if (isLocked) {
+                badgesHtml += `<span class="locked-badge" style="background: #EF4444; color: white;">🔒</span>`;
+            }
+
+            // 所有节点统一显示编辑操作按钮
+            let editButtons = '';
+            editButtons = `
+                <div class="tree-node-actions" onclick="event.stopPropagation();" style="margin-left: auto; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;">
+                    <button class="btn btn-small btn-secondary" style="font-size: 10px; padding: 2px 6px;" onclick="openDerivationEditor('${node.name}')">
+                        ✏️ 编辑派生
+                    </button>
+                    ${!isRoot ? `
+                        <button class="btn btn-small btn-reset" style="font-size: 10px; padding: 2px 6px;" onclick="breakDerivationInTree('${node.name}')">
+                            💔 断开
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-small" style="font-size: 10px; padding: 2px 6px; background: #F59E0B; color: white; border: none;" onclick="quickDeriveFrom('${node.name}')">
+                        🔗 快速派生
+                    </button>
+                </div>
+            `;
+
+            let html = `
+                <div class="derivation-tree-node" onmouseenter="this.querySelector('.tree-node-actions')?.style.setProperty('opacity', '1')" onmouseleave="this.querySelector('.tree-node-actions')?.style.setProperty('opacity', '0')">
+                    <div class="derivation-tree-header ${hasChildren ? 'has-children' : ''}" 
+                         onclick="toggleDerivationNode(this)"
+                         data-color-name="${node.name}">
+                        <span class="derivation-tree-toggle ${hasChildren ? '' : 'collapsed'}">${hasChildren ? '▼' : '•'}</span>
+                        <div class="derivation-tree-swatch" style="background-color: ${argbToRgbaCss(displayColor)}"></div>
+                        <div class="derivation-tree-info">
+                            <div class="derivation-tree-name">
+                                ${node.name}
+                                <div class="derivation-tree-badges">${badgesHtml}</div>
+                            </div>
+                            <div class="derivation-tree-meta">
+                                ${displayColor}
+                                ${node.commentCn ? `| ${node.commentCn}` : ''}
+                            </div>
+                        </div>
+                        ${editButtons}
+                    </div>
+                    ${hasChildren ? `<div class="derivation-tree-children">` : ''}
+            `;
+
+            if (hasChildren) {
+                node.children.forEach(child => {
+                    html += renderDerivationTreeNode(child, depth + 1, false);
+                });
+                html += '</div>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function toggleDerivationNode(header) {
+            const node = header.parentElement;
+            const childrenContainer = node.querySelector('.derivation-tree-children');
+            const toggle = header.querySelector('.derivation-tree-toggle');
+            
+            if (childrenContainer) {
+                const isCollapsed = childrenContainer.classList.contains('collapsed');
+                childrenContainer.classList.toggle('collapsed');
+                toggle.classList.toggle('collapsed', !isCollapsed);
+            }
+        }
+        window.toggleDerivationNode = toggleDerivationNode;
+
+        function expandAllDerivationNodes() {
+            document.querySelectorAll('.derivation-tree-children').forEach(el => {
+                el.classList.remove('collapsed');
+            });
+            document.querySelectorAll('.derivation-tree-toggle').forEach(el => {
+                if (el.textContent !== '•') {
+                    el.classList.remove('collapsed');
+                }
+            });
+        }
+        window.expandAllDerivationNodes = expandAllDerivationNodes;
+
+        function collapseAllDerivationNodes() {
+            document.querySelectorAll('.derivation-tree-children').forEach(el => {
+                el.classList.add('collapsed');
+            });
+            document.querySelectorAll('.derivation-tree-toggle').forEach(el => {
+                if (el.textContent !== '•') {
+                    el.classList.add('collapsed');
+                }
+            });
+        }
+        window.collapseAllDerivationNodes = collapseAllDerivationNodes;
+
+        function calculateDerivationStats() {
+            let totalColors = allColorItems.length;
+            let derivedColors = allColorItems.filter(item => item.derivedFrom && item.derivedFrom.trim() !== '').length;
+            let derivationChains = 0;
+            let maxDepth = 0;
+            let suggestions = 0;
+
+            // 计算派生链数量和最大深度
+            allColorItems.forEach(item => {
+                if (item.derivedFrom && item.derivedFrom.trim() !== '') {
+                    derivationChains++;
+                    const depth = getDerivationDepth(item.name);
+                    maxDepth = Math.max(maxDepth, depth);
+                }
+                // 检查建议：命名符合约定但未建立派生关系的
+                if (!item.derivedFrom || item.derivedFrom.trim() === '') {
+                    if (hasSuggestedDerivation(item.name)) {
+                        suggestions++;
+                    }
+                }
+            });
+
+            return {
+                totalColors,
+                derivedColors,
+                derivationChains,
+                maxDepth,
+                suggestions
+            };
+        }
+
+        function getDerivationDepth(colorName, visited = null) {
+            if (!visited) visited = new Set();
+            if (visited.has(colorName)) return 0; // 循环引用检测
+            visited.add(colorName);
+
+            const item = currentColorMap.get(colorName);
+            if (!item || !item.derivedFrom || item.derivedFrom.trim() === '') {
+                return 0;
+            }
+            return 1 + getDerivationDepth(item.derivedFrom, visited);
+        }
+
+        // ========== 智能派生建议功能 ==========
+        function hasSuggestedDerivation(colorName) {
+            const suggestions = getDerivationSuggestions(colorName);
+            return suggestions.length > 0;
+        }
+
+        function getDerivationSuggestions(colorName, includeAll = false) {
+            const suggestions = [];
+            const item = currentColorMap.get(colorName);
+            if (!item) return suggestions;
+
+            // 命名模式规则
+            const namingPatterns = [
+                // ==============================================
+                // 规则优先级：高 → 低
+                // 优先匹配更具体的模式
+                // ==============================================
+
+                // 规则1: xxx_state + xxx_normal 模式（最高优先级）
+                // 如: border_control_disabled -> border_control_normal
+                // 如: btn_normal_hover -> btn_normal
+                {
+                    pattern: /^(.+)_(normal)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    extract: (match) => `${match[1]}_${match[2]}`,
+                    type: 'substate',
+                    confidence: 98,
+                    adjust: (type) => {
+                        const stateAdjustments = {
+                            'hover': 'lightness:+8',
+                            'pressed': 'lightness:-8',
+                            'selected': 'saturation:+5,lightness:+3',
+                            'checked': 'saturation:+5,lightness:+3',
+                            'disabled': 'alpha:*0.5',
+                            'focus': 'saturation:+10'
+                        };
+                        return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
+                    }
+                },
+                
+                // 规则2: xxx_state -> xxx_normal 模式
+                // 如: border_control_disabled -> border_control_normal
+                // 如: btn_hover -> btn_normal
+                {
+                    pattern: /^(.+)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    extract: (match) => {
+                        const baseName = match[1];
+                        // 先检查 baseName_normal 是否存在（如 border_control_normal）
+                        if (currentColorMap.has(`${baseName}_normal`)) {
+                            return `${baseName}_normal`;
+                        }
+                        // 其次检查是否有 baseName 本身（如 btn）
+                        return baseName;
+                    },
+                    type: 'state_to_normal',
+                    confidence: 95,
+                    adjust: (type) => {
+                        const stateAdjustments = {
+                            'hover': 'lightness:+8',
+                            'pressed': 'lightness:-8',
+                            'selected': 'saturation:+5,lightness:+3',
+                            'checked': 'saturation:+5,lightness:+3',
+                            'disabled': 'alpha:*0.5',
+                            'focus': 'saturation:+10'
+                        };
+                        return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
+                    }
+                },
+
+                // 规则3: color_xxx_variant -> color_xxx 模式
+                // 支持更丰富的颜色变体：deep/dark/light/lighter/muted/pale/vibrant
+                // 如: color_gray_deep -> color_gray
+                {
+                    pattern: /^(.+?)(?:_(deep|dark|darker|light|lighter|muted|pale|vibrant|soft|bright))+$/i,
+                    extract: (match) => match[1],
+                    type: 'color_variant',
+                    confidence: 90,
+                    adjust: (type) => {
+                        const variantAdjustments = {
+                            'deep': 'lightness:-25,saturation:+10',
+                            'dark': 'lightness:-20',
+                            'darker': 'lightness:-15',
+                            'light': 'lightness:+20',
+                            'lighter': 'lightness:+25',
+                            'muted': 'saturation:-25,lightness:+5',
+                            'pale': 'saturation:-30,lightness:+15',
+                            'vibrant': 'saturation:+20',
+                            'soft': 'saturation:-15',
+                            'bright': 'saturation:+15,lightness:+5'
+                        };
+                        return variantAdjustments[type.toLowerCase()] || null;
+                    }
+                },
+
+                // 规则4: text_xxx -> text_default 模式
+                // 如: text_disabled -> text_default
+                // 如: text_muted -> text_default
+                {
+                    pattern: /^text_(?!default)(.+)$/i,
+                    extract: (match) => 'text_default',
+                    type: 'text_variant',
+                    confidence: 85,
+                    adjust: (type) => {
+                        const textAdjustments = {
+                            'disabled': 'alpha:*0.5',
+                            'muted': 'lightness:+15,saturation:-15',
+                            'selected': 'lightness:-10,saturation:+10',
+                            'secondary': 'lightness:+10',
+                            'hint': 'alpha:*0.6',
+                            'link': 'hue:210,saturation:+30'
+                        };
+                        return textAdjustments[type.toLowerCase()] || null;
+                    }
+                },
+
+                // 规则5: bg_xxx_variant -> bg_xxx 模式
+                // 如: bg_card_hover -> bg_card
+                {
+                    pattern: /^(bg_.+?)_(hover|pressed|selected|disabled|focus)$/i,
+                    extract: (match) => match[1],
+                    type: 'bg_state',
+                    confidence: 92,
+                    adjust: (type) => {
+                        const bgAdjustments = {
+                            'hover': 'lightness:+5',
+                            'pressed': 'lightness:-5',
+                            'selected': 'lightness:+3,saturation:+5',
+                            'disabled': 'alpha:*0.3',
+                            'focus': 'lightness:+8'
+                        };
+                        return bgAdjustments[type.toLowerCase()] || 'lightness:+5';
+                    }
+                },
+
+                // ===== 以下为原有规则（保持向后兼容）=====
+                
+                // 基础颜色变体：color_xxx_light / color_xxx_dark -> color_xxx
+                {
+                    pattern: /^(.+)_(light|dark|lighter|darker|pale|vibrant)$/i,
+                    extract: (match) => match[1],
+                    type: 'variant',
+                    confidence: 80,
+                    adjust: (type) => type.toLowerCase().includes('light') ? 'lightness:+15' : 'lightness:-15'
+                },
+                // 状态变体：xxx_hover / xxx_pressed -> xxx (原有规则，优先级降低)
+                {
+                    pattern: /^(.+)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    extract: (match) => match[1],
+                    type: 'state',
+                    confidence: 70,
+                    adjust: (type) => {
+                        const stateAdjustments = {
+                            'hover': 'lightness:+8',
+                            'pressed': 'lightness:-8',
+                            'selected': 'saturation:+5,lightness:+3',
+                            'checked': 'saturation:+5,lightness:+3',
+                            'disabled': 'alpha:*0.5',
+                            'focus': 'saturation:+10'
+                        };
+                        return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
+                    }
+                },
+                // 文字颜色：xxx_text[_...] -> xxx 或 bg_xxx
+                {
+                    pattern: /^(?!text_)(.+)_text(_.*)?$/,
+                    extract: (match) => match[1],
+                    type: 'text',
+                    adjust: () => null
+                },
+                // 背景颜色：xxx_bg[_...] -> xxx 或 text_xxx
+                {
+                    pattern: /^(?!bg_)(.+)_bg(_.*)?$/,
+                    extract: (match) => match[1],
+                    type: 'background',
+                    adjust: () => null
+                },
+                // 颜色编号：color_blue_1 / color_blue_2 -> color_blue
+                {
+                    pattern: /^(.+_\D+)_\d+$/i,
+                    extract: (match) => match[1],
+                    type: 'shade',
+                    adjust: () => null
+                },
+                // 渐变/透明度变体：xxx_transparent / xxx_alpha / xxx_opacity -> xxx
+                {
+                    pattern: /^(.+)_(transparent|alpha|opacity)$/i,
+                    extract: (match) => match[1],
+                    type: 'alpha',
+                    adjust: () => 'alpha:*0.5'
+                }
+            ];
+
+            // 检查所有命名模式
+            namingPatterns.forEach(rule => {
+                const match = colorName.match(rule.pattern);
+                if (match) {
+                    const suggestedBase = rule.extract(match);
+                    const adjustType = match[2] || match[3] || 'variant';
+                    
+                    // 检查建议的源是否存在
+                    let possibleSources = [suggestedBase];
+                    if (rule.type === 'text') {
+                        possibleSources.push(`bg_${suggestedBase}`);
+                    } else if (rule.type === 'background') {
+                        possibleSources.push(`text_${suggestedBase}`);
+                    }
+                    
+                    possibleSources.forEach(source => {
+                        if (currentColorMap.has(source) && source !== colorName) {
+                            // 源颜色存在，这是一个有效的建议
+                            // 优先使用规则内定义的 confidence，否则使用类型映射
+                            const confidence = rule.confidence || getSuggestionConfidence(rule.type);
+                            const suggestion = {
+                                type: rule.type,
+                                from: source,
+                                to: colorName,
+                                confidence: confidence,
+                                recommendedAdjust: typeof rule.adjust === 'function' ? rule.adjust(adjustType) : rule.adjust,
+                                description: getSuggestionDescription(rule.type, source, colorName)
+                            };
+                            
+                            // 检查是否已经建立了派生关系
+                            if (!item.derivedFrom || item.derivedFrom.trim() === '' || includeAll) {
+                                suggestions.push(suggestion);
+                            } else if (item.derivedFrom !== source && includeAll) {
+                                // 已有不同的派生关系
+                                suggestions.push({
+                                    ...suggestion,
+                                    alternative: true,
+                                    currentDerivedFrom: item.derivedFrom
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // ===== 新增：基于下划线分割的精确匹配算法 =====
+            // 如: border_control_disabled 分割为 [border, control, disabled]
+            // 查找: border_control_normal 或 border_control
+            if (suggestions.length === 0 || includeAll) {
+                const underscoreSuggestions = findUnderscoreBasedSuggestions(colorName, item, includeAll);
+                suggestions.push(...underscoreSuggestions);
+            }
+
+            // 检查语义上的相似性（同前缀）
+            if (suggestions.length === 0 || includeAll) {
+                allColorItems.forEach(potentialSource => {
+                    if (potentialSource.name === colorName) return;
+                    if (item.derivedFrom === potentialSource.name && !includeAll) return;
+                    
+                    // 检查是否有共同前缀（长度至少为3）
+                    const minPrefixLength = 3;
+                    let commonPrefix = '';
+                    for (let i = 0; i < Math.min(colorName.length, potentialSource.name.length); i++) {
+                        if (colorName[i] === potentialSource.name[i]) {
+                            commonPrefix += colorName[i];
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    if (commonPrefix.length >= minPrefixLength) {
+                        // 排除太短或太泛的前缀
+                        if (!['bg_', 'text_', 'btn_', 'color_'].includes(commonPrefix)) {
+                            suggestions.push({
+                                type: 'prefix',
+                                from: potentialSource.name,
+                                to: colorName,
+                                confidence: 50,
+                                recommendedAdjust: null,
+                                description: `可能相关：${potentialSource.name} 和 ${colorName} 共享前缀 "${commonPrefix}"`,
+                                weak: true
+                            });
+                        }
+                    }
+                });
+            }
+
+            return suggestions.sort((a, b) => b.confidence - a.confidence);
+        }
+
+        function getSuggestionConfidence(type) {
+            const confidenceMap = {
+                // 新规则类型（高优先级）
+                'substate': 98,         // xxx_normal_hover -> xxx_normal
+                'state_to_normal': 95,  // xxx_hover -> xxx_normal
+                'bg_state': 92,         // bg_xxx_hover -> bg_xxx
+                'color_variant': 90,    // color_xxx_deep -> color_xxx
+                'text_variant': 85,     // text_disabled -> text_default
+                // 原有类型
+                'state': 95,        // 状态变体置信度最高
+                'variant': 90,      // 颜色变体
+                'shade': 85,        // 色调编号
+                'alpha': 85,        // 透明度变体
+                'text': 75,         // 文字-背景关系
+                'background': 75,   // 背景-文字关系
+                'prefix': 50        // 前缀匹配
+            };
+            return confidenceMap[type] || 50;
+        }
+
+        function getSuggestionDescription(type, source, target) {
+            const descriptions = {
+                'state': `"${target}" 看起来是 "${source}" 的状态变体`,
+                'variant': `"${target}" 看起来是 "${source}" 的色调变体`,
+                'shade': `"${target}" 看起来是 "${source}" 的深浅色阶`,
+                'alpha': `"${target}" 看起来是 "${source}" 的透明变体`,
+                'text': `"${target}" 可能与背景色 "${source}" 配合使用`,
+                'background': `"${target}" 可能与文字色 "${source}" 配合使用`,
+                'prefix': `"${target}" 和 "${source}" 可能相关`,
+                // 新增规则类型描述
+                'substate': `"${target}" 是 "${source}" 的子状态变体`,
+                'state_to_normal': `"${target}" 看起来应继承自基准色 "${source}"`,
+                'color_variant': `"${target}" 是 "${source}" 的色调变体`,
+                'text_variant': `"${target}" 属于文本变体，应继承自 "${source}"`,
+                'bg_state': `"${target}" 是背景状态变体，继承自 "${source}"`,
+                // 下划线分割匹配类型
+                'underscore_state': `"${target}" 基于后缀匹配建议继承自 "${source}"`,
+                'underscore_text': `"${target}" 是文本变体，建议继承自 "${source}"`,
+                'underscore_prefix': `"${target}" 前缀匹配 "${source}"`
+            };
+            return descriptions[type] || `"${target}" 可能派生于 "${source}"`;
+        }
+
+        // 一键应用派生建议
+        function applyDerivationSuggestion(suggestion) {
+            const item = currentColorMap.get(suggestion.to);
+            if (!item) return false;
+
+            item.derivedFrom = suggestion.from;
+            if (suggestion.recommendedAdjust) {
+                item.adjust = suggestion.recommendedAdjust;
+            }
+
+            currentColorMap.set(suggestion.to, item);
+            
+            // 如果有调整公式，立即计算
+            if (item.adjust) {
+                recomputeDerivedColors();
+            }
+
+            return true;
+        }
+
+        // 显示派生建议面板
+        function showDerivationSuggestions() {
+            if (!currentColorMap || currentColorMap.size === 0) {
+                showToast('请先加载主题文件', 'warning');
+                return;
+            }
+
+            const allSuggestions = [];
+            const processedTargets = new Set(); // 去重：每个目标颜色只保留一个最佳建议
+
+            allColorItems.forEach(item => {
+                // 只针对没有派生关系的颜色生成建议
+                if (item.derivedFrom && item.derivedFrom.trim() !== '') {
+                    return;
+                }
+
+                const suggestions = getDerivationSuggestions(item.name);
+                suggestions.forEach(s => {
+                    // 高置信度过滤：只保留置信度 >= 85% 的建议
+                    if (s.confidence >= 85 && !processedTargets.has(s.to)) {
+                        allSuggestions.push(s);
+                        processedTargets.add(s.to); // 标记为已处理
+                    }
+                });
+            });
+
+            if (allSuggestions.length === 0) {
+                showToast('没有找到可优化的派生关系建议', 'info');
+                return;
+            }
+
+            console.log(`📊 派生建议统计:`);
+            console.log(`   有效建议 (≥85% 置信度): ${allSuggestions.length}`);
+            console.log(`   建议列表:`, allSuggestions);
+
+            // 在派生树面板中显示建议
+            showSuggestionsInTreePanel(allSuggestions);
+            
+            showToast(`发现 ${allSuggestions.length} 个高质量派生建议`, 'info');
+        }
+        window.showDerivationSuggestions = showDerivationSuggestions;
+
+        // 在派生树面板显示建议
+        function showSuggestionsInTreePanel(suggestions) {
+            // 确保面板打开
+            openDerivationTreePanel();
+            
+            setTimeout(() => {
+                const content = document.getElementById('derivationTreeContent');
+                if (!content) return;
+
+                // 在现有内容前添加建议区域
+                let suggestionsHtml = `
+                    <div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-radius: 8px;">
+                        <h4 style="margin: 0 0 10px 0; color: #92400E; display: flex; align-items: center; gap: 8px;">
+                            💡 派生关系优化建议
+                            <span style="background: #F59E0B; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;">
+                                ${suggestions.length} 条建议
+                            </span>
+                        </h4>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                `;
+
+                suggestions.slice(0, 10).forEach((s, index) => {
+                    const badgeColor = s.confidence >= 80 ? '#10B981' : s.confidence >= 60 ? '#3B82F6' : '#6B7280';
+                    suggestionsHtml += `
+                        <div style="padding: 8px 12px; margin-bottom: 6px; background: white; border-radius: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="color: #1E1E1E; margin-bottom: 2px;">
+                                    <strong>${s.from}</strong> → <strong>${s.to}</strong>
+                                    <span style="background: ${badgeColor}; color: white; padding: 1px 6px; border-radius: 8px; font-size: 10px; margin-left: 8px;">
+                                        ${s.confidence}%
+                                    </span>
+                                </div>
+                                <div style="color: #6B7280; font-size: 11px;">${s.description}</div>
+                                ${s.recommendedAdjust ? `<div style="color: #8B5CF6; font-size: 11px; margin-top: 2px;">📐 建议公式: ${s.recommendedAdjust}</div>` : ''}
+                            </div>
+                            <button class="btn btn-small btn-primary" style="font-size: 11px; padding: 4px 8px;"
+                                    onclick="applySuggestionAndRefresh('${s.from}', '${s.to}', '${s.recommendedAdjust || ''}')">
+                                应用
+                            </button>
+                        </div>
+                    `;
+                });
+
+                if (suggestions.length > 10) {
+                    suggestionsHtml += `<div style="text-align: center; padding: 8px; color: #6B7280; font-size: 11px;">还有 ${suggestions.length - 10} 条建议...</div>`;
+                }
+
+                suggestionsHtml += `
+                        </div>
+                        <div style="margin-top: 12px; display: flex; gap: 8px;">
+                            <button class="btn btn-small btn-derivation" style="font-size: 11px;" onclick="applyHighConfidenceSuggestions()">
+                                应用高置信度建议 (≥80%)
+                            </button>
+                            <button class="btn btn-small btn-secondary" style="font-size: 11px;" onclick="applyAllSuggestions()">
+                                应用全部建议
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // 将建议插入到内容开头
+                const existingContent = content.innerHTML;
+                content.innerHTML = suggestionsHtml + existingContent;
+            }, 100);
+        }
+
+        function applySuggestionAndRefresh(from, to, adjust) {
+            const item = currentColorMap.get(to);
+            if (!item) {
+                showToast('颜色不存在', 'error');
+                return;
+            }
+
+            item.derivedFrom = from;
+            if (adjust) {
+                item.adjust = adjust;
+            }
+            currentColorMap.set(to, item);
+
+            // 重新计算派生颜色
+            recomputeDerivedColors();
+
+            // 刷新面板
+            renderDerivationTree();
+            renderColorCategories();
+            updatePreview();
+            
+            showToast(`已建立派生关系: ${from} → ${to}`, 'success');
+        }
+        window.applySuggestionAndRefresh = applySuggestionAndRefresh;
+
+        function applyHighConfidenceSuggestions() {
+            const threshold = 80;
+            let appliedCount = 0;
+
+            allColorItems.forEach(item => {
+                // 跳过已有派生关系的
+                if (item.derivedFrom && item.derivedFrom.trim() !== '') return;
+
+                const suggestions = getDerivationSuggestions(item.name);
+                const highConfidence = suggestions.find(s => s.confidence >= threshold);
+                
+                if (highConfidence) {
+                    if (applyDerivationSuggestion(highConfidence)) {
+                        appliedCount++;
+                    }
+                }
+            });
+
+            if (appliedCount > 0) {
+                recomputeDerivedColors();
+                renderDerivationTree();
+                renderColorCategories();
+                updatePreview();
+                saveToHistory('批量应用派生建议');
+                showToast(`已应用 ${appliedCount} 个高置信度派生建议`, 'success');
+            } else {
+                showToast('没有可应用的高置信度建议', 'info');
+            }
+        }
+        window.applyHighConfidenceSuggestions = applyHighConfidenceSuggestions;
+
+        function applyAllSuggestions() {
+            let appliedCount = 0;
+            const appliedTargets = new Set(); // 防止重复应用
+
+            // 先收集所有高置信度建议
+            const validSuggestions = [];
+            allColorItems.forEach(item => {
+                if (item.derivedFrom && item.derivedFrom.trim() !== '') return;
+
+                const suggestions = getDerivationSuggestions(item.name);
+                if (suggestions.length > 0 && suggestions[0].confidence >= 85) {
+                    validSuggestions.push(suggestions[0]);
+                }
+            });
+
+            // 按依赖顺序排序（源优先）
+            validSuggestions.sort((a, b) => {
+                const aIsDependent = validSuggestions.some(s => s.to === a.from);
+                const bIsDependent = validSuggestions.some(s => s.to === b.from);
+                if (aIsDependent && !bIsDependent) return 1;
+                if (!aIsDependent && bIsDependent) return -1;
+                return 0;
+            });
+
+            // 应用建议
+            validSuggestions.forEach(suggestion => {
+                if (!appliedTargets.has(suggestion.to)) {
+                    if (applyDerivationSuggestion(suggestion)) {
+                        appliedCount++;
+                        appliedTargets.add(suggestion.to);
+                    }
+                }
+            });
+
+            if (appliedCount > 0) {
+                recomputeDerivedColors();
+                renderDerivationTree();
+                renderColorCategories();
+                updatePreview();
+                saveToHistory('批量应用所有派生建议');
+                showToast(`已应用 ${appliedCount} 个派生建议`, 'success');
+            } else {
+                showToast('没有可应用的高置信度建议', 'info');
+            }
+
+            // 刷新建议面板
+            showDerivationSuggestions();
+        }
+        window.applyAllSuggestions = applyAllSuggestions;
+
         // ========== 对比度计算 (WCAG 2.1) ==========
         function calculateLuminance(r, g, b) {
             const [rs, gs, bs] = [r, g, b].map(c => {
@@ -2898,7 +5155,7 @@
         }
 
         function createColorCard(colorItem) {
-            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn } = colorItem;
+            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn, role, derivedFrom, adjust, locked } = colorItem;
             const isChanged = value !== originalValue;
             
             const currentColor = argbToRgbaCss(value);
@@ -2915,6 +5172,21 @@
             cardEl.dataset.value = value;
             cardEl.dataset.originalValue = originalValue;
 
+            // 构建派生系统徽章HTML
+            let badgesHtml = '';
+            if (role) {
+                badgesHtml += `<span class="role-badge role-${role.replace(/[^a-zA-Z0-9_]/g, '_')}" title="颜色角色：${role}">${role}</span>`;
+            }
+            if (derivedFrom) {
+                badgesHtml += `<span class="derived-badge" title="派生自：${derivedFrom}">🔗 ${derivedFrom}</span>`;
+            }
+            if (adjust) {
+                badgesHtml += `<span class="adjust-badge" title="调整公式：${adjust}">📐 ${adjust}</span>`;
+            }
+            if (locked) {
+                badgesHtml += `<span class="locked-badge" title="已锁定 - 派生计算时将跳过">🔒 已锁定</span>`;
+            }
+
             cardEl.innerHTML = `
                 <div class="color-preview">
                     <div class="color-preview-current" style="background-color: ${currentColor}" title="当前颜色：${value}"></div>
@@ -2924,6 +5196,7 @@
                     <div class="color-label">${name} ${supportAccent ? '[强调色]' : ''} 
                         <span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>
                     </div>
+                    <div class="badges-container">${badgesHtml}</div>
                     <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : ''}</div>
                     <div class="color-code-group">
                         <div class="color-code current ${isChanged ? 'changed' : ''}">当前值：${value}</div>
@@ -2939,6 +5212,9 @@
                         <input type="text" class="color-input" value="${value}" 
                                data-name="${name}" placeholder="输入8位ARGB颜色值（如#FFFFFFFF）">
                         <button class="btn btn-reset" data-name="${name}">恢复原值</button>
+                        <button class="btn btn-derivation" data-name="${name}" onclick="openDerivationEditor('${name}')">
+                            🔗 派生
+                        </button>
                     </div>
                 </div>
             `;
@@ -3111,6 +5387,12 @@
                     node.setAttribute('value', colorData.value);
                     if (colorData.commentCn) node.setAttribute('comment_cn', colorData.commentCn);
                     if (colorData.commentEn) node.setAttribute('comment_en', colorData.commentEn);
+                    // 保存派生系统属性
+                    if (colorData.role !== undefined) node.setAttribute('role', colorData.role);
+                    if (colorData.derivedFrom !== undefined) node.setAttribute('derived_from', colorData.derivedFrom);
+                    if (colorData.adjust !== undefined) node.setAttribute('adjust', colorData.adjust);
+                    // 保存锁定状态
+                    if (colorData.locked !== undefined) node.setAttribute('locked', colorData.locked.toString());
                 }
             });
 
@@ -3868,6 +6150,9 @@
             const totalColors = allColorItems.length;
             const changedColors = allColorItems.filter(item => item.value !== item.originalValue).length;
             const accentColors = allColorItems.filter(item => item.supportAccent).length;
+            // 派生系统统计
+            const roleColors = allColorItems.filter(item => item.role && item.role.trim() !== '').length;
+            const derivedColors = allColorItems.filter(item => item.derivedFrom && item.derivedFrom.trim() !== '').length;
 
             // 计算更全面的对比度达标率
             const windowBg = getColorValue('bg_window_base', '#FFFFFFFF');
@@ -3898,6 +6183,8 @@
             document.getElementById('analyticsChanged').textContent = changedColors;
             document.getElementById('analyticsContrastRate').textContent = `${contrastRate}%`;
             document.getElementById('analyticsAccent').textContent = accentColors;
+            document.getElementById('analyticsRole').textContent = roleColors;
+            document.getElementById('analyticsDerived').textContent = derivedColors;
         }
 
         // ========== 重新检查按钮点击处理 ==========
@@ -3916,6 +6203,714 @@
             }
         }
         window.debugRecheckBtn = debugRecheckBtn;
+
+        function executeDerivationUpdate() {
+            try {
+                const hasChanges = recomputeDerivedColors();
+                if (hasChanges) {
+                    showToast('已重新计算所有派生颜色', 'success');
+                    // 保存到历史
+                    if (typeof saveToHistory === 'function') {
+                        saveToHistory('更新派生颜色');
+                    }
+                } else {
+                    showToast('没有需要更新的派生颜色', 'info');
+                }
+            } catch (e) {
+                console.error('派生更新错误:', e);
+                showToast('派生颜色计算失败', 'error');
+            }
+        }
+        window.executeDerivationUpdate = executeDerivationUpdate;
+
+        // ========== 批量派生向导功能 ==========
+        function openBatchDerivationWizard() {
+            if (!currentColorMap || currentColorMap.size === 0) {
+                showToast('请先加载主题文件', 'warning');
+                return;
+            }
+
+            // 填充源颜色下拉框
+            const sourceSelect = document.getElementById('batchSourceColor');
+            sourceSelect.innerHTML = '<option value="">- 请选择一个颜色作为派生基准 -</option>';
+            
+            // 按名称排序
+            const sortedItems = [...allColorItems].sort((a, b) => a.name.localeCompare(b.name));
+            sortedItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                option.textContent = `${item.name}`;
+                sourceSelect.appendChild(option);
+            });
+
+            // 填充目标颜色复选框列表
+            const targetContainer = document.getElementById('batchTargetColors');
+            targetContainer.innerHTML = '';
+            sortedItems.forEach(item => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer;';
+                label.innerHTML = `
+                    <input type="checkbox" class="batch-target-checkbox" value="${item.name}" onchange="updateSelectedCount(); updateBatchDerivationPreview();">
+                    <div style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #E2E8F0; background-color: ${argbToRgbaCss(item.value)}; flex-shrink: 0;"></div>
+                    <span style="font-size: 12px; word-break: break-all;">${item.name}</span>
+                `;
+                targetContainer.appendChild(label);
+            });
+
+            // 绑定源颜色变化事件
+            sourceSelect.onchange = function() {
+                const selectedColor = currentColorMap.get(this.value);
+                const infoPanel = document.getElementById('selectedSourceInfo');
+                const nameEl = document.getElementById('batchSourceName');
+                const previewEl = document.getElementById('batchSourcePreview');
+                const valueEl = document.getElementById('batchSourceValue');
+                
+                if (selectedColor) {
+                    infoPanel.style.display = 'block';
+                    nameEl.textContent = selectedColor.name;
+                    previewEl.style.backgroundColor = argbToRgbaCss(selectedColor.value);
+                    valueEl.textContent = selectedColor.value;
+                    
+                    // 源颜色改变后，自动筛选同前缀目标
+                    setTimeout(() => filterBatchTargets('same_prefix'), 100);
+                } else {
+                    infoPanel.style.display = 'none';
+                    nameEl.textContent = '-';
+                    previewEl.style.backgroundColor = '';
+                    valueEl.textContent = '-';
+                }
+                updateBatchDerivationPreview();
+            };
+
+            // 初始化默认公式
+            updateBatchFormulaPreview();
+
+            // 显示面板
+            document.getElementById('batchDerivationWizard').classList.remove('hidden');
+            document.getElementById('batchDerivationOverlay').classList.remove('hidden');
+
+            showToast('批量派生向导已打开', 'info');
+        }
+        window.openBatchDerivationWizard = openBatchDerivationWizard;
+
+        // 基于下划线分割的建议匹配算法
+        function findUnderscoreBasedSuggestions(colorName, colorItem, includeAll = false) {
+            const suggestions = [];
+            const parts = colorName.split('_'); // 按下划线分割
+            
+            if (parts.length <= 1) return suggestions; // 没有下划线，无法分析
+
+            // 状态后缀识别
+            const stateSuffixes = ['hover', 'pressed', 'selected', 'checked', 'disabled', 'focus', 'normal'];
+            const colorSuffixes = ['light', 'dark', 'deep', 'darker', 'lighter', 'muted', 'pale', 'vibrant', 'soft', 'bright'];
+            const textSuffixes = ['default', 'muted', 'secondary', 'hint', 'link'];
+
+            // 识别最后一段是否是状态/颜色后缀
+            const lastPart = parts[parts.length - 1].toLowerCase();
+            const isStateSuffix = stateSuffixes.includes(lastPart);
+            const isColorSuffix = colorSuffixes.includes(lastPart);
+            const isTextSuffix = textSuffixes.includes(lastPart);
+
+            // ===== 规则A: 状态变体匹配 =====
+            // 如: border_control_disabled -> border_control_normal 或 border_control
+            if (isStateSuffix || isColorSuffix) {
+                // 移除最后一个部分（状态）
+                const baseWithoutSuffix = parts.slice(0, -1).join('_');
+                
+                // 候选源：xxx_normal > xxx（不带后缀）
+                const candidates = [
+                    `${baseWithoutSuffix}_normal`,  // 优先找带 _normal 的
+                    baseWithoutSuffix               // 其次找不带后缀的基础名
+                ];
+
+                for (const candidate of candidates) {
+                    if (currentColorMap.has(candidate) && candidate !== colorName) {
+                        // 检查是否已有派生关系
+                        if (!colorItem.derivedFrom || colorItem.derivedFrom.trim() === '' || includeAll) {
+                            const adjustFormula = inferAdjustFormulaFromParts(parts, 'state');
+                            suggestions.push({
+                                type: 'underscore_state',
+                                from: candidate,
+                                to: colorName,
+                                confidence: 93,
+                                recommendedAdjust: adjustFormula,
+                                description: `"${colorName}" 基于后缀匹配建议继承自 "${candidate}"`
+                            });
+                            break; // 找到第一个有效候选就停止
+                        }
+                    }
+                }
+            }
+
+            // ===== 规则B: 文本变体 =====
+            // 如: text_disabled -> text_default
+            if (parts[0].toLowerCase() === 'text' && parts.length >= 2) {
+                const textDefault = 'text_default';
+                if (currentColorMap.has(textDefault) && colorName !== textDefault) {
+                    if (!colorItem.derivedFrom || colorItem.derivedFrom.trim() === '' || includeAll) {
+                        const adjustFormula = inferAdjustFormulaFromParts(parts, 'text');
+                        suggestions.push({
+                            type: 'underscore_text',
+                            from: textDefault,
+                            to: colorName,
+                            confidence: 88,
+                            recommendedAdjust: adjustFormula,
+                            description: `"${colorName}" 是文本变体，建议继承自 "${textDefault}"`
+                        });
+                    }
+                }
+            }
+
+            // ===== 规则C: 多级前缀匹配 =====
+            // 如: bg_btn_window_close_hover -> bg_btn_window_close -> bg_btn_window -> bg_btn
+            if (suggestions.length === 0) {
+                for (let i = parts.length - 2; i >= 1; i--) {
+                    const candidateBase = parts.slice(0, i + 1).join('_');
+                    if (currentColorMap.has(candidateBase) && candidateBase !== colorName) {
+                        if (!colorItem.derivedFrom || colorItem.derivedFrom.trim() === '' || includeAll) {
+                            suggestions.push({
+                                type: 'underscore_prefix',
+                                from: candidateBase,
+                                to: colorName,
+                                confidence: 75 - (parts.length - i) * 5, // 层级越深，置信度越低
+                                recommendedAdjust: inferAdjustFormulaFromParts(parts.slice(i + 1), 'generic'),
+                                description: `"${colorName}" 前缀匹配 "${candidateBase}"`
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return suggestions;
+        }
+        window.findUnderscoreBasedSuggestions = findUnderscoreBasedSuggestions;
+
+        // 根据分割后的部分推断调整公式
+        function inferAdjustFormulaFromParts(parts, type) {
+            const stateMap = {
+                'hover': 'lightness:+8',
+                'pressed': 'lightness:-8',
+                'selected': 'saturation:+5,lightness:+3',
+                'checked': 'saturation:+5,lightness:+3',
+                'disabled': 'alpha:*0.5',
+                'focus': 'saturation:+10',
+                'normal': '',
+                'light': 'lightness:+15',
+                'dark': 'lightness:-15',
+                'deep': 'lightness:-25,saturation:+10',
+                'darker': 'lightness:-15',
+                'lighter': 'lightness:+20',
+                'muted': 'saturation:-25,lightness:+5',
+                'pale': 'saturation:-30,lightness:+15',
+                'vibrant': 'saturation:+20',
+                'soft': 'saturation:-15',
+                'bright': 'saturation:+15,lightness:+5'
+            };
+
+            const textMap = {
+                'disabled': 'alpha:*0.5',
+                'muted': 'lightness:+15,saturation:-15',
+                'selected': 'lightness:-10,saturation:+10',
+                'secondary': 'lightness:+10',
+                'hint': 'alpha:*0.6',
+                'link': 'hue:210,saturation:+30'
+            };
+
+            // 查找匹配的状态
+            for (const part of parts) {
+                const lowerPart = part.toLowerCase();
+                if (type === 'text' && textMap[lowerPart]) {
+                    return textMap[lowerPart];
+                }
+                if (stateMap[lowerPart]) {
+                    return stateMap[lowerPart];
+                }
+            }
+
+            return 'lightness:+5'; // 默认公式
+        }
+        window.inferAdjustFormulaFromParts = inferAdjustFormulaFromParts;
+
+        // ========== 派生关系树编辑功能 ==========
+        // 全局变量：快速派生源颜色
+        let quickDeriveSourceColor = null;
+
+        // 快速派生：点击第一个颜色作为源，再点击第二个颜色建立派生关系
+        function quickDeriveFrom(colorName) {
+            if (!quickDeriveSourceColor) {
+                // 第一步：设置源颜色
+                quickDeriveSourceColor = colorName;
+                const colorItem = currentColorMap.get(colorName);
+                if (colorItem) {
+                    showToast(`✅ 已选择源颜色: "${colorName}" - 请点击其他颜色的「🔗 快速派生」按钮完成派生`, 'info');
+                }
+                // 高亮显示当前选中的源
+                highlightQuickDeriveSource();
+            } else if (quickDeriveSourceColor === colorName) {
+                // 取消选择
+                quickDeriveSourceColor = null;
+                showToast(`已取消选择源颜色`, 'info');
+                clearQuickDeriveHighlight();
+            } else {
+                // 第二步：完成派生
+                const sourceItem = currentColorMap.get(quickDeriveSourceColor);
+                const targetItem = currentColorMap.get(colorName);
+                
+                if (sourceItem && targetItem) {
+                    // 跳过锁定的颜色
+                    if (targetItem.locked) {
+                        showToast(`颜色 "${colorName}" 已锁定，无法修改派生关系`, 'warning');
+                        return;
+                    }
+                    
+                    // 使用默认调整公式或根据状态推断
+                    let adjustFormula = inferAdjustFormula(colorName, quickDeriveSourceColor);
+                    targetItem.derivedFrom = quickDeriveSourceColor;
+                    targetItem.adjust = adjustFormula;
+                    
+                    // 立即计算派生值
+                    const resultColor = computeDerivedColor(sourceItem.value, adjustFormula);
+                    targetItem.value = resultColor;
+                    
+                    currentColorMap.set(colorName, targetItem);
+                    
+                    // 更新UI
+                    renderColorCategories();
+                    renderDerivationTree();
+                    updatePreview();
+                    updateAnalytics();
+                    updateContrastResults();
+                    
+                    showToast(`✅ 已建立派生: ${colorName} ← ${quickDeriveSourceColor} (${adjustFormula})`, 'success');
+                    
+                    // 重置快速派生状态
+                    quickDeriveSourceColor = null;
+                    clearQuickDeriveHighlight();
+                }
+            }
+        }
+        window.quickDeriveFrom = quickDeriveFrom;
+
+        // 高亮源颜色显示
+        function highlightQuickDeriveSource() {
+            clearQuickDeriveHighlight();
+            const nodes = document.querySelectorAll('.derivation-tree-header');
+            nodes.forEach(node => {
+                if (node.dataset.colorName === quickDeriveSourceColor) {
+                    node.style.backgroundColor = '#FEF3C7';
+                    node.style.borderRadius = '6px';
+                    node.style.outline = '2px solid #F59E0B';
+                }
+            });
+        }
+
+        function clearQuickDeriveHighlight() {
+            const nodes = document.querySelectorAll('.derivation-tree-header');
+            nodes.forEach(node => {
+                node.style.backgroundColor = '';
+                node.style.borderRadius = '';
+                node.style.outline = '';
+            });
+        }
+
+        function breakDerivationInTree(colorName) {
+            const colorItem = currentColorMap.get(colorName);
+            if (colorItem) {
+                if (colorItem.locked) {
+                    showToast(`颜色 "${colorName}" 已锁定，无法修改派生关系`, 'warning');
+                    return;
+                }
+                
+                colorItem.derivedFrom = '';
+                colorItem.adjust = '';
+                currentColorMap.set(colorName, colorItem);
+                
+                // 更新UI
+                renderColorCategories();
+                renderDerivationTree();
+                updatePreview();
+                updateAnalytics();
+                updateContrastResults();
+                
+                showToast(`已断开 "${colorName}" 的派生关系`, 'info');
+            }
+        }
+        window.breakDerivationInTree = breakDerivationInTree;
+
+        // 根据颜色名称推断调整公式
+        function inferAdjustFormula(targetName, sourceName) {
+            const lowerTarget = targetName.toLowerCase();
+            const lowerSource = sourceName.toLowerCase();
+            
+            // 从目标名称中移除源名称前缀，查看剩余部分
+            const suffix = lowerTarget.replace(lowerSource, '').replace(/^_/, '');
+            
+            const stateMap = {
+                'hover': 'lightness:+8',
+                'pressed': 'lightness:-8',
+                'selected': 'saturation:+5,lightness:+3',
+                'checked': 'saturation:+5,lightness:+3',
+                'disabled': 'alpha:*0.5',
+                'focus': 'saturation:+10',
+                'light': 'lightness:+15',
+                'dark': 'lightness:-15',
+                'deep': 'lightness:-25,saturation:+10',
+                'muted': 'saturation:-25,lightness:+5',
+                'pale': 'saturation:-30,lightness:+15',
+                'vibrant': 'saturation:+20',
+                'soft': 'saturation:-15',
+                'bright': 'saturation:+15,lightness:+5'
+            };
+            
+            for (const [key, formula] of Object.entries(stateMap)) {
+                if (suffix.includes(key)) {
+                    return formula;
+                }
+            }
+            
+            return 'lightness:+5';
+        }
+
+        function closeBatchDerivationWizard() {
+            document.getElementById('batchDerivationWizard').classList.add('hidden');
+            document.getElementById('batchDerivationOverlay').classList.add('hidden');
+        }
+        window.closeBatchDerivationWizard = closeBatchDerivationWizard;
+
+        function bindBatchAdjustmentEvents() {
+            const builder = document.getElementById('batchAdjustmentBuilder');
+            const inputs = builder.querySelectorAll('select, input');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    updateBatchFormulaPreview();
+                    updateBatchDerivationPreview();
+                    updateBatchUnitDisplay();
+                });
+                input.addEventListener('input', () => {
+                    updateBatchFormulaPreview();
+                    updateBatchDerivationPreview();
+                });
+            });
+        }
+
+        function updateBatchUnitDisplay(row = null) {
+            const rows = row ? [row] : document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
+            rows.forEach(r => {
+                const property = r.querySelector('.adjust-property').value;
+                const unit = r.querySelector('.adjust-unit');
+                if (property === 'hue') {
+                    unit.textContent = '°';
+                } else if (property === 'alpha') {
+                    const operator = r.querySelector('.adjust-operator').value;
+                    unit.textContent = operator === '*' ? '' : '%';
+                } else {
+                    unit.textContent = '%';
+                }
+            });
+        }
+
+        function addBatchAdjustmentRow() {
+            const builder = document.getElementById('batchAdjustmentBuilder');
+            const firstRow = builder.querySelector('.adjustment-row');
+            const newRow = firstRow.cloneNode(true);
+            newRow.querySelector('.adjust-value').value = '10';
+            
+            // 添加删除按钮（除第一行外）
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-small btn-reset';
+            deleteBtn.textContent = '×';
+            deleteBtn.style.cssText = 'padding: 2px 8px; min-width: auto;';
+            deleteBtn.onclick = function() {
+                newRow.remove();
+                updateBatchFormulaPreview();
+                updateBatchDerivationPreview();
+            };
+            newRow.appendChild(deleteBtn);
+            
+            builder.insertBefore(newRow, builder.querySelector('.adjustment-actions'));
+            bindBatchAdjustmentEvents();
+            updateBatchFormulaPreview();
+            updateBatchDerivationPreview();
+        }
+        window.addBatchAdjustmentRow = addBatchAdjustmentRow;
+
+        function clearBatchAdjustments() {
+            const builder = document.getElementById('batchAdjustmentBuilder');
+            const rows = builder.querySelectorAll('.adjustment-row');
+            rows.forEach((row, index) => {
+                if (index > 0) {
+                    row.remove();
+                } else {
+                    row.querySelector('.adjust-property').value = 'lightness';
+                    row.querySelector('.adjust-operator').value = '+';
+                    row.querySelector('.adjust-value').value = '10';
+                }
+            });
+            updateBatchFormulaPreview();
+            updateBatchDerivationPreview();
+        }
+        window.clearBatchAdjustments = clearBatchAdjustments;
+
+        function updateBatchFormulaPreview() {
+            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
+            const formulas = [];
+            
+            rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+                const operator = row.querySelector('.adjust-operator').value;
+                const value = row.querySelector('.adjust-value').value;
+                formulas.push(`${property}:${operator}${value}`);
+            });
+
+            const previewEl = document.getElementById('batchFormulaPreview');
+            previewEl.textContent = formulas.length > 0 ? formulas.join(', ') : '-';
+        }
+
+        function selectAllBatchTargets() {
+            document.querySelectorAll('.batch-target-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+            updateBatchDerivationPreview();
+        }
+        window.selectAllBatchTargets = selectAllBatchTargets;
+
+        function clearAllBatchTargets() {
+            document.querySelectorAll('.batch-target-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+            updateBatchDerivationPreview();
+        }
+        window.clearAllBatchTargets = clearAllBatchTargets;
+
+        // 批量筛选目标颜色
+        function filterBatchTargets(filterType) {
+            const sourceName = document.getElementById('batchSourceColor').value;
+            const checkboxes = document.querySelectorAll('.batch-target-checkbox');
+            
+            // 先全部取消选中
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            if (filterType === 'all') {
+                checkboxes.forEach(cb => cb.checked = true);
+            } else if (filterType === 'same_prefix' && sourceName) {
+                // 获取源颜色的前缀部分
+                const sourceParts = sourceName.split('_');
+                // 尝试获取最长的公共前缀
+                for (let i = sourceParts.length; i >= 1; i--) {
+                    const prefix = sourceParts.slice(0, i).join('_');
+                    let foundMatch = false;
+                    
+                    checkboxes.forEach(cb => {
+                        const targetName = cb.value;
+                        if (targetName !== sourceName && targetName.startsWith(prefix + '_')) {
+                            cb.checked = true;
+                            foundMatch = true;
+                        }
+                    });
+                    
+                    if (foundMatch) break; // 找到匹配就停止
+                }
+            } else if (filterType === 'state') {
+                const stateSuffixes = ['_hover', '_pressed', '_selected', '_checked', '_disabled', '_focus'];
+                checkboxes.forEach(cb => {
+                    const targetName = cb.value;
+                    if (stateSuffixes.some(suffix => targetName.endsWith(suffix))) {
+                        cb.checked = true;
+                    }
+                });
+            }
+            
+            updateSelectedCount();
+            updateBatchDerivationPreview();
+        }
+        window.filterBatchTargets = filterBatchTargets;
+
+        // 更新选中数量显示
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.batch-target-checkbox:checked').length;
+            const countEl = document.getElementById('selectedCount');
+            if (countEl) {
+                countEl.textContent = count;
+            }
+        }
+        window.updateSelectedCount = updateSelectedCount;
+
+        function invertBatchTargets() {
+            document.querySelectorAll('.batch-target-checkbox').forEach(cb => cb.checked = !cb.checked);
+            updateBatchDerivationPreview();
+        }
+        window.invertBatchTargets = invertBatchTargets;
+
+        function updateBatchDerivationPreview() {
+            const sourceName = document.getElementById('batchSourceColor').value;
+            const checkboxes = document.querySelectorAll('.batch-target-checkbox:checked');
+            const previewContainer = document.getElementById('batchDerivationPreview');
+
+            if (!sourceName || checkboxes.length === 0) {
+                previewContainer.innerHTML = '<div style="color: #6B7280; font-size: 12px; text-align: center;">选择源颜色和目标颜色后将显示预览</div>';
+                return;
+            }
+
+            const sourceColor = currentColorMap.get(sourceName);
+            if (!sourceColor) return;
+
+            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
+            const formulas = [];
+            rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+                const operator = row.querySelector('.adjust-operator').value;
+                const value = row.querySelector('.adjust-value').value;
+                formulas.push(`${property}:${operator}${value}`);
+            });
+            const formula = formulas.join(',');
+
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;">';
+            
+            checkboxes.forEach(cb => {
+                const targetName = cb.value;
+                const targetColor = currentColorMap.get(targetName);
+                if (!targetColor) return;
+
+                const resultColor = formula ? computeDerivedColor(sourceColor.value, formula) : sourceColor.value;
+                
+                html += `
+                    <div style="background: white; padding: 8px; border-radius: 6px; text-align: center;">
+                        <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 4px;">
+                            <div style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #E2E8F0; background-color: ${argbToRgbaCss(sourceColor.value)};" title="源颜色"></div>
+                            <div style="display: flex; align-items: center; color: #6B7280;">→</div>
+                            <div style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #E2E8F0; background-color: ${argbToRgbaCss(resultColor)};" title="结果"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #1E1E1E; word-break: break-all;">${targetName}</div>
+                        <div style="font-size: 9px; color: #6B7280; font-family: monospace;">${resultColor}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            previewContainer.innerHTML = html;
+        }
+
+        function executeBatchDerivation() {
+            const sourceName = document.getElementById('batchSourceColor').value;
+            const checkboxes = document.querySelectorAll('.batch-target-checkbox:checked');
+
+            if (!sourceName) {
+                showToast('请选择派生源颜色', 'warning');
+                return;
+            }
+
+            if (checkboxes.length === 0) {
+                showToast('请至少选择一个目标颜色', 'warning');
+                return;
+            }
+
+            // 构建调整公式
+            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
+            const formulas = [];
+            rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+                const operator = row.querySelector('.adjust-operator').value;
+                const value = row.querySelector('.adjust-value').value;
+                formulas.push(`${property}:${operator}${value}`);
+            });
+            const formula = formulas.join(',');
+
+            let appliedCount = 0;
+            checkboxes.forEach(cb => {
+                const targetName = cb.value;
+                const targetColor = currentColorMap.get(targetName);
+                
+                if (targetColor && targetName !== sourceName) {
+                    // 跳过锁定的颜色
+                    if (targetColor.locked) {
+                        console.log(`🔒 颜色 ${targetName} 已锁定，跳过`);
+                        return;
+                    }
+
+                    targetColor.derivedFrom = sourceName;
+                    targetColor.adjust = formula;
+                    
+                    // 立即计算派生颜色
+                    const sourceColor = currentColorMap.get(sourceName);
+                    if (sourceColor && formula) {
+                        const resultColor = computeDerivedColor(sourceColor.value, formula);
+                        targetColor.value = resultColor;
+                    }
+                    
+                    currentColorMap.set(targetName, targetColor);
+                    appliedCount++;
+                }
+            });
+
+            if (appliedCount > 0) {
+                // 更新UI
+                renderColorCategories();
+                renderDerivationTree();
+                updatePreview();
+                updateAnalytics();
+                updateContrastResults();
+                
+                // 保存到历史
+                saveToHistory(`批量派生: ${sourceName} → ${appliedCount}个颜色`);
+                
+                showToast(`已成功为 ${appliedCount} 个颜色建立派生关系`, 'success');
+                closeBatchDerivationWizard();
+            } else {
+                showToast('没有可应用的派生设置', 'info');
+            }
+        }
+        window.executeBatchDerivation = executeBatchDerivation;
+
+        // 应用预设调整模板
+        function applyAdjustmentPreset(presetType) {
+            const presets = {
+                'hover': [{property: 'lightness', operator: '+', value: '8'}],
+                'pressed': [{property: 'lightness', operator: '-', value: '8'}],
+                'disabled': [{property: 'alpha', operator: '*', value: '0.5'}],
+                'light': [{property: 'lightness', operator: '+', value: '15'}],
+                'dark': [{property: 'lightness', operator: '-', value: '15'}],
+                'muted': [
+                    {property: 'saturation', operator: '-', value: '25'},
+                    {property: 'lightness', operator: '+', value: '5'}
+                ],
+                'transparent': [{property: 'alpha', operator: '*', value: '0.7'}]
+            };
+
+            const preset = presets[presetType];
+            if (!preset) return;
+
+            // 清空现有调整
+            const builder = document.getElementById('batchAdjustmentBuilder');
+            const rows = builder.querySelectorAll('.adjustment-row');
+            rows.forEach((row, index) => {
+                if (index > 0) {
+                    row.remove();
+                }
+            });
+
+            // 应用预设
+            preset.forEach((adjustment, index) => {
+                const row = index === 0 ? builder.querySelector('.adjustment-row') : null;
+                
+                if (row) {
+                    row.querySelector('.adjust-property').value = adjustment.property;
+                    row.querySelector('.adjust-operator').value = adjustment.operator;
+                    row.querySelector('.adjust-value').value = adjustment.value;
+                } else {
+                    addBatchAdjustmentRow();
+                    const allRows = builder.querySelectorAll('.adjustment-row');
+                    const lastRow = allRows[allRows.length - 1];
+                    lastRow.querySelector('.adjust-property').value = adjustment.property;
+                    lastRow.querySelector('.adjust-operator').value = adjustment.operator;
+                    lastRow.querySelector('.adjust-value').value = adjustment.value;
+                }
+            });
+
+            updateBatchUnitDisplay();
+            updateBatchFormulaPreview();
+            updateBatchDerivationPreview();
+            showToast(`已应用预设: ${presetType}`, 'info');
+        }
+        window.applyAdjustmentPreset = applyAdjustmentPreset;
 
         // ========== 对比度检查结果更新 ==========
         function updateContrastResults(isDebugCall = false) {
@@ -4037,7 +7032,10 @@
                 <div style="margin-bottom: 15px; padding: 10px; background: #f8fafc; border-radius: 4px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <div style="font-size: 12px; color: #6B7280;">WCAG 2.1 对比度检查摘要</div>
-                        <button id="recheckContrastBtn" onclick="debugRecheckBtn();" style="padding: 4px 8px; font-size: 11px; background: #0078D4; color: white; border: none; border-radius: 3px; cursor: pointer;">↻ 重新检查</button>
+                        <div style="display: flex; gap: 5px;">
+                            <button id="recomputeDerivedBtn" onclick="executeDerivationUpdate();" style="padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); color: white; border: none; border-radius: 3px; cursor: pointer;">🔄 重新计算派生颜色</button>
+                            <button id="recheckContrastBtn" onclick="debugRecheckBtn();" style="padding: 4px 8px; font-size: 11px; background: #0078D4; color: white; border: none; border-radius: 3px; cursor: pointer;">↻ 重新检查</button>
+                        </div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
                         <div>
