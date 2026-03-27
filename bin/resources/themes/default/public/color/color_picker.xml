@@ -13,7 +13,7 @@
                                           thumbsize="20,20" min="0" max="255" progress_bar_padding="0,2,0,2"
                                           thumb_normal_image="file='public/color/slider_thumb.svg' valign='center'"/>
 
-    <VBox bkcolor="bg_window_base" visible="true">
+    <VBox bkcolor="bg_window_main" visible="true">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <Label text_id="STRID_PUBLIC_COLORPICKER_CHOOSE_COLOR" valign="center" margin="8" mouse_enabled="false"/>
@@ -31,7 +31,7 @@
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
         <Box bkcolor="bg_window_card">
             <VBox>
-                <HBox height="32" bkcolor="bg_window_base">
+                <HBox height="32" bkcolor="bg_window_main">
                     <Option class="color_picker_tab_option" group="color_picker_option_group" text_id="STRID_PUBLIC_COLORPICKER_COMMON">
                         <Event type="select" receiver="color_picker_tab" applyattribute="selected_id={0}" />
                     </Option>

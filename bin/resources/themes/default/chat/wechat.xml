@@ -17,10 +17,10 @@
         </VBox>
         <!-- 聊天区域 -->
         <VBox>
-            <HBox height="80" bkcolor="bg_window_base">
+            <HBox height="80" bkcolor="bg_window_main">
             </HBox>
             <Control class="splitline_hor_level1"/>
-            <VBox bkcolor="bg_window_base">
+            <VBox bkcolor="bg_window_main">
             </VBox>
             <VBox height="150" bkcolor="bg_window_card">
             </VBox>

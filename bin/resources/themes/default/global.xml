@@ -94,8 +94,8 @@
     <!-- 1. 颜色属性兼容别名 -->
     <Alias name="white" value="color_white"/>
     <Alias name="black" value="color_black"/>
-    <Alias name="darkcolor" value="color_gray_deep"/>    
-    <Alias name="lightcolor" value="color_gray_muted"/>
+    <Alias name="darkcolor" value="color_gray_dark"/>    
+    <Alias name="lightcolor" value="color_gray_light"/>
     <Alias name="gray" value="color_gray"/>
     <Alias name="light_gray" value="color_gray_light"/>
     <Alias name="dark_gray" value="color_gray_dark"/>
@@ -105,7 +105,7 @@
     <Alias name="red" value="color_red"/>
     
     <!-- 2. 历史兼容别名（原有保留） -->
-    <Alias name="bk_wnd_darkcolor" value="bg_window_base"/>
+    <Alias name="bk_wnd_darkcolor" value="bg_window_main"/>
     <Alias name="bk_wnd_lightcolor" value="bg_window_card"/>
     <Alias name="splitline_level1" value="border_split_level1"/>
     <Alias name="splitline_level2" value="border_split_level2"/>
@@ -128,15 +128,7 @@
     <!-- ===================== 基础控件样式基类 ===================== -->
     <!-- 滚动条基类 -->
     <Class name="scrollbar_base" fade_alpha="false"/>
-    
-    <!-- 按钮基类 -->
-    <Class name="btn_global_base" fade_hot="true"/>
-    
-    <!-- 编辑框基类 -->
-    <Class name="richedit_base" bkcolor="bg_richedit" caret_color="bg_richedit_caret" multi_line="false" auto_hscroll="true" rich_text="false"
-                                want_return="false" want_ctrl_return="false" want_tab="false" 
-                                text_align="left,vcenter" normal_text_color="text_default" disabled_text_color="text_disabled"/>
-    
+      
     <!-- ===================== 具体控件样式 ===================== -->
     <!-- 滚动条：简约风格（默认） -->
     <Class name="vscrollbar" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
@@ -211,25 +203,30 @@
                              selected_disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' width='18' height='18' valign='center' fade='80'"/>
     
     <!-- 下拉框基类 -->
-    <Class name="combo_base" bkcolor="bg_combo" padding="1,1,1,1" 
-                             border_size="1" border_color="border_combo_normal" hot_border_color="border_combo_hover" 
+    <Class name="combo_basic" padding="1,1,1,1" border_size="1" 
+                              border_color="border_combo_normal" 
+                              hot_border_color="border_combo_hover"
+                              disabled_border_color="border_combo_disabled"
+                              bkcolor="bg_combo" disabled_color="bg_combo_disabled"/>
+    <Class name="combo_base" class="combo_basic"
                              combo_tree_view_class="class='tree_view' padding='0,0,0,0' border_size='0,0,0,0' indent='20'"
                              combo_tree_node_class="tree_node" 
                              combo_icon_class="bkimage='${PATH_CAPTION}/logo.svg' width='18' height='18' valign='center' margin='2,0,2,0'" 
-                             combo_edit_class="bkcolor='bg_richedit' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"/>
-    
+                             combo_edit_class="bkcolor='bg_richedit' disabled_color='bg_combo_disabled' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"/>
     <!-- 下拉框 -->
     <Class name="combo" class="combo_base"
                         combo_button_class="height='stretch' width='auto' margin='1,0,0,0' padding='1,0,0,0' border_size='1,0,0,0' valign='center' 
                                             hot_border_color='border_combo_hover' 
                                             pushed_border_color='border_combo_hover'
+                                            disabled_border_color='border_combo_disabled'
                                             hot_color='bg_combo_btn_hover' 
-                                            pushed_color='bg_combo_btn_pressed' 
+                                            pushed_color='bg_combo_btn_pressed'
+                                            disabled_color='bg_combo_btn_disabled' 
                                             normal_image={file='${PATH_COMBO}/arrow_normal.svg' valign='center'} 
                                             hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
     <Class name="filter_combo" class="combo_base"/>
-    <Class name="check_combo" border_size="1" border_color="border_combo_normal" 
-                              dropbox="padding='0,0,0,0' bkcolor='bg_window_card' border_size='0,0,0,0' vscrollbar='true'"
+    <Class name="check_combo" class="combo_basic"
+                              dropbox="padding='0,0,0,0' bkcolor='bg_combo' border_size='0,0,0,0' vscrollbar='true'"
                               dropbox_item_class="width='stretch' height='24' text_padding='20,0,2,1' text_align='left,vcenter' 
                                                   normal_image={file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' valign='center'} 
                                                   selected_normal_image={file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' valign='center'}" 
@@ -251,6 +248,9 @@
                                                    pushed_color='bg_combo_btn_pressed' 
                                                    normal_image={file='${PATH_COMBO}/arrow_normal.svg' valign='center'} 
                                                    hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
+    
+    <!-- 按钮基类 -->
+    <Class name="btn_global_base" fade_hot="true"/>
     
     <!-- 全局纯色按钮，颜色跟随主题变化 -->
     <Class name="btn_global" text_align="hcenter,vcenter" 
@@ -308,11 +308,11 @@
                                         disabled_text_color="color_gray" 
                                         normal_color="color_blue_light" 
                                         hot_color="#1089E0" 
-                                        pushed_color="color_blue_deep"/>
+                                        pushed_color="color_blue_dark"/>
     <Class name="btn_global_color_red"  text_align="hcenter,vcenter" 
                                         normal_text_color="color_white" 
                                         disabled_text_color="color_gray" 
-                                        normal_color="color_red_deep" 
+                                        normal_color="color_red_dark" 
                                         hot_color="#E0393E" 
                                         pushed_color="#B71D22"/>
     
@@ -357,17 +357,19 @@
                               disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' fade='80'"/>
     
     <!-- 列表控件 -->
-    <Class name="list" bkcolor="bg_window_card" vscrollbar="true"/>
+    <Class name="list" bkcolor="bg_list" vscrollbar="true"/>
     <Class name="list_item" hot_color="bg_list_item_hover" 
-                            pushed_color="bg_list_item_selected" 
+                            pushed_color="bg_list_item_pressed" 
+                            disabled_color="bg_list_item_disabled" 
                             selected_normal_color="bg_list_item_selected"
                             fade_hot="false"/>
     
     <!-- 树形控件 -->
-    <Class name="tree_view" bkcolor="bg_window_card" vscrollbar="true"/>
-    <Class name="tree_node" height="28" hot_color="bg_list_item_hover" 
-                                        pushed_color="bg_list_item_selected" 
-                                        selected_normal_color="bg_list_item_selected" 
+    <Class name="tree_view" bkcolor="bg_tree_view" vscrollbar="true"/>
+    <Class name="tree_node" height="28" hot_color="bg_tree_view_node_hover" 
+                                        pushed_color="bg_tree_view_node_pressed" 
+                                        disabled_color="bg_tree_view_node_disabled"
+                                        selected_normal_color="bg_tree_view_node_selected" 
                                         icon_image_right_space="4" 
                                         fade_hot="false"/>
     <Class name="tree_node_checkbox" normal_image="file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' margin='2,0,0,0' valign='center'" 
@@ -472,7 +474,11 @@
     <Class name="group_box" line_width="1.0" line_color="border_group_box"/>
     <Class name="group_box_round" line_width="1.0" line_color="border_group_box" corner_size="3,3"/>
     
-    <!-- 富文本编辑框 -->
+    <!-- 编辑框基类 -->
+    <Class name="richedit_base" bkcolor="bg_richedit" caret_color="bg_richedit_caret" multi_line="false" auto_hscroll="true" rich_text="false"
+                                want_return="false" want_ctrl_return="false" want_tab="false" 
+                                text_align="left,vcenter" normal_text_color="text_default" disabled_text_color="text_disabled"/>
+    <!-- 编辑框 -->
     <Class name="simple" class="richedit_base"/>
     <Class name="simple_border" padding="1,1,1,1" border_size="1" 
                                 border_color="border_richedit_normal" 
@@ -486,7 +492,7 @@
                                        focus_bottom_border_color="border_richedit_focus_bottom"/>
     <Class name="prompt" prompt_mode="true" prompt_color="text_richedit_prompt"/>
     
-    <!-- 富文本Spin按钮 -->
+    <!-- 编辑框Spin按钮 -->
     <Class name="rich_edit_spin" spin_class="rich_edit_spin_box,rich_edit_spin_btn_up,rich_edit_spin_btn_down" 
                                  bkcolor="bg_richedit" number_only="true" height="28" width="64" 
                                  text_padding="0,0,18,0" text_align="vcenter,hcenter"/>
@@ -496,15 +502,17 @@
                                  normal_image="file='${PATH_BUTTON}/arrow-up.svg' width='10' height='10' valign='center' halign='center'" 
                                  normal_color="bg_richedit_btn_normal" 
                                  hot_color="bg_richedit_btn_hover" 
-                                 pushed_color="bg_richedit_btn_pressed"/>
+                                 pushed_color="bg_richedit_btn_pressed"
+                                 disabled_color="bg_richedit_btn_disabled"/>
     <Class name="rich_edit_spin_btn_down" height="50%" width="100%" no_focus="true" padding="1,1,0,0" border_size="1,1,0,0" 
                                  border_color="border_richedit_btn"
                                  normal_image="file='${PATH_BUTTON}/arrow-down.svg' width='10' height='10' valign='center' halign='center'" 
                                  normal_color="bg_richedit_btn_normal" 
                                  hot_color="bg_richedit_btn_hover" 
-                                 pushed_color="bg_richedit_btn_pressed"/>
+                                 pushed_color="bg_richedit_btn_pressed"
+                                 disabled_color="bg_richedit_btn_disabled"/>
     
-    <!-- 富文本Spin按钮（全边框） -->
+    <!-- 编辑框Spin按钮（全边框） -->
     <Class name="rich_edit_spin2" spin_class="rich_edit_spin_box,rich_edit_spin_btn_up2,rich_edit_spin_btn_down2" 
                                   bkcolor="bg_richedit" number_only="true" height="28" width="64" 
                                   text_padding="0,0,18,0" text_align="vcenter,hcenter"/>
@@ -513,29 +521,33 @@
                                   normal_image="file='${PATH_BUTTON}/arrow-up.svg' width='10' height='10' valign='center' halign='center'" 
                                   normal_color="bg_richedit_btn_normal" 
                                   hot_color="bg_richedit_btn_hover" 
-                                  pushed_color="bg_richedit_btn_pressed"/>
+                                  pushed_color="bg_richedit_btn_pressed"
+                                  disabled_color="bg_richedit_btn_disabled"/>
     <Class name="rich_edit_spin_btn_down2" height="50%" width="100%" no_focus="true" padding="1,0,1,1" border_size="1,0,1,1" 
                                   border_color="border_richedit_btn" 
                                   normal_image="file='${PATH_BUTTON}/arrow-down.svg' width='10' height='10' valign='center' halign='center'" 
                                   normal_color="bg_richedit_btn_normal" 
                                   hot_color="bg_richedit_btn_hover" 
-                                  pushed_color="bg_richedit_btn_pressed"/>
+                                  pushed_color="bg_richedit_btn_pressed"
+                                  disabled_color="bg_richedit_btn_disabled"/>
     
-    <!-- 富文本清除按钮 -->
+    <!-- 编辑框清除按钮 -->
     <Class name="rich_edit_clear_btn" clear_btn_class="rich_edit_clear_btn_class" text_align="vcenter"/>
     <Class name="rich_edit_clear_btn_class" height="22" width="24" border_round="4,4" margin="0,0,2,0" halign="right" valign="center" 
                                             normal_image="file='${PATH_BUTTON}/window-close.svg' width='18' height='18' valign='center' halign='center'" 
                                             normal_color="bg_richedit_btn_normal" 
                                             hot_color="bg_richedit_btn_hover" 
-                                            pushed_color="bg_richedit_btn_pressed"/>
+                                            pushed_color="bg_richedit_btn_pressed"
+                                            disabled_color="bg_richedit_btn_disabled"/>
 
-    <!-- 富文本显示密码按钮（修复拼写错误） -->
+    <!-- 编辑框显示密码按钮（修复拼写错误） -->
     <Class name="rich_edit_show_password_btn" password="true" show_password="false" show_password_btn_class="rich_edit_show_password_btn_class" text_align="vcenter"/>
     <Class name="rich_edit_show_password_btn_class" height="22" width="24" border_round="4,4" margin="0,0,2,0" halign="right" valign="center" 
                                                     normal_image="file='${PATH_BUTTON}/icon_visibility.svg' width='14' height='14' valign='center' halign='center'" 
                                                     normal_color="bg_richedit_btn_normal" 
                                                     hot_color="bg_richedit_btn_hover" 
-                                                    pushed_color="bg_richedit_btn_pressed"/>    
+                                                    pushed_color="bg_richedit_btn_pressed"
+                                                    disabled_color="bg_richedit_btn_disabled"/>    
     
     <!-- 富文本基本属性 -->
     <Class name="rich_text" text_color="text_default" 
@@ -557,13 +569,13 @@
                              pushed_text_color="text_link_pressed"/>
     
     <!-- ListCtrl控件 -->
-    <Class name="list_ctrl" type="report"
+    <Class name="list_ctrl" bkcolor="bg_list_ctrl" type="report"
                             show_header="true" header_height="32" enable_header_drag_order="true" 
                             data_item_height="32"
                             row_grid_line_width="1"
-                            row_grid_line_color="bg_list_ctrl_view_split"
+                            row_grid_line_color="border_list_ctrl_view_split"
                             column_grid_line_width="1"
-                            column_grid_line_color="bg_list_ctrl_view_split"
+                            column_grid_line_color="border_list_ctrl_view_split"
                             multi_select="true"
                             auto_check_select="false" show_header_checkbox="true" show_data_item_checkbox="true"
                             enable_item_edit="true"                            
@@ -594,7 +606,7 @@
                                         sorted_up_image="file='${PATH_LISTCTRL}/arrow-sorted-up.svg' width='10' height='10' valign='center' halign='left'" 
                                         sorted_down_image="file='${PATH_LISTCTRL}/arrow-sorted-down.svg' width='10' height='10' valign='center' halign='left'"/>
     <Class name="list_ctrl_header_split_box" width="3" height="100%" enable_split_single="true"/>
-    <Class name="list_ctrl_header_split_control" width="1" height="100%" margin="0,4,0,2" bkcolor="bg_list_ctrl_header_split" halign="right"/>
+    <Class name="list_ctrl_header_split_control" width="1" height="100%" margin="0,4,0,2" bkcolor="border_list_ctrl_header_split" halign="right"/>
     
     <!-- ListCtrl复选框 -->
     <Class name="list_ctrl_checkbox" valign="center" halign="left"
@@ -616,6 +628,7 @@
                                       frame_selection_border_color="border_list_ctrl_frame_selected"/>
     <Class name="list_ctrl_item" icon_spacing="4" hot_color="bg_list_ctrl_item_hover" 
                                                   pushed_color="bg_list_ctrl_item_pressed" 
+                                                  disabled_color="bg_list_ctrl_item_disabled" 
                                                   selected_normal_color="bg_list_ctrl_item_selected"/>
     <Class name="list_ctrl_sub_item" icon_spacing="2" text_align="vcenter,left" text_padding="2,0,2,0" auto_tooltip="true" single_line="true"/>    
     
@@ -631,6 +644,7 @@
                                       frame_selection_border_color="border_list_ctrl_frame_selected"/>
     <Class name="list_ctrl_icon_view_item" hot_color="bg_list_ctrl_item_hover" 
                                            pushed_color="bg_list_ctrl_item_pressed" 
+                                           disabled_color="bg_list_ctrl_item_disabled" 
                                            selected_normal_color="bg_list_ctrl_item_selected"/>
     <Class name="list_ctrl_icon_view_item_image" halign="center" margin="2,2,2,2"/>
     <Class name="list_ctrl_icon_view_item_label" width="100%" height="40" 
@@ -649,6 +663,7 @@
                                       frame_selection_border_color="border_list_ctrl_frame_selected"/>
     <Class name="list_ctrl_list_view_item" hot_color="bg_list_ctrl_item_hover" 
                                            pushed_color="bg_list_ctrl_item_pressed" 
+                                           disabled_color="bg_list_ctrl_item_disabled" 
                                            selected_normal_color="bg_list_ctrl_item_selected"/>
     <Class name="list_ctrl_list_view_item_image" valign="center" margin="8,2,2,2"/>
     <Class name="list_ctrl_list_view_item_label" width="100%" height="100%" 
@@ -713,11 +728,12 @@
                                              bkimage="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' halign='center' valign='center'"/>
 
     <!-- Property Grid控件，部分属性在default/public/property_grid/property_grid.xml中定义-->
-    <Class name="property_grid" left_column_width="130"
+    <Class name="property_grid" bkcolor="bg_property_grid" 
+                                left_column_width="130"
                                 row_grid_line_width="1"
-                                row_grid_line_color="bg_property_grid_line"
+                                row_grid_line_color="border_property_grid_line"
                                 column_grid_line_width="1"
-                                column_grid_line_color="bg_property_grid_line"
+                                column_grid_line_color="border_property_grid_line"
                                 header_class="property_grid_header"
                                 group_class="property_grid_group"
                                 group_label_class="property_grid_group_label"

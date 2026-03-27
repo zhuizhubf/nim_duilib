@@ -143,7 +143,7 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
     else if (strName == _T("font")) {
         SetFontId(strValue);
     }
-    else if ((strName == _T("normal_text_color")) || (strName == _T("normaltextcolor"))) {
+    else if ((strName == _T("text_color")) || (strName == _T("normal_text_color")) || (strName == _T("normaltextcolor"))) {
         SetStateTextColor(kControlStateNormal, strValue);
     }
     else if ((strName == _T("hot_text_color")) || (strName == _T("hottextcolor"))) {

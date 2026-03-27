@@ -159,7 +159,8 @@ ScrollBar 控件继承了 `Control` 属性，更多可用属性请参考`Control
 | font | | string | 字体ID，该字体ID必须在 global.xml 中存在 |
 | end_ellipsis | false | bool | 句末显示不完整是否使用 ... 代替 |
 | path_ellipsis | false | bool | 对于路径，显示不完整时是否使用 ... 代替中间路径 |
-| normal_text_color |  | string | 普通字体颜色,不指定则使用默认颜色，如 "blue" |
+| text_color |  | string | 普通字体颜色,不指定则使用默认颜色，如 "blue" |
+| normal_text_color |  | string | 普通字体颜色,不指定则使用默认颜色，如 "blue"，该属性与`text_color`属性相同 |
 | hot_text_color |  | string | 鼠标悬浮字体颜色,不指定则使用默认颜色，如 "blue" |
 | pushed_text_color |  | string | 鼠标按下字体颜色,不指定则使用默认颜色，如 "blue" |
 | disabled_text_color |  | string | disabled字体颜色,不指定则使用默认颜色，如 "blue" |

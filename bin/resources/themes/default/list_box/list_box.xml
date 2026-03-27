@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="540,720" min_size="400,100" caption="0,0,0,36" use_system_caption="false" shadow_attached="true" layered_window="true" size_box="4,4,4,4">
-    <VBox bkcolor="bg_window_base">
+    <VBox bkcolor="bg_window_main">
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <Label text_id="STRID_LISTBOX_TITLE" font="system_regular_14" valign="center" margin="8" width="stretch" mouse_enabled="false"/>
             <HBox width="auto">

@@ -3,7 +3,7 @@
     <!-- 整个布局放在一个VBox容器中 -->
     <!-- 布局属性：margin="left,top,right,bottom"; padding="left,top,right,bottom" -->
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
-    <VBox bkcolor="bg_window_base">
+    <VBox bkcolor="bg_window_main">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <!-- 标题栏：窗口左上角显示区域 -->

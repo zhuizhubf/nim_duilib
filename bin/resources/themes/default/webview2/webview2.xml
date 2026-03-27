@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="700,500" caption="0,0,0,36" shadow_type="default" shadow_attached="true" layered_window="true" size_box="4,4,4,4">
-    <VBox bkcolor="bg_window_base">
+    <VBox bkcolor="bg_window_main">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">
             <Label name="page_title" width="stretch" height="32" text_align="left,vcenter" text_padding="8,2,5,0" mouse_enabled="false"/>
