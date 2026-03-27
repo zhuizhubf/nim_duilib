@@ -92,17 +92,11 @@
     
     <!-- ===================== 完整兼容别名（旧属性名 → 新属性名） ===================== -->
     <!-- 1. 颜色属性兼容别名 -->
-    <Alias name="white" value="color_white"/>
-    <Alias name="black" value="color_black"/>
     <Alias name="darkcolor" value="color_gray_dark"/>    
     <Alias name="lightcolor" value="color_gray_light"/>
-    <Alias name="gray" value="color_gray"/>
     <Alias name="light_gray" value="color_gray_light"/>
     <Alias name="dark_gray" value="color_gray_dark"/>
-    <Alias name="green" value="color_green"/>
     <Alias name="light_green" value="color_green_light"/>
-    <Alias name="blue" value="color_blue"/>
-    <Alias name="red" value="color_red"/>
     
     <!-- 2. 历史兼容别名（原有保留） -->
     <Alias name="bk_wnd_darkcolor" value="bg_window_main"/>

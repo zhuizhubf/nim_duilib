@@ -226,14 +226,14 @@ float CircleProgress::GetCircleWidth() const
 
 void CircleProgress::SetBackgroudColor(const DString& strColor)
 {
-    m_dwBackgroundColor = GlobalManager::Instance().Color().GetColor(strColor);
+    m_dwBackgroundColor = GetUiColor(strColor);
     ASSERT(m_dwBackgroundColor.GetARGB() != 0);
     Invalidate();
 }
 
 void CircleProgress::SetForegroudColor(const DString& strColor)
 {
-    m_dwForegroundColor = GlobalManager::Instance().Color().GetColor(strColor);
+    m_dwForegroundColor = GetUiColor(strColor);
     ASSERT(m_dwForegroundColor.GetARGB() != 0);
     Invalidate();
 }
@@ -252,7 +252,7 @@ void CircleProgress::SetIndicator(const DString& sIndicatorImage)
 
 void CircleProgress::SetCircleGradientColor(const DString& strColor)
 {
-    m_dwGradientColor = GlobalManager::Instance().Color().GetColor(strColor);
+    m_dwGradientColor = GetUiColor(strColor);
     ASSERT(m_dwGradientColor.GetARGB() != 0);
     Invalidate();
 }

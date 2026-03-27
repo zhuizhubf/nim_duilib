@@ -3870,7 +3870,7 @@ void RichEdit::AddLinkColorTextEx(const DString& str, const DString& color, cons
     CHARFORMAT2W cf;
     GetCharFormat(strFontId, cf);
     font_face = StringConvert::UnicodeToMBCS(cf.szFaceName);
-    UiColor dwTextColor = GlobalManager::Instance().Color().GetColor(color);
+    UiColor dwTextColor = GetUiColor(color);
     static std::string font_format = "{\\fonttbl{\\f0\\fnil\\fcharset%d %s;}}";
     static std::string color_format = "{\\colortbl ;\\red%d\\green%d\\blue%d;}";
     static std::string link_format = "{\\rtf1%s%s\\f0\\fs%d{\\field{\\*\\fldinst{HYPERLINK \"%s\"}}{\\fldrslt{\\cf1 %s}}}}";
