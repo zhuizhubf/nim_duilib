@@ -119,57 +119,111 @@
     <Alias name="richedit_focus_border_color" value="border_richedit_focus"/>
     <Alias name="richedit_focus_bottom_border_color" value="border_richedit_focus_bottom"/>
     
-    <!-- ===================== 基础控件样式基类 ===================== -->
-    <!-- 滚动条基类 -->
-    <Class name="scrollbar_base" fade_alpha="false"/>
-      
-    <!-- ===================== 具体控件样式 ===================== -->
-    <!-- 滚动条：简约风格（默认） -->
-    <Class name="vscrollbar" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             show_button1="false" 
-                             show_button2="false" />
-    <Class name="hscrollbar" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             show_button1="false" 
-                             show_button2="false"/>
+    <!-- 按钮基类 -->
+    <Class name="btn_global_base" fade_hot="true"/>
     
-    <!-- 滚动条：标准风格 -->
-    <Class name="vscrollbar2" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'"                              
-                             show_button1="true" 
-                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             show_button2="true"
-                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' " />
-    <Class name="hscrollbar2" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             show_button1="true" 
-                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             show_button2="true"
-                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' " />
+    <!-- 窗口按钮 -->
+    <Var name="SIZE_WND_ICON" value="20"/>
+    <Class name="btn_wnd_base" class="btn_global_base" hot_color="bg_btn_window_hover" pushed_color="bg_btn_window_pressed"/>
+    <Class name="btn_wnd_min_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_MIN"
+                                 normal_image="file='${PATH_BUTTON}/window-minimize.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_wnd_close_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_CLOSE"
+                                 hot_color="bg_btn_window_close_hover" pushed_color="bg_btn_window_close_pressed"
+                                 normal_image="file='${PATH_BUTTON}/window-close.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"
+                                 hot_image="file='${PATH_BUTTON}/window-close_hover.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center'"/>
+    <Class name="btn_wnd_max_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_MAX"
+                                 normal_image="file='${PATH_BUTTON}/window-maximize.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_wnd_restore_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_RESTORE"
+                                 normal_image="file='${PATH_BUTTON}/window-restore.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_wnd_fullscreen_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_FULLSCREEN"
+                                 normal_image="file='${PATH_BUTTON}/window-fullscreen.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' margin='0,4,0,0' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_view_fullscreen_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_PAGE_FULLSCREEN"
+                                 normal_image="file='${PATH_BUTTON}/view-fullscreen.svg' valign='center' halign='center' margin='0,2,0,0' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_wnd_settings_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_SETTINGS"
+                                 normal_image="file='${PATH_BUTTON}/btn_setting.svg' width='18' height='18' valign='center' halign='center' margin='0,2,0,0' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_switch_theme" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_THEME"
+                                   normal_image="file='${PATH_BUTTON}/switch_theme.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
+    <Class name="btn_switch_lang" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_LANGUAGE"
+                                   normal_image="file='${PATH_BUTTON}/switch_lang.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>     
+    <!-- 退出全屏按钮 -->
+    <Class name="btn_exit_fullscreen" width="${SIZE_BTN_EXIT_FULLSCREEN_WIDTH}" height="${SIZE_BTN_EXIT_FULLSCREEN_HEIGHT}" border_round="3,3" valign="top" halign="center" 
+                                      bkcolor="bg_btn_exit_fullscreen" normal_text_color="text_btn_exit_fullscreen" 
+                                      font="system_bold_14" text_align="vcenter,hcenter" 
+                                      text_id="STRID_PUBLIC_EXIT_FULLSCREEN" tooltip_text_id="STRID_PUBLIC_EXIT_FULLSCREEN" 
+                                      float="true" keyboard_enabled="false" no_focus="true" 
+                                      alpha="0" fade_alpha="128" fade_in_out_y_from_top="true"/>
+        
+    <!-- 删除按钮 -->
+    <Class name="btn_recycle" width="auto" height="auto" 
+                              normal_image="file='${PATH_BUTTON}/btn_recycle_normal.svg'" 
+                              hot_image="file='${PATH_BUTTON}/btn_recycle_hovered.svg'" 
+                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pushed.svg'" 
+                              disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' fade='80'"/>
+                              
+    <!-- 全局纯色按钮，颜色跟随主题变化 -->
+    <Class name="btn_global" text_align="hcenter,vcenter" 
+                             normal_text_color="text_btn_normal" disabled_text_color="text_btn_disabled" 
+                             normal_color="bg_btn_normal" hot_color="bg_btn_hover" 
+                             pushed_color="bg_btn_pressed" disabled_color="bg_btn_disabled"
+                             border_size="${border_btn_size}"
+                             normal_border_color="border_btn_normal" hot_border_color="border_btn_hover"
+                             pushed_border_color="border_btn_pressed" disabled_border_color="border_btn_disabled"/>
+    <Class name="btn_primary_global" text_align="hcenter,vcenter" 
+                                     normal_text_color="text_primary_btn_normal" disabled_text_color="text_primary_btn_disabled" 
+                                     normal_color="bg_primary_btn_normal" hot_color="bg_primary_btn_hover" 
+                                     pushed_color="bg_primary_btn_pressed" disabled_color="bg_primary_btn_disabled"
+                                     border_size="${border_primary_btn_size}"
+                                     normal_border_color="border_primary_btn_normal" hot_border_color="border_primary_btn_hover"
+                                     pushed_border_color="border_primary_btn_pressed" disabled_border_color="border_primary_btn_disabled"/>
+
+    <!-- 全局图片按钮 -->
+    <Class name="btn_global_blue_80x30" normal_text_color="color_white" 
+                                        normal_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
+                                        hot_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
+                                        pushed_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                        disabled_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
+    <Class name="btn_global_white_80x30" normal_text_color="color_black" 
+                                         normal_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
+                                         hot_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
+                                         pushed_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                         disabled_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
+    <Class name="btn_global_red_80x30" normal_text_color="color_white" 
+                                       normal_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
+                                       hot_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
+                                       pushed_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                       disabled_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
+    <Class name="btn_global_gray_80x30"  normal_text_color="color_black" 
+                                         normal_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
+                                         hot_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
+                                         pushed_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                         disabled_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
     
+    <!-- 全局纯色按钮，颜色固定，不跟随主题变化 -->
+    <Class name="btn_global_color_gray" text_align="hcenter,vcenter" 
+                                        normal_text_color="color_black" 
+                                        disabled_text_color="color_gray" 
+                                        normal_color="#D7DCE0" 
+                                        hot_color="#D0D0D0" 
+                                        pushed_color="#BFBFBF"/>
+    <Class name="btn_global_color_white" text_align="hcenter,vcenter" 
+                                        normal_text_color="color_black" 
+                                        disabled_text_color="color_gray" 
+                                        normal_color="#F3F2F1" 
+                                        hot_color="#E5E5E5" 
+                                        pushed_color="#D3D2D1"/>
+    <Class name="btn_global_color_blue" text_align="hcenter,vcenter" 
+                                        normal_text_color="color_white" 
+                                        disabled_text_color="color_gray" 
+                                        normal_color="color_blue_light" 
+                                        hot_color="#1089E0" 
+                                        pushed_color="color_blue_dark"/>
+    <Class name="btn_global_color_red"  text_align="hcenter,vcenter" 
+                                        normal_text_color="color_white" 
+                                        disabled_text_color="color_gray" 
+                                        normal_color="color_red_dark" 
+                                        hot_color="#E0393E" 
+                                        pushed_color="#B71D22"/>
+                              
     <!-- 单选框 -->
     <Class name="option_1" height="20" text_padding="22,0,0,0" text_align="vcenter" valign="center"
                            normal_image="file='${PATH_OPTION}/radio-circle-unchecked.svg' width='20' height='20' valign='center'" 
@@ -242,111 +296,6 @@
                                                    pushed_color='bg_combo_btn_pressed' 
                                                    normal_image={file='${PATH_COMBO}/arrow_normal.svg' valign='center'} 
                                                    hot_image={file='${PATH_COMBO}/arrow_hot.svg' valign='center'}"/>
-    
-    <!-- 按钮基类 -->
-    <Class name="btn_global_base" fade_hot="true"/>
-    
-    <!-- 全局纯色按钮，颜色跟随主题变化 -->
-    <Class name="btn_global" text_align="hcenter,vcenter" 
-                             normal_text_color="text_btn_normal" disabled_text_color="text_btn_disabled" 
-                             normal_color="bg_btn_normal" hot_color="bg_btn_hover" 
-                             pushed_color="bg_btn_pressed" disabled_color="bg_btn_disabled"
-                             border_size="${border_btn_size}"
-                             normal_border_color="border_btn_normal" hot_border_color="border_btn_hover"
-                             pushed_border_color="border_btn_pressed" disabled_border_color="border_btn_disabled"/>
-    <Class name="btn_primary_global" text_align="hcenter,vcenter" 
-                                     normal_text_color="text_primary_btn_normal" disabled_text_color="text_primary_btn_disabled" 
-                                     normal_color="bg_primary_btn_normal" hot_color="bg_primary_btn_hover" 
-                                     pushed_color="bg_primary_btn_pressed" disabled_color="bg_primary_btn_disabled"
-                                     border_size="${border_primary_btn_size}"
-                                     normal_border_color="border_primary_btn_normal" hot_border_color="border_primary_btn_hover"
-                                     pushed_border_color="border_primary_btn_pressed" disabled_border_color="border_primary_btn_disabled"/>
-
-    <!-- 全局图片按钮 -->
-    <Class name="btn_global_blue_80x30" normal_text_color="color_white" 
-                                        normal_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
-                                        hot_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                        pushed_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
-                                        disabled_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
-    <Class name="btn_global_white_80x30" normal_text_color="color_black" 
-                                         normal_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
-                                         hot_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                         pushed_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
-                                         disabled_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
-    <Class name="btn_global_red_80x30" normal_text_color="color_white" 
-                                       normal_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
-                                       hot_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                       pushed_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
-                                       disabled_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
-    <Class name="btn_global_gray_80x30"  normal_text_color="color_black" 
-                                         normal_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
-                                         hot_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                         pushed_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
-                                         disabled_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
-    
-    <!-- 全局纯色按钮，颜色固定，不跟随主题变化 -->
-    <Class name="btn_global_color_gray" text_align="hcenter,vcenter" 
-                                        normal_text_color="color_black" 
-                                        disabled_text_color="color_gray" 
-                                        normal_color="#D7DCE0" 
-                                        hot_color="#D0D0D0" 
-                                        pushed_color="#BFBFBF"/>
-    <Class name="btn_global_color_white" text_align="hcenter,vcenter" 
-                                        normal_text_color="color_black" 
-                                        disabled_text_color="color_gray" 
-                                        normal_color="#F3F2F1" 
-                                        hot_color="#E5E5E5" 
-                                        pushed_color="#D3D2D1"/>
-    <Class name="btn_global_color_blue" text_align="hcenter,vcenter" 
-                                        normal_text_color="color_white" 
-                                        disabled_text_color="color_gray" 
-                                        normal_color="color_blue_light" 
-                                        hot_color="#1089E0" 
-                                        pushed_color="color_blue_dark"/>
-    <Class name="btn_global_color_red"  text_align="hcenter,vcenter" 
-                                        normal_text_color="color_white" 
-                                        disabled_text_color="color_gray" 
-                                        normal_color="color_red_dark" 
-                                        hot_color="#E0393E" 
-                                        pushed_color="#B71D22"/>
-    
-    <!-- 窗口按钮 -->
-    <Var name="SIZE_WND_ICON" value="20"/>
-    <Class name="btn_wnd_base" class="btn_global_base" hot_color="bg_btn_window_hover" pushed_color="bg_btn_window_pressed"/>
-    <Class name="btn_wnd_min_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_MIN"
-                                 normal_image="file='${PATH_BUTTON}/window-minimize.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_wnd_close_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_CLOSE"
-                                 hot_color="bg_btn_window_close_hover" pushed_color="bg_btn_window_close_pressed"
-                                 normal_image="file='${PATH_BUTTON}/window-close.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"
-                                 hot_image="file='${PATH_BUTTON}/window-close_hover.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center'"/>
-    <Class name="btn_wnd_max_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_MAX"
-                                 normal_image="file='${PATH_BUTTON}/window-maximize.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_wnd_restore_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_RESTORE"
-                                 normal_image="file='${PATH_BUTTON}/window-restore.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_wnd_fullscreen_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_WND_BTN_FULLSCREEN"
-                                 normal_image="file='${PATH_BUTTON}/window-fullscreen.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' margin='0,4,0,0' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_view_fullscreen_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_PAGE_FULLSCREEN"
-                                 normal_image="file='${PATH_BUTTON}/view-fullscreen.svg' valign='center' halign='center' margin='0,2,0,0' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_wnd_settings_11" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_SETTINGS"
-                                 normal_image="file='${PATH_BUTTON}/btn_setting.svg' width='18' height='18' valign='center' halign='center' margin='0,2,0,0' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_switch_theme" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_THEME"
-                                   normal_image="file='${PATH_BUTTON}/switch_theme.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>
-    <Class name="btn_switch_lang" class="btn_wnd_base" tooltip_text_id="STRID_PUBLIC_TIP_BTN_LANGUAGE"
-                                   normal_image="file='${PATH_BUTTON}/switch_lang.svg' width='${SIZE_WND_ICON}' height='${SIZE_WND_ICON}' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"/>     
-    <!-- 退出全屏按钮 -->
-    <Class name="btn_exit_fullscreen" width="${SIZE_BTN_EXIT_FULLSCREEN_WIDTH}" height="${SIZE_BTN_EXIT_FULLSCREEN_HEIGHT}" border_round="3,3" valign="top" halign="center" 
-                                      bkcolor="bg_btn_exit_fullscreen" normal_text_color="text_btn_exit_fullscreen" 
-                                      font="system_bold_14" text_align="vcenter,hcenter" 
-                                      text_id="STRID_PUBLIC_EXIT_FULLSCREEN" tooltip_text_id="STRID_PUBLIC_EXIT_FULLSCREEN" 
-                                      float="true" keyboard_enabled="false" no_focus="true" 
-                                      alpha="0" fade_alpha="128" fade_in_out_y_from_top="true"/>
-        
-    <!-- 删除按钮 -->
-    <Class name="btn_recycle" width="auto" height="auto" 
-                              normal_image="file='${PATH_BUTTON}/btn_recycle_normal.svg'" 
-                              hot_image="file='${PATH_BUTTON}/btn_recycle_hovered.svg'" 
-                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pushed.svg'" 
-                              disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' fade='80'"/>
     
     <!-- 列表控件 -->
     <Class name="list" bkcolor="bg_list" vscrollbar="true"/>
@@ -734,5 +683,56 @@
                                 property_value_label_class="property_grid_property_value_label"
                                 property_font_normal="system_regular_14"
                                 property_font_modified="system_bold_14"/>
+
+    <!-- ===================== 基础控件样式基类 ===================== -->
+    <!-- 滚动条基类 -->
+    <Class name="scrollbar_base" fade_alpha="false"/>
+      
+    <!-- ===================== 具体控件样式 ===================== -->
+    <!-- 滚动条：简约风格（默认） -->
+    <Class name="vscrollbar" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
+                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             show_button1="false" 
+                             show_button2="false" />
+    <Class name="hscrollbar" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
+                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             show_button1="false" 
+                             show_button2="false"/>
+    
+    <!-- 滚动条：标准风格 -->
+    <Class name="vscrollbar2" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
+                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'"                              
+                             show_button1="true" 
+                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             show_button2="true"
+                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' " />
+    <Class name="hscrollbar2" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
+                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             show_button1="true" 
+                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             show_button2="true"
+                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' " />
     
 </Global>
