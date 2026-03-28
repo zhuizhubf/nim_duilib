@@ -442,8 +442,15 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
     else {
         //替换文本
         DStringA svgText((const DStringA::value_type*)fileData.data(), fileData.size());
-        svgText = SvgImageImpl::GetReplacedSvgText(svgText, svgReplaceTextList);
-        spMemStream = std::move(SkMemoryStream::MakeCopy(svgText.data(), svgText.size()));
+        DStringA newSvgText = SvgImageImpl::GetReplacedSvgText(svgText, svgReplaceTextList);
+        if (decodeParam.m_bAssertEnabled) {
+            ASSERT(newSvgText != svgText);
+        }
+        if (newSvgText == svgText) {
+            //没有替换(配置有错误)
+            svgReplaceTextList.clear();
+        }
+        spMemStream = std::move(SkMemoryStream::MakeCopy(newSvgText.data(), newSvgText.size()));
     }
 
     uint32_t nImageWidth = 0;

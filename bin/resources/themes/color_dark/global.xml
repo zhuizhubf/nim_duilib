@@ -49,6 +49,13 @@
     <ThemeColor name="border_control_normal" value="#FF2D2D30" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
     <ThemeColor name="border_focus_ring" value="#4D3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
 
+    <!-- ===================== SVG图片颜色 (type: image) ===================== -->
+    <ThemeColor name="border_svg_image_light2" value="#F2CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_light" value="#E6CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image" value="#D9CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_dark" value="#CCCCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_dark2" value="#B3CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+
     <!-- ===================== 文本颜色 (type: text) ===================== -->
     <ThemeColor name="text_default" value="#FFE5E7EB" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要文本/浅灰白" comment_en="Primary text/light gray white"/>
     <ThemeColor name="text_disabled" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="禁用文本/弱化显示" comment_en="Disabled text/weak display"/>

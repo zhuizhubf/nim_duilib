@@ -49,6 +49,13 @@
     <ThemeColor name="border_control_normal" value="#FFE5E7EB" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
     <ThemeColor name="border_focus_ring" value="#4D0078D4" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
 
+    <!-- ===================== SVG图片颜色 (type: image) ===================== -->
+    <ThemeColor name="border_svg_image_light2" value="#B3222222" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_light" value="#CC222222" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image" value="#D9222222" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_dark" value="#E6222222" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_dark2" value="#F2222222" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+
     <!-- ===================== 文本颜色 (type: text) ===================== -->
     <ThemeColor name="text_default" value="#FF1E1E1E" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要文本/正文/标题" comment_en="Primary text/body/title"/>
     <ThemeColor name="text_disabled" value="#FF888888" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="禁用文本/不可交互控件" comment_en="Disabled text/non-interactive control"/>

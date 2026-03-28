@@ -72,7 +72,7 @@
                                                 <RichEdit class="simple color_picker_color_edit" name="color_picker_new_color_edit" height="28" width="90" halign="center" text_align="left,vcenter" readonly="false" number_only="false" limit_text="9" limit_chars="#0123456789ABCDEFabcdef" text="#FFFFFFFF"/>
                                                 <Button class="btn_global" name="color_picker_copy" width="22" height="22" border_round="2,2" 
                                                         text="" valign="center" halign="center" margin="2,0,0,0"
-                                                        bkimage="file='copy_color.svg' width='14' height='14' halign='center' valign='center'"
+                                                        bkimage="file='copy_color.svg' width='14' height='14' halign='center' valign='center' svg_replace_colors='#333333,border_svg_image'"
                                                         tooltip_text_id="STRID_PUBLIC_COLORPICKER_COPY_COLOR"/>
                                             </HBox>
                                             <GroupVBox margin="2,0,2,2" height="auto" text=" RGB ">
@@ -151,7 +151,7 @@
                                                         text="" valign="center" halign="center" margin="0,0,0,2"
                                                         normal_color="" disabled_color=""
                                                         normal_border_color="" disabled_border_color=""
-                                                        bkimage="file='copy_color.svg' width='14' height='14' halign='center' valign='center'"
+                                                        bkimage="file='copy_color.svg' width='14' height='14' halign='center' valign='center' svg_replace_colors='#333333,border_svg_image'"
                                                         tooltip_text_id="STRID_PUBLIC_COLORPICKER_COPY_COLOR"/>
                             </HBox>                            
                             <Box height="50%" bkcolor="bg_window_card">

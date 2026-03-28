@@ -27,13 +27,13 @@
     <Class name="property_grid_spin_box" width="18" halign="right" nofocus="true"/>
     <Class name="property_grid_spin_btn_up" height="50%" width="100%" nofocus="true" padding="1,1,1,1"
                                             border_size="1,1,1,1" border_color="border_richedit_btn"
-                                            normal_image="file='public/button/arrow-up.svg' width='10' height='10' valign='center' halign='center'"
+                                            normal_image="file='public/button/arrow-up.svg' width='10' height='10' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"
                                             normal_color="bg_window_main"
                                             hot_color="bg_richedit_btn_hover"
                                             pushed_color="bg_richedit_btn_pressed"/>
     <Class name="property_grid_spin_btn_down" height="50%" width="100%" nofocus="true" padding="1,0,1,1"
                                             border_size="1,0,1,1" border_color="border_richedit_btn"
-                                            normal_image="file='public/button/arrow-down.svg' width='10' height='10' valign='center' halign='center'"
+                                            normal_image="file='public/button/arrow-down.svg' width='10' height='10' valign='center' halign='center' svg_replace_colors='#333333,border_svg_image'"
                                             normal_color="bg_window_main"
                                             hot_color="bg_richedit_btn_hover"
                                             pushed_color="bg_richedit_btn_pressed"/>
