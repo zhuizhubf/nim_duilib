@@ -111,7 +111,8 @@ ImageLoadParam Image::GetImageLoadParam() const
                           nIconFrameDelayMs,
                           nIconSize,
                           fPagMaxFrameRate,
-                          m_imageAttribute.IsAssertEnabled());
+                          m_imageAttribute.IsAssertEnabled(),
+                          m_imageAttribute.m_svgReplaceColors.c_str());
 }
 
 const std::shared_ptr<ImageInfo>& Image::GetImageInfo() const

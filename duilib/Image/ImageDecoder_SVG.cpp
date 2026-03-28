@@ -3,6 +3,8 @@
 #include "duilib/Image/Image_Svg.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/FileUtil.h"
+#include "duilib/Utils/StringUtil.h"
+#include "duilib/Utils/StringConvert.h"
 #include "duilib/Core/GlobalManager.h"
 #include <cmath>
 
@@ -52,9 +54,8 @@ namespace NanoSvgDecoder
 
     /** 获取Svg图片的宽度和高度(仅解析xml，无渲染，速度快)
     */
-    bool ImageSizeFromMemory(const std::vector<uint8_t>& data, int32_t& nSvgImageWidth, int32_t& nSvgImageHeight)
+    bool ImageSizeFromMemory(std::vector<uint8_t>& fileData, int32_t& nSvgImageWidth, int32_t& nSvgImageHeight)
     {
-        std::vector<uint8_t> fileData = data;//此处需要复制数据，因为在解析的过程中，会破坏原来的数据
         ASSERT(!fileData.empty());
         if (fileData.empty()) {
             return false;
@@ -114,11 +115,36 @@ public:
             return nullptr;
         }
 
+        //检查颜色值是否变化，如果变化则需要重新生成图片
+        if (!m_svgReplaceTextList.empty() && !m_svgText.empty()) {
+            if (CheckReplacedSvgColorChanged(m_svgReplaceTextList)) {
+                DStringA svgText = SvgImageImpl::GetReplacedSvgText(m_svgText, m_svgReplaceTextList);
+                std::unique_ptr<SkMemoryStream> spMemStream = SkMemoryStream::MakeCopy(svgText.data(), svgText.size());
+                uint32_t nLoadedImageWidth = 0;
+                uint32_t nLoadedImageHeight = 0;
+                float fImageSizeScale = m_fImageSizeScale;
+                sk_sp<SkSVGDOM> svgDom = SvgImageImpl::LoadSvgImage(spMemStream.get(), fImageSizeScale, false,
+                                                                    nLoadedImageWidth, nLoadedImageHeight);
+                ASSERT(svgDom != nullptr);
+                ASSERT(nLoadedImageWidth == m_nImageWidth);
+                ASSERT(nLoadedImageHeight == m_nImageHeight);
+                if ((svgDom != nullptr) && (nImageWidth == m_nImageWidth) && (nImageHeight == m_nImageHeight)) {
+                    //重现加载成功
+                    m_svgDom = svgDom;
+                }
+            }
+        }
+
         if ((m_pBitmap != nullptr) &&
             (m_pBitmap->GetWidth() == nImageWidth) &&
             (m_pBitmap->GetHeight() == nImageHeight)) {
             //使用缓存位图
             return m_pBitmap;
+        }
+
+        ASSERT(m_svgDom != nullptr);
+        if (m_svgDom == nullptr) {
+            return nullptr;
         }
 
         //生成位图，矢量缩放
@@ -158,6 +184,172 @@ public:
     }
 
 public:
+    //SVG源码中需要替换的内容（颜色等）
+    struct SvgReplaceText
+    {
+        DStringA srcText;   //源字符串
+        DStringA destText;  //目标字符串
+        bool bColor;        //是否为颜色值
+        DString colorName;  //颜色名称（当bColor时使用）
+        UiColor colorValue; //颜色值（当bColor时使用）
+    };
+
+    //生成替换文本的列表
+    static void CreateSvgReplaceTextList(const DString& strSvgReplaceColor, std::vector<SvgImageImpl::SvgReplaceText>& svgReplaceTextList)
+    {
+        svgReplaceTextList.clear();
+        if (strSvgReplaceColor.empty()) {
+            return;
+        }
+        DStringA svgReplaceColor = StringConvert::TToUTF8(strSvgReplaceColor);
+        std::list<DStringA> colorsList = StringUtil::Split(svgReplaceColor, ";");
+        for (DStringA colorPair : colorsList) {
+            StringUtil::Trim(colorPair);
+            std::list<DStringA> colors = StringUtil::Split(svgReplaceColor, ",");
+            if (colors.size() == 2) {
+                DStringA srcColor = *colors.begin();
+                DStringA destColor = *colors.rbegin();
+
+                StringUtil::Trim(srcColor);
+                StringUtil::Trim(destColor);
+
+                if (!srcColor.empty() && !destColor.empty()) {
+                    DString colorName = StringConvert::UTF8ToT(destColor);
+                    UiColor colorValue = ColorManager::ConvertToUiColor(colorName);
+                    if (!colorValue.IsEmpty()) {
+                        //颜色值
+                        SvgImageImpl::SvgReplaceText replaceText;
+                        replaceText.srcText = srcColor;
+                        replaceText.destText = destColor;
+                        replaceText.bColor = true;
+                        replaceText.colorName = colorName;
+                        replaceText.colorValue = colorValue;
+                        svgReplaceTextList.emplace_back(std::move(replaceText));
+                    }
+                    else {
+                        //非颜色值
+                        SvgImageImpl::SvgReplaceText replaceText;
+                        replaceText.srcText = srcColor;
+                        replaceText.destText = destColor;
+                        replaceText.bColor = false;
+                        svgReplaceTextList.emplace_back(std::move(replaceText));
+                    }
+                }
+            }
+        }
+    }
+
+    //生成替换文本（颜色）后的svg源码文本
+    static DStringA GetReplacedSvgText(DStringA svgText, std::vector<SvgReplaceText>& svgReplaceTextList)
+    {
+        for (const SvgReplaceText& replaceText : svgReplaceTextList) {
+            if (replaceText.bColor) {
+                //颜色值：替换为目标颜色值, 格式为：rgba(r,g,b,a)，举例：fill="rgba(181,181,181,0.5)"
+                DStringA rgbaColor = StringUtil::Printf("rgba(%d,%d,%d,%.02f)",
+                                                        (int32_t)replaceText.colorValue.GetR(),
+                                                        (int32_t)replaceText.colorValue.GetG(),
+                                                        (int32_t)replaceText.colorValue.GetB(),
+                                                        (float)replaceText.colorValue.GetA() / 255.0f);
+                StringUtil::ReplaceAll(replaceText.srcText, rgbaColor, svgText);
+            }
+            else {
+                //非颜色值：直接替换
+                StringUtil::ReplaceAll(replaceText.srcText, replaceText.destText, svgText);
+            }
+        }
+        return svgText;
+    }
+
+    /** 检测被替换的颜色值是否变化，如果变化则需要重新加载svg图片
+    * @return 变化返回true，无变化返回false
+    */
+    static bool CheckReplacedSvgColorChanged(std::vector<SvgReplaceText>& svgReplaceTextList)
+    {
+        bool bColorChanged = false;
+        for (SvgReplaceText& replaceText : svgReplaceTextList) {
+            if (replaceText.bColor) {
+                DString colorName = StringConvert::UTF8ToT(replaceText.destText);
+                UiColor colorValue = ColorManager::ConvertToUiColor(colorName);
+                if (!colorValue.IsEmpty() && colorValue != replaceText.colorValue) {
+                    //更新颜色值（一般是主题变化时，才会变化）
+                    replaceText.colorValue = colorValue;
+                    bColorChanged = true;
+                }
+            }
+        }
+        return bColorChanged;
+    }
+
+    /** 加载SVG图片
+    */
+    static sk_sp<SkSVGDOM> LoadSvgImage(SkMemoryStream* spMemStream, float fImageSizeScale, bool bAssertEnabled,
+                                        uint32_t& nImageWidth, uint32_t& nImageHeight)
+    {
+        ASSERT(spMemStream != nullptr);
+        if (spMemStream == nullptr) {
+            return nullptr;
+        }
+        sk_sp<SkSVGDOM> svgDom = SkSVGDOM::MakeFromStream(*spMemStream);
+        if (bAssertEnabled) {
+            ASSERT(svgDom != nullptr);
+        }
+        if (svgDom == nullptr) {
+            return nullptr;
+        }
+        if (bAssertEnabled) {
+            ASSERT(svgDom->getRoot() != nullptr);
+        }
+        if (svgDom->getRoot() == nullptr) {
+            return nullptr;
+        }
+        SkSize svgSize = svgDom->getRoot()->intrinsicSize(SkSVGLengthContext(SkSize::Make(0, 0)));
+        int32_t nSvgImageWidth = int32_t(std::ceil(svgSize.width()));
+        int32_t nSvgImageHeight = int32_t(std::ceil(svgSize.height()));
+        if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
+            auto viewBox = svgDom->getRoot()->getViewBox();
+            if (viewBox.has_value()) {
+                nSvgImageWidth = int32_t(std::ceil(viewBox->width()));
+                nSvgImageHeight = int32_t(std::ceil(viewBox->height()));
+            }
+        }
+        else {
+            //如果viewBox不存在，则设置一个，否则图片缩放时存在异常（此处逻辑保持与NanoSvg保持一致）
+            auto viewBox = svgDom->getRoot()->getViewBox();
+            if (!viewBox.has_value()) {
+                svgDom->getRoot()->setViewBox(SkRect::MakeIWH(nSvgImageWidth, nSvgImageHeight));
+            }
+        }
+        if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
+            //如果图片中没有直接定义宽和高，使用NanoSvg计算图片的宽度和高度（Skia的Svg封装没有提供相关功能）
+            const void* pData = spMemStream->getMemoryBase();
+            const size_t nDataLen = spMemStream->getLength();
+            if ((pData != nullptr) && (nDataLen > 0)) {
+                std::vector<uint8_t> fileData;
+                fileData.resize(nDataLen);
+                memcpy(fileData.data(), pData, nDataLen);
+                if (!NanoSvgDecoder::ImageSizeFromMemory(fileData, nSvgImageWidth, nSvgImageHeight)) {
+                    if (bAssertEnabled) {
+                        ASSERT(0);
+                    }
+                }
+            }            
+        }
+        ASSERT((nSvgImageWidth > 0) && (nSvgImageHeight > 0));
+        if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
+            return nullptr;
+        }
+
+        //计算缩放后的大小
+        nImageWidth = ImageUtil::GetScaledImageSize((uint32_t)nSvgImageWidth, fImageSizeScale);
+        nImageHeight = ImageUtil::GetScaledImageSize((uint32_t)nSvgImageHeight, fImageSizeScale);
+        ASSERT((nImageHeight > 0) && (nImageHeight > 0));
+        if ((nImageWidth < 1) || (nImageHeight < 1)) {
+            return nullptr;
+        }
+        return svgDom;
+    }
+
+public:
     //宽度
     uint32_t m_nImageWidth = 0;
 
@@ -167,8 +359,12 @@ public:
     //缩放比例
     float m_fImageSizeScale = IMAGE_SIZE_SCALE_NONE;
 
-    //内存数据流
-    std::unique_ptr<SkMemoryStream> m_spMemStream;
+public:
+    //SVG源码文本
+    DStringA m_svgText;
+
+    //SVG源码中需要替换的内容（颜色等）
+    std::vector<SvgReplaceText> m_svgReplaceTextList;
 
     //SVG DOM
     sk_sp<SkSVGDOM> m_svgDom;
@@ -234,74 +430,44 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
         ASSERT(0);
         return nullptr;
     }
-    std::unique_ptr<SkMemoryStream> spMemStream = SkMemoryStream::MakeCopy(fileData.data(), fileData.size());
-    ASSERT(spMemStream != nullptr);
-    if (spMemStream == nullptr) {
-        return nullptr;
-    }
-    sk_sp<SkSVGDOM> svgDom = SkSVGDOM::MakeFromStream(*spMemStream);
-    if (decodeParam.m_bAssertEnabled) {
-        ASSERT(svgDom != nullptr);
-    }
-    if (svgDom == nullptr) {
-        return nullptr;
-    }
-    if (decodeParam.m_bAssertEnabled) {
-        ASSERT(svgDom->getRoot() != nullptr);
-    }
-    if (svgDom->getRoot() == nullptr) {
-        return nullptr;
-    }
-    spMemStream.reset();
 
-    SkSize svgSize = svgDom->getRoot()->intrinsicSize(SkSVGLengthContext(SkSize::Make(0, 0)));    
-    int32_t nSvgImageWidth = int32_t(std::ceil(svgSize.width()));
-    int32_t nSvgImageHeight = int32_t(std::ceil(svgSize.height()));
-    if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
-        auto viewBox = svgDom->getRoot()->getViewBox();
-        if (viewBox.has_value()) {
-            nSvgImageWidth = int32_t(std::ceil(viewBox->width()));
-            nSvgImageHeight = int32_t(std::ceil(viewBox->height()));
-        }
+    //当有需要从SVG中替换的文本时，需要记录SVG源码及替换规则
+    std::vector<SvgImageImpl::SvgReplaceText> svgReplaceTextList;
+    SvgImageImpl::CreateSvgReplaceTextList(decodeParam.m_svgReplaceColors, svgReplaceTextList);
+
+    std::unique_ptr<SkMemoryStream> spMemStream;
+    if (svgReplaceTextList.empty()) {
+        spMemStream = std::move(SkMemoryStream::MakeCopy(fileData.data(), fileData.size()));
     }
     else {
-        //如果viewBox不存在，则设置一个，否则图片缩放时存在异常（此处逻辑保持与NanoSvg保持一致）
-        auto viewBox = svgDom->getRoot()->getViewBox();
-        if (!viewBox.has_value()) {
-            svgDom->getRoot()->setViewBox(SkRect::MakeIWH(nSvgImageWidth, nSvgImageHeight));
-        }
-    }
-    if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
-        //如果图片中没有直接定义宽和高，使用NanoSvg计算图片的宽度和高度（Skia的Svg封装没有提供相关功能）
-        if (!NanoSvgDecoder::ImageSizeFromMemory(fileData, nSvgImageWidth, nSvgImageHeight)) {
-            if (decodeParam.m_bAssertEnabled) {
-                ASSERT(0);
-            }
-            return nullptr;
-        }
+        //替换文本
+        DStringA svgText((const DStringA::value_type*)fileData.data(), fileData.size());
+        svgText = SvgImageImpl::GetReplacedSvgText(svgText, svgReplaceTextList);
+        spMemStream = std::move(SkMemoryStream::MakeCopy(svgText.data(), svgText.size()));
     }
 
-    ASSERT((nSvgImageWidth > 0) && (nSvgImageHeight > 0));
-    if ((nSvgImageWidth < 1) || (nSvgImageHeight < 1)) {
-        return nullptr;
-    }
-
-    //计算缩放后的大小
+    uint32_t nImageWidth = 0;
+    uint32_t nImageHeight = 0;
     float fImageSizeScale = decodeParam.m_fImageSizeScale;
-    uint32_t nImageWidth = ImageUtil::GetScaledImageSize((uint32_t)nSvgImageWidth, fImageSizeScale);
-    uint32_t nImageHeight = ImageUtil::GetScaledImageSize((uint32_t)nSvgImageHeight, fImageSizeScale);
-    ASSERT((nImageHeight > 0) && (nImageHeight > 0));
-    if ((nImageWidth < 1) || (nImageHeight < 1)) {
+    sk_sp<SkSVGDOM> svgDom = SvgImageImpl::LoadSvgImage(spMemStream.get(), fImageSizeScale, decodeParam.m_bAssertEnabled,
+                                                        nImageWidth, nImageHeight);
+    if (svgDom == nullptr) {
         return nullptr;
     }
 
     SvgImageImpl* pSvgImageImpl = new SvgImageImpl;
-    std::shared_ptr<ISvgImage> pSvgImage(pSvgImageImpl);    
+    std::shared_ptr<ISvgImage> pSvgImage(pSvgImageImpl);
     pSvgImageImpl->m_nImageWidth = nImageWidth;
     pSvgImageImpl->m_nImageHeight = nImageHeight;
     pSvgImageImpl->m_fImageSizeScale = fImageSizeScale;
-    pSvgImageImpl->m_spMemStream = std::move(spMemStream);
     pSvgImageImpl->m_svgDom = svgDom;
+
+    //保存需要替换的源数据
+    pSvgImageImpl->m_svgReplaceTextList.swap(svgReplaceTextList);
+    if (!pSvgImageImpl->m_svgReplaceTextList.empty()) {
+        DStringA svgText((const DStringA::value_type*)fileData.data(), fileData.size());
+        pSvgImageImpl->m_svgText.swap(svgText);
+    }
 
     std::unique_ptr<IImage> pImage = Image_Svg::MakeImage(pSvgImage);
     return pImage;

@@ -335,6 +335,9 @@ public:
 
     //PAG格式，解码动画的帧率
     float m_fPagMaxFrameRate = 30.0f;
+
+    //SVG格式的颜色替换参数(支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，现在只要一个svg就够了)
+    DString m_svgReplaceColors;
 };
 
 /** 图片解码器接口

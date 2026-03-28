@@ -27,7 +27,8 @@ ImageLoadParam::ImageLoadParam(DString srcWidth,
                                int32_t nIconFrameDelayMs,
                                uint32_t nIconSize,
                                float fPagMaxFrameRate,
-                               bool bAssertEnabled):
+                               bool bAssertEnabled,
+                               const DString& svgReplaceColors):
     m_bImageDpiScaleEnabled(bImageDpiScaleEnabled),
     m_nLoadDpiScale(nLoadDpiScale),
     m_bAsyncDecode(bAsyncDecode),
@@ -35,7 +36,8 @@ ImageLoadParam::ImageLoadParam(DString srcWidth,
     m_nIconFrameDelayMs(nIconFrameDelayMs),
     m_nIconSize(nIconSize),
     m_fPagMaxFrameRate(fPagMaxFrameRate),
-    m_bAssertEnabled(bAssertEnabled)
+    m_bAssertEnabled(bAssertEnabled),
+    m_svgReplaceColors(svgReplaceColors)
 {
     StringUtil::Trim(srcWidth);
     StringUtil::Trim(srcHeight);
@@ -139,6 +141,11 @@ bool ImageLoadParam::IsAsyncDecodeEnabled() const
 bool ImageLoadParam::IsAssertEnabled() const
 {
     return m_bAssertEnabled;
+}
+
+DString ImageLoadParam::GetSvgReplaceColors() const
+{
+    return m_svgReplaceColors.c_str();
 }
 
 bool ImageLoadParam::HasImageFixedSize(void) const

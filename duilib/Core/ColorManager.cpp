@@ -74,14 +74,14 @@ UiColor ColorManager::ConvertToUiColor(const DString& strColor)
         return color;
     }
     if (strColor.at(0) != _T('#')) {
-        //按标准颜色值获取
-        color = GlobalManager::Instance().Color().GetStandardColor(strColor);
+        //按已定义颜色获取
+        color = GlobalManager::Instance().Color().GetColor(strColor);
         if (!color.IsEmpty()) {
             return color;
         }
 
-        //按已定义颜色获取
-        color = GlobalManager::Instance().Color().GetColor(strColor);
+        //按标准颜色值获取
+        color = GlobalManager::Instance().Color().GetStandardColor(strColor);
         if (!color.IsEmpty()) {
             return color;
         }
