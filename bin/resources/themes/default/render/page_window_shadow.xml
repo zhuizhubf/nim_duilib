@@ -6,27 +6,27 @@
     <VBox>
         <HBox width="auto" height="auto">
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_big.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_big.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_BIG"/>
             </VBox>
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_big_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_big_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_BIG_ROUND"/>
             </VBox>
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_small.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_small.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_SMALL"/>
             </VBox>
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_small_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_small_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_SMALL_ROUND"/>
             </VBox>
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_menu.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_menu.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_MENU"/>
             </VBox>
             <VBox class="page_window_shadow_vbox">
-                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_menu_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5,border_window'"/>
+                <Control class="page_window_shadow_control" bkimage="file='public/shadow/shadow_menu_round.svg' width='180' valign='center' halign='center' svg_replace_colors='#B5B5B5|border_window'"/>
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_MENU_ROUND"/>
             </VBox>
         </HBox>

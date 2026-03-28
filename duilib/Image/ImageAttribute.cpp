@@ -417,8 +417,8 @@ void ImageAttribute::ModifyAttribute(const DString& strImageString, const DpiMan
         }
         else if (name == _T("svg_replace_colors")) {
             // SVG格式的颜色替换参数：支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，使用这个功能只要一个svg就够了。
-            // 使用示例: "#B5B5B5,color_gray_light"，表示将"#B5B5B5"替换为"color_gray_light"，"color_gray_light"在global.xml中定义。
-            // 若有多组颜色需要替换，则用分号分割，比如："#B5B5B5,color_gray_light;#B2B2B2,color_gray_dark"。
+            // 使用示例: "#B5B5B5|color_gray_light"，表示将"#B5B5B5"替换为"color_gray_light"，"color_gray_light"在global.xml中定义。
+            // 若有多组颜色需要替换，则用分号分割，比如："#B5B5B5|color_gray_light;#B2B2B2|color_gray_dark"。
             // 该功能当目标不是颜色值时，按字符串替换。
             imageAttribute.m_svgReplaceColors = value;
         }

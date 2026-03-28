@@ -427,7 +427,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
     //阴影边缘的颜色，与窗口边框的颜色保持一致
     DString svgReplaceColors;
     if ((pShadowObj != nullptr) && !pShadowObj->GetShadowBorderColor().empty()) {
-        svgReplaceColors = StringUtil::Printf(_T("svg_replace_colors='#B5B5B5,%s'"), pShadowObj->GetShadowBorderColor().c_str());
+        svgReplaceColors = StringUtil::Printf(_T("svg_replace_colors='#B5B5B5|%s'"), pShadowObj->GetShadowBorderColor().c_str());
     }
     if (nShadowType == Shadow::ShadowType::kShadowBig) {
         bRet = true;

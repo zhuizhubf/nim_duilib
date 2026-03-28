@@ -205,7 +205,7 @@ public:
         std::list<DStringA> colorsList = StringUtil::Split(svgReplaceColor, ";");
         for (DStringA colorPair : colorsList) {
             StringUtil::Trim(colorPair);
-            std::list<DStringA> colors = StringUtil::Split(svgReplaceColor, ",");
+            std::list<DStringA> colors = StringUtil::Split(svgReplaceColor, "|");
             if (colors.size() == 2) {
                 DStringA srcColor = *colors.begin();
                 DStringA destColor = *colors.rbegin();
@@ -213,6 +213,7 @@ public:
                 StringUtil::Trim(srcColor);
                 StringUtil::Trim(destColor);
 
+                ASSERT(!srcColor.empty() && !destColor.empty());
                 if (!srcColor.empty() && !destColor.empty()) {
                     DString colorName = StringConvert::UTF8ToT(destColor);
                     UiColor colorValue = ColorManager::ConvertToUiColor(colorName);
