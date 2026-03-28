@@ -228,7 +228,7 @@ Shadow::Shadow(Window* pWindow):
     if (!GlobalManager::Instance().Color().GetColor(borderWindow).IsEmpty()) {
         m_shadowBorderColor = borderWindow;
     }
-    else {
+    if (m_shadowBorderColor.empty()) {
         //若无配置，则设置默认值
         if (GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark) {
             //深色主题
@@ -424,71 +424,82 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                             Shadow* pShadowObj)
 {
     bool bRet = false;
+    //阴影边缘的颜色，与窗口边框的颜色保持一致
+    DString svgReplaceColors;
+    if ((pShadowObj != nullptr) && !pShadowObj->GetShadowBorderColor().empty()) {
+        svgReplaceColors = StringUtil::Printf(_T("svg_replace_colors='#B5B5B5,%s'"), pShadowObj->GetShadowBorderColor().c_str());
+    }
     if (nShadowType == Shadow::ShadowType::kShadowBig) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(30, 30, 34, 36);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_big.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_big.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                              DUILIB_PUBLIC_RES_DIR,
                                              rcShadowCorner.left + szBorderRound.cx,
                                              rcShadowCorner.top + szBorderRound.cx,
                                              rcShadowCorner.right + szBorderRound.cx,
-                                             rcShadowCorner.bottom + szBorderRound.cx);
+                                             rcShadowCorner.bottom + szBorderRound.cx,
+                                             svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowBigRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(30, 30, 34, 36);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_big_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_big_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                          DUILIB_PUBLIC_RES_DIR,
                                          rcShadowCorner.left + szBorderRound.cx,
                                          rcShadowCorner.top + szBorderRound.cx,
                                          rcShadowCorner.right + szBorderRound.cx,
-                                         rcShadowCorner.bottom + szBorderRound.cx);
+                                         rcShadowCorner.bottom + szBorderRound.cx,
+                                         svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowSmall) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_small.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_small.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                              DUILIB_PUBLIC_RES_DIR,
                                              rcShadowCorner.left + szBorderRound.cx,
                                              rcShadowCorner.top + szBorderRound.cx,
                                              rcShadowCorner.right + szBorderRound.cx,
-                                             rcShadowCorner.bottom + szBorderRound.cx);
+                                             rcShadowCorner.bottom + szBorderRound.cx,
+                                             svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowSmallRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_small_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_small_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                          DUILIB_PUBLIC_RES_DIR,
                                          rcShadowCorner.left + szBorderRound.cx,
                                          rcShadowCorner.top + szBorderRound.cx,
                                          rcShadowCorner.right + szBorderRound.cx,
-                                         rcShadowCorner.bottom + szBorderRound.cx);
+                                         rcShadowCorner.bottom + szBorderRound.cx,
+                                         svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowMenu) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_menu.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_menu.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                              DUILIB_PUBLIC_RES_DIR,
                                              rcShadowCorner.left + szBorderRound.cx,
                                              rcShadowCorner.top + szBorderRound.cx,
                                              rcShadowCorner.right + szBorderRound.cx,
-                                             rcShadowCorner.bottom + szBorderRound.cx);
+                                             rcShadowCorner.bottom + szBorderRound.cx,
+                                             svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowMenuRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
-        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_menu_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d'"),
+        shadowImage = StringUtil::Printf(_T("file='%s/shadow/shadow_menu_round.svg' window_shadow_mode='true' corner='%d,%d,%d,%d' %s"),
                                          DUILIB_PUBLIC_RES_DIR,
                                          rcShadowCorner.left + szBorderRound.cx,
                                          rcShadowCorner.top + szBorderRound.cx,
                                          rcShadowCorner.right + szBorderRound.cx,
-                                         rcShadowCorner.bottom + szBorderRound.cx);
+                                         rcShadowCorner.bottom + szBorderRound.cx,
+                                         svgReplaceColors.c_str());
     }
     else if (nShadowType == Shadow::ShadowType::kShadowNone) {
         bRet = true;
