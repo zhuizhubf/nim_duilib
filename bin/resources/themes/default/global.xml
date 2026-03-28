@@ -687,52 +687,52 @@
     <!-- ===================== 基础控件样式基类 ===================== -->
     <!-- 滚动条基类 -->
     <Class name="scrollbar_base" fade_alpha="false"/>
-      
+
     <!-- ===================== 具体控件样式 ===================== -->
     <!-- 滚动条：简约风格（默认） -->
     <Class name="vscrollbar" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
+                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='#C0C0C0|bg_scrollbar_thumb_normal'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='#A0A0A0|bg_scrollbar_thumb_hovered'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='rgba(100,100,100,0.18)|bg_scrollbar_hovered'" 
                              show_button1="false" 
                              show_button2="false" />
     <Class name="hscrollbar" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             thumb_normal_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='#C0C0C0|bg_scrollbar_thumb_normal'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='#A0A0A0|bg_scrollbar_thumb_hovered'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_SIMPLE}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='rgba(100,100,100,0.18)|bg_scrollbar_hovered'" 
                              show_button1="false" 
                              show_button2="false"/>
     
     <!-- 滚动条：标准风格 -->
     <Class name="vscrollbar2" class="scrollbar_base" width="${SIZE_SCROLLBAR_WIDTH}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8'"                              
+                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='#C0C0C0|bg_scrollbar_thumb_normal'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/thumb_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='#A0A0A0|bg_scrollbar_thumb_hovered'" 
+                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='rgba(120,120,120,0.15)|bg_scrollbar_normal'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/bk_hovered.svg' width='${SIZE_SCROLLBAR_WIDTH}' corner='0,8,0,8' svg_replace_colors='rgba(100,100,100,0.18)|bg_scrollbar_hovered'"                              
                              show_button1="true" 
-                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
+                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
+                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'"
                              show_button2="true"
-                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' "
-                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' " />
+                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
+                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'" />
     <Class name="hscrollbar2" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
-                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
-                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0'" 
+                             thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='#C0C0C0|bg_scrollbar_thumb_normal'" 
+                             thumb_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='#A0A0A0|bg_scrollbar_thumb_hovered'" 
+                             bk_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='rgba(120,120,120,0.15)|bg_scrollbar_normal'" 
+                             bk_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/bk_hovered.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='rgba(100,100,100,0.18)|bg_scrollbar_hovered'" 
                              show_button1="true" 
-                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
+                             button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
+                             button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'"
                              show_button2="true"
-                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' "
-                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' " />
+                             button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
+                             button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'" />
     
 </Global>

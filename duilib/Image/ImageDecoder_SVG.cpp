@@ -118,7 +118,7 @@ public:
         //检查颜色值是否变化，如果变化则需要重新生成图片
         if (!m_svgReplaceTextList.empty() && !m_svgText.empty()) {
             if (CheckReplacedSvgColorChanged(m_svgReplaceTextList)) {
-                DStringA svgText = SvgImageImpl::GetReplacedSvgText(m_svgText, m_svgReplaceTextList);
+                DStringA svgText = SvgImageImpl::GetReplacedSvgText(m_svgText, m_svgReplaceTextList, nullptr);
                 std::unique_ptr<SkMemoryStream> spMemStream = SkMemoryStream::MakeCopy(svgText.data(), svgText.size());
                 uint32_t nLoadedImageWidth = 0;
                 uint32_t nLoadedImageHeight = 0;
@@ -241,7 +241,7 @@ public:
     }
 
     //生成替换文本（颜色）后的svg源码文本
-    static DStringA GetReplacedSvgText(DStringA svgText, std::vector<SvgReplaceText>& svgReplaceTextList)
+    static DStringA GetReplacedSvgText(DStringA svgText, std::vector<SvgReplaceText>& svgReplaceTextList, bool* pExecReplaced)
     {
         for (const SvgReplaceText& replaceText : svgReplaceTextList) {
             if (replaceText.bColor) {
@@ -251,11 +251,21 @@ public:
                                                         (int32_t)replaceText.colorValue.GetG(),
                                                         (int32_t)replaceText.colorValue.GetB(),
                                                         (float)replaceText.colorValue.GetA() / 255.0f);
-                StringUtil::ReplaceAll(replaceText.srcText, rgbaColor, svgText);
+                if (replaceText.srcText != rgbaColor) {
+                    StringUtil::ReplaceAll(replaceText.srcText, rgbaColor, svgText);
+                    if (pExecReplaced) {
+                        *pExecReplaced = true;
+                    }
+                }                
             }
             else {
                 //非颜色值：直接替换
-                StringUtil::ReplaceAll(replaceText.srcText, replaceText.destText, svgText);
+                if (replaceText.srcText != replaceText.destText) {
+                    StringUtil::ReplaceAll(replaceText.srcText, replaceText.destText, svgText);
+                    if (pExecReplaced) {
+                        *pExecReplaced = true;
+                    }
+                }                
             }
         }
         return svgText;
@@ -442,9 +452,10 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
     }
     else {
         //替换文本
+        bool bExecReplaced = false;
         DStringA svgText((const DStringA::value_type*)fileData.data(), fileData.size());
-        DStringA newSvgText = SvgImageImpl::GetReplacedSvgText(svgText, svgReplaceTextList);
-        if (decodeParam.m_bAssertEnabled) {
+        DStringA newSvgText = SvgImageImpl::GetReplacedSvgText(svgText, svgReplaceTextList, &bExecReplaced);
+        if (decodeParam.m_bAssertEnabled && bExecReplaced) {
             ASSERT(newSvgText != svgText);
         }
         if (newSvgText == svgText) {

@@ -198,9 +198,18 @@
     <ThemeColor name="border_split_level2" value="#FFF5F5F5" type="split_line" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="二级分割线/次要区域分隔" comment_en="Level 2 split line/secondary area separator"/>
 
     <!-- ===================== 滚动条颜色 (type: scroll_bar) ===================== -->
-    <ThemeColor name="bg_scrollbar" value="#FFF0F0F0" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条背景" comment_en="Scrollbar background"/>
-    <ThemeColor name="bg_scrollbar_thumb" value="#FFCDCDCD" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条滑块背景" comment_en="Scrollbar thumb background"/>
-    <ThemeColor name="bg_scrollbar_thumb_hover" value="#FFB0B0B0" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条滑块悬浮态" comment_en="Scrollbar thumb hover state"/>
+    <ThemeColor name="bg_scrollbar_normal" value="#26787878" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条轨道背景" comment_en="Scrollbar background"/>
+    <ThemeColor name="bg_scrollbar_hovered" value="#2E646464" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条轨道背景悬浮态" comment_en="Scrollbar background hover state"/>
+    <ThemeColor name="bg_scrollbar_thumb_normal" value="#FFC0C0C0" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条滑块背景" comment_en="Scrollbar thumb background"/>
+    <ThemeColor name="bg_scrollbar_thumb_hovered" value="#FFA0A0A0" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条滑块悬浮态" comment_en="Scrollbar thumb hover state"/>
+    <ThemeColor name="bg_scrollbar_btn_normal" value="#4CDCDCDC" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮" comment_en="Scrollbar button"/>
+    <ThemeColor name="bg_scrollbar_btn_arrow_normal" value="#CC787878" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮箭头" comment_en="Scrollbar button arrow"/>
+    <ThemeColor name="bg_scrollbar_btn_disabled" value="#1ADCDCDC" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮禁用态" comment_en="Scrollbar button disabled"/>
+    <ThemeColor name="bg_scrollbar_btn_arrow_disabled" value="#66787878" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮箭头禁用态" comment_en="Scrollbar button arrow disabled"/>
+    <ThemeColor name="bg_scrollbar_btn_hover" value="#80C8C8C8" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮悬浮态" comment_en="Scrollbar button hover"/>
+    <ThemeColor name="bg_scrollbar_btn_arrow_hover" value="#E61E78C8" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮箭头悬浮态" comment_en="Scrollbar button arrow hover"/>
+    <ThemeColor name="bg_scrollbar_btn_pushed" value="#B2B4B4B4" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮按下态" comment_en="Scrollbar button pushed"/>
+    <ThemeColor name="bg_scrollbar_btn_arrow_pushed" value="#FF505050" type="scroll_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="滚动条按钮箭头按下态" comment_en="Scrollbar button arrow pushed"/>
 
     <!-- ===================== ToolTip颜色 (type: tooltip) ===================== -->
     <ThemeColor name="bg_tooltip" value="#FFFFFFE1" type="tooltip" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="工具提示背景" comment_en="Tooltip background"/>
