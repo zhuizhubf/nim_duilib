@@ -11,6 +11,7 @@ namespace ui
 enum class ThemeStyle
 {
     kUnknown,  //未知主题
+    kBase,     //基础主题
     kLight,    //浅色主题
     kDark      //深色主题
 };

@@ -50,6 +50,9 @@ ThemeStyle ThemeManager::GetThemeStyleValue(DString themeStyle) const
     if (themeStyle == _T("light")) {
         return ThemeStyle::kLight;
     }
+    else if (themeStyle == _T("base")) {
+        return ThemeStyle::kBase;
+    }
     else if (themeStyle == _T("dark")) {
         return ThemeStyle::kDark;
     }
@@ -126,7 +129,7 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
     }
     if ((m_defaultThemePath == themePath)) {
         //默认主题
-        destThemeType = ThemeType::kUnknown;
+        destThemeType = ThemeType::kCombined;
     }
     else {
         //颜色主题或者图标主题
