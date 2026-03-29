@@ -487,6 +487,25 @@
             font-size: 14px;
             color: #6B7280;
         }
+        .theme-type {
+            font-size: 13px;
+            color: #3B82F6;
+            margin-top: 2px;
+        }
+        .theme-meta {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #E5E7EB;
+        }
+        .theme-meta-item {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 2px;
+        }
+        .theme-meta-item span {
+            font-weight: 600;
+            color: #374151;
+        }
         .category-type .category-header {
             border-left: 4px solid #0078D4;
         }
@@ -1767,6 +1786,8 @@
         <div>
             <div class="theme-name" id="themeName"></div>
             <div class="theme-style" id="themeStyle"></div>
+            <div class="theme-type" id="themeType"></div>
+            <div class="theme-meta" id="themeMeta"></div>
         </div>
         <div class="change-stat" id="changeStat">修改数：0 / 0</div>
         <div class="search-box" id="searchBox" style="display: none;">
@@ -2461,6 +2482,8 @@
         const themeInfoEl = document.getElementById('themeInfo');
         const themeNameEl = document.getElementById('themeName');
         const themeStyleEl = document.getElementById('themeStyle');
+        const themeTypeEl = document.getElementById('themeType');
+        const themeMetaEl = document.getElementById('themeMeta');
         const changeStatEl = document.getElementById('changeStat');
         const generatePanelEl = document.getElementById('generatePanel');
         const previewPanelEl = document.getElementById('previewPanel');
@@ -2748,10 +2771,27 @@
                 const themeName = themeNode.getAttribute('name') || '未命名主题';
                 const themeStyle = themeNode.getAttribute('style') || 'Light';
                 const themeVersion = themeNode.getAttribute('version') || '1.0';
+                const themeType = themeNode.getAttribute('type') || '';
+                const accentSupport = themeNode.getAttribute('accent_support') || 'false';
                 themeNameEl.textContent = `主题: ${themeName} (v${themeVersion})`;
                 themeStyleEl.textContent = `风格: ${themeStyle}`;
+                themeTypeEl.textContent = `类型: ${themeType}${accentSupport === 'true' ? ' (支持强调色)' : ''}`;
                 isDarkPreview = themeStyle.toLowerCase() === 'dark';
             }
+
+            const themeMetaNode = xmlDoc.querySelector('ThemeMeta');
+            let metaHtml = '';
+            if (themeMetaNode) {
+                const properties = themeMetaNode.querySelectorAll('Property');
+                properties.forEach(prop => {
+                    const name = prop.getAttribute('name');
+                    const value = prop.getAttribute('value');
+                    if (name && value) {
+                        metaHtml += `<div class="theme-meta-item"><span>${name}:</span> ${value}</div>`;
+                    }
+                });
+            }
+            themeMetaEl.innerHTML = metaHtml;
 
             const colorNodes = xmlDoc.querySelectorAll('ThemeColor');
             currentColorMap.clear();
@@ -5977,23 +6017,23 @@
             if (!currentColorMap.size) return;
 
             // 获取颜色值
-            const windowBg = getColorValue('bg_window_base', isDarkPreview ? '#FF1E1E1E' : '#FFFFFFFF');
-            const windowHeader = getColorValue('bg_title_bar', isDarkPreview ? '#FF2D2D2D' : '#FFF0F0F0');
-            const textPrimary = getColorValue('text_main', isDarkPreview ? '#FFFFFFFF' : '#FF1E1E1E');
-            const textSecondary = getColorValue('text_second', isDarkPreview ? '#FFB0B0B0' : '#FF6B6B6B');
-            const buttonPrimary = getColorValue('btn_normal_bg', '#FF0078D4');
-            const buttonHover = getColorValue('btn_hover_bg', buttonPrimary);
-            const buttonText = getColorValue('btn_normal_text', '#FFFFFFFF');
-            const borderColor = getColorValue('border_ctrl', isDarkPreview ? '#FF555555' : '#FFCCCCCC');
-            const inputBg = getColorValue('bg_edit', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
-            const linkColor = getColorValue('text_link', '#FF0078D4');
-            const listItemBg = getColorValue('listitem_bg', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
-            const listItemHover = getColorValue('listitem_hover_bg', listItemBg);
-            const listItemBorder = getColorValue('border_listitem', isDarkPreview ? '#FF3D3D3D' : '#FFE5E5E5');
-            const tagBg = getColorValue('btn_hover_bg', '#FFE5F1FF');
-            const successColor = getColorValue('text_success', '#FF10B981');
-            const warningColor = getColorValue('text_warn', '#FFF59E0B');
-            const errorColor = getColorValue('text_error', '#FFEF4444');
+            const windowBg = getColorValue('bg_window_main', isDarkPreview ? '#FF1E1E1E' : '#FFF0F0F0');
+            const windowHeader = getColorValue('bg_titlebar', isDarkPreview ? '#FF2D2D2D' : '#FFF0F0F0');
+            const textPrimary = getColorValue('text_default', isDarkPreview ? '#FFFFFFFF' : '#FF1E1E1E');
+            const textSecondary = getColorValue('text_muted', isDarkPreview ? '#FFB0B0B0' : '#FF6B6B6B');
+            const buttonPrimary = getColorValue('bg_btn_normal', '#FF0078D4');
+            const buttonHover = getColorValue('bg_btn_hover', buttonPrimary);
+            const buttonText = getColorValue('text_default', '#FFFFFFFF');
+            const borderColor = getColorValue('border_control_normal', isDarkPreview ? '#FF555555' : '#FFCCCCCC');
+            const inputBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
+            const linkColor = getColorValue('text_link_normal', '#FF0078D4');
+            const listItemBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
+            const listItemHover = getColorValue('bg_content', listItemBg);
+            const listItemBorder = getColorValue('border_control_normal', isDarkPreview ? '#FF3D3D3D' : '#FFE5E5E5');
+            const tagBg = getColorValue('bg_btn_hover', '#FFE5F1FF');
+            const successColor = getColorValue('color_green', '#FF10B981');
+            const warningColor = getColorValue('color_red_light', '#FFF59E0B');
+            const errorColor = getColorValue('color_red', '#FFEF4444');
 
             // 应用到预览窗口
             const previewWindow = document.getElementById('previewWindow');

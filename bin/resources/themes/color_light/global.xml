@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Global>
     <!-- 主题基础配置：Win11 25H2 浅色主题 | 类型为颜色主题 -->
-    <Theme name="Light" type="Color" style="Light" accent_support="true" version="2.0"/>
+    <Theme name="Light" type="color" style="light" accent_support="true" version="2.0"/>
     <ThemeMeta>        
         <Property name="contrast_ratio" value="7.2"/>
         <Property name="accent_color" value="#FF0078D4"/>
