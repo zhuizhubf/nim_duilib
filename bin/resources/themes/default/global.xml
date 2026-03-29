@@ -2,6 +2,13 @@
 <Global>
     <!-- 主题名称和主题类型 -->
     <Theme name="Default" type="Unknown" style="Unknown"/>
+    
+    <!-- ===================== 主题元数据 ===================== -->
+    <ThemeMeta>
+        <Author>nim-duilib Team</Author>
+        <Version>2.0</Version>
+        <Description>Default theme with base control styles for nim-duilib framework</Description>
+    </ThemeMeta>
         
     <!-- ===================== 全局变量定义 ===================== -->
     <!-- 尺寸变量 -->

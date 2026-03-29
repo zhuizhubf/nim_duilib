@@ -8,7 +8,6 @@
         <Property name="accent_color" value="#FF3B82F6"/>
         <Property name="base_luminance" value="dark"/>
     </ThemeMeta>
-
     
     <!-- ===================== 通用基础颜色 (type: common) ===================== -->
     <ThemeColor name="color_white" value="#FFFFFFFF" type="common" category="basic_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="高亮文本/按钮文字" comment_en="Highlight text/button text"/>
