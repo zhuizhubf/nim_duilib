@@ -30,7 +30,7 @@
     <ThemeColor name="bg_window_card" value="#FF202020" type="window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="卡片/弹窗背景" comment_en="Card/popup background"/>
     <ThemeColor name="bg_titlebar" value="#FF1A1A1A" type="window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="标题栏背景" comment_en="Title bar background"/>
     <ThemeColor name="border_window" value="#FF444444" type="window" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="窗口边框" comment_en="Window border"/>
- 
+
     <!-- ===================== 窗口按钮颜色 (type: button_window/button_window_close) ===================== -->
     <ThemeColor name="bg_btn_window_close_hover" value="#FFEF4444" type="button_window_close" category="bg_color" role="semantic_error_light" derived_from="" adjust="" fixed="false" comment_cn="关闭按钮悬浮背景" comment_en="Close button hover bg"/>
     <ThemeColor name="bg_btn_window_close_pressed" value="#FFDC2626" type="button_window_close" category="bg_color" role="semantic_error" derived_from="" adjust="" fixed="false" comment_cn="关闭按钮点击背景" comment_en="Close button pressed bg"/>
@@ -44,22 +44,22 @@
     <ThemeColor name="bg_overlay" value="#80000000" type="control" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="蒙层背景" comment_en="Overlay background"/>
     <ThemeColor name="border_control_disabled" value="#FF2A2A2A" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件禁用边框" comment_en="General control disabled border"/>
     <ThemeColor name="border_control_focus" value="#FF3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="通用控件聚焦高亮边框" comment_en="General control focus border"/>
-    <ThemeColor name="border_control_pressed" value="#FF3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="通用控件聚焦高亮边框" comment_en="General control focus border"/>
+    <ThemeColor name="border_control_pressed" value="#FF3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="通用控件点击边框" comment_en="General control pressed border"/>
     <ThemeColor name="border_control_hover" value="#FF444444" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件悬浮边框" comment_en="General control hover border"/>
     <ThemeColor name="border_control_normal" value="#FF2D2D30" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
     <ThemeColor name="border_focus_ring" value="#4D3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
 
     <!-- ===================== SVG图片颜色 (type: image) ===================== -->
-    <ThemeColor name="border_svg_image_light2" value="#F2CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
-    <ThemeColor name="border_svg_image_light" value="#E6CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
-    <ThemeColor name="border_svg_image" value="#D9CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
-    <ThemeColor name="border_svg_image_dark" value="#CCCCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
-    <ThemeColor name="border_svg_image_dark2" value="#B3CCCCCC" type="image" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="svg图片的颜色" comment_en="colors for svg image"/>
+    <ThemeColor name="border_svg_image_light2" value="#F2E5E7EB" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="SVG图片浅色2" comment_en="SVG image light color 2"/>
+    <ThemeColor name="border_svg_image_light" value="#E6E5E7EB" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="SVG图片浅色1" comment_en="SVG image light color 1"/>
+    <ThemeColor name="border_svg_image" value="#D9E5E7EB" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="SVG图片默认色" comment_en="SVG image default color"/>
+    <ThemeColor name="border_svg_image_dark" value="#CC9CA3AF" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="SVG图片深色1" comment_en="SVG image dark color 1"/>
+    <ThemeColor name="border_svg_image_dark2" value="#B36B7280" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="SVG图片深色2" comment_en="SVG image dark color 2"/>
 
     <!-- ===================== 文本颜色 (type: text) ===================== -->
     <ThemeColor name="text_default" value="#FFE5E7EB" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要文本/正文/标题" comment_en="Primary text/body/title"/>
     <ThemeColor name="text_disabled" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="禁用文本/不可交互控件" comment_en="Disabled text/non-interactive control"/>
-    <ThemeColor name="text_muted" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要文本/辅助说明" comment_en="Secondary text / auxiliary instructions"/>
+    <ThemeColor name="text_muted" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要文本/辅助说明" comment_en="Secondary text/auxiliary description"/>
     <ThemeColor name="text_selected" value="#FFFFFFFF" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="选中文本颜色" comment_en="Selected text color"/>
     <ThemeColor name="text_link_normal" value="#FF3B82F6" type="text" category="text_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="链接默认状态" comment_en="Link normal state"/>
     <ThemeColor name="text_link_hover" value="#FF60A5FA" type="text" category="text_color" role="primary_dark" derived_from="" adjust="" fixed="true" comment_cn="链接悬浮状态" comment_en="Link hover state"/>
@@ -107,26 +107,26 @@
     <!-- ===================== 列表框颜色 (type: list_box) ===================== -->
     <ThemeColor name="bg_list" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表背景" comment_en="List background"/>
     <ThemeColor name="bg_list_item_hover" value="#FF333333" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项悬浮" comment_en="List item hover"/>
-    <ThemeColor name="bg_list_item_pressed" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中" comment_en="List item selected"/>
-    <ThemeColor name="bg_list_item_disabled" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项选中" comment_en="List item selected"/>
+    <ThemeColor name="bg_list_item_pressed" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项点击" comment_en="List item pressed"/>
+    <ThemeColor name="bg_list_item_disabled" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项禁用" comment_en="List item disabled"/>
     <ThemeColor name="bg_list_item_selected" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中" comment_en="List item selected"/>
 
     <!-- ===================== 树控件颜色 (type: tree_view) ===================== -->
-    <ThemeColor name="bg_tree_view" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表背景" comment_en="List background"/>
-    <ThemeColor name="bg_tree_view_node_hover" value="#FF333333" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项悬浮" comment_en="List item hover"/>
-    <ThemeColor name="bg_tree_view_node_pressed" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中" comment_en="List item selected"/>
-    <ThemeColor name="bg_tree_view_node_disabled" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项选中" comment_en="List item selected"/>
-    <ThemeColor name="bg_tree_view_node_selected" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中" comment_en="List item selected"/>
+    <ThemeColor name="bg_tree_view" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="树控件背景" comment_en="Tree view background"/>
+    <ThemeColor name="bg_tree_view_node_hover" value="#FF333333" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点悬浮" comment_en="Tree node hover"/>
+    <ThemeColor name="bg_tree_view_node_pressed" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点点击" comment_en="Tree node pressed"/>
+    <ThemeColor name="bg_tree_view_node_disabled" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="树节点禁用" comment_en="Tree node disabled"/>
+    <ThemeColor name="bg_tree_view_node_selected" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点选中" comment_en="Tree node selected"/>
 
     <!-- ===================== 列表控件颜色 (type: list_ctrl) ===================== -->
-    <ThemeColor name="bg_list_ctrl" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表背景" comment_en="List background"/>
-    <ThemeColor name="bg_list_ctrl_header" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表控件表头背景" comment_en="ListCtrl header background"/>
+    <ThemeColor name="bg_list_ctrl" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表控件背景" comment_en="List control background"/>
+    <ThemeColor name="bg_list_ctrl_header" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表控件表头背景" comment_en="List control header background"/>
     <ThemeColor name="bg_list_ctrl_header_hover" value="#FF333333" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表表头悬浮背景" comment_en="List header hover bg"/>
     <ThemeColor name="bg_list_ctrl_header_pressed" value="#FF3A3A3A" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表表头点击背景" comment_en="List header pressed bg"/>
     <ThemeColor name="border_list_ctrl_header_split" value="#FF444444" type="list_ctrl" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表表头分割线" comment_en="List header split line"/>
     <ThemeColor name="bg_list_ctrl_item_hover" value="#FF333333" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项悬浮背景" comment_en="List item hover bg"/>
     <ThemeColor name="bg_list_ctrl_item_pressed" value="#FF3A3A3A" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项点击背景" comment_en="List item pressed bg"/>
-    <ThemeColor name="bg_list_ctrl_item_disabled" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项选中背景" comment_en="List item selected bg"/>
+    <ThemeColor name="bg_list_ctrl_item_disabled" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项禁用背景" comment_en="List item disabled bg"/>
     <ThemeColor name="bg_list_ctrl_item_selected" value="#FF404040" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中背景" comment_en="List item selected bg"/>
     <ThemeColor name="bg_list_ctrl_view" value="#FF252525" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表视图背景" comment_en="List view background"/>
     <ThemeColor name="border_list_ctrl_view_split" value="#FF444444" type="list_ctrl" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="表格分割线" comment_en="Table split line"/>
@@ -135,13 +135,13 @@
 
     <!-- ===================== 下拉框颜色 (type: combo_box) ===================== -->
     <ThemeColor name="bg_combo" value="#FF252525" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框默认背景" comment_en="ComboBox normal background"/>
-    <ThemeColor name="bg_combo_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框禁用背景" comment_en="ComboBox normal background"/>
+    <ThemeColor name="bg_combo_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框禁用背景" comment_en="ComboBox disabled background"/>
     <ThemeColor name="bg_combo_btn_hover" value="#FF333333" type="combo_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="下拉按钮悬浮背景" comment_en="Combo button hover bg"/>
     <ThemeColor name="bg_combo_btn_pressed" value="#FF3A3A3A" type="combo_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="下拉按钮点击背景" comment_en="Combo button pressed bg"/>
-    <ThemeColor name="bg_combo_btn_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉按钮禁用状态背景" comment_en="Combo button pressed bg"/>
+    <ThemeColor name="bg_combo_btn_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉按钮禁用背景" comment_en="Combo button disabled bg"/>
     <ThemeColor name="border_combo_hover" value="#FF444444" type="combo_box" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框悬浮边框" comment_en="ComboBox hover border"/>
     <ThemeColor name="border_combo_normal" value="#FF2D2D30" type="combo_box" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框默认边框" comment_en="ComboBox normal border"/>
-    <ThemeColor name="border_combo_disabled" value="#FF505050" type="combo_box" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框禁用边框" comment_en="ComboBox normal border"/>
+    <ThemeColor name="border_combo_disabled" value="#FF505050" type="combo_box" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉框禁用边框" comment_en="ComboBox disabled border"/>
 
     <!-- ===================== 编辑框颜色 (type: richedit) ===================== -->
     <ThemeColor name="bg_richedit" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框默认背景" comment_en="RichEdit default background"/>
@@ -150,7 +150,7 @@
     <ThemeColor name="bg_richedit_btn_hover" value="#FF333333" type="richedit" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="编辑框按钮悬浮背景" comment_en="RichEdit button hover bg"/>
     <ThemeColor name="bg_richedit_btn_normal" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮默认背景" comment_en="RichEdit button normal bg"/>
     <ThemeColor name="bg_richedit_btn_pressed" value="#FF3A3A3A" type="richedit" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="编辑框按钮点击背景" comment_en="RichEdit button pressed bg"/>
-    <ThemeColor name="bg_richedit_btn_disabled" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮默认背景" comment_en="RichEdit button normal bg"/>
+    <ThemeColor name="bg_richedit_btn_disabled" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮禁用背景" comment_en="RichEdit button disabled bg"/>
     <ThemeColor name="border_richedit_btn" value="#FF2D2D30" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮边框" comment_en="RichEdit button border"/>
     <ThemeColor name="border_richedit_focus" value="#FF2D2D30" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框聚焦边框" comment_en="RichEdit focus border"/>
     <ThemeColor name="border_richedit_focus_bottom" value="#FF3B82F6" type="richedit" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="编辑框聚焦下划线" comment_en="RichEdit focus bottom line"/>
@@ -167,7 +167,7 @@
     <ThemeColor name="border_tab_ctrl_item" value="#FF2D2D30" type="tab_ctrl" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="标签项边框" comment_en="Tab item border"/>
 
     <!-- ===================== 属性页颜色 (type: property_grid) ===================== -->
-    <ThemeColor name="bg_property_grid" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框默认背景" comment_en="RichEdit default background"/>
+    <ThemeColor name="bg_property_grid" value="#FF252525" type="property_grid" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="属性页背景" comment_en="PropertyGrid background"/>
     <ThemeColor name="bg_property_grid_group" value="#FF1E1E1E" type="property_grid" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="属性分组背景" comment_en="Property group background"/>
     <ThemeColor name="bg_property_grid_header" value="#FF252525" type="property_grid" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="属性页分组表头背景" comment_en="PropertyGrid header bg"/>
     <ThemeColor name="bg_property_grid_property" value="#FF252525" type="property_grid" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="属性行背景" comment_en="Property row background"/>
@@ -213,6 +213,6 @@
 
     <!-- ===================== ToolTip颜色 (type: tooltip) ===================== -->
     <ThemeColor name="bg_tooltip" value="#FF2B2B2B" type="tooltip" category="bg_color" role="neutral" derived_from="" adjust="" fixed="true" comment_cn="工具提示背景" comment_en="Tooltip background"/>
-    <ThemeColor name="text_tooltip" value="#FFE5E7EB" type="tooltip" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要文本/正文/标题" comment_en="Primary text/body/title"/>
+    <ThemeColor name="text_tooltip" value="#FFE5E7EB" type="tooltip" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="工具提示文本" comment_en="Tooltip text"/>
 
 </Global>
