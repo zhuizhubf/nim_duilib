@@ -2809,7 +2809,7 @@
                 const role = node.getAttribute('role') || '';
                 const derivedFrom = node.getAttribute('derived_from') || '';
                 const adjust = node.getAttribute('adjust') || '';
-                const locked = (node.getAttribute('locked') || 'false') === 'true';
+                const fixed = (node.getAttribute('fixed') || 'false') === 'true';
 
                 const colorItem = {
                     name,
@@ -2823,7 +2823,7 @@
                     role,
                     derivedFrom,
                     adjust,
-                    locked
+                    fixed
                 };
 
                 currentColorMap.set(name, colorItem);
@@ -3773,7 +3773,7 @@
                 const children = dependencyMap.get(current) || [];
                 children.forEach(child => {
                     // 跳过锁定的颜色
-                    if (child.locked) {
+                    if (child.fixed) {
                         console.log(`🔒 颜色 ${child.name} 已锁定，跳过派生计算`);
                         return;
                     }
@@ -3850,7 +3850,7 @@
             // 更新锁定按钮状态
             const lockBtn = document.getElementById('toggleLockBtn');
             if (lockBtn) {
-                if (colorItem.locked) {
+                if (colorItem.fixed) {
                     lockBtn.innerHTML = '🔓 解锁颜色';
                     lockBtn.style.backgroundColor = '#10B981';
                     lockBtn.style.color = 'white';
@@ -3876,13 +3876,13 @@
             if (!colorItem) return;
             
             // 切换锁定状态
-            colorItem.locked = !colorItem.locked;
+            colorItem.fixed = !colorItem.fixed;
             currentColorMap.set(currentEditingColor, colorItem);
             
             // 更新按钮状态
             const lockBtn = document.getElementById('toggleLockBtn');
             if (lockBtn) {
-                if (colorItem.locked) {
+                if (colorItem.fixed) {
                     lockBtn.innerHTML = '🔓 解锁颜色';
                     lockBtn.style.backgroundColor = '#10B981';
                     lockBtn.style.color = 'white';
@@ -4390,7 +4390,7 @@
             const hasChildren = node.children && node.children.length > 0;
             const colorItem = currentColorMap.get(node.name);
             const displayColor = colorItem ? colorItem.value : '#FFFFFFFF';
-            const isLocked = colorItem && colorItem.locked;
+            const isFixed = colorItem && colorItem.fixed;
             
             // 构建徽章HTML
             let badgesHtml = '';
@@ -4406,7 +4406,7 @@
             if (node.orphan) {
                 badgesHtml += `<span class="suggestion-badge">⚠️ 源颜色不存在</span>`;
             }
-            if (isLocked) {
+            if (isFixed) {
                 badgesHtml += `<span class="locked-badge" style="background: #EF4444; color: white;">🔒</span>`;
             }
 
@@ -5195,7 +5195,7 @@
         }
 
         function createColorCard(colorItem) {
-            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn, role, derivedFrom, adjust, locked } = colorItem;
+            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn, role, derivedFrom, adjust, fixed } = colorItem;
             const isChanged = value !== originalValue;
             
             const currentColor = argbToRgbaCss(value);
@@ -5223,7 +5223,7 @@
             if (adjust) {
                 badgesHtml += `<span class="adjust-badge" title="调整公式：${adjust}">📐 ${adjust}</span>`;
             }
-            if (locked) {
+            if (fixed) {
                 badgesHtml += `<span class="locked-badge" title="已锁定 - 派生计算时将跳过">🔒 已锁定</span>`;
             }
 
@@ -5432,7 +5432,7 @@
                     if (colorData.derivedFrom !== undefined) node.setAttribute('derived_from', colorData.derivedFrom);
                     if (colorData.adjust !== undefined) node.setAttribute('adjust', colorData.adjust);
                     // 保存锁定状态
-                    if (colorData.locked !== undefined) node.setAttribute('locked', colorData.locked.toString());
+                    if (colorData.fixed !== undefined) node.setAttribute('fixed', colorData.fixed.toString());
                 }
             });
 
@@ -6499,7 +6499,7 @@
                 
                 if (sourceItem && targetItem) {
                     // 跳过锁定的颜色
-                    if (targetItem.locked) {
+                    if (targetItem.fixed) {
                         showToast(`颜色 "${colorName}" 已锁定，无法修改派生关系`, 'warning');
                         return;
                     }
@@ -6557,7 +6557,7 @@
         function breakDerivationInTree(colorName) {
             const colorItem = currentColorMap.get(colorName);
             if (colorItem) {
-                if (colorItem.locked) {
+                if (colorItem.fixed) {
                     showToast(`颜色 "${colorName}" 已锁定，无法修改派生关系`, 'warning');
                     return;
                 }
@@ -6861,7 +6861,7 @@
                 
                 if (targetColor && targetName !== sourceName) {
                     // 跳过锁定的颜色
-                    if (targetColor.locked) {
+                    if (targetColor.fixed) {
                         console.log(`🔒 颜色 ${targetName} 已锁定，跳过`);
                         return;
                     }
