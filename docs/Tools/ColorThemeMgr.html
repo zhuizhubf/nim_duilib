@@ -5438,7 +5438,7 @@
 
             const serializer = new XMLSerializer();
             let xmlContent = serializer.serializeToString(currentXmlDoc);
-            xmlContent = xmlContent.replace(/<\?xml version="1.0"\?>/, '<?xml version="1.0" encoding="UTF-8"?>\n');
+            xmlContent = xmlContent.replace(/<\?xml version="1.0" encoding="UTF-8"\?>/, '<?xml version="1.0" encoding="UTF-8"?>\n');
 
             const blob = new Blob([xmlContent], {
                 type: 'application/xml;charset=utf-8'
