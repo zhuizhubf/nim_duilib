@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Global>
     <!-- 主题名称和主题类型 -->
-    <Theme name="Default" type="Unknown" style="Unknown"/>
+    <Theme name="Default" type="Unknown" style="Unknown" version="2.0"/>
     
     <!-- ===================== 主题元数据 ===================== -->
     <ThemeMeta>
-        <Author>nim-duilib Team</Author>
-        <Version>2.0</Version>
-        <Description>Default theme with base control styles for nim-duilib framework</Description>
+        <Property name="author" value="nim_duilib"/>
+        <Property name="description" value="Default theme with base control styles for nim-duilib framework"/>
     </ThemeMeta>
         
     <!-- ===================== 全局变量定义 ===================== -->
@@ -34,6 +33,13 @@
     <Var name="PATH_CAPTION" value="public/caption"/>
     <Var name="PATH_COMBO" value="public/combo"/>
     <Var name="PATH_MENU" value="public/menu"/>
+    
+    <!-- 字体文件（放在资源根目录的fonts目录中），程序启动时加载，加载后可以按照使用系统字体相同的方式使用 -->
+    <!-- 注意事项：该RobotoMono字体只能用于显示英文字母，不支持中文 -->
+    <FontFile file="fonts/RobotoMono-Regular.ttf" desc="字体名称：Roboto Mono，常规字体"/>
+    <FontFile file="fonts/RobotoMono-Bold.ttf" desc="字体名称：Roboto Mono，粗体"/>
+    <FontFile file="fonts/RobotoMono-Italic.ttf" desc="字体名称：Roboto Mono，斜体"/>
+    <FontFile file="fonts/RobotoMono-BoldItalic.ttf" desc="字体名称：Roboto Mono，粗斜体"/>
     
     <!-- ===================== 字体配置 ===================== -->
     <!--默认字体名称，列表形式，依次匹配，直到发现第一个有效字体作为默认字体名称，多个字体名称用逗号分隔-->
@@ -87,13 +93,6 @@
     <Font id="system_20" name="system" size="20"/>
     <Font id="system_22" name="system" size="22"/>
     
-    <!-- 字体文件（放在资源根目录的fonts目录中），程序启动时加载，加载后可以按照使用系统字体相同的方式使用 -->
-    <!-- 注意事项：该RobotoMono字体只能用于显示英文字母，不支持中文 -->
-    <FontFile file="RobotoMono-Regular.ttf" desc="字体名称：Roboto Mono，常规字体"/>
-    <FontFile file="RobotoMono-Bold.ttf" desc="字体名称：Roboto Mono，粗体"/>
-    <FontFile file="RobotoMono-Italic.ttf" desc="字体名称：Roboto Mono，斜体"/>
-    <FontFile file="RobotoMono-BoldItalic.ttf" desc="字体名称：Roboto Mono，粗斜体"/>
-
     <Var name="border_primary_btn_size" value="0"/> <!-- 主要按默认边框：边框大小 -->
     <Var name="border_btn_size" value="1"/> <!-- 次要按钮默认边框：边框大小 -->
     

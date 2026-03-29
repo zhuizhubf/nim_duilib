@@ -294,7 +294,6 @@ void FontManager::ClearFontCache()
 
 bool FontManager::AddFontFile(const DString& strFontFile, const DString& /*strFontDesc*/)
 {
-    FilePath fontFilePath = FilePathUtil::JoinFilePath(GlobalManager::Instance().GetFontFilePath(), FilePath(strFontFile));
     IFontMgr* pFontMgr = nullptr;
     IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     if (pRenderFactory != nullptr) {
@@ -305,17 +304,27 @@ bool FontManager::AddFontFile(const DString& strFontFile, const DString& /*strFo
         return false;
     }
 
+    std::vector<FilePath> searchDirList;
+    searchDirList.push_back(GlobalManager::Instance().GetFontFilePath());
+    searchDirList.push_back(GlobalManager::Instance().GetResourceRootPath());
     bool bRet = false;
-    if (GlobalManager::Instance().Zip().IsUseZip()) {
-        std::vector<unsigned char> file_data;
-        if (GlobalManager::Instance().Zip().GetZipData(fontFilePath, file_data)) {
-            //从内存流加载
-            bRet = pFontMgr->LoadFontFileData(file_data.data(), file_data.size());
+    for (const FilePath& searchDir : searchDirList) {
+        FilePath fontFilePath = searchDir;
+        fontFilePath /= FilePath(strFontFile);
+        if (GlobalManager::Instance().Zip().IsUseZip()) {
+            std::vector<unsigned char> file_data;
+            if (GlobalManager::Instance().Zip().GetZipData(fontFilePath, file_data)) {
+                //从内存流加载
+                bRet = pFontMgr->LoadFontFileData(file_data.data(), file_data.size());
+            }
         }
-    }
-    else {
-        //从文件加载
-        bRet = pFontMgr->LoadFontFile(fontFilePath.ToString());
+        else {
+            //从文件加载
+            bRet = pFontMgr->LoadFontFile(fontFilePath.ToString());
+        }
+        if (bRet) {
+            break;
+        }
     }
     ASSERT(bRet);
     return bRet;

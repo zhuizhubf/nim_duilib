@@ -46,6 +46,7 @@ public:
 
     /** 获取资源目录的根路径（绝对路径）
     * @param [in] bMacOsAppBundle MacOS平台是否使用App Bundle（目前仅在使用CEF模块时需要传入true，其他均传入false）
+    *             该函数仅用于在调用Startup函数前确定资源目录，其他情况下，请使用GlobalManager::Instance().GetResourceRootPath()函数
     * @return 返回绝对路径，示例：<程序所在目录的绝对路径>/resources/
     */
     static FilePath GetResourceRootPath(bool bMacOsAppBundle);
@@ -86,22 +87,32 @@ public:
     */
     void* GetPlatformData() const;
 
-    /** 设置字体文件所在路径
-    */
+    /** 获取资源目录的根路径
+     *  如果是使用本地文件系统做资源目录，则为绝对路径
+     *  如果是使用zip压缩包提供资源，则为相对路径
+     */
+    FilePath GetResourceRootPath() const;
+
+    /** 设置字体文件所在目录，可以是相对路径或者是绝对路径
+     *  如果是使用本地文件系统做资源目录，则为绝对路径
+     *  如果是使用zip压缩包提供资源，则为相对路径
+     */
     void SetFontFilePath(const FilePath& strPath);
 
-    /** 获取字体文件所在路径
+    /** 获取字体文件所在目录
+    * @return 返回字体文件所在目录，详细说明同上
     */
     const FilePath& GetFontFilePath() const;
 
 public:
-    /** 设置语言文件所在路径，可以是相对路径或者是绝对路径（多语言版时，所有的语言文件都放在这个目录中）
-    *   如果是绝对路径，则在这个绝对路径中查找语言文件
-    *   如果是相对路径，则根据resType和resourcePath决定的资源路径下，按相对路径查找资源文件
-    */
+    /** 设置语言文件所在目录，可以是相对路径或者是绝对路径（多语言版时，所有的语言文件都放在这个目录中）
+     *  如果是使用本地文件系统做资源目录，则为绝对路径
+     *  如果是使用zip压缩包提供资源，则为相对路径
+     */
     void SetLanguagePath(const FilePath& strPath);
 
-    /** 获取语言文件所在路径
+    /** 获取语言文件所在目录
+    * @return 返回语言文件所在目录，详细说明同上
     */
     const FilePath& GetLanguagePath() const;
 
@@ -477,6 +488,10 @@ private:
     *   Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）
     */
     void* m_platformData;
+
+    /** 资源根目录（使用本地文件时为绝对路径，使用zip时为相对路）
+    */
+    FilePath m_resourceRootPath;
 
     /** 全局字体文件路径（绝对路径）
     */

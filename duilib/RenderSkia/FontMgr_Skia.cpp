@@ -307,6 +307,10 @@ bool FontMgr_Skia::LoadFontFile(const DString& fontFilePath)
         return false;
     }
     sk_sp<SkTypeface> spTypeface = m_impl->m_pSkFontMgr->makeFromFile(fontFile.c_str());
+    if (spTypeface == nullptr) {
+        //加载失败不加断言
+        return false;
+    }
     return m_impl->m_fontFileMgr.AddFontTypeface(spTypeface);
 }
 

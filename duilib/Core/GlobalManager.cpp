@@ -359,6 +359,11 @@ void* GlobalManager::GetPlatformData() const
     return m_platformData;
 }
 
+FilePath GlobalManager::GetResourceRootPath() const
+{
+    return m_resourceRootPath;
+}
+
 void GlobalManager::SetFontFilePath(const FilePath& strPath)
 {
      m_fontFilePath = strPath;
@@ -403,7 +408,8 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
         return false;
     }
 
-    const FilePath resourcePath = resParam.resourcePath;        //资源根目录: resources（使用zip时是相对路径，使用文件系统是是本地绝对路径）
+    m_resourceRootPath = resParam.resourcePath; //资源根目录: resources（使用zip时是相对路径，使用文件系统是是本地绝对路径）
+    const FilePath resourcePath = resParam.resourcePath;
     FilePath themeRootFullPath = resourcePath;
     themeRootFullPath /= resParam.themeRootPath;                        //主题根目录：resources/themes
 

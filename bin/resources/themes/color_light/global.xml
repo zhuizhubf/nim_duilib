@@ -2,11 +2,12 @@
 <Global>
     <!-- 主题基础配置：Win11 25H2 浅色主题 | 类型为颜色主题 -->
     <Theme name="Light" type="Color" style="Light" accent_support="true" version="2.0"/>
-    <ThemeMeta>
-        <Property name="author" value="nim_duilib"/>
+    <ThemeMeta>        
         <Property name="contrast_ratio" value="7.2"/>
         <Property name="accent_color" value="#FF0078D4"/>
         <Property name="base_luminance" value="light"/>
+        <Property name="author" value="nim_duilib"/>
+        <Property name="description" value="Light theme with base control styles for nim-duilib framework"/>
     </ThemeMeta>
     
     <!-- ===================== 通用基础颜色 (type: common) ===================== -->
