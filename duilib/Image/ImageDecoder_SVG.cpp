@@ -205,7 +205,7 @@ public:
         std::list<DStringA> colorsList = StringUtil::Split(svgReplaceColor, ";");
         for (DStringA colorPair : colorsList) {
             StringUtil::Trim(colorPair);
-            std::list<DStringA> colors = StringUtil::Split(svgReplaceColor, "|");
+            std::list<DStringA> colors = StringUtil::Split(colorPair, "|");
             if (colors.size() == 2) {
                 DStringA srcColor = *colors.begin();
                 DStringA destColor = *colors.rbegin();
