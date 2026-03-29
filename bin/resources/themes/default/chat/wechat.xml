@@ -22,7 +22,7 @@
             <Control class="splitline_hor_level1"/>
             <VBox bkcolor="bg_window_main">
             </VBox>
-            <VBox height="150" bkcolor="bg_window_card">
+            <VBox height="150" bkcolor="bg_container">
             </VBox>
         </VBox>
     </HBox>

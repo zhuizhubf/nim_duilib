@@ -4,8 +4,8 @@
     <!-- 该窗口下的Class定义 -->
     <Class name="btn_view_common" width="32" height="24" border_round="4,4" valign="center"
                                   normal_color="" hot_color="bg_btn_hover" pushed_color="bg_btn_pressed"/>
-    <Class name="btn_view_up" normal_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center' svg_replace_colors='#333333|border_svg_image'"
-                              disabled_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center' fade='128' svg_replace_colors='#333333|border_svg_image'"/>
+    <Class name="btn_view_up" normal_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center'"
+                              disabled_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center' fade='128'"/>
     <Class name="btn_view_left" normal_image="file='../tree_view/arrow-left.svg' width='16' height='16' valign='center' halign='center'"
                                 disabled_image="file='../tree_view/arrow-left.svg' width='16' height='16' valign='center' halign='center' fade='128'"/>
     <Class name="btn_view_right" normal_image="file='../tree_view/arrow-right.svg' width='16' height='16' valign='center' halign='center'"
@@ -86,13 +86,13 @@
                 <AddressBar class="address_bar" name="file_path" width="stretch" height="28" valign="center" margin="8,0,10,0"
                                                 kill_focus_update_ui="false"/>
             </HBox>
-            <HBox minheight="60" bkcolor="bg_window_card" border_size="0,1,0,0" border_color="border_address_bar" padding="0,2,0,0">
+            <HBox minheight="60" bkcolor="bg_container" border_size="0,1,0,0" border_color="border_address_bar" padding="0,2,0,0">
                 <HBox width="300" minwidth="60">
                     <DirectoryTree class="tree_view" name="tree" multi_select="false" check_box_class="tree_node_checkbox" expand_image_class="tree_node_expand" padding="5,3,5,3" indent="20"/>
                 </HBox>
                 <!-- 纵向分割条，用于调整左右区域大小 -->
                 <Split class="split_vertical"/>
-                <TabBox name="main_view_tab_box" bkcolor="bg_window_card" selected_id="0">
+                <TabBox name="main_view_tab_box" bkcolor="bg_container" selected_id="0">
                     <VirtualVTileListBox class="list" name="simple_file_view" columns="auto" item_size="200,120" multi_select="false" vscrollbar="true" hscrollbar="true" child_halign="left"/>
                     <ListCtrl class="list_ctrl" name="explorer_view"
                               show_header_checkbox="false" show_data_item_checkbox="false" enable_item_edit="false"

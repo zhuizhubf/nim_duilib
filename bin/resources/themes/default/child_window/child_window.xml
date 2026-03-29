@@ -29,7 +29,7 @@
 
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
         <Box>
-            <GridBox name="child_window_box" valign="center" rows="3" columns="3" bkcolor="bg_window_card" >
+            <GridBox name="child_window_box" valign="center" rows="3" columns="3" bkcolor="bg_container" >
                 <Include src="child_window_item.xml" count="9"/>
             </GridBox>
         </Box>

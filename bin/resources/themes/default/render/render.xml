@@ -42,7 +42,7 @@
                 <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_TAB_CONTROL_TEST" close_button_class="" tab_box_item_index="11"/>
                 <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_TAB_CONTROL_ANI" close_button_class="" tab_box_item_index="12"/>
             </TabCtrl>
-            <TabBox name="main_view_tab" bkcolor="bg_window_card" selected_id="0" margin="4,4,4,4" padding="3,3,3,3"
+            <TabBox name="main_view_tab" bkcolor="bg_container" selected_id="0" margin="4,4,4,4" padding="3,3,3,3"
                     border_size="1" border_color="border_window" border_round="3,3"
                     fade_switch_type="FadeInOut"
                     fade_switch_frame_interval_ms="16"

@@ -11,7 +11,7 @@
         <TabCtrlItem class="tab_ctrl_item" title_id="STRID_LAYOUT_TAB_ITEM3" close_button_class="" tab_box_item_index="2"/>
     </TabCtrl>
     <TabBox name="main_view_tab_test" bkcolor="white" selected_id="0">
-        <VBox bkcolor="bg_window_card">
+        <VBox bkcolor="bg_container">
             <Label text_id="STRID_LAYOUT_PAGE1_CONTENT"/>
         </VBox>
         <VBox bkcolor="blue">

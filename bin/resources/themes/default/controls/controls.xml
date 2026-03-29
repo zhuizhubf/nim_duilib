@@ -196,12 +196,12 @@
             <Control class="splitline_hor_level1" margin="0,8,0,4"/>
             <!-- RichEdit -->
             <HBox>
-                <RichEdit class="prompt" name="edit" bkcolor="bg_window_card" width="stretch" height="stretch"
+                <RichEdit class="prompt" name="edit" bkcolor="bg_richedit" width="stretch" height="stretch"
                             hide_selection="false" multi_line="true" auto_vscroll="true"
                             vscrollbar="true" hscrollbar="true"
                             want_return_msg="true" rich="false"
                             enable_drag_drop="true" enable_drop_file="true" drop_file_types=".txt;.md"/>
-                <RichEdit class="prompt" name="edit2" bkcolor="bg_window_card" width="stretch" height="stretch"
+                <RichEdit class="prompt" name="edit2" bkcolor="bg_richedit" width="stretch" height="stretch"
                             hide_selection="false" multi_line="true" auto_vscroll="true"
                             vscrollbar="true" hscrollbar="true" scrollbar_float="true"
                             vscrollbar_class="vscrollbar2" hscrollbar_class="hscrollbar2"

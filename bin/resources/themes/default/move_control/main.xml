@@ -17,18 +17,18 @@
             <Button class="btn_wnd_close_11" height="stretch" width="40" name="btn_window_close" margin="0,0,0,2"/>
         </HBox>
         <Control class="splitline_hor_level1"/>
-        <VBox height="200" bkcolor="bg_window_card">
+        <VBox height="200" bkcolor="bg_container">
             <HBox bkcolor="bg_window_main" height="35" >
                 <Label text_id="STRID_MOVECONTROL_APP_COMMON" font="system_regular_14" margin="10,10"/>
             </HBox>
-            <VTileBox name="frequent_app" child_halign="left" drop_in_id="1" drag_out_id="1" bkcolor="bg_window_card"/>
+            <VTileBox name="frequent_app" child_halign="left" drop_in_id="1" drag_out_id="1" bkcolor="bg_container"/>
         </VBox>
         <Control class="splitline_hor_level1"/>
-        <VBox bkcolor="bg_window_card">
+        <VBox bkcolor="bg_container">
             <HBox bkcolor="bg_window_main" height="35" >
                 <Label text_id="STRID_MOVECONTROL_MY_APP" font="system_regular_14" margin="10,10"/>
             </HBox>
-            <VTileBox name="my_app" child_halign="left" drop_in_id="1" drag_out_id="1" bkcolor="bg_window_card"/>
+            <VTileBox name="my_app" child_halign="left" drop_in_id="1" drag_out_id="1" bkcolor="bg_container"/>
         </VBox>
     </VBox>
 </Window>

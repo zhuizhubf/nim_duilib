@@ -20,7 +20,7 @@
             <Label text_id="STRID_VIRTUALLISTBOX_BOX_TYPE" font="system_regular_14" valign="center" margin="8,0,8,0"/>
             <Label name="list_box_type" text="VirtualHTileListBox" font="system_regular_14" valign="center"/>
         </HBox>
-        <HBox child_margin="5" padding="5,5,5,10" bkcolor="bg_window_card">
+        <HBox child_margin="5" padding="5,5,5,10" bkcolor="bg_container">
             <VBox width="300" border_size="1" border_color="border_split_level1" padding="5,10,5,10" child_margin="10">
                 <VBox height="80">
                     <Label name="label_column_row" font="system_bold_14" text_id="STRID_VIRTUALLISTBOX_ROW_COLS"  width="auto" height="auto" valign="center" />
@@ -97,7 +97,7 @@
             </VBox>
             <Box>
                 <!-- VirtualHTileListBox | VirtualVTileListBox | VirtualHListBox | VirtualVListBox -->
-                <VirtualVTileListBox class="list" name="list" bkcolor="bg_window_card" frame_selection="true" select_none_when_click_blank="true" select_like_list_ctrl="true" multi_select="true" scroll_select="false" item_size="240,64" auto_calc_item_size="false" vscrollbar="true" hscrollbar="true" border_size="1" border_color="border_split_level1" padding="1,1,1,1"/>
+                <VirtualVTileListBox class="list" name="list" bkcolor="bg_container" frame_selection="true" select_none_when_click_blank="true" select_like_list_ctrl="true" multi_select="true" scroll_select="false" item_size="240,64" auto_calc_item_size="false" vscrollbar="true" hscrollbar="true" border_size="1" border_color="border_split_level1" padding="1,1,1,1"/>
             </Box>
         </HBox>
     </VBox>

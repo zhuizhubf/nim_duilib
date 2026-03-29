@@ -15,7 +15,7 @@
             </HBox>
         </HBox>
         <Box>
-            <VListBox bkcolor="bg_window_card" vscrollbar="true" hscrollbar="true" multi_select="false" scroll_select="false" name="list"/>
+            <VListBox bkcolor="bg_container" vscrollbar="true" hscrollbar="true" multi_select="false" scroll_select="false" name="list"/>
         </Box>
     </VBox>
 </Window>

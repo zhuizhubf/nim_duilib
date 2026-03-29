@@ -46,7 +46,7 @@
         <!-- 显示区域 -->
         <HBox>
             <!-- 左侧区域 -->
-            <VScrollBox width="360" vscrollbar="true" minwidth="60" bkcolor="bg_window_card" border_size="1,1,1,1" border_color="border_window" border_round="4,4">
+            <VScrollBox width="360" vscrollbar="true" minwidth="60" bkcolor="bg_container" border_size="1,1,1,1" border_color="border_window" border_round="4,4">
                 <GroupVBox margin="6,6,6,6" text_id="STRID_RICHEDIT_PASSWORD_FUNC" height="auto" corner_size="4,4">
                     <HBox height="36" margin="8,16,8,0">
                         <Label text_id="STRID_RICHEDIT_PASSWORD_INPUT" valign="center"/>
@@ -223,7 +223,7 @@
                 <!-- 横向分割条，用于调整上下区域大小 -->
                 <Split class="split_horizontal"/>
                 <HBox bkcolor="Pink" border_size="1" border_color="border_window" border_round="4,4" min_width="60">
-                    <RichEdit name="rich_edit" enable_drag_drop="true" zoom="0,0" wheel_zoom="true" multi_line="true" want_return="true" word_wrap="true" rich_text="false" default_context_menu="true" save_selection="true" hide_selection="false" word_wrap="true" vscrollbar="true" auto_vscroll="true" bkcolor="bg_window_card"/>
+                    <RichEdit name="rich_edit" enable_drag_drop="true" zoom="0,0" wheel_zoom="true" multi_line="true" want_return="true" word_wrap="true" rich_text="false" default_context_menu="true" save_selection="true" hide_selection="false" word_wrap="true" vscrollbar="true" auto_vscroll="true" bkcolor="bg_richedit"/>
                 </HBox>
             </VBox>
         </HBox>

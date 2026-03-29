@@ -100,7 +100,7 @@
     
     <!-- 2. 历史兼容别名（原有保留） -->
     <Alias name="bk_wnd_darkcolor" value="bg_window_main"/>
-    <Alias name="bk_wnd_lightcolor" value="bg_window_card"/>
+    <Alias name="bk_wnd_lightcolor" value="bg_container"/>
     <Alias name="splitline_level1" value="border_split_level1"/>
     <Alias name="splitline_level2" value="border_split_level2"/>
     <Alias name="bk_menuitem_hovered" value="bg_menu_item_hover"/>
@@ -155,10 +155,10 @@
         
     <!-- 删除按钮 -->
     <Class name="btn_recycle" width="auto" height="auto" 
-                              normal_image="file='${PATH_BUTTON}/btn_recycle_normal.svg'" 
-                              hot_image="file='${PATH_BUTTON}/btn_recycle_hovered.svg'" 
-                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pushed.svg'" 
-                              disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' fade='80'"/>
+                              normal_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' svg_replace_colors='#969696|border_svg_image_light' fade='180'" 
+                              hot_image="file='${PATH_BUTTON}/btn_recycle_hovered.svg' svg_replace_colors='#6671c2|border_svg_image_light'" 
+                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pushed.svg' svg_replace_colors='#253cef|border_svg_image_dark'" 
+                              disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' svg_replace_colors='#969696|border_svg_image' fade='80'"/>
                               
     <!-- 全局纯色按钮，颜色跟随主题变化 -->
     <Class name="btn_global" text_align="hcenter,vcenter" 
@@ -281,7 +281,7 @@
                               selected_item_class="width='auto' height='22' margin='4,2,4,2' bkcolor='bg_menu_item_selected' text_padding='2,1,2,1'"/>
     <Class name="combo_button" padding="1,1,1,1" border_size="1" hot_border_color="border_combo_hover" 
                                hot_color="bg_combo_btn_hover" pushed_color="bg_combo_btn_pressed"
-                               combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_window_card'" 
+                               combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_container'" 
                                left_button_class="height='stretch' width='stretch' padding='0,0,1,0' border_size='0,0,1,0' valign='center' 
                                                   hot_border_color='border_combo_hover' 
                                                   pushed_border_color='border_combo_hover'                                                   

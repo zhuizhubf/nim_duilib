@@ -29,7 +29,7 @@
             <Button class="btn_global_blue_80x30" name="btn_navigate" text_id="STRID_WEBVIEW2_BROWSER_BROWSE_TO" width="60" margin="5"/>
             <Button class="btn_global_blue_80x30" name="btn_refresh" text_id="STRID_WEBVIEW2_BROWSER_REFRESH" width="60" margin="5"/>
         </HBox>
-        <VBox bkcolor="bg_window_card" margin="0,2,0,0">
+        <VBox bkcolor="bg_container" margin="0,2,0,0">
             <WebView2Control name="webview2_control" url="https://www.baidu.com" F12="true" margin="2,0,2,2"/>
         </VBox>
     </VBox>

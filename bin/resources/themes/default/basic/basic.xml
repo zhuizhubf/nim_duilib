@@ -25,7 +25,7 @@
         <!-- 标题栏区域结束 -->
 
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
-        <Box bkcolor="bg_window_card">
+        <Box bkcolor="bg_container">
             <VBox margin="0,0,0,0" valign="center" halign="center">
                 <Label name="tooltip" text_id="STRID_BASIC_TEXT" height="100%" width="100%" text_align="hcenter,vcenter"/>
             </VBox>

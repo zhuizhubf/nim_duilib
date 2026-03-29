@@ -26,7 +26,7 @@
 
 
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
-        <VBox bkcolor="bg_window_card" >
+        <VBox bkcolor="bg_container" >
             <HBox height="auto">
                 <Label text_id="STRID_LISTCTRL_TABLE_TYPE" valign="center" margin="2,0,2,0"/>
                 <Combo class="combo" name="list_ctrl_type_combo" combo_type="drop_list" dropbox_size="0,300" combo_icon_class="" height="26" width="80" margin="0,0,0,1" valign="center">

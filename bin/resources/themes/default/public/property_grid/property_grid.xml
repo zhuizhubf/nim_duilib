@@ -41,7 +41,7 @@
     <Class name="property_grid_combo" bkcolor="bg_combo" dropbox_size="0,200" padding="1,1,1,1"
                         border_size="1" border_color="border_combo_normal"
                         hot_border_color="border_combo_hover"
-                        combo_tree_view_class="padding='0,0,0,0' bkcolor='bg_window_card' indent='20' class='tree_view'"
+                        combo_tree_view_class="padding='0,0,0,0' bkcolor='bg_container' indent='20' class='tree_view'"
                         combo_tree_node_class="tree_node"
                         combo_icon_class=""
                         combo_edit_class="bkcolor='bg_richedit' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"
