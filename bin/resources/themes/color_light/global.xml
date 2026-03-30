@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Global>
     <!-- 主题基础配置：Win11 25H2 浅色主题 | 类型为颜色主题 -->
     <Theme name="Light" type="color" style="light" accent_support="true" version="2.0"/>
@@ -19,12 +19,12 @@
     <ThemeColor name="color_gray" value="#FF949494" type="common" category="basic_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要文本/辅助说明" comment_en="Secondary text/auxiliary description"/>
     <ThemeColor name="color_gray_dark" value="#FF6B6B6B" type="common" category="basic_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要背景/禁用控件底色" comment_en="Secondary background/disabled control bg"/>
     <ThemeColor name="color_gray_light" value="#FFE5E5E5" type="common" category="basic_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="默认边框/一级分割线" comment_en="Default border/level 1 split line"/>
-    <ThemeColor name="color_green" value="#FF00B050" type="common" category="basic_color" role="semantic_success" derived_from="" adjust="" fixed="false" comment_cn="成功/完成状态" comment_en="Success/completed status"/>
-    <ThemeColor name="color_green_light" value="#FF33C070" type="common" category="basic_color" role="semantic_success_light" derived_from="" adjust="" fixed="false" comment_cn="绿色系hover" comment_en="Green hover state"/>
-    <ThemeColor name="color_green_dark" value="#FF009848" type="common" category="basic_color" role="semantic_success_dark" derived_from="color_green" adjust="darken+10" fixed="false" comment_cn="绿色系pressed/选中态" comment_en="Green pressed/active state"/>
-    <ThemeColor name="color_red" value="#FFE81123" type="common" category="basic_color" role="semantic_error" derived_from="" adjust="" fixed="false" comment_cn="错误/警告/关闭按钮" comment_en="Error/warning/close button"/>
-    <ThemeColor name="color_red_dark" value="#FFD00C1A" type="common" category="basic_color" role="semantic_error_dark" derived_from="" adjust="" fixed="false" comment_cn="红色系pressed" comment_en="Red pressed state"/>
-    <ThemeColor name="color_red_light" value="#FFFF6666" type="common" category="basic_color" role="semantic_error_light" derived_from="" adjust="" fixed="false" comment_cn="红色系hover" comment_en="Red hover state"/>
+    <ThemeColor name="color_green" value="#FF00B050" type="common" category="basic_color" role="semantic_success" derived_from="" adjust="" fixed="true" comment_cn="成功/完成状态" comment_en="Success/completed status"/>
+    <ThemeColor name="color_green_light" value="#FF33C070" type="common" category="basic_color" role="semantic_success_light" derived_from="" adjust="" fixed="true" comment_cn="绿色系hover" comment_en="Green hover state"/>
+    <ThemeColor name="color_green_dark" value="#FF009848" type="common" category="basic_color" role="semantic_success_dark" derived_from="color_green" adjust="darken+10" fixed="true" comment_cn="绿色系pressed/选中态" comment_en="Green pressed/active state"/>
+    <ThemeColor name="color_red" value="#FFE81123" type="common" category="basic_color" role="semantic_error" derived_from="" adjust="" fixed="true" comment_cn="错误/警告/关闭按钮" comment_en="Error/warning/close button"/>
+    <ThemeColor name="color_red_dark" value="#FFD00C1A" type="common" category="basic_color" role="semantic_error_dark" derived_from="" adjust="" fixed="true" comment_cn="红色系pressed" comment_en="Red pressed state"/>
+    <ThemeColor name="color_red_light" value="#FFFF6666" type="common" category="basic_color" role="semantic_error_light" derived_from="" adjust="" fixed="true" comment_cn="红色系hover" comment_en="Red hover state"/>
 
     <!-- ===================== 窗口相关颜色 (type: window) ===================== -->
     <ThemeColor name="bg_window_main" value="#FFF0F0F0" type="window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主窗口/面板背景" comment_en="Main window/panel background"/>
@@ -69,12 +69,12 @@
     <!-- ===================== 按钮颜色 (type: button) ===================== -->
     <ThemeColor name="bg_btn_normal" value="#FFFFFFFF" type="button" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮默认背景" comment_en="Secondary button normal bg"/>
     <ThemeColor name="bg_btn_disabled" value="#FFF5F5F5" type="button" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮禁用背景" comment_en="Secondary button disabled bg"/>
-    <ThemeColor name="bg_btn_hover" value="#FFE5F3FF" type="button" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="次要按钮悬浮背景" comment_en="Secondary button hover bg"/>
-    <ThemeColor name="bg_btn_pressed" value="#FFD0E8FF" type="button" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="次要按钮点击背景" comment_en="Secondary button pressed bg"/>
+    <ThemeColor name="bg_btn_hover" value="#FFE5F3FF" type="button" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="次要按钮悬浮背景" comment_en="Secondary button hover bg"/>
+    <ThemeColor name="bg_btn_pressed" value="#FFD0E8FF" type="button" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="次要按钮点击背景" comment_en="Secondary button pressed bg"/>
     <ThemeColor name="border_btn_disabled" value="#FFCECECE" type="button" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮禁用边框" comment_en="Secondary button disabled border"/>
     <ThemeColor name="border_btn_hover" value="#FFB0B0B0" type="button" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮悬浮边框" comment_en="Secondary button hover border"/>
     <ThemeColor name="border_btn_normal" value="#FFCACACA" type="button" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮默认边框" comment_en="Secondary button normal border"/>
-    <ThemeColor name="border_btn_pressed" value="#FF909090" type="button" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="次要按钮点击边框" comment_en="Secondary button pressed border"/>
+    <ThemeColor name="border_btn_pressed" value="#FF909090" type="button" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="次要按钮点击边框" comment_en="Secondary button pressed border"/>
     <ThemeColor name="text_btn_disabled" value="#FFA0A0A0" type="button" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮禁用文本" comment_en="Secondary button disabled text"/>
     <ThemeColor name="text_btn_normal" value="#FF1E1E1E" type="button" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="次要按钮默认文本" comment_en="Secondary button normal text"/>
 
@@ -84,40 +84,40 @@
 
     <!-- ===================== 主要按钮颜色 (type: button_primary) ===================== -->
     <ThemeColor name="bg_primary_btn_disabled" value="#FFC0E0FF" type="button_primary" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>
-    <ThemeColor name="bg_primary_btn_hover" value="#FF1D8CDB" type="button_primary" category="bg_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="主要按钮悬浮背景" comment_en="Primary button hover bg"/>
-    <ThemeColor name="bg_primary_btn_normal" value="#FF0078D4" type="button_primary" category="bg_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="主要按钮默认背景" comment_en="Primary button normal bg"/>
-    <ThemeColor name="bg_primary_btn_pressed" value="#FF005A9E" type="button_primary" category="bg_color" role="primary_dark" derived_from="" adjust="" fixed="true" comment_cn="主要按钮点击背景" comment_en="Primary button pressed bg"/>
+    <ThemeColor name="bg_primary_btn_hover" value="#FF1D8CDB" type="button_primary" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="主要按钮悬浮背景" comment_en="Primary button hover bg"/>
+    <ThemeColor name="bg_primary_btn_normal" value="#FF0078D4" type="button_primary" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="主要按钮默认背景" comment_en="Primary button normal bg"/>
+    <ThemeColor name="bg_primary_btn_pressed" value="#FF005A9E" type="button_primary" category="bg_color" role="primary_dark" derived_from="" adjust="" fixed="false" comment_cn="主要按钮点击背景" comment_en="Primary button pressed bg"/>
     <ThemeColor name="border_primary_btn_disabled" value="#FFAED7FF" type="button_primary" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要按钮禁用边框" comment_en="Primary button disabled border"/>
-    <ThemeColor name="border_primary_btn_hover" value="#FF005A9E" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="true" comment_cn="主要按钮悬浮边框" comment_en="Primary button hover border"/>
-    <ThemeColor name="border_primary_btn_normal" value="#FF005A9E" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="true" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
-    <ThemeColor name="border_primary_btn_pressed" value="#FF004080" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="true" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
+    <ThemeColor name="border_primary_btn_hover" value="#FF005A9E" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="false" comment_cn="主要按钮悬浮边框" comment_en="Primary button hover border"/>
+    <ThemeColor name="border_primary_btn_normal" value="#FF005A9E" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="false" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
+    <ThemeColor name="border_primary_btn_pressed" value="#FF004080" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="false" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
     <ThemeColor name="text_primary_btn_disabled" value="#FF80C0FF" type="button_primary" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要按钮禁用文本" comment_en="Primary button disabled text"/>
     <ThemeColor name="text_primary_btn_normal" value="#FFFFFFFF" type="button_primary" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
 
     <!-- ===================== 菜单颜色 (type: menu) ===================== -->
     <ThemeColor name="bg_menu" value="#FFFFFFFF" type="menu" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="下拉/右键菜单背景" comment_en="Dropdown/context menu background"/>
-    <ThemeColor name="bg_menu_item_hover" value="#FFE5F3FF" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="菜单项悬浮" comment_en="Menu item hover"/>
-    <ThemeColor name="bg_menu_item_selected" value="#FFD0E8FF" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="菜单项选中" comment_en="Menu item selected"/>
+    <ThemeColor name="bg_menu_item_hover" value="#FFE5F3FF" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="菜单项悬浮" comment_en="Menu item hover"/>
+    <ThemeColor name="bg_menu_item_selected" value="#FFD0E8FF" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="菜单项选中" comment_en="Menu item selected"/>
 
     <!-- ===================== 菜单栏颜色 (type: menu_bar) ===================== -->
     <ThemeColor name="bg_menu_bar" value="#FFF0F0F0" type="menu_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="菜单栏背景" comment_en="Menu bar background"/>
-    <ThemeColor name="bg_menu_bar_hover" value="#FFE0E0E0" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="菜单栏项悬浮" comment_en="Menu bar item hover"/>
-    <ThemeColor name="bg_menu_bar_pressed" value="#FFD0D0D0" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="菜单栏项点击" comment_en="Menu bar item pressed"/>
+    <ThemeColor name="bg_menu_bar_hover" value="#FFE0E0E0" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="菜单栏项悬浮" comment_en="Menu bar item hover"/>
+    <ThemeColor name="bg_menu_bar_pressed" value="#FFD0D0D0" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="菜单栏项点击" comment_en="Menu bar item pressed"/>
     <ThemeColor name="text_menu_bar" value="#FF1E1E1E" type="menu_bar" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="菜单栏文本" comment_en="Menu bar text"/>
 
     <!-- ===================== 列表框颜色 (type: list_box) ===================== -->
     <ThemeColor name="bg_list" value="#FFFFFFFF" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表背景" comment_en="List background"/>
-    <ThemeColor name="bg_list_item_hover" value="#FFE5F3FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项悬浮" comment_en="List item hover"/>
-    <ThemeColor name="bg_list_item_pressed" value="#FFD0E8FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项点击" comment_en="List item pressed"/>
+    <ThemeColor name="bg_list_item_hover" value="#FFE5F3FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="列表项悬浮" comment_en="List item hover"/>
+    <ThemeColor name="bg_list_item_pressed" value="#FFD0E8FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="列表项点击" comment_en="List item pressed"/>
     <ThemeColor name="bg_list_item_disabled" value="#FFF5F5F5" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表项禁用" comment_en="List item disabled"/>
-    <ThemeColor name="bg_list_item_selected" value="#FFD0E8FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="列表项选中" comment_en="List item selected"/>
+    <ThemeColor name="bg_list_item_selected" value="#FFD0E8FF" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="列表项选中" comment_en="List item selected"/>
 
     <!-- ===================== 树控件颜色 (type: tree_view) ===================== -->
     <ThemeColor name="bg_tree_view" value="#FFFFFFFF" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="树控件背景" comment_en="Tree view background"/>
-    <ThemeColor name="bg_tree_view_node_hover" value="#FFE5F3FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点悬浮" comment_en="Tree node hover"/>
-    <ThemeColor name="bg_tree_view_node_pressed" value="#FFD0E8FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点点击" comment_en="Tree node pressed"/>
+    <ThemeColor name="bg_tree_view_node_hover" value="#FFE5F3FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="树节点悬浮" comment_en="Tree node hover"/>
+    <ThemeColor name="bg_tree_view_node_pressed" value="#FFD0E8FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="树节点点击" comment_en="Tree node pressed"/>
     <ThemeColor name="bg_tree_view_node_disabled" value="#FFF5F5F5" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="树节点禁用" comment_en="Tree node disabled"/>
-    <ThemeColor name="bg_tree_view_node_selected" value="#FFD0E8FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="树节点选中" comment_en="Tree node selected"/>
+    <ThemeColor name="bg_tree_view_node_selected" value="#FFD0E8FF" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="树节点选中" comment_en="Tree node selected"/>
 
     <!-- ===================== 列表控件颜色 (type: list_ctrl) ===================== -->
     <ThemeColor name="bg_list_ctrl" value="#FFFFFFFF" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="列表控件背景" comment_en="List control background"/>
@@ -160,8 +160,8 @@
 
     <!-- ===================== 标签页颜色 (type: tab_ctrl) ===================== -->
     <ThemeColor name="bg_tab_ctrl" value="#FFF0F0F0" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="标签页整体背景" comment_en="TabCtrl background"/>
-    <ThemeColor name="bg_tab_ctrl_item_close_hover" value="#FFE5F3FF" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="标签关闭按钮悬浮" comment_en="Tab close button hover"/>
-    <ThemeColor name="bg_tab_ctrl_item_close_pressed" value="#FFD0E8FF" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="标签关闭按钮点击" comment_en="Tab close button pressed"/>
+    <ThemeColor name="bg_tab_ctrl_item_close_hover" value="#FFE5F3FF" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="标签关闭按钮悬浮" comment_en="Tab close button hover"/>
+    <ThemeColor name="bg_tab_ctrl_item_close_pressed" value="#FFD0E8FF" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" comment_cn="标签关闭按钮点击" comment_en="Tab close button pressed"/>
     <ThemeColor name="bg_tab_ctrl_item_hover" value="#FFE5F3FF" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="标签项悬浮背景" comment_en="Tab item hover bg"/>
     <ThemeColor name="bg_tab_ctrl_item_pressed" value="#FFD0E8FF" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="标签项点击背景" comment_en="Tab item pressed bg"/>
     <ThemeColor name="bg_tab_ctrl_item_selected" value="#FFFFFFFF" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="选中标签背景" comment_en="Selected tab background"/>
