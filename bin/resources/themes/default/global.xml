@@ -500,7 +500,7 @@
     <Class name="rich_text" text_color="text_default" 
                             default_link_font_color="text_link_normal" 
                             hovered_link_font_color="text_link_hovered" 
-                            mouse_down_link_font_color="text_link_pressed" 
+                            pressed_link_font_color="text_link_pressed" 
                             link_font_underline="true"/>
     
     <!-- IP地址控件 -->

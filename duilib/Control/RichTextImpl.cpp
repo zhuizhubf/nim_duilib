@@ -80,11 +80,11 @@ bool RichTextImpl::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if ((strName == _T("hovered_link_font_color")) || (strName == _T("hover_link_font_color"))) {
         //超级链接：Hover状态文本颜色值
-        m_linkHoverTextColor = strValue;
+        m_linkHoveredTextColor = strValue;
     }
-    else if (strName == _T("mouse_down_link_font_color")) {
+    else if ((strName == _T("pressed_link_font_color")) || (strName == _T("mouse_down_link_font_color"))) {
         //超级链接：鼠标按下状态文本颜色值
-        m_linkMouseDownTextColor = strValue;
+        m_linkPressedTextColor = strValue;
     }
     else if (strName == _T("link_font_underline")) {
         //超级链接：是否使用带下划线的字体
@@ -349,12 +349,12 @@ void RichTextImpl::PaintText(IRender* pRender)
             normalLinkTextColor = m_pOwner->GetUiColor(m_linkNormalTextColor.c_str());
         }
         UiColor mouseDownLinkTextColor;
-        if (!m_linkMouseDownTextColor.empty()) {
-            mouseDownLinkTextColor = m_pOwner->GetUiColor(m_linkMouseDownTextColor.c_str());
+        if (!m_linkPressedTextColor.empty()) {
+            mouseDownLinkTextColor = m_pOwner->GetUiColor(m_linkPressedTextColor.c_str());
         }
         UiColor linkHoverTextColor;
-        if (!m_linkHoverTextColor.empty()) {
-            linkHoverTextColor = m_pOwner->GetUiColor(m_linkHoverTextColor.c_str());
+        if (!m_linkHoveredTextColor.empty()) {
+            linkHoverTextColor = m_pOwner->GetUiColor(m_linkHoveredTextColor.c_str());
         }
 
         std::vector<RichTextData> richTextData;
@@ -377,12 +377,12 @@ void RichTextImpl::PaintText(IRender* pRender)
                         textData.m_textColor = normalLinkTextColor;//标准状态的字体颜色
                     }
                 }
-                if (textDataEx.m_bMouseDown && !m_linkMouseDownTextColor.empty()) {                    
+                if (textDataEx.m_bMouseDown && !m_linkPressedTextColor.empty()) {                    
                     if (!mouseDownLinkTextColor.IsEmpty()) {
                         textData.m_textColor = mouseDownLinkTextColor;//鼠标按下时的字体颜色
                     }
                 }
-                else if (textDataEx.m_bMouseHover && !m_linkHoverTextColor.empty()) {                    
+                else if (textDataEx.m_bMouseHover && !m_linkHoveredTextColor.empty()) {                    
                     if (!linkHoverTextColor.IsEmpty()) {
                         textData.m_textColor = linkHoverTextColor;//鼠标Hover时的字体颜色
                     }
