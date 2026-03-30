@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Global>
     <!-- 主题基础配置：Win11 25H2 深色主题 | 类型为颜色主题 -->
     <Theme name="Dark" type="color" style="dark" accent_support="true" version="2.0"/>
@@ -21,6 +21,7 @@
     <ThemeColor name="color_gray_light" value="#FF2D2D30" type="common" category="basic_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="默认边框/一级分割线" comment_en="Default border/level 1 split line"/>
     <ThemeColor name="color_green" value="#FF10B981" type="common" category="basic_color" role="semantic_success" derived_from="" adjust="" fixed="false" comment_cn="成功/完成状态" comment_en="Success/completed status"/>
     <ThemeColor name="color_green_light" value="#FF34D399" type="common" category="basic_color" role="semantic_success_light" derived_from="" adjust="" fixed="false" comment_cn="绿色系hover" comment_en="Green hover state"/>
+    <ThemeColor name="color_green_dark" value="#FF0EA06E" type="common" category="basic_color" role="semantic_success_dark" derived_from="color_green" adjust="darken+10" fixed="false" comment_cn="绿色系pressed/选中态" comment_en="Green pressed/active state"/>
     <ThemeColor name="color_red" value="#FFEF4444" type="common" category="basic_color" role="semantic_error" derived_from="" adjust="" fixed="false" comment_cn="错误/警告/关闭按钮" comment_en="Error/warning/close button"/>
     <ThemeColor name="color_red_dark" value="#FFDC2626" type="common" category="basic_color" role="semantic_error_dark" derived_from="" adjust="" fixed="false" comment_cn="红色系pressed" comment_en="Red pressed state"/>
     <ThemeColor name="color_red_light" value="#FFFCA5A5" type="common" category="basic_color" role="semantic_error_light" derived_from="" adjust="" fixed="false" comment_cn="红色系hover" comment_en="Red hover state"/>
