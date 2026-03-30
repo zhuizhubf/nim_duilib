@@ -2000,7 +2000,7 @@ bool RichEdit::OnSetFocus(const EventArgs& /*msg*/)
 
     //不调用基类的方法
     if (GetState() == kControlStateNormal) {
-        SetState(kControlStateHot);
+        SetState(kControlStateHovered);
     }
 
     //确保获取焦点时，需要显示选择状态，否则选择的文本状态无法正常看到

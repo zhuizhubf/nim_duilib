@@ -198,7 +198,7 @@ void TabCtrl::AdjustItemLineStatus()
             continue;
         }
         ControlStateType state = pItem->GetState();
-        if ((state == kControlStateHot) || (state == kControlStatePushed) || pItem->IsSelected()) {
+        if ((state == kControlStateHovered) || (state == kControlStatePressed) || pItem->IsSelected()) {
             //活动标签，不显示分割线
             pItem->SetItemLineVisible(false);
 
@@ -709,8 +709,8 @@ void TabCtrlItem::PaintStateColors(IRender* pRender)
     if (IsSelected()) {
         PaintTabItemSelected(pRender);
     }
-    else if ((GetState() == ControlStateType::kControlStateHot)    ||
-             (GetState() == ControlStateType::kControlStatePushed) ||
+    else if ((GetState() == ControlStateType::kControlStateHovered)    ||
+             (GetState() == ControlStateType::kControlStatePressed) ||
              IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
         //鼠标悬停状态
         PaintTabItemHot(pRender);
@@ -805,7 +805,7 @@ void TabCtrlItem::PaintTabItemHot(IRender* pRender)
     rc.bottom -= hotPadding.bottom;
  
     UiSize roundSize = GetHotRoundCorner();
-    DString color = GetStateColor(ControlStateType::kControlStateHot);
+    DString color = GetStateColor(ControlStateType::kControlStateHovered);
     if (color.empty()) {
         return;
     }

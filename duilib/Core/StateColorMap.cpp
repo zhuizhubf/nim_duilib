@@ -23,7 +23,7 @@ void StateColorMap::SetStateColor(ControlStateType stateType, const DString& col
 
 bool StateColorMap::HasHotColor() const
 {
-    return HasStateColor(kControlStateHot);
+    return HasStateColor(kControlStateHovered);
 }
 
 bool StateColorMap::HasStateColors() const
@@ -62,7 +62,7 @@ void StateColorMap::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Con
     }
     if (m_pControl != nullptr) {        
         if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
-            if ((stateType == kControlStateNormal || stateType == kControlStateHot) && HasStateColor(kControlStateHot)) {
+            if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && HasStateColor(kControlStateHovered)) {
                 const uint8_t nHotAlpha = m_pControl->GetHotAlpha();
                 //先绘制默认的颜色
                 DString strColor = GetStateColor(kControlStateNormal);
@@ -70,16 +70,16 @@ void StateColorMap::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Con
                     pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(strColor), 255 - nHotAlpha);
                 }
                 //绘制Hot状态的颜色（半透明）
-                pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(GetStateColor(kControlStateHot)), nHotAlpha);
+                pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHotAlpha);
                 return;
             }
         }
     }
 
-    if (stateType == kControlStatePushed && !HasStateColor(kControlStatePushed)) {
-        stateType = kControlStateHot;
+    if (stateType == kControlStatePressed && !HasStateColor(kControlStatePressed)) {
+        stateType = kControlStateHovered;
     }
-    if (stateType == kControlStateHot && !HasStateColor(kControlStateHot)) {
+    if (stateType == kControlStateHovered && !HasStateColor(kControlStateHovered)) {
         stateType = kControlStateNormal;
     }
     if (stateType == kControlStateDisabled && !HasStateColor(kControlStateDisabled)) {

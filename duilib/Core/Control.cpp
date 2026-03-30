@@ -280,10 +280,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
             SetState(kControlStateNormal);
         }
         else if (strValue == _T("hot")) {
-            SetState(kControlStateHot);
+            SetState(kControlStateHovered);
         }
         else if (strValue == _T("pushed")) {
-            SetState(kControlStatePushed);
+            SetState(kControlStatePressed);
         }
         else if (strValue == _T("disabled")) {
             SetState(kControlStateDisabled);
@@ -342,10 +342,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         SetStateColor(kControlStateNormal, strValue);
     }
     else if ((strName == _T("hovered_color")) || (strName == _T("hot_color")) || (strName == _T("hotcolor"))) {
-        SetStateColor(kControlStateHot, strValue);
+        SetStateColor(kControlStateHovered, strValue);
     }
     else if ((strName == _T("pressed_color")) || (strName == _T("pushed_color")) || (strName == _T("pushedcolor"))) {
-        SetStateColor(kControlStatePushed, strValue);
+        SetStateColor(kControlStatePressed, strValue);
     }
     else if ((strName == _T("disabled_color")) || (strName == _T("disabledcolor"))) {
         SetStateColor(kControlStateDisabled, strValue);
@@ -358,12 +358,12 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("hovered_color_margin")) || (strName == _T("hot_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
-        SetStateColorMargin(kControlStateHot, rcMargin, true);
+        SetStateColorMargin(kControlStateHovered, rcMargin, true);
     }
     else if ((strName == _T("pressed_color_margin")) || (strName == _T("pushed_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
-        SetStateColorMargin(kControlStatePushed, rcMargin, true);
+        SetStateColorMargin(kControlStatePressed, rcMargin, true);
     }
     else if (strName == _T("disabled_color_margin")) {
         UiMargin rcMargin;
@@ -386,12 +386,12 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("hovered_color_round")) || (strName == _T("hot_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
-        SetStateColorRound(kControlStateHot, szRound, true);
+        SetStateColorRound(kControlStateHovered, szRound, true);
     }
     else if ((strName == _T("pressed_color_round")) || (strName == _T("pushed_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
-        SetStateColorRound(kControlStatePushed, szRound, true);
+        SetStateColorRound(kControlStatePressed, szRound, true);
     }
     else if (strName == _T("disabled_color_round")) {
         UiSize szRound;
@@ -405,10 +405,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         SetBorderColor(kControlStateNormal, strValue);
     }
     else if ((strName == _T("hovered_border_color")) || (strName == _T("hot_border_color"))) {
-        SetBorderColor(kControlStateHot, strValue);
+        SetBorderColor(kControlStateHovered, strValue);
     }
     else if ((strName == _T("pressed_border_color")) || (strName == _T("pushed_border_color"))) {
-        SetBorderColor(kControlStatePushed, strValue);
+        SetBorderColor(kControlStatePressed, strValue);
     }
     else if (strName == _T("disabled_border_color")) {
         SetBorderColor(kControlStateDisabled, strValue);
@@ -495,10 +495,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         SetStateImage(kControlStateNormal, strValue);
     }
     else if ((strName == _T("hovered_image")) || (strName == _T("hot_image")) || (strName == _T("hotimage"))) {
-        SetStateImage(kControlStateHot, strValue);
+        SetStateImage(kControlStateHovered, strValue);
     }
     else if ((strName == _T("pressed_image")) || (strName == _T("pushed_image")) || (strName == _T("pushedimage"))) {
-        SetStateImage(kControlStatePushed, strValue);
+        SetStateImage(kControlStatePressed, strValue);
     }
     else if ((strName == _T("disabled_image")) || (strName == _T("disabledimage"))) {
         SetStateImage(kControlStateDisabled, strValue);
@@ -507,10 +507,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         SetForeStateImage(kControlStateNormal, strValue);
     }
     else if ((strName == _T("fore_hovered_image")) || (strName == _T("fore_hot_image")) || (strName == _T("forehotimage"))) {
-        SetForeStateImage(kControlStateHot, strValue);
+        SetForeStateImage(kControlStateHovered, strValue);
     }
     else if ((strName == _T("fore_pressed_image")) || (strName == _T("fore_pushed_image")) || (strName == _T("forepushedimage"))) {
-        SetForeStateImage(kControlStatePushed, strValue);
+        SetForeStateImage(kControlStatePressed, strValue);
     }
     else if ((strName == _T("fore_disabled_image")) || (strName == _T("foredisabledimage"))) {
         SetForeStateImage(kControlStateDisabled, strValue);
@@ -1209,7 +1209,7 @@ void Control::SetStateColor(ControlStateType stateType, const DString& strColor)
         m_pColorMap = std::make_unique<StateColorMap2>(this);
     }
     m_pColorMap->SetStateColor(stateType, strColor);
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         SetFadeHovered(true);
     }
     Invalidate();
@@ -1229,7 +1229,7 @@ void Control::SetStateColorMargin(ControlStateType stateType, UiMargin colorMarg
         m_pColorMap = std::make_unique<StateColorMap2>(this);
     }
     m_pColorMap->SetStateColorMargin(stateType, colorMargin);
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         SetFadeHovered(true);
     }
     Invalidate();
@@ -1249,7 +1249,7 @@ void Control::SetStateColorRound(ControlStateType stateType, UiSize colorRound, 
         m_pColorMap = std::make_unique<StateColorMap2>(this);
     }
     m_pColorMap->SetStateColorRound(stateType, colorRound);
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         SetFadeHovered(true);
     }
     Invalidate();
@@ -1478,7 +1478,7 @@ DString Control::GetStateImage(ControlStateType stateType) const
 
 void Control::SetStateImage(ControlStateType stateType, const DString& strImage)
 {
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         SetFadeHovered(true);
     }
     SetStateImage(kStateImageBk, stateType, strImage);
@@ -1492,7 +1492,7 @@ DString Control::GetForeStateImage(ControlStateType stateType) const
 
 void Control::SetForeStateImage(ControlStateType stateType, const DString& strImage)
 {
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         SetFadeHovered(true);
     }
     SetStateImage(kStateImageFore, stateType, strImage);
@@ -1609,7 +1609,7 @@ void Control::SetState(ControlStateType controlState)
     if (controlState == kControlStateNormal) {
         m_nHotAlpha = 0;
     }
-    else if (controlState == kControlStateHot) {
+    else if (controlState == kControlStateHovered) {
         m_nHotAlpha = 255;
     }
     PrivateSetState(controlState);
@@ -1628,7 +1628,7 @@ void Control::PrivateSetState(ControlStateType controlState)
 
 bool Control::IsHotState() const
 {
-    return (GetState() == kControlStateHot) ? true : false;
+    return (GetState() == kControlStateHovered) ? true : false;
 }
 
 DString Control::GetBorderColor(ControlStateType stateType) const
@@ -1643,8 +1643,8 @@ DString Control::GetBorderColor(ControlStateType stateType) const
 void Control::SetBorderColor(const DString& strBorderColor)
 {
     SetBorderColor(kControlStateNormal, strBorderColor);
-    SetBorderColor(kControlStateHot, strBorderColor);
-    SetBorderColor(kControlStatePushed, strBorderColor);
+    SetBorderColor(kControlStateHovered, strBorderColor);
+    SetBorderColor(kControlStatePressed, strBorderColor);
     SetBorderColor(kControlStateDisabled, strBorderColor);
 }
 
@@ -2808,7 +2808,7 @@ bool Control::MouseEnter(const EventArgs& msg)
                     pHotAnimationPlayer->Continue();
                 }
             }
-            PrivateSetState(kControlStateHot);
+            PrivateSetState(kControlStateHovered);
         }
         if (!m_bMouseEnter) {
             m_bMouseEnter = true;
@@ -2822,7 +2822,7 @@ bool Control::MouseEnter(const EventArgs& msg)
     else {
         //恢复状态
         m_bMouseEnter = false;
-        if (GetState() == kControlStateHot) {
+        if (GetState() == kControlStateHovered) {
             PrivateSetState(kControlStateNormal);
         }
     }
@@ -2836,7 +2836,7 @@ bool Control::MouseLeave(const EventArgs& msg)
         return true;
     }
     if(IsEnabled()) {
-        if (GetState() == kControlStateHot) {
+        if (GetState() == kControlStateHovered) {
             PrivateSetState(kControlStateNormal);
             if (HasHotState()) {
                 //Hot状态动画
@@ -2859,7 +2859,7 @@ bool Control::MouseLeave(const EventArgs& msg)
     else {
         //恢复状态
         m_bMouseEnter = false;
-        if (GetState() == kControlStateHot) {
+        if (GetState() == kControlStateHovered) {
             PrivateSetState(kControlStateNormal);
             Invalidate();
         }
@@ -2873,7 +2873,7 @@ bool Control::ButtonDown(const EventArgs& msg)
         return true;
     }
     if( IsEnabled() ) {
-        PrivateSetState(kControlStatePushed);
+        PrivateSetState(kControlStatePressed);
         SetMouseFocused(true);
         Invalidate();
     }
@@ -2894,7 +2894,7 @@ bool Control::ButtonUp(const EventArgs& msg)
         }
         Invalidate();
         if( IsPointInWithScrollOffset(msg.ptMouse) ) {
-            PrivateSetState(kControlStateHot);
+            PrivateSetState(kControlStateHovered);
             m_nHotAlpha = 255;
             Activate(&msg);
         }
@@ -3089,7 +3089,7 @@ bool Control::OnSetFocus(const EventArgs& msg)
 #endif
 
     if (GetState() == kControlStateNormal) {
-        SetState(kControlStateHot);
+        SetState(kControlStateHovered);
         Invalidate();
     }
     return true;
@@ -3100,10 +3100,10 @@ bool Control::OnKillFocus(const EventArgs& msg)
     if (!CheckEventType(msg, kEventKillFocus)) {
         return true;
     }
-    if (GetState() == kControlStateHot) {
+    if (GetState() == kControlStateHovered) {
         SetState(kControlStateNormal);
     }
-    else if (GetState() == kControlStatePushed) {
+    else if (GetState() == kControlStatePressed) {
         //失去焦点时，修复控件状态（如果鼠标按下时，窗口失去焦点，鼠标弹起事件这个控件就收不到了）
         SetMouseFocused(false);
         //停止Hot状态动画

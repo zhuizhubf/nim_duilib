@@ -147,10 +147,10 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         SetStateTextColor(kControlStateNormal, strValue);
     }
     else if ((strName == _T("hovered_text_color")) || (strName == _T("hot_text_color")) || (strName == _T("hottextcolor"))) {
-        SetStateTextColor(kControlStateHot, strValue);
+        SetStateTextColor(kControlStateHovered, strValue);
     }
     else if ((strName == _T("pressed_text_color")) || (strName == _T("pushed_text_color")) || (strName == _T("pushedtextcolor"))) {
-        SetStateTextColor(kControlStatePushed, strValue);
+        SetStateTextColor(kControlStatePressed, strValue);
     }
     else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
         SetStateTextColor(kControlStateDisabled, strValue);
@@ -746,8 +746,8 @@ void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
     drawParam.textRect = rc;
 
     if (m_pOwner->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
-        if ((stateType == kControlStateNormal || stateType == kControlStateHot) && 
-            !GetStateTextColor(kControlStateHot).empty()) {
+        if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && 
+            !GetStateTextColor(kControlStateHovered).empty()) {
             //先绘制默认的文本
             const uint8_t nHotAlpha = m_pOwner->GetHotAlpha();
             bool bPainted = false;
@@ -759,7 +759,7 @@ void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
                 bPainted = true;
             }
             //绘制Hot状态的文本（半透明）
-            DString textColor = GetStateTextColor(kControlStateHot);
+            DString textColor = GetStateTextColor(kControlStateHovered);
             if (!textColor.empty()) {
                 drawParam.dwTextColor = m_pOwner->GetUiColor(textColor);
                 drawParam.uFade = nHotAlpha;
@@ -833,7 +833,7 @@ DString LabelImpl::GetStateTextColor(ControlStateType stateType) const
 
 void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString& dwTextColor)
 {
-    if (stateType == kControlStateHot) {
+    if (stateType == kControlStateHovered) {
         m_pOwner->SetFadeHovered(true);
     }
     if (m_pTextColorMap == nullptr) {
@@ -846,10 +846,10 @@ void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString& dwT
 DString LabelImpl::GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType& stateType)
 {
     stateType = buttonStateType;
-    if (stateType == kControlStatePushed && GetStateTextColor(kControlStatePushed).empty()) {
-        stateType = kControlStateHot;
+    if (stateType == kControlStatePressed && GetStateTextColor(kControlStatePressed).empty()) {
+        stateType = kControlStateHovered;
     }
-    if (stateType == kControlStateHot && GetStateTextColor(kControlStateHot).empty()) {
+    if (stateType == kControlStateHovered && GetStateTextColor(kControlStateHovered).empty()) {
         stateType = kControlStateNormal;
     }
     if (stateType == kControlStateDisabled && GetStateTextColor(kControlStateDisabled).empty()) {

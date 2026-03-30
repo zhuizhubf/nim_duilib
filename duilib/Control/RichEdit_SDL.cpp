@@ -3384,7 +3384,7 @@ bool RichEdit::OnSetFocus(const EventArgs& /*msg*/)
 
     //不调用基类的方法
     if (GetState() == kControlStateNormal) {
-        SetState(kControlStateHot);
+        SetState(kControlStateHovered);
     }
 
     Invalidate();

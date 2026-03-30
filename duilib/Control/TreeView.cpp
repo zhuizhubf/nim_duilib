@@ -50,10 +50,10 @@ void TreeNode::SetAttribute(const DString& strName, const DString& strValue2)
         SetExpandStateImage(kControlStateNormal, strValue);
     }
     else if ((strName == _T("expand_hovered_image")) || (strName == _T("expand_hot_image"))) {
-        SetExpandStateImage(kControlStateHot, strValue);
+        SetExpandStateImage(kControlStateHovered, strValue);
     }
     else if ((strName == _T("expand_pressed_image")) || (strName == _T("expand_pushed_image"))) {
-        SetExpandStateImage(kControlStatePushed, strValue);
+        SetExpandStateImage(kControlStatePressed, strValue);
     }
     else if (strName == _T("expand_disabled_image")) {
         SetExpandStateImage(kControlStateDisabled, strValue);
@@ -62,10 +62,10 @@ void TreeNode::SetAttribute(const DString& strName, const DString& strValue2)
         SetCollapseStateImage(kControlStateNormal, strValue);
     }
     else if ((strName == _T("collapse_hovered_image")) || (strName == _T("collapse_hot_image"))) {
-        SetCollapseStateImage(kControlStateHot, strValue);
+        SetCollapseStateImage(kControlStateHovered, strValue);
     }
     else if ((strName == _T("collapse_pressed_image")) || (strName == _T("collapse_pushed_image"))) {
-        SetCollapseStateImage(kControlStatePushed, strValue);
+        SetCollapseStateImage(kControlStatePressed, strValue);
     }
     else if (strName == _T("collapse_disabled_image")) {
         SetCollapseStateImage(kControlStateDisabled, strValue);

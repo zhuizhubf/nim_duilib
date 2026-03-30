@@ -49,7 +49,7 @@ void StateColorMap2::SetStateColorRound(ControlStateType stateType, const UiSize
 
 bool StateColorMap2::HasHotColor() const
 {
-    return HasStateColor(kControlStateHot);
+    return HasStateColor(kControlStateHovered);
 }
 
 bool StateColorMap2::HasStateColors() const
@@ -116,7 +116,7 @@ void StateColorMap2::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Co
     }
     if (m_pControl != nullptr) {        
         if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
-            if ((stateType == kControlStateNormal || stateType == kControlStateHot) && HasStateColor(kControlStateHot)) {
+            if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && HasStateColor(kControlStateHovered)) {
                 const uint8_t nHotAlpha = m_pControl->GetHotAlpha();
                 //先绘制默认的颜色
                 DString strColor = GetStateColor(kControlStateNormal);
@@ -125,16 +125,16 @@ void StateColorMap2::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Co
                 }
 
                 //绘制Hot状态的颜色（半透明）
-                DoPaintStateColor(pRender, rcPaint, kControlStateHot, m_pControl->GetUiColor(GetStateColor(kControlStateHot)), nHotAlpha);
+                DoPaintStateColor(pRender, rcPaint, kControlStateHovered, m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHotAlpha);
                 return;
             }
         }
     }
 
-    if (stateType == kControlStatePushed && !HasStateColor(kControlStatePushed)) {
-        stateType = kControlStateHot;
+    if (stateType == kControlStatePressed && !HasStateColor(kControlStatePressed)) {
+        stateType = kControlStateHovered;
     }
-    if (stateType == kControlStateHot && !HasStateColor(kControlStateHot)) {
+    if (stateType == kControlStateHovered && !HasStateColor(kControlStateHovered)) {
         stateType = kControlStateNormal;
     }
     if (stateType == kControlStateDisabled && !HasStateColor(kControlStateDisabled)) {

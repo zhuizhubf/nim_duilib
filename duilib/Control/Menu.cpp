@@ -313,7 +313,7 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                 for (size_t nIndex = 0; nIndex < pLayoutListBox->GetItemCount(); ++nIndex) {
                     MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(nIndex));
                     if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
-                        if (pItem->GetState() == ControlStateType::kControlStateHot) {
+                        if (pItem->GetState() == ControlStateType::kControlStateHovered) {
                             pLayoutListBox->SelectItem(nIndex, false, false);
                             bFoundItem = true;
                             break;
@@ -665,7 +665,7 @@ void Menu::PostInitWindow()
 
     //菜单显示后，让关联控件处于Push状态(异步)
     if (m_pRelatedControl != nullptr) {
-        m_pRelatedControl->SetState(kControlStatePushed);
+        m_pRelatedControl->SetState(kControlStatePressed);
     }
 
     //需要在最后才调用基类的实现函数
@@ -742,8 +742,8 @@ void Menu::OnCloseWindow()
         m_pRelatedControl->ScreenToClient(pt);
         pt.Offset(m_pRelatedControl->GetScrollOffsetInScrollBox());
         if (m_pRelatedControl->GetRect().ContainsPt(pt)) {
-            if (m_pRelatedControl->GetState() != ui::kControlStateHot) {
-                m_pRelatedControl->SetState(ui::kControlStateHot);
+            if (m_pRelatedControl->GetState() != ui::kControlStateHovered) {
+                m_pRelatedControl->SetState(ui::kControlStateHovered);
             }            
         }
         else {

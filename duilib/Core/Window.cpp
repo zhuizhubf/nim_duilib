@@ -1322,7 +1322,7 @@ LRESULT Window::OnSetFocusMsg(WindowBase* /*pLostFocusWindow*/, const NativeMsg&
             ScreenToClient(pt);
             if (pFocus->IsPointInWithScrollOffset(pt)) {
                 //鼠标还在控件范围内，保持hot状态
-                pFocus->SetState(kControlStateHot);
+                pFocus->SetState(kControlStateHovered);
             }
             else {
                 //鼠标不再控件范围内，恢复为Normal状态

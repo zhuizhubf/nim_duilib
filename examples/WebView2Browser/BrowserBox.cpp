@@ -162,7 +162,7 @@ bool BrowserBox::OnSetFocus(const ui::EventArgs& msg)
 
     //不再调用基类的方法，避免覆盖输入法管理的逻辑（基类会关闭输入法）
     if (GetState() == kControlStateNormal) {
-        SetState(kControlStateHot);
+        SetState(kControlStateHovered);
         Invalidate();
     }
     return true;

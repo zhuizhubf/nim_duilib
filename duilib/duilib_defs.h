@@ -181,8 +181,8 @@ namespace ui
     enum ControlStateType: int8_t
     {
         kControlStateNormal     = 0,    // 普通状态
-        kControlStateHot        = 1,    // 悬停状态
-        kControlStatePushed     = 2,    // 按下状态
+        kControlStateHovered    = 1,    // 悬停状态
+        kControlStatePressed    = 2,    // 按下状态
         kControlStateDisabled   = 3,    // 禁用状态
 
         kControlStateCount      = 4     // 状态个数

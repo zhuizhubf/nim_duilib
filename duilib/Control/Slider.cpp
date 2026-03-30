@@ -170,10 +170,10 @@ void Slider::SetAttribute(const DString& strName, const DString& strValue2)
         SetThumbStateImage(kControlStateNormal, strValue);
     }
     else if ((strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
-        SetThumbStateImage(kControlStateHot, strValue);
+        SetThumbStateImage(kControlStateHovered, strValue);
     }
     else if ((strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
-        SetThumbStateImage(kControlStatePushed, strValue);
+        SetThumbStateImage(kControlStatePressed, strValue);
     }
     else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
         SetThumbStateImage(kControlStateDisabled, strValue);
@@ -255,14 +255,14 @@ void Slider::PaintStateImages(IRender* pRender)
     if (IsMouseFocused()) {
         m_sImageModify.clear();
         m_sImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rcThumb.left, rcThumb.top, rcThumb.right, rcThumb.bottom);
-        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStatePushed), m_sImageModify.c_str())) {
+        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStatePressed), m_sImageModify.c_str())) {
             return;
         }
     }
-    else if (GetState() == kControlStateHot) {
+    else if (GetState() == kControlStateHovered) {
         m_sImageModify.clear();
         m_sImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rcThumb.left, rcThumb.top, rcThumb.right, rcThumb.bottom);
-        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStateHot), m_sImageModify.c_str())) {
+        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStateHovered), m_sImageModify.c_str())) {
             return;
         }
     }

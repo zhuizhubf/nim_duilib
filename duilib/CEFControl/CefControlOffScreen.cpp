@@ -640,7 +640,7 @@ bool CefControlOffScreen::OnSetFocus(const EventArgs& /*msg*/)
 {
     //不调用基类的方法(基类的方法会关闭输入法)
     if (GetState() == kControlStateNormal) {
-        SetState(kControlStateHot);
+        SetState(kControlStateHovered);
     }
 
     //设置输入法相关属性

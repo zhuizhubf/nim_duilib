@@ -260,7 +260,7 @@ Control* ColorPickerRegularProvider::CreateElement(VirtualListBox* pVirtualListB
     float fBorderSize = 2.0f;//TODO
     UiRectF borderSize(fBorderSize, fBorderSize, fBorderSize, fBorderSize);
     pControl->SetBorderSize(borderSize, true);
-    pControl->SetBorderColor(kControlStatePushed, _T("blue"));
+    pControl->SetBorderColor(kControlStatePressed, _T("blue"));
     return pControl;
 }
 

@@ -112,14 +112,14 @@ Image* StateImage::GetStateImage(ControlStateType stateType) const
 
 bool StateImage::HasHotImage() const
 {
-    return !GetImageString(kControlStateHot).empty();
+    return !GetImageString(kControlStateHovered).empty();
 }
 
 bool StateImage::HasImage() const
 {
     return !GetImageString(kControlStateNormal).empty() ||
-           !GetImageString(kControlStateHot).empty()    ||
-           !GetImageString(kControlStatePushed).empty() ||
+           !GetImageString(kControlStateHovered).empty()    ||
+           !GetImageString(kControlStatePressed).empty() ||
            !GetImageString(kControlStateDisabled).empty();
 }
 
@@ -127,12 +127,12 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
                                  const DString& sImageModify, UiRect* pDestRect)
 {
     if (m_pControl != nullptr) {        
-        if (((stateType == kControlStateNormal) || (stateType == kControlStateHot)) &&
+        if (((stateType == kControlStateNormal) || (stateType == kControlStateHovered)) &&
             m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
             //正在播放Hot状态动画
             uint8_t nHotAlpha = m_pControl->GetHotAlpha();
             Image* pNormalImage = GetStateImage(kControlStateNormal);
-            Image* pHotImage = GetStateImage(kControlStateHot);
+            Image* pHotImage = GetStateImage(kControlStateHovered);
             for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
                 ASSERT(iter->second != nullptr);
                 bool bNeedPause = true;
@@ -162,7 +162,7 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
 
             //绘制Hot图片
             if (pHotImage != nullptr) {
-                int32_t nHotFade = GetImageFade(kControlStateHot);
+                int32_t nHotFade = GetImageFade(kControlStateHovered);
                 nHotFade = int32_t(nHotFade * (double)nHotAlpha / 255);
                 bHotPaintd = m_pControl->PaintImage(pRender, pHotImage, sImageModify, nHotFade);                
             }
@@ -173,14 +173,14 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
         }
     }
 
-    if (stateType == kControlStatePushed && GetImageString(kControlStatePushed).empty()) {
-        stateType = kControlStateHot;
-        auto iter = m_stateImageMap.find(kControlStateHot);
+    if (stateType == kControlStatePressed && GetImageString(kControlStatePressed).empty()) {
+        stateType = kControlStateHovered;
+        auto iter = m_stateImageMap.find(kControlStateHovered);
         if (iter != m_stateImageMap.end()) {
             iter->second->SetImageFade(255);
         }
     }
-    if (stateType == kControlStateHot && GetImageString(kControlStateHot).empty()) {
+    if (stateType == kControlStateHovered && GetImageString(kControlStateHovered).empty()) {
         stateType = kControlStateNormal;
     }
     if (stateType == kControlStateDisabled && GetImageString(kControlStateDisabled).empty()) {
@@ -218,7 +218,7 @@ Image* StateImage::GetEstimateImage() const
         }        
     }
     if(pEstimateImage == nullptr) {
-        iter = m_stateImageMap.find(kControlStateHot);
+        iter = m_stateImageMap.find(kControlStateHovered);
         if (iter != m_stateImageMap.end()) {
             if (!iter->second->GetImagePath().empty()) {
                 pEstimateImage = iter->second;
@@ -226,7 +226,7 @@ Image* StateImage::GetEstimateImage() const
         }
     }
     if (pEstimateImage == nullptr) {
-        iter = m_stateImageMap.find(kControlStatePushed);
+        iter = m_stateImageMap.find(kControlStatePressed);
         if (iter != m_stateImageMap.end()) {
             if (!iter->second->GetImagePath().empty()) {
                 pEstimateImage = iter->second;

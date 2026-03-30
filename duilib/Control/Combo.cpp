@@ -87,7 +87,7 @@ void CComboWnd::InitComboWnd(Combo* pOwner, bool bActivated)
         SetWindowForeground();
         KeepParentActive();
         pOwner->GetTreeView()->SetFocus();
-        pOwner->SetState(kControlStateHot);
+        pOwner->SetState(kControlStateHovered);
     }
     else {
         ShowWindow(ui::kSW_SHOW_NA);
@@ -519,21 +519,21 @@ DString Combo::GetBorderColor(ControlStateType stateType) const
     DString borderColor;
     if (m_pIconControl != nullptr) {
         if (m_pIconControl->IsFocused() || m_pIconControl->IsMouseFocused()) {
-            borderColor = BaseClass::GetBorderColor(kControlStateHot);
+            borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
     if (borderColor.empty() && (m_pEditControl != nullptr)) {
         if (m_pEditControl->IsFocused() || m_pEditControl->IsMouseFocused()) {
-            borderColor = BaseClass::GetBorderColor(kControlStateHot);
+            borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
     if (borderColor.empty() && (m_pButtonControl != nullptr)) {
         if (m_pButtonControl->IsFocused() || m_pButtonControl->IsMouseFocused()) {
-            borderColor = BaseClass::GetBorderColor(kControlStateHot);
+            borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
     if (borderColor.empty() && (m_pWindow != nullptr) && !m_pWindow->IsClosingWnd()) {
-        borderColor = BaseClass::GetBorderColor(kControlStateHot);
+        borderColor = BaseClass::GetBorderColor(kControlStateHovered);
     }
     if (borderColor.empty()) {
         borderColor = BaseClass::GetBorderColor(stateType);
