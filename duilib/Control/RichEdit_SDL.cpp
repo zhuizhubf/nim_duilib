@@ -265,13 +265,13 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
         //当控件处于非激活状态时，是否隐藏选择内容
         SetHideSelection(StringUtil::IsValueTrue(strValue));
     }
-    else if (strName == _T("focus_bottom_border_size")) {
+    else if ((strName == _T("focused_bottom_border_size")) || (strName == _T("focus_bottom_border_size"))) {
         //焦点状态时，底部边框的大小
-        SetFocusBottomBorderSize(StringUtil::StringToInt32(strValue));
+        SetFocusedBottomBorderSize(StringUtil::StringToInt32(strValue));
     }
-    else if (strName == _T("focus_bottom_border_color")) {
+    else if ((strName == _T("focused_bottom_border_color")) || (strName == _T("focus_bottom_border_color"))) {
         //焦点状态时，底部边框的颜色
-        SetFocusBottomBorderColor(strValue);
+        SetFocusedBottomBorderColor(strValue);
     }
     else if (strName == _T("zoom")) {
         //缩放比例：格式有两种，一种如"2,1" 放大到200%； 表示另外一种如："200%"，代表放大到200%。
@@ -323,7 +323,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
         //如果 为 TRUE，则当控件处于非活动状态时，应保存所选内容的边界。
         //如果 为 FALSE，则当控件再次处于活动状态时，可以选择边界重置为 start = 0，length = 0。
     }
-    else if (strName == _T("select_all_on_focus")) {
+    else if ((strName == _T("select_all_on_focused")) || (strName == _T("select_all_on_focus"))) {
         //获取焦点的时候，是否全选
         SetSelAllOnFocus(StringUtil::IsValueTrue(strValue));
     }
@@ -1353,7 +1353,7 @@ bool RichEdit::IsHideSelection() const
     return m_bHideSelection;
 }
 
-void RichEdit::SetFocusBottomBorderSize(int32_t nBottomBorderSize)
+void RichEdit::SetFocusedBottomBorderSize(int32_t nBottomBorderSize)
 {
     ASSERT(nBottomBorderSize > 0);
     if (nBottomBorderSize < 0) {
@@ -1362,17 +1362,17 @@ void RichEdit::SetFocusBottomBorderSize(int32_t nBottomBorderSize)
     m_nFocusBottomBorderSize = ui::TruncateToUInt8(nBottomBorderSize);
 }
 
-int32_t RichEdit::GetFocusBottomBorderSize() const
+int32_t RichEdit::GetFocusedBottomBorderSize() const
 {
     return (int32_t)(uint32_t)m_nFocusBottomBorderSize;
 }
 
-void RichEdit::SetFocusBottomBorderColor(const DString& bottomBorderColor)
+void RichEdit::SetFocusedBottomBorderColor(const DString& bottomBorderColor)
 {
     m_sFocusBottomBorderColor = bottomBorderColor;
 }
 
-DString RichEdit::GetFocusBottomBorderColor() const
+DString RichEdit::GetFocusedBottomBorderColor() const
 {
     return m_sFocusBottomBorderColor.c_str();
 }
@@ -1979,8 +1979,8 @@ void RichEdit::PaintBorder(IRender* pRender)
         return;
     }
     //绘制下边线
-    DString borderColor = GetFocusBottomBorderColor();
-    int32_t borderSize = GetFocusBottomBorderSize();
+    DString borderColor = GetFocusedBottomBorderColor();
+    int32_t borderSize = GetFocusedBottomBorderSize();
     if ((borderSize > 0) && !borderColor.empty()) {
         UiColor dwBorderColor = GetUiColor(borderColor);
         UiRect rcBorder = GetRect();

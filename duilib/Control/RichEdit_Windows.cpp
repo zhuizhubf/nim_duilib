@@ -575,15 +575,15 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
         //是否隐藏选择内容
         SetHideSelection(StringUtil::IsValueTrue(strValue));
     }
-    else if (strName == _T("focus_bottom_border_size")) {
+    else if ((strName == _T("focused_bottom_border_size")) || (strName == _T("focus_bottom_border_size"))) {
         //焦点状态时，底部边框的大小
-        SetFocusBottomBorderSize(StringUtil::StringToInt32(strValue));
+        SetFocusedBottomBorderSize(StringUtil::StringToInt32(strValue));
     }
-    else if (strName == _T("focus_bottom_border_color")) {
+    else if ((strName == _T("focused_bottom_border_color")) || (strName == _T("focus_bottom_border_color"))) {
         //焦点状态时，底部边框的颜色
-        SetFocusBottomBorderColor(strValue);
+        SetFocusedBottomBorderColor(strValue);
     }
-    else if (strName == _T("select_all_on_focus")) {
+    else if ((strName == _T("select_all_on_focused")) || (strName == _T("select_all_on_focus"))) {
         //获取焦点的时候，是否全选
         SetSelAllOnFocus(StringUtil::IsValueTrue(strValue));
     }
@@ -2756,8 +2756,8 @@ void RichEdit::PaintBorder(IRender* pRender)
         return;
     }
     //绘制下边线
-    DString borderColor = GetFocusBottomBorderColor();
-    int32_t borderSize = GetFocusBottomBorderSize();
+    DString borderColor = GetFocusedBottomBorderColor();
+    int32_t borderSize = GetFocusedBottomBorderSize();
     if ((borderSize > 0) && !borderColor.empty()) {
         UiColor dwBorderColor = GetUiColor(borderColor);
         UiRect rcBorder = GetRect();
@@ -3760,7 +3760,7 @@ bool RichEdit::IsHideSelection() const
     return bRet;
 }
 
-void RichEdit::SetFocusBottomBorderSize(int32_t nBottomBorderSize)
+void RichEdit::SetFocusedBottomBorderSize(int32_t nBottomBorderSize)
 {
     ASSERT(nBottomBorderSize > 0);
     if (nBottomBorderSize < 0) {
@@ -3769,17 +3769,17 @@ void RichEdit::SetFocusBottomBorderSize(int32_t nBottomBorderSize)
     m_nFocusBottomBorderSize = ui::TruncateToUInt8(nBottomBorderSize);
 }
 
-int32_t RichEdit::GetFocusBottomBorderSize() const
+int32_t RichEdit::GetFocusedBottomBorderSize() const
 {
     return (int32_t)(uint32_t)m_nFocusBottomBorderSize;
 }
 
-void RichEdit::SetFocusBottomBorderColor(const DString& bottomBorderColor)
+void RichEdit::SetFocusedBottomBorderColor(const DString& bottomBorderColor)
 {
     m_sFocusBottomBorderColor = bottomBorderColor;
 }
 
-DString RichEdit::GetFocusBottomBorderColor() const
+DString RichEdit::GetFocusedBottomBorderColor() const
 {
     return m_sFocusBottomBorderColor.c_str();
 }

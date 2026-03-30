@@ -38,7 +38,7 @@ Control::Control(Window* pWindow) :
     m_nHotAlpha(0),
     m_bBoxShadowPainted(false),
     m_uUserDataID((size_t)-1),
-    m_bShowFocusRect(false),
+    m_bShowFocusedRect(false),
     m_nPaintOrder(0),
     m_bBordersOnTop(true),
     m_bMouseEnter(false)
@@ -413,8 +413,8 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("disabled_border_color")) {
         SetBorderColor(kControlStateDisabled, strValue);
     }
-    else if (strName == _T("focus_border_color")) {
-        SetFocusBorderColor(strValue);
+    else if ((strName == _T("focused_border_color")) || (strName == _T("focus_border_color"))) {
+        SetFocusedBorderColor(strValue);
     }
     else if ((strName == _T("left_border_size")) || (strName == _T("leftbordersize"))) {
         SetLeftBorderSize((float)StringUtil::StringToInt32(strValue), true);
@@ -573,11 +573,11 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("loading")) {
         SetLoadingAttribute(strValue);
     }
-    else if (strName == _T("show_focus_rect")) {
-        SetShowFocusRect(StringUtil::IsValueTrue(strValue));
+    else if ((strName == _T("show_focused_rect")) || (strName == _T("show_focus_rect"))) {
+        SetShowFocusedRect(StringUtil::IsValueTrue(strValue));
     }
-    else if (strName == _T("focus_rect_color")) {
-        SetFocusRectColor(strValue);
+    else if ((strName == _T("focused_rect_color")) || (strName == _T("focus_rect_color"))) {
+        SetFocusedRectColor(strValue);
     }
     else if (strName == _T("paint_order")) {
         uint8_t nPaintOrder = TruncateToUInt8(StringUtil::StringToInt32(strValue));
@@ -1662,21 +1662,21 @@ void Control::SetBorderColor(ControlStateType stateType, const DString& strBorde
     }
 }
 
-void Control::SetFocusBorderColor(const DString& strBorderColor)
+void Control::SetFocusedBorderColor(const DString& strBorderColor)
 {
     if (m_pBorderData == nullptr) {
         m_pBorderData = std::make_unique<TBorderData>();
     }
-    if (m_pBorderData->m_focusBorderColor != strBorderColor) {
-        m_pBorderData->m_focusBorderColor = strBorderColor;
+    if (m_pBorderData->m_focusedBorderColor != strBorderColor) {
+        m_pBorderData->m_focusedBorderColor = strBorderColor;
         Invalidate();
     }
 }
 
-DString Control::GetFocusBorderColor() const
+DString Control::GetFocusedBorderColor() const
 {
     if (m_pBorderData != nullptr) {
-        return m_pBorderData->m_focusBorderColor.c_str();
+        return m_pBorderData->m_focusedBorderColor.c_str();
     }
     return DString();
 }
@@ -2133,32 +2133,32 @@ void Control::SetNoFocus()
     EnsureNoFocus();
 }
 
-void Control::SetShowFocusRect(bool bShowFocusRect)
+void Control::SetShowFocusedRect(bool bShowFocusedRect)
 {
-    m_bShowFocusRect = bShowFocusRect;
+    m_bShowFocusedRect = bShowFocusedRect;
 }
 
-bool Control::IsShowFocusRect() const
+bool Control::IsShowFocusedRect() const
 {
-    return m_bShowFocusRect;
+    return m_bShowFocusedRect;
 }
 
-void Control::SetFocusRectColor(const DString& focusRectColor)
+void Control::SetFocusedRectColor(const DString& focusRectColor)
 {
     if (m_pColorData == nullptr) {
         m_pColorData = std::make_unique<TColorData>();
     }
-    if (m_pColorData->m_focusRectColor == focusRectColor) {
+    if (m_pColorData->m_focusedRectColor == focusRectColor) {
         return;
     }
-    m_pColorData->m_focusRectColor = focusRectColor;
+    m_pColorData->m_focusedRectColor = focusRectColor;
     Invalidate();
 }
 
-DString Control::GetFocusRectColor() const
+DString Control::GetFocusedRectColor() const
 {
     if (m_pColorData != nullptr) {
-        return m_pColorData->m_focusRectColor.c_str();
+        return m_pColorData->m_focusedRectColor.c_str();
     }
     return DString();
 }
@@ -3815,7 +3815,7 @@ void Control::PaintBorder(IRender* pRender)
     DString borderColor;
     if (IsFocused()) {
         if (borderColor.empty()) {
-            borderColor = GetFocusBorderColor();
+            borderColor = GetFocusedBorderColor();
         }
     }
     if (borderColor.empty()) {
@@ -4004,7 +4004,7 @@ bool Control::ShouldBeRoundRectBorders() const
 
 void Control::PaintFocusRect(IRender* pRender)
 {
-    if ((pRender != nullptr) && IsShowFocusRect() && IsFocused()) {
+    if ((pRender != nullptr) && IsShowFocusedRect() && IsFocused()) {
         DoPaintFocusRect(pRender);    //绘制焦点状态
     }
 }
@@ -4021,7 +4021,7 @@ void Control::DoPaintFocusRect(IRender* pRender)
     }
     float fWidth =  Dpi().GetScaleFloat(1.0f); //画笔宽度
     UiColor dwBorderColor;//画笔颜色
-    DString focusRectColor = GetFocusRectColor();
+    DString focusRectColor = GetFocusedRectColor();
     if (!focusRectColor.empty()) {
         dwBorderColor = GetUiColor(focusRectColor);
     }

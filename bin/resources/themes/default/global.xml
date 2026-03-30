@@ -122,8 +122,8 @@
     <Alias name="bk_progress_progress" value="bg_progress"/>
     <Alias name="richedit_border_color" value="border_richedit_normal"/>
     <Alias name="richedit_hot_border_color" value="border_richedit_hovered"/>
-    <Alias name="richedit_focus_border_color" value="border_richedit_focus"/>
-    <Alias name="richedit_focus_bottom_border_color" value="border_richedit_focus_bottom"/>
+    <Alias name="richedit_focus_border_color" value="border_richedit_focused"/>
+    <Alias name="richedit_focus_bottom_border_color" value="border_richedit_focused_bottom"/>
     
     <!-- 按钮基类 -->
     <Class name="btn_global_base" fade_hovered="true"/>
@@ -430,13 +430,13 @@
     <Class name="simple_border" padding="1,1,1,1" border_size="1" 
                                 border_color="border_richedit_normal" 
                                 hovered_border_color="border_richedit_hovered" 
-                                focus_border_color="border_richedit_focus"/>
+                                focused_border_color="border_richedit_focused"/>
     <Class name="simple_border_bottom" padding="1,1,1,1" border_size="1,1,1,1" 
                                        border_color="border_richedit_normal" 
                                        hovered_border_color="border_richedit_hovered" 
-                                       focus_border_color="border_richedit_focus"
-                                       focus_bottom_border_size="2"
-                                       focus_bottom_border_color="border_richedit_focus_bottom"/>
+                                       focused_border_color="border_richedit_focused"
+                                       focused_bottom_border_size="2"
+                                       focused_bottom_border_color="border_richedit_focused_bottom"/>
     <Class name="prompt" prompt_mode="true" prompt_color="text_richedit_prompt"/>
     
     <!-- 编辑框Spin按钮 -->
@@ -657,7 +657,7 @@
                               sub_path_root_class="address_bar_sub_path_root"
                               path_separator_class="address_bar_path_separator"/>
     <Class name="address_bar_edit" multi_line="false" auto_hscroll="true" rich_text="false" 
-                                   default_context_menu="true" select_all_on_focus="true"
+                                   default_context_menu="true" select_all_on_focused="true"
                                    want_return="false" want_ctrl_return="false" want_tab="false"
                                    normal_text_color="text_default" 
                                    disabled_text_color="text_disabled"

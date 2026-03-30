@@ -1438,7 +1438,7 @@ public:
             return;
         }
         BaseClass::OnInit();
-        SetShowFocusRect(true);
+        SetShowFocusedRect(true);
         SetTabStop(false);
     }
 };
@@ -1873,7 +1873,7 @@ public:
             return;
         }
         BaseClass::OnInit();
-        this->SetShowFocusRect(false);
+        this->SetShowFocusedRect(false);
         this->SetTabStop(false);
     }
 };

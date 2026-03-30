@@ -153,8 +153,8 @@
     <ThemeColor name="bg_richedit_btn_pressed" value="#FFD0E8FF" type="richedit" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="true" comment_cn="编辑框按钮点击背景" comment_en="RichEdit button pressed bg"/>
     <ThemeColor name="bg_richedit_btn_disabled" value="#FFF5F5F5" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮禁用背景" comment_en="RichEdit button disabled bg"/>
     <ThemeColor name="border_richedit_btn" value="#FFCACACA" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框按钮边框" comment_en="RichEdit button border"/>
-    <ThemeColor name="border_richedit_focus" value="#FFCACACA" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框聚焦边框" comment_en="RichEdit focus border"/>
-    <ThemeColor name="border_richedit_focus_bottom" value="#FF0078D4" type="richedit" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="编辑框聚焦下划线" comment_en="RichEdit focus bottom line"/>
+    <ThemeColor name="border_richedit_focused" value="#FFCACACA" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框聚焦边框" comment_en="RichEdit focused border"/>
+    <ThemeColor name="border_richedit_focused_bottom" value="#FF0078D4" type="richedit" category="border_color" role="primary" derived_from="" adjust="" fixed="true" comment_cn="编辑框聚焦下划线" comment_en="RichEdit focused bottom line"/>
     <ThemeColor name="border_richedit_hovered" value="#FFB0B0B0" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框悬浮边框" comment_en="RichEdit hovered border"/>
     <ThemeColor name="border_richedit_normal" value="#FFCACACA" type="richedit" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="编辑框默认边框" comment_en="RichEdit normal border"/>
 

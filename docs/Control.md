@@ -50,7 +50,7 @@
 | hovered_border_color |  | string | SetBorderColor|悬浮状态的边框颜色,如"blue" |
 | pressed_border_color |  | string | SetBorderColor|按下状态的边框颜色,如"blue" |
 | disabled_border_color |  | string | SetBorderColor|禁止状态的边框颜色,如"blue" |
-| focus_border_color |  | string | SetFocusBorderColor|焦点状态的边框颜色,如"blue" |
+| focused_border_color |  | string | SetFocusedBorderColor|焦点状态的边框颜色,如"blue" |
 | border_size | 0 | int / rect | SetBorderSize|可以设置int或rect类型的值。当值为int时则左、上、右、下都用该值作为宽。值为rect类型时则分别设置左、上、右、下的边框 |
 | border_dash_style |"solid"| string | SetBorderDashStyle |线的形状，可选值：<br>"solid"：实线<br>"dash"：短划线构成的虚线<br>"dot"：点构成的虚线<br>"dash_dot"：交替短划线点线<br>"dash_dot_dot"：交替短划线点点线|
 | borders_on_top | true | bool | SetBordersOnTop|边框是否在顶层（即先绘制子控件，后绘制边框，避免边框被子控件覆盖）|
@@ -81,8 +81,8 @@
 | menu | false | bool | |是否需要右键菜单,如"true"|
 | no_focus | false | bool | SetNoFocus|是否可以获取焦点,如"true"|
 | tab_stop | true | bool | SetTabStop| 是否允许通过按TAB键切换到此控件 |
-| show_focus_rect | false| bool | SetShowFocusRect| 是否显示焦点状态(一个虚线构成的矩形) |
-| focus_rect_color | | string | SetFocusRectColor| 焦点状态矩形的颜色 |
+| show_focused_rect | false| bool | SetShowFocusedRect| 是否显示焦点状态(一个虚线构成的矩形) |
+| focused_rect_color | | string | SetFocusedRectColor| 焦点状态矩形的颜色 |
 | alpha | 255 | int | SetAlpha|控件的整体透明度,如alpha="128"，有效值为 0-255 |
 | state | normal | string | SetState|控件的当前状态: 支持normal、hot、pushed、disabled状态 |
 | cursor_type | arrow | string | SetCursorType|鼠标移动到控件上时的鼠标光标: <br>"arrow"：箭头<br>"hand"：手型<br>"wait"：忙碌<br>"cross"：十字线<br>"ibeam"：I型光标,文本光标<br>"size_we"：水平调整<br>"size_ns"：垂直调整<br>"size_nwse"：对角线调整，西北-东南调整<br>"size_nesw"：对角线调整，东北-西南调整<br>"size_all"：移动，四向调整<br>"no"：禁止光标<br>"progress"：进度，应用启动光标|
@@ -471,9 +471,9 @@ CircleProgress 控件继承了 `Progress` 属性，更多可用属性请参考`P
 | inactive_selection_bkcolor | "DarkGray" | string | 选择文本的背景色（非焦点状态），如果设置为空，则不显示 |
 | current_row_bkcolor | "" | string | 当前行的背景色（焦点状态），如果设置为空，则在焦点状态不显示当前行的背景色|
 | inactive_current_row_bkcolor | "" | string |当前行的背景色（非焦点状态），如果设置为空，则在非焦点状态不显示当前行的背景色  |
-| select_all_on_focus |false| bool | 获取焦点的时候，是否全选 |
-| focus_bottom_border_size |0| int | 焦点状态时，底部边框的大小 |
-| focus_bottom_border_color || string | 焦点状态时，底部边框的颜色 |
+| select_all_on_focused |false| bool | 获取焦点的时候，是否全选 |
+| focused_bottom_border_size |0| int | 焦点状态时，底部边框的大小 |
+| focused_bottom_border_color || string | 焦点状态时，底部边框的颜色 |
 | enable_drag_drop |false| bool   | 是否允许拖放操作|
 | enable_drop_file |false| bool   | 是否允许拖放文件操作|
 | drop_file_types  |     | string | 拖放文件操作支持的后缀名列表，比如:".txt;.csv"，表示仅支持txt和csv文件；如果为空，表示支持所有文件|

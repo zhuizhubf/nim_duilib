@@ -235,11 +235,11 @@ public:
 
     /** 设置焦点状态下的边框颜色
     */
-    void SetFocusBorderColor(const DString& strBorderColor);
+    void SetFocusedBorderColor(const DString& strBorderColor);
 
     /** 获取焦点状态下的边框颜色
     */
-    DString GetFocusBorderColor() const;
+    DString GetFocusedBorderColor() const;
 
     /** 设置边框的大小(left、top、right、bottom分别对应左边框大小，上边框大小，右边框大小、下边框大小)
      * @param [in] rc 一个 `UiRectF` 结构的边框大小集合
@@ -473,19 +473,19 @@ public:
 
     /** 设置是否显示焦点状态(一个虚线构成的矩形)
     */
-    void SetShowFocusRect(bool bShowFocusRect);
+    void SetShowFocusedRect(bool bShowFocusedRect);
 
     /** 设置是否显示焦点状态(一个虚线构成的矩形)
     */
-    bool IsShowFocusRect() const;
+    bool IsShowFocusedRect() const;
 
     /** 设置焦点状态虚线矩形的颜色(线条的颜色)
     */
-    void SetFocusRectColor(const DString& focusRectColor);
+    void SetFocusedRectColor(const DString& focusRectColor);
 
     /** 获取焦点状态虚线矩形的颜色(线条的颜色)
     */
-    DString GetFocusRectColor() const;
+    DString GetFocusedRectColor() const;
 
     /** 判断当前鼠标焦点是否在控件上
      * @return 返回鼠标焦点是否在控件上，true 鼠标焦点在控件上，false 鼠标焦点不在控件上
@@ -1716,7 +1716,7 @@ private:
         std::unique_ptr<StateColorMap> m_pBorderColorMap;
 
         //焦点状态下的边框颜色
-        UiString m_focusBorderColor;
+        UiString m_focusedBorderColor;
 
         /** 边框圆角大小(与m_rcBorderSize联合应用)或者阴影的圆角大小(与m_boxShadow联合应用)
             仅当 m_rcBorderSize 四个边框值都有效, 并且都相同时
@@ -1741,7 +1741,7 @@ private:
         UiString m_strForeColor;
 
         //焦点状态虚线矩形的颜色
-        UiString m_focusRectColor;
+        UiString m_focusedRectColor;
     };
 
     //拖放相关数据
@@ -1886,7 +1886,7 @@ private:
     CursorType m_cursorType;
 
     //是否显示焦点状态(一个虚线构成的矩形)
-    bool m_bShowFocusRect;
+    bool m_bShowFocusedRect;
 
     //绘制顺序: 0 表示常规绘制，非0表示指定绘制顺序，值越大表示绘制越晚绘制
     uint8_t m_nPaintOrder;

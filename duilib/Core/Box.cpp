@@ -182,7 +182,7 @@ void Box::PaintChild(IRender* pRender, const UiRect& rcPaint)
         }
     }
 
-    if ((pRender != nullptr) && IsShowFocusRect() && IsFocused()) {
+    if ((pRender != nullptr) && IsShowFocusedRect() && IsFocused()) {
         DoPaintFocusRect(pRender);    //绘制焦点状态
     }
 }

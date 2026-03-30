@@ -619,19 +619,19 @@ public:
     * @param [in] nBottomBorderSize 底部边框的大小(未经DPI缩放)
     * @param [in] bNeedDpiScale 是否支持DPI缩放
     */
-    void SetFocusBottomBorderSize(int32_t nBottomBorderSize);
+    void SetFocusedBottomBorderSize(int32_t nBottomBorderSize);
 
     /** 获取焦点状态时，底部边框的大小(未经DPI缩放)
     */
-    int32_t GetFocusBottomBorderSize() const;
+    int32_t GetFocusedBottomBorderSize() const;
 
     /** 设置焦点状态时，底部边框的颜色
     */
-    void SetFocusBottomBorderColor(const DString& bottomBorderColor);
+    void SetFocusedBottomBorderColor(const DString& bottomBorderColor);
 
     /** 获取焦点状态时，底部边框的颜色
     */
-    DString GetFocusBottomBorderColor() const;
+    DString GetFocusedBottomBorderColor() const;
 
     /** 是否可以Redo
     */

@@ -4638,7 +4638,7 @@
                 // 如: border_control_disabled -> border_control_normal
                 // 如: btn_normal_hovered -> btn_normal
                 {
-                    pattern: /^(.+)_(normal)_(hovered|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(normal)_(hovered|pressed|selected|checked|disabled|focused)$/i,
                     extract: (match) => `${match[1]}_${match[2]}`,
                     type: 'substate',
                     confidence: 98,
@@ -4649,7 +4649,7 @@
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
                             'disabled': 'alpha:*0.5',
-                            'focus': 'saturation:+10'
+                            'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
                     }
@@ -4659,7 +4659,7 @@
                 // 如: border_control_disabled -> border_control_normal
                 // 如: btn_hovered -> btn_normal
                 {
-                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focused)$/i,
                     extract: (match) => {
                         const baseName = match[1];
                         // 先检查 baseName_normal 是否存在（如 border_control_normal）
@@ -4678,7 +4678,7 @@
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
                             'disabled': 'alpha:*0.5',
-                            'focus': 'saturation:+10'
+                            'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
                     }
@@ -4733,7 +4733,7 @@
                 // 规则5: bg_xxx_variant -> bg_xxx 模式
                 // 如: bg_card_hovered -> bg_card
                 {
-                    pattern: /^(bg_.+?)_(hovered|pressed|selected|disabled|focus)$/i,
+                    pattern: /^(bg_.+?)_(hovered|pressed|selected|disabled|focused)$/i,
                     extract: (match) => match[1],
                     type: 'bg_state',
                     confidence: 92,
@@ -4743,7 +4743,7 @@
                             'pressed': 'lightness:-5',
                             'selected': 'lightness:+3,saturation:+5',
                             'disabled': 'alpha:*0.3',
-                            'focus': 'lightness:+8'
+                            'focused': 'lightness:+8'
                         };
                         return bgAdjustments[type.toLowerCase()] || 'lightness:+5';
                     }
@@ -4761,7 +4761,7 @@
                 },
                 // 状态变体：xxx_hovered / xxx_pressed -> xxx (原有规则，优先级降低)
                 {
-                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focused)$/i,
                     extract: (match) => match[1],
                     type: 'state',
                     confidence: 70,
@@ -4772,7 +4772,7 @@
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
                             'disabled': 'alpha:*0.5',
-                            'focus': 'saturation:+10'
+                            'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
                     }
@@ -6416,7 +6416,7 @@
             if (parts.length <= 1) return suggestions; // 没有下划线，无法分析
 
             // 状态后缀识别
-            const stateSuffixes = ['hovered', 'pressed', 'selected', 'checked', 'disabled', 'focus', 'normal'];
+            const stateSuffixes = ['hovered', 'pressed', 'selected', 'checked', 'disabled', 'focused', 'normal'];
             const colorSuffixes = ['light', 'dark', 'deep', 'darker', 'lighter', 'muted', 'pale', 'vibrant', 'soft', 'bright'];
             const textSuffixes = ['default', 'muted', 'secondary', 'hint', 'link'];
 
@@ -6509,7 +6509,7 @@
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
                 'disabled': 'alpha:*0.5',
-                'focus': 'saturation:+10',
+                'focused': 'saturation:+10',
                 'normal': '',
                 'light': 'lightness:+15',
                 'dark': 'lightness:-15',
@@ -6667,7 +6667,7 @@
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
                 'disabled': 'alpha:*0.5',
-                'focus': 'saturation:+10',
+                'focused': 'saturation:+10',
                 'light': 'lightness:+15',
                 'dark': 'lightness:-15',
                 'deep': 'lightness:-25,saturation:+10',
@@ -6825,7 +6825,7 @@
                     if (foundMatch) break; // 找到匹配就停止
                 }
             } else if (filterType === 'state') {
-                const stateSuffixes = ['_hovered', '_pressed', '_selected', '_checked', '_disabled', '_focus'];
+                const stateSuffixes = ['_hovered', '_pressed', '_selected', '_checked', '_disabled', '_focused'];
                 checkboxes.forEach(cb => {
                     const targetName = cb.value;
                     if (stateSuffixes.some(suffix => targetName.endsWith(suffix))) {
