@@ -2020,7 +2020,7 @@
 
     <!-- 派生关系编辑面板 -->
     <div class="derivation-edit-panel hidden" id="derivationEditPanel">
-        <div class="derivation-edit-title">
+        <div class="derivation-edit-title" id="derivationEditTitle">
             <span>派生关系编辑器</span>
             <button class="derivation-edit-close" onclick="closeDerivationPanel()">×</button>
         </div>
@@ -3904,6 +3904,7 @@
             document.getElementById('derivationEditPanel').classList.add('hidden');
             document.getElementById('derivationOverlay').classList.add('hidden');
             currentEditingColor = null;
+            resetDerivationEditPanelPosition();
         }
 
         function populateAdjustmentRows(formula) {
@@ -4136,6 +4137,7 @@
             
             // 更新UI
             renderColorCategories();
+            renderDerivationTree();
             updatePreview();
             updateContrastResults();
             updateAnalytics();
@@ -4158,6 +4160,7 @@
             
             // 更新UI
             renderColorCategories();
+            renderDerivationTree();
             updatePreview();
             updateContrastResults();
             updateAnalytics();
@@ -4174,6 +4177,7 @@
             }
             
             renderDerivationTree();
+            resetDerivationEditPanelPosition();
             document.getElementById('derivationTreePanel').classList.remove('hidden');
             document.getElementById('derivationTreeOverlay').classList.remove('hidden');
         }
@@ -4290,6 +4294,77 @@
 
         // 页面加载时初始化拖拽
         document.addEventListener('DOMContentLoaded', initDerivationTreeDrag);
+
+        // ========== 派生关系编辑器面板拖拽功能 ==========
+        let isEditPanelDragging = false;
+        let editPanelDragOffset = { x: 0, y: 0 };
+
+        // 初始化派生关系编辑器拖拽功能
+        function initDerivationEditDrag() {
+            const panel = document.getElementById('derivationEditPanel');
+            const titleBar = document.getElementById('derivationEditTitle');
+
+            if (!panel || !titleBar) return;
+
+            // 拖拽移动
+            titleBar.addEventListener('mousedown', (e) => {
+                // 点击按钮时不触发拖拽
+                if (e.target.tagName === 'BUTTON') return;
+                
+                isEditPanelDragging = true;
+                panel.classList.add('dragging');
+                
+                // 获取当前面板位置（需要移除transform偏移来计算真实位置）
+                const rect = panel.getBoundingClientRect();
+                editPanelDragOffset.x = e.clientX - rect.left;
+                editPanelDragOffset.y = e.clientY - rect.top;
+
+                // 清除transform，改用top/left定位
+                panel.style.transform = 'none';
+                panel.style.top = rect.top + 'px';
+                panel.style.left = rect.left + 'px';
+            });
+
+            // 全局鼠标移动事件
+            document.addEventListener('mousemove', (e) => {
+                if (isEditPanelDragging) {
+                    const panel = document.getElementById('derivationEditPanel');
+                    if (panel) {
+                        panel.style.left = (e.clientX - editPanelDragOffset.x) + 'px';
+                        panel.style.top = (e.clientY - editPanelDragOffset.y) + 'px';
+                    }
+                }
+            });
+
+            // 全局鼠标释放事件
+            document.addEventListener('mouseup', () => {
+                if (isEditPanelDragging) {
+                    isEditPanelDragging = false;
+                    const panel = document.getElementById('derivationEditPanel');
+                    if (panel) {
+                        panel.classList.remove('dragging');
+                    }
+                }
+            });
+        }
+
+        // 重置派生关系编辑器面板位置
+        function resetDerivationEditPanelPosition() {
+            const panel = document.getElementById('derivationEditPanel');
+            if (panel) {
+                panel.style.transform = 'translate(-50%, -50%)';
+                panel.style.top = '50%';
+                panel.style.left = '50%';
+                panel.style.width = 'auto';
+                panel.style.height = 'auto';
+                panel.style.maxWidth = '600px';
+                panel.style.maxHeight = '90vh';
+            }
+            isEditPanelDragging = false;
+        }
+
+        // 页面加载时初始化派生关系编辑器拖拽
+        document.addEventListener('DOMContentLoaded', initDerivationEditDrag);
 
         function renderDerivationTree() {
             const content = document.getElementById('derivationTreeContent');
