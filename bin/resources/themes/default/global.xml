@@ -163,7 +163,7 @@
     <Class name="btn_recycle" width="auto" height="auto" 
                               normal_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' svg_replace_colors='#969696|border_svg_image_light' fade='180'" 
                               hot_image="file='${PATH_BUTTON}/btn_recycle_hovered.svg' svg_replace_colors='#6671c2|border_svg_image_light'" 
-                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pushed.svg' svg_replace_colors='#253cef|border_svg_image_dark'" 
+                              pushed_image="file='${PATH_BUTTON}/btn_recycle_pressed.svg' svg_replace_colors='#253cef|border_svg_image_dark'" 
                               disabled_image="file='${PATH_BUTTON}/btn_recycle_normal.svg' svg_replace_colors='#969696|border_svg_image' fade='80'"/>
                               
     <!-- 全局纯色按钮，颜色跟随主题变化 -->
@@ -186,22 +186,22 @@
     <Class name="btn_global_blue_80x30" normal_text_color="color_white" 
                                         normal_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
                                         hot_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                        pushed_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                        pushed_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_pressed.svg'" 
                                         disabled_image="file='${PATH_BUTTON}/btn_global_blue_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
     <Class name="btn_global_white_80x30" normal_text_color="color_black" 
                                          normal_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
                                          hot_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                         pushed_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                         pushed_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_pressed.svg'" 
                                          disabled_image="file='${PATH_BUTTON}/btn_global_white_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
     <Class name="btn_global_red_80x30" normal_text_color="color_white" 
                                        normal_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
                                        hot_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                       pushed_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                       pushed_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_pressed.svg'" 
                                        disabled_image="file='${PATH_BUTTON}/btn_global_red_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='80'"/>
     <Class name="btn_global_gray_80x30"  normal_text_color="color_black" 
                                          normal_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg'" 
                                          hot_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_hovered.svg'" 
-                                         pushed_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_pushed.svg'" 
+                                         pushed_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_pressed.svg'" 
                                          disabled_image="file='${PATH_BUTTON}/btn_global_gray_${SIZE_BTN_GLOBAL_DEFAULT}_normal.svg' fade='128'"/>
     
     <!-- 全局纯色按钮，颜色固定，不跟随主题变化 -->
@@ -718,12 +718,12 @@
                              show_button1="true" 
                              button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
                              button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_pressed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
                              button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_top_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'"
                              show_button2="true"
                              button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_normal.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
                              button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_hover.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pushed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_pressed.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
                              button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/vscrollbar/btn_bottom_disabled.svg' width='${SIZE_SCROLLBAR_WIDTH}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'" />
     <Class name="hscrollbar2" class="scrollbar_base" height="${SIZE_SCROLLBAR_HEIGHT}"
                              thumb_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/thumb_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' corner='8,0,8,0' svg_replace_colors='#C0C0C0|bg_scrollbar_thumb_normal'" 
@@ -733,12 +733,12 @@
                              show_button1="true" 
                              button1_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
                              button1_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
-                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button1_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_pressed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
                              button1_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_left_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'"
                              show_button2="true"
                              button2_normal_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_normal.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.3)|bg_scrollbar_btn_normal;rgba(120,120,120,0.8)|bg_scrollbar_btn_arrow_normal'"
                              button2_hot_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_hover.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(200,200,200,0.5)|bg_scrollbar_btn_hover;rgba(30,120,200,0.9)|bg_scrollbar_btn_arrow_hover'"
-                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pushed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
+                             button2_pushed_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_pressed.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(180,180,180,0.7)|bg_scrollbar_btn_pushed;rgba(80,80,80,1.0)|bg_scrollbar_btn_arrow_pushed'"
                              button2_disabled_image="file='${PATH_SCROLLBAR_STANDARD}/hscrollbar/btn_right_disabled.svg' height='${SIZE_SCROLLBAR_HEIGHT}' svg_replace_colors='rgba(220,220,220,0.1)|bg_scrollbar_btn_disabled;rgba(120,120,120,0.4)|bg_scrollbar_btn_arrow_disabled'" />
     
 </Global>
