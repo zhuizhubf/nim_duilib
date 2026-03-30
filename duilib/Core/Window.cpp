@@ -1312,7 +1312,7 @@ LRESULT Window::OnSetFocusMsg(WindowBase* /*pLostFocusWindow*/, const NativeMsg&
     if (pFocus != nullptr) {
         pFocus->SendEvent(kEventWindowSetFocus);
 
-        //重新激活控件焦点（但不恢复Hot状态，避免按钮等控件的显示状态异常）
+        //重新激活控件焦点（但不恢复Hovered状态，避免按钮等控件的显示状态异常）
         if (!windowFlag.expired() && (pFocus == m_pFocus)) {
             pFocus->SendEvent(kEventSetFocus);
         }

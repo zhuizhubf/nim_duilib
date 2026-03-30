@@ -505,12 +505,12 @@ DString ComboButton::GetBorderColor(ControlStateType stateType) const
 {
     DString borderColor;
     if (borderColor.empty() && (m_pLeftButton != nullptr)) {
-        if (m_pLeftButton->IsFocused() || m_pLeftButton->IsMouseFocused() || m_pLeftButton->IsHotState()) {
+        if (m_pLeftButton->IsFocused() || m_pLeftButton->IsMouseFocused() || m_pLeftButton->IsHoveredState()) {
             borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
     if (borderColor.empty() && (m_pRightButton != nullptr)) {
-        if (m_pRightButton->IsFocused() || m_pRightButton->IsMouseFocused() || m_pRightButton->IsHotState()) {
+        if (m_pRightButton->IsFocused() || m_pRightButton->IsMouseFocused() || m_pRightButton->IsHoveredState()) {
             borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }

@@ -24,7 +24,7 @@ public:
     virtual void SetPos(UiRect rc) override;
     virtual void SetWindow(Window* pWindow) override;
     virtual void PaintText(IRender* pRender) override;
-    virtual bool HasHotState() override;
+    virtual bool HasHoveredState() override;
     virtual DString GetToolTipText() const override;
     virtual void OnLanguageChanged(bool bRedraw) override;
     virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;
@@ -507,12 +507,12 @@ bool LabelTemplate<T>::IsTextEquals(const DString& text) const
 }
 
 template<typename T>
-bool LabelTemplate<T>::HasHotState()
+bool LabelTemplate<T>::HasHoveredState()
 {
-    if (BaseClass::HasHotState()) {
+    if (BaseClass::HasHoveredState()) {
         return true;
     }
-    return m_impl->HasHotColorState();
+    return m_impl->HasHoveredStateColor();
 }
 
 template<typename T>

@@ -40,7 +40,7 @@ public:
     virtual void PaintStateColors(IRender* pRender) override;
     virtual void PaintStateImages(IRender* pRender) override;
     virtual void PaintText(IRender* pRender) override;
-    virtual bool HasHotState() override;
+    virtual bool HasHoveredState() override;
     virtual DString GetBorderColor(ControlStateType stateType) const override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -784,15 +784,15 @@ bool CheckBoxTemplate<InheritType>::PrivateSetChecked(bool bChecked)
 }
 
 template<typename InheritType>
-bool CheckBoxTemplate<InheritType>::HasHotState()
+bool CheckBoxTemplate<InheritType>::HasHoveredState()
 {
-    if (BaseClass::HasHotState()) {
+    if (BaseClass::HasHoveredState()) {
         return true;
     }
-    if ((m_pSelectedColorMap != nullptr) && m_pSelectedColorMap->HasHotColor()) {
+    if ((m_pSelectedColorMap != nullptr) && m_pSelectedColorMap->HasHoveredColor()) {
         return true;
     }
-    if ((m_pSelectedTextColorMap != nullptr) && m_pSelectedTextColorMap->HasHotColor()) {
+    if ((m_pSelectedTextColorMap != nullptr) && m_pSelectedTextColorMap->HasHoveredColor()) {
         return true;
     }
     return false;
@@ -940,24 +940,24 @@ void CheckBoxTemplate<InheritType>::PaintText(IRender* pRender)
     DrawStringParam drawParam = this->GetDrawParam();//绘制参数
     drawParam.textRect = rc;
 
-    if (this->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
+    if (this->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
         if ((stateType == kControlStateNormal || stateType == kControlStateHovered) &&
             !GetSelectedStateTextColor(kControlStateHovered).empty()) {
             //先绘制默认的文本
-            const uint8_t nHotAlpha = this->GetHotAlpha();
+            const uint8_t nHoveredAlpha = this->GetHoveredAlpha();
             bool bPainted = false;
             DString clrStateColor = GetSelectedStateTextColor(kControlStateNormal);
             if (!clrStateColor.empty()) {
                 drawParam.dwTextColor = this->GetUiColor(clrStateColor);
-                drawParam.uFade = 255 - nHotAlpha;
+                drawParam.uFade = 255 - nHoveredAlpha;
                 pRender->DrawString(textValue, drawParam);
                 bPainted = true;
             }
-            //绘制Hot状态的文本（半透明）
+            //绘制Hovered状态的文本（半透明）
             DString textColor = GetSelectedStateTextColor(kControlStateHovered);
             if (!textColor.empty()) {
                 drawParam.dwTextColor = this->GetUiColor(textColor);
-                drawParam.uFade = nHotAlpha;
+                drawParam.uFade = nHoveredAlpha;
                 pRender->DrawString(textValue, drawParam);
                 bPainted = true;
             }

@@ -192,7 +192,7 @@ namespace ui
     enum class AnimationType: int8_t
     {
         kAnimationNone              = 0,    //无动画
-        kAnimationHot               = 1,    //鼠标悬停状态的动画
+        kAnimationHovered           = 1,    //鼠标悬停状态的动画
         kAnimationAlpha             = 2,    //透明度渐变动画
         kAnimationHeight            = 3,    //控件高度变化动画（高度不能是拉伸类型）
         kAnimationWidth             = 4,    //控件宽度变化动画（宽度不能是拉伸类型）

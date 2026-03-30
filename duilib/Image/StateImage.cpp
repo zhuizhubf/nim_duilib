@@ -110,7 +110,7 @@ Image* StateImage::GetStateImage(ControlStateType stateType) const
     return pImage;
 }
 
-bool StateImage::HasHotImage() const
+bool StateImage::HasHoveredImage() const
 {
     return !GetImageString(kControlStateHovered).empty();
 }
@@ -128,18 +128,18 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
 {
     if (m_pControl != nullptr) {        
         if (((stateType == kControlStateNormal) || (stateType == kControlStateHovered)) &&
-            m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
-            //正在播放Hot状态动画
-            uint8_t nHotAlpha = m_pControl->GetHotAlpha();
+            m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
+            //正在播放Hovered状态动画
+            uint8_t nHoveredAlpha = m_pControl->GetHoveredAlpha();
             Image* pNormalImage = GetStateImage(kControlStateNormal);
-            Image* pHotImage = GetStateImage(kControlStateHovered);
+            Image* pHoveredImage = GetStateImage(kControlStateHovered);
             for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
                 ASSERT(iter->second != nullptr);
                 bool bNeedPause = true;
                 if ((pNormalImage != nullptr) && (iter->second == pNormalImage)) {
                     bNeedPause = false;
                 }
-                if ((pHotImage != nullptr) && (iter->second == pHotImage)) {
+                if ((pHoveredImage != nullptr) && (iter->second == pHoveredImage)) {
                     bNeedPause = false;
                 }
                 if (bNeedPause) {
@@ -148,26 +148,26 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
                 }
             }
             bool bNormalPaintd = false;
-            bool bHotPaintd = false;
+            bool bHoveredPaintd = false;
 
             //先绘制Normal图片
             if (pNormalImage != nullptr) {
                 int32_t nNormalFade = GetImageFade(kControlStateNormal);
-                nNormalFade = int32_t(nNormalFade * (double)(255 - nHotAlpha) / 255);
-                if (pHotImage == nullptr) {
+                nNormalFade = int32_t(nNormalFade * (double)(255 - nHoveredAlpha) / 255);
+                if (pHoveredImage == nullptr) {
                     nNormalFade = -1;
                 }
                 bNormalPaintd = m_pControl->PaintImage(pRender, pNormalImage, sImageModify, nNormalFade, nullptr, nullptr, pDestRect);
             }
 
-            //绘制Hot图片
-            if (pHotImage != nullptr) {
-                int32_t nHotFade = GetImageFade(kControlStateHovered);
-                nHotFade = int32_t(nHotFade * (double)nHotAlpha / 255);
-                bHotPaintd = m_pControl->PaintImage(pRender, pHotImage, sImageModify, nHotFade);                
+            //绘制Hovered图片
+            if (pHoveredImage != nullptr) {
+                int32_t nHoveredFade = GetImageFade(kControlStateHovered);
+                nHoveredFade = int32_t(nHoveredFade * (double)nHoveredAlpha / 255);
+                bHoveredPaintd = m_pControl->PaintImage(pRender, pHoveredImage, sImageModify, nHoveredFade);                
             }
 
-            if (bNormalPaintd || bHotPaintd) {
+            if (bNormalPaintd || bHoveredPaintd) {
                 return true;
             }
         }

@@ -238,7 +238,7 @@ bool ScrollBar::ButtonUp(const EventArgs& msg)
     return ret;
 }
 
-bool ScrollBar::HasHotState()
+bool ScrollBar::HasHoveredState()
 {
     return true;
 }
@@ -246,7 +246,7 @@ bool ScrollBar::HasHotState()
 bool ScrollBar::MouseEnter(const EventArgs& msg)
 {
     bool ret = BaseClass::MouseEnter(msg);
-    if (IsHotState() && !msg.IsSenderExpired()) {
+    if (IsHoveredState() && !msg.IsSenderExpired()) {
         m_uButton1State = kControlStateHovered;
         m_uButton2State = kControlStateHovered;
         m_uThumbState = kControlStateHovered;
@@ -257,7 +257,7 @@ bool ScrollBar::MouseEnter(const EventArgs& msg)
 bool ScrollBar::MouseLeave(const EventArgs& msg)
 {
     bool ret = BaseClass::MouseLeave(msg);
-    if (!IsHotState() && !msg.IsSenderExpired()) {
+    if (!IsHoveredState() && !msg.IsSenderExpired()) {
         m_uButton1State = kControlStateNormal;
         m_uButton2State = kControlStateNormal;
         m_uThumbState = kControlStateNormal;

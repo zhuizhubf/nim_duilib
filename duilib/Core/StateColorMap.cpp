@@ -21,7 +21,7 @@ void StateColorMap::SetStateColor(ControlStateType stateType, const DString& col
     }
 }
 
-bool StateColorMap::HasHotColor() const
+bool StateColorMap::HasHoveredColor() const
 {
     return HasStateColor(kControlStateHovered);
 }
@@ -61,16 +61,16 @@ void StateColorMap::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Con
         return;
     }
     if (m_pControl != nullptr) {        
-        if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
+        if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
             if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && HasStateColor(kControlStateHovered)) {
-                const uint8_t nHotAlpha = m_pControl->GetHotAlpha();
+                const uint8_t nHoveredAlpha = m_pControl->GetHoveredAlpha();
                 //先绘制默认的颜色
                 DString strColor = GetStateColor(kControlStateNormal);
                 if (!strColor.empty()) {
-                    pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(strColor), 255 - nHotAlpha);
+                    pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(strColor), 255 - nHoveredAlpha);
                 }
-                //绘制Hot状态的颜色（半透明）
-                pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHotAlpha);
+                //绘制Hovered状态的颜色（半透明）
+                pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHoveredAlpha);
                 return;
             }
         }

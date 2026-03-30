@@ -207,9 +207,9 @@ public:
      */
     void SetState(ControlStateType controlState);
 
-    /** 当前是否为Hot状态(这个状态下，业务逻辑较多)
+    /** 当前是否为Hovered状态(这个状态下，业务逻辑较多)
     */
-    bool IsHotState() const;
+    bool IsHoveredState() const;
 
     /** 获取用于估算控件大小（宽和高）图片接口
      */
@@ -600,7 +600,7 @@ public:
      * @brief 判断控件是否有 HOT 状态
      * @return 返回 true 有 HOT 状态， 否则为 false
      */
-    virtual bool HasHotState();
+    virtual bool HasHoveredState();
 
     // 属性设置
     /**
@@ -687,12 +687,12 @@ public:
     /** 设置焦点状态透明度
      * @param [in] alpha 0 ~ 255 的透明度值，255 为不透明
      */
-    void SetHotAlpha(uint8_t nHotAlpha);
+    void SetHoveredAlpha(uint8_t nHoveredAlpha);
 
     /** 获取焦点状态透明度
      * @return 返回控件焦点状态的透明度
      */
-    uint8_t GetHotAlpha() const { return m_nHotAlpha; }
+    uint8_t GetHoveredAlpha() const { return m_nHoveredAlpha; }
 
     /**
      * @brief 设置是否接受TAB键切换焦点
@@ -839,34 +839,34 @@ public:
 public:
     /// 控件动画相关接口
 
-    /** 设置或清除Hot状态的播放动画（对应动画类型为：kAnimationHot）
+    /** 设置或清除Hovered状态的播放动画（对应动画类型为：kAnimationHovered）
     * @param [in] bFadeHovered true表示设置动画，false表示清除动画
     */
     void SetFadeHovered(bool bFadeHovered);
 
-    /** 设置播放Hot状态动画的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHot）
+    /** 设置播放Hovered状态动画的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHovered）
     * @param [in] frameIntervalMillSeconds 播放动画的定时器时间间隔（毫秒）
     */
     void SetFadeHoveredFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds);
 
-    /** 获取Hot状态动画播放的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHot）
+    /** 获取Hovered状态动画播放的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHovered）
     */
     int32_t GetFadeHoveredFrameIntervalMillSeconds() const;
 
-    /** 设置Hot状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHot）
+    /** 设置Hovered状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHovered）
     * @param [in] totalMillSeconds 动画总的播放时间（毫秒）
     */
     void SetFadeHoveredTotalMillSeconds(int32_t totalMillSeconds);
 
-    /** 获取Hot状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHot）
+    /** 获取Hovered状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHovered）
     */
     int32_t GetFadeHoveredTotalMillSeconds() const;
 
-    /** 设置Hot状态动画缓动函数类型（对应动画类型为：kAnimationHot）
+    /** 设置Hovered状态动画缓动函数类型（对应动画类型为：kAnimationHovered）
     */
     void SetFadeHoveredEasingFunctionType(EasingFunctionType easingFunctionType);
 
-    /** 获取Hot状态动画缓动函数类型（对应动画类型为：kAnimationHot）
+    /** 获取Hovered状态动画缓动函数类型（对应动画类型为：kAnimationHovered）
     */
     EasingFunctionType GetFadeHoveredEasingFunctionType() const;
 
@@ -1646,9 +1646,9 @@ private:
     bool HasXmlBubbledEventMap() const;
 
 private:
-    /** 获取Hot动画的播放接口
+    /** 获取Hovered动画的播放接口
     */
-    AnimationPlayer* GetHotAnimationPlayer() const;
+    AnimationPlayer* GetHoveredAnimationPlayer() const;
 
 private:
     /** 图片异步解码的实现函数
@@ -1839,9 +1839,9 @@ private:
     */
     std::unique_ptr<TOtherData> m_pOtherData;
 
-    /** Hot动画的播放接口
+    /** Hovered动画的播放接口
     */
-    std::unique_ptr<AnimationPlayer> m_pHotAnimationPlayer;
+    std::unique_ptr<AnimationPlayer> m_pHoveredAnimationPlayer;
 
     /** 控件的绘制区域
     */
@@ -1867,8 +1867,8 @@ private:
     //控件的透明度（0 - 255，0为完全透明，255为不透明）
     uint8_t m_nAlpha;
 
-    //控件为Hot状态时的透明度（0 - 255，0为完全透明，255为不透明）
-    uint8_t m_nHotAlpha;
+    //控件为Hovered状态时的透明度（0 - 255，0为完全透明，255为不透明）
+    uint8_t m_nHoveredAlpha;
 
     //鼠标焦点是否在控件上
     bool m_bMouseFocused;

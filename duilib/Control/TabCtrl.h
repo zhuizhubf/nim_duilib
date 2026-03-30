@@ -225,21 +225,21 @@ public:
     * @param [in] szCorner 圆角的宽度和高度
     * @param [in] bNeedDpiScale 是否根据 DPI 自适应，默认为 true
     */
-    void SetHotRoundCorner(UiSize szCorner, bool bNeedDpiScale);
+    void SetHoveredRoundCorner(UiSize szCorner, bool bNeedDpiScale);
 
     /** 获取悬停状态的标签圆角大小
     */
-    UiSize GetHotRoundCorner() const;
+    UiSize GetHoveredRoundCorner() const;
 
-    /** 设置Hot状态的背景色的内边距
+    /** 设置Hovered状态的背景色的内边距
     * @param [in] rcPadding 内边距数据
     * @param [in] bNeedDpiScale 是否根据 DPI 自适应，默认为 true
     */
-    void SetHotPadding(UiPadding rcPadding, bool bNeedDpiScale);
+    void SetHoveredPadding(UiPadding rcPadding, bool bNeedDpiScale);
 
-    /** 获取Hot状态的背景色的内边距
+    /** 获取Hovered状态的背景色的内边距
     */
-    UiPadding GetHotPadding() const;
+    UiPadding GetHoveredPadding() const;
 
     /** 设置关闭按钮是否自动隐藏
     * @param [in] bAutoHideCloseBtn true表示自动隐藏关闭按钮，false表示关闭按钮始终显示
@@ -303,7 +303,7 @@ protected:
 
     /** 绘制标签页(悬停状态)
     */
-    virtual void PaintTabItemHot(IRender* pRender);
+    virtual void PaintTabItemHovered(IRender* pRender);
 
     /** 设置可见状态事件
     * @param [in] bChanged true表示状态发生变化，false表示状态未发生变化
@@ -336,9 +336,9 @@ private:
         uint8_t cy; //圆角的高度
     };
 
-    /** Hot标签的状态Padding值
+    /** Hovered标签的状态Padding值
     */
-    struct HotPadding
+    struct HoveredPadding
     {
         uint8_t left;
         uint8_t top;
@@ -352,11 +352,11 @@ private:
 
     /** 悬停状态的标签圆角大小
     */
-    RoundCorner m_rcHot;
+    RoundCorner m_rcHovered;
 
-    /** Hot标签的状态Padding值
+    /** Hovered标签的状态Padding值
     */
-    HotPadding m_hotPadding;
+    HoveredPadding m_hoveredPadding;
 
     /** 关闭按钮是否自动隐藏
     */

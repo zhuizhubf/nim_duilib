@@ -56,9 +56,9 @@ public:
     float GetStateColorMinHeight() const;
 
 public:
-    /** 是否包含Hot状态的颜色
+    /** 是否包含Hovered状态的颜色
     */
-    bool HasHotColor() const;
+    bool HasHoveredColor() const;
 
     /** 是否含有指定颜色值
     */

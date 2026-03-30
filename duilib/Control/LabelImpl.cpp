@@ -625,10 +625,10 @@ void LabelImpl::CheckShowToolTip()
     }
 }
 
-bool LabelImpl::HasHotColorState()
+bool LabelImpl::HasHoveredStateColor()
 {
     if (m_pTextColorMap != nullptr) {
-        return m_pTextColorMap->HasHotColor();
+        return m_pTextColorMap->HasHoveredColor();
     }
     return false;
 }
@@ -745,24 +745,24 @@ void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
     DrawStringParam drawParam = GetDrawParam();//绘制参数
     drawParam.textRect = rc;
 
-    if (m_pOwner->IsAnimationPlayerPlaying(AnimationType::kAnimationHot)) {
+    if (m_pOwner->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
         if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && 
             !GetStateTextColor(kControlStateHovered).empty()) {
             //先绘制默认的文本
-            const uint8_t nHotAlpha = m_pOwner->GetHotAlpha();
+            const uint8_t nHoveredAlpha = m_pOwner->GetHoveredAlpha();
             bool bPainted = false;
             DString clrColor = GetStateTextColor(kControlStateNormal);
             if (!clrColor.empty()) {                
                 drawParam.dwTextColor = m_pOwner->GetUiColor(clrColor);
-                drawParam.uFade = 255 - nHotAlpha;
+                drawParam.uFade = 255 - nHoveredAlpha;
                 m_pTextDrawer->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
                 bPainted = true;
             }
-            //绘制Hot状态的文本（半透明）
+            //绘制Hovered状态的文本（半透明）
             DString textColor = GetStateTextColor(kControlStateHovered);
             if (!textColor.empty()) {
                 drawParam.dwTextColor = m_pOwner->GetUiColor(textColor);
-                drawParam.uFade = nHotAlpha;
+                drawParam.uFade = nHoveredAlpha;
                 m_pTextDrawer->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
                 bPainted = true;
             }

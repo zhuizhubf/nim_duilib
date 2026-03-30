@@ -321,7 +321,7 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                     }
                 }
                 if (!bFoundItem) {
-                    //如果未找到Hot状态的菜单项
+                    //如果未找到Hovered状态的菜单项
                     if (vkCode == kVK_DOWN) {
                         //选中第一个
                         for (size_t nIndex = 0; nIndex < pLayoutListBox->GetItemCount(); ++nIndex) {
@@ -1142,7 +1142,7 @@ bool MenuItem::MouseEnter(const ui::EventArgs& msg)
     }
     std::weak_ptr<WeakFlag> weakFlag = pWindow->GetWeakFlag();
     bool ret = BaseClass::MouseEnter(msg);
-    if (!weakFlag.expired() && IsHotState() && !msg.IsSenderExpired()) {
+    if (!weakFlag.expired() && IsHoveredState() && !msg.IsSenderExpired()) {
         //这里处理下如果有子菜单则显示子菜单
         if (!CheckSubMenuItem()) {
             ContextMenuParam param;

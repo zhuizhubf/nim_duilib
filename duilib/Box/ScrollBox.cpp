@@ -518,12 +518,12 @@ void ScrollBox::HandleEvent(const EventArgs& msg)
 bool ScrollBox::MouseEnter(const EventArgs& msg)
 {
     bool bRet = BaseClass::MouseEnter(msg);
-    if (IsHotState() && (m_pVScrollBar != nullptr) && m_pVScrollBar->IsValid() && m_pVScrollBar->IsEnabled()) {
+    if (IsHoveredState() && (m_pVScrollBar != nullptr) && m_pVScrollBar->IsValid() && m_pVScrollBar->IsEnabled()) {
         if (m_pVScrollBar->IsAutoHideScroll()) {
             m_pVScrollBar->SetFadeVisible(true);
         }
     }
-    if (IsHotState() && (m_pHScrollBar != nullptr) && m_pHScrollBar->IsValid() && m_pHScrollBar->IsEnabled()) {
+    if (IsHoveredState() && (m_pHScrollBar != nullptr) && m_pHScrollBar->IsValid() && m_pHScrollBar->IsEnabled()) {
         if (m_pHScrollBar->IsAutoHideScroll()) {
             m_pHScrollBar->SetFadeVisible(true);
         }
@@ -534,7 +534,7 @@ bool ScrollBox::MouseEnter(const EventArgs& msg)
 bool ScrollBox::MouseLeave(const EventArgs& msg)
 {
     bool bRet = BaseClass::MouseLeave(msg);
-    if (!IsHotState() && (m_pVScrollBar != nullptr) && m_pVScrollBar->IsValid() && m_pVScrollBar->IsEnabled()) {
+    if (!IsHoveredState() && (m_pVScrollBar != nullptr) && m_pVScrollBar->IsValid() && m_pVScrollBar->IsEnabled()) {
         if ((m_pVScrollBar->GetThumbState() == kControlStateNormal) && 
              m_pVScrollBar->IsAutoHideScroll()) {
             Control* pNewHover = nullptr;
@@ -546,7 +546,7 @@ bool ScrollBox::MouseLeave(const EventArgs& msg)
             }
         }
     }
-    if (!IsHotState() && (m_pHScrollBar != nullptr) && m_pHScrollBar->IsValid() && m_pHScrollBar->IsEnabled()) {
+    if (!IsHoveredState() && (m_pHScrollBar != nullptr) && m_pHScrollBar->IsValid() && m_pHScrollBar->IsEnabled()) {
         if ((m_pHScrollBar->GetThumbState() == kControlStateNormal) && 
              m_pHScrollBar->IsAutoHideScroll()) {
             Control* pNewHover = nullptr;
