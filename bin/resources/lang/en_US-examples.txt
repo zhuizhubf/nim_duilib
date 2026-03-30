@@ -532,7 +532,7 @@ STRID_RENDER_P1_ANI_LOTTIE = Lottie JSON Animation
 STRID_RENDER_P1_ANI_PAG = PAG Animation
 
 # Interactive prompt text
-STRID_RENDER_P1_HOVER_PLAY = Play on mouse hover
+STRID_RENDER_P1_HOVER_PLAY = Play on mouse hovered
 
 STRID_RENDER_SHADOW_BIG = Shadow:big
 STRID_RENDER_SHADOW_BIG_ROUND = Shadow:big_round

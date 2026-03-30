@@ -78,7 +78,7 @@ bool RichTextImpl::SetAttribute(const DString& strName, const DString& strValue)
         //超级链接：常规文本颜色值
         m_linkNormalTextColor = strValue;
     }
-    else if (strName == _T("hover_link_font_color")) {
+    else if ((strName == _T("hovered_link_font_color")) || (strName == _T("hover_link_font_color"))) {
         //超级链接：Hover状态文本颜色值
         m_linkHoverTextColor = strValue;
     }

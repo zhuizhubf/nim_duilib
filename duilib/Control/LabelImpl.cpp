@@ -146,10 +146,10 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
     else if ((strName == _T("text_color")) || (strName == _T("normal_text_color")) || (strName == _T("normaltextcolor"))) {
         SetStateTextColor(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("hot_text_color")) || (strName == _T("hottextcolor"))) {
+    else if ((strName == _T("hovered_text_color")) || (strName == _T("hot_text_color")) || (strName == _T("hottextcolor"))) {
         SetStateTextColor(kControlStateHot, strValue);
     }
-    else if ((strName == _T("pushed_text_color")) || (strName == _T("pushedtextcolor"))) {
+    else if ((strName == _T("pressed_text_color")) || (strName == _T("pushed_text_color")) || (strName == _T("pushedtextcolor"))) {
         SetStateTextColor(kControlStatePushed, strValue);
     }
     else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
@@ -834,7 +834,7 @@ DString LabelImpl::GetStateTextColor(ControlStateType stateType) const
 void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString& dwTextColor)
 {
     if (stateType == kControlStateHot) {
-        m_pOwner->SetFadeHot(true);
+        m_pOwner->SetFadeHovered(true);
     }
     if (m_pTextColorMap == nullptr) {
         m_pTextColorMap = std::make_unique<StateColorMap>(m_pOwner);

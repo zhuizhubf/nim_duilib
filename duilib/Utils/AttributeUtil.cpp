@@ -190,7 +190,7 @@ bool AttributeUtil::ParseAttributeList(const DString& strList, std::vector<std::
     // 清空输出列表，避免残留数据
     attributeList.clear();
 
-    // 示例：normal_image={file='public/button/window-minimize.svg' width='24'} hot_color="AliceBlue" pushed_color='Lavender'
+    // 示例：normal_image={file='public/button/window-minimize.svg' width='24'} hovered_color="AliceBlue" pressed_color='Lavender'
     DString sName;
     DString sValue;
     const DString::value_type* pstrList = strList.c_str();

@@ -2357,7 +2357,7 @@
                 <div style="font-weight: 600; color: #1E40AF; margin-bottom: 5px;">💡 如何使用</div>
                 <div style="font-size: 12px; color: #3B82F6; line-height: 1.5;">
                     1. 选择一个<strong>源颜色</strong>（如：<code>border_control_normal</code>）<br>
-                    2. 选择要派生的<strong>目标颜色</strong>（如：<code>border_control_hover</code>）<br>
+                    2. 选择要派生的<strong>目标颜色</strong>（如：<code>border_control_hovered</code>）<br>
                     3. 选择一个<strong>调整模板</strong>（或手动调整），然后点击「开始派生」
                 </div>
             </div>
@@ -2408,7 +2408,7 @@
                     🎯 第三步：选择<strong style="color: #D97706;">调整规则</strong>（点击模板可快速应用）
                 </label>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                    <button class="btn btn-small" onclick="applyAdjustmentPreset('hover')" style="background: #DBEAFE; color: #1E40AF; border: none; padding: 6px 12px;">🖱️ Hover (+亮8%)</button>
+                    <button class="btn btn-small" onclick="applyAdjustmentPreset('hovered')" style="background: #DBEAFE; color: #1E40AF; border: none; padding: 6px 12px;">🖱️ Hover (+亮8%)</button>
                     <button class="btn btn-small" onclick="applyAdjustmentPreset('pressed')" style="background: #FEE2E2; color: #991B1B; border: none; padding: 6px 12px;">👆 Pressed (-暗8%)</button>
                     <button class="btn btn-small" onclick="applyAdjustmentPreset('disabled')" style="background: #F3F4F6; color: #4B5563; border: none; padding: 6px 12px;">🚫 Disabled (半透)</button>
                     <button class="btn btn-small" onclick="applyAdjustmentPreset('light')" style="background: #FEF9C3; color: #713F12; border: none; padding: 6px 12px;">☀️ 变亮+15%</button>
@@ -4636,15 +4636,15 @@
 
                 // 规则1: xxx_state + xxx_normal 模式（最高优先级）
                 // 如: border_control_disabled -> border_control_normal
-                // 如: btn_normal_hover -> btn_normal
+                // 如: btn_normal_hovered -> btn_normal
                 {
-                    pattern: /^(.+)_(normal)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(normal)_(hovered|pressed|selected|checked|disabled|focus)$/i,
                     extract: (match) => `${match[1]}_${match[2]}`,
                     type: 'substate',
                     confidence: 98,
                     adjust: (type) => {
                         const stateAdjustments = {
-                            'hover': 'lightness:+8',
+                            'hovered': 'lightness:+8',
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
@@ -4657,9 +4657,9 @@
                 
                 // 规则2: xxx_state -> xxx_normal 模式
                 // 如: border_control_disabled -> border_control_normal
-                // 如: btn_hover -> btn_normal
+                // 如: btn_hovered -> btn_normal
                 {
-                    pattern: /^(.+)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focus)$/i,
                     extract: (match) => {
                         const baseName = match[1];
                         // 先检查 baseName_normal 是否存在（如 border_control_normal）
@@ -4673,7 +4673,7 @@
                     confidence: 95,
                     adjust: (type) => {
                         const stateAdjustments = {
-                            'hover': 'lightness:+8',
+                            'hovered': 'lightness:+8',
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
@@ -4731,15 +4731,15 @@
                 },
 
                 // 规则5: bg_xxx_variant -> bg_xxx 模式
-                // 如: bg_card_hover -> bg_card
+                // 如: bg_card_hovered -> bg_card
                 {
-                    pattern: /^(bg_.+?)_(hover|pressed|selected|disabled|focus)$/i,
+                    pattern: /^(bg_.+?)_(hovered|pressed|selected|disabled|focus)$/i,
                     extract: (match) => match[1],
                     type: 'bg_state',
                     confidence: 92,
                     adjust: (type) => {
                         const bgAdjustments = {
-                            'hover': 'lightness:+5',
+                            'hovered': 'lightness:+5',
                             'pressed': 'lightness:-5',
                             'selected': 'lightness:+3,saturation:+5',
                             'disabled': 'alpha:*0.3',
@@ -4759,15 +4759,15 @@
                     confidence: 80,
                     adjust: (type) => type.toLowerCase().includes('light') ? 'lightness:+15' : 'lightness:-15'
                 },
-                // 状态变体：xxx_hover / xxx_pressed -> xxx (原有规则，优先级降低)
+                // 状态变体：xxx_hovered / xxx_pressed -> xxx (原有规则，优先级降低)
                 {
-                    pattern: /^(.+)_(hover|pressed|selected|checked|disabled|focus)$/i,
+                    pattern: /^(.+)_(hovered|pressed|selected|checked|disabled|focus)$/i,
                     extract: (match) => match[1],
                     type: 'state',
                     confidence: 70,
                     adjust: (type) => {
                         const stateAdjustments = {
-                            'hover': 'lightness:+8',
+                            'hovered': 'lightness:+8',
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
@@ -4900,9 +4900,9 @@
         function getSuggestionConfidence(type) {
             const confidenceMap = {
                 // 新规则类型（高优先级）
-                'substate': 98,         // xxx_normal_hover -> xxx_normal
-                'state_to_normal': 95,  // xxx_hover -> xxx_normal
-                'bg_state': 92,         // bg_xxx_hover -> bg_xxx
+                'substate': 98,         // xxx_normal_hovered -> xxx_normal
+                'state_to_normal': 95,  // xxx_hovered -> xxx_normal
+                'bg_state': 92,         // bg_xxx_hovered -> bg_xxx
                 'color_variant': 90,    // color_xxx_deep -> color_xxx
                 'text_variant': 85,     // text_disabled -> text_default
                 // 原有类型
@@ -5749,8 +5749,8 @@
                         newHsl.s = 0.75;  // 高饱和度
                         
                         // 根据状态调整亮度
-                        if (itemName.includes('hover')) {
-                            newHsl.l = 0.55;  // hover时亮红色
+                        if (itemName.includes('hovered')) {
+                            newHsl.l = 0.55;  // hovered时亮红色
                         } else if (itemName.includes('pressed')) {
                             newHsl.l = 0.40;  // pressed时深红色
                         } else {
@@ -5760,11 +5760,11 @@
                         // 其他交互和强调色：使用基础色的变体
                         newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                         // 按钮状态变化 - 根据状态类型应用不同的亮度调整
-                        if (itemName.includes('hover')) {
-                            // hover状态：增加亮度（+0.15）
+                        if (itemName.includes('hovered')) {
+                            // hovered状态：增加亮度（+0.15）
                             newHsl.l = Math.min(0.95, newHsl.l + 0.15);
                         } else if (itemName.includes('selected') || itemName.includes('checked')) {
-                            // selected/checked状态：中等亮度（+0.05），与hover区分
+                            // selected/checked状态：中等亮度（+0.05），与hovered区分
                             newHsl.l = Math.min(0.9, newHsl.l + 0.05);
                         } else if (itemName.includes('pressed') || itemName.includes('active')) {
                             // pressed/active状态：减少亮度（-0.15）
@@ -5866,8 +5866,8 @@
                     };
                     
                     // 根据状态调整亮度
-                    if (itemName.includes('hover')) {
-                        newHsl.l = 0.55;  // hover时亮红色
+                    if (itemName.includes('hovered')) {
+                        newHsl.l = 0.55;  // hovered时亮红色
                     } else if (itemName.includes('pressed')) {
                         newHsl.l = 0.40;  // pressed时深红色
                     }
@@ -6046,8 +6046,8 @@
                     const baseHsl = { h: 0, s: 0.85, l: 0.50 };
                     
                     // 根据状态调整亮度
-                    if (itemName.includes('hover')) {
-                        baseHsl.l = 0.60;  // hover时亮红色
+                    if (itemName.includes('hovered')) {
+                        baseHsl.l = 0.60;  // hovered时亮红色
                     } else if (itemName.includes('pressed')) {
                         baseHsl.l = 0.35;  // pressed时深红色
                     }
@@ -6097,7 +6097,7 @@
             const textPrimary = getColorValue('text_default', isDarkPreview ? '#FFFFFFFF' : '#FF1E1E1E');
             const textSecondary = getColorValue('text_muted', isDarkPreview ? '#FFB0B0B0' : '#FF6B6B6B');
             const buttonPrimary = getColorValue('bg_btn_normal', '#FF0078D4');
-            const buttonHover = getColorValue('bg_btn_hover', buttonPrimary);
+            const buttonHover = getColorValue('bg_btn_hovered', buttonPrimary);
             const buttonText = getColorValue('text_default', '#FFFFFFFF');
             const borderColor = getColorValue('border_control_normal', isDarkPreview ? '#FF555555' : '#FFCCCCCC');
             const inputBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
@@ -6105,7 +6105,7 @@
             const listItemBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
             const listItemHover = getColorValue('bg_content', listItemBg);
             const listItemBorder = getColorValue('border_control_normal', isDarkPreview ? '#FF3D3D3D' : '#FFE5E5E5');
-            const tagBg = getColorValue('bg_btn_hover', '#FFE5F1FF');
+            const tagBg = getColorValue('bg_btn_hovered', '#FFE5F1FF');
             const successColor = getColorValue('color_green', '#FF10B981');
             const warningColor = getColorValue('color_red_light', '#FFF59E0B');
             const errorColor = getColorValue('color_red', '#FFEF4444');
@@ -6416,7 +6416,7 @@
             if (parts.length <= 1) return suggestions; // 没有下划线，无法分析
 
             // 状态后缀识别
-            const stateSuffixes = ['hover', 'pressed', 'selected', 'checked', 'disabled', 'focus', 'normal'];
+            const stateSuffixes = ['hovered', 'pressed', 'selected', 'checked', 'disabled', 'focus', 'normal'];
             const colorSuffixes = ['light', 'dark', 'deep', 'darker', 'lighter', 'muted', 'pale', 'vibrant', 'soft', 'bright'];
             const textSuffixes = ['default', 'muted', 'secondary', 'hint', 'link'];
 
@@ -6477,7 +6477,7 @@
             }
 
             // ===== 规则C: 多级前缀匹配 =====
-            // 如: bg_btn_window_close_hover -> bg_btn_window_close -> bg_btn_window -> bg_btn
+            // 如: bg_btn_window_close_hovered -> bg_btn_window_close -> bg_btn_window -> bg_btn
             if (suggestions.length === 0) {
                 for (let i = parts.length - 2; i >= 1; i--) {
                     const candidateBase = parts.slice(0, i + 1).join('_');
@@ -6504,7 +6504,7 @@
         // 根据分割后的部分推断调整公式
         function inferAdjustFormulaFromParts(parts, type) {
             const stateMap = {
-                'hover': 'lightness:+8',
+                'hovered': 'lightness:+8',
                 'pressed': 'lightness:-8',
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
@@ -6662,7 +6662,7 @@
             const suffix = lowerTarget.replace(lowerSource, '').replace(/^_/, '');
             
             const stateMap = {
-                'hover': 'lightness:+8',
+                'hovered': 'lightness:+8',
                 'pressed': 'lightness:-8',
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
@@ -6825,7 +6825,7 @@
                     if (foundMatch) break; // 找到匹配就停止
                 }
             } else if (filterType === 'state') {
-                const stateSuffixes = ['_hover', '_pressed', '_selected', '_checked', '_disabled', '_focus'];
+                const stateSuffixes = ['_hovered', '_pressed', '_selected', '_checked', '_disabled', '_focus'];
                 checkboxes.forEach(cb => {
                     const targetName = cb.value;
                     if (stateSuffixes.some(suffix => targetName.endsWith(suffix))) {
@@ -6978,7 +6978,7 @@
         // 应用预设调整模板
         function applyAdjustmentPreset(presetType) {
             const presets = {
-                'hover': [{property: 'lightness', operator: '+', value: '8'}],
+                'hovered': [{property: 'lightness', operator: '+', value: '8'}],
                 'pressed': [{property: 'lightness', operator: '-', value: '8'}],
                 'disabled': [{property: 'alpha', operator: '*', value: '0.5'}],
                 'light': [{property: 'lightness', operator: '+', value: '15'}],

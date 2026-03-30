@@ -169,10 +169,10 @@ void Slider::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
         SetThumbStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
+    else if ((strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
         SetThumbStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
+    else if ((strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
         SetThumbStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Window size="600,520" min_size="80,50" caption="0,0,0,35" use_system_caption="false"
         shadow_attached="true" layered_window="true" alpha="255" size_box="4,4,4,4">
     <Class name="color_picker_tab_option" width="72" height="32" font="system_regular_14" text_align="hcenter,vcenter"
                                           normal_color="bg_tab_ctrl"
-                                          hot_color="bg_tab_ctrl_item_hover"
+                                          hovered_color="bg_tab_ctrl_item_hovered"
                                           selected_normal_color="bg_tab_ctrl_item_selected"/>
     <Class name="color_picker_color_edit" text_padding="4,0,4,0" width="36" margin="2,0,0,0" default_context_menu="true"
                                           number_only="true" limit_text="3" valign="center" text_align="vcenter"

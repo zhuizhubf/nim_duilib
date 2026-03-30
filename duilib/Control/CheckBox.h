@@ -426,10 +426,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if ((strName == _T("selected_normal_image")) || (strName == _T("selectednormalimage"))) {
         SetSelectedStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("selected_hot_image")) || (strName == _T("selectedhotimage"))) {
+    else if ((strName == _T("selected_hovered_image")) || (strName == _T("selected_hot_image")) || (strName == _T("selectedhotimage"))) {
         SetSelectedStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("selected_pushed_image")) || (strName == _T("selectedpushedimage"))) {
+    else if ((strName == _T("selected_pressed_image")) || (strName == _T("selected_pushed_image")) || (strName == _T("selectedpushedimage"))) {
         SetSelectedStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("selected_disabled_image")) || (strName == _T("selecteddisabledimage"))) {
@@ -438,10 +438,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if ((strName == _T("selected_fore_normal_image")) || (strName == _T("selectedforenormalimage"))) {
         SetSelectedForeStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("selected_fore_hot_image")) || (strName == _T("selectedforehotimage"))) {
+    else if ((strName == _T("selected_fore_hovered_image")) || (strName == _T("selected_fore_hot_image")) || (strName == _T("selectedforehotimage"))) {
         SetSelectedForeStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("selected_fore_pushed_image")) || (strName == _T("selectedforepushedimage"))) {
+    else if ((strName == _T("selected_fore_pressed_image")) || (strName == _T("selected_fore_pushed_image")) || (strName == _T("selectedforepushedimage"))) {
         SetSelectedForeStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("selected_fore_disabled_image")) || (strName == _T("selectedforedisabledimage"))) {
@@ -450,10 +450,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if (strName == _T("part_selected_normal_image")) {
         SetPartSelectedStateImage(kControlStateNormal, strValue);
     }
-    else if (strName == _T("part_selected_hot_image")) {
+    else if ((strName == _T("part_selected_hovered_image")) || (strName == _T("part_selected_hot_image"))) {
         SetPartSelectedStateImage(kControlStateHot, strValue);
     }
-    else if (strName == _T("part_selected_pushed_image")) {
+    else if ((strName == _T("part_selected_pressed_image")) || (strName == _T("part_selected_pushed_image"))) {
         SetPartSelectedStateImage(kControlStatePushed, strValue);
     }
     else if (strName == _T("part_selected_disabled_image")) {
@@ -462,10 +462,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if (strName == _T("part_selected_fore_normal_image")) {
         SetPartSelectedForeStateImage(kControlStateNormal, strValue);
     }
-    else if (strName == _T("part_selected_fore_hot_image")) {
+    else if ((strName == _T("part_selected_fore_hovered_image")) || (strName == _T("part_selected_fore_hot_image"))) {
         SetPartSelectedForeStateImage(kControlStateHot, strValue);
     }
-    else if (strName == _T("part_selected_fore_pushed_image")) {
+    else if ((strName == _T("part_selected_fore_pressed_image")) || (strName == _T("part_selected_fore_pushed_image"))) {
         SetPartSelectedForeStateImage(kControlStatePushed, strValue);
     }
     else if (strName == _T("part_selected_fore_disabled_image")) {
@@ -477,10 +477,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if ((strName == _T("selected_normal_text_color")) || (strName == _T("selectednormaltextcolor"))) {
         SetSelectedStateTextColor(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("selected_hot_text_color")) || (strName == _T("selectedhottextcolor"))) {
+    else if ((strName == _T("selected_hovered_text_color")) || (strName == _T("selected_hot_text_color")) || (strName == _T("selectedhottextcolor"))) {
         SetSelectedStateTextColor(kControlStateHot, strValue);
     }
-    else if ((strName == _T("selected_pushed_text_color")) || (strName == _T("selectedpushedtextcolor"))) {
+    else if ((strName == _T("selected_pressed_text_color")) || (strName == _T("selected_pushed_text_color")) || (strName == _T("selectedpushedtextcolor"))) {
         SetSelectedStateTextColor(kControlStatePushed, strValue);
     }
     else if ((strName == _T("selected_disabled_text_color")) || (strName == _T("selecteddisabledtextcolor"))) {
@@ -489,10 +489,10 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
     else if ((strName == _T("selected_normal_color")) || (strName == _T("selectednormalcolor"))) {
         SetSelectedStateColor(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("selected_hot_color")) || (strName == _T("selectedhotcolor"))) {
+    else if ((strName == _T("selected_hovered_color")) || (strName == _T("selected_hot_color")) || (strName == _T("selectedhotcolor"))) {
         SetSelectedStateColor(kControlStateHot, strValue);
     }
-    else if ((strName == _T("selected_pushed_color")) || (strName == _T("selectedpushedcolor"))) {
+    else if ((strName == _T("selected_pressed_color")) || (strName == _T("selected_pushed_color")) || (strName == _T("selectedpushedcolor"))) {
         SetSelectedStateColor(kControlStatePushed, strValue);
     }
     else if ((strName == _T("selected_disabled_color")) || (strName == _T("selecteddisabledcolor"))) {
@@ -503,12 +503,12 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStateNormal, rcMargin, true);
     }
-    else if (strName == _T("selected_hot_color_margin")) {
+    else if ((strName == _T("selected_hovered_color_margin")) || (strName == _T("selected_hot_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStateHot, rcMargin, true);
     }
-    else if (strName == _T("selected_pushed_color_margin")) {
+    else if ((strName == _T("selected_pressed_color_margin")) || (strName == _T("selected_pushed_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStatePushed, rcMargin, true);
@@ -523,12 +523,12 @@ void CheckBoxTemplate<InheritType>::SetAttribute(const DString& strName, const D
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStateNormal, szRound, true);
     }
-    else if (strName == _T("selected_hot_color_round")) {
+    else if ((strName == _T("selected_hovered_color_round")) || (strName == _T("selected_hot_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStateHot, szRound, true);
     }
-    else if (strName == _T("selected_pushed_color_round")) {
+    else if ((strName == _T("selected_pressed_color_round")) || (strName == _T("selected_pushed_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStatePushed, szRound, true);

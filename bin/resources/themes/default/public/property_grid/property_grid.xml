@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Global>
     <!-- 通用的Class 定义 -->
     <!-- 属性区域的背景色：包括编辑框等 -->
     <Class name="property_grid_expand" expand_normal_image="file='public/property_grid/minus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
-                                       expand_hot_image="file='public/property_grid/minus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
+                                       expand_hovered_image="file='public/property_grid/minus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
                                        expand_disabled_image="file='public/property_grid/minus.svg' height='18' width='18' margin='2,0,0,0' valign='center' fade='80'"
                                        collapse_normal_image="file='public/property_grid/plus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
-                                       collapse_hot_image="file='public/property_grid/plus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
+                                       collapse_hovered_image="file='public/property_grid/plus.svg' height='18' width='18' margin='2,0,0,0' valign='center'"
                                        collapse_disabled_image="file='public/property_grid/plus.svg' height='18' width='18' margin='2,0,0,0' valign='center' fade='80'"
                                        icon_image_right_space="4"/>
     <!-- 属性页的表头 -->
@@ -29,31 +29,31 @@
                                             border_size="1,1,1,1" border_color="border_richedit_btn"
                                             normal_image="file='public/button/arrow-up.svg' width='10' height='10' valign='center' halign='center' svg_replace_colors='#333333|border_svg_image'"
                                             normal_color="bg_window_main"
-                                            hot_color="bg_richedit_btn_hover"
-                                            pushed_color="bg_richedit_btn_pressed"/>
+                                            hovered_color="bg_richedit_btn_hovered"
+                                            pressed_color="bg_richedit_btn_pressed"/>
     <Class name="property_grid_spin_btn_down" height="50%" width="100%" nofocus="true" padding="1,0,1,1"
                                             border_size="1,0,1,1" border_color="border_richedit_btn"
                                             normal_image="file='public/button/arrow-down.svg' width='10' height='10' valign='center' halign='center' svg_replace_colors='#333333|border_svg_image'"
                                             normal_color="bg_window_main"
-                                            hot_color="bg_richedit_btn_hover"
-                                            pushed_color="bg_richedit_btn_pressed"/>
+                                            hovered_color="bg_richedit_btn_hovered"
+                                            pressed_color="bg_richedit_btn_pressed"/>
     <!--下拉框-->
     <Class name="property_grid_combo" bkcolor="bg_combo" dropbox_size="0,200" padding="1,1,1,1"
                         border_size="1" border_color="border_combo_normal"
-                        hot_border_color="border_combo_hover"
+                        hovered_border_color="border_combo_hovered"
                         combo_tree_view_class="padding='0,0,0,0' bkcolor='bg_container' indent='20' class='tree_view'"
                         combo_tree_node_class="tree_node"
                         combo_icon_class=""
                         combo_edit_class="bkcolor='bg_richedit' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"
-                        combo_button_class="height={stretch} width={auto} margin={1,0,0,0} padding={1,0,0,0} border_size={1,0,0,0} nofocus={true} hot_border_color={border_combo_hover} pushed_border_color={border_combo_hover} valign={center} hot_color={bg_combo_btn_hover} pushed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hot_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
+                        combo_button_class="height={stretch} width={auto} margin={1,0,0,0} padding={1,0,0,0} border_size={1,0,0,0} nofocus={true} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
     <!--颜色选择下拉框-->
     <Class name="property_grid_combo_button" height="100%" width="100%" dropbox_size="200,250"
-                               padding="1,1,1,1" border_size="1" hot_border_color="border_combo_hover" hot_color="bg_combo_btn_hover" pushed_color="bg_combo_btn_pressed"
+                               padding="1,1,1,1" border_size="1" hovered_border_color="border_combo_hovered" hovered_color="bg_combo_btn_hovered" pressed_color="bg_combo_btn_pressed"
                                combo_box_class="padding='0,0,0,0' border_size='0,0,0,0' bkcolor='bg_combo'"
-                               left_button_class="height={stretch} width={stretch} bkcolor={bg_combo} padding={0,0,1,0} border_size={0,0,1,0} hot_border_color={border_combo_hover} pushed_border_color={border_combo_hover} valign={center}"
+                               left_button_class="height={stretch} width={stretch} bkcolor={bg_combo} padding={0,0,1,0} border_size={0,0,1,0} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center}"
                                left_button_top_label_class="width={stretch} height={16} margin={1,0,1,0} font={system_regular_12} text_align={bottom,hcenter}"
                                left_button_bottom_label_class="width={stretch} height={stretch} margin={2,0,2,1} bkcolor={bg_combo}"
-                               right_button_class="height={stretch} width={auto} padding={1,0,0,0} border_size={1,0,0,0} hot_border_color={border_combo_hover} pushed_border_color={border_combo_hover} valign={center} hot_color={bg_combo_btn_hover} pushed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hot_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
+                               right_button_class="height={stretch} width={auto} padding={1,0,0,0} border_size={1,0,0,0} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
 
     <!--日期时间-->
     <Class name="property_grid_date_time" bkcolor="bg_richedit" height="100%" width="100%"/>
@@ -64,7 +64,7 @@
     <!--HotKey控件通用样式-->
     <Class name="property_grid_hot_key" height="100%" width="100%" bkcolor="bg_richedit" border_size="1" border_color="border_richedit_normal"/>
     <!-- 纯色按钮 -->
-    <Class name="property_grid_button" height="100%" width="40" text=". . ." halign="right" valign="center" text_padding="0,0,0,4" font="system_regular_14" normal_text_color="text_btn_normal" disabled_text_color="text_btn_disabled" text_align="hcenter,vcenter" normal_color="bg_btn_normal" hot_color="bg_btn_hover" pushed_color="bg_btn_pressed"/>
+    <Class name="property_grid_button" height="100%" width="40" text=". . ." halign="right" valign="center" text_padding="0,0,0,4" font="system_regular_14" normal_text_color="text_btn_normal" disabled_text_color="text_btn_disabled" text_align="hcenter,vcenter" normal_color="bg_btn_normal" hovered_color="bg_btn_hovered" pressed_color="bg_btn_pressed"/>
 
     <PropertyGrid>
         <!-- 表头 -->

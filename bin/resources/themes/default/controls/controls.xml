@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Window size="1000,760" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" use_system_caption="false" shadow_attached="true" layered_window="true" size_box="2,2,2,2" min_size="400,320" icon="public/caption/logo.ico">
     <!-- 整个布局放在一个VBox容器中 -->
     <!-- 布局属性：margin="left,top,right,bottom"; padding="left,top,right,bottom" -->
@@ -123,7 +123,7 @@
                         <!-- DateTime -->
                         <VBox margin="4,8,0,0">
                             <HBox child_margin="4" width="300">
-                                <Label text_id="STRID_CONTROLS_DATE" height="24" text_align="vcenter" hot_text_color="red" pushed_text_color="blue"/>
+                                <Label text_id="STRID_CONTROLS_DATE" height="24" text_align="vcenter" hovered_text_color="red" pressed_text_color="blue"/>
                                 <DateTime width="100%" height="24" text="2022-02-01"/>
                                 <DateTime width="120" height="24" edit_format="date_up_down" />
                             </HBox>

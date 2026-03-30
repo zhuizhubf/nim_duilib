@@ -90,7 +90,7 @@
         </HBox>
         <HBox child_margin_x="8">
             <VBox margin="4,0,0,0" height="auto" border_size="1" width="320" height="184" border_color="gray" padding="2,2,2,2">
-                <Label halign="center" text_id="STRID_RENDER_CTRL_ANI_HOT_STATE_ANIM" tooltip_text="fade_hot='true'"/>
+                <Label halign="center" text_id="STRID_RENDER_CTRL_ANI_HOT_STATE_ANIM" tooltip_text="fade_hovered='true'"/>
                 <HBox>
                     <VBox child_margin_y="8" padding="10,6,10,6">
                         <Button class="btn_global_blue_80x30" text="blue"/>
@@ -106,18 +106,18 @@
                     </VBox>
                     <VBox child_margin_y="8" padding="10,6,10,6">
                         <CheckBox class="checkbox_1" text_id="STRID_RENDER_CTRL_ANI_CHECKBOX" margin="0,3,0,3" selected="true"
-                                  normal_text_color="red" hot_text_color="blue"
-                                  selected_normal_text_color="red" selected_hot_text_color="blue"
-                                  fade_hot="true"/>
+                                  normal_text_color="red" hovered_text_color="blue"
+                                  selected_normal_text_color="red" selected_hovered_text_color="blue"
+                                  fade_hovered="true"/>
                         <Label text_id="STRID_RENDER_CTRL_ANI_TEXT_LABEL" margin="0,3,0,3"
-                                  normal_text_color="red" hot_text_color="blue"
-                                  fade_hot="true"/>
+                                  normal_text_color="red" hovered_text_color="blue"
+                                  fade_hovered="true"/>
                         <Label text_id="STRID_RENDER_CTRL_ANI_NORMAL_CTRL" margin="0,3,0,3" width="80" height="30" text_align="vcenter,hcenter"
-                                  normal_color="" hot_color="blue"
-                                  fade_hot="true"/>
+                                  normal_color="" hovered_color="blue"
+                                  fade_hovered="true"/>
                         <Control margin="0,3,0,3" width="80" height="30"
-                                  normal_image="autumn.png" hot_image="svg_test.svg"
-                                  fade_hot="true" fade_hot_total_ms="200" fade_hot_frame_interval_ms="16" fade_hot_easing_function="EaseInOutCubic"/>
+                                  normal_image="autumn.png" hovered_image="svg_test.svg"
+                                  fade_hovered="true" fade_hot_total_ms="200" fade_hot_frame_interval_ms="16" fade_hot_easing_function="EaseInOutCubic"/>
                     </VBox>
                 </HBox>
             </VBox>

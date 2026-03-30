@@ -279,12 +279,12 @@ void TabCtrlItem::SetAttribute(const DString& strName, const DString& strValue2)
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetSelectedRoundCorner(sz, true);
     }
-    else if (strName == _T("hot_round_corner")) {
+    else if ((strName == _T("hovered_round_corner")) || (strName == _T("hot_round_corner"))) {
         UiSize sz;
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetHotRoundCorner(sz, true);
     }
-    else if (strName == _T("hot_padding")) {
+    else if ((strName == _T("hovered_padding")) || (strName == _T("hot_padding"))) {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetHotPadding(rcPadding, true);

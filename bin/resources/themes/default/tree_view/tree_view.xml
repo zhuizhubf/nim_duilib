@@ -1,9 +1,9 @@
-<Window size="80%,80%" shadow_attached="true" layered_window="true" 
+﻿<Window size="80%,80%" shadow_attached="true" layered_window="true" 
         snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" 
         caption="0,0,0,36" size_box="4,4,4,4" text_id="STRID_TREEVIEW_TITLE">
     <!-- 该窗口下的Class定义 -->
     <Class name="btn_view_common" width="32" height="24" border_round="4,4" valign="center"
-                                  normal_color="" hot_color="bg_btn_hover" pushed_color="bg_btn_pressed"/>
+                                  normal_color="" hovered_color="bg_btn_hovered" pressed_color="bg_btn_pressed"/>
     <Class name="btn_view_up" normal_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center'"
                               disabled_image="file='../tree_view/arrow-up.svg' width='16' height='16' valign='center' halign='center' fade='128'"/>
     <Class name="btn_view_left" normal_image="file='../tree_view/arrow-left.svg' width='16' height='16' valign='center' halign='center'"
@@ -72,12 +72,12 @@
                 <Button class="btn_view_common btn_view_left" name="btn_view_left" tooltip_text_id="STRID_TREEVIEW_VIEW_LEFT" margin="2,0,0,0"/>
                 <Button class="btn_view_common btn_view_right" name="btn_view_right" tooltip_text_id="STRID_TREEVIEW_VIEW_RIGHT" margin="2,0,0,0"/>
                 <Button class="btn_view_common btn_view_refresh" name="btn_view_refresh" margin="2,0,0,0" tooltip_text_id="STRID_TREEVIEW_VIEW_REFRESH"/>
-                <ButtonHBox name="btn_view_sort" width="auto" height="26" border_round="5,5" padding="6,0,6,0" margin="2,0,0,0" valign="center" halign="center" tooltip_text_id="STRID_TREEVIEW_VIEW_SORT_MODE" hot_color="bg_btn_hover" pushed_color="bg_btn_pressed">
+                <ButtonHBox name="btn_view_sort" width="auto" height="26" border_round="5,5" padding="6,0,6,0" margin="2,0,0,0" valign="center" halign="center" tooltip_text_id="STRID_TREEVIEW_VIEW_SORT_MODE" hovered_color="bg_btn_hovered" pressed_color="bg_btn_pressed">
                     <Control width="auto" bkimage="file='../tree_view/view-sort.svg' width='16' height='16' valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>
                     <Label text_id="STRID_TREEVIEW_VIEW_SORT" width="auto" height="28" margin="4,0,4,0" font="system_regular_12" text_align="hcenter,vcenter" valign="center" mouse_enabled="false" keyboard_enabled="false"/>
                     <Control width="auto" bkimage="file='../tree_view/chevron-bottom.svg' width='8' height='8' valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>
                 </ButtonHBox>
-                <ButtonHBox name="btn_view_list_type" width="auto" height="26" border_round="5,5" padding="6,0,6,0" margin="2,0,0,0" valign="center" halign="center" tooltip_text_id="STRID_TREEVIEW_VIEW_SWITCH_MODE" hot_color="bg_btn_hover" pushed_color="bg_btn_pressed">
+                <ButtonHBox name="btn_view_list_type" width="auto" height="26" border_round="5,5" padding="6,0,6,0" margin="2,0,0,0" valign="center" halign="center" tooltip_text_id="STRID_TREEVIEW_VIEW_SWITCH_MODE" hovered_color="bg_btn_hovered" pressed_color="bg_btn_pressed">
                     <Control width="auto" bkimage="file='../tree_view/view-list-symbolic.svg' width='16' height='16' valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>
                     <Label text_id="STRID_TREEVIEW_VIEW_MODE" width="auto" height="28" margin="4,0,4,0" font="system_regular_12" text_align="hcenter,vcenter" valign="center" mouse_enabled="false" keyboard_enabled="false"/>
                     <Control width="auto" bkimage="file='../tree_view/chevron-bottom.svg' width='8' height='8' valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>

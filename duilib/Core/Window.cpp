@@ -1778,7 +1778,7 @@ LRESULT Window::OnMouseHoverMsg(const UiPoint& pt, uint32_t modifierKey, const N
     if (pNewHover == nullptr) {
         return lResult;
     }
-    std::weak_ptr<WeakFlag> hoverFlag = pNewHover->GetWeakFlag();
+    std::weak_ptr<WeakFlag> hoveredFlag = pNewHover->GetWeakFlag();
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     EventArgs msgData;
     msgData.modifierKey = modifierKey;
@@ -1786,7 +1786,7 @@ LRESULT Window::OnMouseHoverMsg(const UiPoint& pt, uint32_t modifierKey, const N
     msgData.wParam = nativeMsg.wParam;
     msgData.lParam = nativeMsg.lParam;
     pNewHover->SendEvent(kEventMouseHover, msgData);
-    if (hoverFlag.expired() || windowFlag.expired()) {
+    if (hoveredFlag.expired() || windowFlag.expired()) {
         return lResult;
     }
 

@@ -341,10 +341,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("normal_color")) || (strName == _T("normalcolor"))) {
         SetStateColor(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("hot_color")) || (strName == _T("hotcolor"))) {
+    else if ((strName == _T("hovered_color")) || (strName == _T("hot_color")) || (strName == _T("hotcolor"))) {
         SetStateColor(kControlStateHot, strValue);
     }
-    else if ((strName == _T("pushed_color")) || (strName == _T("pushedcolor"))) {
+    else if ((strName == _T("pressed_color")) || (strName == _T("pushed_color")) || (strName == _T("pushedcolor"))) {
         SetStateColor(kControlStatePushed, strValue);
     }
     else if ((strName == _T("disabled_color")) || (strName == _T("disabledcolor"))) {
@@ -355,12 +355,12 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStateNormal, rcMargin, true);
     }
-    else if (strName == _T("hot_color_margin")) {
+    else if ((strName == _T("hovered_color_margin")) || (strName == _T("hot_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStateHot, rcMargin, true);
     }
-    else if (strName == _T("pushed_color_margin")) {
+    else if ((strName == _T("pressed_color_margin")) || (strName == _T("pushed_color_margin"))) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStatePushed, rcMargin, true);
@@ -383,12 +383,12 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStateNormal, szRound, true);
     }
-    else if (strName == _T("hot_color_round")) {
+    else if ((strName == _T("hovered_color_round")) || (strName == _T("hot_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStateHot, szRound, true);
     }
-    else if (strName == _T("pushed_color_round")) {
+    else if ((strName == _T("pressed_color_round")) || (strName == _T("pushed_color_round"))) {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStatePushed, szRound, true);
@@ -404,10 +404,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("normal_border_color")) {
         SetBorderColor(kControlStateNormal, strValue);
     }
-    else if (strName == _T("hot_border_color")) {
+    else if ((strName == _T("hovered_border_color")) || (strName == _T("hot_border_color"))) {
         SetBorderColor(kControlStateHot, strValue);
     }
-    else if (strName == _T("pushed_border_color")) {
+    else if ((strName == _T("pressed_border_color")) || (strName == _T("pushed_border_color"))) {
         SetBorderColor(kControlStatePushed, strValue);
     }
     else if (strName == _T("disabled_border_color")) {
@@ -494,10 +494,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("normal_image")) || (strName == _T("normalimage"))) {
         SetStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("hot_image")) || (strName == _T("hotimage"))) {
+    else if ((strName == _T("hovered_image")) || (strName == _T("hot_image")) || (strName == _T("hotimage"))) {
         SetStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("pushed_image")) || (strName == _T("pushedimage"))) {
+    else if ((strName == _T("pressed_image")) || (strName == _T("pushed_image")) || (strName == _T("pushedimage"))) {
         SetStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("disabled_image")) || (strName == _T("disabledimage"))) {
@@ -506,10 +506,10 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("fore_normal_image")) || (strName == _T("forenormalimage"))) {
         SetForeStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("fore_hot_image")) || (strName == _T("forehotimage"))) {
+    else if ((strName == _T("fore_hovered_image")) || (strName == _T("fore_hot_image")) || (strName == _T("forehotimage"))) {
         SetForeStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("fore_pushed_image")) || (strName == _T("forepushedimage"))) {
+    else if ((strName == _T("fore_pressed_image")) || (strName == _T("fore_pushed_image")) || (strName == _T("forepushedimage"))) {
         SetForeStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("fore_disabled_image")) || (strName == _T("foredisabledimage"))) {
@@ -525,17 +525,17 @@ void Control::SetAttribute(const DString& strName, const DString& strValue2)
         }
         GetAnimationManager().SetFadeAlpha(bFadeVisible, nEndAlpha);
     }
-    else if ((strName == _T("fade_hot")) || (strName == _T("fadehot"))) {
-        SetFadeHot(StringUtil::IsValueTrue(strValue));
+    else if ((strName == _T("fade_hovered")) || (strName == _T("fade_hot")) || (strName == _T("fadehot"))) {
+        SetFadeHovered(StringUtil::IsValueTrue(strValue));
     }
-    else if (strName == _T("fade_hot_frame_interval_ms")) {
-        SetFadeHotFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
+    else if ((strName == _T("fade_hovered_frame_interval_ms")) || (strName == _T("fade_hot_frame_interval_ms"))) {
+        SetFadeHoveredFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
     }
-    else if (strName == _T("fade_hot_total_ms")) {
-        SetFadeHotTotalMillSeconds(StringUtil::StringToInt32(strValue));
+    else if ((strName == _T("fade_hovered_total_ms")) || (strName == _T("fade_hot_total_ms"))) {
+        SetFadeHoveredTotalMillSeconds(StringUtil::StringToInt32(strValue));
     }
-    else if (strName == _T("fade_hot_easing_function")) {
-        SetFadeHotEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
+    else if ((strName == _T("fade_hovered_easing_function")) || (strName == _T("fade_hot_easing_function"))) {
+        SetFadeHoveredEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
     }
     else if ((strName == _T("fade_width")) || (strName == _T("fadewidth"))) {
         GetAnimationManager().SetFadeWidth(StringUtil::IsValueTrue(strValue));
@@ -892,9 +892,9 @@ bool Control::OnApplyAttributeList(const DString& strReceiver, const DString& st
     }
 }
 
-void Control::SetFadeHot(bool bFadeHot)
+void Control::SetFadeHovered(bool bFadeHovered)
 {
-    if (bFadeHot) {
+    if (bFadeHovered) {
         AnimationPlayer* pAnimationPlayer = new AnimationPlayer;
         pAnimationPlayer->SetAnimationType(AnimationType::kAnimationHot);
         pAnimationPlayer->SetStartValue(0);
@@ -943,10 +943,10 @@ AnimationPlayer* Control::GetHotAnimationPlayer() const
     return m_pHotAnimationPlayer.get();
 }
 
-void Control::SetFadeHotFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds)
+void Control::SetFadeHoveredFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds)
 {
     if (m_pHotAnimationPlayer == nullptr) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     ASSERT(m_pHotAnimationPlayer != nullptr);
     if (m_pHotAnimationPlayer != nullptr) {
@@ -954,7 +954,7 @@ void Control::SetFadeHotFrameIntervalMillSeconds(int32_t frameIntervalMillSecond
     }
 }
 
-int32_t Control::GetFadeHotFrameIntervalMillSeconds() const
+int32_t Control::GetFadeHoveredFrameIntervalMillSeconds() const
 {
     if (m_pHotAnimationPlayer != nullptr) {
         return m_pHotAnimationPlayer->GetFrameIntervalMillSeconds();
@@ -962,10 +962,10 @@ int32_t Control::GetFadeHotFrameIntervalMillSeconds() const
     return -1;
 }
 
-void Control::SetFadeHotTotalMillSeconds(int32_t totalMillSeconds)
+void Control::SetFadeHoveredTotalMillSeconds(int32_t totalMillSeconds)
 {
     if (m_pHotAnimationPlayer == nullptr) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     ASSERT(m_pHotAnimationPlayer != nullptr);
     if (m_pHotAnimationPlayer != nullptr) {
@@ -973,7 +973,7 @@ void Control::SetFadeHotTotalMillSeconds(int32_t totalMillSeconds)
     }
 }
 
-int32_t Control::GetFadeHotTotalMillSeconds() const
+int32_t Control::GetFadeHoveredTotalMillSeconds() const
 {
     if (m_pHotAnimationPlayer != nullptr) {
         return m_pHotAnimationPlayer->GetTotalMillSeconds();
@@ -981,10 +981,10 @@ int32_t Control::GetFadeHotTotalMillSeconds() const
     return -1;
 }
 
-void Control::SetFadeHotEasingFunctionType(EasingFunctionType easingFunctionType)
+void Control::SetFadeHoveredEasingFunctionType(EasingFunctionType easingFunctionType)
 {
     if (m_pHotAnimationPlayer == nullptr) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     ASSERT(m_pHotAnimationPlayer != nullptr);
     if (m_pHotAnimationPlayer != nullptr) {
@@ -992,7 +992,7 @@ void Control::SetFadeHotEasingFunctionType(EasingFunctionType easingFunctionType
     }
 }
 
-EasingFunctionType Control::GetFadeHotEasingFunctionType() const
+EasingFunctionType Control::GetFadeHoveredEasingFunctionType() const
 {
     if (m_pHotAnimationPlayer != nullptr) {
         return m_pHotAnimationPlayer->GetEasingFunctionType();
@@ -1210,7 +1210,7 @@ void Control::SetStateColor(ControlStateType stateType, const DString& strColor)
     }
     m_pColorMap->SetStateColor(stateType, strColor);
     if (stateType == kControlStateHot) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     Invalidate();
 }
@@ -1230,7 +1230,7 @@ void Control::SetStateColorMargin(ControlStateType stateType, UiMargin colorMarg
     }
     m_pColorMap->SetStateColorMargin(stateType, colorMargin);
     if (stateType == kControlStateHot) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     Invalidate();
 }
@@ -1250,7 +1250,7 @@ void Control::SetStateColorRound(ControlStateType stateType, UiSize colorRound, 
     }
     m_pColorMap->SetStateColorRound(stateType, colorRound);
     if (stateType == kControlStateHot) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     Invalidate();
 }
@@ -1479,7 +1479,7 @@ DString Control::GetStateImage(ControlStateType stateType) const
 void Control::SetStateImage(ControlStateType stateType, const DString& strImage)
 {
     if (stateType == kControlStateHot) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     SetStateImage(kStateImageBk, stateType, strImage);
     RelayoutOrRedraw();
@@ -1493,7 +1493,7 @@ DString Control::GetForeStateImage(ControlStateType stateType) const
 void Control::SetForeStateImage(ControlStateType stateType, const DString& strImage)
 {
     if (stateType == kControlStateHot) {
-        SetFadeHot(true);
+        SetFadeHovered(true);
     }
     SetStateImage(kStateImageFore, stateType, strImage);
     Invalidate();

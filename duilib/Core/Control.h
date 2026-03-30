@@ -840,35 +840,35 @@ public:
     /// 控件动画相关接口
 
     /** 设置或清除Hot状态的播放动画（对应动画类型为：kAnimationHot）
-    * @param [in] bFadeHot true表示设置动画，false表示清除动画
+    * @param [in] bFadeHovered true表示设置动画，false表示清除动画
     */
-    void SetFadeHot(bool bFadeHot);
+    void SetFadeHovered(bool bFadeHovered);
 
     /** 设置播放Hot状态动画的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHot）
     * @param [in] frameIntervalMillSeconds 播放动画的定时器时间间隔（毫秒）
     */
-    void SetFadeHotFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds);
+    void SetFadeHoveredFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds);
 
     /** 获取Hot状态动画播放的定时器时间间隔（毫秒）（对应动画类型为：kAnimationHot）
     */
-    int32_t GetFadeHotFrameIntervalMillSeconds() const;
+    int32_t GetFadeHoveredFrameIntervalMillSeconds() const;
 
     /** 设置Hot状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHot）
     * @param [in] totalMillSeconds 动画总的播放时间（毫秒）
     */
-    void SetFadeHotTotalMillSeconds(int32_t totalMillSeconds);
+    void SetFadeHoveredTotalMillSeconds(int32_t totalMillSeconds);
 
     /** 获取Hot状态动画总的播放时间（毫秒）（对应动画类型为：kAnimationHot）
     */
-    int32_t GetFadeHotTotalMillSeconds() const;
+    int32_t GetFadeHoveredTotalMillSeconds() const;
 
     /** 设置Hot状态动画缓动函数类型（对应动画类型为：kAnimationHot）
     */
-    void SetFadeHotEasingFunctionType(EasingFunctionType easingFunctionType);
+    void SetFadeHoveredEasingFunctionType(EasingFunctionType easingFunctionType);
 
     /** 获取Hot状态动画缓动函数类型（对应动画类型为：kAnimationHot）
     */
-    EasingFunctionType GetFadeHotEasingFunctionType() const;
+    EasingFunctionType GetFadeHoveredEasingFunctionType() const;
 
     /** 判断是否包含指定类型的动画播放接口
     */

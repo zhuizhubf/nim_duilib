@@ -42,7 +42,7 @@ public:
      * (2) 使用单引号: color='black' offset='1,1' blur_radius='2' spread_radius='2'
      * (3) 使用单引号和双引号混合：color="black" offset='1,1' blur_radius="2" spread_radius='2'
      * (4) 使用花括号(当无法用单引号和双引号时，可适当使用花括号):
-     *     combo_button_class="height='stretch' hot_image={file='test/arrow_hot.svg' valign='center'}"
+     *     combo_button_class="height='stretch' hovered_image={file='test/arrow_hot.svg' valign='center'}"
      * @param [in] strList 需要解析的属性列表，格式如上说明
      * @param [out] attributeList 返回解析结果的name和value列表
      * @param [in] seperateStartChars 起始分隔符集合（如_T("\"'{["）

@@ -373,7 +373,7 @@ public:
     bool IsAnimationEnabled() const;
 
 public:
-    /** 添加别名：<Alias name="bk_menuitem_hovered" value="bg_menu_item_hover"/>
+    /** 添加别名：<Alias name="bk_menuitem_hovered" value="bg_menu_item_hovered"/>
     *   为了兼容旧版本程序，避免改名后导致旧版本程序无法运行
     * @param [in] name 名字
     * @param [in] value 别名的实际取值

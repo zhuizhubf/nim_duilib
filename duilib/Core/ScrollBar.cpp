@@ -73,10 +73,10 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
     if ((strName == _T("button1_normal_image")) || (strName == _T("button1normalimage"))) {
         SetButton1StateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("button1_hot_image")) || (strName == _T("button1hotimage"))) {
+    else if ((strName == _T("button1_hovered_image")) || (strName == _T("button1_hot_image")) || (strName == _T("button1hotimage"))) {
         SetButton1StateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("button1_pushed_image")) || (strName == _T("button1pushedimage"))) {
+    else if ((strName == _T("button1_pressed_image")) || (strName == _T("button1_pushed_image")) || (strName == _T("button1pushedimage"))) {
         SetButton1StateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("button1_disabled_image")) || (strName == _T("button1disabledimage"))) {
@@ -85,10 +85,10 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("button2_normal_image")) || (strName == _T("button2normalimage"))) {
         SetButton2StateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("button2_hot_image")) || (strName == _T("button2hotimage"))) {
+    else if ((strName == _T("button2_hovered_image")) || (strName == _T("button2_hot_image")) || (strName == _T("button2hotimage"))) {
         SetButton2StateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("button2_pushed_image")) || (strName == _T("button2pushedimage"))) {
+    else if ((strName == _T("button2_pressed_image")) || (strName == _T("button2_pushed_image")) || (strName == _T("button2pushedimage"))) {
         SetButton2StateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("button2_disabled_image")) || (strName == _T("button2disabledimage"))) {
@@ -97,10 +97,10 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
         SetThumbStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
+    else if ((strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
         SetThumbStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
+    else if ((strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
         SetThumbStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
@@ -109,10 +109,10 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("rail_normal_image")) || (strName == _T("railnormalimage"))) {
         SetRailStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("rail_hot_image")) || (strName == _T("railhotimage"))) {
+    else if ((strName == _T("rail_hovered_image")) || (strName == _T("rail_hot_image")) || (strName == _T("railhotimage"))) {
         SetRailStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("rail_pushed_image")) || (strName == _T("railpushedimage"))) {
+    else if ((strName == _T("rail_pressed_image")) || (strName == _T("rail_pushed_image")) || (strName == _T("railpushedimage"))) {
         SetRailStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("rail_disabled_image")) || (strName == _T("raildisabledimage"))) {
@@ -121,10 +121,10 @@ void ScrollBar::SetAttribute(const DString& strName, const DString& strValue2)
     else if ((strName == _T("bk_normal_image")) || (strName == _T("bknormalimage"))) {
         SetBkStateImage(kControlStateNormal, strValue);
     }
-    else if ((strName == _T("bk_hot_image")) || (strName == _T("bkhotimage"))) {
+    else if ((strName == _T("bk_hovered_image")) || (strName == _T("bk_hot_image")) || (strName == _T("bkhotimage"))) {
         SetBkStateImage(kControlStateHot, strValue);
     }
-    else if ((strName == _T("bk_pushed_image")) || (strName == _T("bkpushedimage"))) {
+    else if ((strName == _T("bk_pressed_image")) || (strName == _T("bk_pushed_image")) || (strName == _T("bkpushedimage"))) {
         SetBkStateImage(kControlStatePushed, strValue);
     }
     else if ((strName == _T("bk_disabled_image")) || (strName == _T("bkdisabledimage"))) {

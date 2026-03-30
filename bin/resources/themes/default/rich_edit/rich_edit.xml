@@ -1,22 +1,22 @@
-<Window size="90%,80%" size_box="4,4,4,4" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" shadow_attached="true" layered_window="true" text_id="STRID_RICHEDIT_TEST_TITLE">
+﻿<Window size="90%,80%" size_box="4,4,4,4" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" shadow_attached="true" layered_window="true" text_id="STRID_RICHEDIT_TEST_TITLE">
     <!-- 该窗口下的Class定义 -->
     <Font id="btn_font_bold_14" name="Elephant" size="14" bold="true"/>
     <Font id="btn_font_italic_14" name="Elephant" size="14" bold="true" italic="true"/>
     <Class name="checkbox_font_class" font="system_regular_14" text_align="hcenter,vcenter"
                                       border_size="1"
-                                      hot_border_color="border_btn_hover"
-                                      pushed_border_color="border_btn_pressed"
+                                      hovered_border_color="border_btn_hovered"
+                                      pressed_border_color="border_btn_pressed"
                                       selected_normal_color="bg_btn_pressed"
-                                      hot_color="border_btn_hover"
-                                      selected_hot_color="border_btn_hover"
-                                      pushed_color="bg_btn_pressed"
-                                      selected_pushed_color="bg_btn_pressed"/>
+                                      hovered_color="border_btn_hovered"
+                                      selected_hovered_color="border_btn_hovered"
+                                      pressed_color="bg_btn_pressed"
+                                      selected_pressed_color="bg_btn_pressed"/>
     <Class name="btn_font_class" font="system_regular_14" text_align="hcenter,vcenter"
                                       border_size="1"
-                                      hot_border_color="border_btn_hover"
-                                      pushed_border_color="border_btn_pressed"
-                                      hot_color="border_btn_hover"
-                                      pushed_color="bg_btn_pressed" />
+                                      hovered_border_color="border_btn_hovered"
+                                      pressed_border_color="border_btn_pressed"
+                                      hovered_color="border_btn_hovered"
+                                      pressed_color="bg_btn_pressed" />
 
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
     <VBox bkcolor="bg_window_main">

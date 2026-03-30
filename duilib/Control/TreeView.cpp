@@ -49,10 +49,10 @@ void TreeNode::SetAttribute(const DString& strName, const DString& strValue2)
     if (strName == _T("expand_normal_image")) {
         SetExpandStateImage(kControlStateNormal, strValue);
     }
-    else if (strName == _T("expand_hot_image")) {
+    else if ((strName == _T("expand_hovered_image")) || (strName == _T("expand_hot_image"))) {
         SetExpandStateImage(kControlStateHot, strValue);
     }
-    else if (strName == _T("expand_pushed_image")) {
+    else if ((strName == _T("expand_pressed_image")) || (strName == _T("expand_pushed_image"))) {
         SetExpandStateImage(kControlStatePushed, strValue);
     }
     else if (strName == _T("expand_disabled_image")) {
@@ -61,10 +61,10 @@ void TreeNode::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("collapse_normal_image")) {
         SetCollapseStateImage(kControlStateNormal, strValue);
     }
-    else if (strName == _T("collapse_hot_image")) {
+    else if ((strName == _T("collapse_hovered_image")) || (strName == _T("collapse_hot_image"))) {
         SetCollapseStateImage(kControlStateHot, strValue);
     }
-    else if (strName == _T("collapse_pushed_image")) {
+    else if ((strName == _T("collapse_pressed_image")) || (strName == _T("collapse_pushed_image"))) {
         SetCollapseStateImage(kControlStatePushed, strValue);
     }
     else if (strName == _T("collapse_disabled_image")) {
