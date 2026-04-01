@@ -44,7 +44,7 @@
     <ThemeColor name="bg_header" value="#FFF5F5F5" type="control" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="页眉背景" comment_en="Header background"/>
     <ThemeColor name="bg_overlay" value="#80000000" type="control" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="蒙层背景" comment_en="Overlay background"/>
     <ThemeColor name="border_control_disabled" value="#FFCECECE" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件禁用边框" comment_en="General control disabled border"/>
-    <ThemeColor name="border_control_focus" value="#FF0078D4" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="通用控件聚焦高亮边框" comment_en="General control focus border"/>
+    <ThemeColor name="border_control_focused" value="#FF0078D4" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="通用控件聚焦高亮边框" comment_en="General control focus border"/>
     <ThemeColor name="border_control_pressed" value="#FF0078D4" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" comment_cn="通用控件点击边框" comment_en="General control pressed border"/>
     <ThemeColor name="border_control_hovered" value="#FFB0B0B0" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件悬浮边框" comment_en="General control hovered border"/>
     <ThemeColor name="border_control_normal" value="#FFCACACA" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
