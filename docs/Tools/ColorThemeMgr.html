@@ -979,6 +979,25 @@
             gap: 4px;
             margin-top: 4px;
         }
+        /* 派生信息显示样式 */
+        .color-derivation-info {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 4px;
+            padding: 4px 8px;
+            background-color: #F3F4F6;
+            border-radius: 4px;
+            border-left: 3px solid #8B5CF6;
+        }
+        .color-derivation-info .derivation-ref {
+            color: #8B5CF6;
+            font-weight: 500;
+        }
+        .color-derivation-info .adjust-formula {
+            color: #EC4899;
+            font-weight: 500;
+            font-family: monospace;
+        }
         .contrast-warning {
             background-color: #F59E0B;
             color: white;
@@ -5313,6 +5332,7 @@
                     </div>
                     <div class="badges-container">${badgesHtml}</div>
                     <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : ''}</div>
+                    ${(derivedFrom || adjust) ? `<div class="color-derivation-info">${derivedFrom ? `派生自: <span class="derivation-ref">${derivedFrom}</span>` : ''}${adjust ? ` | 调整: <span class="adjust-formula">${adjust}</span>` : ''}</div>` : ''}
                     <div class="color-code-group">
                         <div class="color-code current ${isChanged ? 'changed' : ''}">当前值：${value}</div>
                         <div class="color-code original">原始值：${originalValue}</div>
