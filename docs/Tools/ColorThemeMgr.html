@@ -2089,10 +2089,10 @@
                                 <option value="alpha">透明度 (alpha)</option>
                             </select>
                             <select class="adjust-operator">
-                                <option value="+">+ 增加</option>
-                                <option value="-">- 减少</option>
-                                <option value="*">× 乘以</option>
-                                <option value="=">= 设置为</option>
+                                <option value="+">+ 加法 (lightness:+15 表示 lightness 增加 15%)</option>
+                                <option value="-">- 减法 (lightness:-15 表示 lightness 减少 15%)</option>
+                                <option value="*">× 乘法 (lightness:*0.5 表示 lightness 变为 50%)</option>
+                                <option value=":=">:= 设为绝对值 (lightness:=50 表示 lightness 设为 50%)</option>
                             </select>
                             <input type="number" class="adjust-value" value="15" min="-100" max="360" step="1">
                             <span class="adjust-unit">%</span>
@@ -3627,24 +3627,24 @@
          */
         function parseDerivationFormula(formula) {
             if (!formula || typeof formula !== 'string') return [];
-            
+
             const operations = [];
             const parts = formula.split(',');
-            
+
             parts.forEach(part => {
                 part = part.trim();
                 if (!part) return;
-                
-                const match = part.match(/^(lightness|luminance|saturation|alpha|hue)\s*([\+\-\*\/:])\s*(-?\d+\.?\d*)$/);
+
+                const match = part.match(/^(lightness|luminance|saturation|alpha|hue)\s*(:=|[\+\-\*])\s*(-?\d+\.?\d*)$/);
                 if (match) {
                     operations.push({
                         property: match[1] === 'luminance' ? 'lightness' : match[1],
-                        operator: match[2] === ':' ? '=' : match[2],
+                        operator: match[2],
                         value: parseFloat(match[3])
                     });
                 }
             });
-            
+
             return operations;
         }
 
@@ -3656,9 +3656,10 @@
          */
         function computeDerivedColor(sourceArgb, formula) {
             if (!sourceArgb || !/^#([0-9A-F]{8})$/i.test(sourceArgb)) {
-                return sourceArgb;
+                console.warn(`[ColorThemeMgr] 无效的颜色值: ${sourceArgb}, 公式: ${formula}, 返回默认值`);
+                return '#FF000000';
             }
-            
+
             const operations = parseDerivationFormula(formula);
             if (operations.length === 0) return sourceArgb;
             
@@ -3676,29 +3677,30 @@
                         if (op.operator === '+') currentHsl.l += op.value / 100;
                         else if (op.operator === '-') currentHsl.l -= op.value / 100;
                         else if (op.operator === '*') currentHsl.l *= op.value;
-                        else if (op.operator === '=') currentHsl.l = op.value / 100;
+                        else if (op.operator === ':=') currentHsl.l = Math.max(0, Math.min(1, op.value / 100));
                         currentHsl.l = Math.max(0, Math.min(1, currentHsl.l));
                         break;
-                        
+
                     case 'saturation':
                         if (op.operator === '+') currentHsl.s += op.value / 100;
                         else if (op.operator === '-') currentHsl.s -= op.value / 100;
                         else if (op.operator === '*') currentHsl.s *= op.value;
-                        else if (op.operator === '=') currentHsl.s = op.value / 100;
+                        else if (op.operator === ':=') currentHsl.s = Math.max(0, Math.min(1, op.value / 100));
                         currentHsl.s = Math.max(0, Math.min(1, currentHsl.s));
                         break;
-                        
+
                     case 'hue':
-                        if (op.operator === '+' || op.operator === '=') currentHsl.h += op.value;
+                        if (op.operator === '+') currentHsl.h += op.value;
                         else if (op.operator === '-') currentHsl.h -= op.value;
+                        else if (op.operator === ':=') currentHsl.h = ((op.value % 360) + 360) % 360;
                         currentHsl.h = ((currentHsl.h % 360) + 360) % 360;
                         break;
-                        
+
                     case 'alpha':
-                        if (op.operator === '+') currentAlpha += op.value;
-                        else if (op.operator === '-') currentAlpha -= op.value;
+                        if (op.operator === '+') currentAlpha += op.value / 100;
+                        else if (op.operator === '-') currentAlpha -= op.value / 100;
                         else if (op.operator === '*') currentAlpha *= op.value;
-                        else if (op.operator === '=') currentAlpha = op.value;
+                        else if (op.operator === ':=') currentAlpha = Math.max(0, Math.min(1, op.value / 100));
                         currentAlpha = Math.max(0, Math.min(1, currentAlpha));
                         break;
                 }
@@ -5101,13 +5103,14 @@
             currentColorMap.set(to, item);
 
             // 重新计算派生颜色
+            calculateGroupStatistics();
             recomputeDerivedColors();
 
             // 刷新面板
             renderDerivationTree();
             renderColorCategories();
             updatePreview();
-            
+
             showToast(`已建立派生关系: ${from} → ${to}`, 'success');
         }
         window.applySuggestionAndRefresh = applySuggestionAndRefresh;
@@ -5122,7 +5125,7 @@
 
                 const suggestions = getDerivationSuggestions(item.name);
                 const highConfidence = suggestions.find(s => s.confidence >= threshold);
-                
+
                 if (highConfidence) {
                     if (applyDerivationSuggestion(highConfidence)) {
                         appliedCount++;
@@ -5131,6 +5134,7 @@
             });
 
             if (appliedCount > 0) {
+                calculateGroupStatistics();
                 recomputeDerivedColors();
                 renderDerivationTree();
                 renderColorCategories();
@@ -5178,6 +5182,7 @@
             });
 
             if (appliedCount > 0) {
+                calculateGroupStatistics();
                 recomputeDerivedColors();
                 renderDerivationTree();
                 renderColorCategories();
@@ -5526,8 +5531,12 @@
                     if (colorData.role !== undefined) node.setAttribute('role', colorData.role);
                     if (colorData.derivedFrom !== undefined) node.setAttribute('derived_from', colorData.derivedFrom);
                     if (colorData.adjust !== undefined) node.setAttribute('adjust', colorData.adjust);
-                    // 保存锁定状态
-                    if (colorData.fixed !== undefined) node.setAttribute('fixed', colorData.fixed.toString());
+                    // 保存锁定状态 - 始终导出为"true"或"false"
+                    if (colorData.fixed === true) {
+                        node.setAttribute('fixed', 'true');
+                    } else {
+                        node.setAttribute('fixed', 'false');
+                    }
                 }
             });
 
