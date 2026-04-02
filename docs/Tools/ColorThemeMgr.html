@@ -3614,19 +3614,28 @@
                 part = part.trim();
                 if (!part) return;
 
+                let property, operator, valueStr;
                 const colonIdx = part.indexOf(':');
-                if (colonIdx <= 0 || colonIdx >= part.length - 1) return;
 
-                const property = part.substring(0, colonIdx);
+                if (colonIdx > 0 && colonIdx < part.length - 1) {
+                    // 新格式: lightness:+20
+                    property = part.substring(0, colonIdx);
+                    const rest = part.substring(colonIdx + 1);
+                    if (rest.length < 2) return;
+                    operator = rest.charAt(0);
+                    valueStr = rest.substring(1);
+                } else {
+                    // 旧格式: lightness+20 (无冒号)
+                    const match = part.match(/^(lightness|luminance|saturation|alpha|hue)([+*/-])(.+)$/);
+                    if (!match) return;
+                    property = match[1];
+                    operator = match[2];
+                    valueStr = match[3];
+                }
+
                 if (!['lightness', 'luminance', 'saturation', 'alpha', 'hue'].includes(property)) return;
+                if (!['+', '-', '*', '/', ':='].includes(operator)) return;
 
-                const rest = part.substring(colonIdx + 1);
-                if (rest.length < 2) return;
-
-                const operator = rest.charAt(0);
-                if (!['+', '-', '*', '/'].includes(operator)) return;
-
-                const valueStr = rest.substring(1);
                 const value = parseFloat(valueStr);
                 if (isNaN(value)) return;
 
@@ -3648,7 +3657,6 @@
          */
         function computeDerivedColor(sourceArgb, formula) {
             if (!sourceArgb || !/^#([0-9A-F]{8})$/i.test(sourceArgb)) {
-                console.warn(`[ColorThemeMgr] 无效的颜色值: ${sourceArgb}, 公式: ${formula}, 返回默认值`);
                 return '#FF000000';
             }
 
@@ -4075,7 +4083,7 @@
                 const value = row.querySelector('.adjust-value').value;
                 
                 if (value !== '' && value !== '0') {
-                    formulas.push(`${property}${operator}${value}`);
+                    formulas.push(`${property}:${operator}${value}`);
                 }
             });
             
@@ -6585,7 +6593,7 @@
                 'selected': 'lightness:-10,saturation:+10',
                 'secondary': 'lightness:+10',
                 'hint': 'alpha:*0.6',
-                'link': 'hue:210,saturation:+30'
+                'link': 'hue:+210,saturation:+30'
             };
 
             // 查找匹配的状态
