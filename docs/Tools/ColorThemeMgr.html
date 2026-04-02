@@ -1667,8 +1667,6 @@
             
             // 简化版XML解析（最基础的解析，让内容能显示）
             function miniParseXml(content) {
-                console.log('迷你解析器工作中...');
-                
                 try {
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(content, 'text/xml');
@@ -1682,7 +1680,6 @@
                     // 缓存解析结果，等主脚本用
                     window._miniParser.content = content;
                     window._miniParser.xmlDoc = xmlDoc;
-                    console.log('迷你解析器已缓存XML');
                     return true;
                 } catch(e) {
                     console.error('迷你解析失败:', e);
@@ -1692,18 +1689,10 @@
             
             // 检查主脚本是否接管
             function checkMainScript() {
-                // 检测是否有主脚本标记（_isMain）或只是暴露了函数
                 if (window.parseXmlContent) {
-                    if (window.parseXmlContent._isMain) {
-                        console.log('主脚本解析函数已就绪，转交控制权！');
-                    } else {
-                        console.log('解析函数存在但无主脚本标记，尝试调用...');
-                    }
-                    
                     if (window._miniParser.content) {
                         window.parseXmlContent(window._miniParser.content);
                         window._miniParser.content = null;
-                        console.log('✅ 内容已转交主脚本解析！');
                         alert('解析完成！');
                     }
                     return true;
@@ -1722,7 +1711,6 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     var content = e.target.result;
-                    console.log('文件读取成功，长度:', content.length);
                     
                     // 第一步：迷你解析
                     miniParseXml(content);
@@ -1766,8 +1754,6 @@
                 if (!input.files || !input.files[0]) return;
                 alert('导入文件功能：' + input.files[0].name);
             };
-            
-            console.log('✅ 迷你解析器已就绪！');
         })();
     </script>
 
@@ -2516,8 +2502,6 @@
         const historyListEl = document.getElementById('historyList');
         const historyCloseEl = document.getElementById('historyClose');
 
-        console.log('DOM元素预检查:', {openFileBtn: !!openFileBtn, fileInput: !!fileInput});
-
         // ========== 初始化 ==========
         function init() {
             // 文件操作 - V2标准绑定方式（如果上面的终极绑定成功，这部分会被忽略）
@@ -2534,8 +2518,6 @@
                 importFileInput.addEventListener('change', handleImportConfig);
                 importConfigBtn.dataset.bound = 'true';
             }
-
-            console.log('事件绑定完成:', {openFileBtn: !!openFileBtn, fileInput: !!fileInput});
 
             // 历史记录
             undoBtn.addEventListener('click', undo);
@@ -2872,11 +2854,8 @@
             // 标记这是主脚本的解析函数，不是迷你解析器的
             window.parseXmlContent._isMain = true;
             window._isParserReady = true;
-            console.log('✅ parseXmlContent 已紧急暴露到全局！位置：函数定义后立即');
-            
             // 检查迷你解析器是否已经缓存了内容
             if (window._miniParser && window._miniParser.content) {
-                console.log('发现迷你解析器缓存的内容，立即解析！');
                 parseXmlContent(window._miniParser.content);
                 window._miniParser.content = null;
             }
@@ -3635,14 +3614,27 @@
                 part = part.trim();
                 if (!part) return;
 
-                const match = part.match(/^(lightness|luminance|saturation|alpha|hue)\s*(:=|[\+\-\*])\s*(-?\d+\.?\d*)$/);
-                if (match) {
-                    operations.push({
-                        property: match[1] === 'luminance' ? 'lightness' : match[1],
-                        operator: match[2],
-                        value: parseFloat(match[3])
-                    });
-                }
+                const colonIdx = part.indexOf(':');
+                if (colonIdx <= 0 || colonIdx >= part.length - 1) return;
+
+                const property = part.substring(0, colonIdx);
+                if (!['lightness', 'luminance', 'saturation', 'alpha', 'hue'].includes(property)) return;
+
+                const rest = part.substring(colonIdx + 1);
+                if (rest.length < 2) return;
+
+                const operator = rest.charAt(0);
+                if (!['+', '-', '*', '/'].includes(operator)) return;
+
+                const valueStr = rest.substring(1);
+                const value = parseFloat(valueStr);
+                if (isNaN(value)) return;
+
+                operations.push({
+                    property: property === 'luminance' ? 'lightness' : property,
+                    operator: operator,
+                    value: value
+                });
             });
 
             return operations;
@@ -3662,15 +3654,15 @@
 
             const operations = parseDerivationFormula(formula);
             if (operations.length === 0) return sourceArgb;
-            
+
             // 解析ARGB
             const alpha = parseInt(sourceArgb.slice(1, 3), 16) / 255;
             const rgb = argbToRgb(sourceArgb);
             const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            
+
             let currentAlpha = alpha;
             let currentHsl = { h: hsl.h, s: hsl.s, l: hsl.l };
-            
+
             operations.forEach(op => {
                 switch (op.property) {
                     case 'lightness':
@@ -3705,13 +3697,16 @@
                         break;
                 }
             });
-            
+
             // 转换回RGB
             const newRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+
             const newAlphaHex = Math.round(currentAlpha * 255).toString(16).padStart(2, '0');
             const newRgbHex = rgbToHex(newRgb.r) + rgbToHex(newRgb.g) + rgbToHex(newRgb.b);
-            
-            return `#${newAlphaHex}${newRgbHex}`.toUpperCase();
+
+            const result = `#${newAlphaHex}${newRgbHex}`.toUpperCase();
+
+            return result;
         }
 
         /**
@@ -3758,7 +3753,7 @@
             // 按派生链的层级顺序处理
             const processed = new Set();
             let hasChanges = false;
-            
+
             // 构建依赖关系图
             const dependencyMap = new Map();
             allColorItems.forEach(item => {
@@ -3769,44 +3764,48 @@
                     dependencyMap.get(item.derivedFrom).push(item);
                 }
             });
-            
+
             // 广度优先遍历处理派生颜色
             const processQueue = [];
-            
-            // 确定起始点
+
+            // 确定起始点 - 只加入没有派生源的根节点
             if (rootSource) {
                 processQueue.push(rootSource);
             } else {
-                // 找到所有没有派生源但有派生关系的根节点
+                // 找到所有没有派生源的根节点（锚点颜色）
                 allColorItems.forEach(item => {
-                    if (!item.derivedFrom || !item.adjust) {
-                        // 这是一个根节点（锚点颜色）
+                    if (!item.derivedFrom) {
                         processQueue.push(item.name);
                     }
                 });
             }
-            
+
             while (processQueue.length > 0) {
                 const current = processQueue.shift();
                 if (processed.has(current)) continue;
                 processed.add(current);
-                
+
                 const children = dependencyMap.get(current) || [];
                 children.forEach(child => {
                     // 跳过锁定的颜色
-                    if (child.fixed) {
-                        console.log(`🔒 颜色 ${child.name} 已锁定，跳过派生计算`);
-                        return;
-                    }
-                    
+                    if (child.fixed) return;
+
                     if (child.adjust) {
+                        // 获取源颜色的最新值
                         const sourceColor = currentColorMap.get(current);
+
                         if (sourceColor && sourceColor.value) {
                             const oldValue = child.value;
                             const newValue = computeDerivedColor(sourceColor.value, child.adjust);
+
                             if (oldValue !== newValue) {
                                 child.value = newValue;
                                 currentColorMap.set(child.name, child);
+                                // 同步更新 allColorItems
+                                const allColorIndex = allColorItems.findIndex(c => c.name === child.name);
+                                if (allColorIndex !== -1) {
+                                    allColorItems[allColorIndex] = child;
+                                }
                                 hasChanges = true;
                             }
                         }
@@ -3814,14 +3813,14 @@
                     processQueue.push(child.name);
                 });
             }
-            
+
             if (hasChanges) {
                 renderColorCategories();
                 updatePreview();
                 updateContrastResults();
                 updateAnalytics();
             }
-            
+
             return hasChanges;
         }
 
@@ -3895,11 +3894,17 @@
             
             const colorItem = currentColorMap.get(currentEditingColor);
             if (!colorItem) return;
-            
+
             // 切换锁定状态
             colorItem.fixed = !colorItem.fixed;
             currentColorMap.set(currentEditingColor, colorItem);
-            
+
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingColor);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = colorItem;
+            }
+
             // 更新按钮状态
             const lockBtn = document.getElementById('toggleLockBtn');
             if (lockBtn) {
@@ -4144,7 +4149,7 @@
             });
             
             colorItem.adjust = formulas.join(',');
-            
+
             // 如果有源颜色且有调整公式，自动计算并应用颜色
             if (colorItem.derivedFrom && colorItem.adjust) {
                 const sourceColor = currentColorMap.get(colorItem.derivedFrom);
@@ -4153,39 +4158,56 @@
                     colorItem.value = resultColor;
                 }
             }
-            
+
             currentColorMap.set(currentEditingColor, colorItem);
-            
+
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingColor);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = colorItem;
+            }
+
+            // 重新计算派生颜色
+            calculateGroupStatistics();
+            recomputeDerivedColors();
+
             // 更新UI
             renderColorCategories();
             renderDerivationTree();
             updatePreview();
             updateContrastResults();
             updateAnalytics();
-            
+
             closeDerivationPanel();
             showToast(`已更新 ${currentEditingColor} 的派生关系`, 'success');
         }
 
         function breakDerivationLink() {
             if (!currentEditingColor) return;
-            
+
             const colorItem = currentColorMap.get(currentEditingColor);
             if (!colorItem) return;
-            
+
             // 清除派生关系
             colorItem.derivedFrom = '';
             colorItem.adjust = '';
-            
+
             currentColorMap.set(currentEditingColor, colorItem);
-            
+
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingColor);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = colorItem;
+            }
+
             // 更新UI
+            calculateGroupStatistics();
             renderColorCategories();
             renderDerivationTree();
             updatePreview();
             updateContrastResults();
             updateAnalytics();
-            
+
             closeDerivationPanel();
             showToast(`已断开 ${currentEditingColor} 的派生链接`, 'success');
         }
@@ -4967,15 +4989,17 @@
             if (!item) return false;
 
             item.derivedFrom = suggestion.from;
-            if (suggestion.recommendedAdjust) {
+            // 只在有有效的调整公式时才设置
+            if (suggestion.recommendedAdjust && suggestion.recommendedAdjust.trim() !== '') {
                 item.adjust = suggestion.recommendedAdjust;
             }
 
             currentColorMap.set(suggestion.to, item);
-            
-            // 如果有调整公式，立即计算
-            if (item.adjust) {
-                recomputeDerivedColors();
+
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === suggestion.to);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = item;
             }
 
             return true;
@@ -5012,13 +5036,9 @@
                 return;
             }
 
-            console.log(`📊 派生建议统计:`);
-            console.log(`   有效建议 (≥85% 置信度): ${allSuggestions.length}`);
-            console.log(`   建议列表:`, allSuggestions);
-
             // 在派生树面板中显示建议
             showSuggestionsInTreePanel(allSuggestions);
-            
+
             showToast(`发现 ${allSuggestions.length} 个高质量派生建议`, 'info');
         }
         window.showDerivationSuggestions = showDerivationSuggestions;
@@ -5102,6 +5122,12 @@
             }
             currentColorMap.set(to, item);
 
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === to);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = item;
+            }
+
             // 重新计算派生颜色
             calculateGroupStatistics();
             recomputeDerivedColors();
@@ -5134,6 +5160,7 @@
             });
 
             if (appliedCount > 0) {
+                // 所有建议应用完成后，一次性重新计算所有派生颜色
                 calculateGroupStatistics();
                 recomputeDerivedColors();
                 renderDerivationTree();
@@ -6616,10 +6643,17 @@
                     // 立即计算派生值
                     const resultColor = computeDerivedColor(sourceItem.value, adjustFormula);
                     targetItem.value = resultColor;
-                    
+
                     currentColorMap.set(colorName, targetItem);
-                    
+
+                    // 同步更新 allColorItems
+                    const allColorIndex = allColorItems.findIndex(c => c.name === colorName);
+                    if (allColorIndex !== -1) {
+                        allColorItems[allColorIndex] = targetItem;
+                    }
+
                     // 更新UI
+                    calculateGroupStatistics();
                     renderColorCategories();
                     renderDerivationTree();
                     updatePreview();
@@ -6966,7 +7000,6 @@
                 if (targetColor && targetName !== sourceName) {
                     // 跳过锁定的颜色
                     if (targetColor.fixed) {
-                        console.log(`🔒 颜色 ${targetName} 已锁定，跳过`);
                         return;
                     }
 
@@ -7273,7 +7306,6 @@
             // // 重新检查按钮已就绪
             const recheckBtn = document.getElementById('recheckContrastBtn');
             if (recheckBtn) {
-                console.log('🔄 重新检查按钮已就绪（onclick 绑定）');
                 recheckBtn.dataset.bound = 'ready';
             }
             
@@ -7788,31 +7820,20 @@
         // 终极绑定：脚本最后强制执行一次 - 清除式重绑定，确保只执行一次！
         // ==============================================
         (function() {
-            console.log('\n' + '='.repeat(60));
-            console.log('🚀 执行全局最终绑定方案！(清除式重绑定)');
-            console.log('='.repeat(60) + '\n');
-            
             // 辅助函数：覆盖onclick绑定（确保只执行一次！）
             function rebindElement(id, onclickHandler) {
                 const el = document.getElementById(id);
                 if (!el) {
-                    console.log('⚠️  元素未找到:', id);
                     return null;
                 }
-                
-                // 关键：使用 onclick = handler 覆盖，它会确保该处理程序只执行一次
-                // 虽然 addEventListener 绑定的仍会执行，但主要逻辑在 onclick 中
-                // 实际上这里应该使用停止事件传播的技巧，或者完全克隆元素来移除所有事件
                 
                 // 最彻底：通过 outerHTML 清除所有事件监听，然后重新获取并绑定
                 el.outerHTML = el.outerHTML;
                 const newEl = document.getElementById(id);
                 
                 if (newEl && onclickHandler) {
-                    newEl.onclick = onclickHandler;  // 只用 onclick，不用 addEventListener
+                    newEl.onclick = onclickHandler;
                 }
-                
-                console.log('✅ 重新绑定（彻底清除）:', id);
                 return newEl;
             }
             
@@ -7908,9 +7929,6 @@
             // 点击外部关闭下拉菜单
             // 注意：全局事件委托已在 init() 中统一处理
             
-            console.log('\n✅✅✅ 全局按钮绑定完成！(克隆替换清除旧事件)');
-            console.log('\n' + '='.repeat(60) + '\n');
-            
             // ------------------------------------------------
             // 暴露全局函数 - 动态HTML中的onclick需要
             // ------------------------------------------------
@@ -7920,8 +7938,6 @@
             window.exportColorConfig = exportColorConfig;
             window.exportConfig = exportColorConfig;
             window.parseXmlContent = parseXmlContent;
-            
-            console.log('✅ 全局函数已暴露！');
             
             window._isParserReady = true;
             
