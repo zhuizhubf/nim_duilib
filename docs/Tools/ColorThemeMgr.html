@@ -1354,25 +1354,53 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
-        .adjustment-row select,
-        .adjustment-row input {
-            flex: 1 1 120px;
-            min-width: 100px;
-        }
         .adjustment-row select.adjust-property {
-            flex: 1 1 180px;
+            flex: 0 0 120px;
+            min-width: 0;
         }
         .adjustment-row select.adjust-operator {
-            flex: 1 1 320px;
+            flex: 1 1 200px;
+            min-width: 0;
         }
         .adjustment-row input.adjust-value {
-            flex: 0 0 80px;
-            min-width: 70px;
+            flex: 0 0 60px;
+            min-width: 0;
         }
         .adjust-unit {
             font-size: 12px;
             color: #6B7280;
             min-width: 20px;
+        }
+        .adjust-input-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            flex: 0 0 auto;
+        }
+        .adjust-input-wrapper input.adjust-value {
+            width: 60px;
+            flex: 0 0 60px;
+        }
+        .adjust-input-wrapper .adjust-unit {
+            flex: 0 0 auto;
+            font-size: 12px;
+            color: #6B7280;
+            min-width: 15px;
+        }
+        .adjust-input-wrapper .adjust-hint {
+            flex: 0 0 auto;
+            font-size: 10px;
+            color: #9CA3AF;
+            white-space: nowrap;
+        }
+        .adjust-hint {
+            font-size: 10px;
+            color: #9CA3AF;
+            white-space: nowrap;
+        }
+        .adjust-hint.error {
+            color: #EF4444;
         }
         .adjustment-actions {
             display: flex;
@@ -2320,8 +2348,11 @@
                                 <option value="*">× 乘法 (lightness:*50 表示 lightness 变为原来的 50%)</option>
                                 <option value=":=">:= 设为绝对值 (lightness:=50 表示 lightness 设为 50%)</option>
                             </select>
-                            <input type="number" class="adjust-value" value="15" min="-100" max="360" step="1">
-                            <span class="adjust-unit">%</span>
+                            <div class="adjust-input-wrapper">
+                                <input type="number" class="adjust-value" value="15" min="-100" max="100" step="1">
+                                <span class="adjust-unit">%</span>
+                                <span class="adjust-hint"></span>
+                            </div>
                         </div>
                         <div class="adjustment-actions">
                             <button class="btn btn-small btn-secondary" onclick="addAdjustmentRow()">+ 添加调整</button>
@@ -4482,22 +4513,31 @@
             newRow.appendChild(deleteBtn);
             
             builder.insertBefore(newRow, document.querySelector('.adjustment-actions'));
-            
+
             // 绑定事件
             const selects = newRow.querySelectorAll('select');
             const input = newRow.querySelector('input');
             selects.forEach(select => {
                 select.addEventListener('change', () => {
+                    updateUnitDisplay(newRow);
                     updateFormulaPreview();
                     updateDerivationPreview();
-                    updateUnitDisplay(newRow);
                 });
             });
             input.addEventListener('input', () => {
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+                const hint = newRow.querySelector('.adjust-hint');
+                if (!validateInputValue(input, min, max, hint)) {
+                    return;
+                }
                 updateFormulaPreview();
                 updateDerivationPreview();
             });
-            
+
+            // 初始化新行的显示
+            updateUnitDisplay(newRow);
+
             return newRow;
         }
 
@@ -4511,6 +4551,7 @@
                     row.querySelector('.adjust-property').value = 'lightness';
                     row.querySelector('.adjust-operator').value = '+';
                     row.querySelector('.adjust-value').value = '0';
+                    updateUnitDisplay(row);
                 }
             });
             updateFormulaPreview();
@@ -4533,45 +4574,104 @@
                 
                 selects.forEach(select => {
                     select.addEventListener('change', () => {
+                        updateUnitDisplay(row);
                         updateFormulaPreview();
                         updateDerivationPreview();
-                        updateUnitDisplay(row);
                     });
                 });
-                
+
                 input.addEventListener('input', () => {
+                    const property = row.querySelector('.adjust-property').value;
+                    const operator = row.querySelector('.adjust-operator').value;
+                    const min = parseFloat(input.min);
+                    const max = parseFloat(input.max);
+                    const hint = row.querySelector('.adjust-hint');
+
+                    if (!validateInputValue(input, min, max, hint)) {
+                        return; // 不更新预览
+                    }
                     updateFormulaPreview();
                     updateDerivationPreview();
                 });
+
+                // 初始化时设置范围
+                updateUnitDisplay(row);
             });
         }
 
         function updateUnitDisplay(row) {
             const property = row.querySelector('.adjust-property').value;
+            const operator = row.querySelector('.adjust-operator').value;
             const unit = row.querySelector('.adjust-unit');
+            const input = row.querySelector('.adjust-value');
+            const hint = row.querySelector('.adjust-hint');
+
+            let min, max, hintText;
+
+            // 根据属性类型和运算符设置范围和提示
             if (property === 'alpha') {
-                unit.textContent = '';
+                min = 0;
+                max = 100;
+                hintText = '透明度: 0-100%';
             } else if (property === 'hue') {
-                unit.textContent = '°';
+                min = 0;
+                max = 360;
+                hintText = '色相: 0-360°';
+            } else if (operator === ':=') {
+                // 绝对值模式：亮度/饱和度 0-100
+                min = 0;
+                max = 100;
+                hintText = '绝对值: 0-100%';
+            } else if (operator === '*') {
+                // 乘法模式：1-200 表示 1%-200%
+                min = 1;
+                max = 200;
+                hintText = '倍数: 1-200 (50=50%)';
             } else {
-                unit.textContent = '%';
+                // 加法/减法模式：-100 到 100
+                min = -100;
+                max = 100;
+                hintText = '增减量: -100 ~ 100%';
             }
+
+            input.min = min;
+            input.max = max;
+            input.step = 1;
+            unit.textContent = (property === 'hue') ? '°' : (property === 'alpha' ? '' : '%');
+            hint.textContent = hintText;
+            hint.classList.remove('error');
+
+            // 校验当前值
+            validateInputValue(input, min, max, hint);
+        }
+
+        function validateInputValue(input, min, max, hint) {
+            const value = parseFloat(input.value);
+            if (isNaN(value) || value < min || value > max) {
+                hint.textContent = `非法值！有效范围: ${min} ~ ${max}`;
+                hint.classList.add('error');
+                input.style.borderColor = '#EF4444';
+                return false;
+            }
+            hint.classList.remove('error');
+            input.style.borderColor = '';
+            return true;
         }
 
         function updateFormulaPreview() {
             const rows = document.querySelectorAll('.adjustment-row');
             const formulas = [];
-            
+
             rows.forEach(row => {
                 const property = row.querySelector('.adjust-property').value;
                 const operator = row.querySelector('.adjust-operator').value;
                 const value = row.querySelector('.adjust-value').value;
-                
+
                 if (value !== '' && value !== '0') {
-                    formulas.push(`${property}:${operator}${value}`);
+                    formulas.push(`${property}${operator}${value}`);
                 }
             });
-            
+
             const formulaStr = formulas.join(', ') || '-';
             document.getElementById('formulaPreview').textContent = formulaStr;
         }
