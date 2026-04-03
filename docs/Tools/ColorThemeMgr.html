@@ -2317,7 +2317,7 @@
                             <select class="adjust-operator">
                                 <option value="+">+ 加法 (lightness:+15 表示 lightness 增加 15%)</option>
                                 <option value="-">- 减法 (lightness:-15 表示 lightness 减少 15%)</option>
-                                <option value="*">× 乘法 (lightness:*0.5 表示 lightness 变为 50%)</option>
+                                <option value="*">× 乘法 (lightness:*50 表示 lightness 变为原来的 50%)</option>
                                 <option value=":=">:= 设为绝对值 (lightness:=50 表示 lightness 设为 50%)</option>
                             </select>
                             <input type="number" class="adjust-value" value="15" min="-100" max="360" step="1">
@@ -3931,12 +3931,18 @@
                 const colonIdx = part.indexOf(':');
 
                 if (colonIdx > 0 && colonIdx < part.length - 1) {
-                    // 新格式: lightness:+20
+                    // 新格式: lightness:+20 或 lightness:*50 或 lightness:=50
                     property = part.substring(0, colonIdx);
                     const rest = part.substring(colonIdx + 1);
                     if (rest.length < 2) return;
-                    operator = rest.charAt(0);
-                    valueStr = rest.substring(1);
+                    // 检查是否为 := 运算符
+                    if (rest.startsWith(':=')) {
+                        operator = ':=';
+                        valueStr = rest.substring(2);
+                    } else {
+                        operator = rest.charAt(0);
+                        valueStr = rest.substring(1);
+                    }
                 } else {
                     // 旧格式: lightness+20 (无冒号)
                     const match = part.match(/^(lightness|luminance|saturation|alpha|hue)([+*/-])(.+)$/);
@@ -3989,7 +3995,7 @@
                     case 'lightness':
                         if (op.operator === '+') currentHsl.l += op.value / 100;
                         else if (op.operator === '-') currentHsl.l -= op.value / 100;
-                        else if (op.operator === '*') currentHsl.l *= op.value;
+                        else if (op.operator === '*') currentHsl.l *= (op.value / 100);
                         else if (op.operator === ':=') currentHsl.l = Math.max(0, Math.min(1, op.value / 100));
                         currentHsl.l = Math.max(0, Math.min(1, currentHsl.l));
                         break;
@@ -3997,7 +4003,7 @@
                     case 'saturation':
                         if (op.operator === '+') currentHsl.s += op.value / 100;
                         else if (op.operator === '-') currentHsl.s -= op.value / 100;
-                        else if (op.operator === '*') currentHsl.s *= op.value;
+                        else if (op.operator === '*') currentHsl.s *= (op.value / 100);
                         else if (op.operator === ':=') currentHsl.s = Math.max(0, Math.min(1, op.value / 100));
                         currentHsl.s = Math.max(0, Math.min(1, currentHsl.s));
                         break;
@@ -4012,7 +4018,7 @@
                     case 'alpha':
                         if (op.operator === '+') currentAlpha += op.value / 100;
                         else if (op.operator === '-') currentAlpha -= op.value / 100;
-                        else if (op.operator === '*') currentAlpha *= op.value;
+                        else if (op.operator === '*') currentAlpha *= (op.value / 100);
                         else if (op.operator === ':=') currentAlpha = Math.max(0, Math.min(1, op.value / 100));
                         currentAlpha = Math.max(0, Math.min(1, currentAlpha));
                         break;
