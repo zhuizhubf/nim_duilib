@@ -936,6 +936,10 @@
             background-color: #EF4444;
             color: white;
         }
+        .contrast-badge-none {
+            background-color: #9CA3AF;
+            color: white;
+        }
         
         /* 颜色角色徽章样式 */
         .role-badge {
@@ -5806,9 +5810,17 @@
             const originalColor = argbToRgbaCss(originalValue);
             const currentRgbHex = argbToRgbHex(value);
 
-            const bgColor = getColorValue('bg_window_base', '#FFFFFFFF');
-            const contrastRatio = calculateContrastRatio(value, bgColor);
-            const contrastLevel = getContrastLevel(contrastRatio);
+            // 对比度计算：只有指定了 contrast_bg 的颜色才计算对比度
+            let contrastRatio = null;
+            let contrastLevel = null;
+            if (contrastBg && contrastBg.trim() !== '') {
+                const firstBgName = contrastBg.split(',')[0].trim();
+                const bgColorValue = getColorValue(firstBgName, null);
+                if (bgColorValue) {
+                    contrastRatio = calculateContrastRatio(value, bgColorValue);
+                    contrastLevel = getContrastLevel(contrastRatio);
+                }
+            }
 
             const cardEl = document.createElement('div');
             cardEl.className = `color-card ${isChanged ? 'changed' : ''}`;
@@ -5841,7 +5853,7 @@
                 </div>
                 <div class="color-info">
                     <div class="color-label">${name} ${supportAccent ? '[强调色]' : ''} 
-                        <span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>
+                        ${contrastLevel ? `<span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>` : '<span class="contrast-badge-none" title="未设置对比度检查背景色">未检查</span>'}
                     </div>
                     <div class="badges-container">${badgesHtml}</div>
                     <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : ''}</div>
@@ -5849,7 +5861,7 @@
                     <div class="color-code-group">
                         <div class="color-code current ${isChanged ? 'changed' : ''}">当前值：${value}</div>
                         <div class="color-code original">原始值：${originalValue}</div>
-                        <div class="color-code">对比度：${contrastRatio.toFixed(2)}:1</div>
+                        <div class="color-code">对比度：${contrastRatio !== null ? contrastRatio.toFixed(2) + ':1' : '未设置'}</div>
                     </div>
                     <div class="color-comment">
                         <span class="comment-cn">【中文】${commentCn}</span>
