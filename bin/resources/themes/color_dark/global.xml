@@ -51,18 +51,18 @@
     <ThemeColor name="border_focus_ring" value="#4D3B82F6" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
 
     <!-- ===================== SVG图片颜色 (type: image) ===================== -->
-    <ThemeColor name="border_svg_image_light2" value="#F2C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="SVG图片浅色2" comment_en="SVG image light color 2"/>
-    <ThemeColor name="border_svg_image_light" value="#E6C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="SVG图片浅色1" comment_en="SVG image light color 1"/>
-    <ThemeColor name="border_svg_image" value="#D9C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="SVG图片默认色" comment_en="SVG image default color"/>
-    <ThemeColor name="border_svg_image_dark" value="#CC9CA3AF" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="SVG图片深色1" comment_en="SVG image dark color 1"/>
-    <ThemeColor name="border_svg_image_dark2" value="#B36B7280" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="SVG图片深色2" comment_en="SVG image dark color 2"/>
+    <ThemeColor name="border_svg_image_light2" value="#F2C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片浅色2" comment_en="SVG image light color 2"/>
+    <ThemeColor name="border_svg_image_light" value="#E6C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片浅色1" comment_en="SVG image light color 1"/>
+    <ThemeColor name="border_svg_image" value="#D9C7CBD4" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片默认色" comment_en="SVG image default color"/>
+    <ThemeColor name="border_svg_image_dark" value="#CC9CA3AF" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片深色1" comment_en="SVG image dark color 1"/>
+    <ThemeColor name="border_svg_image_dark2" value="#B36B7280" type="image" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片深色2" comment_en="SVG image dark color 2"/>
 
     <!-- ===================== 文本颜色 (type: text) ===================== -->
-    <ThemeColor name="text_default" value="#FF656F83" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要文本/正文/标题" comment_en="Primary text/body/title"/>
+    <ThemeColor name="text_default" value="#FF656F83" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="主要文本/正文/标题" comment_en="Primary text/body/title"/>
     <ThemeColor name="text_disabled" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="禁用文本/不可交互控件" comment_en="Disabled text/non-interactive control"/>
     <ThemeColor name="text_muted" value="#FF6B7280" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="次要文本/辅助说明" comment_en="Secondary text/auxiliary description"/>
     <ThemeColor name="text_selected" value="#FF707070" type="text" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="选中文本颜色" comment_en="Selected text color"/>
-    <ThemeColor name="text_link_normal" value="#FF196CF4" type="text" category="text_color" role="primary" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="链接默认状态" comment_en="Link normal state"/>
+    <ThemeColor name="text_link_normal" value="#FF196CF4" type="text" category="text_color" role="primary" derived_from="" adjust="" fixed="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="链接默认状态" comment_en="Link normal state"/>
     <ThemeColor name="text_link_hovered" value="#FF076CE8" type="text" category="text_color" role="primary_dark" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="链接悬浮状态" comment_en="Link hovered state"/>
     <ThemeColor name="text_link_pressed" value="#FF2563EB" type="text" category="text_color" role="primary_dark" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="链接点击状态" comment_en="Link pressed state"/>
 
@@ -76,11 +76,11 @@
     <ThemeColor name="border_btn_normal" value="#FF2D2D30" type="button" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="次要按钮默认边框" comment_en="Secondary button normal border"/>
     <ThemeColor name="border_btn_pressed" value="#FF555555" type="button" category="border_color" role="primary" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="次要按钮点击边框" comment_en="Secondary button pressed border"/>
     <ThemeColor name="text_btn_disabled" value="#FF6B7280" type="button" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="次要按钮禁用文本" comment_en="Secondary button disabled text"/>
-    <ThemeColor name="text_btn_normal" value="#FFE5E7EB" type="button" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="次要按钮默认文本" comment_en="Secondary button normal text"/>
+    <ThemeColor name="text_btn_normal" value="#FFE5E7EB" type="button" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_btn_normal" comment_cn="次要按钮默认文本" comment_en="Secondary button normal text"/>
 
     <!-- ===================== 全屏退出按钮颜色 (type: button_exit) ===================== -->
     <ThemeColor name="bg_btn_exit_fullscreen" value="#FF3B82F6" type="button_exit" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="退出全屏按钮背景" comment_en="Exit fullscreen button bg"/>
-    <ThemeColor name="text_btn_exit_fullscreen" value="#FFFFFFFF" type="button_exit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="退出全屏按钮文本" comment_en="Exit fullscreen button text"/>
+    <ThemeColor name="text_btn_exit_fullscreen" value="#FFFFFFFF" type="button_exit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_btn_exit_fullscreen" comment_cn="退出全屏按钮文本" comment_en="Exit fullscreen button text"/>
 
     <!-- ===================== 主要按钮颜色 (type: button_primary) ===================== -->
     <ThemeColor name="bg_primary_btn_disabled" value="#FF2E456B" type="button_primary" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>
@@ -92,7 +92,7 @@
     <ThemeColor name="border_primary_btn_normal" value="#FF2563EB" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要按钮默认边框" comment_en="Primary button normal border"/>
     <ThemeColor name="border_primary_btn_pressed" value="#FF1E57D9" type="button_primary" category="border_color" role="primary_dark" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要按钮点击边框" comment_en="Primary button pressed border"/>
     <ThemeColor name="text_primary_btn_disabled" value="#FF94BFFF" type="button_primary" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要按钮禁用文本" comment_en="Primary button disabled text"/>
-    <ThemeColor name="text_primary_btn_normal" value="#FFFFFFFF" type="button_primary" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
+    <ThemeColor name="text_primary_btn_normal" value="#FFFFFFFF" type="button_primary" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_primary_btn_normal" comment_cn="主要按钮默认文本" comment_en="Primary button normal text"/>
 
     <!-- ===================== 菜单颜色 (type: menu) ===================== -->
     <ThemeColor name="bg_menu" value="#FF252525" type="menu" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="下拉/右键菜单背景" comment_en="Dropdown/context menu background"/>
@@ -103,7 +103,7 @@
     <ThemeColor name="bg_menu_bar" value="#FF1A1A1A" type="menu_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="菜单栏背景" comment_en="Menu bar background"/>
     <ThemeColor name="bg_menu_bar_hovered" value="#FF333333" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="菜单栏项悬浮" comment_en="Menu bar item hovered"/>
     <ThemeColor name="bg_menu_bar_pressed" value="#FF3A3A3A" type="menu_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="菜单栏项点击" comment_en="Menu bar item pressed"/>
-    <ThemeColor name="text_menu_bar" value="#FF656F83" type="menu_bar" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="菜单栏文本" comment_en="Menu bar text"/>
+    <ThemeColor name="text_menu_bar" value="#FF656F83" type="menu_bar" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_menu_bar" comment_cn="菜单栏文本" comment_en="Menu bar text"/>
 
     <!-- ===================== 列表框颜色 (type: list_box) ===================== -->
     <ThemeColor name="bg_list" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="列表背景" comment_en="List background"/>
@@ -146,8 +146,8 @@
 
     <!-- ===================== 编辑框颜色 (type: richedit) ===================== -->
     <ThemeColor name="bg_richedit" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框默认背景" comment_en="RichEdit default background"/>
-    <ThemeColor name="bg_richedit_caret" value="#FF656F83" type="richedit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框光标颜色" comment_en="RichEdit caret color"/>
-    <ThemeColor name="text_richedit_prompt" value="#FF6B7280" type="richedit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框占位符文本" comment_en="RichEdit prompt text"/>
+    <ThemeColor name="bg_richedit_caret" value="#FF656F83" type="richedit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_richedit" comment_cn="编辑框光标颜色" comment_en="RichEdit caret color"/>
+    <ThemeColor name="text_richedit_prompt" value="#FF6B7280" type="richedit" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_richedit" comment_cn="编辑框占位符文本" comment_en="RichEdit prompt text"/>
     <ThemeColor name="bg_richedit_btn_hovered" value="#FF333333" type="richedit" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框按钮悬浮背景" comment_en="RichEdit button hovered bg"/>
     <ThemeColor name="bg_richedit_btn_normal" value="#FF252525" type="richedit" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框按钮默认背景" comment_en="RichEdit button normal bg"/>
     <ThemeColor name="bg_richedit_btn_pressed" value="#FF3A3A3A" type="richedit" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="编辑框按钮点击背景" comment_en="RichEdit button pressed bg"/>
@@ -177,8 +177,8 @@
     <ThemeColor name="border_property_grid_header_split" value="#FF3D3D3D" type="property_grid" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="属性表头分割线" comment_en="Property header split line"/>
     <ThemeColor name="border_property_grid_line" value="#FF3D3D3D" type="property_grid" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="属性页网格分割线" comment_en="PropertyGrid grid line"/>
     <ThemeColor name="border_property_grid_header" value="#FF2D2D30" type="property_grid" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="属性表头边框" comment_en="Property header border"/>
-    <ThemeColor name="text_property_grid_header" value="#FF656F83" type="property_grid" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="属性表头默认文本" comment_en="Property header normal text"/>
-    <ThemeColor name="text_property_grid_header_disabled" value="#FF6B7280" type="property_grid" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="属性表头禁用文本" comment_en="Property header disabled text"/>
+    <ThemeColor name="text_property_grid_header" value="#FF656F83" type="property_grid" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_property_grid_header" comment_cn="属性表头默认文本" comment_en="Property header normal text"/>
+    <ThemeColor name="text_property_grid_header_disabled" value="#FF6B7280" type="property_grid" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_property_grid" comment_cn="属性表头禁用文本" comment_en="Property header disabled text"/>
 
     <!-- ===================== 地址栏颜色 (type: address_bar) ===================== -->
     <ThemeColor name="bg_address_bar" value="#FF252525" type="address_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="地址栏默认背景" comment_en="AddressBar normal background"/>
@@ -214,6 +214,6 @@
 
     <!-- ===================== ToolTip颜色 (type: tooltip) ===================== -->
     <ThemeColor name="bg_tooltip" value="#FF2B2B2B" type="tooltip" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="工具提示背景" comment_en="Tooltip background"/>
-    <ThemeColor name="text_tooltip" value="#FF656F83" type="tooltip" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="" comment_cn="工具提示文本" comment_en="Tooltip text"/>
+    <ThemeColor name="text_tooltip" value="#FF656F83" type="tooltip" category="text_color" role="neutral" derived_from="" adjust="" fixed="false" contrast_bg="bg_tooltip" comment_cn="工具提示文本" comment_en="Tooltip text"/>
 
 </Global>
