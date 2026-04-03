@@ -1223,24 +1223,24 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 90%;
-            max-width: 650px;
-            max-height: 85vh;
+            max-width: 900px;
+            max-height: 92vh;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             z-index: 10000;  /* 提高层级，确保在最前面 */
-            overflow: hidden;
+            overflow: auto;
             display: flex;
             flex-direction: column;
         }
         .derivation-edit-panel.hidden {
-            display: none;
+            display: none !important;
         }
         .derivation-edit-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 10px 10px;
             background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
             color: white;
             font-size: 16px;
@@ -1267,7 +1267,10 @@
         .derivation-edit-content {
             padding: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
             flex: 1;
+            min-height: 0;
+            align-self: stretch;
         }
         .derivation-current-color {
             display: flex;
@@ -1329,14 +1332,25 @@
         }
         .adjustment-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
         .adjustment-row select,
         .adjustment-row input {
-            flex: 1;
-            min-width: 80px;
+            flex: 1 1 120px;
+            min-width: 100px;
+        }
+        .adjustment-row select.adjust-property {
+            flex: 1 1 180px;
+        }
+        .adjustment-row select.adjust-operator {
+            flex: 1 1 320px;
+        }
+        .adjustment-row input.adjust-value {
+            flex: 0 0 80px;
+            min-width: 70px;
         }
         .adjust-unit {
             font-size: 12px;
@@ -1376,7 +1390,7 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
-            padding: 20px;
+            padding: 5px;
             background-color: #F8FAFC;
             border-radius: 8px;
         }
@@ -1410,8 +1424,13 @@
             display: flex;
             gap: 10px;
             justify-content: flex-end;
-            padding-top: 10px;
+            padding: 15px 20px;
             border-top: 1px solid #E2E8F0;
+            background-color: white;
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
         .derivation-edit-panel-overlay {
             position: fixed;
@@ -1423,7 +1442,7 @@
             z-index: 9999;  /* 对应面板层级调整 */
         }
         .derivation-edit-panel-overlay.hidden {
-            display: none;
+            display: none !important;
         }
         
         /* 派生链可视化面板样式 */
@@ -1473,13 +1492,13 @@
             border-bottom: 2px solid rgba(0,0,0,0.2);
         }
         .derivation-tree-panel.hidden {
-            display: none;
+            display: none !important;
         }
         .derivation-tree-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 10px 10px;
             background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
             color: white;
             font-size: 16px;
@@ -1526,7 +1545,7 @@
             z-index: 1001;
         }
         .derivation-tree-overlay.hidden {
-            display: none;
+            display: none !important;
         }
         
         /* 派生树节点样式 */
@@ -2050,17 +2069,17 @@
                     <label for="derivationRole">颜色角色 (Role)</label>
                     <select id="derivationRole">
                         <option value="">- 未定义 -</option>
-                        <option value="primary">primary (主色调)</option>
-                        <option value="primary_light">primary_light (主色调亮)</option>
-                        <option value="primary_dark">primary_dark (主色调暗)</option>
-                        <option value="neutral">neutral (中性色)</option>
-                        <option value="semantic_success">semantic_success (成功)</option>
-                        <option value="semantic_success_light">semantic_success_light (成功亮)</option>
-                        <option value="semantic_error">semantic_error (错误)</option>
-                        <option value="semantic_error_light">semantic_error_light (错误亮)</option>
-                        <option value="semantic_error_dark">semantic_error_dark (错误暗)</option>
-                        <option value="semantic_warning">semantic_warning (警告)</option>
-                        <option value="semantic_info">semantic_info (信息)</option>
+                        <option value="primary">primary (主色调/主题色)</option>
+                        <option value="primary_light">primary_light (主色浅色变体)</option>
+                        <option value="primary_dark">primary_dark (主色深色变体)</option>
+                        <option value="neutral">neutral (中性灰/文字色)</option>
+                        <option value="semantic_success">semantic_success (成功/正向状态)</option>
+                        <option value="semantic_success_light">semantic_success_light (成功浅色)</option>
+                        <option value="semantic_error">semantic_error (错误/失败状态)</option>
+                        <option value="semantic_error_light">semantic_error_light (错误浅色)</option>
+                        <option value="semantic_error_dark">semantic_error_dark (错误深色)</option>
+                        <option value="semantic_warning">semantic_warning (警告提示)</option>
+                        <option value="semantic_info">semantic_info (信息提示)</option>
                     </select>
                 </div>
                 
@@ -2097,19 +2116,19 @@
                     </div>
                 </div>
                 
-                <div class="derivation-form-group">
-                    <label>派生预览</label>
+                <div class="derivation-form-group">                    
                     <div class="derivation-preview-container">
+                        <big>派生预览：</big>
                         <div class="derivation-preview-item">
                             <div class="preview-label">源颜色</div>
-                            <div class="preview-swatch" id="sourcePreviewSwatch"></div>
                             <div class="preview-value" id="sourcePreviewValue">-</div>
+                            <div class="preview-swatch" id="sourcePreviewSwatch"></div>
                         </div>
                         <div class="derivation-preview-arrow">→</div>
                         <div class="derivation-preview-item">
                             <div class="preview-label">计算结果</div>
-                            <div class="preview-swatch" id="resultPreviewSwatch"></div>
                             <div class="preview-value" id="resultPreviewValue">-</div>
+                            <div class="preview-swatch" id="resultPreviewSwatch"></div>
                         </div>
                     </div>
                 </div>
@@ -4406,10 +4425,10 @@
                 panel.style.transform = 'translate(-50%, -50%)';
                 panel.style.top = '50%';
                 panel.style.left = '50%';
-                panel.style.width = 'auto';
+                panel.style.width = '98%';
                 panel.style.height = 'auto';
-                panel.style.maxWidth = '600px';
-                panel.style.maxHeight = '90vh';
+                panel.style.maxWidth = '900px';
+                panel.style.maxHeight = '92vh';
             }
             isEditPanelDragging = false;
         }
