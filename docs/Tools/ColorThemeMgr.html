@@ -125,6 +125,15 @@
         .btn-derivation:hover {
             background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
         }
+        .btn-attr {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .btn-attr:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
         .btn-collapse {
             background-color: #8B5CF6;
             padding: 6px 12px;
@@ -1448,7 +1457,222 @@
         .derivation-edit-panel-overlay.hidden {
             display: none !important;
         }
-        
+
+        /* 颜色属性面板样式（模态对话框） */
+        .color-attr-panel {
+            position: fixed;
+            top: 100px;
+            left: calc(50% - 225px);
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .color-attr-panel.hidden {
+            display: none !important;
+        }
+        .color-attr-panel.centered {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+        }
+        .color-attr-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 15px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: move;
+            user-select: none;
+        }
+        .color-attr-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .color-attr-close:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .color-attr-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .color-attr-preview {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .color-attr-preview-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .color-attr-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .color-attr-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E1E1E;
+            word-break: break-all;
+        }
+        .color-attr-value {
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+        .color-attr-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .color-attr-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .color-attr-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .color-attr-group select {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+        .color-attr-group select:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .color-attr-hint {
+            font-size: 11px;
+            color: #9CA3AF;
+        }
+        .color-attr-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+        .attr-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        .attr-info-label {
+            color: #6B7280;
+        }
+        .attr-info-value {
+            color: #1E1E1E;
+            text-align: right;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .color-attr-buttons {
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+        .color-attr-buttons .btn {
+            flex: 1;
+            padding: 10px;
+        }
+        .color-attr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.3);
+            z-index: 10000;
+        }
+        .color-attr-overlay.hidden {
+            display: none !important;
+        }
+
+        /* 对比度背景色多选框样式 */
+        .contrast-bg-selector {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+        }
+        .contrast-bg-options {
+            padding: 5px;
+        }
+        .contrast-bg-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.15s;
+        }
+        .contrast-bg-option:hover {
+            background-color: #f3f4f6;
+        }
+        .contrast-bg-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .contrast-bg-option .bg-name {
+            font-size: 13px;
+            color: #1E1E1E;
+        }
+        .contrast-bg-option .bg-preview {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #e5e7eb;
+            margin-left: auto;
+        }
+        .contrast-bg-option.selected {
+            background-color: #EFF6FF;
+        }
+
         /* 派生链可视化面板样式 */
         .derivation-tree-panel {
             position: fixed;
@@ -2064,25 +2288,7 @@
                         <option value="">- 无（锚点颜色）-</option>
                     </select>
                 </div>
-                
-                <div class="derivation-form-group">
-                    <label for="derivationRole">颜色角色 (Role)</label>
-                    <select id="derivationRole">
-                        <option value="">- 未定义 -</option>
-                        <option value="primary">primary (主色调/主题色)</option>
-                        <option value="primary_light">primary_light (主色浅色变体)</option>
-                        <option value="primary_dark">primary_dark (主色深色变体)</option>
-                        <option value="neutral">neutral (中性灰/文字色)</option>
-                        <option value="semantic_success">semantic_success (成功/正向状态)</option>
-                        <option value="semantic_success_light">semantic_success_light (成功浅色)</option>
-                        <option value="semantic_error">semantic_error (错误/失败状态)</option>
-                        <option value="semantic_error_light">semantic_error_light (错误浅色)</option>
-                        <option value="semantic_error_dark">semantic_error_dark (错误深色)</option>
-                        <option value="semantic_warning">semantic_warning (警告提示)</option>
-                        <option value="semantic_info">semantic_info (信息提示)</option>
-                    </select>
-                </div>
-                
+
                 <div class="derivation-form-group">
                     <label>派生调整公式 (Adjust Formula)</label>
                     <div class="adjustment-builder">
@@ -2137,11 +2343,84 @@
             <div class="derivation-edit-buttons">
                 <button class="btn btn-generate" onclick="applyDerivationChanges()">应用更改</button>
                 <button class="btn btn-secondary" onclick="breakDerivationLink()">断开派生链接</button>
-                <button class="btn btn-secondary" id="toggleLockBtn" onclick="toggleDerivationLock()">🔒 锁定颜色</button>
                 <button class="btn btn-secondary" onclick="closeDerivationPanel()">取消</button>
             </div>
         </div>
     </div>
+
+    <!-- 颜色属性面板（右侧滑出） -->
+    <div class="color-attr-panel hidden" id="colorAttrPanel">
+        <div class="color-attr-title">
+            <span>📋 颜色属性</span>
+            <button class="color-attr-close" onclick="closeColorAttrPanel()">×</button>
+        </div>
+        <div class="color-attr-content">
+            <div class="color-attr-preview">
+                <div class="color-attr-preview-swatch" id="attrColorPreview"></div>
+                <div class="color-attr-preview-info">
+                    <div class="color-attr-name" id="attrColorName">-</div>
+                    <div class="color-attr-value" id="attrColorValue">-</div>
+                </div>
+            </div>
+
+            <div class="color-attr-form">
+                <div class="color-attr-group">
+                    <label>颜色角色 (Role)</label>
+                    <select id="attrRole">
+                        <option value="">- 未定义 -</option>
+                        <option value="primary">primary (主色调/主题色)</option>
+                        <option value="primary_light">primary_light (主色浅色变体)</option>
+                        <option value="primary_dark">primary_dark (主色深色变体)</option>
+                        <option value="neutral">neutral (中性灰/文字色)</option>
+                        <option value="semantic_success">semantic_success (成功/正向状态)</option>
+                        <option value="semantic_success_light">semantic_success_light (成功浅色)</option>
+                        <option value="semantic_error">semantic_error (错误/失败状态)</option>
+                        <option value="semantic_error_light">semantic_error_light (错误浅色)</option>
+                        <option value="semantic_error_dark">semantic_error_dark (错误深色)</option>
+                        <option value="semantic_warning">semantic_warning (警告提示)</option>
+                        <option value="semantic_info">semantic_info (信息提示)</option>
+                    </select>
+                </div>
+
+                <div class="color-attr-group">
+                    <label>对比度检查背景色 (contrast_bg)</label>
+                    <div class="contrast-bg-selector" id="contrastBgSelector">
+                        <div class="contrast-bg-options" id="contrastBgOptions">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                    <div class="color-attr-hint">
+                        <small>选择该颜色需要检查对比度的背景色（可多选）</small>
+                    </div>
+                </div>
+
+                <div class="color-attr-group">
+                    <label>其他信息</label>
+                    <div class="color-attr-info">
+                        <div class="attr-info-row">
+                            <span class="attr-info-label">类型</span>
+                            <span class="attr-info-value" id="attrType">-</span>
+                        </div>
+                        <div class="attr-info-row">
+                            <span class="attr-info-label">类别</span>
+                            <span class="attr-info-value" id="attrCategory">-</span>
+                        </div>
+                        <div class="attr-info-row">
+                            <span class="attr-info-label">中文描述</span>
+                            <span class="attr-info-value" id="attrCommentCn">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-attr-buttons">
+            <button class="btn btn-generate" onclick="applyColorAttrChanges()">应用更改</button>
+            <button class="btn btn-secondary" id="toggleAttrLockBtn" onclick="toggleDerivationLock()">🔒 锁定颜色</button>
+            <button class="btn btn-secondary" onclick="closeColorAttrPanel()">取消</button>
+        </div>
+    </div>
+    <div class="color-attr-overlay hidden" id="colorAttrOverlay" onclick="closeColorAttrPanel()"></div>
 
     <!-- 批量编辑面板 -->
     <div class="batch-edit-panel hidden" id="batchEditPanel">
@@ -2827,6 +3106,8 @@
                 const derivedFrom = node.getAttribute('derived_from') || '';
                 const adjust = node.getAttribute('adjust') || '';
                 const fixed = (node.getAttribute('fixed') || 'false') === 'true';
+                // 对比度检查背景色（支持多个，逗号分隔）
+                const contrastBg = node.getAttribute('contrast_bg') || '';
 
                 const colorItem = {
                     name,
@@ -2840,7 +3121,8 @@
                     role,
                     derivedFrom,
                     adjust,
-                    fixed
+                    fixed,
+                    contrastBg
                 };
 
                 currentColorMap.set(name, colorItem);
@@ -3880,71 +4162,57 @@
             
             // 设置当前值
             sourceSelect.value = colorItem.derivedFrom || '';
-            document.getElementById('derivationRole').value = colorItem.role || '';
-            
+
             // 解析并填充调整公式
             populateAdjustmentRows(colorItem.adjust);
             
             // 更新公式预览
             updateFormulaPreview();
-            
+
             // 更新派生预览
             updateDerivationPreview();
-            
-            // 更新锁定按钮状态
-            const lockBtn = document.getElementById('toggleLockBtn');
-            if (lockBtn) {
-                if (colorItem.fixed) {
-                    lockBtn.innerHTML = '🔓 解锁颜色';
-                    lockBtn.style.backgroundColor = '#10B981';
-                    lockBtn.style.color = 'white';
-                } else {
-                    lockBtn.innerHTML = '🔒 锁定颜色';
-                    lockBtn.style.backgroundColor = '';
-                    lockBtn.style.color = '';
-                }
-            }
-            
+
             // 显示面板
             document.getElementById('derivationEditPanel').classList.remove('hidden');
             document.getElementById('derivationOverlay').classList.remove('hidden');
-            
+
             // 绑定调整行变更事件
             bindAdjustmentEvents();
         }
 
         function toggleDerivationLock() {
-            if (!currentEditingColor) return;
-            
-            const colorItem = currentColorMap.get(currentEditingColor);
+            const colorName = currentEditingColor || currentEditingAttrColor;
+            if (!colorName) return;
+
+            const colorItem = currentColorMap.get(colorName);
             if (!colorItem) return;
 
             // 切换锁定状态
             colorItem.fixed = !colorItem.fixed;
-            currentColorMap.set(currentEditingColor, colorItem);
+            currentColorMap.set(colorName, colorItem);
 
             // 同步更新 allColorItems
-            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingColor);
+            const allColorIndex = allColorItems.findIndex(c => c.name === colorName);
             if (allColorIndex !== -1) {
                 allColorItems[allColorIndex] = colorItem;
             }
 
-            // 更新按钮状态
-            const lockBtn = document.getElementById('toggleLockBtn');
+            // 更新按钮状态（可能在派生面板或属性面板）
+            const lockBtn = document.getElementById('toggleLockBtn') || document.getElementById('toggleAttrLockBtn');
             if (lockBtn) {
                 if (colorItem.fixed) {
                     lockBtn.innerHTML = '🔓 解锁颜色';
                     lockBtn.style.backgroundColor = '#10B981';
                     lockBtn.style.color = 'white';
-                    showToast(`已锁定 ${currentEditingColor}，派生计算时将跳过`, 'success');
+                    showToast(`已锁定 ${colorName}，派生计算时将跳过`, 'success');
                 } else {
                     lockBtn.innerHTML = '🔒 锁定颜色';
                     lockBtn.style.backgroundColor = '';
                     lockBtn.style.color = '';
-                    showToast(`已解锁 ${currentEditingColor}`, 'success');
+                    showToast(`已解锁 ${colorName}`, 'success');
                 }
             }
-            
+
             // 更新UI
             renderColorCategories();
         }
@@ -3956,6 +4224,186 @@
             currentEditingColor = null;
             resetDerivationEditPanelPosition();
         }
+
+        // ========== 颜色属性面板 ==========
+        let currentEditingAttrColor = null;
+
+        function openColorAttrPanel(colorName) {
+            const colorItem = currentColorMap.get(colorName);
+            if (!colorItem) return;
+
+            currentEditingAttrColor = colorName;
+
+            // 更新预览
+            document.getElementById('attrColorPreview').style.backgroundColor = argbToRgbaCss(colorItem.value);
+            document.getElementById('attrColorName').textContent = colorItem.name;
+            document.getElementById('attrColorValue').textContent = colorItem.value;
+
+            // 设置 Role
+            document.getElementById('attrRole').value = colorItem.role || '';
+
+            // 设置其他信息
+            document.getElementById('attrType').textContent = colorItem.type || '-';
+            document.getElementById('attrCategory').textContent = colorItem.category || '-';
+            document.getElementById('attrCommentCn').textContent = colorItem.commentCn || '-';
+
+            // 生成对比度背景色选项
+            renderContrastBgOptions(colorItem.contrastBg || '');
+
+            // 更新锁定按钮状态
+            const lockBtn = document.getElementById('toggleAttrLockBtn');
+            if (lockBtn) {
+                if (colorItem.fixed) {
+                    lockBtn.innerHTML = '🔓 解锁颜色';
+                    lockBtn.style.backgroundColor = '#10B981';
+                    lockBtn.style.color = 'white';
+                } else {
+                    lockBtn.innerHTML = '🔒 锁定颜色';
+                    lockBtn.style.backgroundColor = '';
+                    lockBtn.style.color = '';
+                }
+            }
+
+            // 显示面板前先清空 inline 样式，确保居中
+            const panel = document.getElementById('colorAttrPanel');
+            panel.style.top = '';
+            panel.style.left = '';
+
+            // 显示面板
+            panel.classList.remove('hidden');
+            panel.classList.add('centered');
+            document.getElementById('colorAttrOverlay').classList.remove('hidden');
+
+            // 添加拖动功能
+            initColorAttrPanelDrag();
+        }
+        window.openColorAttrPanel = openColorAttrPanel;
+
+        function closeColorAttrPanel() {
+            document.getElementById('colorAttrPanel').classList.add('hidden');
+            document.getElementById('colorAttrPanel').classList.remove('centered');
+            document.getElementById('colorAttrOverlay').classList.add('hidden');
+            currentEditingAttrColor = null;
+            // 重置锁定按钮状态
+            const lockBtn = document.getElementById('toggleAttrLockBtn');
+            if (lockBtn) {
+                lockBtn.innerHTML = '🔒 锁定颜色';
+                lockBtn.style.backgroundColor = '';
+                lockBtn.style.color = '';
+            }
+            // 移除拖动事件
+            document.removeEventListener('mousemove', dragColorAttrPanel);
+            document.removeEventListener('mouseup', stopDragColorAttrPanel);
+        }
+        window.closeColorAttrPanel = closeColorAttrPanel;
+
+        // 颜色属性面板拖动功能
+        let isDraggingColorAttr = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        function initColorAttrPanelDrag() {
+            const panel = document.getElementById('colorAttrPanel');
+            const title = panel.querySelector('.color-attr-title');
+
+            title.addEventListener('mousedown', function(e) {
+                if (e.target === title.querySelector('.color-attr-close')) return;
+                isDraggingColorAttr = true;
+                // 拖动时移除居中样式
+                panel.classList.remove('centered');
+                const rect = panel.getBoundingClientRect();
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+                panel.style.transition = 'none';
+            });
+        }
+
+        function dragColorAttrPanel(e) {
+            if (!isDraggingColorAttr) return;
+            const panel = document.getElementById('colorAttrPanel');
+            panel.style.left = (e.clientX - dragOffsetX) + 'px';
+            panel.style.top = (e.clientY - dragOffsetY) + 'px';
+        }
+
+        function stopDragColorAttrPanel() {
+            isDraggingColorAttr = false;
+            const panel = document.getElementById('colorAttrPanel');
+            panel.style.transition = '';
+        }
+
+        document.addEventListener('mousemove', dragColorAttrPanel);
+        document.addEventListener('mouseup', stopDragColorAttrPanel);
+
+        function renderContrastBgOptions(selectedBgs) {
+            const container = document.getElementById('contrastBgOptions');
+            const selectedArray = selectedBgs ? selectedBgs.split(',').map(b => b.trim()).filter(b => b) : [];
+
+            // 获取所有背景色（名称以 bg_ 开头的颜色）
+            const bgColors = allColorItems.filter(item => item.name.startsWith('bg_'));
+
+            if (bgColors.length === 0) {
+                container.innerHTML = '<div style="padding: 10px; color: #9CA3AF; font-size: 12px;">未找到背景色定义</div>';
+                return;
+            }
+
+            let html = '';
+            bgColors.forEach(bg => {
+                const isSelected = selectedArray.includes(bg.name);
+                html += `
+                    <label class="contrast-bg-option ${isSelected ? 'selected' : ''}">
+                        <input type="checkbox" value="${bg.name}" ${isSelected ? 'checked' : ''} onchange="toggleContrastBgOption(this)">
+                        <span class="bg-name">${bg.name}</span>
+                        <span class="bg-preview" style="background-color: ${argbToRgbaCss(bg.value)}"></span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleContrastBgOption(checkbox) {
+            const label = checkbox.closest('.contrast-bg-option');
+            if (checkbox.checked) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+        }
+
+        function getSelectedContrastBgs() {
+            const checkboxes = document.querySelectorAll('#contrastBgOptions input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function applyColorAttrChanges() {
+            if (!currentEditingAttrColor) return;
+
+            const colorItem = currentColorMap.get(currentEditingAttrColor);
+            if (!colorItem) return;
+
+            // 保存颜色名称用于 toast（关闭面板后会清空 currentEditingAttrColor）
+            const updatedColorName = currentEditingAttrColor;
+
+            // 更新属性
+            colorItem.role = document.getElementById('attrRole').value;
+            colorItem.contrastBg = getSelectedContrastBgs().join(', ');
+
+            currentColorMap.set(currentEditingAttrColor, colorItem);
+
+            // 同步更新 allColorItems
+            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingAttrColor);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = colorItem;
+            }
+
+            // 更新UI
+            renderColorCategories();
+            updateContrastResults();
+            updateAnalytics();
+
+            closeColorAttrPanel();
+            showToast(`已更新 ${updatedColorName} 的颜色属性`, 'success');
+        }
+        window.applyColorAttrChanges = applyColorAttrChanges;
 
         function populateAdjustmentRows(formula) {
             const builder = document.querySelector('.adjustment-builder');
@@ -4156,8 +4604,7 @@
             
             // 更新派生关系
             colorItem.derivedFrom = document.getElementById('derivationSource').value;
-            colorItem.role = document.getElementById('derivationRole').value;
-            
+
             // 构建调整公式
             const rows = document.querySelectorAll('.adjustment-row');
             const formulas = [];
@@ -5405,6 +5852,9 @@
                         <button class="btn btn-derivation" data-name="${name}" onclick="openDerivationEditor('${name}')">
                             🔗 派生
                         </button>
+                        <button class="btn btn-attr" data-name="${name}" onclick="openColorAttrPanel('${name}')">
+                            📋 属性
+                        </button>
                     </div>
                 </div>
             `;
@@ -5581,6 +6031,12 @@
                     if (colorData.role !== undefined) node.setAttribute('role', colorData.role);
                     if (colorData.derivedFrom !== undefined) node.setAttribute('derived_from', colorData.derivedFrom);
                     if (colorData.adjust !== undefined) node.setAttribute('adjust', colorData.adjust);
+                    // 保存对比度检查背景色
+                    if (colorData.contrastBg !== undefined && colorData.contrastBg !== '') {
+                        node.setAttribute('contrast_bg', colorData.contrastBg);
+                    } else {
+                        node.removeAttribute('contrast_bg');
+                    }
                     // 保存锁定状态 - 始终导出为"true"或"false"
                     if (colorData.fixed === true) {
                         node.setAttribute('fixed', 'true');
@@ -7123,19 +7579,14 @@
         function updateContrastResults(isDebugCall = false) {
             // 紧急暴露到全局
             window.updateContrastResults = updateContrastResults;
-            
+
             const resultsEl = document.getElementById('contrastResults');
             const summaryEl = document.getElementById('contrastSummary');
             if (!resultsEl) {
                 if (window.showToast) window.showToast('错误：找不到对比度检查面板', 'error');
                 return;
             }
-            
-            const windowBg = getColorValue('bg_window_base', '#FFFFFFFF');
-            const cardBg = getColorValue('bg_card', windowBg);
-            const buttonBg = getColorValue('btn_normal_bg', '#FF0078D4');
-            const inputBg = getColorValue('bg_edit', windowBg);
-            
+
             let results = [];
             let summary = {
                 total: 0,
@@ -7143,75 +7594,47 @@
                 passAA: 0,
                 fail: 0
             };
-            
-            // 定义需要检查的颜色组合
-            const contrastChecks = [
-                {
-                    name: '文本与窗口背景',
-                    filter: item => (item.category.includes('text') || item.name.includes('text_')) && !item.name.includes('btn'),
-                    bg: windowBg,
-                    minRatio: 4.5
-                },
-                {
-                    name: '按钮文本与按钮背景',
-                    filter: item => item.name.includes('btn') && item.name.includes('text'),
-                    bg: buttonBg,
-                    minRatio: 4.5
-                },
-                {
-                    name: '输入框文本与输入框背景',
-                    filter: item => item.category.includes('text') && item.name.includes('main'),
-                    bg: inputBg,
-                    minRatio: 4.5
-                },
-                {
-                    name: '边框与背景对比度',
-                    filter: item => item.category.includes('border') || item.name.includes('border_'),
-                    bg: windowBg,
-                    minRatio: 1.5
+
+            // 根据 contrast_bg 属性进行对比度检查
+            allColorItems.forEach(item => {
+                // 只有指定了 contrast_bg 的颜色才进行检查
+                if (!item.contrastBg || item.contrastBg.trim() === '') {
+                    return;
                 }
-            ];
-            
-            // 执行所有对比度检查
-            contrastChecks.forEach(check => {
-                allColorItems.forEach(item => {
-                    if (check.filter(item)) {
-                        const ratio = calculateContrastRatio(item.value, check.bg);
-                        const level = getContrastLevel(ratio);
-                        const isPassed = ratio >= check.minRatio;
-                        
-                        // 更新统计：根据每个检查的 minRatio 判断是否通过
-                        summary.total++;
-                        if (ratio >= 7) {
-                            summary.passAAA++;
-                        } else if (ratio >= check.minRatio) {  // 使用当前检查的标准判断
-                            summary.passAA++;  // 达到或超过当前标准的都计入AA类
-                        } else {
-                            summary.fail++;
-                        }
-                        
-                        // 根据当前检查标准调整显示级别
-                        let displayLevel = level;
-                        if (!isPassed) {
-                            // 未通过检查，显示为不达标
-                            displayLevel = { level: 'Fail', class: 'contrast-fail', text: '不达标' };
-                        } else if (level.level === 'Fail' && ratio >= check.minRatio) {
-                            // 虽然低于全局WCAG标准，但达到了当前检查的标准（如边框对比度）
-                            displayLevel = { level: 'Pass', class: 'contrast-warning', text: '通过' };
-                        }
-                        
-                        results.push({
-                            name: item.name,
-                            group: check.name,
-                            ratio: ratio,
-                            level: displayLevel,
-                            isPassed: isPassed,
-                            comment: item.commentCn || item.commentEn,
-                            fgColor: item.value,
-                            bgColor: check.bg,
-                            minRatio: check.minRatio
-                        });
+
+                // 解析多个背景色（逗号分隔）
+                const bgNames = item.contrastBg.split(',').map(bg => bg.trim()).filter(bg => bg);
+
+                bgNames.forEach(bgName => {
+                    const bgColor = getColorValue(bgName, null);
+                    if (!bgColor) return; // 背景色不存在，跳过
+
+                    const ratio = calculateContrastRatio(item.value, bgColor);
+                    const level = getContrastLevel(ratio);
+                    const isPassed = ratio >= 4.5; // 默认标准 4.5:1
+
+                    // 更新统计
+                    summary.total++;
+                    if (ratio >= 7) {
+                        summary.passAAA++;
+                    } else if (ratio >= 4.5) {
+                        summary.passAA++;
+                    } else {
+                        summary.fail++;
                     }
+
+                    results.push({
+                        name: item.name,
+                        bgName: bgName,
+                        group: '自定义对比度检查',
+                        ratio: ratio,
+                        level: isPassed ? level : { level: 'Fail', class: 'contrast-fail', text: '不达标' },
+                        isPassed: isPassed,
+                        comment: item.commentCn || item.commentEn,
+                        fgColor: item.value,
+                        bgColor: bgColor,
+                        minRatio: 4.5
+                    });
                 });
             });
 
@@ -7223,7 +7646,13 @@
 
             // 渲染结果
             if (results.length === 0) {
-                resultsEl.innerHTML = '<p style="color: #6B7280; font-size: 12px;">没有找到颜色进行对比度检查</p>';
+                resultsEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #6B7280;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
+                        <div style="font-size: 14px; margin-bottom: 8px;">暂无对比度检查结果</div>
+                        <div style="font-size: 12px;">在颜色编辑面板中为需要检查的颜色设置 <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px;">contrast_bg</code> 属性来指定对比度检查的背景色</div>
+                    </div>
+                `;
                 return;
             }
 
@@ -7236,8 +7665,9 @@
                 groupedResults[item.group].push(item);
             });
 
-            let html = `
-                <div style="margin-bottom: 15px; padding: 10px; background: #f8fafc; border-radius: 4px;">
+            // 渲染摘要到 summaryEl
+            let summaryHtml = `
+                <div style="margin-bottom: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <div style="font-size: 12px; color: #6B7280;">WCAG 2.1 对比度检查摘要</div>
                         <div style="display: flex; gap: 5px; align-items: center;">
@@ -7245,7 +7675,6 @@
                                 <input type="checkbox" id="contrastFilterFail" ${contrastFilterFailOnly ? 'checked' : ''} onchange="toggleContrastFilter()" style="cursor: pointer;">
                                 仅显示不达标
                             </label>
-                            <button id="recomputeDerivedBtn" onclick="executeDerivationUpdate();" style="padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); color: white; border: none; border-radius: 3px; cursor: pointer;">🔄 重新计算派生颜色</button>
                             <button id="recheckContrastBtn" onclick="debugRecheckBtn();" style="padding: 4px 8px; font-size: 11px; background: #0078D4; color: white; border: none; border-radius: 3px; cursor: pointer;">↻ 重新检查</button>
                         </div>
                     </div>
@@ -7276,18 +7705,20 @@
 
             // 添加一键修复按钮
             if (summary.fail > 0) {
-                html += `
-                    <div style="margin-bottom: 15px; padding: 12px; background: #FEF3F2; border: 1px solid #FEE4E2; border-radius: 4px;">
+                summaryHtml += `
+                    <div style="margin-bottom: 10px; padding: 8px; background: #FEF3F2; border: 1px solid #FEE4E2; border-radius: 4px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <div style="font-size: 13px; font-weight: 600; color: #D92D20;">发现 ${summary.fail} 项对比度不达标</div>
-                                <div style="font-size: 11px; color: #B42318; margin-top: 2px;">说明：修复通过调整前景色的亮度和饱和度来提高与背景的对比度</div>
+                                <div style="font-size: 12px; font-weight: 600; color: #D92D20;">发现 ${summary.fail} 项对比度不达标</div>
+                                <div style="font-size: 10px; color: #B42318; margin-top: 2px;">说明：修复通过调整前景色的亮度和饱和度来提高与背景的对比度</div>
                             </div>
-                            <button class="btn" style="background-color: #D92D20; color: white; padding: 6px 12px; font-size: 12px;" onclick="fixAllContrastIssues()">一键修复所有</button>
+                            <button class="btn" style="background-color: #D92D20; color: white; padding: 4px 10px; font-size: 11px;" onclick="fixAllContrastIssues()">一键修复</button>
                         </div>
                     </div>
                 `;
             }
+
+            summaryEl.innerHTML = summaryHtml;
 
             // 添加过滤
             if (contrastFilterFailOnly) {
@@ -7299,6 +7730,7 @@
                 });
             }
 
+            let html = '';
             Object.keys(groupedResults).forEach(groupName => {
                 const groupItems = groupedResults[groupName];
                 if (groupItems.length === 0) return;
@@ -7314,12 +7746,11 @@
                 `;
                 
                 groupItems.forEach(item => {
-                    // 使用当前检查项的标准来判断
                     const isActuallyPassed = item.ratio >= item.minRatio;
                     const statusClass = item.ratio >= 7 ? 'pass' : (isActuallyPassed ? 'warning' : 'fail');
                     const ratioDisplay = item.ratio.toFixed(2);
                     const sampleText = isActuallyPassed ? 'Aa' : '不达标';
-                    
+
                     html += `
                         <div class="contrast-result-item ${statusClass}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
                             <div style="flex: 1;">
@@ -7328,11 +7759,12 @@
                                         ${sampleText}
                                     </span>
                                     <strong style="font-size: 12px;">${item.name}</strong>
+                                    <span style="font-size: 10px; color: #9CA3AF;">@ ${item.bgName}</span>
                                 </div>
                                 <div style="font-size: 10px; color: #6B7280; margin-top: 2px;">${item.comment || ''}</div>
                                 <div style="font-size: 10px; color: #9CA3AF; margin-top: 3px; display: flex; gap: 8px;">
                                     <span title="前景色: ${item.fgColor}">前景: ${item.fgColor}</span>
-                                    <span title="背景色: ${item.bgColor}">背景: ${item.bgColor}</span>
+                                    <span title="背景色 [${item.bgName}]: ${item.bgColor}">背景: ${item.bgColor}</span>
                                     <span>最低标准: ${item.minRatio}:1</span>
                                 </div>
                             </div>
