@@ -1363,7 +1363,7 @@
             min-width: 0;
         }
         .adjustment-row input.adjust-value {
-            flex: 0 0 60px;
+            flex: 0 0 70px;
             min-width: 0;
         }
         .adjust-unit {
@@ -1379,8 +1379,8 @@
             flex: 0 0 auto;
         }
         .adjust-input-wrapper input.adjust-value {
-            width: 60px;
-            flex: 0 0 60px;
+            width: 70px;
+            flex: 0 0 70px;
         }
         .adjust-input-wrapper .adjust-unit {
             flex: 0 0 auto;
@@ -2349,7 +2349,7 @@
                                 <option value=":=">:= 设为绝对值 (lightness:=50 表示 lightness 设为 50%)</option>
                             </select>
                             <div class="adjust-input-wrapper">
-                                <input type="number" class="adjust-value" value="15" min="-100" max="100" step="1">
+                                <input type="number" class="adjust-value" value="15" min="-100" max="100" step="1" style="width: 70px;">
                                 <span class="adjust-unit">%</span>
                                 <span class="adjust-hint"></span>
                             </div>
@@ -3966,10 +3966,14 @@
                     property = part.substring(0, colonIdx);
                     const rest = part.substring(colonIdx + 1);
                     if (rest.length < 2) return;
-                    // 检查是否为 := 运算符
+                    // 检查是否为 := 运算符（需要看冒号后面是否是 =）
                     if (rest.startsWith(':=')) {
                         operator = ':=';
                         valueStr = rest.substring(2);
+                    } else if (rest.startsWith('=')) {
+                        // 兼容旧格式：lightness:=50 的 rest 是 "=50"
+                        operator = ':=';
+                        valueStr = rest.substring(1);
                     } else {
                         operator = rest.charAt(0);
                         valueStr = rest.substring(1);
@@ -4719,17 +4723,47 @@
 
         function applyDerivationChanges() {
             if (!currentEditingColor) return;
-            
+
             const colorItem = currentColorMap.get(currentEditingColor);
             if (!colorItem) return;
-            
+
+            // 验证所有输入值
+            const rows = document.querySelectorAll('.adjustment-row');
+            let hasInvalidInput = false;
+
+            rows.forEach(row => {
+                const input = row.querySelector('.adjust-value');
+                const hint = row.querySelector('.adjust-hint');
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+                const valueStr = input.value.trim();
+
+                // 空值和0是允许的（0是有效值）
+                if (valueStr === '' || valueStr === '0' || valueStr === '-') {
+                    return; // 跳过验证
+                }
+
+                const value = parseFloat(valueStr);
+                if (isNaN(value) || value < min || value > max) {
+                    hasInvalidInput = true;
+                    // 高亮错误输入框
+                    hint.textContent = `非法值！有效范围: ${min} ~ ${max}`;
+                    hint.classList.add('error');
+                    input.style.borderColor = '#EF4444';
+                }
+            });
+
+            if (hasInvalidInput) {
+                showToast('存在非法输入值，请修正后再保存', 'error');
+                return;
+            }
+
             // 更新派生关系
             colorItem.derivedFrom = document.getElementById('derivationSource').value;
 
             // 构建调整公式
-            const rows = document.querySelectorAll('.adjustment-row');
             const formulas = [];
-            
+
             rows.forEach(row => {
                 const property = row.querySelector('.adjust-property').value;
                 const operator = row.querySelector('.adjust-operator').value;
