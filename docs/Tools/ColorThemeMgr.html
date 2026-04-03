@@ -1896,6 +1896,14 @@
             font-size: 10px;
             font-weight: 500;
         }
+        .contrast-bg-badge {
+            background-color: #FEF3C7;
+            color: #92400E;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -5791,9 +5799,9 @@
         }
 
         function createColorCard(colorItem) {
-            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn, role, derivedFrom, adjust, fixed } = colorItem;
+            const { name, value, originalValue, type, category, supportAccent, commentCn, commentEn, role, derivedFrom, adjust, fixed, contrastBg } = colorItem;
             const isChanged = value !== originalValue;
-            
+
             const currentColor = argbToRgbaCss(value);
             const originalColor = argbToRgbaCss(originalValue);
             const currentRgbHex = argbToRgbHex(value);
@@ -5821,6 +5829,9 @@
             }
             if (fixed) {
                 badgesHtml += `<span class="locked-badge" title="已锁定 - 派生计算时将跳过">🔒 已锁定</span>`;
+            }
+            if (contrastBg) {
+                badgesHtml += `<span class="contrast-bg-badge" title="对比度检查背景色：${contrastBg}">🎨 ${contrastBg}</span>`;
             }
 
             cardEl.innerHTML = `
