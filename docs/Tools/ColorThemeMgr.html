@@ -602,6 +602,10 @@
             min-height: 300px;
             transition: all 0.3s;
         }
+        .preview-window.has-scroll {
+            overflow-y: auto;
+            max-height: 500px;
+        }
         .preview-window-header {
             padding: 10px 15px;
             display: flex;
@@ -1974,15 +1978,14 @@
                     </div>
                 </div>
             </div>
-            <div class="preview-window" id="previewContrastCheck">
+            <div class="preview-window has-scroll" id="previewContrastCheck" style="display: flex; flex-direction: column; background-color: #fafafa;">
                 <div class="preview-window-header" style="background-color: #f8fafc;">
                     <div class="preview-window-title">对比度检查 (WCAG 2.1)</div>
                     <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">说明：检查前景色与背景色之间的对比度，标准为文字(AA≥4.5:1, AAA≥7:1)</div>
                 </div>
-                <div class="preview-window-content" style="background-color: #fafafa;">
-                    <div id="contrastResults" style="max-height: 250px; overflow-y: auto;">
-                        <p style="color: #6B7280; font-size: 12px;">加载主题后将显示对比度分析结果</p>
-                    </div>
+                <div id="contrastSummary" style="padding: 10px 15px; flex-shrink: 0;"></div>
+                <div id="contrastResults" style="flex: 1; overflow-y: auto; min-height: 0; padding: 0 15px 15px 15px;">
+                    <p style="color: #6B7280; font-size: 12px;">加载主题后将显示对比度分析结果</p>
                 </div>
             </div>
         </div>
@@ -2471,6 +2474,7 @@
         let currentColorMap = new Map();
         let currentGroupType = 'original';
         let allColorItems = [];
+        let contrastFilterFailOnly = false;
         let groupedData = {
             original: { name: '所有颜色', count: 0, changeCount: 0, items: [], className: 'category-original' },
             type: {},
@@ -4567,7 +4571,7 @@
             `;
 
             let html = `
-                <div class="derivation-tree-node" onmouseenter="this.querySelector('.tree-node-actions')?.style.setProperty('opacity', '1')" onmouseleave="this.querySelector('.tree-node-actions')?.style.setProperty('opacity', '0')">
+                <div class="derivation-tree-node ${isRoot ? 'root' : ''}" style="margin-left: ${depth * 24}px;">
                     <div class="derivation-tree-header ${hasChildren ? 'has-children' : ''}" 
                          onclick="toggleDerivationNode(this)"
                          data-color-name="${node.name}">
@@ -4585,7 +4589,6 @@
                         </div>
                         ${editButtons}
                     </div>
-                    ${hasChildren ? `<div class="derivation-tree-children">` : ''}
             `;
 
             if (hasChildren) {
@@ -7109,12 +7112,20 @@
         }
         window.applyAdjustmentPreset = applyAdjustmentPreset;
 
+        // ========== 对比度过滤切换 ==========
+        function toggleContrastFilter() {
+            contrastFilterFailOnly = !contrastFilterFailOnly;
+            updateContrastResults();
+        }
+        window.toggleContrastFilter = toggleContrastFilter;
+
         // ========== 对比度检查结果更新 ==========
         function updateContrastResults(isDebugCall = false) {
             // 紧急暴露到全局
             window.updateContrastResults = updateContrastResults;
             
             const resultsEl = document.getElementById('contrastResults');
+            const summaryEl = document.getElementById('contrastSummary');
             if (!resultsEl) {
                 if (window.showToast) window.showToast('错误：找不到对比度检查面板', 'error');
                 return;
@@ -7229,7 +7240,11 @@
                 <div style="margin-bottom: 15px; padding: 10px; background: #f8fafc; border-radius: 4px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <div style="font-size: 12px; color: #6B7280;">WCAG 2.1 对比度检查摘要</div>
-                        <div style="display: flex; gap: 5px;">
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6B7280; cursor: pointer;">
+                                <input type="checkbox" id="contrastFilterFail" ${contrastFilterFailOnly ? 'checked' : ''} onchange="toggleContrastFilter()" style="cursor: pointer;">
+                                仅显示不达标
+                            </label>
                             <button id="recomputeDerivedBtn" onclick="executeDerivationUpdate();" style="padding: 4px 8px; font-size: 11px; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); color: white; border: none; border-radius: 3px; cursor: pointer;">🔄 重新计算派生颜色</button>
                             <button id="recheckContrastBtn" onclick="debugRecheckBtn();" style="padding: 4px 8px; font-size: 11px; background: #0078D4; color: white; border: none; border-radius: 3px; cursor: pointer;">↻ 重新检查</button>
                         </div>
@@ -7274,8 +7289,20 @@
                 `;
             }
 
+            // 添加过滤
+            if (contrastFilterFailOnly) {
+                Object.keys(groupedResults).forEach(key => {
+                    groupedResults[key] = groupedResults[key].filter(item => !item.isPassed);
+                });
+                Object.keys(groupedResults).forEach(key => {
+                    if (groupedResults[key].length === 0) delete groupedResults[key];
+                });
+            }
+
             Object.keys(groupedResults).forEach(groupName => {
                 const groupItems = groupedResults[groupName];
+                if (groupItems.length === 0) return;
+                
                 const groupFail = groupItems.filter(item => !item.isPassed).length;
                 
                 html += `
@@ -7294,7 +7321,7 @@
                     const sampleText = isActuallyPassed ? 'Aa' : '不达标';
                     
                     html += `
-                        <div class="contrast-result-item ${statusClass}" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div class="contrast-result-item ${statusClass}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 12px; padding: 2px 6px; border-radius: 2px; color: ${argbToRgbaCss(item.fgColor)}; background-color: ${argbToRgbaCss(item.bgColor)}; border: 1px solid #ddd;">
@@ -7303,9 +7330,13 @@
                                     <strong style="font-size: 12px;">${item.name}</strong>
                                 </div>
                                 <div style="font-size: 10px; color: #6B7280; margin-top: 2px;">${item.comment || ''}</div>
+                                <div style="font-size: 10px; color: #9CA3AF; margin-top: 3px; display: flex; gap: 8px;">
+                                    <span title="前景色: ${item.fgColor}">前景: ${item.fgColor}</span>
+                                    <span title="背景色: ${item.bgColor}">背景: ${item.bgColor}</span>
+                                    <span>最低标准: ${item.minRatio}:1</span>
+                                </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 11px; color: #6B7280;">最低 ${item.minRatio}:1</span>
                                 <span style="font-weight: 600; font-size: 13px;">${ratioDisplay}:1</span>
                                 <span class="contrast-badge contrast-${item.level.class}">
                                     ${item.level.text}
