@@ -6031,12 +6031,8 @@
                     if (colorData.role !== undefined) node.setAttribute('role', colorData.role);
                     if (colorData.derivedFrom !== undefined) node.setAttribute('derived_from', colorData.derivedFrom);
                     if (colorData.adjust !== undefined) node.setAttribute('adjust', colorData.adjust);
-                    // 保存对比度检查背景色
-                    if (colorData.contrastBg !== undefined && colorData.contrastBg !== '') {
-                        node.setAttribute('contrast_bg', colorData.contrastBg);
-                    } else {
-                        node.removeAttribute('contrast_bg');
-                    }
+                    // 保存对比度检查背景色 - 必须导出，即使为空也要保留属性
+                    node.setAttribute('contrast_bg', colorData.contrastBg || '');
                     // 保存锁定状态 - 始终导出为"true"或"false"
                     if (colorData.fixed === true) {
                         node.setAttribute('fixed', 'true');
