@@ -1825,10 +1825,6 @@
     <div class="preview-panel hidden" id="previewPanel">
         <div class="preview-header">
             <div class="preview-title">实时预览</div>
-            <div class="preview-toggle">
-                <button class="btn btn-secondary" id="togglePreviewMode">切换深色/浅色</button>
-                <button class="btn btn-secondary" id="refreshPreview">刷新预览</button>
-            </div>
         </div>
         <div class="preview-container">
             <div class="preview-window" id="previewWindow">
@@ -1981,6 +1977,7 @@
             <div class="preview-window" id="previewContrastCheck">
                 <div class="preview-window-header" style="background-color: #f8fafc;">
                     <div class="preview-window-title">对比度检查 (WCAG 2.1)</div>
+                    <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">说明：检查前景色与背景色之间的对比度，标准为文字(AA≥4.5:1, AAA≥7:1)</div>
                 </div>
                 <div class="preview-window-content" style="background-color: #fafafa;">
                     <div id="contrastResults" style="max-height: 250px; overflow-y: auto;">
@@ -2565,10 +2562,6 @@
             document.getElementById('applyBasicThemeBtn').addEventListener('click', applyBasicColorTheme);
             document.getElementById('generateAccentBtn').addEventListener('click', applyAccentColorTheme);
             document.getElementById('generateContrastBtn').addEventListener('click', applyHighContrastTheme);
-
-            // 预览切换
-            document.getElementById('togglePreviewMode').addEventListener('click', togglePreviewMode);
-            document.getElementById('refreshPreview').addEventListener('click', updatePreview);
 
             // 搜索
             searchInput.addEventListener('input', handleSearch);
@@ -7273,7 +7266,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 13px; font-weight: 600; color: #D92D20;">发现 ${summary.fail} 项对比度不达标</div>
-                                <div style="font-size: 11px; color: #B42318; margin-top: 2px;">点击修复按钮可自动调整颜色以满足WCAG标准</div>
+                                <div style="font-size: 11px; color: #B42318; margin-top: 2px;">说明：修复通过调整前景色的亮度和饱和度来提高与背景的对比度</div>
                             </div>
                             <button class="btn" style="background-color: #D92D20; color: white; padding: 6px 12px; font-size: 12px;" onclick="fixAllContrastIssues()">一键修复所有</button>
                         </div>
@@ -7909,8 +7902,6 @@
             rebindElement('applyBasicThemeBtn', applyBasicColorTheme);
             rebindElement('generateAccentBtn', applyAccentColorTheme);
             rebindElement('generateContrastBtn', applyHighContrastTheme);
-            rebindElement('togglePreviewMode', togglePreviewMode);
-            rebindElement('refreshPreview', updatePreview);
             rebindElement('applyBatchEdit', applyBatchEdit);
             rebindElement('resetBatchEdit', resetBatchEdit);
             
