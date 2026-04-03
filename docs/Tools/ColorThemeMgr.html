@@ -7924,76 +7924,51 @@
                 
                 showToast(`${colorName} 无法自动修复。当前对比度 ${finalRatio.toFixed(2)}:1，要求 ${minRatio}:1。${reason}。${suggestion}`, 'warning', 8000);
             }
+
+            return fixed;
         }
 
         function fixAllContrastIssues() {
-            const resultsEl = document.getElementById('contrastResults');
-            const windowBg = getColorValue('bg_window_base', '#FFFFFFFF');
-            const cardBg = getColorValue('bg_card', windowBg);
-            const buttonBg = getColorValue('btn_normal_bg', '#FF0078D4');
-            const inputBg = getColorValue('bg_edit', windowBg);
-            
             let fixedCount = 0;
+            let skippedCount = 0;
             const itemsToFix = [];
 
-            // 定义需要检查的颜色组合（与updateContrastResults保持一致）
-            const contrastChecks = [
-                {
-                    filter: item => (item.category.includes('text') || item.name.includes('text_')) && !item.name.includes('btn'),
-                    bg: windowBg,
-                    minRatio: 4.5
-                },
-                {
-                    filter: item => item.name.includes('btn') && item.name.includes('text'),
-                    bg: buttonBg,
-                    minRatio: 4.5
-                },
-                {
-                    filter: item => item.category.includes('text') && item.name.includes('main'),
-                    bg: inputBg,
-                    minRatio: 4.5
-                },
-                {
-                    filter: item => item.category.includes('border') || item.name.includes('border_'),
-                    bg: windowBg,
-                    minRatio: 1.5
+            // 根据 contrast_bg 属性收集所有需要修复的项目
+            allColorItems.forEach(item => {
+                // 只有指定了 contrast_bg 的颜色才进行检查
+                if (!item.contrastBg || item.contrastBg.trim() === '') {
+                    return;
                 }
-            ];
 
-            // 收集所有需要修复的项目
-            contrastChecks.forEach(check => {
-                allColorItems.forEach(item => {
-                    if (check.filter(item)) {
-                        const ratio = calculateContrastRatio(item.value, check.bg);
-                        if (ratio < check.minRatio) {
-                            itemsToFix.push({
-                                name: item.name,
-                                fgColor: item.value,
-                                bgColor: check.bg,
-                                minRatio: check.minRatio
-                            });
-                        }
+                // 解析多个背景色（逗号分隔）
+                const bgNames = item.contrastBg.split(',').map(bg => bg.trim()).filter(bg => bg);
+
+                bgNames.forEach(bgName => {
+                    const bgColor = getColorValue(bgName, null);
+                    if (!bgColor) return;
+
+                    const ratio = calculateContrastRatio(item.value, bgColor);
+                    if (ratio < 4.5) {
+                        itemsToFix.push({
+                            name: item.name,
+                            fgColor: item.value,
+                            bgColor: bgColor,
+                            bgName: bgName,
+                            minRatio: 4.5
+                        });
                     }
                 });
             });
 
-            // 执行修复 - 复用 fixSingleContrastIssue 逻辑避免代码重复
-            let skippedCount = 0;
+            if (itemsToFix.length === 0) {
+                showToast('没有可自动修复的对比度问题', 'info');
+                return;
+            }
+
+            // 执行修复
             itemsToFix.forEach(item => {
-                // 临时捕获 showToast 的调用来统计
-                const originalToast = window.showToast;
-                let fixSucceeded = false;
-                window.showToast = function(msg, type) {
-                    if (msg.includes('已修复')) {
-                        fixSucceeded = true;
-                    }
-                    originalToast(msg, type);
-                };
-                
-                fixSingleContrastIssue(item.name, item.fgColor, item.bgColor, item.minRatio);
-                
-                window.showToast = originalToast;
-                if (fixSucceeded) {
+                const result = fixSingleContrastIssue(item.name, item.fgColor, item.bgColor, item.minRatio);
+                if (result) {
                     fixedCount++;
                 } else {
                     skippedCount++;
@@ -8008,7 +7983,7 @@
                 updateAnalytics();
                 updateContrastResults();
                 saveToHistory('批量修复对比度');
-                
+
                 showToast(`已修复 ${fixedCount} 项对比度问题${skippedCount > 0 ? '，' + skippedCount + '项无法自动修复' : ''}`, skippedCount > 0 ? 'warning' : 'success');
             } else if (skippedCount > 0) {
                 showToast(`${skippedCount} 项无法自动修复，请手动调整`, 'warning');
