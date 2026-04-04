@@ -42,7 +42,13 @@ if exist "C:\LLVM\bin\clang++.exe" (
 )
 
 @REM # detect vs version
-call detect_vs_version.bat
+if exist "%SCRIPT_DIR%\detect_vs_version.bat" (
+    call %SCRIPT_DIR%\detect_vs_version.bat
+) else (
+    echo detect_vs_version.bat not found in %SCRIPT_DIR%
+    cd /d %CURRENT_DIR%
+    exit /b 1
+)
 
 set MSVC_PATH="%VS_PATH%"
 echo %MSVC_PATH%
