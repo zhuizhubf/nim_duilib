@@ -4112,12 +4112,12 @@
          * 【取值范围说明】
          * lightness  : 公式 0~100% → 内部 0~1
          * saturation : 公式 0~100% → 内部 0~1
-         * alpha      : 公式 0~100% → 内部 0~1
-         * hue        : 公式 0~100% → 内部 0~360（色环）
+         * alpha      : 公式 0~100% → 内部 0~1（最终转 0~255）
+         * hue        : 公式 0~100% → 内部 0~360（严格限制 0 ≤ hue < 360）
          * 所有属性运算规则完全统一：+ - * = 均按百分比计算
          */
         function computeDerivedColor(sourceArgb, formula) {
-            // 非法颜色直接返回黑色
+            // 非法颜色直接返回不透明黑色
             if (!sourceArgb || !/^#([0-9A-F]{8})$/i.test(sourceArgb)) {
                 return '#FF000000';
             }
@@ -4174,10 +4174,13 @@
                     case 'hue':
                         const hueNormalized = currentHsl.h / 360;
                         const newHue = applyOperation(hueNormalized, op);
-                        currentHsl.h = newHue * 360;
+                        let calculatedHue = newHue * 360;
+                        
+                        // 严格限制：0 ≤ hue < 360
+                        calculatedHue = Math.max(0, Math.min(359, calculatedHue));
+                        currentHsl.h = calculatedHue;
                         break;
 
-                    // 反相（直接对RGB取反）
                     case 'invert':
                         currentRgb.r = 255 - currentRgb.r;
                         currentRgb.g = 255 - currentRgb.g;
@@ -4189,6 +4192,10 @@
 
             // 转换回最终颜色
             const finalRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+            
+            // Alpha 严格限制 0~1（对应十六进制 00~FF，即 0~255）
+            currentAlpha = Math.max(0, Math.min(1, currentAlpha));
+
             const alphaHex = Math.round(currentAlpha * 255).toString(16).padStart(2, '0');
             const rgbHex = rgbToHex(finalRgb.r) + rgbToHex(finalRgb.g) + rgbToHex(finalRgb.b);
 
