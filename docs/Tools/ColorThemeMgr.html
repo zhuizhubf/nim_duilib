@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>nim_duilib主题配色编辑器</title>
-    
-    
-    
     <style>
         * {
             margin: 0;
@@ -2366,7 +2363,7 @@
                                 <option value="+">增加(+)</option>
                                 <option value="-">减少(-)</option>
                                 <option value="*">倍乘(×)</option>
-                                <option value=":=">绝对值(:=)</option>
+                                <option value="=">绝对值(=)</option>
                             </select>
                             <div class="adjust-input-wrapper">
                                 <input type="range" class="adjust-slider" min="-100" max="100" value="15">
@@ -2385,7 +2382,7 @@
                         <code id="formulaPreview">-</code>
                     </div>
                     <div class="formula-hint">
-                        <small>支持: lightness:+15, saturation:-10, alpha:*0.8, hue:30</small>
+                        <small>支持: lightness:+15, saturation:-10, alpha:*80, hue:=60,</small>
                     </div>
                 </div>
                 
@@ -3964,23 +3961,38 @@
          * 解析派生公式
          * 支持的公式格式:
          * - lightness:+15 (亮度增加15%)
+         * - lightness:=15 (亮度调整为原来的15%)
          * - saturation:-10 (饱和度减少10%)
-         * - alpha:*0.8 (透明度乘以0.8)
-         * - hue:30 (色相旋转30度)
+         * - alpha:*80 (透明度乘以80%)
+         * - hue:+30 (色相旋转30度)
+         * - invert (反相)
          * - 多个公式用逗号分隔: lightness:+10,saturation:-5
+         * 支持容错：带空格、连续逗号、空字符串均可正常处理
          */
         function parseDerivationFormula(formula) {
-            if (!formula || typeof formula !== 'string') return [];
+            // 基础空值判断
+            if (!formula || typeof formula !== 'string') {
+                return [];
+            }
+
+            // 合法属性白名单
+            const ALLOWED_PROPERTIES = ['lightness', 'saturation', 'alpha', 'hue', 'invert'];
+            const ALLOWED_OPERATORS = ['+', '-', '*', '='];
+            
+            // 正则匹配：属性:运算符数值，自动忽略空格
+            const FORMULA_REGEX = /^\s*([a-z]+)\s*:\s*([+\-*=])\s*(-?\d+\.?\d*)\s*$/i;
 
             const operations = [];
-            const parts = formula.split(',');
 
-            parts.forEach(part => {
-                part = part.trim();
-                if (!part) return;
+            // 分割并过滤空项
+            const formulaParts = formula.split(',')
+                .map(part => part.trim())
+                .filter(part => part !== '');
 
-                // 反相不需要运算符和值
-                if (part === 'invert') {
+            // 解析每个部分
+            formulaParts.forEach(part => {
+                // 处理 invert
+                if (part.toLowerCase() === 'invert') {
                     operations.push({
                         property: 'invert',
                         operator: '+',
@@ -3989,43 +4001,22 @@
                     return;
                 }
 
-                let property, operator, valueStr;
-                const colonIdx = part.indexOf(':');
+                // 正则匹配标准格式
+                const match = part.match(FORMULA_REGEX);
+                if (!match) return;
 
-                if (colonIdx > 0 && colonIdx < part.length - 1) {
-                    // 新格式: lightness:+20 或 lightness:*50 或 lightness:=50
-                    property = part.substring(0, colonIdx);
-                    const rest = part.substring(colonIdx + 1);
-                    if (rest.length < 2) return;
-                    // 检查是否为 := 运算符（需要看冒号后面是否是 =）
-                    if (rest.startsWith(':=')) {
-                        operator = ':=';
-                        valueStr = rest.substring(2);
-                    } else if (rest.startsWith('=')) {
-                        // 兼容旧格式：lightness:=50 的 rest 是 "=50"
-                        operator = ':=';
-                        valueStr = rest.substring(1);
-                    } else {
-                        operator = rest.charAt(0);
-                        valueStr = rest.substring(1);
-                    }
-                } else {
-                    // 旧格式: lightness+20 (无冒号)
-                    const match = part.match(/^(lightness|luminance|saturation|alpha|hue)([+*/-])(.+)$/);
-                    if (!match) return;
-                    property = match[1];
-                    operator = match[2];
-                    valueStr = match[3];
-                }
+                const [, prop, op, valStr] = match;
+                const property = prop.toLowerCase();
+                const operator = op;
+                const value = parseFloat(valStr);
 
-                if (!['lightness', 'luminance', 'saturation', 'alpha', 'hue', 'invert'].includes(property)) return;
-                if (!['+', '-', '*', '/', ':='].includes(operator)) return;
-
-                const value = parseFloat(valueStr);
+                // 严格校验
+                if (!ALLOWED_PROPERTIES.includes(property)) return;
+                if (!ALLOWED_OPERATORS.includes(operator)) return;
                 if (isNaN(value)) return;
 
                 operations.push({
-                    property: property === 'luminance' ? 'lightness' : property,
+                    property: property,
                     operator: operator,
                     value: value
                 });
@@ -4036,9 +4027,9 @@
 
         /**
          * 根据派生公式计算颜色
-         * @param {string} sourceArgb - 源颜色 (ARGB格式)
+         * @param {string} sourceArgb - 源颜色 (ARGB格式：#AARRGGBB)
          * @param {string} formula - 派生公式
-         * @returns {string} 计算后的颜色 (ARGB格式)
+         * @returns {string} 计算后的颜色 (ARGB格式：#AARRGGBB)
          */
         function computeDerivedColor(sourceArgb, formula) {
             if (!sourceArgb || !/^#([0-9A-F]{8})$/i.test(sourceArgb)) {
@@ -4046,74 +4037,67 @@
             }
 
             const operations = parseDerivationFormula(formula);
-            if (operations.length === 0) return sourceArgb;
+            if (operations.length === 0) return sourceArgb.toUpperCase();
 
-            // 解析ARGB
             const alpha = parseInt(sourceArgb.slice(1, 3), 16) / 255;
             const rgb = argbToRgb(sourceArgb);
             const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
 
             let currentAlpha = alpha;
-            let currentHsl = { h: hsl.h, s: hsl.s, l: hsl.l };
+            let currentHsl = { ...hsl };
+            let currentRgb = { ...rgb };
+
+            // 统一运算函数：+ - * = 都按百分比计算，结果 clamp 0~1
+            const applyOperation = (current, op) => {
+                const num = op.value / 100;
+                let val = current;
+                switch (op.operator) {
+                    case '+': val += num; break;
+                    case '-': val -= num; break;
+                    case '*': val *= num; break;
+                    case '=': val = num; break;
+                }
+                return Math.max(0, Math.min(1, val));
+            };
 
             operations.forEach(op => {
                 switch (op.property) {
                     case 'lightness':
-                        if (op.operator === '+') currentHsl.l += op.value / 100;
-                        else if (op.operator === '-') currentHsl.l -= op.value / 100;
-                        else if (op.operator === '*') currentHsl.l *= (op.value / 100);
-                        else if (op.operator === ':=') currentHsl.l = Math.max(0, Math.min(1, op.value / 100));
-                        currentHsl.l = Math.max(0, Math.min(1, currentHsl.l));
+                        currentHsl.l = applyOperation(currentHsl.l, op);
                         break;
 
                     case 'saturation':
-                        if (op.operator === '+') currentHsl.s += op.value / 100;
-                        else if (op.operator === '-') currentHsl.s -= op.value / 100;
-                        else if (op.operator === '*') currentHsl.s *= (op.value / 100);
-                        else if (op.operator === ':=') currentHsl.s = Math.max(0, Math.min(1, op.value / 100));
-                        currentHsl.s = Math.max(0, Math.min(1, currentHsl.s));
-                        break;
-
-                    case 'hue':
-                        if (op.operator === '+') currentHsl.h += op.value;
-                        else if (op.operator === '-') currentHsl.h -= op.value;
-                        else if (op.operator === ':=') currentHsl.h = ((op.value % 360) + 360) % 360;
-                        currentHsl.h = ((currentHsl.h % 360) + 360) % 360;
+                        currentHsl.s = applyOperation(currentHsl.s, op);
                         break;
 
                     case 'alpha':
-                        if (op.operator === '+') currentAlpha += op.value / 100;
-                        else if (op.operator === '-') currentAlpha -= op.value / 100;
-                        else if (op.operator === '*') currentAlpha *= (op.value / 100);
-                        else if (op.operator === ':=') currentAlpha = Math.max(0, Math.min(1, op.value / 100));
-                        currentAlpha = Math.max(0, Math.min(1, currentAlpha));
+                        currentAlpha = applyOperation(currentAlpha, op);
+                        break;
+
+                    // ==============================
+                    // ✅ hue 现在和 lightness 完全一致
+                    // ==============================
+                    case 'hue':
+                        // hue 原本范围 0~360，先归一化成 0~1，再统一运算，最后转回 0~360
+                        const hue01 = currentHsl.h / 360;
+                        const newHue01 = applyOperation(hue01, op);
+                        currentHsl.h = newHue01 * 360;
                         break;
 
                     case 'invert':
-                        // 反相：RGB 分量取反
-                        // 需要从 HSL 转换回 RGB 进行反相
-                        const invertRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
-                        invertRgb.r = 255 - invertRgb.r;
-                        invertRgb.g = 255 - invertRgb.g;
-                        invertRgb.b = 255 - invertRgb.b;
-                        // 重新转换回 HSL
-                        const invertHsl = rgbToHsl(invertRgb.r, invertRgb.g, invertRgb.b);
-                        currentHsl.h = invertHsl.h;
-                        currentHsl.s = invertHsl.s;
-                        currentHsl.l = invertHsl.l;
+                        currentRgb.r = 255 - currentRgb.r;
+                        currentRgb.g = 255 - currentRgb.g;
+                        currentRgb.b = 255 - currentRgb.b;
+                        currentHsl = rgbToHsl(currentRgb.r, currentRgb.g, currentRgb.b);
                         break;
                 }
             });
 
-            // 转换回RGB
-            const newRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+            const finalRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+            const alphaHex = Math.round(currentAlpha * 255).toString(16).padStart(2, '0');
+            const rgbHex = rgbToHex(finalRgb.r) + rgbToHex(finalRgb.g) + rgbToHex(finalRgb.b);
 
-            const newAlphaHex = Math.round(currentAlpha * 255).toString(16).padStart(2, '0');
-            const newRgbHex = rgbToHex(newRgb.r) + rgbToHex(newRgb.g) + rgbToHex(newRgb.b);
-
-            const result = `#${newAlphaHex}${newRgbHex}`.toUpperCase();
-
-            return result;
+            return `#${alphaHex}${rgbHex}`.toUpperCase();
         }
 
         /**
@@ -4535,7 +4519,7 @@
                         row.querySelector('.adjust-operator').value = '+';
                         row.querySelector('.adjust-value').value = '0';
                     } else {
-                        row.querySelector('.adjust-operator').value = op.operator === ':=' ? ':=' : '+';
+                        row.querySelector('.adjust-operator').value = op.operator === '=' ? '=' : '+';
                         row.querySelector('.adjust-value').value = op.value || '0';
                     }
                     updateUnitDisplay(row);
@@ -4710,35 +4694,7 @@
             unit.style.display = '';
 
             // 根据属性类型和运算符设置范围和提示
-            if (property === 'hue') {
-                if (operator === ':=') {
-                    min = 0;
-                    max = 360;
-                    hintText = '绝对值 (0-360°)';
-                } else {
-                    min = 0;
-                    max = 360;
-                    hintText = '旋转角度 (0-360°)';
-                }
-            } else if (property === 'alpha') {
-                if (operator === ':=') {
-                    min = 0;
-                    max = 100;
-                    hintText = '绝对值 (0-100%)';
-                } else if (operator === '*') {
-                    min = 1;
-                    max = 200;
-                    hintText = '倍数 (50=50%)';
-                } else if (operator === '+') {
-                    min = 0;
-                    max = 100;
-                    hintText = '增加量 (0-100%)';
-                } else if (operator === '-') {
-                    min = 0;
-                    max = 100;
-                    hintText = '减少量 (0-100%)';
-                }
-            } else if (operator === ':=') {
+            if (operator === '=') {
                 min = 0;
                 max = 100;
                 hintText = '绝对值 (0-100%)';
@@ -4762,7 +4718,7 @@
             slider.min = min;
             slider.max = max;
             slider.step = 1;
-            unit.textContent = (property === 'hue') ? '°' : (property === 'alpha' ? '' : '%');
+            unit.textContent = '%';
             hint.textContent = hintText;
             hint.classList.remove('error');
 
@@ -5458,7 +5414,7 @@
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
-                            'disabled': 'alpha:*0.5',
+                            'disabled': 'alpha:*50',
                             'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
@@ -5487,7 +5443,7 @@
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
-                            'disabled': 'alpha:*0.5',
+                            'disabled': 'alpha:*50',
                             'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
@@ -5529,12 +5485,12 @@
                     confidence: 85,
                     adjust: (type) => {
                         const textAdjustments = {
-                            'disabled': 'alpha:*0.5',
+                            'disabled': 'alpha:*50',
                             'muted': 'lightness:+15,saturation:-15',
                             'selected': 'lightness:-10,saturation:+10',
                             'secondary': 'lightness:+10',
-                            'hint': 'alpha:*0.6',
-                            'link': 'hue:210,saturation:+30'
+                            'hint': 'alpha:*60',
+                            'link': 'hue:=60,saturation:+30'
                         };
                         return textAdjustments[type.toLowerCase()] || null;
                     }
@@ -5552,7 +5508,7 @@
                             'hovered': 'lightness:+5',
                             'pressed': 'lightness:-5',
                             'selected': 'lightness:+3,saturation:+5',
-                            'disabled': 'alpha:*0.3',
+                            'disabled': 'alpha:*30',
                             'focused': 'lightness:+8'
                         };
                         return bgAdjustments[type.toLowerCase()] || 'lightness:+5';
@@ -5581,7 +5537,7 @@
                             'pressed': 'lightness:-8',
                             'selected': 'saturation:+5,lightness:+3',
                             'checked': 'saturation:+5,lightness:+3',
-                            'disabled': 'alpha:*0.5',
+                            'disabled': 'alpha:*50',
                             'focused': 'saturation:+10'
                         };
                         return stateAdjustments[type.toLowerCase()] || 'lightness:+5';
@@ -5613,7 +5569,7 @@
                     pattern: /^(.+)_(transparent|alpha|opacity)$/i,
                     extract: (match) => match[1],
                     type: 'alpha',
-                    adjust: () => 'alpha:*0.5'
+                    adjust: () => 'alpha:*50'
                 }
             ];
 
@@ -7347,7 +7303,7 @@
                 'pressed': 'lightness:-8',
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
-                'disabled': 'alpha:*0.5',
+                'disabled': 'alpha:*50',
                 'focused': 'saturation:+10',
                 'normal': '',
                 'light': 'lightness:+15',
@@ -7363,12 +7319,12 @@
             };
 
             const textMap = {
-                'disabled': 'alpha:*0.5',
+                'disabled': 'alpha:*50',
                 'muted': 'lightness:+15,saturation:-15',
                 'selected': 'lightness:-10,saturation:+10',
                 'secondary': 'lightness:+10',
-                'hint': 'alpha:*0.6',
-                'link': 'hue:+210,saturation:+30'
+                'hint': 'alpha:*60',
+                'link': 'hue:+60,saturation:+30'
             };
 
             // 查找匹配的状态
@@ -7512,7 +7468,7 @@
                 'pressed': 'lightness:-8',
                 'selected': 'saturation:+5,lightness:+3',
                 'checked': 'saturation:+5,lightness:+3',
-                'disabled': 'alpha:*0.5',
+                'disabled': 'alpha:*50',
                 'focused': 'saturation:+10',
                 'light': 'lightness:+15',
                 'dark': 'lightness:-15',
@@ -7560,14 +7516,7 @@
             rows.forEach(r => {
                 const property = r.querySelector('.adjust-property').value;
                 const unit = r.querySelector('.adjust-unit');
-                if (property === 'hue') {
-                    unit.textContent = '°';
-                } else if (property === 'alpha') {
-                    const operator = r.querySelector('.adjust-operator').value;
-                    unit.textContent = operator === '*' ? '' : '%';
-                } else {
-                    unit.textContent = '%';
-                }
+                unit.textContent = '%';
             });
         }
 
@@ -7825,14 +7774,14 @@
             const presets = {
                 'hovered': [{property: 'lightness', operator: '+', value: '8'}],
                 'pressed': [{property: 'lightness', operator: '-', value: '8'}],
-                'disabled': [{property: 'alpha', operator: '*', value: '0.5'}],
+                'disabled': [{property: 'alpha', operator: '*', value: '50'}],
                 'light': [{property: 'lightness', operator: '+', value: '15'}],
                 'dark': [{property: 'lightness', operator: '-', value: '15'}],
                 'muted': [
                     {property: 'saturation', operator: '-', value: '25'},
                     {property: 'lightness', operator: '+', value: '5'}
                 ],
-                'transparent': [{property: 'alpha', operator: '*', value: '0.7'}]
+                'transparent': [{property: 'alpha', operator: '*', value: '70'}]
             };
 
             const preset = presets[presetType];
