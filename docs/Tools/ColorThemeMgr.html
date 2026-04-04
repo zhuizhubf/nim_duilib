@@ -2795,7 +2795,8 @@
                 <!-- 当前公式显示 -->
                 <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px;">
                     <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;">当前调整公式:</div>
-                    <code id="batchFormulaPreview" style="display: block; padding: 8px; background: white; border-radius: 4px; font-size: 13px; color: #059669; font-weight: 600;">lightness:+8</code>
+                    <code id="batchFormulaPreview" style="display: block; padding: 8px; background: white; border-radius: 4px; font-size: 13px; color: #059669; font-weight: 600;">-</code>
+                    <input type="hidden" id="batchFormulaInput" value="">
                 </div>
             </div>
 
@@ -7391,8 +7392,11 @@
                 updateBatchDerivationPreview();
             };
 
-            // 初始化默认公式
-            updateBatchFormulaPreview();
+            // 初始化时清空公式
+            const formulaInput = document.getElementById('batchFormulaInput');
+            if (formulaInput) formulaInput.value = '';
+            const formulaPreview = document.getElementById('batchFormulaPreview');
+            if (formulaPreview) formulaPreview.textContent = '-';
 
             // 显示面板
             document.getElementById('batchDerivationWizard').classList.remove('hidden');
@@ -7689,6 +7693,12 @@
         }
 
         function closeBatchDerivationWizard() {
+            // 关闭时清空公式
+            const formulaInput = document.getElementById('batchFormulaInput');
+            if (formulaInput) formulaInput.value = '';
+            const formulaPreview = document.getElementById('batchFormulaPreview');
+            if (formulaPreview) formulaPreview.textContent = '-';
+
             document.getElementById('batchDerivationWizard').classList.add('hidden');
             document.getElementById('batchDerivationOverlay').classList.add('hidden');
         }
@@ -7771,10 +7781,30 @@
 
         /**
          * 更新批量派生的公式预览
-         * 根据批量调整面板中的调整行生成公式字符串
+         * 根据预设或调整行生成公式字符串
          */
         function updateBatchFormulaPreview() {
-            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
+            // 优先从隐藏输入框获取公式
+            const formulaInput = document.getElementById('batchFormulaInput');
+            if (formulaInput && formulaInput.value) {
+                const previewEl = document.getElementById('batchFormulaPreview');
+                if (previewEl) {
+                    previewEl.textContent = formulaInput.value;
+                }
+                return;
+            }
+
+            // 否则从调整行获取（如果存在）
+            const builder = document.getElementById('batchAdjustmentBuilder');
+            if (!builder) {
+                const previewEl = document.getElementById('batchFormulaPreview');
+                if (previewEl) {
+                    previewEl.textContent = '-';
+                }
+                return;
+            }
+
+            const rows = builder.querySelectorAll('.adjustment-row');
             const formulas = [];
 
             rows.forEach(row => {
@@ -7880,15 +7910,9 @@
             const sourceColor = currentColorMap.get(sourceName);
             if (!sourceColor) return;
 
-            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
-            const formulas = [];
-            rows.forEach(row => {
-                const property = row.querySelector('.adjust-property').value;
-                const operator = row.querySelector('.adjust-operator').value;
-                const value = row.querySelector('.adjust-value').value;
-                formulas.push(`${property}:${operator}${value}`);
-            });
-            const formula = formulas.join(',');
+            // 获取公式（优先从隐藏输入框获取）
+            const formulaInput = document.getElementById('batchFormulaInput');
+            const formula = formulaInput && formulaInput.value ? formulaInput.value : '';
 
             let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;">';
             
@@ -7937,16 +7961,14 @@
                 return;
             }
 
-            // 构建调整公式
-            const rows = document.querySelectorAll('#batchAdjustmentBuilder .adjustment-row');
-            const formulas = [];
-            rows.forEach(row => {
-                const property = row.querySelector('.adjust-property').value;
-                const operator = row.querySelector('.adjust-operator').value;
-                const value = row.querySelector('.adjust-value').value;
-                formulas.push(`${property}:${operator}${value}`);
-            });
-            const formula = formulas.join(',');
+            // 获取调整公式（优先从隐藏输入框获取，否则从调整行获取）
+            const formulaInput = document.getElementById('batchFormulaInput');
+            const formula = formulaInput && formulaInput.value ? formulaInput.value : '';
+
+            if (!formula) {
+                showToast('请先选择或设置调整公式', 'warning');
+                return;
+            }
 
             let appliedCount = 0;
             checkboxes.forEach(cb => {
@@ -8015,34 +8037,22 @@
             const preset = presets[presetType];
             if (!preset) return;
 
-            // 清空现有调整
-            const builder = document.getElementById('batchAdjustmentBuilder');
-            const rows = builder.querySelectorAll('.adjustment-row');
-            rows.forEach((row, index) => {
-                if (index > 0) {
-                    row.remove();
-                }
-            });
+            // 将预设转换为公式字符串
+            const formula = preset.map(op => `${op.property}:${op.operator}${op.value}`).join(',');
 
-            // 应用预设
-            preset.forEach((adjustment, index) => {
-                const row = index === 0 ? builder.querySelector('.adjustment-row') : null;
-                
-                if (row) {
-                    row.querySelector('.adjust-property').value = adjustment.property;
-                    row.querySelector('.adjust-operator').value = adjustment.operator;
-                    row.querySelector('.adjust-value').value = adjustment.value;
-                } else {
-                    addBatchAdjustmentRow();
-                    const allRows = builder.querySelectorAll('.adjustment-row');
-                    const lastRow = allRows[allRows.length - 1];
-                    lastRow.querySelector('.adjust-property').value = adjustment.property;
-                    lastRow.querySelector('.adjust-operator').value = adjustment.operator;
-                    lastRow.querySelector('.adjust-value').value = adjustment.value;
-                }
-            });
+            // 更新公式预览显示
+            const previewEl = document.getElementById('batchFormulaPreview');
+            if (previewEl) {
+                previewEl.textContent = formula;
+            }
 
-            updateBatchUnitDisplay();
+            // 保存公式到隐藏输入框
+            const inputEl = document.getElementById('batchFormulaInput');
+            if (inputEl) {
+                inputEl.value = formula;
+            }
+
+            // 触发预览更新
             updateBatchFormulaPreview();
             updateBatchDerivationPreview();
             showToast(`已应用预设: ${presetType}`, 'info');
