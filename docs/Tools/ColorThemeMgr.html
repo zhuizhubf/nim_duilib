@@ -1347,30 +1347,39 @@
             padding: 15px;
             background-color: #F8FAFC;
         }
+        /* ========== 派生编辑器调整行样式 ========== */
         .adjustment-row {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
         }
+        /* 属性下拉框: 160px 宽度 */
         .adjustment-row select.adjust-property {
-            flex: 0 0 120px;
+            flex: 0 0 160px;
             min-width: 0;
+            font-size: 12px;
         }
+        /* 运算符下拉框: 100px 宽度 */
         .adjustment-row select.adjust-operator {
-            flex: 1 1 200px;
+            flex: 0 0 100px;
             min-width: 0;
+            font-size: 12px;
         }
+        /* 输入框: 50px 宽度 */
         .adjustment-row input.adjust-value {
-            flex: 0 0 70px;
+            flex: 0 0 50px;
             min-width: 0;
+            font-size: 12px;
         }
+        /* 单位标签 */
         .adjust-unit {
             font-size: 12px;
             color: #6B7280;
-            min-width: 20px;
+            min-width: 18px;
         }
+        /* 输入控件容器(滑块+输入框+单位+提示) */
         .adjust-input-wrapper {
             display: flex;
             flex-direction: row;
@@ -1378,24 +1387,34 @@
             gap: 4px;
             flex: 0 0 auto;
         }
+        /* 滑块: 240px 固定宽度 */
+        .adjust-input-wrapper input.adjust-slider {
+            width: 240px;
+            flex: 0 0 240px;
+            height: 18px;
+            cursor: pointer;
+        }
+        /* 数字输入框 */
         .adjust-input-wrapper input.adjust-value {
             width: 70px;
             flex: 0 0 70px;
         }
+        /* 单位标签 */
         .adjust-input-wrapper .adjust-unit {
             flex: 0 0 auto;
             font-size: 12px;
             color: #6B7280;
             min-width: 15px;
         }
+        /* 提示文字 */
         .adjust-input-wrapper .adjust-hint {
             flex: 0 0 auto;
-            font-size: 10px;
+            font-size: 12px;
             color: #9CA3AF;
             white-space: nowrap;
         }
         .adjust-hint {
-            font-size: 10px;
+            font-size: 12px;
             color: #9CA3AF;
             white-space: nowrap;
         }
@@ -2337,20 +2356,21 @@
                     <div class="adjustment-builder">
                         <div class="adjustment-row">
                             <select class="adjust-property">
-                                <option value="lightness">亮度 (lightness)</option>
-                                <option value="saturation">饱和度 (saturation)</option>
-                                <option value="hue">色相 (hue)</option>
-                                <option value="alpha">透明度 (alpha)</option>
-                                <option value="invert">反相 (invert)</option>
+                                <option value="lightness">亮度 (Lightness)</option>
+                                <option value="saturation">饱和度 (Saturation)</option>
+                                <option value="hue">色相 (Hue)</option>
+                                <option value="alpha">透明度 (Alpha)</option>
+                                <option value="invert">反相 (Invert)</option>
                             </select>
                             <select class="adjust-operator">
-                                <option value="+">+ 加法 (lightness:+15 表示 lightness 增加 15%)</option>
-                                <option value="-">- 减法 (lightness:-15 表示 lightness 减少 15%)</option>
-                                <option value="*">× 乘法 (lightness:*50 表示 lightness 变为原来的 50%)</option>
-                                <option value=":=">:= 设为绝对值 (lightness:=50 表示 lightness 设为 50%)</option>
+                                <option value="+">增加(+)</option>
+                                <option value="-">减少(-)</option>
+                                <option value="*">倍乘(×)</option>
+                                <option value=":=">绝对值(:=)</option>
                             </select>
                             <div class="adjust-input-wrapper">
-                                <input type="number" class="adjust-value" value="15" min="-100" max="100" step="1" style="width: 70px;">
+                                <input type="range" class="adjust-slider" min="-100" max="100" value="15">
+                                <input type="number" class="adjust-value" value="15" min="-100" max="100" step="1" style="width: 60px;">
                                 <span class="adjust-unit">%</span>
                                 <span class="adjust-hint"></span>
                             </div>
@@ -4550,7 +4570,8 @@
 
             // 绑定事件
             const selects = newRow.querySelectorAll('select');
-            const input = newRow.querySelector('input');
+            const input = newRow.querySelector('.adjust-value');
+            const slider = newRow.querySelector('.adjust-slider');
             selects.forEach(select => {
                 select.addEventListener('change', () => {
                     updateUnitDisplay(newRow);
@@ -4558,6 +4579,8 @@
                     updateDerivationPreview();
                 });
             });
+
+            // 输入框变化时同步滑块
             input.addEventListener('input', () => {
                 const min = parseFloat(input.min);
                 const max = parseFloat(input.max);
@@ -4565,6 +4588,18 @@
                 if (!validateInputValue(input, min, max, hint)) {
                     return;
                 }
+                slider.value = input.value;
+                updateFormulaPreview();
+                updateDerivationPreview();
+            });
+
+            // 滑块变化时同步输入框
+            slider.addEventListener('input', () => {
+                input.value = slider.value;
+                const hint = newRow.querySelector('.adjust-hint');
+                const min = parseFloat(slider.min);
+                const max = parseFloat(slider.max);
+                validateInputValue(input, min, max, hint);
                 updateFormulaPreview();
                 updateDerivationPreview();
             });
@@ -4604,8 +4639,9 @@
             const rows = builder.querySelectorAll('.adjustment-row');
             rows.forEach(row => {
                 const selects = row.querySelectorAll('select');
-                const input = row.querySelector('input');
-                
+                const input = row.querySelector('.adjust-value');
+                const slider = row.querySelector('.adjust-slider');
+
                 selects.forEach(select => {
                     select.addEventListener('change', () => {
                         updateUnitDisplay(row);
@@ -4614,6 +4650,7 @@
                     });
                 });
 
+                // 输入框变化时同步滑块
                 input.addEventListener('input', () => {
                     const property = row.querySelector('.adjust-property').value;
                     const operator = row.querySelector('.adjust-operator').value;
@@ -4624,6 +4661,19 @@
                     if (!validateInputValue(input, min, max, hint)) {
                         return; // 不更新预览
                     }
+                    // 同步滑块
+                    slider.value = input.value;
+                    updateFormulaPreview();
+                    updateDerivationPreview();
+                });
+
+                // 滑块变化时同步输入框
+                slider.addEventListener('input', () => {
+                    input.value = slider.value;
+                    const hint = row.querySelector('.adjust-hint');
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    validateInputValue(input, min, max, hint);
                     updateFormulaPreview();
                     updateDerivationPreview();
                 });
@@ -4638,6 +4688,7 @@
             const operator = row.querySelector('.adjust-operator').value;
             const unit = row.querySelector('.adjust-unit');
             const input = row.querySelector('.adjust-value');
+            const slider = row.querySelector('.adjust-slider');
             const hint = row.querySelector('.adjust-hint');
 
             let min, max, hintText;
@@ -4645,6 +4696,7 @@
             // 反相不需要输入值
             if (property === 'invert') {
                 input.style.display = 'none';
+                slider.style.display = 'none';
                 unit.style.display = 'none';
                 hint.textContent = 'RGB 反相，无需输入值';
                 hint.classList.remove('error');
@@ -4652,42 +4704,72 @@
                 return;
             }
 
-            // 恢复输入框显示
+            // 恢复输入框和滑块显示
             input.style.display = '';
+            slider.style.display = '';
             unit.style.display = '';
 
             // 根据属性类型和运算符设置范围和提示
-            if (property === 'alpha') {
-                min = 0;
-                max = 100;
-                hintText = '透明度: 0-100%';
-            } else if (property === 'hue') {
-                min = 0;
-                max = 360;
-                hintText = '色相: 0-360°';
+            if (property === 'hue') {
+                if (operator === ':=') {
+                    min = 0;
+                    max = 360;
+                    hintText = '绝对值 (0-360°)';
+                } else {
+                    min = 0;
+                    max = 360;
+                    hintText = '旋转角度 (0-360°)';
+                }
+            } else if (property === 'alpha') {
+                if (operator === ':=') {
+                    min = 0;
+                    max = 100;
+                    hintText = '绝对值 (0-100%)';
+                } else if (operator === '*') {
+                    min = 1;
+                    max = 200;
+                    hintText = '倍数 (50=50%)';
+                } else if (operator === '+') {
+                    min = 0;
+                    max = 100;
+                    hintText = '增加量 (0-100%)';
+                } else if (operator === '-') {
+                    min = 0;
+                    max = 100;
+                    hintText = '减少量 (0-100%)';
+                }
             } else if (operator === ':=') {
-                // 绝对值模式：亮度/饱和度 0-100
                 min = 0;
                 max = 100;
-                hintText = '绝对值: 0-100%';
+                hintText = '绝对值 (0-100%)';
             } else if (operator === '*') {
-                // 乘法模式：1-200 表示 1%-200%
                 min = 1;
                 max = 200;
-                hintText = '倍数: 1-200 (50=50%)';
-            } else {
-                // 加法/减法模式：-100 到 100
-                min = -100;
+                hintText = '倍数 (1-200%)';
+            } else if (operator === '+') {
+                min = 0;
                 max = 100;
-                hintText = '增减量: -100 ~ 100%';
+                hintText = '增加量 (0-100%)';
+            } else if (operator === '-') {
+                min = 0;
+                max = 100;
+                hintText = '减少量 (0-100%)';
             }
 
             input.min = min;
             input.max = max;
             input.step = 1;
+            slider.min = min;
+            slider.max = max;
+            slider.step = 1;
             unit.textContent = (property === 'hue') ? '°' : (property === 'alpha' ? '' : '%');
             hint.textContent = hintText;
             hint.classList.remove('error');
+
+            // 同步滑块和输入框的值
+            if (parseFloat(input.value) < min) input.value = min;
+            if (parseFloat(input.value) > max) input.value = max;
+            slider.value = input.value;
 
             // 校验当前值
             validateInputValue(input, min, max, hint);
@@ -4719,7 +4801,7 @@
                 if (property === 'invert') {
                     formulas.push('invert');
                 } else if (value !== '' && value !== '0') {
-                    formulas.push(`${property}${operator}${value}`);
+                    formulas.push(`${property}:${operator}${value}`);
                 }
             });
 
@@ -4747,8 +4829,8 @@
                     // 反相不需要值
                     if (property === 'invert') {
                         formulas.push('invert');
-                    } else if (value !== '') {
-                        formulas.push(`${property}${operator}${value}`);
+                    } else if (value !== '' && value !== '0') {
+                        formulas.push(`${property}:${operator}${value}`);
                     }
                 });
                 
@@ -4830,7 +4912,7 @@
                 if (property === 'invert') {
                     formulas.push('invert');
                 } else if (value !== '' && value !== '0') {
-                    formulas.push(`${property}${operator}${value}`);
+                    formulas.push(`${property}:${operator}${value}`);
                 }
             });
 
