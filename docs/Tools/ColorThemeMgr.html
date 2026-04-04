@@ -2341,6 +2341,7 @@
                                 <option value="saturation">饱和度 (saturation)</option>
                                 <option value="hue">色相 (hue)</option>
                                 <option value="alpha">透明度 (alpha)</option>
+                                <option value="invert">反相 (invert)</option>
                             </select>
                             <select class="adjust-operator">
                                 <option value="+">+ 加法 (lightness:+15 表示 lightness 增加 15%)</option>
@@ -3958,6 +3959,16 @@
                 part = part.trim();
                 if (!part) return;
 
+                // 反相不需要运算符和值
+                if (part === 'invert') {
+                    operations.push({
+                        property: 'invert',
+                        operator: '+',
+                        value: 0
+                    });
+                    return;
+                }
+
                 let property, operator, valueStr;
                 const colonIdx = part.indexOf(':');
 
@@ -3987,7 +3998,7 @@
                     valueStr = match[3];
                 }
 
-                if (!['lightness', 'luminance', 'saturation', 'alpha', 'hue'].includes(property)) return;
+                if (!['lightness', 'luminance', 'saturation', 'alpha', 'hue', 'invert'].includes(property)) return;
                 if (!['+', '-', '*', '/', ':='].includes(operator)) return;
 
                 const value = parseFloat(valueStr);
@@ -4056,6 +4067,20 @@
                         else if (op.operator === '*') currentAlpha *= (op.value / 100);
                         else if (op.operator === ':=') currentAlpha = Math.max(0, Math.min(1, op.value / 100));
                         currentAlpha = Math.max(0, Math.min(1, currentAlpha));
+                        break;
+
+                    case 'invert':
+                        // 反相：RGB 分量取反
+                        // 需要从 HSL 转换回 RGB 进行反相
+                        const invertRgb = hslToRgb(currentHsl.h, currentHsl.s, currentHsl.l);
+                        invertRgb.r = 255 - invertRgb.r;
+                        invertRgb.g = 255 - invertRgb.g;
+                        invertRgb.b = 255 - invertRgb.b;
+                        // 重新转换回 HSL
+                        const invertHsl = rgbToHsl(invertRgb.r, invertRgb.g, invertRgb.b);
+                        currentHsl.h = invertHsl.h;
+                        currentHsl.s = invertHsl.s;
+                        currentHsl.l = invertHsl.l;
                         break;
                 }
             });
@@ -4476,6 +4501,7 @@
                     firstRow.querySelector('.adjust-property').value = 'lightness';
                     firstRow.querySelector('.adjust-operator').value = '+';
                     firstRow.querySelector('.adjust-value').value = '15';
+                    updateUnitDisplay(firstRow);
                 }
             } else {
                 operations.forEach((op, index) => {
@@ -4484,11 +4510,15 @@
                         row = addAdjustmentRow();
                     }
                     row.querySelector('.adjust-property').value = op.property;
-                    row.querySelector('.adjust-operator').value = op.operator;
-                    row.querySelector('.adjust-value').value = op.value;
-                    
-                    const unit = row.querySelector('.adjust-unit');
-                    unit.textContent = op.property === 'alpha' ? '' : (op.property === 'hue' ? '°' : '%');
+                    // 反相的运算符和值需要特殊处理
+                    if (op.property === 'invert') {
+                        row.querySelector('.adjust-operator').value = '+';
+                        row.querySelector('.adjust-value').value = '0';
+                    } else {
+                        row.querySelector('.adjust-operator').value = op.operator === ':=' ? ':=' : '+';
+                        row.querySelector('.adjust-value').value = op.value || '0';
+                    }
+                    updateUnitDisplay(row);
                 });
             }
         }
@@ -4612,6 +4642,20 @@
 
             let min, max, hintText;
 
+            // 反相不需要输入值
+            if (property === 'invert') {
+                input.style.display = 'none';
+                unit.style.display = 'none';
+                hint.textContent = 'RGB 反相，无需输入值';
+                hint.classList.remove('error');
+                input.style.borderColor = '';
+                return;
+            }
+
+            // 恢复输入框显示
+            input.style.display = '';
+            unit.style.display = '';
+
             // 根据属性类型和运算符设置范围和提示
             if (property === 'alpha') {
                 min = 0;
@@ -4671,7 +4715,10 @@
                 const operator = row.querySelector('.adjust-operator').value;
                 const value = row.querySelector('.adjust-value').value;
 
-                if (value !== '' && value !== '0') {
+                // 反相不需要值
+                if (property === 'invert') {
+                    formulas.push('invert');
+                } else if (value !== '' && value !== '0') {
                     formulas.push(`${property}${operator}${value}`);
                 }
             });
@@ -4696,8 +4743,11 @@
                     const property = row.querySelector('.adjust-property').value;
                     const operator = row.querySelector('.adjust-operator').value;
                     const value = row.querySelector('.adjust-value').value;
-                    
-                    if (value !== '') {
+
+                    // 反相不需要值
+                    if (property === 'invert') {
+                        formulas.push('invert');
+                    } else if (value !== '') {
                         formulas.push(`${property}${operator}${value}`);
                     }
                 });
@@ -4732,6 +4782,13 @@
             let hasInvalidInput = false;
 
             rows.forEach(row => {
+                const property = row.querySelector('.adjust-property').value;
+
+                // 反相不需要验证
+                if (property === 'invert') {
+                    return;
+                }
+
                 const input = row.querySelector('.adjust-value');
                 const hint = row.querySelector('.adjust-hint');
                 const min = parseFloat(input.min);
@@ -4768,12 +4825,15 @@
                 const property = row.querySelector('.adjust-property').value;
                 const operator = row.querySelector('.adjust-operator').value;
                 const value = row.querySelector('.adjust-value').value;
-                
-                if (value !== '' && value !== '0') {
+
+                // 反相不需要值
+                if (property === 'invert') {
+                    formulas.push('invert');
+                } else if (value !== '' && value !== '0') {
                     formulas.push(`${property}${operator}${value}`);
                 }
             });
-            
+
             colorItem.adjust = formulas.join(',');
 
             // 如果有源颜色且有调整公式，自动计算并应用颜色
