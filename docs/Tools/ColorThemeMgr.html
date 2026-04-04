@@ -4317,6 +4317,26 @@
             return hasChanges;
         }
 
+        /**
+         * 重新计算所有派生颜色
+         * 遍历所有颜色，根据派生源和公式重新计算派生颜色值
+         */
+        function recomputeAllDerivedColors() {
+            const hasChanges = recomputeDerivedColors();
+            if (hasChanges) {
+                calculateGroupStatistics();
+                renderColorCategories();
+                renderDerivationTree();
+                updatePreview();
+                updateContrastResults();
+                updateAnalytics();
+                saveToHistory('重新计算所有派生颜色');
+                showToast('已重新计算所有派生颜色', 'success');
+            } else {
+                showToast('没有需要重新计算的派生颜色', 'info');
+            }
+        }
+
         // ========== 派生编辑器交互函数 ==========
         let currentEditingColor = null;
 
@@ -5338,7 +5358,10 @@
                         <span>💡 可优化建议:</span>
                         <span class="derivation-tree-stat-value">${stats.suggestions}</span>
                     </div>
-                    <div style="margin-left: auto;">
+                    <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <button class="btn btn-small btn-derivation" style="font-size: 11px; padding: 4px 10px;" onclick="recomputeAllDerivedColors()">
+                            🔄 重新计算所有
+                        </button>
                         <button class="btn btn-small btn-derivation" style="font-size: 11px; padding: 4px 10px;" onclick="openBatchDerivationWizard()">
                             ⚡ 批量派生向导
                         </button>
