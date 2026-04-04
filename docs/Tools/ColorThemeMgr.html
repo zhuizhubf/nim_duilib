@@ -4917,6 +4917,17 @@
             const sourceName = document.getElementById('derivationSource').value;
             const sourceColor = sourceName ? currentColorMap.get(sourceName) : null;
 
+            if (!sourceName) {
+                // 派生自为空时，显示提示
+                document.getElementById('sourcePreviewSwatch').style.backgroundColor = '#F3F4F6';
+                document.getElementById('sourcePreviewValue').textContent = '-';
+                document.getElementById('sourcePreviewAHSL').textContent = '请先选择派生源颜色';
+                document.getElementById('resultPreviewSwatch').style.backgroundColor = '#F3F4F6';
+                document.getElementById('resultPreviewValue').textContent = '-';
+                document.getElementById('resultPreviewAHSL').textContent = '无源颜色';
+                return;
+            }
+
             if (sourceColor && sourceColor.value) {
                 // 显示源颜色
                 document.getElementById('sourcePreviewSwatch').style.backgroundColor = argbToRgbaCss(sourceColor.value);
@@ -4957,14 +4968,13 @@
                     document.getElementById('resultPreviewAHSL').textContent = `A:${resultAHSL.a} H:${resultAHSL.h}° S:${resultAHSL.s} L:${resultAHSL.l}`;
                 }
             } else {
-                const currentColor = currentEditingColor ? currentColorMap.get(currentEditingColor) : null;
-                const displayColor = currentColor ? currentColor.value : '#FFFFFFFF';
-                document.getElementById('sourcePreviewSwatch').style.backgroundColor = argbToRgbaCss(displayColor);
-                document.getElementById('sourcePreviewValue').textContent = displayColor;
-                document.getElementById('sourcePreviewAHSL').textContent = '-';
-                document.getElementById('resultPreviewSwatch').style.backgroundColor = argbToRgbaCss(displayColor);
-                document.getElementById('resultPreviewValue').textContent = displayColor;
-                document.getElementById('resultPreviewAHSL').textContent = '-';
+                // 源颜色无效时
+                document.getElementById('sourcePreviewSwatch').style.backgroundColor = '#F3F4F6';
+                document.getElementById('sourcePreviewValue').textContent = '-';
+                document.getElementById('sourcePreviewAHSL').textContent = '源颜色无效';
+                document.getElementById('resultPreviewSwatch').style.backgroundColor = '#F3F4F6';
+                document.getElementById('resultPreviewValue').textContent = '-';
+                document.getElementById('resultPreviewAHSL').textContent = '无源颜色';
             }
         }
 
