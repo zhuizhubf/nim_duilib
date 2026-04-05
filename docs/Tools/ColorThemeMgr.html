@@ -1187,49 +1187,7 @@
         .history-item.future {
             opacity: 0.6;
         }
-        .batch-edit-panel {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .batch-edit-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1E1E1E;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .batch-edit-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .batch-edit-option {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .batch-edit-option label {
-            font-size: 13px;
-            color: #4B5563;
-        }
-        .batch-edit-option input,
-        .batch-edit-option select {
-            padding: 6px;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        .batch-edit-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
+
         /* 派生关系编辑器样式 */
         .derivation-edit-panel {
             position: fixed;
@@ -2495,37 +2453,6 @@
     </div>
     <div class="color-attr-overlay hidden" id="colorAttrOverlay" onclick="closeColorAttrPanel()"></div>
 
-    <!-- 批量编辑面板 -->
-    <div class="batch-edit-panel hidden" id="batchEditPanel">
-        <div class="batch-edit-title">批量编辑</div>
-        <div class="batch-edit-options">
-            <div class="batch-edit-option">
-                <label>选择类型 (Type)</label>
-                <select id="batchTypeFilter">
-                    <option value="">全部类型</option>
-                </select>
-            </div>
-            <div class="batch-edit-option">
-                <label>选择类别 (Category)</label>
-                <select id="batchCategoryFilter">
-                    <option value="">全部类别</option>
-                </select>
-            </div>
-            <div class="batch-edit-option">
-                <label>亮度调整 (%)</label>
-                <input type="number" id="batchBrightness" value="0" min="-100" max="100" step="5">
-            </div>
-            <div class="batch-edit-option">
-                <label>透明度调整 (%)</label>
-                <input type="number" id="batchAlpha" value="0" min="-100" max="100" step="5">
-            </div>
-        </div>
-        <div class="batch-edit-buttons">
-            <button class="btn btn-generate" id="applyBatchEdit">应用批量修改</button>
-            <button class="btn btn-secondary" id="resetBatchEdit">重置筛选</button>
-        </div>
-    </div>
-
     <div class="generate-panel hidden" id="generatePanel">
         <div class="theme-generate-cards">
             <div class="theme-card theme-card-basic">
@@ -2767,7 +2694,6 @@
         const generatePanelEl = document.getElementById('generatePanel');
         const previewPanelEl = document.getElementById('previewPanel');
         const colorAnalyticsEl = document.getElementById('colorAnalytics');
-        const batchEditPanelEl = document.getElementById('batchEditPanel');
         const groupSwitchEl = document.getElementById('groupSwitch');
         const searchBoxEl = document.getElementById('searchBox');
         const searchInput = document.getElementById('searchInput');
@@ -2823,10 +2749,6 @@
 
             // 搜索
             searchInput.addEventListener('input', handleSearch);
-
-            // 批量编辑
-            document.getElementById('applyBatchEdit').addEventListener('click', applyBatchEdit);
-            document.getElementById('resetBatchEdit').addEventListener('click', resetBatchEdit);
 
             // 键盘快捷键
             document.addEventListener('keydown', handleKeyboardShortcuts);
@@ -3026,7 +2948,6 @@
                 generatePanelEl.classList.remove('hidden');
                 previewPanelEl.classList.remove('hidden');
                 colorAnalyticsEl.classList.remove('hidden');
-                batchEditPanelEl.classList.remove('hidden');
                 searchBoxEl.style.display = 'block';
 
                 showToast('主题文件加载成功！', 'success');
@@ -3106,7 +3027,6 @@
 
             groupColors();
             calculateGroupStatistics();
-            populateBatchFilters();
             renderColorCategories();
             renderQuickActions();
             updatePreview();
@@ -3196,34 +3116,6 @@
             });
 
             changeStatEl.textContent = `修改数: ${totalChanged} / ${totalCount}`;
-        }
-
-        // ========== 填充批量编辑过滤器 ==========
-        function populateBatchFilters() {
-            const typeFilter = document.getElementById('batchTypeFilter');
-            const categoryFilter = document.getElementById('batchCategoryFilter');
-            
-            // 清空现有选项
-            typeFilter.innerHTML = '<option value="">全部类型</option>';
-            categoryFilter.innerHTML = '<option value="">全部类别</option>';
-
-            // 添加类型选项
-            const types = new Set(allColorItems.map(item => item.type));
-            types.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                typeFilter.appendChild(option);
-            });
-
-            // 添加类别选项
-            const categories = new Set(allColorItems.map(item => item.category));
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categoryFilter.appendChild(option);
-            });
         }
 
         // ========== 渲染快速操作 ==========
@@ -3642,93 +3534,6 @@
             };
             reader.readAsText(file);
             e.target.value = '';
-        }
-
-        // ========== 批量编辑功能 ==========
-        function applyBatchEdit() {
-            const typeFilter = document.getElementById('batchTypeFilter').value;
-            const categoryFilter = document.getElementById('batchCategoryFilter').value;
-            const brightnessChange = parseInt(document.getElementById('batchBrightness').value) || 0;
-            const alphaChange = parseInt(document.getElementById('batchAlpha').value) || 0;
-
-            if (brightnessChange === 0 && alphaChange === 0) {
-                showToast('请设置亮度或透明度调整值', 'warning');
-                return;
-            }
-
-            let modifiedCount = 0;
-            allColorItems.forEach(item => {
-                // 检查是否符合筛选条件
-                const typeMatch = !typeFilter || item.type === typeFilter;
-                const categoryMatch = !categoryFilter || item.category === categoryFilter;
-                
-                if (typeMatch && categoryMatch) {
-                    let newValue = item.value;
-                    
-                    // 调整亮度
-                    if (brightnessChange !== 0) {
-                        newValue = adjustColorBrightness(newValue, brightnessChange);
-                    }
-                    
-                    // 调整透明度
-                    if (alphaChange !== 0) {
-                        newValue = adjustColorAlpha(newValue, alphaChange);
-                    }
-                    
-                    if (newValue !== item.value) {
-                        item.value = newValue;
-                        currentColorMap.set(item.name, item);
-                        updateAllGroupedValues(item.name, newValue);
-                        modifiedCount++;
-                    }
-                }
-            });
-
-            if (modifiedCount > 0) {
-                calculateGroupStatistics();
-                renderColorCategories();
-                updatePreview();
-                updateAnalytics();
-                updateContrastResults();
-                saveToHistory(`批量修改 (${modifiedCount}个)`);
-                showToast(`已修改 ${modifiedCount} 个颜色`, 'success');
-            } else {
-                showToast('没有颜色被修改', 'info');
-            }
-        }
-
-        function resetBatchEdit() {
-            document.getElementById('batchTypeFilter').value = '';
-            document.getElementById('batchCategoryFilter').value = '';
-            document.getElementById('batchBrightness').value = '0';
-            document.getElementById('batchAlpha').value = '0';
-            showToast('已重置筛选条件', 'info');
-        }
-
-        function adjustColorBrightness(argb, percent) {
-            if (!/^#([0-9A-F]{8})$/i.test(argb)) return argb;
-            
-            const rgb = argbToRgb(argb);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            
-            // 调整亮度
-            hsl.l = Math.max(0, Math.min(1, hsl.l + percent / 100));
-            
-            const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-            const alphaHex = argb.slice(1, 3);
-            const newRgbHex = rgbToHex(newRgb.r) + rgbToHex(newRgb.g) + rgbToHex(newRgb.b);
-            
-            return `#${alphaHex}${newRgbHex}`.toUpperCase();
-        }
-
-        function adjustColorAlpha(argb, percent) {
-            if (!/^#([0-9A-F]{8})$/i.test(argb)) return argb;
-            
-            let alpha = parseInt(argb.slice(1, 3), 16);
-            alpha = Math.max(0, Math.min(255, alpha + Math.round(percent * 2.55)));
-            
-            const alphaHex = rgbToHex(alpha);
-            return `#${alphaHex}${argb.slice(3)}`.toUpperCase();
         }
 
         // ========== 工具函数 ==========
@@ -8052,7 +7857,6 @@
                 generatePanelEl.classList.remove('hidden');
                 previewPanelEl.classList.remove('hidden');
                 colorAnalyticsEl.classList.remove('hidden');
-                batchEditPanelEl.classList.remove('hidden');
                 searchBoxEl.style.display = 'block';
 
                 showToast('主题文件加载成功！', 'success');
@@ -8289,9 +8093,7 @@
             rebindElement('applyBasicThemeBtn', applyBasicColorTheme);
             rebindElement('generateAccentBtn', applyAccentColorTheme);
             rebindElement('generateContrastBtn', applyHighContrastTheme);
-            rebindElement('applyBatchEdit', applyBatchEdit);
-            rebindElement('resetBatchEdit', resetBatchEdit);
-            
+
             // ------------------------------------------------
             // 导出按钮特殊处理
             // ------------------------------------------------
