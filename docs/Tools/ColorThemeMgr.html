@@ -6789,26 +6789,47 @@
         function updatePreview() {
             if (!currentColorMap.size) return;
 
-            // 获取颜色值
-            const windowBg = getColorValue('bg_window_main', isDarkPreview ? '#FF1E1E1E' : '#FFF0F0F0');
-            const windowHeader = getColorValue('bg_titlebar', isDarkPreview ? '#FF2D2D2D' : '#FFF0F0F0');
-            const textPrimary = getColorValue('text_default', isDarkPreview ? '#FFFFFFFF' : '#FF1E1E1E');
-            const textSecondary = getColorValue('text_muted', isDarkPreview ? '#FFB0B0B0' : '#FF6B6B6B');
-            const buttonPrimary = getColorValue('bg_btn_normal', '#FF0078D4');
-            const buttonHover = getColorValue('bg_btn_hovered', buttonPrimary);
-            const buttonText = getColorValue('text_default', '#FFFFFFFF');
-            const borderColor = getColorValue('border_control_normal', isDarkPreview ? '#FF555555' : '#FFCCCCCC');
-            const inputBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
-            const linkColor = getColorValue('text_link_normal', '#FF0078D4');
-            const listItemBg = getColorValue('bg_container', isDarkPreview ? '#FF2D2D2D' : '#FFFFFFFF');
-            const listItemHover = getColorValue('bg_content', listItemBg);
-            const listItemBorder = getColorValue('border_control_normal', isDarkPreview ? '#FF3D3D3D' : '#FFE5E5E5');
-            const tagBg = getColorValue('bg_btn_hovered', '#FFE5F1FF');
-            const successColor = getColorValue('color_green', '#FF10B981');
-            const warningColor = getColorValue('color_red_light', '#FFF59E0B');
-            const errorColor = getColorValue('color_red', '#FFEF4444');
+            // ========== 获取XML配置文件中的颜色 ==========
+            // 窗口背景
+            const windowBg = getColorValue('bg_window_main', '#FFF0F0F0');
+            const windowBorder = getColorValue('border_window', '#FFD0D0D0');
+            const titleBarBg = getColorValue('bg_titlebar', '#FFF0F0F0');
 
-            // 应用到预览窗口
+            // 文本颜色
+            const textDefault = getColorValue('text_default', '#FF1E1E1E');
+            const textMuted = getColorValue('text_muted', '#FF6B6B6B');
+            const textDisabled = getColorValue('text_disabled', '#FF737373');
+            const textLink = getColorValue('text_link_normal', '#FF006EC2');
+
+            // 容器/内容
+            const containerBg = getColorValue('bg_container', '#FFFFFFFF');
+            const borderNormal = getColorValue('border_control_normal', '#FFCACACA');
+            const borderHovered = getColorValue('border_control_hovered', '#FFB0B0B0');
+            const borderDisabled = getColorValue('border_control_disabled', '#FFCECECE');
+
+            // 次要按钮
+            const btnNormalBg = getColorValue('bg_btn_normal', '#FFFFFFFF');
+            const btnDisabledBg = getColorValue('bg_btn_disabled', '#FFF5F5F5');
+            const btnNormalBorder = getColorValue('border_btn_normal', '#FFCACACA');
+            const btnTextNormal = getColorValue('text_btn_normal', '#FF1E1E1E');
+            const btnTextDisabled = getColorValue('text_btn_disabled', '#FFA0A0A0');
+
+            // 主要按钮
+            const primaryBtnNormalBg = getColorValue('bg_primary_btn_normal', '#FF0078D4');
+            const primaryBtnNormalBorder = getColorValue('border_primary_btn_normal', '#FF005A9E');
+            const primaryBtnText = getColorValue('text_primary_btn_normal', '#FFFFFFFF');
+
+            // 菜单
+            const menuBg = getColorValue('bg_menu', '#FFFFFFFF');
+
+            // 列表
+            const listBg = getColorValue('bg_list', '#FFFFFFFF');
+
+            // 语义颜色
+            const greenColor = getColorValue('color_green', '#FF00B050');
+            const redColor = getColorValue('color_red', '#FFE81123');
+
+            // ========== 应用到预览窗口 ==========
             const previewWindow = document.getElementById('previewWindow');
             const windowHeaderEl = document.getElementById('previewWindowHeader');
             const windowContent = document.getElementById('previewWindowContent');
@@ -6817,7 +6838,9 @@
             const textSecondaryEl = document.getElementById('previewTextMuted');
             const btnPrimary = document.getElementById('previewBtnPrimary');
             const btnSecondary = document.getElementById('previewBtnSecondary');
+            const btnDisabled = document.getElementById('previewBtnDisabled');
             const inputEl = document.getElementById('previewInput');
+            const inputDisabled = document.getElementById('previewInputDisabled');
             const linkEl = document.getElementById('previewLink');
             const listEl = document.getElementById('previewList');
             const listItems = document.querySelectorAll('.preview-list-item');
@@ -6838,123 +6861,135 @@
             const badgeSuccess = document.getElementById('badgeSuccess');
             const badgeWarning = document.getElementById('badgeWarning');
             const badgeError = document.getElementById('badgeError');
-            const alerts = document.querySelectorAll('.preview-alert');
 
-            // 设置背景色
+            // ========== 窗口样式 ==========
             previewWindow.style.backgroundColor = argbToRgbaCss(windowBg);
-            previewWindow.style.borderColor = argbToRgbaCss(borderColor);
-            windowHeaderEl.style.backgroundColor = argbToRgbaCss(windowHeader);
-            windowHeaderEl.style.color = argbToRgbaCss(textPrimary);
+            previewWindow.style.borderColor = argbToRgbaCss(windowBorder);
+            windowHeaderEl.style.backgroundColor = argbToRgbaCss(titleBarBg);
+            windowHeaderEl.style.color = argbToRgbaCss(textDefault);
             windowContent.style.backgroundColor = argbToRgbaCss(windowBg);
             contentArea.style.backgroundColor = argbToRgbaCss(windowBg);
 
-            // 设置文本颜色
-            textPrimaryEl.style.color = argbToRgbaCss(textPrimary);
-            textSecondaryEl.style.color = argbToRgbaCss(textSecondary);
+            // ========== 文本样式 ==========
+            textPrimaryEl.style.color = argbToRgbaCss(textDefault);
+            textSecondaryEl.style.color = argbToRgbaCss(textMuted);
 
-            // 设置按钮样式
-            btnPrimary.style.backgroundColor = argbToRgbaCss(buttonPrimary);
-            btnPrimary.style.color = argbToRgbaCss(buttonText);
-            btnPrimary.style.borderColor = argbToRgbaCss(buttonPrimary);
-            btnSecondary.style.color = argbToRgbaCss(buttonPrimary);
-            btnSecondary.style.borderColor = argbToRgbaCss(buttonPrimary);
+            // ========== 主要按钮样式 ==========
+            btnPrimary.style.backgroundColor = argbToRgbaCss(primaryBtnNormalBg);
+            btnPrimary.style.color = argbToRgbaCss(primaryBtnText);
+            btnPrimary.style.borderColor = argbToRgbaCss(primaryBtnNormalBorder);
 
-            // 设置输入框样式
-            inputEl.style.backgroundColor = argbToRgbaCss(inputBg);
-            inputEl.style.color = argbToRgbaCss(textPrimary);
-            inputEl.style.borderColor = argbToRgbaCss(borderColor);
+            // ========== 次要按钮样式 ==========
+            btnSecondary.style.backgroundColor = argbToRgbaCss(btnNormalBg);
+            btnSecondary.style.color = argbToRgbaCss(btnTextNormal);
+            btnSecondary.style.borderColor = argbToRgbaCss(btnNormalBorder);
 
-            // 设置链接颜色
-            linkEl.style.color = argbToRgbaCss(linkColor);
+            // ========== 禁用按钮样式 ==========
+            btnDisabled.style.backgroundColor = argbToRgbaCss(btnDisabledBg);
+            btnDisabled.style.color = argbToRgbaCss(btnTextDisabled);
+            btnDisabled.style.borderColor = argbToRgbaCss(borderDisabled);
 
-            // 设置列表样式
-            listEl.style.backgroundColor = argbToRgbaCss(listItemBg);
-            listEl.style.border = `1px solid ${argbToRgbaCss(borderColor)}`;
+            // ========== 输入框样式 ==========
+            inputEl.style.backgroundColor = argbToRgbaCss(containerBg);
+            inputEl.style.color = argbToRgbaCss(textDefault);
+            inputEl.style.borderColor = argbToRgbaCss(borderNormal);
+
+            // ========== 禁用输入框样式 ==========
+            inputDisabled.style.backgroundColor = argbToRgbaCss(btnDisabledBg);
+            inputDisabled.style.color = argbToRgbaCss(textDisabled);
+            inputDisabled.style.borderColor = argbToRgbaCss(borderDisabled);
+
+            // ========== 链接样式 ==========
+            linkEl.style.color = argbToRgbaCss(textLink);
+
+            // ========== 列表样式 ==========
+            listEl.style.backgroundColor = argbToRgbaCss(listBg);
+            listEl.style.borderColor = argbToRgbaCss(borderNormal);
             listItems.forEach(item => {
-                item.style.color = argbToRgbaCss(textPrimary);
-                item.style.borderBottomColor = argbToRgbaCss(listItemBorder);
+                item.style.color = argbToRgbaCss(textDefault);
+                item.style.borderBottomColor = argbToRgbaCss(borderNormal);
             });
 
-            // 设置 Tab 样式
-            tabsContainer.style.borderBottomColor = argbToRgbaCss(borderColor);
+            // ========== Tab 样式 ==========
+            tabsContainer.style.borderBottomColor = argbToRgbaCss(borderNormal);
             tabs.forEach(tab => {
-                tab.style.color = argbToRgbaCss(textSecondary);
+                tab.style.color = argbToRgbaCss(textMuted);
                 if (tab.classList.contains('active')) {
-                    tab.style.color = argbToRgbaCss(buttonPrimary);
-                    tab.style.borderBottomColor = argbToRgbaCss(buttonPrimary);
+                    tab.style.color = argbToRgbaCss(textLink);
+                    tab.style.borderBottomColor = argbToRgbaCss(textLink);
                 }
             });
 
-            // 设置复选框和单选按钮
+            // ========== 复选框和单选按钮 ==========
             checkboxes.forEach(label => {
-                label.style.color = argbToRgbaCss(textPrimary);
+                label.style.color = argbToRgbaCss(textDefault);
             });
             radios.forEach(label => {
-                label.style.color = argbToRgbaCss(textPrimary);
+                label.style.color = argbToRgbaCss(textDefault);
             });
 
-            // 设置开关控件
-            toggleSwitch.style.backgroundColor = argbToRgbaCss(buttonPrimary);
+            // ========== 开关控件 ==========
+            toggleSwitch.style.backgroundColor = argbToRgbaCss(primaryBtnNormalBg);
 
-            // 设置下拉菜单
-            dropdownBtn.style.backgroundColor = argbToRgbaCss(inputBg);
-            dropdownBtn.style.color = argbToRgbaCss(textPrimary);
-            dropdownBtn.style.borderColor = argbToRgbaCss(borderColor);
-            dropdownMenu.style.backgroundColor = argbToRgbaCss(windowBg);
-            dropdownMenu.style.border = `1px solid ${argbToRgbaCss(borderColor)}`;
+            // ========== 下拉菜单 ==========
+            dropdownBtn.style.backgroundColor = argbToRgbaCss(containerBg);
+            dropdownBtn.style.color = argbToRgbaCss(textDefault);
+            dropdownBtn.style.borderColor = argbToRgbaCss(borderNormal);
+            dropdownMenu.style.backgroundColor = argbToRgbaCss(menuBg);
+            dropdownMenu.style.borderColor = argbToRgbaCss(borderNormal);
             dropdownItems.forEach(item => {
-                item.style.color = argbToRgbaCss(textPrimary);
+                item.style.color = argbToRgbaCss(textDefault);
             });
 
-            // 设置进度条
-            progressBar.style.backgroundColor = argbToRgbaCss(listItemBorder);
-            progressFill.style.backgroundColor = argbToRgbaCss(buttonPrimary);
+            // ========== 进度条 ==========
+            progressBar.style.backgroundColor = argbToRgbaCss(borderNormal);
+            progressFill.style.backgroundColor = argbToRgbaCss(primaryBtnNormalBg);
 
-            // 设置滑块
-            const sliderBg = argbToRgbaCss(buttonPrimary);
-            slider.style.background = `linear-gradient(to right, ${sliderBg} 0%, ${sliderBg} 50%, ${argbToRgbaCss(listItemBorder)} 50%, ${argbToRgbaCss(listItemBorder)} 100%)`;
+            // ========== 滑块 ==========
+            slider.style.background = `linear-gradient(to right, ${argbToRgbaCss(primaryBtnNormalBg)} 0%, ${argbToRgbaCss(primaryBtnNormalBg)} 50%, ${argbToRgbaCss(borderNormal)} 50%, ${argbToRgbaCss(borderNormal)} 100%)`;
 
-            // 设置标签
+            // ========== 标签 ==========
             tags.forEach(tag => {
-                tag.style.backgroundColor = argbToRgbaCss(tagBg);
-                tag.style.color = argbToRgbaCss(buttonPrimary);
+                tag.style.backgroundColor = argbToRgbaCss(containerBg);
+                tag.style.color = argbToRgbaCss(textLink);
+                tag.style.borderColor = argbToRgbaCss(borderHovered);
             });
 
-            // 设置表格
-            table.style.color = argbToRgbaCss(textPrimary);
+            // ========== 表格 ==========
+            table.style.color = argbToRgbaCss(textDefault);
             tableCells.forEach(cell => {
-                cell.style.borderBottomColor = argbToRgbaCss(listItemBorder);
+                cell.style.borderBottomColor = argbToRgbaCss(borderNormal);
             });
 
-            // 设置徽章
-            badgeSuccess.style.backgroundColor = argbToRgbaCss(successColor);
+            // ========== 徽章 ==========
+            badgeSuccess.style.backgroundColor = argbToRgbaCss(greenColor);
             badgeSuccess.style.color = '#FFFFFF';
-            badgeWarning.style.backgroundColor = argbToRgbaCss(warningColor);
+            badgeWarning.style.backgroundColor = '#FFF59E0B';
             badgeWarning.style.color = '#FFFFFF';
-            badgeError.style.backgroundColor = argbToRgbaCss(errorColor);
+            badgeError.style.backgroundColor = argbToRgbaCss(redColor);
             badgeError.style.color = '#FFFFFF';
 
-            // 设置提示框
+            // ========== 提示框 ==========
             const alertInfo = document.getElementById('alertInfo');
             const alertSuccess = document.getElementById('alertSuccess');
             const alertWarning = document.getElementById('alertWarning');
             const alertError = document.getElementById('alertError');
-            
+
             if (alertInfo) {
-                alertInfo.style.borderLeftColor = argbToRgbaCss(buttonPrimary);
-                alertInfo.style.color = argbToRgbaCss(textPrimary);
+                alertInfo.style.borderLeftColor = argbToRgbaCss(primaryBtnNormalBg);
+                alertInfo.style.color = argbToRgbaCss(textDefault);
             }
             if (alertSuccess) {
-                alertSuccess.style.borderLeftColor = argbToRgbaCss(successColor);
-                alertSuccess.style.color = argbToRgbaCss(textPrimary);
+                alertSuccess.style.borderLeftColor = argbToRgbaCss(greenColor);
+                alertSuccess.style.color = argbToRgbaCss(textDefault);
             }
             if (alertWarning) {
-                alertWarning.style.borderLeftColor = argbToRgbaCss(warningColor);
-                alertWarning.style.color = argbToRgbaCss(textPrimary);
+                alertWarning.style.borderLeftColor = '#FFF59E0B';
+                alertWarning.style.color = argbToRgbaCss(textDefault);
             }
             if (alertError) {
-                alertError.style.borderLeftColor = argbToRgbaCss(errorColor);
-                alertError.style.color = argbToRgbaCss(textPrimary);
+                alertError.style.borderLeftColor = argbToRgbaCss(redColor);
+                alertError.style.color = argbToRgbaCss(textDefault);
             }
         }
 
