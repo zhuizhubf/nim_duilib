@@ -2968,7 +2968,7 @@
                 const accentSupport = themeNode.getAttribute('accent_support') || 'false';
                 themeNameEl.textContent = `主题: ${themeName} (v${themeVersion})`;
                 themeStyleEl.textContent = `风格: ${themeStyle}`;
-                themeTypeEl.textContent = `类型: ${themeType}${accentSupport === 'true' ? ' (支持强调色)' : ''}`;
+                themeTypeEl.textContent = `类型: ${themeType}${accentSupport === 'true' ? ' (支持强调色)' : '(不支持强调色)'}`;
                 isDarkPreview = themeStyle.toLowerCase() === 'dark';
             }
 
@@ -4166,6 +4166,8 @@
                     showToast(`已禁用 ${colorName} 的强调色支持`, 'success');
                 }
             }
+
+            renderColorCategories();
         }
         window.toggleAccentSupport = toggleAccentSupport;
 
@@ -6058,7 +6060,7 @@
                         ${contrastLevel ? `<span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>` : '<span class="contrast-badge-none" title="未设置对比度检查背景色，不检查对比度">未设置对比度检查背景色</span>'}
                     </div>
                     <div class="badges-container">${badgesHtml}</div>
-                    <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : ''}</div>
+                    <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : '| 不支持强调色'}</div>
                     ${(derivedFrom || adjust) ? `<div class="color-derivation-info">${derivedFrom ? `派生自: <span class="derivation-ref">${derivedFrom}</span>` : ''}${adjust ? ` | 调整: <span class="adjust-formula">${adjust}</span>` : ''}</div>` : ''}
                     <div class="color-code-group">
                         <div class="color-code current ${isChanged ? 'changed' : ''}">当前值：${value}</div>
