@@ -35,6 +35,7 @@
     <!-- ===================== 窗口按钮颜色 (type: button_window/button_window_close) ===================== -->
     <ThemeColor name="bg_btn_window_close_hovered" value="#FFEF4444" type="button_window_close" category="bg_color" role="semantic_error_light" derived_from="" adjust="" fixed="true" support_accent="false" contrast_bg="" comment_cn="关闭按钮悬浮背景" comment_en="Close button hovered bg"/>
     <ThemeColor name="bg_btn_window_close_pressed" value="#FFDC2626" type="button_window_close" category="bg_color" role="semantic_error" derived_from="" adjust="" fixed="true" support_accent="false" contrast_bg="" comment_cn="关闭按钮点击背景" comment_en="Close button pressed bg"/>
+    <ThemeColor name="bg_btn_window_normal" value="#FF2E2E2E" type="button_window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="窗口按钮背景" comment_en="Window button bg"/>
     <ThemeColor name="bg_btn_window_hovered" value="#FF333333" type="button_window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="窗口按钮悬浮背景" comment_en="Window button hovered bg"/>
     <ThemeColor name="bg_btn_window_pressed" value="#FF3A3A3A" type="button_window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="窗口按钮点击背景" comment_en="Window button pressed bg"/>
 
@@ -96,8 +97,9 @@
 
     <!-- ===================== 菜单颜色 (type: menu) ===================== -->
     <ThemeColor name="bg_menu" value="#FF252525" type="menu" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉/右键菜单背景" comment_en="Dropdown/context menu background"/>
-    <ThemeColor name="bg_menu_item_hovered" value="#FF333333" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单项悬浮" comment_en="Menu item hovered"/>
-    <ThemeColor name="bg_menu_item_selected" value="#FF3A3A3A" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单项选中" comment_en="Menu item selected"/>
+    <ThemeColor name="bg_menu_item_normal" value="#FF2E2E2E" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单项背景" comment_en="Menu item bg"/>
+    <ThemeColor name="bg_menu_item_hovered" value="#FF333333" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单项悬浮背景" comment_en="Menu item hovered bg"/>
+    <ThemeColor name="bg_menu_item_selected" value="#FF3A3A3A" type="menu" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单项选中背景" comment_en="Menu item selected bg"/>
 
     <!-- ===================== 菜单栏颜色 (type: menu_bar) ===================== -->
     <ThemeColor name="bg_menu_bar" value="#FF1A1A1A" type="menu_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="菜单栏背景" comment_en="Menu bar background"/>
@@ -107,17 +109,19 @@
 
     <!-- ===================== 列表框颜色 (type: list_box) ===================== -->
     <ThemeColor name="bg_list" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表背景" comment_en="List background"/>
-    <ThemeColor name="bg_list_item_hovered" value="#FF333333" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项悬浮" comment_en="List item hovered"/>
-    <ThemeColor name="bg_list_item_pressed" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项点击" comment_en="List item pressed"/>
-    <ThemeColor name="bg_list_item_disabled" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项禁用" comment_en="List item disabled"/>
-    <ThemeColor name="bg_list_item_selected" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项选中" comment_en="List item selected"/>
+    <ThemeColor name="bg_list_item_normal" value="#FF2E2E2E" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项背景" comment_en="List item bg"/>
+    <ThemeColor name="bg_list_item_hovered" value="#FF333333" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项悬浮背景" comment_en="List item hovered bg"/>
+    <ThemeColor name="bg_list_item_pressed" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项点击背景" comment_en="List item pressed bg"/>
+    <ThemeColor name="bg_list_item_disabled" value="#FF202020" type="list_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项禁用背景" comment_en="List item disabled bg"/>
+    <ThemeColor name="bg_list_item_selected" value="#FF3A3A3A" type="list_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项选中背景" comment_en="List item selected bg"/>
 
     <!-- ===================== 树控件颜色 (type: tree_view) ===================== -->
     <ThemeColor name="bg_tree_view" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树控件背景" comment_en="Tree view background"/>
-    <ThemeColor name="bg_tree_view_node_hovered" value="#FF333333" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点悬浮" comment_en="Tree node hovered"/>
-    <ThemeColor name="bg_tree_view_node_pressed" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点点击" comment_en="Tree node pressed"/>
-    <ThemeColor name="bg_tree_view_node_disabled" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点禁用" comment_en="Tree node disabled"/>
-    <ThemeColor name="bg_tree_view_node_selected" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点选中" comment_en="Tree node selected"/>
+    <ThemeColor name="bg_tree_view_node_normal" value="#FF2E2E2E" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点背景" comment_en="Tree node bg"/>
+    <ThemeColor name="bg_tree_view_node_hovered" value="#FF333333" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点悬浮背景" comment_en="Tree node hovered bg"/>
+    <ThemeColor name="bg_tree_view_node_pressed" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点点击背景" comment_en="Tree node pressed bg"/>
+    <ThemeColor name="bg_tree_view_node_disabled" value="#FF202020" type="tree_view" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点禁用背景" comment_en="Tree node disabled bg"/>
+    <ThemeColor name="bg_tree_view_node_selected" value="#FF3A3A3A" type="tree_view" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="树节点选中背景" comment_en="Tree node selected bg"/>
 
     <!-- ===================== 列表控件颜色 (type: list_ctrl) ===================== -->
     <ThemeColor name="bg_list_ctrl" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表控件背景" comment_en="List control background"/>
@@ -125,6 +129,7 @@
     <ThemeColor name="bg_list_ctrl_header_hovered" value="#FF333333" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表表头悬浮背景" comment_en="List header hovered bg"/>
     <ThemeColor name="bg_list_ctrl_header_pressed" value="#FF3A3A3A" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表表头点击背景" comment_en="List header pressed bg"/>
     <ThemeColor name="border_list_ctrl_header_split" value="#FF444444" type="list_ctrl" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表表头分割线" comment_en="List header split line"/>
+    <ThemeColor name="bg_list_ctrl_item_normal" value="#FF2E2E2E" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项背景" comment_en="List item bg"/>
     <ThemeColor name="bg_list_ctrl_item_hovered" value="#FF333333" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项悬浮背景" comment_en="List item hovered bg"/>
     <ThemeColor name="bg_list_ctrl_item_pressed" value="#FF3A3A3A" type="list_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项点击背景" comment_en="List item pressed bg"/>
     <ThemeColor name="bg_list_ctrl_item_disabled" value="#FF202020" type="list_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="列表项禁用背景" comment_en="List item disabled bg"/>
@@ -137,6 +142,7 @@
     <!-- ===================== 下拉框颜色 (type: combo_box) ===================== -->
     <ThemeColor name="bg_combo" value="#FF252525" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉框默认背景" comment_en="ComboBox normal background"/>
     <ThemeColor name="bg_combo_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉框禁用背景" comment_en="ComboBox disabled background"/>
+    <ThemeColor name="bg_combo_btn_normal" value="#FF2E2E2E" type="combo_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉按钮背景" comment_en="Combo button bg"/>
     <ThemeColor name="bg_combo_btn_hovered" value="#FF333333" type="combo_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉按钮悬浮背景" comment_en="Combo button hovered bg"/>
     <ThemeColor name="bg_combo_btn_pressed" value="#FF3A3A3A" type="combo_box" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉按钮点击背景" comment_en="Combo button pressed bg"/>
     <ThemeColor name="bg_combo_btn_disabled" value="#FF303030" type="combo_box" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="下拉按钮禁用背景" comment_en="Combo button disabled bg"/>
@@ -160,8 +166,10 @@
 
     <!-- ===================== 标签页颜色 (type: tab_ctrl) ===================== -->
     <ThemeColor name="bg_tab_ctrl" value="#FF1A1A1A" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签页整体背景" comment_en="TabCtrl background"/>
-    <ThemeColor name="bg_tab_ctrl_item_close_hovered" value="#FF3F3F3F" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签关闭按钮悬浮" comment_en="Tab close button hovered"/>
-    <ThemeColor name="bg_tab_ctrl_item_close_pressed" value="#FF3A3A3A" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签关闭按钮点击" comment_en="Tab close button pressed"/>
+    <ThemeColor name="bg_tab_ctrl_item_close_normal" value="#FF393939" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签关闭按钮背景" comment_en="Tab close button bg"/>
+    <ThemeColor name="bg_tab_ctrl_item_close_hovered" value="#FF3F3F3F" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签关闭按钮悬浮背景" comment_en="Tab close button hovered bg"/>
+    <ThemeColor name="bg_tab_ctrl_item_close_pressed" value="#FF3A3A3A" type="tab_ctrl" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签关闭按钮点击背景" comment_en="Tab close button pressed bg"/>
+    <ThemeColor name="bg_tab_ctrl_item_normal" value="#FF393939" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签项背景" comment_en="Tab item bg"/>
     <ThemeColor name="bg_tab_ctrl_item_hovered" value="#FF3F3F3F" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签项悬浮背景" comment_en="Tab item hovered bg"/>
     <ThemeColor name="bg_tab_ctrl_item_pressed" value="#FF3A3A3A" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签项点击背景" comment_en="Tab item pressed bg"/>
     <ThemeColor name="bg_tab_ctrl_item_selected" value="#FF404040" type="tab_ctrl" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="选中标签背景" comment_en="Selected tab background"/>
@@ -182,8 +190,9 @@
 
     <!-- ===================== 地址栏颜色 (type: address_bar) ===================== -->
     <ThemeColor name="bg_address_bar" value="#FF252525" type="address_bar" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏默认背景" comment_en="AddressBar normal background"/>
-    <ThemeColor name="bg_address_bar_btn_hovered" value="#FF333333" type="address_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏按钮悬浮" comment_en="AddressBar button hovered"/>
-    <ThemeColor name="bg_address_bar_btn_pressed" value="#FF3A3A3A" type="address_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏按钮点击" comment_en="AddressBar button pressed"/>
+    <ThemeColor name="bg_address_bar_btn_normal" value="#FF2E2E2E" type="address_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏按钮背景" comment_en="AddressBar button bg"/>
+    <ThemeColor name="bg_address_bar_btn_hovered" value="#FF333333" type="address_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏按钮悬浮背景" comment_en="AddressBar button hovered bg"/>
+    <ThemeColor name="bg_address_bar_btn_pressed" value="#FF3A3A3A" type="address_bar" category="bg_color" role="primary_light" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏按钮点击背景" comment_en="AddressBar button pressed bg"/>
     <ThemeColor name="border_address_bar" value="#FF2D2D30" type="address_bar" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏默认边框" comment_en="AddressBar normal border"/>
 
     <!-- ===================== 进度条颜色 (type: progress) ===================== -->
