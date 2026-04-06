@@ -2994,14 +2994,14 @@
                 const value = node.getAttribute('value') || '#FFFFFFFF';
                 const type = node.getAttribute('type') || 'common';
                 const category = node.getAttribute('category') || 'basic';
-                const supportAccent = node.getAttribute('fixed') !== 'true';
+                const fixed = (node.getAttribute('fixed') || 'false') === 'true';
+                const supportAccent = !fixed;
                 const commentCn = node.getAttribute('comment_cn') || '';
                 const commentEn = node.getAttribute('comment_en') || '';
                 // 颜色派生系统字段
                 const role = node.getAttribute('role') || '';
                 const derivedFrom = node.getAttribute('derived_from') || '';
                 const adjust = node.getAttribute('adjust') || '';
-                const fixed = (node.getAttribute('fixed') || 'false') === 'true';
                 // 对比度检查背景色（支持多个，逗号分隔）
                 const contrastBg = node.getAttribute('contrast_bg') || '';
 
