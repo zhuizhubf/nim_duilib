@@ -2579,7 +2579,7 @@
             </div>
 
             <div class="theme-card theme-card-contrast">
-                <h3><span></span>Win11 25H2 官方高对比度主题</h3>
+                <h3><span></span>高对比度主题</h3>
                 <div class="generate-options">
                     <div class="generate-option">
                         <label for="contrastThemeType">高对比度主题样式</label>
@@ -2592,7 +2592,7 @@
                     </div>
                     <div class="generate-option">
                         <label>对比度等级</label>
-                        <input type="text" value="≥7:1（官方固定值）" disabled style="background-color:#f1f5f9; color:#6B7280;">
+                        <input type="text" value="≥7:1（固定值）" disabled style="background-color:#f1f5f9; color:#6B7280;">
                         <small style="color:#6B7280">高对比度主题色值不可自定义</small>
                     </div>
                     <div class="generate-option toggle-switch">
@@ -2605,7 +2605,7 @@
                 </div>
                 <button class="btn btn-contrast" id="generateContrastBtn">应用高对比度主题</button>
                 <div class="hct-details">
-                    <strong>Win11 25H2 高对比度主题说明：</strong><br>
+                    <strong>高对比度主题说明：</strong><br>
                     • 水生 (Aquatic) - 深蓝背景配白色文字，保护视力同时保持专业感<br>
                     • 夜空 (Night Sky) - 纯黑背景配白色文字，最大化对比度<br>
                     • 沙漠 (Desert) - 暖棕色调，减少蓝光暴露<br>
@@ -6953,8 +6953,7 @@
         function applyHighContrastTheme() {
             const themeType = document.getElementById('contrastThemeType').value;
             const useRedCloseBtn = document.getElementById('contrastRedCloseBtn')?.checked ?? true;
-            
-            // 高对比度主题配色
+
             const contrastThemes = {
                 nightSky: {
                     bg: '#FF000000',
@@ -6985,32 +6984,46 @@
             const theme = contrastThemes[themeType];
             if (!theme) return;
 
+            const STATE_SUFFIXES = ['_normal', '_hovered', '_pressed', '_disabled', '_focused'];
+
+            function extractState(name) {
+                for (const suffix of STATE_SUFFIXES) {
+                    if (name.endsWith(suffix)) {
+                        return { state: suffix.slice(1), baseName: name.slice(0, -suffix.length) };
+                    }
+                }
+                return { state: 'none', baseName: name };
+            }
+
             let modifiedCount = 0;
             allColorItems.forEach(item => {
-                let newArgb = item.value;
                 const itemName = item.name.toLowerCase();
+                const { state, baseName } = extractState(itemName);
 
-                // 特殊处理：窗口关闭按钮使用红色系（优先级最高）
+                let newArgb = item.value;
+
                 if (useRedCloseBtn && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
                     const baseHsl = { h: 0, s: 0.85, l: 0.50 };
-                    
-                    // 根据状态调整亮度
-                    if (itemName.includes('hovered')) {
-                        baseHsl.l = 0.60;  // hovered时亮红色
-                    } else if (itemName.includes('pressed')) {
-                        baseHsl.l = 0.35;  // pressed时深红色
+
+                    if (state === 'hovered') {
+                        baseHsl.l = 0.60;
+                    } else if (state === 'pressed') {
+                        baseHsl.l = 0.35;
+                    } else if (state === 'disabled') {
+                        baseHsl.l = 0.45;
+                        baseHsl.s = 0.4;
                     }
 
                     const newRgb = hslToRgb(baseHsl.h, baseHsl.s, baseHsl.l);
                     const newRgbHex = `#${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
                     newArgb = rgbHexToArgb(newRgbHex, item.value);
                 } else {
-                    // 根据颜色类型分配高对比度颜色
-                    if (item.category.includes('bg') || item.name.includes('bg_')) {
+                    const cat = item.category;
+                    if (cat === 'bg' || cat === 'background' || baseName.startsWith('bg_')) {
                         newArgb = theme.bg;
-                    } else if (item.category.includes('text') || item.name.includes('text_')) {
+                    } else if (cat === 'text' || baseName.startsWith('text_')) {
                         newArgb = theme.text;
-                    } else if (item.category.includes('border') || item.name.includes('border_')) {
+                    } else if (cat === 'border' || baseName.startsWith('border_')) {
                         newArgb = theme.border;
                     } else if (item.supportAccent) {
                         newArgb = theme.accent;
