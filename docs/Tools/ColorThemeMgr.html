@@ -1476,8 +1476,8 @@
             position: fixed;
             top: 100px;
             left: calc(50% - 225px);
-            width: 90%;
-            max-width: 450px;
+            width: 95%;
+            max-width: 600px;
             max-height: 90vh;
             background-color: white;
             border-radius: 12px;
@@ -1494,8 +1494,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 450px;
+            width: 95%;
+            max-width: 600px;
         }
         .color-attr-title {
             display: flex;
@@ -2448,6 +2448,7 @@
         <div class="color-attr-buttons">
             <button class="btn btn-generate" onclick="applyColorAttrChanges()">应用更改</button>
             <button class="btn btn-secondary" id="toggleAttrLockBtn" onclick="toggleDerivationLock()">🔒 锁定颜色</button>
+            <button class="btn btn-secondary" id="toggleAttrAccentBtn" onclick="toggleAccentSupport()">🎨 支持强调色</button>
             <button class="btn btn-secondary" onclick="closeColorAttrPanel()">取消</button>
         </div>
     </div>
@@ -4131,6 +4132,43 @@
         }
         window.toggleDerivationLock = toggleDerivationLock;
 
+        function toggleAccentSupport() {
+            const colorName = currentEditingColor || currentEditingAttrColor;
+            if (!colorName) return;
+
+            const colorItem = currentColorMap.get(colorName);
+            if (!colorItem) return;
+
+            if (colorItem.fixed) {
+                showToast(`颜色 "${colorName}" 已锁定，无法修改强调色支持状态`, 'warning');
+                return;
+            }
+
+            colorItem.supportAccent = !colorItem.supportAccent;
+            currentColorMap.set(colorName, colorItem);
+
+            const allColorIndex = allColorItems.findIndex(c => c.name === colorName);
+            if (allColorIndex !== -1) {
+                allColorItems[allColorIndex] = colorItem;
+            }
+
+            const accentBtn = document.getElementById('toggleAttrAccentBtn');
+            if (accentBtn) {
+                if (colorItem.supportAccent) {
+                    accentBtn.innerHTML = '🎨 取消强调色';
+                    accentBtn.style.backgroundColor = '#8B5CF6';
+                    accentBtn.style.color = 'white';
+                    showToast(`已启用 ${colorName} 的强调色支持`, 'success');
+                } else {
+                    accentBtn.innerHTML = '🎨 支持强调色';
+                    accentBtn.style.backgroundColor = '';
+                    accentBtn.style.color = '';
+                    showToast(`已禁用 ${colorName} 的强调色支持`, 'success');
+                }
+            }
+        }
+        window.toggleAccentSupport = toggleAccentSupport;
+
         function closeDerivationPanel() {
             document.getElementById('derivationEditPanel').classList.add('hidden');
             document.getElementById('derivationOverlay').classList.add('hidden');
@@ -4177,6 +4215,20 @@
                 }
             }
 
+            // 更新强调色支持按钮状态
+            const accentBtn = document.getElementById('toggleAttrAccentBtn');
+            if (accentBtn) {
+                if (colorItem.supportAccent) {
+                    accentBtn.innerHTML = '🎨 取消强调色';
+                    accentBtn.style.backgroundColor = '#8B5CF6';
+                    accentBtn.style.color = 'white';
+                } else {
+                    accentBtn.innerHTML = '🎨 支持强调色';
+                    accentBtn.style.backgroundColor = '';
+                    accentBtn.style.color = '';
+                }
+            }
+
             // 显示面板前先清空 inline 样式，确保居中
             const panel = document.getElementById('colorAttrPanel');
             panel.style.top = '';
@@ -4203,6 +4255,13 @@
                 lockBtn.innerHTML = '🔒 锁定颜色';
                 lockBtn.style.backgroundColor = '';
                 lockBtn.style.color = '';
+            }
+            // 重置强调色支持按钮状态
+            const accentBtn = document.getElementById('toggleAttrAccentBtn');
+            if (accentBtn) {
+                accentBtn.innerHTML = '🎨 支持强调色';
+                accentBtn.style.backgroundColor = '';
+                accentBtn.style.color = '';
             }
             // 移除拖动事件
             document.removeEventListener('mousemove', dragColorAttrPanel);
@@ -5983,7 +6042,7 @@
                 badgesHtml += `<span class="adjust-badge" title="调整公式：${adjust}">📐 ${adjust}</span>`;
             }
             if (fixed) {
-                badgesHtml += `<span class="locked-badge" title="已锁定 - 派生计算时将跳过">🔒 已锁定</span>`;
+                badgesHtml += `<span class="locked-badge" title="已锁定 - 设置主题颜色时将跳过">🔒 已锁定</span>`;
             }
             if (contrastBg) {
                 badgesHtml += `<span class="contrast-bg-badge" title="对比度检查背景色：${contrastBg}">🎨 ${contrastBg}</span>`;
@@ -5995,8 +6054,8 @@
                     <div class="color-preview-compare" style="background-color: ${originalColor}" title="原始颜色：${originalValue}"></div>
                 </div>
                 <div class="color-info">
-                    <div class="color-label">${name} ${supportAccent ? '[强调色]' : ''} 
-                        ${contrastLevel ? `<span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>` : '<span class="contrast-badge-none" title="未设置对比度检查背景色">未检查</span>'}
+                    <div class="color-label">${name} 
+                        ${contrastLevel ? `<span class="contrast-badge ${contrastLevel.class}" title="对比度：${contrastRatio.toFixed(2)}:1">${contrastLevel.text}</span>` : '<span class="contrast-badge-none" title="未设置对比度检查背景色，不检查对比度">未设置对比度检查背景色</span>'}
                     </div>
                     <div class="badges-container">${badgesHtml}</div>
                     <div class="color-meta">Type: ${type} | Category: ${category} ${supportAccent ? '| 支持强调色' : ''}</div>
