@@ -307,7 +307,10 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     //不自动换行 或者 单行模式
                     maxWidth = SK_FloatInfinity;
                 }
-                ASSERT(maxWidth > 0);
+                //if (maxWidth <= 0.0f) {
+                //    ASSERT(maxWidth > 0);
+                //}
+                maxWidth = std::max(maxWidth, 0.0f);
                 SkScalar textMeasuredWidth = 0;  //当前要绘制的文本，估算的所需宽度
                 SkScalar textMeasuredHeight = 0; //当前要绘制的文本，估算的所需高度
 
