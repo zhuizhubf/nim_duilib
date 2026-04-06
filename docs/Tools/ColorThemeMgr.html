@@ -6608,6 +6608,10 @@
                         newHsl.h = 0;
                     } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
                         newHsl.h = 210;
+                    } else if (itemName.includes('gray') || itemName.includes('white') || itemName.includes('black')) {
+                        // 中性灰度色：保持原有色相（灰色=任意色相都可以，white/black需要保持中性）
+                        newHsl.h = 0; // 灰色使用0度色相（也符合灰度定义）
+                        newHsl.s = 0; // 完全去饱和
                     } else {
                         newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                     }
