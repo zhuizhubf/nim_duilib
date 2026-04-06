@@ -2514,7 +2514,7 @@
                         </label>
                     </div>
                     <div class="generate-option toggle-switch">
-                        <label for="redCloseButton">关闭按钮使用红色</label>
+                        <label for="redCloseButton">窗口关闭按钮使用红色</label>
                         <label class="switch">
                             <input type="checkbox" id="redCloseButton" checked>
                             <span class="slider"></span>
@@ -2568,7 +2568,7 @@
                         </label>
                     </div>
                     <div class="generate-option toggle-switch">
-                        <label for="accentRedCloseBtn">关闭按钮使用红色</label>
+                        <label for="accentRedCloseBtn">窗口关闭按钮使用红色</label>
                         <label class="switch">
                             <input type="checkbox" id="accentRedCloseBtn" checked>
                             <span class="slider"></span>
@@ -2596,7 +2596,7 @@
                         <small style="color:#6B7280">高对比度主题色值不可自定义</small>
                     </div>
                     <div class="generate-option toggle-switch">
-                        <label for="contrastRedCloseBtn">关闭按钮使用红色</label>
+                        <label for="contrastRedCloseBtn">窗口关闭按钮使用红色</label>
                         <label class="switch">
                             <input type="checkbox" id="contrastRedCloseBtn" checked>
                             <span class="slider"></span>
@@ -2998,7 +2998,6 @@
                 const supportAccent = !fixed;
                 const commentCn = node.getAttribute('comment_cn') || '';
                 const commentEn = node.getAttribute('comment_en') || '';
-                // 颜色派生系统字段
                 const role = node.getAttribute('role') || '';
                 const derivedFrom = node.getAttribute('derived_from') || '';
                 const adjust = node.getAttribute('adjust') || '';
@@ -6362,18 +6361,25 @@
                 categorizedColors[category].forEach((entry, index) => {
                     const { item, state, baseName } = entry;
 
+                    // Skip fixed colors
+                    if (item.fixed) {
+                        return;
+                    }
+
                     // 检查是否是灰度色（但语义色和交互色不受此限制）
                     const isSemanticOrInteractive = (category === 'semantic' || category === 'interactive' || category === 'accent');
                     if (keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive) {
                         return;
                     }
 
+                    // Check if this is a window close button (baseName starts with bg_btn_window_close_)
+                    const isWindowCloseBtn = baseName.startsWith('bg_btn_window_close_');
+
                     let newHsl = { ...baseHsl };
                     const categoryItems = categorizedColors[category];
 
                     if (smartGeneration) {
-                        // 智能生成模式：根据颜色类型应用不同策略，传入state和baseName
-                        newHsl = generateSmartColor(baseHsl, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange);
+                        newHsl = generateSmartColor(baseHsl, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn);
                     } else {
                         // 传统模式
                         newHsl = generateColorByScheme(baseHsl, index, categoryItems.length, schemeType, brightnessStep);
@@ -6475,7 +6481,7 @@
          * - _disabled: 禁用状态，亮度0.60，饱和度降低
          * - _focused: 焦点状态，亮度+0.08
          */
-        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null) {
+        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null, isWindowCloseBtn = false) {
             let newHsl = { ...baseHsl };
             const itemName = baseName || item.name.toLowerCase();
 
@@ -6602,11 +6608,9 @@
 
                 case 'interactive':
                 case 'accent':
-                    // 特殊处理：窗口关闭按钮使用红色系
-                    if (useRedCloseButton && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
-                        newHsl.h = 0;  // 红色
+                    if (useRedCloseButton && isWindowCloseBtn) {
+                        newHsl.h = 0;
                         newHsl.s = 0.75;
-                        // 根据状态调整亮度
                         if (state === 'hovered') {
                             newHsl.l = 0.55;
                         } else if (state === 'pressed') {
@@ -6788,6 +6792,18 @@
             return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
         }
 
+        /**
+         * 确保强调色与窗口主背景有足够的对比度
+         * @param {object} accentHsl - 强调色HSL值
+         * @param {string} baseBgColor - 窗口主背景色
+         * @param {number} contrastThreshold - 对比度阈值，默认3.0
+         * @returns {object} 调整后的HSL值
+         *
+         * 对比度不足时：
+         * - 亮背景：降低强调色亮度（加深）
+         * - 暗背景：提高强调色亮度（加亮）
+         * 同时适当提升饱和度以增强可见性
+         */
         function ensureAccentContrastWithBackgrounds(accentHsl, baseBgColor, contrastThreshold = 3.0) {
             const bgRgb = hexToRgb(baseBgColor);
             const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
@@ -6808,6 +6824,18 @@
             return accentHsl;
         }
 
+        /**
+         * 确保颜色与XML配置中指定的对比度背景色有足够的对比度
+         * @param {object} itemHsl - 颜色的HSL值
+         * @param {string} itemContrastBg - 对比度背景色名称（支持多个，逗号分隔）
+         * @param {number} minRatio - 最小对比度比率，默认4.5（WCAG AA标准）
+         * @returns {object} 调整后的HSL值
+         *
+         * 遍历所有配置的背景色，找到对比度最差的那个：
+         * - 如果对比度低于minRatio，进行调整
+         * - 亮背景：降低颜色亮度
+         * - 暗背景：提高颜色亮度
+         */
         function ensureContrastWithConfiguredBGs(itemHsl, itemContrastBg, minRatio = 4.5) {
             if (!itemContrastBg || itemContrastBg.trim() === '') {
                 return itemHsl;
@@ -6859,6 +6887,42 @@
             return itemHsl;
         }
 
+        /**
+         * 应用强调色主题
+         *
+         * 功能说明：
+         * 根据用户选择的强调色基础色，将指定的UI颜色调整为强调色系
+         *
+         * 参数获取：
+         * - accentBaseColor: 用户选择的强调色
+         * - accentIntensity: 强调色强度 (10-100)
+         * - accentScope: 应用范围 (all/buttons/links/borders)
+         * - accentBlendMode: 混合模式 (hue/hsl/rgb/overlay)
+         * - autoBrightness: 是否自动调整亮度
+         * - keepSaturation: 是否保持原饱和度
+         * - useRedCloseBtn: 窗口关闭按钮是否使用红色
+         *
+         * 处理流程：
+         * 1. 遍历所有颜色项
+         * 2. 跳过 fixed=true 的颜色（锁定不修改）
+         * 3. 窗口关闭按钮特殊处理（可选红色）
+         * 4. 根据应用范围筛选需要强调的颜色
+         * 5. 根据混合模式计算新颜色
+         * 6. 应用对比度保护（主背景 + 配置的背景色）
+         * 7. 更新颜色并刷新界面
+         *
+         * 颜色筛选逻辑（shouldApply）：
+         * - 首先必须 supportAccent=true（fixed=false）
+         * - 然后根据范围进一步判断：
+         *   - all: btn/link/primary/selected/focused/slider/progress/toggle/icon 等
+         *   - buttons: category为button/interactive 或 名称含btn_
+         *   - links: 名称含link/highlight/text_link
+         *   - borders: category为border 或 名称以border_开头
+         *
+         * 对比度保护：
+         * - ensureAccentContrastWithBackgrounds: 确保与窗口主背景对比度≥3.0
+         * - ensureContrastWithConfiguredBGs: 确保与XML配置的contrast_bg对比度≥4.5
+         */
         function applyAccentColorTheme() {
             const accentBaseColor = document.getElementById('accentBaseColor').value;
             const accentIntensity = parseInt(document.getElementById('accentIntensity').value) || 80;
@@ -6872,8 +6936,15 @@
             const accentHsl = rgbToHsl(accentRgb.r, accentRgb.g, accentRgb.b);
             const blendRatio = accentIntensity / 100;
 
+            // 状态后缀定义，用于解析颜色名称中的状态信息
+            // 例如：bg_btn_normal -> { state: 'normal', baseName: 'bg_btn' }
             const STATE_SUFFIXES = ['_normal', '_hovered', '_pressed', '_disabled', '_focused'];
 
+            /**
+             * 从颜色名称中提取状态后缀和基础名称
+             * @param {string} name - 小写后的颜色名称
+             * @returns {object} { state: 状态字符串, baseName: 去掉状态后缀的基础名称 }
+             */
             function extractState(name) {
                 for (const suffix of STATE_SUFFIXES) {
                     if (name.endsWith(suffix)) {
@@ -6888,7 +6959,17 @@
                 const itemName = item.name.toLowerCase();
                 const { state, baseName } = extractState(itemName);
 
-                if (useRedCloseBtn && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
+                // fixed=true 的颜色不参与主题修改（强制锁定）
+                if (item.fixed) {
+                    return;
+                }
+
+                // 判断是否为窗口关闭按钮（名称以 bg_btn_window_close_ 开头）
+                const isWindowCloseBtn = baseName.startsWith('bg_btn_window_close_');
+
+                // 窗口关闭按钮特殊处理：使用红色系
+                // 状态对应亮度：normal=0.50, hovered=0.55, pressed=0.40, disabled=0.45
+                if (useRedCloseBtn && isWindowCloseBtn) {
                     let newHsl = { h: 0, s: 0.75, l: 0.50 };
 
                     if (state === 'hovered') {
@@ -6916,13 +6997,19 @@
                 let shouldApply = item.supportAccent;
                 const cat = item.category;
 
+                // 根据应用范围筛选需要强调的颜色
+                // supportAccent=true 且满足范围条件才应用
                 if (accentScope === 'buttons') {
+                    // 按钮类：category为button/interactive 或 名称含btn_
                     shouldApply = shouldApply && (cat === 'button' || cat === 'interactive' || baseName.includes('btn_'));
                 } else if (accentScope === 'links') {
+                    // 链接类：名称含link/highlight/text_link
                     shouldApply = shouldApply && (baseName.includes('link') || baseName.includes('highlight') || baseName.includes('text_link'));
                 } else if (accentScope === 'borders') {
+                    // 边框类：category为border 或 名称以border_开头
                     shouldApply = shouldApply && (baseName.startsWith('border_') || cat === 'border');
                 } else if (accentScope === 'all') {
+                    // 全部：包含按钮、链接、主要、选中、焦点、滑块、进度、开关、图标等
                     shouldApply = shouldApply && (
                         baseName.includes('btn_') ||
                         baseName.includes('link') ||
@@ -6945,10 +7032,15 @@
 
                     let newHsl;
 
-                    // 普通强调色处理
+                    // 根据混合模式计算新颜色
+                    // hue: 仅替换色相，保留原饱和度和亮度
+                    // hsl: HSL混合，保留亮度
+                    // rgb: RGB线性混合
+                    // overlay: 叠加模式
                     switch(accentBlendMode) {
                         case 'hue':
-                                // 仅替换色相
+                            // 色相替换模式：保持原饱和度和亮度，只改变色相到强调色
+                            // 饱和度取原色和(强调色*强度)的较大值，并保证最小0.3
                             newHsl = {
                                 h: accentHsl.h,
                                 s: keepSaturation ? originalHsl.s : Math.max(originalHsl.s, accentHsl.s * blendRatio, 0.3),
@@ -6957,7 +7049,8 @@
                             break;
 
                         case 'hsl':
-                                // HSL混合（保留亮度）
+                            // HSL混合模式：色相和饱和度混合，亮度可选择自动调整
+                            // 亮度自动调整时调用adjustBrightnessForAccent确保对比度
                             newHsl = {
                                 h: accentHsl.h,
                                 s: keepSaturation ? originalHsl.s : Math.max(originalHsl.s * (1 - blendRatio) + accentHsl.s * blendRatio, 0.4),
@@ -6966,7 +7059,8 @@
                             break;
 
                         case 'rgb':
-                            // RGB完全混合
+                            // RGB混合模式：RGB三通道线性插值混合
+                            // new = original * (1-ratio) + accent * ratio
                             const newRgbDirect = {
                                 r: Math.round(originalRgb.r * (1 - blendRatio) + accentRgb.r * blendRatio),
                                 g: Math.round(originalRgb.g * (1 - blendRatio) + accentRgb.g * blendRatio),
@@ -6976,7 +7070,7 @@
                             break;
 
                         case 'overlay':
-                            // 叠加模式
+                            // 叠加模式：取色相为强调色，饱和度取原色和强调色的较大值（保证最小0.5），亮度取平均值
                             newHsl = {
                                 h: accentHsl.h,
                                 s: Math.max(originalHsl.s, accentHsl.s, 0.5),
@@ -6985,16 +7079,19 @@
                             break;
 
                         default:
+                            // 默认：直接使用纯强调色
                             newHsl = { ...accentHsl };
                     }
 
-                    // 确保饱和度和亮度在有效范围内
+                    // 确保饱和度和亮度在有效范围内（饱和度0.15-1.0，亮度0.15-0.85）
                     newHsl.s = Math.max(0.15, Math.min(1, newHsl.s));
                     newHsl.l = Math.max(0.15, Math.min(0.85, newHsl.l));
 
+                    // 对比度保护：确保与窗口主背景有足够对比度（阈值3.0）
                     const mainBgColor = getColorValue('bg_window_main', '#FFF0F0F0');
                     newHsl = ensureAccentContrastWithBackgrounds(newHsl, mainBgColor, 3.0);
 
+                    // 如果该颜色配置了contrast_bg，则额外检查与配置背景色的对比度（阈值4.5，WCAG AA标准）
                     if (item.contrastBg && item.contrastBg.trim() !== '') {
                         newHsl = ensureContrastWithConfiguredBGs(newHsl, item.contrastBg, 4.5);
                     }
@@ -7026,6 +7123,18 @@
         }
 
         // 为强调色调整亮度
+        /**
+         * 为强调色智能调整亮度
+         * @param {number} originalL - 原颜色的亮度 (0-1)
+         * @param {number} accentL - 强调色的亮度 (0-1)
+         * @param {number} blendRatio - 混合比例 (0-1)
+         * @returns {number} 调整后的亮度值
+         *
+         * 调整策略：
+         * - 原亮度 > 0.8（亮色）：稍微降低强调色亮度，避免对比度不足
+         * - 原亮度 < 0.3（暗色）：稍微提高强调色亮度，确保可见性
+         * - 中等亮度：直接使用强调色亮度
+         */
         function adjustBrightnessForAccent(originalL, accentL, blendRatio) {
             // 确保按钮状态有合适的亮度差异
             const targetL = originalL;
@@ -7101,9 +7210,15 @@
                 const itemName = item.name.toLowerCase();
                 const { state, baseName } = extractState(itemName);
 
+                if (item.fixed) {
+                    return;
+                }
+
                 let newArgb = item.value;
 
-                if (useRedCloseBtn && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
+                const isWindowCloseBtn = baseName.startsWith('bg_btn_window_close_');
+
+                if (useRedCloseBtn && isWindowCloseBtn) {
                     const baseHsl = { h: 0, s: 0.85, l: 0.50 };
 
                     if (state === 'hovered') {
