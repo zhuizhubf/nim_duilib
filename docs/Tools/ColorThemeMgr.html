@@ -6283,43 +6283,88 @@
                 case 'cool2': tempAdjust = -30; break;
             }
 
+            // 颜色状态后缀定义
+            const STATE_SUFFIXES = ['_normal', '_hovered', '_pressed', '_disabled', '_focused'];
+
             // 根据颜色类型智能分类
+            // 结构: { category: [{ item, state, baseName }, ...] }
+            // state: 'normal' | 'hovered' | 'pressed' | 'disabled' | 'focused' | 'none'
             const categorizedColors = {
-                background: [],    // 背景色
-                text: [],          // 文本色
-                border: [],        // 边框色
-                accent: [],        // 强调色
-                interactive: [],   // 交互元素（按钮等）
-                other: []          // 其他
+                background: [],
+                text: [],
+                semantic: [],
+                svg: [],
+                border: [],
+                accent: [],
+                interactive: [],
+                other: []
             };
+
+            // 辅助函数：提取颜色名称的状态后缀和基础名称
+            function extractState(name) {
+                for (const suffix of STATE_SUFFIXES) {
+                    if (name.endsWith(suffix)) {
+                        return {
+                            state: suffix.slice(1),  // 去掉下划线
+                            baseName: name.slice(0, -suffix.length)
+                        };
+                    }
+                }
+                return { state: 'none', baseName: name };
+            }
 
             allColorItems.forEach(item => {
                 const name = item.name.toLowerCase();
+                const { state, baseName } = extractState(name);
+
                 // 窗口关闭按钮特殊处理：优先分到interactive类别
                 if (name.includes('window_close') || name.includes('close_btn')) {
-                    categorizedColors.interactive.push(item);
-                } else if (name.includes('bg_') || name.includes('background')) {
-                    categorizedColors.background.push(item);
-                } else if (name.includes('text_') || name.includes('color_')) {
-                    categorizedColors.text.push(item);
-                } else if (name.includes('border_')) {
-                    categorizedColors.border.push(item);
+                    categorizedColors.interactive.push({ item, state, baseName });
+                } else if (name.startsWith('bg_') || name.includes('background')) {
+                    categorizedColors.background.push({ item, state, baseName });
+                } else if (name.startsWith('color_')) {
+                    // 语义色单独分类（color_green/color_blue/color_red等）
+                    categorizedColors.semantic.push({ item, state, baseName });
+                } else if (name.startsWith('text_')) {
+                    categorizedColors.text.push({ item, state, baseName });
+                } else if (name.includes('svg')) {
+                    // SVG图片颜色单独分类，需要与背景有足够对比度
+                    categorizedColors.svg.push({ item, state, baseName });
+                } else if (name.startsWith('border_')) {
+                    categorizedColors.border.push({ item, state, baseName });
                 } else if (item.supportAccent) {
-                    categorizedColors.accent.push(item);
+                    categorizedColors.accent.push({ item, state, baseName });
                 } else if (name.includes('btn_') || name.includes('button')) {
-                    categorizedColors.interactive.push(item);
+                    categorizedColors.interactive.push({ item, state, baseName });
                 } else {
-                    categorizedColors.other.push(item);
+                    categorizedColors.other.push({ item, state, baseName });
                 }
             });
+
+            // 预计算所有背景色的亮度范围，用于对比度保护
+            const bgLuminanceRange = {
+                min: Math.min(...categorizedColors.background.map(entry => {
+                    const rgb = argbToRgb(entry.item.value);
+                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    return hsl.l;
+                })),
+                max: Math.max(...categorizedColors.background.map(entry => {
+                    const rgb = argbToRgb(entry.item.value);
+                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    return hsl.l;
+                }))
+            };
 
             let modifiedCount = 0;
 
             // 为每个分类应用不同的配色策略
             Object.keys(categorizedColors).forEach(category => {
-                categorizedColors[category].forEach((item, index) => {
-                    // 检查是否是灰度色
-                    if (keepGrayscale && isGrayscaleColor(item.value)) {
+                categorizedColors[category].forEach((entry, index) => {
+                    const { item, state, baseName } = entry;
+
+                    // 检查是否是灰度色（但语义色和交互色不受此限制）
+                    const isSemanticOrInteractive = (category === 'semantic' || category === 'interactive' || category === 'accent');
+                    if (keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive) {
                         return;
                     }
 
@@ -6327,8 +6372,8 @@
                     const categoryItems = categorizedColors[category];
 
                     if (smartGeneration) {
-                        // 智能生成模式：根据颜色类型应用不同策略
-                        newHsl = generateSmartColor(baseHsl, item, category, index, categoryItems.length, schemeType, brightnessStep, redCloseButton);
+                        // 智能生成模式：根据颜色类型应用不同策略，传入state和baseName
+                        newHsl = generateSmartColor(baseHsl, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange);
                     } else {
                         // 传统模式
                         newHsl = generateColorByScheme(baseHsl, index, categoryItems.length, schemeType, brightnessStep);
@@ -6337,28 +6382,33 @@
                     // 应用色温调整
                     newHsl.h = (newHsl.h + tempAdjust + 360) % 360;
 
-                    // 调整饱和度
+                    // 调整饱和度（基于颜色角色动态调整）
                     const satMultiplier = saturationLevel / 100;
-                    newHsl.s = Math.max(0.1, Math.min(1, newHsl.s * satMultiplier));
+                    let targetSaturation = newHsl.s * satMultiplier;
+                    // 根据分类设定饱和度范围，避免过灰或过艳
+                    if (category === 'background') {
+                        targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
+                    } else if (category === 'text') {
+                        targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
+                    } else if (category === 'border') {
+                        targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
+                    } else if (category === 'semantic') {
+                        // 语义色保持较高饱和度
+                        targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
+                    } else if (category === 'svg') {
+                        // SVG颜色需要较高饱和度以确保可见性
+                        targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
+                    }
+                    newHsl.s = targetSaturation;
 
-                    // 对比度保护：确保文本与背景有足够对比度
+                    // 对比度保护：确保文本与所有背景都有足够对比度
                     if (preserveContrast && category === 'text' && categorizedColors.background.length > 0) {
-                        const bgItem = categorizedColors.background[0];
-                        const estimatedBgHsl = generateSmartColor(baseHsl, bgItem, 'background', 0, 1, schemeType, brightnessStep, false);
-                        const estimatedBgRgb = hslToRgb(estimatedBgHsl.h, estimatedBgHsl.s, estimatedBgHsl.l);
-                        const estimatedBgArgb = rgbToArgb(`#${rgbToHex(estimatedBgRgb.r)}${rgbToHex(estimatedBgRgb.g)}${rgbToHex(estimatedBgRgb.b)}`);
-                        const textRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
-                        const textArgb = rgbToArgb(`#${rgbToHex(textRgb.r)}${rgbToHex(textRgb.g)}${rgbToHex(textRgb.b)}`);
-                        
-                        const contrastRatio = calculateContrastRatio(textArgb, estimatedBgArgb);
-                        if (contrastRatio < 4.5) {
-                            // 调整亮度以提高对比度
-                            if (newHsl.l > 0.5) {
-                                newHsl.l = Math.max(0.1, newHsl.l - 0.3);
-                            } else {
-                                newHsl.l = Math.min(0.9, newHsl.l + 0.3);
-                            }
-                        }
+                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
+                    }
+
+                    // SVG对比度保护：确保SVG颜色与窗口背景有足够对比度
+                    if (preserveContrast && category === 'svg' && categorizedColors.background.length > 0) {
+                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
                     }
 
                     const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
@@ -6387,90 +6437,201 @@
             }
         }
 
-        // 判断是否是灰度色
+        /**
+         * 判断颜色是否为灰度色（RGB三通道值接近）
+         * @param {string} argb - ARGB格式颜色
+         * @returns {boolean} 是否为灰度色
+         *
+         * 判断标准：R/G/B三通道的差值都在容差范围内（默认15）
+         * 灰度色在主题生成时通常需要保留，如灰色边框、灰色文字等
+         */
         function isGrayscaleColor(argb) {
             const rgb = argbToRgb(argb);
             const tolerance = 15;
-            return Math.abs(rgb.r - rgb.g) <= tolerance && 
-                   Math.abs(rgb.g - rgb.b) <= tolerance && 
+            return Math.abs(rgb.r - rgb.g) <= tolerance &&
+                   Math.abs(rgb.g - rgb.b) <= tolerance &&
                    Math.abs(rgb.r - rgb.b) <= tolerance;
         }
 
-        // 智能生成颜色
-        function generateSmartColor(baseHsl, item, category, index, total, schemeType, brightnessStep, useRedCloseButton = true) {
+        /**
+         * 根据颜色分类智能生成新颜色
+         *
+         * @param {object} baseHsl - 基础色的HSL值 {h, s, l}
+         * @param {object} item - 当前颜色项，包含name（名称）等信息
+         * @param {string} category - 颜色分类：background/text/border/semantic/interactive/accent/other/svg
+         * @param {string} state - 状态后缀：'normal'/'hovered'/'pressed'/'disabled'/'focused'/'none'
+         * @param {string} baseName - 去掉状态后缀的基础名称
+         * @param {number} index - 当前颜色在其分类中的索引
+         * @param {number} total - 该分类中的颜色总数
+         * @param {string} schemeType - 配色方案
+         * @param {number} brightnessStep - 亮度步进值
+         * @param {boolean} useRedCloseButton - 是否将窗口关闭按钮设为红色
+         * @param {object} bgLuminanceRange - 背景色亮度范围 {min, max}
+         *
+         * 状态处理逻辑：
+         * - _normal: 正常状态，使用基础亮度
+         * - _hovered: 悬停状态，亮度+0.12
+         * - _pressed: 按下状态，亮度-0.12
+         * - _disabled: 禁用状态，亮度0.60，饱和度降低
+         * - _focused: 焦点状态，亮度+0.08
+         */
+        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null) {
             let newHsl = { ...baseHsl };
-            const itemName = item.name.toLowerCase();
-            
-            // 根据颜色角色确定基础亮度
+            const itemName = baseName || item.name.toLowerCase();
+
+            // 状态亮度调整偏移量
+            const STATE_LIGHTNESS_OFFSET = {
+                'normal': 0,
+                'hovered': 0.12,
+                'pressed': -0.12,
+                'disabled': 0.40,
+                'focused': 0.08,
+                'none': 0
+            };
+
             let targetLuminance = baseHsl.l;
-            
+            const lightnessOffset = STATE_LIGHTNESS_OFFSET[state] || 0;
+
             switch(category) {
                 case 'background':
-                    // 背景色：使用较亮或较暗的色调
+                    // 背景色：状态决定亮度
                     if (itemName.includes('window') || itemName.includes('base')) {
-                        targetLuminance = 0.95;  // 窗口背景最亮
+                        targetLuminance = 0.95;
                     } else if (itemName.includes('card') || itemName.includes('content')) {
                         targetLuminance = 0.90;
                     } else {
                         targetLuminance = 0.85;
                     }
-                    newHsl.l = targetLuminance;
-                    newHsl.s = baseHsl.s * 0.3;  // 背景色降低饱和度
+                    if (state === 'disabled') {
+                        targetLuminance = 0.65;
+                        newHsl.s = baseHsl.s * 0.15;
+                    } else {
+                        newHsl.s = baseHsl.s * 0.3;
+                        targetLuminance += lightnessOffset;
+                    }
+                    newHsl.l = Math.max(0.1, Math.min(0.98, targetLuminance));
                     break;
 
                 case 'text':
-                    // 文本色：使用较高对比度的颜色
+                    // 文本色：根据状态和语义确定亮度
                     if (itemName.includes('main') || itemName.includes('primary')) {
-                        newHsl.l = 0.15;  // 主要文本
+                        newHsl.l = 0.15;
                     } else if (itemName.includes('second') || itemName.includes('muted')) {
-                        newHsl.l = 0.40;  // 次要文本
+                        newHsl.l = 0.40;
                     } else if (itemName.includes('disabled')) {
-                        newHsl.l = 0.60;  // 禁用文本
+                        newHsl.l = 0.60;
                     } else {
                         newHsl.l = 0.20;
                     }
-                    newHsl.s = baseHsl.s * 0.5;  // 文本适当降低饱和度
+                    if (state === 'disabled') {
+                        newHsl.l = 0.55;
+                        newHsl.s = baseHsl.s * 0.2;
+                    } else {
+                        newHsl.l += lightnessOffset;
+                        newHsl.s = baseHsl.s * 0.5;
+                    }
+                    newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l));
+                    break;
+
+                case 'semantic':
+                    // 语义色：根据语义角色生成对应色调，状态影响亮度
+                    if (itemName.includes('success') || itemName.includes('green') || itemName.includes('ok')) {
+                        newHsl.h = 120;
+                    } else if (itemName.includes('error') || itemName.includes('red') || itemName.includes('danger') || itemName.includes('warning')) {
+                        newHsl.h = 0;
+                    } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
+                        newHsl.h = 210;
+                    } else {
+                        newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                    }
+                    if (state === 'disabled') {
+                        newHsl.l = 0.50;
+                        newHsl.s = 0.3;
+                    } else if (state === 'hovered') {
+                        newHsl.l = Math.min(0.75, newHsl.l + 0.15);
+                    } else if (state === 'pressed') {
+                        newHsl.l = Math.max(0.25, newHsl.l - 0.15);
+                    } else {
+                        newHsl.l = itemName.includes('light') ? 0.75 : (itemName.includes('dark') ? 0.25 : 0.50);
+                    }
+                    newHsl.s = 0.70;
+                    break;
+
+                case 'svg':
+                    // SVG图片颜色：需要与bg_window_main有足够对比度
+                    // 使用基础色的色相，但调整亮度和饱和度以确保可见性
+                    newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                    // SVG通常是单色图标，需要较高饱和度
+                    newHsl.s = Math.max(0.5, baseHsl.s * 0.8);
+                    // 亮度调整：根据窗口背景亮度决定
+                    if (bgLuminanceRange) {
+                        const avgBgLuminance = (bgLuminanceRange.min + bgLuminanceRange.max) / 2;
+                        if (avgBgLuminance > 0.7) {
+                            // 亮背景：使用深色SVG
+                            newHsl.l = Math.min(0.4, avgBgLuminance - 0.3);
+                        } else if (avgBgLuminance < 0.3) {
+                            // 暗背景：使用亮色SVG
+                            newHsl.l = Math.max(0.6, avgBgLuminance + 0.3);
+                        } else {
+                            // 中等亮度背景：使用中等亮度的SVG
+                            newHsl.l = 0.5;
+                        }
+                    }
                     break;
 
                 case 'border':
-                    // 边框色：介于背景和文本之间
-                    newHsl.l = 0.70;
-                    newHsl.s = baseHsl.s * 0.4;
+                    // 边框色：根据状态调整亮度
+                    if (state === 'disabled') {
+                        newHsl.l = 0.55;
+                        newHsl.s = baseHsl.s * 0.2;
+                    } else if (state === 'hovered') {
+                        newHsl.l = 0.65;
+                        newHsl.s = baseHsl.s * 0.35;
+                    } else if (state === 'pressed') {
+                        newHsl.l = 0.75;
+                        newHsl.s = baseHsl.s * 0.4;
+                    } else if (state === 'focused') {
+                        newHsl.l = 0.68;
+                        newHsl.s = baseHsl.s * 0.5;
+                    } else {
+                        // normal
+                        newHsl.l = 0.70;
+                        newHsl.s = baseHsl.s * 0.4;
+                    }
                     break;
 
                 case 'interactive':
                 case 'accent':
                     // 特殊处理：窗口关闭按钮使用红色系
                     if (useRedCloseButton && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
-                        // 使用红色系（色相=0）
                         newHsl.h = 0;  // 红色
-                        newHsl.s = 0.75;  // 高饱和度
-                        
+                        newHsl.s = 0.75;
                         // 根据状态调整亮度
-                        if (itemName.includes('hovered')) {
-                            newHsl.l = 0.55;  // hovered时亮红色
-                        } else if (itemName.includes('pressed')) {
-                            newHsl.l = 0.40;  // pressed时深红色
+                        if (state === 'hovered') {
+                            newHsl.l = 0.55;
+                        } else if (state === 'pressed') {
+                            newHsl.l = 0.40;
+                        } else if (state === 'disabled') {
+                            newHsl.l = 0.50;
+                            newHsl.s = 0.3;
                         } else {
-                            newHsl.l = 0.50;  // 正常状态红色
+                            newHsl.l = 0.50;
                         }
                     } else {
                         // 其他交互和强调色：使用基础色的变体
                         newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
-                        // 按钮状态变化 - 根据状态类型应用不同的亮度调整
-                        if (itemName.includes('hovered')) {
-                            // hovered状态：增加亮度（+0.15）
+                        // 根据状态调整亮度
+                        if (state === 'hovered') {
                             newHsl.l = Math.min(0.95, newHsl.l + 0.15);
-                        } else if (itemName.includes('selected') || itemName.includes('checked')) {
-                            // selected/checked状态：中等亮度（+0.05），与hovered区分
+                        } else if (state === 'selected' || state === 'checked') {
                             newHsl.l = Math.min(0.9, newHsl.l + 0.05);
-                        } else if (itemName.includes('pressed') || itemName.includes('active')) {
-                            // pressed/active状态：减少亮度（-0.15）
+                        } else if (state === 'pressed' || state === 'active') {
                             newHsl.l = Math.max(0.15, newHsl.l - 0.15);
-                        } else if (itemName.includes('disabled')) {
-                            // disabled状态：灰度化
-                            newHsl.l = 0.6;
-                            newHsl.s = 0.15;
+                        } else if (state === 'disabled') {
+                            newHsl.l = 0.55;
+                            newHsl.s = 0.2;
+                        } else if (state === 'focused') {
+                            newHsl.l = Math.min(0.9, newHsl.l + 0.08);
                         }
                     }
                     break;
@@ -6484,49 +6645,66 @@
             return newHsl;
         }
 
-        // 根据配色方案生成颜色
+        /**
+         * 根据配色方案生成颜色
+         *
+         * @param {object} baseHsl - 基础色的HSL值
+         * @param {number} index - 当前颜色在序列中的索引
+         * @param {number} total - 颜色总数
+         * @param {string} schemeType - 配色方案类型
+         * @param {number} brightnessStep - 亮度步进值
+         *
+         * 配色方案说明：
+         * - monochromatic: 单色系，保持色相不变，只改变亮度
+         * - complementary: 互补色，色相偏移180度
+         * - split_complementary: 分裂互补色，色相偏移±150度
+         * - analogous: 邻近色，色相偏移±30度
+         * - triadic: 三角色，色相偏移120度
+         * - tetradic: 四色配色，色相偏移90度（矩形）
+         * - square: 四方配色，色相均匀分布（正方形）
+         */
         function generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep) {
             let newHsl = { ...baseHsl };
-            
+
             switch(schemeType) {
                 case 'monochromatic':
                     // 单色系：改变亮度
                     const brightnessVariation = ((index % 10) - 5) * brightnessStep / 100;
                     newHsl.l = Math.max(0.1, Math.min(0.95, baseHsl.l + brightnessVariation));
                     break;
-                    
+
                 case 'complementary':
                     // 互补色：色相偏移180度
                     newHsl.h = (baseHsl.h + 180) % 360;
                     newHsl.l = Math.max(0.2, Math.min(0.8, baseHsl.l + ((index % 5) - 2) * 0.1));
                     break;
-                    
+
                 case 'split_complementary':
                     // 分裂互补色：色相偏移±150度
                     const splitOffset = (index % 2 === 0 ? 150 : 210);
                     newHsl.h = (baseHsl.h + splitOffset) % 360;
                     newHsl.l = Math.max(0.2, Math.min(0.8, baseHsl.l + ((index % 4) - 2) * 0.15));
                     break;
-                    
+
                 case 'analogous':
                     // 邻近色：色相偏移±30度
                     const analOffset = (index % 5 - 2) * 25;
                     newHsl.h = (baseHsl.h + analOffset + 360) % 360;
                     newHsl.l = Math.max(0.2, Math.min(0.8, baseHsl.l + ((index % 3) - 1) * 0.15));
                     break;
-                    
+
                 case 'triadic':
                     // 三角色：色相偏移120度
                     newHsl.h = (baseHsl.h + (index % 3) * 120) % 360;
                     newHsl.l = Math.max(0.2, Math.min(0.8, 0.5 + ((index % 3) - 1) * 0.2));
                     break;
-                    
+
                 case 'tetradic':
                     // 四色配色：矩形配色（90度偏移）
                     newHsl.h = (baseHsl.h + (index % 4) * 90) % 360;
                     newHsl.l = Math.max(0.2, Math.min(0.8, 0.4 + ((index % 4) - 1.5) * 0.2));
                     break;
-                    
+
                 case 'square':
                     // 四方配色：正方形配色（均匀分布）
                     newHsl.h = (baseHsl.h + (index % 4) * 90 + 45) % 360;
@@ -6535,6 +6713,79 @@
             }
 
             return newHsl;
+        }
+
+        /**
+         * 确保文本色与所有背景色都有足够的对比度
+         *
+         * @param {object} textHsl - 文本色的HSL对象（会被修改）
+         * @param {array} backgroundItems - 所有背景色项数组
+         * @param {object} baseHsl - 基础色的HSL值，用于生成背景色
+         *
+         * 对比度标准：
+         * - 普通文本：至少 4.5:1
+         * - 大文本（>=18pt）：至少 3:1
+         *
+         * 算法：对每个背景色计算对比度，如果不足则调整文本亮度
+         */
+        function ensureContrastWithAllBackgrounds(textHsl, backgroundItems, baseHsl) {
+            const MIN_CONTRAST_NORMAL = 4.5;  // 普通文本对比度
+            const MIN_CONTRAST_LARGE = 3.0;   // 大文本对比度
+
+            // 找出最小的对比度
+            let worstContrast = Infinity;
+            let worstBgItem = null;
+
+            for (const entry of backgroundItems) {
+                const bgItem = entry.item || entry;
+                const bgState = entry.state || 'none';
+                const bgBaseName = entry.baseName || (bgItem.name ? bgItem.name.toLowerCase() : '');
+                const bgHsl = generateSmartColor(baseHsl, bgItem, 'background', bgState, bgBaseName, 0, 1, 'monochromatic', 10, false);
+                const bgRgb = hslToRgb(bgHsl.h, bgHsl.s, bgHsl.l);
+                const textRgb = hslToRgb(textHsl.h, textHsl.s, textHsl.l);
+
+                const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+                const textLuminance = getRelativeLuminance(textRgb.r, textRgb.g, textRgb.b);
+
+                const contrast = (Math.max(bgLuminance, textLuminance) + 0.05) /
+                                 (Math.min(bgLuminance, textLuminance) + 0.05);
+
+                if (contrast < worstContrast) {
+                    worstContrast = contrast;
+                    worstBgItem = entry;
+                }
+            }
+
+            if (worstContrast < MIN_CONTRAST_NORMAL && worstBgItem) {
+                const worstBgItemName = worstBgItem.baseName || (worstBgItem.item ? worstBgItem.item.name.toLowerCase() : '');
+                const bgHsl = generateSmartColor(baseHsl, worstBgItem.item, 'background', worstBgItem.state || 'none', worstBgItemName, 0, 1, 'monochromatic', 10, false);
+                const bgRgb = hslToRgb(bgHsl.h, bgHsl.s, bgHsl.l);
+                const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+
+                // 根据背景亮度决定文本应该是亮还是暗
+                if (bgLuminance > 0.5) {
+                    // 亮背景：用深色文本
+                    textHsl.l = Math.max(0.05, textHsl.l - 0.25);
+                } else {
+                    // 暗背景：用亮色文本
+                    textHsl.l = Math.min(0.95, textHsl.l + 0.25);
+                }
+            }
+        }
+
+        /**
+         * 计算RGB颜色的相对亮度
+         * @param {number} r - 红色 0-255
+         * @param {number} g - 绿色 0-255
+         * @param {number} b - 蓝色 0-255
+         * @returns {number} 相对亮度 0-1
+         */
+        function getRelativeLuminance(r, g, b) {
+            const [rs, gs, bs] = [r, g, b].map(c => {
+                c = c / 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
         }
 
         function applyAccentColorTheme() {
