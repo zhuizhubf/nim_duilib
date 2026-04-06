@@ -2995,7 +2995,7 @@
                 const type = node.getAttribute('type') || 'common';
                 const category = node.getAttribute('category') || 'basic';
                 const fixed = (node.getAttribute('fixed') || 'false') === 'true';
-                const supportAccent = !fixed;
+                const supportAccent = !fixed && (node.getAttribute('support_accent') || 'false') === 'true';
                 const commentCn = node.getAttribute('comment_cn') || '';
                 const commentEn = node.getAttribute('comment_en') || '';
                 const role = node.getAttribute('role') || '';
