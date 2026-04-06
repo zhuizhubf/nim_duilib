@@ -4416,7 +4416,7 @@
                         row.querySelector('.adjust-operator').value = '+';
                         row.querySelector('.adjust-value').value = '0';
                     } else {
-                        row.querySelector('.adjust-operator').value = op.operator === '=' ? '=' : '+';
+                        row.querySelector('.adjust-operator').value = op.operator;
                         row.querySelector('.adjust-value').value = op.value || '0';
                     }
                     updateUnitDisplay(row);
