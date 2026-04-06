@@ -2994,7 +2994,7 @@
                 const value = node.getAttribute('value') || '#FFFFFFFF';
                 const type = node.getAttribute('type') || 'common';
                 const category = node.getAttribute('category') || 'basic';
-                const supportAccent = (node.getAttribute('support_accent') || node.getAttribute('fixed') || 'false') === 'true';
+                const supportAccent = node.getAttribute('fixed') !== 'true';
                 const commentCn = node.getAttribute('comment_cn') || '';
                 const commentEn = node.getAttribute('comment_en') || '';
                 // 颜色派生系统字段
@@ -6788,6 +6788,26 @@
             return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
         }
 
+        function ensureAccentContrastWithBackgrounds(accentHsl, baseBgColor, contrastThreshold = 3.0) {
+            const bgRgb = hexToRgb(baseBgColor);
+            const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+            const accentRgb = hslToRgb(accentHsl.h, accentHsl.s, accentHsl.l);
+            const accentLuminance = getRelativeLuminance(accentRgb.r, accentRgb.g, accentRgb.b);
+
+            const contrast = (Math.max(bgLuminance, accentLuminance) + 0.05) /
+                             (Math.min(bgLuminance, accentLuminance) + 0.05);
+
+            if (contrast < contrastThreshold) {
+                if (bgLuminance > 0.5) {
+                    accentHsl.l = Math.max(0.15, accentHsl.l - 0.2);
+                } else {
+                    accentHsl.l = Math.min(0.85, accentHsl.l + 0.2);
+                }
+                accentHsl.s = Math.min(1, accentHsl.s + 0.15);
+            }
+            return accentHsl;
+        }
+
         function applyAccentColorTheme() {
             const accentBaseColor = document.getElementById('accentBaseColor').value;
             const accentIntensity = parseInt(document.getElementById('accentIntensity').value) || 80;
@@ -6801,24 +6821,32 @@
             const accentHsl = rgbToHsl(accentRgb.r, accentRgb.g, accentRgb.b);
             const blendRatio = accentIntensity / 100;
 
+            const STATE_SUFFIXES = ['_normal', '_hovered', '_pressed', '_disabled', '_focused'];
+
+            function extractState(name) {
+                for (const suffix of STATE_SUFFIXES) {
+                    if (name.endsWith(suffix)) {
+                        return { state: suffix.slice(1), baseName: name.slice(0, -suffix.length) };
+                    }
+                }
+                return { state: 'none', baseName: name };
+            }
+
             let modifiedCount = 0;
             allColorItems.forEach(item => {
                 const itemName = item.name.toLowerCase();
-                
-                // 特殊处理：窗口关闭按钮使用红色系（优先级最高）
+                const { state, baseName } = extractState(itemName);
+
                 if (useRedCloseBtn && (itemName.includes('window_close') || itemName.includes('close_btn'))) {
-                    // 使用红色系（色相=0）
-                    let newHsl = {
-                        h: 0,  // 红色
-                        s: 0.75,  // 高饱和度
-                        l: 0.50   // 中等亮度
-                    };
-                    
-                    // 根据状态调整亮度
-                    if (itemName.includes('hovered')) {
-                        newHsl.l = 0.55;  // hovered时亮红色
-                    } else if (itemName.includes('pressed')) {
-                        newHsl.l = 0.40;  // pressed时深红色
+                    let newHsl = { h: 0, s: 0.75, l: 0.50 };
+
+                    if (state === 'hovered') {
+                        newHsl.l = 0.55;
+                    } else if (state === 'pressed') {
+                        newHsl.l = 0.40;
+                    } else if (state === 'disabled') {
+                        newHsl.l = 0.45;
+                        newHsl.s = 0.4;
                     }
 
                     const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
@@ -6831,18 +6859,18 @@
                         updateAllGroupedValues(item.name, newArgb);
                         modifiedCount++;
                     }
-                    return; // 跳过后续强调色处理
+                    return;
                 }
 
-                // 检查是否应该应用强调色
                 let shouldApply = item.supportAccent;
-                
+                const cat = item.category;
+
                 if (accentScope === 'buttons') {
-                    shouldApply = shouldApply && (item.category.includes('button') || item.type.includes('interactive') || itemName.includes('btn_'));
+                    shouldApply = shouldApply && (cat === 'button' || cat === 'interactive' || baseName.includes('btn_'));
                 } else if (accentScope === 'links') {
-                    shouldApply = shouldApply && (itemName.includes('link') || itemName.includes('highlight') || itemName.includes('text_link'));
+                    shouldApply = shouldApply && (baseName.includes('link') || baseName.includes('highlight') || baseName.includes('text_link'));
                 } else if (accentScope === 'borders') {
-                    shouldApply = shouldApply && (itemName.includes('border_') || item.category.includes('border'));
+                    shouldApply = shouldApply && (baseName.startsWith('border_') || cat === 'border');
                 }
 
                 if (shouldApply) {
@@ -6850,27 +6878,27 @@
                     const originalHsl = rgbToHsl(originalRgb.r, originalRgb.g, originalRgb.b);
 
                     let newHsl;
-                    
+
                     // 普通强调色处理
-                        switch(accentBlendMode) {
-                            case 'hue':
+                    switch(accentBlendMode) {
+                        case 'hue':
                                 // 仅替换色相
-                                newHsl = {
-                                    h: accentHsl.h,
-                                    s: keepSaturation ? originalHsl.s : Math.max(originalHsl.s, accentHsl.s * blendRatio),
-                                    l: originalHsl.l
-                                };
-                                break;
-                                
-                            case 'hsl':
+                            newHsl = {
+                                h: accentHsl.h,
+                                s: keepSaturation ? originalHsl.s : Math.max(originalHsl.s, accentHsl.s * blendRatio, 0.3),
+                                l: originalHsl.l
+                            };
+                            break;
+
+                        case 'hsl':
                                 // HSL混合（保留亮度）
-                                newHsl = {
-                                    h: accentHsl.h,
-                                s: keepSaturation ? originalHsl.s : (originalHsl.s * (1 - blendRatio) + accentHsl.s * blendRatio),
+                            newHsl = {
+                                h: accentHsl.h,
+                                s: keepSaturation ? originalHsl.s : Math.max(originalHsl.s * (1 - blendRatio) + accentHsl.s * blendRatio, 0.4),
                                 l: autoBrightness ? adjustBrightnessForAccent(originalHsl.l, accentHsl.l, blendRatio) : originalHsl.l
                             };
                             break;
-                            
+
                         case 'rgb':
                             // RGB完全混合
                             const newRgbDirect = {
@@ -6880,23 +6908,26 @@
                             };
                             newHsl = rgbToHsl(newRgbDirect.r, newRgbDirect.g, newRgbDirect.b);
                             break;
-                            
+
                         case 'overlay':
                             // 叠加模式
                             newHsl = {
                                 h: accentHsl.h,
-                                s: Math.max(originalHsl.s, accentHsl.s),
+                                s: Math.max(originalHsl.s, accentHsl.s, 0.5),
                                 l: (originalHsl.l + accentHsl.l) / 2
                             };
                             break;
-                            
+
                         default:
-                                newHsl = { ...accentHsl };
-                        }
+                            newHsl = { ...accentHsl };
+                    }
 
                     // 确保饱和度和亮度在有效范围内
-                    newHsl.s = Math.max(0.1, Math.min(1, newHsl.s));
+                    newHsl.s = Math.max(0.15, Math.min(1, newHsl.s));
                     newHsl.l = Math.max(0.15, Math.min(0.85, newHsl.l));
+
+                    const mainBgColor = getColorValue('bg_window_main', '#FFF0F0F0');
+                    newHsl = ensureAccentContrastWithBackgrounds(newHsl, mainBgColor, 3.0);
 
                     const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
                     const newRgbHex = `#${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
