@@ -6808,6 +6808,57 @@
             return accentHsl;
         }
 
+        function ensureContrastWithConfiguredBGs(itemHsl, itemContrastBg, minRatio = 4.5) {
+            if (!itemContrastBg || itemContrastBg.trim() === '') {
+                return itemHsl;
+            }
+
+            const bgNames = itemContrastBg.split(',').map(bg => bg.trim()).filter(bg => bg);
+            let needsAdjust = false;
+            let worstBgName = '';
+            let worstRatio = Infinity;
+
+            for (const bgName of bgNames) {
+                const bgColor = getColorValue(bgName, null);
+                if (!bgColor) continue;
+
+                const bgRgb = hexToRgb(bgColor.replace('#', ''));
+                const itemRgb = hslToRgb(itemHsl.h, itemHsl.s, itemHsl.l);
+
+                const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+                const itemLuminance = getRelativeLuminance(itemRgb.r, itemRgb.g, itemRgb.b);
+
+                const ratio = (Math.max(bgLuminance, itemLuminance) + 0.05) /
+                             (Math.min(bgLuminance, itemLuminance) + 0.05);
+
+                if (ratio < worstRatio) {
+                    worstRatio = ratio;
+                    worstBgName = bgName;
+                }
+
+                if (ratio < minRatio) {
+                    needsAdjust = true;
+                }
+            }
+
+            if (needsAdjust && worstBgName) {
+                const bgColor = getColorValue(worstBgName, null);
+                if (bgColor) {
+                    const bgRgb = hexToRgb(bgColor.replace('#', ''));
+                    const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+
+                    if (bgLuminance > 0.5) {
+                        itemHsl.l = Math.max(0.15, itemHsl.l - 0.25);
+                    } else {
+                        itemHsl.l = Math.min(0.85, itemHsl.l + 0.25);
+                    }
+                    itemHsl.s = Math.min(1, itemHsl.s + 0.1);
+                }
+            }
+
+            return itemHsl;
+        }
+
         function applyAccentColorTheme() {
             const accentBaseColor = document.getElementById('accentBaseColor').value;
             const accentIntensity = parseInt(document.getElementById('accentIntensity').value) || 80;
@@ -6871,6 +6922,21 @@
                     shouldApply = shouldApply && (baseName.includes('link') || baseName.includes('highlight') || baseName.includes('text_link'));
                 } else if (accentScope === 'borders') {
                     shouldApply = shouldApply && (baseName.startsWith('border_') || cat === 'border');
+                } else if (accentScope === 'all') {
+                    shouldApply = shouldApply && (
+                        baseName.includes('btn_') ||
+                        baseName.includes('link') ||
+                        baseName.includes('primary') ||
+                        baseName.includes('accent') ||
+                        baseName.includes('selected') ||
+                        baseName.includes('focused') ||
+                        baseName.includes('slider_') ||
+                        baseName.includes('progress_') ||
+                        baseName.includes('toggle_') ||
+                        baseName.includes('icon_') ||
+                        cat === 'interactive' ||
+                        cat === 'accent'
+                    );
                 }
 
                 if (shouldApply) {
@@ -6928,6 +6994,10 @@
 
                     const mainBgColor = getColorValue('bg_window_main', '#FFF0F0F0');
                     newHsl = ensureAccentContrastWithBackgrounds(newHsl, mainBgColor, 3.0);
+
+                    if (item.contrastBg && item.contrastBg.trim() !== '') {
+                        newHsl = ensureContrastWithConfiguredBGs(newHsl, item.contrastBg, 4.5);
+                    }
 
                     const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
                     const newRgbHex = `#${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
