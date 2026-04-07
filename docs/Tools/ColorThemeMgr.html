@@ -2514,6 +2514,13 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                    <div class="generate-option">
+                        <label for="buttonStyle">按钮风格</label>
+                        <select id="buttonStyle">
+                            <option value="accent">强调色（蓝色系）</option>
+                            <option value="neutral">中性色（白/灰系）</option>
+                        </select>
+                    </div>
                     <div class="generate-option toggle-switch">
                         <label for="redCloseButton">窗口关闭按钮使用红色</label>
                         <label class="switch">
@@ -6386,6 +6393,7 @@
             const preserveContrast = document.getElementById('preserveContrast')?.checked ?? true;
             const keepGrayscale = document.getElementById('keepGrayscale')?.checked ?? true;
             const redCloseButton = document.getElementById('redCloseButton')?.checked ?? true;
+            const buttonStyle = document.getElementById('buttonStyle')?.value ?? 'accent';
 
             // ============================================================
             // 第二步：转换基础色为HSL格式
@@ -6463,6 +6471,12 @@
                 // 窗口关闭按钮通常需要使用红色以表示重要操作
                 if (name.includes('window_close') || name.includes('close_btn')) {
                     categorizedColors.interactive.push({ item, state, baseName });
+                } else if (name.includes('svg')) {
+                    // SVG颜色：名称包含svg
+                    categorizedColors.svg.push({ item, state, baseName });
+                } else if (name.includes('btn_') || name.includes('button')) {
+                    // 交互按钮：包含btn_或button
+                    categorizedColors.interactive.push({ item, state, baseName });
                 } else if (name.startsWith('bg_') || name.includes('background')) {
                     // 背景色：bg_开头或包含background
                     categorizedColors.background.push({ item, state, baseName });
@@ -6472,18 +6486,12 @@
                 } else if (name.startsWith('text_')) {
                     // 文本色：text_开头
                     categorizedColors.text.push({ item, state, baseName });
-                } else if (name.includes('svg')) {
-                    // SVG颜色：名称包含svg
-                    categorizedColors.svg.push({ item, state, baseName });
                 } else if (name.startsWith('border_')) {
                     // 边框色：border_开头
                     categorizedColors.border.push({ item, state, baseName });
                 } else if (item.supportAccent) {
                     // 强调色：supportAccent=true的颜色
                     categorizedColors.accent.push({ item, state, baseName });
-                } else if (name.includes('btn_') || name.includes('button')) {
-                    // 交互按钮：包含btn_或button
-                    categorizedColors.interactive.push({ item, state, baseName });
                 } else {
                     // 其他颜色
                     categorizedColors.other.push({ item, state, baseName });
@@ -6552,7 +6560,7 @@
                         newHsl = generateSmartColor(
                             baseHsl, item, category, state, baseName,
                             index, categoryItems.length, schemeType, brightnessStep,
-                            redCloseButton, bgLuminanceRange, isWindowCloseBtn
+                            redCloseButton, bgLuminanceRange, isWindowCloseBtn, buttonStyle
                         );
                     } else {
                         // 传统模式：使用配色方案统一生成
@@ -6742,9 +6750,11 @@
          * @param {boolean} useRedCloseButton - 是否对关闭窗口使用红色
          * @param {object} bgLuminanceRange - 背景色亮度范围 {min, max}
          * @param {boolean} isWindowCloseBtn - 是否为窗口关闭按钮
+         * @param {string} buttonStyle - 按钮风格：'accent'使用强调色，'neutral'使用中性色
          * @returns {object} 新的HSL颜色值 {h, s, l}
          */
-        // 从基础HSL复制，用于生成新颜色
+        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null, isWindowCloseBtn = false, buttonStyle = 'accent') {
+            // 从基础HSL复制，用于生成新颜色
             let newHsl = { ...baseHsl };
             const itemName = baseName || item.name.toLowerCase();
 
@@ -7008,19 +7018,49 @@
                         }
                     } else {
                         // 其他交互和强调色：使用基础色的变体
-                        newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
-                        // 根据状态调整亮度
-                        if (state === 'hovered') {
-                            newHsl.l = Math.min(0.95, newHsl.l + 0.15);
-                        } else if (state === 'selected' || state === 'checked') {
-                            newHsl.l = Math.min(0.9, newHsl.l + 0.05);
-                        } else if (state === 'pressed' || state === 'active') {
-                            newHsl.l = Math.max(0.15, newHsl.l - 0.15);
-                        } else if (state === 'disabled') {
-                            newHsl.l = 0.55;
-                            newHsl.s = 0.2;
-                        } else if (state === 'focused') {
-                            newHsl.l = Math.min(0.9, newHsl.l + 0.08);
+                        // 但如果选择"中性按钮风格"，则使用灰度而非强调色
+                        if (buttonStyle === 'neutral' && category === 'interactive') {
+                            // 中性按钮风格：使用灰度而非强调色
+                            // 这是 Windows 11 风格的按钮设计
+                            // 白色/浅灰色背景，高对比度文字
+                            if (state === 'hovered') {
+                                newHsl.h = 0;
+                                newHsl.s = 0;
+                                newHsl.l = 0.92;  // 浅灰
+                            } else if (state === 'pressed') {
+                                newHsl.h = 0;
+                                newHsl.s = 0;
+                                newHsl.l = 0.88;  // 稍深灰
+                            } else if (state === 'disabled') {
+                                newHsl.h = 0;
+                                newHsl.s = 0;
+                                newHsl.l = 0.90;  // 淡灰
+                            } else if (state === 'focused') {
+                                newHsl.h = 0;
+                                newHsl.s = 0.15;  // 轻微蓝色边缘
+                                newHsl.l = 0.90;
+                            } else {
+                                // normal
+                                newHsl.h = 0;
+                                newHsl.s = 0;
+                                newHsl.l = 0.95;  // 近白
+                            }
+                        } else {
+                            // 强调色风格：继承基础色的变体
+                            newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                            // 根据状态调整亮度
+                            if (state === 'hovered') {
+                                newHsl.l = Math.min(0.95, newHsl.l + 0.15);
+                            } else if (state === 'selected' || state === 'checked') {
+                                newHsl.l = Math.min(0.9, newHsl.l + 0.05);
+                            } else if (state === 'pressed' || state === 'active') {
+                                newHsl.l = Math.max(0.15, newHsl.l - 0.15);
+                            } else if (state === 'disabled') {
+                                newHsl.l = 0.55;
+                                newHsl.s = 0.2;
+                            } else if (state === 'focused') {
+                                newHsl.l = Math.min(0.9, newHsl.l + 0.08);
+                            }
                         }
                     }
                     break;
