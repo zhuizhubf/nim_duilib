@@ -6780,33 +6780,58 @@
                     // --------------------------------------------------------
                     // 背景色处理策略
                     //
-                    // 背景色通常需要与窗口背景协调，饱和度较低以避免过于鲜艳
+                    // 背景色处理遵循 UI 标准规范：
+                    // - 所有状态色均基于基础亮度推导，仅调整亮度，不改变色相和饱和度
+                    // - 根据深/浅主题自动调整偏移方向
+                    // - 有明确的亮度边界限制
                     //
-                    // 亮度设置规则：
-                    // - 包含 window/base：L=0.95（主窗口，最亮）
-                    // - 包含 card/content：L=0.90（卡片/内容区）
-                    // - 其他背景：L=0.85
-                    // - disabled状态：L=0.65，饱和度降至15%
+                    // 深浅主题判断：
+                    // - 浅色主题（baseHsl.l > 0.5）：hover/pressed 变暗
+                    // - 深色主题（baseHsl.l <= 0.5）：hover/pressed 变亮
                     //
-                    // 饱和度设置：
-                    // - normal状态：S = 基础饱和度 × 0.3（低饱和度）
-                    // - disabled状态：S = 基础饱和度 × 0.15（更低饱和度）
+                    // 亮度边界限制：
+                    // - 浅色主题：pressed 亮度不低于 0.80
+                    // - 深色主题：pressed 亮度不高于 0.60
                     // --------------------------------------------------------
-                    if (itemName.includes('window') || itemName.includes('base')) {
-                        targetLuminance = 0.95;
-                    } else if (itemName.includes('card') || itemName.includes('content')) {
-                        targetLuminance = 0.90;
-                    } else {
-                        targetLuminance = 0.85;
-                    }
+
+                    // 判断是否为深色主题
+                    const isDarkBgTheme = baseHsl.l <= 0.5;
+
                     if (state === 'disabled') {
-                        targetLuminance = 0.65;
-                        newHsl.s = baseHsl.s * 0.15;
+                        // disabled: 降低对比度，弱化处理
+                        // 根据背景亮度动态调整，而非固定值
+                        if (baseHsl.l > 0.5) {
+                            newHsl.l = baseHsl.l * 0.6;  // 浅色背景：降低亮度
+                        } else {
+                            // 深色背景：提亮但不完全接近基准色
+                            newHsl.l = baseHsl.l + (0.5 - baseHsl.l) * 0.5;
+                        }
+                        newHsl.s = baseHsl.s * 0.3;  // 降低饱和度
+                    } else if (state === 'hovered') {
+                        // hovered: 轻微变亮/变暗，表示可交互
+                        if (isDarkBgTheme) {
+                            // 深色主题：变亮
+                            newHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                        } else {
+                            // 浅色主题：变暗（步长 3-5，约 0.03-0.05）
+                            newHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                        }
+                        newHsl.s = baseHsl.s * 0.4;  // 适度增加饱和度
+                    } else if (state === 'pressed') {
+                        // pressed: 进一步变亮/变暗，表示按下反馈
+                        if (isDarkBgTheme) {
+                            // 深色主题：变亮（步长 15-20，约 0.15-0.20）
+                            newHsl.l = Math.min(0.60, baseHsl.l + 0.18);
+                        } else {
+                            // 浅色主题：变暗（步长 8-10，约 0.08-0.10）
+                            newHsl.l = Math.max(0.80, baseHsl.l - 0.09);
+                        }
+                        newHsl.s = baseHsl.s * 0.5;  // 更高饱和度
                     } else {
-                        newHsl.s = baseHsl.s * 0.3;
-                        targetLuminance += lightnessOffset;
+                        // normal: 基准色，无偏移
+                        newHsl.l = baseHsl.l;
+                        newHsl.s = baseHsl.s * 0.3;  // 低饱和度
                     }
-                    newHsl.l = Math.max(0.1, Math.min(0.98, targetLuminance));
                     break;
 
                 case 'text':
@@ -7020,44 +7045,81 @@
                         // 其他交互和强调色：使用基础色的变体
                         // 但如果选择"中性按钮风格"，则使用灰度而非强调色
                         if (buttonStyle === 'neutral' && category === 'interactive') {
+                            // --------------------------------------------------------
                             // 中性按钮风格：使用灰度而非强调色
                             // 这是 Windows 11 风格的按钮设计
                             // 白色/浅灰色背景，高对比度文字
+                            //
+                            // 深浅主题判断：
+                            // - 浅色主题：hover 变暗，pressed 更暗
+                            // - 深色主题：hover 变亮，pressed 更亮
+                            // --------------------------------------------------------
+                            const isDarkInteractiveTheme = baseHsl.l <= 0.5;
+
                             if (state === 'hovered') {
                                 newHsl.h = 0;
                                 newHsl.s = 0;
-                                newHsl.l = 0.92;  // 浅灰
+                                if (isDarkInteractiveTheme) {
+                                    newHsl.l = Math.min(0.95, baseHsl.l + 0.15);  // 深色主题：变亮
+                                } else {
+                                    newHsl.l = Math.max(0.15, baseHsl.l - 0.05);  // 浅色主题：变暗
+                                }
                             } else if (state === 'pressed') {
                                 newHsl.h = 0;
                                 newHsl.s = 0;
-                                newHsl.l = 0.88;  // 稍深灰
+                                if (isDarkInteractiveTheme) {
+                                    newHsl.l = Math.min(0.60, baseHsl.l + 0.25);  // 深色主题：更亮
+                                } else {
+                                    newHsl.l = Math.max(0.80, baseHsl.l - 0.10);  // 浅色主题：更暗
+                                }
                             } else if (state === 'disabled') {
                                 newHsl.h = 0;
                                 newHsl.s = 0;
-                                newHsl.l = 0.90;  // 淡灰
+                                if (baseHsl.l > 0.5) {
+                                    newHsl.l = baseHsl.l * 0.7;  // 浅色背景：降低
+                                } else {
+                                    newHsl.l = baseHsl.l + (0.5 - baseHsl.l) * 0.5;  // 深色背景：提亮
+                                }
                             } else if (state === 'focused') {
                                 newHsl.h = 0;
                                 newHsl.s = 0.15;  // 轻微蓝色边缘
-                                newHsl.l = 0.90;
+                                newHsl.l = baseHsl.l + 0.05;
                             } else {
-                                // normal
+                                // normal: 基准色
                                 newHsl.h = 0;
                                 newHsl.s = 0;
-                                newHsl.l = 0.95;  // 近白
+                                newHsl.l = baseHsl.l;
                             }
                         } else {
+                            // --------------------------------------------------------
                             // 强调色风格：继承基础色的变体
+                            // 根据深/浅主题自动调整偏移方向
+                            // --------------------------------------------------------
+                            const isDarkAccentTheme = baseHsl.l <= 0.5;
+
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
-                            // 根据状态调整亮度
+
                             if (state === 'hovered') {
-                                newHsl.l = Math.min(0.95, newHsl.l + 0.15);
+                                if (isDarkAccentTheme) {
+                                    newHsl.l = Math.min(0.95, newHsl.l + 0.12);
+                                } else {
+                                    newHsl.l = Math.max(0.15, newHsl.l - 0.08);
+                                }
                             } else if (state === 'selected' || state === 'checked') {
                                 newHsl.l = Math.min(0.9, newHsl.l + 0.05);
                             } else if (state === 'pressed' || state === 'active') {
-                                newHsl.l = Math.max(0.15, newHsl.l - 0.15);
+                                if (isDarkAccentTheme) {
+                                    newHsl.l = Math.min(0.65, newHsl.l + 0.20);
+                                } else {
+                                    newHsl.l = Math.max(0.80, newHsl.l - 0.12);
+                                }
                             } else if (state === 'disabled') {
-                                newHsl.l = 0.55;
-                                newHsl.s = 0.2;
+                                if (baseHsl.l > 0.5) {
+                                    newHsl.l = baseHsl.l * 0.6;
+                                } else {
+                                    newHsl.l = baseHsl.l + (0.5 - baseHsl.l) * 0.5;
+                                }
+                                newHsl.s = 0.25;
                             } else if (state === 'focused') {
                                 newHsl.l = Math.min(0.9, newHsl.l + 0.08);
                             }
