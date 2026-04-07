@@ -6320,7 +6320,63 @@
             showToast(`预览模式: ${isDarkPreview ? '深色' : '浅色'}`, 'info');
         }
 
+        /**
+         * 应用基础色主题
+         *
+         * 根据用户选择的基础色和配色参数，为所有支持主题的颜色生成新的颜色值。
+         *
+         * ## 功能流程
+         *
+         * 1. **读取参数**：从UI控件读取基础色、配色方案、色温、饱和度等参数
+         * 2. **颜色分类**：将所有颜色按语义分类（背景、文本、语义色、SVG、边框、交互、强调色等）
+         * 3. **颜色生成**：对每个分类应用不同的配色策略生成新颜色
+         * 4. **后处理**：应用色温调整、饱和度调整、对比度保护等
+         * 5. **应用更新**：将新颜色应用到颜色映射并更新UI
+         *
+         * ## 颜色分类说明
+         *
+         * | 分类 | 说明 | 处理策略 |
+         * |------|------|----------|
+         * | background | 背景色（bg_开头） | 根据状态调整亮度，保持低饱和度 |
+         * | text | 文本色（text_开头） | 根据语义确定亮度（主/次/禁用） |
+         * | semantic | 语义基础色（color_开头） | 根据名称关键词设置色相（蓝/绿/红/灰） |
+         * | svg | SVG图片颜色 | 高饱和度，确保与背景对比度 |
+         * | border | 边框色 | 根据状态调整亮度 |
+         * | interactive | 交互色（窗口关闭按钮、btn_） | 特殊处理，状态影响亮度 |
+         * | accent | 强调色（supportAccent=true） | 继承基础色变体 |
+         * | other | 其他颜色 | 使用配色方案生成 |
+         *
+         * ## 状态后缀
+         *
+         * 颜色名称支持以下状态后缀，会影响亮度和饱和度计算：
+         * - `_normal`：正常状态（默认）
+         * - `_hovered`：悬浮状态（亮度+0.12）
+         * - `_pressed`：按下状态（亮度-0.12）
+         * - `_disabled`：禁用状态（亮度固定，饱和度降低）
+         * - `_focused`：聚焦状态（亮度+0.08）
+         *
+         * ## 对比度保护
+         *
+         * 当启用"保留对比度"选项时：
+         * - 文本颜色会确保与所有背景颜色都有足够对比度（AA标准4.5:1）
+         * - SVG颜色会确保与窗口背景有足够对比度
+         *
+         * ## 中性灰度色处理
+         *
+         * 以下颜色被识别为中性灰度色，会保持饱和度为0，不被染色：
+         * - 名称包含 white、black、gray 的颜色
+         *
+         * @requires hexToRgb, rgbToHsl, hslToRgb, rgbToHex, argbToRgb, rgbHexToArgb
+         * @requires generateSmartColor, generateColorByScheme, ensureContrastWithAllBackgrounds
+         * @requires updateAllGroupedValues, calculateGroupStatistics, renderColorCategories
+         *
+         * @see generateSmartColor 智能生成单个颜色的核心算法
+         * @see generateColorByScheme 根据配色方案生成颜色
+         */
         function applyBasicColorTheme() {
+            // ============================================================
+            // 第一步：读取用户配置的参数
+            // ============================================================
             const baseColor = document.getElementById('baseColor').value;
             const schemeType = document.getElementById('schemeType').value;
             const brightnessStep = parseInt(document.getElementById('brightnessStep').value) || 12;
@@ -6331,10 +6387,19 @@
             const keepGrayscale = document.getElementById('keepGrayscale')?.checked ?? true;
             const redCloseButton = document.getElementById('redCloseButton')?.checked ?? true;
 
+            // ============================================================
+            // 第二步：转换基础色为HSL格式
+            // HSL格式便于后续的色相、饱和度、亮度独立调整
+            // ============================================================
             const baseRgb = hexToRgb(baseColor);
             const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
 
-            // 计算色温调整
+            // ============================================================
+            // 第三步：计算色温调整值
+            // 色温影响基础色的色相偏移：
+            // - warm1/warm2：正偏移（偏暖色调，红色方向）
+            // - cool1/cool2：负偏移（偏冷色调，蓝色方向）
+            // ============================================================
             let tempAdjust = 0;
             switch(colorTemperature) {
                 case 'warm1': tempAdjust = 15; break;
@@ -6343,65 +6408,92 @@
                 case 'cool2': tempAdjust = -30; break;
             }
 
-            // 颜色状态后缀定义
+            // ============================================================
+            // 第四步：定义颜色状态后缀
+            // 状态后缀用于标识颜色的交互状态，影响亮度计算
+            // ============================================================
             const STATE_SUFFIXES = ['_normal', '_hovered', '_pressed', '_disabled', '_focused'];
 
-            // 根据颜色类型智能分类
-            // 结构: { category: [{ item, state, baseName }, ...] }
-            // state: 'normal' | 'hovered' | 'pressed' | 'disabled' | 'focused' | 'none'
+            // ============================================================
+            // 第五步：初始化颜色分类容器
+            // 每个分类会应用不同的配色策略
+            // ============================================================
             const categorizedColors = {
-                background: [],
-                text: [],
-                semantic: [],
-                svg: [],
-                border: [],
-                accent: [],
-                interactive: [],
-                other: []
+                background: [],    // 背景色
+                text: [],          // 文本色
+                semantic: [],      // 语义基础色（color_开头）
+                svg: [],           // SVG图片颜色
+                border: [],        // 边框色
+                accent: [],        // 强调色（supportAccent=true）
+                interactive: [],   // 交互色（窗口关闭按钮、btn_）
+                other: []          // 其他颜色
             };
 
-            // 辅助函数：提取颜色名称的状态后缀和基础名称
+            // ============================================================
+            // 辅助函数：提取颜色名称的状态后缀
+            //
+            // 例如：
+            // - "bg_btn_normal" -> { state: 'normal', baseName: 'bg_btn' }
+            // - "text_default" -> { state: 'none', baseName: 'text_default' }
+            //
+            // @param {string} name - 颜色名称
+            // @returns {object} 包含state和baseName的对象
+            // ============================================================
             function extractState(name) {
                 for (const suffix of STATE_SUFFIXES) {
                     if (name.endsWith(suffix)) {
                         return {
-                            state: suffix.slice(1),  // 去掉下划线
-                            baseName: name.slice(0, -suffix.length)
+                            state: suffix.slice(1),  // 去掉下划线得到状态名
+                            baseName: name.slice(0, -suffix.length)  // 去掉后缀得到基础名称
                         };
                     }
                 }
-                return { state: 'none', baseName: name };
+                return { state: 'none', baseName: name };  // 无状态后缀
             }
 
+            // ============================================================
+            // 第六步：遍历所有颜色，按语义分类到对应容器
+            // 分类依据：颜色名称的前缀和内容
+            // ============================================================
             allColorItems.forEach(item => {
                 const name = item.name.toLowerCase();
                 const { state, baseName } = extractState(name);
 
-                // 窗口关闭按钮特殊处理：优先分到interactive类别
+                // 窗口关闭按钮特殊处理：优先归类到interactive
+                // 窗口关闭按钮通常需要使用红色以表示重要操作
                 if (name.includes('window_close') || name.includes('close_btn')) {
                     categorizedColors.interactive.push({ item, state, baseName });
                 } else if (name.startsWith('bg_') || name.includes('background')) {
+                    // 背景色：bg_开头或包含background
                     categorizedColors.background.push({ item, state, baseName });
                 } else if (name.startsWith('color_')) {
-                    // 语义色单独分类（color_green/color_blue/color_red等）
+                    // 语义基础色：color_开头（color_blue/color_green/color_red等）
                     categorizedColors.semantic.push({ item, state, baseName });
                 } else if (name.startsWith('text_')) {
+                    // 文本色：text_开头
                     categorizedColors.text.push({ item, state, baseName });
                 } else if (name.includes('svg')) {
-                    // SVG图片颜色单独分类，需要与背景有足够对比度
+                    // SVG颜色：名称包含svg
                     categorizedColors.svg.push({ item, state, baseName });
                 } else if (name.startsWith('border_')) {
+                    // 边框色：border_开头
                     categorizedColors.border.push({ item, state, baseName });
                 } else if (item.supportAccent) {
+                    // 强调色：supportAccent=true的颜色
                     categorizedColors.accent.push({ item, state, baseName });
                 } else if (name.includes('btn_') || name.includes('button')) {
+                    // 交互按钮：包含btn_或button
                     categorizedColors.interactive.push({ item, state, baseName });
                 } else {
+                    // 其他颜色
                     categorizedColors.other.push({ item, state, baseName });
                 }
             });
 
-            // 预计算所有背景色的亮度范围，用于对比度保护
+            // ============================================================
+            // 第七步：预计算背景色亮度范围
+            // 用于后续的对比度保护和SVG颜色调整
+            // ============================================================
             const bgLuminanceRange = {
                 min: Math.min(...categorizedColors.background.map(entry => {
                     const rgb = argbToRgb(entry.item.value);
@@ -6417,86 +6509,135 @@
 
             let modifiedCount = 0;
 
-            // 为每个分类应用不同的配色策略
+            // ============================================================
+            // 第八步：遍历每个分类，应用配色策略生成新颜色
+            // ============================================================
             Object.keys(categorizedColors).forEach(category => {
                 categorizedColors[category].forEach((entry, index) => {
                     const { item, state, baseName } = entry;
 
-                    // Skip fixed colors
+                    // --------------------------------------------------
+                    // 跳过固定颜色（fixed=true）
+                    // 固定颜色不被主题修改，保持原值
+                    // --------------------------------------------------
                     if (item.fixed) {
                         return;
                     }
 
-                    // 检查是否是灰度色（但语义色和交互色不受此限制）
+                    // --------------------------------------------------
+                    // 跳过灰度色（可选）
+                    // 当启用"保留灰度"选项时，灰度色不会被染色
+                    // 但语义色、交互色、强调色不受此限制
+                    // --------------------------------------------------
                     const isSemanticOrInteractive = (category === 'semantic' || category === 'interactive' || category === 'accent');
                     if (keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive) {
                         return;
                     }
 
-                    // Check if this is a window close button (baseName starts with bg_btn_window_close_)
+                    // --------------------------------------------------
+                    // 判断是否为窗口关闭按钮
+                    // 窗口关闭按钮需要特殊处理（通常是红色）
+                    // --------------------------------------------------
                     const isWindowCloseBtn = baseName.startsWith('bg_btn_window_close_');
 
+                    // 从基础HSL复制，用于生成新颜色
                     let newHsl = { ...baseHsl };
                     const categoryItems = categorizedColors[category];
 
+                    // --------------------------------------------------
+                    // 根据是否启用智能生成，选择不同的颜色生成方式
+                    // --------------------------------------------------
                     if (smartGeneration) {
-                        newHsl = generateSmartColor(baseHsl, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn);
+                        // 智能模式：根据颜色分类应用不同的生成策略
+                        newHsl = generateSmartColor(
+                            baseHsl, item, category, state, baseName,
+                            index, categoryItems.length, schemeType, brightnessStep,
+                            redCloseButton, bgLuminanceRange, isWindowCloseBtn
+                        );
                     } else {
-                        // 传统模式
+                        // 传统模式：使用配色方案统一生成
                         newHsl = generateColorByScheme(baseHsl, index, categoryItems.length, schemeType, brightnessStep);
                     }
 
+                    // --------------------------------------------------
                     // 应用色温调整
+                    // 在智能生成的颜色基础上偏移色相
+                    // --------------------------------------------------
                     newHsl.h = (newHsl.h + tempAdjust + 360) % 360;
 
-                    // 调整饱和度（基于颜色角色动态调整）
-                    // 但如果是中性灰度色（white/black/gray），保持饱和度为0
+                    // --------------------------------------------------
+                    // 调整饱和度
+                    // 不同分类有不同的饱和度范围要求
+                    // --------------------------------------------------
                     const baseNameLower = baseName.toLowerCase();
-                    const isNeutralGrayColor = baseNameLower.includes('gray') || baseNameLower.includes('white') || baseNameLower.includes('black');
-                    
+                    const isNeutralGrayColor = baseNameLower.includes('gray') ||
+                                              baseNameLower.includes('white') ||
+                                              baseNameLower.includes('black');
+
+                    // 中性灰度色保持饱和度为0，不被调整
                     if (!isNeutralGrayColor) {
                         const satMultiplier = saturationLevel / 100;
                         let targetSaturation = newHsl.s * satMultiplier;
+
                         // 根据分类设定饱和度范围，避免过灰或过艳
                         if (category === 'background') {
+                            // 背景色：低饱和度（0.05-0.3），避免过于鲜艳
                             targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
                         } else if (category === 'text') {
+                            // 文本色：中等饱和度（0.1-0.5），保证可读性
                             targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
                         } else if (category === 'border') {
+                            // 边框色：低饱和度（0.05-0.25），保持低调
                             targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
                         } else if (category === 'semantic') {
-                            // 语义色保持较高饱和度
+                            // 语义色：高饱和度（0.5-1.0），保持色彩鲜明
                             targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
                         } else if (category === 'svg') {
-                            // SVG颜色需要较高饱和度以确保可见性
+                            // SVG颜色：高饱和度（0.4-1.0），确保图标可见
                             targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
                         }
                         newHsl.s = targetSaturation;
                     }
 
-                    // 对比度保护：确保文本与所有背景都有足够对比度
+                    // --------------------------------------------------
+                    // 对比度保护
+                    // 确保文本颜色与所有背景颜色都有足够对比度
+                    // AA标准：正文文本对比度 >= 4.5:1
+                    // --------------------------------------------------
                     if (preserveContrast && category === 'text' && categorizedColors.background.length > 0) {
                         ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
                     }
 
-                    // SVG对比度保护：确保SVG颜色与窗口背景有足够对比度
+                    // --------------------------------------------------
+                    // SVG对比度保护
+                    // 确保SVG颜色与窗口背景有足够对比度
+                    // --------------------------------------------------
                     if (preserveContrast && category === 'svg' && categorizedColors.background.length > 0) {
                         ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
                     }
 
+                    // --------------------------------------------------
+                    // 转换回RGB并应用新颜色
+                    // --------------------------------------------------
                     const newRgb = hslToRgb(newHsl.h, newHsl.s, newHsl.l);
                     const newRgbHex = `#${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
+                    // 保留原始alpha通道
                     const newArgb = rgbHexToArgb(newRgbHex, item.value);
 
+                    // 如果颜色有变化，则更新
                     if (newArgb !== item.value) {
                         item.value = newArgb;
                         currentColorMap.set(item.name, item);
+                        // 更新所有引用此颜色的分组值
                         updateAllGroupedValues(item.name, newArgb);
                         modifiedCount++;
                     }
                 });
             });
 
+            // ============================================================
+            // 第九步：更新UI和统计数据
+            // ============================================================
             if (modifiedCount > 0) {
                 calculateGroupStatistics();
                 renderColorCategories();
@@ -6548,26 +6689,99 @@
          * - _disabled: 禁用状态，亮度0.60，饱和度降低
          * - _focused: 焦点状态，亮度+0.08
          */
-        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null, isWindowCloseBtn = false) {
+        /**
+         * 智能生成单个颜色
+         *
+         * 根据颜色所属的分类和状态，应用不同的配色策略生成新的HSL颜色值。
+         *
+         * ## 分类处理策略
+         *
+         * | 分类 | 色相(H)处理 | 饱和度(S)处理 | 亮度(L)处理 |
+         * |------|------------|--------------|-------------|
+         * | background | 继承基础色 | 低饱和度(0.15-0.3) | 根据窗口类型设定 |
+         * | text | 继承基础色 | 中等饱和度(0.5) | 根据语义设定(0.15-0.55) |
+         * | semantic | 根据关键词设定(0/120/210) | 高饱和度(0.7) | 根据状态调整 |
+         * | svg | 继承基础色 | 高饱和度(0.5+) | 根据背景亮度调整 |
+         * | border | 继承基础色 | 低饱和度(0.2-0.4) | 根据状态调整(0.55-0.75) |
+         * | interactive | 红色或基础色变体 | 高饱和度(0.75) | 根据状态调整 |
+         * | accent | 继承基础色变体 | 高饱和度 | 根据状态调整 |
+         *
+         * ## 状态亮度偏移
+         *
+         * 状态后缀会影响最终亮度值：
+         * - `_normal`：无偏移
+         * - `_hovered`：亮度 +0.12
+         * - `_pressed`：亮度 -0.12
+         * - `_disabled`：亮度固定为0.50，饱和度降低
+         * - `_focused`：亮度 +0.08
+         *
+         * ## 中性灰度色处理
+         *
+         * 名称包含 white/black/gray 的颜色被识别为中性灰度色，
+         * 会保持饱和度为0，直接返回预定义的标准灰度值：
+         * - white: L=0.95 (几乎纯白)
+         * - black: L=0.12 (几乎纯黑)
+         * - gray: L=0.75(light)/0.50(normal)/0.25(dark)
+         *
+         * ## 窗口关闭按钮特殊处理
+         *
+         * 当 useRedCloseButton=true 且 isWindowCloseBtn=true 时：
+         * - 色相固定为0（红色）
+         * - 饱和度固定为0.75
+         * - 亮度根据状态变化
+         *
+         * @param {object} baseHsl - 基础色的HSL值 {h, s, l}
+         * @param {object} item - 颜色配置项，包含name、value等属性
+         * @param {string} category - 颜色分类（background/text/semantic/svg/border/interactive/accent）
+         * @param {string} state - 颜色状态（normal/hovered/pressed/disabled/focused/none）
+         * @param {string} baseName - 颜色基础名称（不含状态后缀）
+         * @param {number} index - 当前颜色在同类颜色中的索引
+         * @param {number} total - 同类颜色的总数
+         * @param {string} schemeType - 配色方案类型
+         * @param {number} brightnessStep - 亮度步进值
+         * @param {boolean} useRedCloseButton - 是否对关闭窗口使用红色
+         * @param {object} bgLuminanceRange - 背景色亮度范围 {min, max}
+         * @param {boolean} isWindowCloseBtn - 是否为窗口关闭按钮
+         * @returns {object} 新的HSL颜色值 {h, s, l}
+         */
+        // 从基础HSL复制，用于生成新颜色
             let newHsl = { ...baseHsl };
             const itemName = baseName || item.name.toLowerCase();
 
             // 状态亮度调整偏移量
+            // 定义各状态下相对于基础亮度的调整值
             const STATE_LIGHTNESS_OFFSET = {
-                'normal': 0,
-                'hovered': 0.12,
-                'pressed': -0.12,
-                'disabled': 0.40,
-                'focused': 0.08,
-                'none': 0
+                'normal': 0,      // 正常状态：无偏移
+                'hovered': 0.12,   // 悬浮状态：变亮
+                'pressed': -0.12,  // 按下状态：变暗
+                'disabled': 0.40,  // 禁用状态：显著变亮
+                'focused': 0.08,   // 聚焦状态：轻微变亮
+                'none': 0           // 无状态：无偏移
             };
 
             let targetLuminance = baseHsl.l;
             const lightnessOffset = STATE_LIGHTNESS_OFFSET[state] || 0;
 
+            // ============================================================
+            // 根据分类应用不同的配色策略
+            // ============================================================
             switch(category) {
                 case 'background':
-                    // 背景色：状态决定亮度
+                    // --------------------------------------------------------
+                    // 背景色处理策略
+                    //
+                    // 背景色通常需要与窗口背景协调，饱和度较低以避免过于鲜艳
+                    //
+                    // 亮度设置规则：
+                    // - 包含 window/base：L=0.95（主窗口，最亮）
+                    // - 包含 card/content：L=0.90（卡片/内容区）
+                    // - 其他背景：L=0.85
+                    // - disabled状态：L=0.65，饱和度降至15%
+                    //
+                    // 饱和度设置：
+                    // - normal状态：S = 基础饱和度 × 0.3（低饱和度）
+                    // - disabled状态：S = 基础饱和度 × 0.15（更低饱和度）
+                    // --------------------------------------------------------
                     if (itemName.includes('window') || itemName.includes('base')) {
                         targetLuminance = 0.95;
                     } else if (itemName.includes('card') || itemName.includes('content')) {
@@ -6586,7 +6800,20 @@
                     break;
 
                 case 'text':
-                    // 文本色：根据状态和语义确定亮度
+                    // --------------------------------------------------------
+                    // 文本色处理策略
+                    //
+                    // 文本色需要确保可读性，亮度根据语义重要程度区分
+                    //
+                    // 亮度设置规则：
+                    // - 包含 main/primary：L=0.15（主文本，最暗，高对比度）
+                    // - 包含 second/muted：L=0.40（次要文本）
+                    // - 包含 disabled：L=0.60（禁用文本，较亮）
+                    // - 其他文本：L=0.20
+                    //
+                    // disabled状态额外处理：
+                    // - L=0.55，S降至20%（灰化处理）
+                    // --------------------------------------------------------
                     if (itemName.includes('main') || itemName.includes('primary')) {
                         newHsl.l = 0.15;
                     } else if (itemName.includes('second') || itemName.includes('muted')) {
@@ -6607,8 +6834,33 @@
                     break;
 
                 case 'semantic':
-                    // 语义色：根据语义角色生成对应色调，状态影响亮度
-                    // 判断是否为中性灰度色（需要特殊处理，保持饱和度为0且色相任意）
+                    // --------------------------------------------------------
+                    // 语义色处理策略
+                    //
+                    // 语义色根据其代表的含义（成功/错误/信息等）设置固定的色相
+                    // 而非继承基础色
+                    //
+                    // 色相设置（基于颜色名称关键词）：
+                    // - 包含 success/green/ok：H=120（绿色）
+                    // - 包含 error/red/danger/warning：H=0（红色）
+                    // - 包含 info/link/blue：H=210（蓝色）
+                    // - 包含 gray/white/black：中性灰度，保持S=0
+                    // - 其他：使用配色方案生成
+                    //
+                    // 亮度设置（基于状态）：
+                    // - disabled：L=0.50，S=0（灰色）
+                    // - hovered：L+0.15
+                    // - pressed：L-0.15
+                    // - light后缀：L=0.75
+                    // - dark后缀：L=0.25
+                    // - 无后缀：L=0.50
+                    //
+                    // 饱和度设置：
+                    // - disabled：S=0（灰色）
+                    // - 其他：S=0.70（较高饱和度保持色彩鲜明）
+                    // --------------------------------------------------------
+
+                    // 判断是否为中性灰度色
                     const isNeutralGray = itemName.includes('gray') || itemName.includes('white') || itemName.includes('black');
 
                     if (itemName.includes('success') || itemName.includes('green') || itemName.includes('ok')) {
@@ -6618,20 +6870,16 @@
                     } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
                         newHsl.h = 210;
                     } else if (isNeutralGray) {
-                        // 中性灰度色：保持绝对中性
-                        // 直接设置为一个标准灰度值，不继承 baseHsl
+                        // 中性灰度色：保持绝对中性，不继承基础色调
                         if (itemName.includes('white')) {
-                            // 白色：亮度最高
                             newHsl.h = 0;
                             newHsl.s = 0;
                             newHsl.l = 0.95; // 几乎纯白
                         } else if (itemName.includes('black')) {
-                            // 黑色：亮度最低
                             newHsl.h = 0;
                             newHsl.s = 0;
                             newHsl.l = 0.12; // 几乎纯黑
                         } else {
-                            // 灰色系列：根据后缀设置亮度
                             newHsl.h = 0;
                             newHsl.s = 0;
                             if (itemName.includes('light')) {
@@ -6664,29 +6912,47 @@
                     break;
 
                 case 'svg':
-                    // SVG图片颜色：需要与bg_window_main有足够对比度
-                    // 使用基础色的色相，但调整亮度和饱和度以确保可见性
+                    // --------------------------------------------------------
+                    // SVG图片颜色处理策略
+                    //
+                    // SVG图标需要与背景有足够对比度以确保可见性
+                    // 通过调整亮度和饱和度来实现
+                    //
+                    // 色相：继承基础色
+                    // 饱和度：S = max(0.5, 基础饱和度 × 0.8)
+                    //
+                    // 亮度：根据背景亮度范围动态调整
+                    // - 亮背景(avg>0.7)：L = min(0.4, avgBgLuminance - 0.3)
+                    // - 暗背景(avg<0.3)：L = max(0.6, avgBgLuminance + 0.3)
+                    // - 中等背景：L=0.5
+                    // --------------------------------------------------------
                     newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
-                    // SVG通常是单色图标，需要较高饱和度
                     newHsl.s = Math.max(0.5, baseHsl.s * 0.8);
-                    // 亮度调整：根据窗口背景亮度决定
                     if (bgLuminanceRange) {
                         const avgBgLuminance = (bgLuminanceRange.min + bgLuminanceRange.max) / 2;
                         if (avgBgLuminance > 0.7) {
-                            // 亮背景：使用深色SVG
                             newHsl.l = Math.min(0.4, avgBgLuminance - 0.3);
                         } else if (avgBgLuminance < 0.3) {
-                            // 暗背景：使用亮色SVG
                             newHsl.l = Math.max(0.6, avgBgLuminance + 0.3);
                         } else {
-                            // 中等亮度背景：使用中等亮度的SVG
                             newHsl.l = 0.5;
                         }
                     }
                     break;
 
                 case 'border':
-                    // 边框色：根据状态调整亮度
+                    // --------------------------------------------------------
+                    // 边框色处理策略
+                    //
+                    // 边框色通常比较低调，饱和度较低
+                    //
+                    // 亮度设置（基于状态）：
+                    // - disabled：L=0.55，S=基础×0.2
+                    // - hovered：L=0.65，S=基础×0.35
+                    // - pressed：L=0.75，S=基础×0.4
+                    // - focused：L=0.68，S=基础×0.5
+                    // - normal：L=0.70，S=基础×0.4
+                    // --------------------------------------------------------
                     if (state === 'disabled') {
                         newHsl.l = 0.55;
                         newHsl.s = baseHsl.s * 0.2;
@@ -6708,6 +6974,25 @@
 
                 case 'interactive':
                 case 'accent':
+                    // --------------------------------------------------------
+                    // 交互色/强调色处理策略
+                    //
+                    // 交互色包括按钮、窗口关闭按钮等
+                    // 强调色包括支持强调色替换的颜色
+                    //
+                    // 窗口关闭按钮特殊处理（当useRedCloseButton=true时）：
+                    // - H=0（固定红色）
+                    // - S=0.75（高饱和度）
+                    // - L根据状态变化：
+                    //   - hovered：L=0.55
+                    //   - pressed：L=0.40
+                    //   - disabled：L=0.50，S=0.3
+                    //   - normal：L=0.50
+                    //
+                    // 其他交互色/强调色：
+                    // - 继承基础色变体
+                    // - 根据状态调整亮度
+                    // --------------------------------------------------------
                     if (useRedCloseButton && isWindowCloseBtn) {
                         newHsl.h = 0;
                         newHsl.s = 0.75;
@@ -6741,7 +7026,11 @@
                     break;
 
                 default:
-                    // 其他类型：使用方案生成
+                    // --------------------------------------------------------
+                    // 其他类型颜色处理策略
+                    //
+                    // 对于未分类的颜色，使用配色方案统一生成
+                    // --------------------------------------------------------
                     newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                     break;
             }
