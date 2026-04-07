@@ -6450,23 +6450,29 @@
                     newHsl.h = (newHsl.h + tempAdjust + 360) % 360;
 
                     // 调整饱和度（基于颜色角色动态调整）
-                    const satMultiplier = saturationLevel / 100;
-                    let targetSaturation = newHsl.s * satMultiplier;
-                    // 根据分类设定饱和度范围，避免过灰或过艳
-                    if (category === 'background') {
-                        targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
-                    } else if (category === 'text') {
-                        targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
-                    } else if (category === 'border') {
-                        targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
-                    } else if (category === 'semantic') {
-                        // 语义色保持较高饱和度
-                        targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
-                    } else if (category === 'svg') {
-                        // SVG颜色需要较高饱和度以确保可见性
-                        targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
+                    // 但如果是中性灰度色（white/black/gray），保持饱和度为0
+                    const baseNameLower = baseName.toLowerCase();
+                    const isNeutralGrayColor = baseNameLower.includes('gray') || baseNameLower.includes('white') || baseNameLower.includes('black');
+                    
+                    if (!isNeutralGrayColor) {
+                        const satMultiplier = saturationLevel / 100;
+                        let targetSaturation = newHsl.s * satMultiplier;
+                        // 根据分类设定饱和度范围，避免过灰或过艳
+                        if (category === 'background') {
+                            targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
+                        } else if (category === 'text') {
+                            targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
+                        } else if (category === 'border') {
+                            targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
+                        } else if (category === 'semantic') {
+                            // 语义色保持较高饱和度
+                            targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
+                        } else if (category === 'svg') {
+                            // SVG颜色需要较高饱和度以确保可见性
+                            targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
+                        }
+                        newHsl.s = targetSaturation;
                     }
-                    newHsl.s = targetSaturation;
 
                     // 对比度保护：确保文本与所有背景都有足够对比度
                     if (preserveContrast && category === 'text' && categorizedColors.background.length > 0) {
@@ -6602,22 +6608,48 @@
 
                 case 'semantic':
                     // 语义色：根据语义角色生成对应色调，状态影响亮度
+                    // 判断是否为中性灰度色（需要特殊处理，保持饱和度为0且色相任意）
+                    const isNeutralGray = itemName.includes('gray') || itemName.includes('white') || itemName.includes('black');
+
                     if (itemName.includes('success') || itemName.includes('green') || itemName.includes('ok')) {
                         newHsl.h = 120;
                     } else if (itemName.includes('error') || itemName.includes('red') || itemName.includes('danger') || itemName.includes('warning')) {
                         newHsl.h = 0;
                     } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
                         newHsl.h = 210;
-                    } else if (itemName.includes('gray') || itemName.includes('white') || itemName.includes('black')) {
-                        // 中性灰度色：保持原有色相（灰色=任意色相都可以，white/black需要保持中性）
-                        newHsl.h = 0; // 灰色使用0度色相（也符合灰度定义）
-                        newHsl.s = 0; // 完全去饱和
+                    } else if (isNeutralGray) {
+                        // 中性灰度色：保持绝对中性
+                        // 直接设置为一个标准灰度值，不继承 baseHsl
+                        if (itemName.includes('white')) {
+                            // 白色：亮度最高
+                            newHsl.h = 0;
+                            newHsl.s = 0;
+                            newHsl.l = 0.95; // 几乎纯白
+                        } else if (itemName.includes('black')) {
+                            // 黑色：亮度最低
+                            newHsl.h = 0;
+                            newHsl.s = 0;
+                            newHsl.l = 0.12; // 几乎纯黑
+                        } else {
+                            // 灰色系列：根据后缀设置亮度
+                            newHsl.h = 0;
+                            newHsl.s = 0;
+                            if (itemName.includes('light')) {
+                                newHsl.l = 0.75;
+                            } else if (itemName.includes('dark')) {
+                                newHsl.l = 0.25;
+                            } else {
+                                newHsl.l = 0.50; // 中灰
+                            }
+                        }
+                        // 灰度色直接返回，不继续后续处理
+                        return newHsl;
                     } else {
                         newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                     }
                     if (state === 'disabled') {
                         newHsl.l = 0.50;
-                        newHsl.s = 0.3;
+                        newHsl.s = isNeutralGray ? 0 : 0.3;
                     } else if (state === 'hovered') {
                         newHsl.l = Math.min(0.75, newHsl.l + 0.15);
                     } else if (state === 'pressed') {
@@ -6625,7 +6657,10 @@
                     } else {
                         newHsl.l = itemName.includes('light') ? 0.75 : (itemName.includes('dark') ? 0.25 : 0.50);
                     }
-                    newHsl.s = 0.70;
+                    // 中性灰度色保持饱和度为0，不被覆盖
+                    if (!isNeutralGray) {
+                        newHsl.s = 0.70;
+                    }
                     break;
 
                 case 'svg':
