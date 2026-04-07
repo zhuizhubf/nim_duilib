@@ -2517,8 +2517,8 @@
                     <div class="generate-option">
                         <label for="buttonStyle">按钮风格</label>
                         <select id="buttonStyle">
-                            <option value="accent">强调色（蓝色系）</option>
                             <option value="neutral">中性色（白/灰系）</option>
+                            <option value="accent">强调色（蓝色系）</option>
                         </select>
                     </div>
                     <div class="generate-option toggle-switch">
@@ -7578,6 +7578,46 @@
                     newHsl.s = Math.max(0.15, Math.min(1, newHsl.s));
                     newHsl.l = Math.max(0.15, Math.min(0.85, newHsl.l));
 
+                    // --------------------------------------------------------
+                    // 四状态亮度调整（深浅主题自适应）
+                    // 根据状态在基础色上调整亮度，与 generateSmartColor 保持一致
+                    // --------------------------------------------------------
+                    const isDarkAccentTheme = originalHsl.l <= 0.5;
+
+                    if (state === 'hovered') {
+                        // hovered: 轻微变亮/变暗
+                        if (isDarkAccentTheme) {
+                            newHsl.l = Math.min(0.95, newHsl.l + 0.12);
+                        } else {
+                            newHsl.l = Math.max(0.15, newHsl.l - 0.08);
+                        }
+                        newHsl.s = Math.max(0.4, newHsl.s);
+                    } else if (state === 'pressed' || state === 'active') {
+                        // pressed: 进一步变亮/变暗
+                        if (isDarkAccentTheme) {
+                            newHsl.l = Math.min(0.65, newHsl.l + 0.20);
+                        } else {
+                            newHsl.l = Math.max(0.80, newHsl.l - 0.12);
+                        }
+                        newHsl.s = Math.max(0.5, newHsl.s);
+                    } else if (state === 'disabled') {
+                        // disabled: 降低对比度，弱化处理
+                        if (originalHsl.l > 0.5) {
+                            newHsl.l = originalHsl.l * 0.6;
+                        } else {
+                            newHsl.l = originalHsl.l + (0.5 - originalHsl.l) * 0.5;
+                        }
+                        newHsl.s = 0.25;
+                    } else if (state === 'focused') {
+                        // focused: 轻微提亮
+                        newHsl.l = Math.min(0.9, newHsl.l + 0.08);
+                        newHsl.s = Math.max(0.4, newHsl.s);
+                    } else if (state === 'selected' || state === 'checked') {
+                        // selected/checked: 轻微提亮
+                        newHsl.l = Math.min(0.9, newHsl.l + 0.05);
+                    }
+                    // normal 状态：直接使用混合后的颜色
+
                     // 对比度保护：确保与窗口主背景有足够对比度（阈值3.0）
                     const mainBgColor = getColorValue('bg_window_main', '#FFF0F0F0');
                     newHsl = ensureAccentContrastWithBackgrounds(newHsl, mainBgColor, 3.0);
@@ -7726,14 +7766,63 @@
                     newArgb = rgbHexToArgb(newRgbHex, item.value);
                 } else {
                     const cat = item.category;
+                    let baseColor = null;
+                    let baseHsl = null;
+
                     if (cat === 'bg' || cat === 'background' || baseName.startsWith('bg_')) {
-                        newArgb = theme.bg;
+                        baseColor = theme.bg;
                     } else if (cat === 'text' || baseName.startsWith('text_')) {
-                        newArgb = theme.text;
+                        baseColor = theme.text;
                     } else if (cat === 'border' || baseName.startsWith('border_')) {
-                        newArgb = theme.border;
+                        baseColor = theme.border;
                     } else if (item.supportAccent) {
-                        newArgb = theme.accent;
+                        baseColor = theme.accent;
+                    }
+
+                    if (baseColor) {
+                        // 解析基础色的 HSL
+                        const baseRgb = hexToRgb(baseColor);
+                        baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+
+                        // --------------------------------------------------------
+                        // 高对比度主题的四状态处理
+                        // 与基础色主题保持一致的深浅主题自适应逻辑
+                        // --------------------------------------------------------
+                        const isDarkTheme = baseHsl.l <= 0.5;
+
+                        if (state === 'hovered') {
+                            // hovered: 轻微变亮/变暗
+                            if (isDarkTheme) {
+                                baseHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                            } else {
+                                baseHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                            }
+                            baseHsl.s = Math.max(0.4, baseHsl.s * 0.5);
+                        } else if (state === 'pressed') {
+                            // pressed: 进一步变亮/变暗
+                            if (isDarkTheme) {
+                                baseHsl.l = Math.min(0.60, baseHsl.l + 0.18);
+                            } else {
+                                baseHsl.l = Math.max(0.80, baseHsl.l - 0.09);
+                            }
+                            baseHsl.s = Math.max(0.5, baseHsl.s * 0.6);
+                        } else if (state === 'disabled') {
+                            // disabled: 降低对比度，弱化处理
+                            if (baseHsl.l > 0.5) {
+                                baseHsl.l = baseHsl.l * 0.6;
+                            } else {
+                                baseHsl.l = baseHsl.l + (0.5 - baseHsl.l) * 0.5;
+                            }
+                            baseHsl.s = baseHsl.s * 0.3;
+                        } else if (state === 'focused') {
+                            // focused: 轻微提亮
+                            baseHsl.l = Math.min(0.9, baseHsl.l + 0.08);
+                        }
+                        // normal 状态：直接使用主题色
+
+                        const newRgb = hslToRgb(baseHsl.h, baseHsl.s, baseHsl.l);
+                        const newRgbHex = `#${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
+                        newArgb = rgbHexToArgb(newRgbHex, item.value);
                     }
                 }
 
