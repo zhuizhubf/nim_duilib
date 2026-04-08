@@ -2995,6 +2995,20 @@
                     const value = prop.getAttribute('value');
                     if (name && value) {
                         metaHtml += `<div class="theme-meta-item"><span>${name}:</span> ${value}</div>`;
+                        
+                        // 如果是base_color属性，更新baseColor输入框
+                        if (name === 'base_color') {
+                            // 转换ARGB格式到RGB格式（去掉Alpha通道）
+                            let rgbColor = value;
+                            if (value.length === 9 && value.startsWith('#')) {
+                                rgbColor = '#' + value.substring(3);
+                            }
+                            // 设置到baseColor输入框
+                            const baseColorInput = document.getElementById('baseColor');
+                            if (baseColorInput) {
+                                baseColorInput.value = rgbColor;
+                            }
+                        }
                     }
                 });
             }
@@ -6680,9 +6694,11 @@
                     let newAdjustFormula = '';
 
                     if (state === 'hovered' || state === 'hover') {
+                        // 与 generateSmartColor 保持一致：深色主题变亮，浅色主题变暗
                         newAdjustFormula = isDarkTheme ? 'lightness:+12' : 'lightness:-10';
                     } else if (state === 'pressed' || state === 'press') {
-                        newAdjustFormula = isDarkTheme ? 'lightness:+18' : 'lightness:-15';
+                        // 与 generateSmartColor 保持一致：pressed 比 hovered 变化更大
+                        newAdjustFormula = isDarkTheme ? 'lightness:+22' : 'lightness:-15';
                     } else if (state === 'disabled' || state === 'disable') {
                         // disabled 亮度趋近背景，降低对比度
                         // 浅色主题：若背景亮度>128(0.5)：L+2~3，否则 L-2~3
@@ -6872,6 +6888,7 @@
                     // - 所有状态色均基于基础亮度推导，仅调整亮度，不改变色相和饱和度
                     // - 根据深/浅主题自动调整偏移方向
                     // - 有明确的亮度边界限制
+                    // - 背景色分层：主窗口、卡片、容器、页眉等有不同亮度
                     //
                     // 深浅主题判断：
                     // - 浅色主题（baseHsl.l > 0.5）：hover/pressed 变暗
@@ -6885,42 +6902,86 @@
                     // 判断是否为深色主题
                     const isDarkBgTheme = baseHsl.l <= 0.5;
 
+                    // 计算基础亮度（根据容器类型分层）
+                    let baseLuminance = baseHsl.l;
+                    
+                    // 背景色分层处理 - 为不同类型的容器设置不同亮度
+                    if (baseName.includes('card') || baseName.includes('popup')) {
+                        // 卡片/弹窗背景：稍亮/暗
+                        if (isDarkBgTheme) {
+                            baseLuminance = Math.max(0.1, baseHsl.l - 0.08); // 更深
+                        } else {
+                            baseLuminance = Math.min(0.95, baseHsl.l + 0.08); // 更亮
+                        }
+                    } else if (baseName.includes('header')) {
+                        // 页眉背景：与主背景一致或稍暗
+                        if (isDarkBgTheme) {
+                            baseLuminance = Math.max(0.1, baseHsl.l - 0.05);
+                        } else {
+                            baseLuminance = Math.min(0.9, baseHsl.l - 0.05);
+                        }
+                    } else if (baseName.includes('container') || baseName.includes('content')) {
+                        // 通用容器/内容区域：与主窗口有细微差异
+                        if (isDarkBgTheme) {
+                            baseLuminance = Math.max(0.12, baseHsl.l - 0.03);
+                        } else {
+                            baseLuminance = Math.min(0.92, baseHsl.l + 0.03);
+                        }
+                    } else if (baseName.includes('menu')) {
+                        // 菜单背景：与主窗口一致或稍暗
+                        if (isDarkBgTheme) {
+                            baseLuminance = Math.max(0.1, baseHsl.l - 0.04);
+                        } else {
+                            baseLuminance = Math.min(0.9, baseHsl.l - 0.04);
+                        }
+                    } else if (baseName.includes('list') || baseName.includes('tree')) {
+                        // 列表/树控件背景：与主窗口一致
+                        baseLuminance = baseHsl.l;
+                    } else {
+                        // 主窗口背景：基础亮度
+                        baseLuminance = baseHsl.l;
+                    }
+
+                    // 设置基础亮度
+                    newHsl.l = baseLuminance;
+
                     if (state === 'disabled') {
                         // disabled: 亮度趋近背景，降低对比度
                         // 浅色主题：若背景亮度>128(0.5)：L+2~3，否则 L-2~3
                         // 深色主题：若背景亮度>60(0.235)：L-5~8，否则 L+5~8
-                        const bgL = baseHsl.l * 255;
+                        const bgL = baseLuminance * 255;
                         if (!isDarkBgTheme) {
-                            if (bgL > 128) { newHsl.l = Math.min(0.95, baseHsl.l + 0.01); }
-                            else { newHsl.l = Math.max(0.15, baseHsl.l - 0.01); }
+                            if (bgL > 128) { newHsl.l = Math.min(0.95, baseLuminance + 0.01); }
+                            else { newHsl.l = Math.max(0.15, baseLuminance - 0.01); }
                         } else {
-                            if (bgL > 60) { newHsl.l = Math.max(0.12, baseHsl.l - 0.03); }
-                            else { newHsl.l = Math.min(0.40, baseHsl.l + 0.03); }
+                            if (bgL > 60) { newHsl.l = Math.max(0.12, baseLuminance - 0.03); }
+                            else { newHsl.l = Math.min(0.40, baseLuminance + 0.03); }
                         }
                         newHsl.s = baseHsl.s * 0.3;
                     } else if (state === 'hovered') {
                         // hovered: 轻微变亮/变暗，表示可交互
                         if (isDarkBgTheme) {
                             // 深色主题：变亮
-                            newHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                            newHsl.l = Math.min(0.95, baseLuminance + 0.12);
                         } else {
                             // 浅色主题：变暗（步长 3-5，约 0.03-0.05）
-                            newHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                            newHsl.l = Math.max(0.15, baseLuminance - 0.06);
                         }
                         newHsl.s = baseHsl.s * 0.4;  // 适度增加饱和度
                     } else if (state === 'pressed') {
                         // pressed: 进一步变亮/变暗，表示按下反馈
                         if (isDarkBgTheme) {
                             // 深色主题：变亮（步长 15-20，约 0.15-0.20）
-                            newHsl.l = Math.min(0.60, baseHsl.l + 0.18);
+                            // 确保pressed状态比hovered更亮
+                            newHsl.l = Math.min(0.80, baseLuminance + 0.22);
                         } else {
                             // 浅色主题：变暗（步长 8-10，约 0.08-0.10）
-                            newHsl.l = Math.max(0.80, baseHsl.l - 0.09);
+                            newHsl.l = Math.max(0.65, baseLuminance - 0.14);
                         }
                         newHsl.s = baseHsl.s * 0.5;  // 更高饱和度
                     } else {
                         // normal: 基准色，无偏移
-                        newHsl.l = baseHsl.l;
+                        newHsl.l = baseLuminance;
                         newHsl.s = baseHsl.s * 0.3;  // 低饱和度
                     }
                     break;
@@ -6963,8 +7024,8 @@
                     // --------------------------------------------------------
                     // 语义色处理策略
                     //
-                    // 语义色根据其代表的含义（成功/错误/信息等）设置固定的色相
-                    // 而非继承基础色
+                    // 语义色根据其代表的含义（成功/错误/信息等）设置固定的色相和饱和度
+                    // 确保语义色有足够的色彩区分度
                     //
                     // 色相设置（基于颜色名称关键词）：
                     // - 包含 success/green/ok：H=120（绿色）
@@ -6983,11 +7044,17 @@
                     const isNeutralGray = itemName.includes('gray') || itemName.includes('white') || itemName.includes('black');
 
                     if (itemName.includes('success') || itemName.includes('green') || itemName.includes('ok')) {
-                        newHsl.h = 120;
+                        newHsl.h = 120; // 绿色
+                        newHsl.s = 0.6;  // 固定饱和度
+                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (itemName.includes('error') || itemName.includes('red') || itemName.includes('danger') || itemName.includes('warning')) {
-                        newHsl.h = 0;
+                        newHsl.h = 0; // 红色
+                        newHsl.s = 0.6; // 固定饱和度
+                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
-                        newHsl.h = 210;
+                        newHsl.h = 210; // 蓝色
+                        newHsl.s = 0.6; // 固定饱和度
+                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (isNeutralGray) {
                         // 中性灰度色：保持绝对中性，不继承基础色调
                         if (itemName.includes('white')) {
@@ -7013,6 +7080,8 @@
                         return newHsl;
                     } else {
                         newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                        // 确保其他语义色有足够饱和度
+                        newHsl.s = Math.max(0.5, newHsl.s);
                     }
 
                     // 判断是否为深色主题
@@ -7034,16 +7103,16 @@
                     } else if (state === 'hovered') {
                         // hovered: 轻微变亮/变暗
                         if (isDarkSemanticTheme) {
-                            newHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                            newHsl.l = Math.min(0.95, newHsl.l + 0.10);
                         } else {
-                            newHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                            newHsl.l = Math.max(0.15, newHsl.l - 0.04);
                         }
                     } else if (state === 'pressed') {
                         // pressed: 进一步变亮/变暗
                         if (isDarkSemanticTheme) {
-                            newHsl.l = Math.min(0.60, baseHsl.l + 0.18);
+                            newHsl.l = Math.min(0.60, newHsl.l + 0.18);
                         } else {
-                            newHsl.l = Math.max(0.80, baseHsl.l - 0.09);
+                            newHsl.l = Math.max(0.80, newHsl.l - 0.09);
                         }
                     } else if (state === 'focused') {
                         // focused: 轻微提亮
@@ -7087,7 +7156,8 @@
                     // --------------------------------------------------------
                     // 边框色处理策略
                     //
-                    // 边框色通常比较低调，饱和度较低
+                    // 边框色通常比较低调，但需要与背景有足够对比度
+                    // 确保边框可见性
                     //
                     // 四状态亮度公式（深浅主题自适应）：
                     // - 浅色主题（baseHsl.l > 0.5）：hover 变暗 -0.04，pressed 变暗 -0.09
@@ -7097,52 +7167,67 @@
                     // --------------------------------------------------------
                     const isDarkBorderTheme = baseHsl.l <= 0.5;
 
+                    // 边框色需要与背景有明显区分
+                    // 对于按钮边框，使用更明显的亮度差异
+                    if (baseName.includes('btn') || baseName.includes('button')) {
+                        // 按钮边框：与按钮背景有明显对比度
+                        if (isDarkBorderTheme) {
+                            // 深色主题：按钮边框明显亮于背景
+                            newHsl.l = Math.min(0.65, baseHsl.l + 0.20);
+                        } else {
+                            // 浅色主题：按钮边框明显暗于背景
+                            newHsl.l = Math.max(0.25, baseHsl.l - 0.15);
+                        }
+                    } else {
+                        // 其他边框：与背景有适度对比度
+                        if (isDarkBorderTheme) {
+                            // 深色主题：边框稍亮于背景
+                            newHsl.l = Math.min(0.6, baseHsl.l + 0.15);
+                        } else {
+                            // 浅色主题：边框稍暗于背景
+                            newHsl.l = Math.max(0.3, baseHsl.l - 0.12);
+                        }
+                    }
+
+                    // 确保边框有足够的饱和度，即使原颜色是灰度
+                    newHsl.s = Math.max(0.25, baseHsl.s * 0.5);
+
                     if (state === 'disabled') {
                         // disabled: 亮度趋近背景，降低对比度
-                        // 浅色主题：若背景亮度>128(0.5)：L+2~3，否则 L-2~3
-                        // 深色主题：若背景亮度>60(0.235)：L-5~8，否则 L+5~8
-                        const bgL = baseHsl.l * 255;
-                        if (!isDarkBorderTheme) {
-                            if (bgL > 128) { newHsl.l = Math.min(0.95, baseHsl.l + 0.01); }
-                            else { newHsl.l = Math.max(0.15, baseHsl.l - 0.01); }
+                        // 但仍保持一定可见性
+                        if (isDarkBorderTheme) {
+                            newHsl.l = Math.max(0.15, baseHsl.l + 0.05);
                         } else {
-                            if (bgL > 60) { newHsl.l = Math.max(0.12, baseHsl.l - 0.03); }
-                            else { newHsl.l = Math.min(0.40, baseHsl.l + 0.03); }
+                            newHsl.l = Math.min(0.85, baseHsl.l - 0.05);
                         }
-                        // 确保边框可见：即使原饱和度为0，也要有最小饱和度
-                        newHsl.s = Math.max(0.10, baseHsl.s * 0.2);
+                        newHsl.s = Math.max(0.15, baseHsl.s * 0.3);
                     } else if (state === 'hovered') {
-                        // hovered: 轻微变亮/变暗
+                        // hovered: 边框变亮/变暗，增强视觉反馈
                         if (isDarkBorderTheme) {
-                            newHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                            newHsl.l = Math.min(0.75, newHsl.l + 0.10);
                         } else {
-                            newHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                            newHsl.l = Math.max(0.20, newHsl.l - 0.08);
                         }
-                        // 确保边框可见：即使原饱和度为0，也要有最小饱和度
-                        newHsl.s = Math.max(0.15, baseHsl.s * 0.35);
+                        newHsl.s = Math.max(0.30, baseHsl.s * 0.6);
                     } else if (state === 'pressed') {
-                        // pressed: 进一步变亮/变暗
+                        // pressed: 边框进一步变亮/变暗
                         if (isDarkBorderTheme) {
-                            newHsl.l = Math.min(0.60, baseHsl.l + 0.18);
+                            newHsl.l = Math.min(0.80, newHsl.l + 0.15);
                         } else {
-                            newHsl.l = Math.max(0.80, baseHsl.l - 0.09);
+                            newHsl.l = Math.max(0.15, newHsl.l - 0.12);
                         }
-                        // 确保边框可见：即使原饱和度为0，也要有最小饱和度
-                        newHsl.s = Math.max(0.20, baseHsl.s * 0.4);
+                        newHsl.s = Math.max(0.35, baseHsl.s * 0.7);
                     } else if (state === 'focused') {
-                        // focused: 轻微提亮
+                        // focused: 边框变亮，突出显示
                         if (isDarkBorderTheme) {
-                            newHsl.l = Math.min(0.95, baseHsl.l + 0.10);
+                            newHsl.l = Math.min(0.85, newHsl.l + 0.12);
                         } else {
-                            newHsl.l = Math.max(0.15, baseHsl.l - 0.04);
+                            newHsl.l = Math.max(0.15, newHsl.l - 0.06);
                         }
-                        // 确保边框可见：即使原饱和度为0，也要有最小饱和度
-                        newHsl.s = Math.max(0.25, baseHsl.s * 0.5);
+                        newHsl.s = Math.max(0.40, baseHsl.s * 0.8);
                     } else {
-                        // normal: 基准色
-                        newHsl.l = baseHsl.l;
-                        // 确保边框可见：即使原饱和度为0，也要有最小饱和度
-                        newHsl.s = Math.max(0.15, baseHsl.s * 0.4);
+                        // normal: 基准边框色
+                        // 确保足够的饱和度和亮度差异
                     }
                     break;
 
@@ -7238,9 +7323,9 @@
                                 newHsl.h = 0;
                                 newHsl.s = 0;
                                 if (isDarkInteractiveTheme) {
-                                    newHsl.l = 0.15;
+                                    newHsl.l = 0.25; // 稍亮的深灰
                                 } else {
-                                    newHsl.l = 0.92;
+                                    newHsl.l = 0.90; // 稍暗的白色
                                 } 
                             }
                         } else {
@@ -7256,6 +7341,8 @@
                             const isDarkAccentTheme = baseHsl.l <= 0.5;
 
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                            // 确保强调色有足够饱和度
+                            newHsl.s = Math.max(0.6, newHsl.s);
 
                             if (state === 'hovered') {
                                 // hovered: 轻微变亮/变暗

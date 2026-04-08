@@ -359,7 +359,7 @@
     <Class name="menu" width="auto" height="auto" bkcolor="bg_menu"/>
     <Class name="menu_element" height="32" padding="20,0,20,0" margin="1,1,1,1" 
                                hovered_color="bg_menu_item_hovered" hovered_color_margin="3,0,3,0" hovered_color_round="4,4"
-                               pressed_color="bg_menu_item_selected" pressed_color_margin="3,0,3,0" pressed_color_round="4,4"
+                               pressed_color="bg_menu_item_pressed" pressed_color_margin="3,0,3,0" pressed_color_round="4,4"
                                selected_normal_color="bg_menu_item_selected" 
                                selected_normal_color_margin="3,0,3,0" 
                                selected_normal_color_round="4,4"/>
