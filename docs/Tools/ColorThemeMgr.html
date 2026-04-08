@@ -6636,7 +6636,7 @@
                     // AA标准：正文文本对比度 >= 4.5:1
                     // --------------------------------------------------
                     if (preserveContrast && category === 'text' && categorizedColors.background.length > 0) {
-                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
+                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHslWithTemp);
                     }
 
                     // --------------------------------------------------
@@ -6644,7 +6644,7 @@
                     // 确保SVG颜色与窗口背景有足够对比度
                     // --------------------------------------------------
                     if (preserveContrast && category === 'svg' && categorizedColors.background.length > 0) {
-                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHsl);
+                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHslWithTemp);
                     }
 
                     // 如果是灰度色且启用保留灰度选项，强制设为纯灰色（H=0, S=0），只保留新的亮度
@@ -6685,7 +6685,7 @@
                     let sourceValue;
                     if (sourceColor) { sourceValue = sourceColor.value; }
                     else {
-                        const baseRgbFromHsl = hslToRgb(baseHsl.h, baseHsl.s, baseHsl.l);
+                        const baseRgbFromHsl = hslToRgb(baseHslWithTemp.h, baseHslWithTemp.s, baseHslWithTemp.l);
                         // 确保生成的sourceValue包含Alpha通道（8位ARGB格式）
                         sourceValue = `#FFFFFFFF${rgbToHex(baseRgbFromHsl.r)}${rgbToHex(baseRgbFromHsl.g)}${rgbToHex(baseRgbFromHsl.b)}`;
                         // 截断为8位ARGB格式
@@ -6866,18 +6866,32 @@
             const itemName = baseName || item.name.toLowerCase();
 
             // 状态亮度调整偏移量
-            // 定义各状态下相对于基础亮度的调整值
-            const STATE_LIGHTNESS_OFFSET = {
-                'normal': 0,      // 正常状态：无偏移
-                'hovered': 0.12,   // 悬浮状态：变亮
-                'pressed': -0.12,  // 按下状态：变暗
-                'disabled': 0.40,  // 禁用状态：显著变亮
-                'focused': 0.08,   // 聚焦状态：轻微变亮
-                'none': 0           // 无状态：无偏移
-            };
+            // 根据深色/浅色主题返回不同的亮度偏移值
+            function getLightnessOffset(state, isDarkTheme) {
+                if (isDarkTheme) {
+                    // 深色主题：hover/pressed 变亮
+                    switch(state) {
+                        case 'hovered': return 0.12;   // 悬浮状态：变亮
+                        case 'pressed': return 0.22;   // 按下状态：更亮
+                        case 'disabled': return 0.03;  // 禁用状态：轻微变亮
+                        case 'focused': return 0.08;   // 聚焦状态：轻微变亮
+                        default: return 0;
+                    }
+                } else {
+                    // 浅色主题：hover/pressed 变暗
+                    switch(state) {
+                        case 'hovered': return -0.06;  // 悬浮状态：变暗
+                        case 'pressed': return -0.14;  // 按下状态：更暗
+                        case 'disabled': return 0.01;  // 禁用状态：轻微变亮
+                        case 'focused': return 0.08;   // 聚焦状态：轻微变亮
+                        default: return 0;
+                    }
+                }
+            }
 
             let targetLuminance = baseHsl.l;
-            const lightnessOffset = STATE_LIGHTNESS_OFFSET[state] || 0;
+            const isDarkTheme = baseHsl.l <= 0.5;
+            const lightnessOffset = getLightnessOffset(state, isDarkTheme);
 
             // ============================================================
             // 根据分类应用不同的配色策略
@@ -7017,7 +7031,10 @@
                         newHsl.l = 0.55;
                         newHsl.s = baseHsl.s * 0.2;
                     } else {
-                        newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l + lightnessOffset));
+                        // 使用主题感知的亮度偏移
+                        const textIsDarkTheme = baseHsl.l <= 0.5;
+                        const textLightnessOffset = getLightnessOffset(state, textIsDarkTheme);
+                        newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l + textLightnessOffset));
                         newHsl.s = baseHsl.s * 0.5;
                     }
                     break;
