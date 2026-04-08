@@ -6441,6 +6441,10 @@
                 case 'cool1': tempAdjust = -15; break;
                 case 'cool2': tempAdjust = -30; break;
             }
+            
+            // 预应用色温调整到基础色
+            const baseHslWithTemp = { ...baseHsl };
+            baseHslWithTemp.h = (baseHslWithTemp.h + tempAdjust + 360) % 360;
 
             // ============================================================
             // 第四步：定义颜色状态后缀
@@ -6528,18 +6532,18 @@
             // 第七步：预计算背景色亮度范围
             // 用于后续的对比度保护和SVG颜色调整
             // ============================================================
-            const bgLuminanceRange = {
-                min: Math.min(...categorizedColors.background.map(entry => {
+            let bgLuminanceRange = { min: 0.5, max: 0.5 }; // 默认值
+            if (categorizedColors.background.length > 0) {
+                const bgLuminances = categorizedColors.background.map(entry => {
                     const rgb = argbToRgb(entry.item.value);
                     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
                     return hsl.l;
-                })),
-                max: Math.max(...categorizedColors.background.map(entry => {
-                    const rgb = argbToRgb(entry.item.value);
-                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                    return hsl.l;
-                }))
-            };
+                });
+                bgLuminanceRange = {
+                    min: Math.min(...bgLuminances),
+                    max: Math.max(...bgLuminances)
+                };
+            }
 
             let modifiedCount = 0;
 
@@ -6569,7 +6573,7 @@
                     const isGrayColor = keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive;
 
                     // 保存原始灰度色的 H 和 S（如果需要保留灰度）
-                    const originalHslForGray = isGrayColor ? { h: baseHsl.h, s: baseHsl.s } : null;
+                    const originalHslForGray = isGrayColor ? { h: 0, s: 0 } : null;
 
                     // 跳过派生颜色，在第二阶段处理
                     const isDerivedColor = item.derivedFrom && item.derivedFrom.trim() !== '';
@@ -6578,21 +6582,17 @@
                     const isWindowCloseBtn = baseName.startsWith('bg_btn_window_close_');
 
                     // 从基础HSL复制，用于生成新颜色
-                    let newHsl = { ...baseHsl };
+                    let newHsl = { ...baseHslWithTemp };
                     const categoryItems = categorizedColors[category];
 
                     // 处理派生颜色在第二阶段进行
                     if (smartGeneration) {
-                        newHsl = generateSmartColor(baseHsl, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn, buttonStyle);
+                        newHsl = generateSmartColor(baseHslWithTemp, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn, buttonStyle);
                     } else {
-                        newHsl = generateColorByScheme(baseHsl, index, categoryItems.length, schemeType, brightnessStep);
+                        newHsl = generateColorByScheme(baseHslWithTemp, index, categoryItems.length, schemeType, brightnessStep);
                     }
 
-                    // --------------------------------------------------
-                    // 应用色温调整
-                    // 在智能生成的颜色基础上偏移色相
-                    // --------------------------------------------------
-                    newHsl.h = (newHsl.h + tempAdjust + 360) % 360;
+                    // 色温调整已在baseHslWithTemp中预应用，无需再次调整
 
                     // --------------------------------------------------
                     // 调整饱和度
@@ -6686,7 +6686,10 @@
                     if (sourceColor) { sourceValue = sourceColor.value; }
                     else {
                         const baseRgbFromHsl = hslToRgb(baseHsl.h, baseHsl.s, baseHsl.l);
-                        sourceValue = `#${rgbToHex(baseRgbFromHsl.r)}${rgbToHex(baseRgbFromHsl.g)}${rgbToHex(baseRgbFromHsl.b)}`;
+                        // 确保生成的sourceValue包含Alpha通道（8位ARGB格式）
+                        sourceValue = `#FFFFFFFF${rgbToHex(baseRgbFromHsl.r)}${rgbToHex(baseRgbFromHsl.g)}${rgbToHex(baseRgbFromHsl.b)}`;
+                        // 截断为8位ARGB格式
+                        sourceValue = sourceValue.substring(0, 9);
                     }
                     const sourceRgb = argbToRgb(sourceValue);
                     const sourceHsl = rgbToHsl(sourceRgb.r, sourceRgb.g, sourceRgb.b);
@@ -7014,10 +7017,9 @@
                         newHsl.l = 0.55;
                         newHsl.s = baseHsl.s * 0.2;
                     } else {
-                        newHsl.l += lightnessOffset;
+                        newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l + lightnessOffset));
                         newHsl.s = baseHsl.s * 0.5;
                     }
-                    newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l));
                     break;
 
                 case 'semantic':
@@ -7317,7 +7319,7 @@
                                 // focused: 轻微提亮
                                 newHsl.h = 0;
                                 newHsl.s = 0.15;  // 轻微蓝色边缘
-                                newHsl.l = baseHsl.l + 0.08;
+                                newHsl.l = Math.min(0.95, baseHsl.l + 0.08);
                             } else {
                                 // normal: 基准色
                                 newHsl.h = 0;
@@ -7342,7 +7344,7 @@
 
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                             // 确保强调色有足够饱和度
-                            newHsl.s = Math.max(0.6, newHsl.s);
+                            newHsl.s = Math.max(0.6, Math.min(1.0, newHsl.s));
 
                             if (state === 'hovered') {
                                 // hovered: 轻微变亮/变暗
