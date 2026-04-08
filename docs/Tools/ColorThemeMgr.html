@@ -6583,6 +6583,8 @@
                     // --------------------------------------------------
                     // 调整饱和度
                     // 不同分类有不同的饱和度范围要求
+                    // 注意：智能生成模式下，generateSmartColor已经设置了合适的饱和度
+                    // 只在非智能生成模式下进行额外调整
                     // --------------------------------------------------
                     const baseNameLower = baseName.toLowerCase();
                     const isNeutralGrayColor = baseNameLower.includes('gray') ||
@@ -6590,7 +6592,7 @@
                                               baseNameLower.includes('black');
 
                     // 中性灰度色保持饱和度为0，不被调整
-                    if (!isNeutralGrayColor) {
+                    if (!isNeutralGrayColor && !smartGeneration) {
                         const satMultiplier = saturationLevel / 100;
                         let targetSaturation = newHsl.s * satMultiplier;
 
