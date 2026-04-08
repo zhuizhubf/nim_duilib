@@ -17,7 +17,7 @@ STRID_PUBLIC_MENU_TEXT_SELECT_THEME    = Select Theme
 
 # global.xml
 STRID_PUBLIC_EXIT_FULLSCREEN = Exit Fullscreen
-STRID_PUBLIC_EXIT_FULLSCREEN = Click button or press ESC to exit fullscreen
+STRID_PUBLIC_EXIT_FULLSCREEN_TOOLTIP = Click button or press ESC to exit fullscreen
 
 # PropertyGrid
 STRID_PUBLIC_PROPERTY_NAME  = Name

@@ -80,8 +80,8 @@
     <ThemeColor name="text_btn_normal" value="#FF6C6C6C" type="button" category="text_color" role="neutral" derived_from="text_default" adjust="" fixed="false" support_accent="false" contrast_bg="bg_btn_normal" comment_cn="次要按钮默认文本" comment_en="Secondary button normal text"/>
 
     <!-- ===================== 全屏退出按钮颜色 (type: button_exit) ===================== -->
-    <ThemeColor name="bg_btn_exit_fullscreen" value="#FFF2F2F2" type="button_exit" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="退出全屏按钮背景" comment_en="Exit fullscreen button bg"/>
-    <ThemeColor name="text_btn_exit_fullscreen" value="#FF6C6C6C" type="button_exit" category="text_color" role="neutral" derived_from="text_default" adjust="" fixed="false" support_accent="true" contrast_bg="bg_btn_exit_fullscreen" comment_cn="退出全屏按钮文本" comment_en="Exit fullscreen button text"/>
+    <ThemeColor name="bg_btn_exit_fullscreen" value="#FF0C0C0C" type="button_exit" category="bg_color" role="neutral" derived_from="bg_window_main" adjust="invert,alpha:=100" fixed="false" support_accent="false" contrast_bg="" comment_cn="退出全屏按钮背景" comment_en="Exit fullscreen button bg"/>
+    <ThemeColor name="text_btn_exit_fullscreen" value="#FFF3F3F3" type="button_exit" category="text_color" role="neutral" derived_from="bg_btn_exit_fullscreen" adjust="invert,alpha:=100" fixed="false" support_accent="false" contrast_bg="bg_btn_exit_fullscreen" comment_cn="退出全屏按钮文本" comment_en="Exit fullscreen button text"/>
 
     <!-- ===================== 主要按钮颜色 (type: button_primary) ===================== -->
     <ThemeColor name="bg_primary_btn_disabled" value="#80F2F2F2" type="button_primary" category="bg_color" role="neutral" derived_from="bg_primary_btn_normal" adjust="alpha:*50" fixed="false" support_accent="false" contrast_bg="" comment_cn="主要按钮禁用背景" comment_en="Primary button disabled bg"/>

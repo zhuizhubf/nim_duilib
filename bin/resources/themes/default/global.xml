@@ -155,7 +155,7 @@
     <Class name="btn_exit_fullscreen" width="${SIZE_BTN_EXIT_FULLSCREEN_WIDTH}" height="${SIZE_BTN_EXIT_FULLSCREEN_HEIGHT}" border_round="3,3" valign="top" halign="center" 
                                       bkcolor="bg_btn_exit_fullscreen" normal_text_color="text_btn_exit_fullscreen" 
                                       font="system_bold_14" text_align="vcenter,hcenter" 
-                                      text_id="STRID_PUBLIC_EXIT_FULLSCREEN" tooltip_text_id="STRID_PUBLIC_EXIT_FULLSCREEN" 
+                                      text_id="STRID_PUBLIC_EXIT_FULLSCREEN" tooltip_text_id="STRID_PUBLIC_EXIT_FULLSCREEN_TOOLTIP" 
                                       float="true" keyboard_enabled="false" no_focus="true" 
                                       alpha="0" fade_alpha="128" fade_in_out_y_from_top="true"/>
         
