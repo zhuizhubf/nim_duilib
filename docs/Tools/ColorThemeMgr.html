@@ -6488,7 +6488,9 @@
                 bg_combo_box: [],  // 下拉框背景
                 bg_richedit: [],   // 编辑框背景
                 bg_tab_ctrl: [],   // 标签页背景
-                bg_control: [],    // 通用控件背景（容器、内容、页眉、蒙层等）
+                bg_control: [],    // 通用控件背景
+                bg_container: [], // 容器背景
+                bg_content: [],   // 内容背景
                 bg_button: [],     // 按钮背景
                 bg_progress: [],   // 进度条背景
                 bg_scrollbar: [],  // 滚动条背景
@@ -6565,9 +6567,13 @@
                     // 背景色：bg_开头或包含background
                     // 根据item.type细分到对应的背景色子分类
                     const itemType = item.type || '';
-                    // 特殊处理：标题栏根据名称单独分类
+                    // 特殊处理：标题栏、容器、内容根据名称单独分类
                     if (baseName.includes('titlebar')) {
                         categorizedColors.bg_titlebar.push({ item, state, baseName, itemType: 'titlebar' });
+                    } else if (baseName.includes('container')) {
+                        categorizedColors.bg_container.push({ item, state, baseName, itemType: 'control' });
+                    } else if (baseName.includes('content')) {
+                        categorizedColors.bg_content.push({ item, state, baseName, itemType: 'control' });
                     } else if (baseName.includes('card')) {
                         categorizedColors.bg_window_card.push({ item, state, baseName, itemType: 'window' });
                     } else if (itemType === 'window' || baseName.includes('window')) {
@@ -6678,7 +6684,7 @@
             // 遍历所有背景色子分类，收集亮度范围
             // ============================================================
             let bgLuminanceRange = { min: 0.5, max: 0.5 }; // 默认值
-            const bgCategories = ['bg_window_main', 'bg_window_card', 'bg_titlebar', 'bg_menu', 'bg_menu_bar', 'bg_list_box', 'bg_tree_view',
+            const bgCategories = ['bg_window_main', 'bg_window_card', 'bg_titlebar', 'bg_container', 'bg_content', 'bg_menu', 'bg_menu_bar', 'bg_list_box', 'bg_tree_view',
                                   'bg_list_ctrl', 'bg_combo_box', 'bg_richedit', 'bg_tab_ctrl',
                                   'bg_control', 'bg_button', 'bg_progress', 'bg_scrollbar',
                                   'bg_split_line', 'bg_tooltip', 'bg_address_bar', 'bg_property_grid'];
@@ -7096,6 +7102,8 @@
                 case 'bg_window_main':
                 case 'bg_window_card':
                 case 'bg_titlebar':
+                case 'bg_container':
+                case 'bg_content':
                 case 'bg_menu':
                 case 'bg_menu_bar':
                 case 'bg_list_box':
@@ -7164,6 +7172,14 @@
                         case 'bg_titlebar':
                             // 标题栏背景：与窗口有细微差异，浅色主题略暗，深色主题略亮
                             baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.02) : Math.max(0.88, baseHsl.l - 0.02);
+                            break;
+                        case 'bg_container':
+                            // 容器背景：与窗口有细微差异，浅色主题略暗，深色主题略亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.12, baseHsl.l + 0.02) : Math.max(0.90, baseHsl.l - 0.02);
+                            break;
+                        case 'bg_content':
+                            // 内容背景：与窗口一致或略亮
+                            baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.01) : Math.min(0.95, baseHsl.l + 0.01);
                             break;
                         case 'bg_menu':
                             // 菜单背景：与主窗口略有区分
@@ -7811,9 +7827,15 @@
         function getBackgroundCategoryForItem(item) {
             const itemType = item.type || '';
             const itemName = (item.name || '').toLowerCase();
-            // 特殊处理：标题栏根据名称单独分类
+            // 特殊处理：标题栏、容器、内容根据名称单独分类
             if (itemName.includes('titlebar')) {
                 return 'bg_titlebar';
+            }
+            if (itemName.includes('container')) {
+                return 'bg_container';
+            }
+            if (itemName.includes('content')) {
+                return 'bg_content';
             }
             // 特殊处理：卡片背景
             if (itemName.includes('card')) {
