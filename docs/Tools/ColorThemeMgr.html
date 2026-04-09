@@ -3661,7 +3661,7 @@
          */
         function rgbToHex(value) {
             const hex = value.toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
+            return (hex.length === 1 ? '0' + hex : hex).toUpperCase();
         }
 
         /**
@@ -6283,7 +6283,7 @@
                 const name = node.getAttribute('name');
                 const colorData = currentColorMap.get(name);
                 if (colorData) {
-                    node.setAttribute('value', colorData.value);
+                    node.setAttribute('value', colorData.value.toUpperCase());
                     if (colorData.commentCn) node.setAttribute('comment_cn', colorData.commentCn);
                     if (colorData.commentEn) node.setAttribute('comment_en', colorData.commentEn);
                     // 保存派生系统属性
