@@ -6742,7 +6742,7 @@
 
                     // 处理派生颜色在第二阶段进行
                     if (smartGeneration) {
-                        newHsl = generateSmartColor(baseHslWithTemp, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn, buttonStyle);
+                        newHsl = generateSmartColor(baseHslWithTemp, item, category, state, baseName, index, categoryItems.length, schemeType, brightnessStep, redCloseButton, bgLuminanceRange, isWindowCloseBtn, buttonStyle, isDarkTheme);
                     } else {
                         newHsl = generateColorByScheme(baseHslWithTemp, index, categoryItems.length, schemeType, brightnessStep);
                     }
@@ -7045,10 +7045,14 @@
          * @param {string} buttonStyle - 按钮风格：'accent'使用强调色，'neutral'使用中性色
          * @returns {object} 新的HSL颜色值 {h, s, l}
          */
-        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null, isWindowCloseBtn = false, buttonStyle = 'accent') {
+        function generateSmartColor(baseHsl, item, category, state, baseName, index, total, schemeType, brightnessStep, useRedCloseButton = true, bgLuminanceRange = null, isWindowCloseBtn = false, buttonStyle = 'accent', isDarkThemeOverride = null) {
             // 从基础HSL复制，用于生成新颜色
             let newHsl = { ...baseHsl };
             const itemName = (baseName || item.name || '').toLowerCase();
+
+            // 如果调用者提供了深浅主题覆盖参数，使用它；否则根据基础色亮度判断
+            // 注意：对于对比度保护等辅助函数，可能需要传入 baseHsl.l <= 0.5 来保持准确性
+            const isDarkTheme = isDarkThemeOverride !== null ? isDarkThemeOverride : (baseHsl.l <= 0.5);
 
             // 状态亮度调整偏移量
             // 根据深色/浅色主题返回不同的亮度偏移值
@@ -7075,7 +7079,6 @@
             }
 
             let targetLuminance = baseHsl.l;
-            const isDarkTheme = baseHsl.l <= 0.5;
             const lightnessOffset = getLightnessOffset(state, isDarkTheme);
 
             // ============================================================
@@ -7134,8 +7137,8 @@
                     // - bg_tooltip: +0.08 / -0.08（提示框更亮/暗以突出）
                     // --------------------------------------------------------
 
-                    // 判断是否为深色主题
-                    const isDarkBgTheme = baseHsl.l <= 0.5;
+                    // 使用全局 isDarkTheme 判断深浅主题
+                    const isDarkBgTheme = isDarkTheme;
 
                     // 计算基础亮度（根据控件类型分层）
                     let baseLuminance = baseHsl.l;
@@ -7296,7 +7299,7 @@
                     // - 深色主题：L=0.45，S=0.2
                     // - 浅色主题：L=0.55，S=0.2
                     // --------------------------------------------------------
-                    const isDarkTextTheme = baseHsl.l <= 0.5;
+                    const isDarkTextTheme = isDarkTheme;
                     
                     if (itemName.includes('main') || itemName.includes('primary')) {
                         newHsl.l = isDarkTextTheme ? 0.85 : 0.15;
@@ -7344,15 +7347,15 @@
                     if (itemName.includes('success') || itemName.includes('green') || itemName.includes('ok')) {
                         newHsl.h = 120; // 绿色
                         newHsl.s = 0.6;  // 固定饱和度
-                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
+                        newHsl.l = isDarkTheme ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (itemName.includes('error') || itemName.includes('red') || itemName.includes('danger') || itemName.includes('warning')) {
                         newHsl.h = 0; // 红色
                         newHsl.s = 0.6; // 固定饱和度
-                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
+                        newHsl.l = isDarkTheme ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (itemName.includes('info') || itemName.includes('link') || itemName.includes('blue')) {
                         newHsl.h = 210; // 蓝色
                         newHsl.s = 0.6; // 固定饱和度
-                        newHsl.l = baseHsl.l <= 0.5 ? 0.5 : 0.4; // 根据主题调整亮度
+                        newHsl.l = isDarkTheme ? 0.5 : 0.4; // 根据主题调整亮度
                     } else if (isNeutralGray) {
                         // 中性灰度色：保持绝对中性，不继承基础色调
                         if (itemName.includes('white')) {
@@ -7383,7 +7386,7 @@
                     }
 
                     // 判断是否为深色主题
-                    const isDarkSemanticTheme = baseHsl.l <= 0.5;
+                    const isDarkSemanticTheme = isDarkTheme;
 
                     if (state === 'disabled') {
                         // disabled: 亮度趋近背景，降低对比度
@@ -7494,7 +7497,7 @@
                     // - border_focus_ring: 焦点环，保持高对比度
                     // - border_svg_image: SVG图片边框，特殊处理
                     // --------------------------------------------------------
-                    const isDarkBorderTheme = baseHsl.l <= 0.5;
+                    const isDarkBorderTheme = isDarkTheme;
                     let borderBaseLuminance = baseHsl.l;
 
                     if (category === 'border_split_line') {
@@ -7605,7 +7608,7 @@
                             // - 深色主题（baseHsl.l <= 0.5）：hover 变亮 +0.10，pressed 变亮 +0.18
                             // - disabled：动态降低亮度
                             // --------------------------------------------------------
-                            const isDarkInteractiveTheme = baseHsl.l <= 0.5;
+                            const isDarkInteractiveTheme = isDarkTheme;
 
                             if (['hovered', 'hover'].includes(state)) {
                                 // hovered: 轻微变亮/变暗
@@ -7660,7 +7663,7 @@
                             // - 深色主题（baseHsl.l <= 0.5）：hover 变亮 +0.10，pressed 变亮 +0.18
                             // - disabled：动态降低亮度
                             // --------------------------------------------------------
-                            const isDarkAccentTheme = baseHsl.l <= 0.5;
+                            const isDarkAccentTheme = isDarkTheme;
 
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                             // 确保强调色有足够饱和度
@@ -8196,7 +8199,7 @@
                     // 四状态亮度调整（深浅主题自适应）
                     // 根据状态在基础色上调整亮度，与 generateSmartColor 保持一致
                     // --------------------------------------------------------
-                    const isDarkAccentTheme = originalHsl.l <= 0.5;
+                    const isDarkAccentTheme = isDarkTheme;
 
                     if (state === 'hovered') {
                         // hovered: 轻微变亮/变暗
@@ -8407,7 +8410,7 @@
                         // 高对比度主题的四状态处理
                         // 与基础色主题保持一致的深浅主题自适应逻辑
                         // --------------------------------------------------------
-                        const isDarkTheme = baseHsl.l <= 0.5;
+                        // 使用全局 isDarkTheme 判断深浅主题（高对比度主题的四状态处理）
 
                         if (state === 'hovered') {
                             // hovered: 轻微变亮/变暗
