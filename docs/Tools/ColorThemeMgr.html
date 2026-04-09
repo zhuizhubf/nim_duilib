@@ -6842,6 +6842,9 @@
                     const isGrayColor = keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive;
                     const isDerivedColor = item.derivedFrom && item.derivedFrom.trim() !== '';
                     if (!isDerivedColor) { return; }
+                    
+                    //是否为按钮背景色
+                    const isBgButton = (category === 'bg_button');
 
                     const sourceColor = currentColorMap.get(item.derivedFrom);
                     let sourceValue;
@@ -6861,9 +6864,14 @@
 
                     // 使用全局 isDarkTheme 判断深浅主题（基于XML中Theme style属性）
                     if (['hovered', 'hover'].includes(state)) {
-                        newAdjustFormula = isDarkTheme ? 'lightness:+10' : 'lightness:-8';
+                        if (isBgButton) {
+                            //按钮的hover状态，亮度增加
+                            newAdjustFormula = isDarkTheme ? 'lightness:+10' : 'lightness:+8';
+                        } else {
+                            newAdjustFormula = isDarkTheme ? 'lightness:+10' : 'lightness:-8';
+                        }
                     } else if (['pressed', 'press'].includes(state)) {
-                        newAdjustFormula = isDarkTheme ? 'lightness:+18' : 'lightness:-15';
+                        newAdjustFormula = isDarkTheme ? 'lightness:+16' : 'lightness:-12';
                     } else if (['disabled', 'disable'].includes(state)) {
                         const bgL = sourceHsl.l * 255;
                         if (!isDarkTheme) {
