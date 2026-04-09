@@ -6506,7 +6506,24 @@
                     categorizedColors.svg.push({ item, state, baseName });
                 } else if (name.includes('btn_') || name.includes('button')) {
                     // 交互按钮：包含btn_或button
-                    categorizedColors.interactive.push({ item, state, baseName });
+                    // --------------------------------------------------------
+                    // 按钮颜色进一步细分
+                    // 根据按钮颜色的前缀（border_btn_/bg_btn_/text_btn_）进行分类
+                    // 纯按钮颜色（如 btn_normal）归类到interactive
+                    // --------------------------------------------------------
+                    if (name.startsWith('border_btn_') || baseName.includes('border_btn')) {
+                        // 按钮边框色：使用边框色的处理逻辑
+                        categorizedColors.border.push({ item, state, baseName });
+                    } else if (name.startsWith('bg_btn_') || baseName.includes('bg_btn')) {
+                        // 按钮背景色：使用背景色的处理逻辑
+                        categorizedColors.background.push({ item, state, baseName });
+                    } else if (name.startsWith('text_btn_') || baseName.includes('text_btn')) {
+                        // 按钮文本色：使用文本色的处理逻辑
+                        categorizedColors.text.push({ item, state, baseName });
+                    } else {
+                        // 其他按钮颜色（纯按钮颜色如 btn_normal）归类到interactive
+                        categorizedColors.interactive.push({ item, state, baseName });
+                    }
                 } else if (name.startsWith('bg_') || name.includes('background')) {
                     // 背景色：bg_开头或包含background
                     categorizedColors.background.push({ item, state, baseName });
