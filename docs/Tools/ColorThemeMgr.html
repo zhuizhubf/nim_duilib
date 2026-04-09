@@ -7007,33 +7007,41 @@
                     // --------------------------------------------------------
                     // 文本色处理策略
                     //
-                    // 文本色需要确保可读性，亮度根据语义重要程度区分
+                    // 文本色需要确保可读性，亮度根据语义重要程度和主题类型区分
                     //
-                    // 亮度设置规则：
-                    // - 包含 main/primary：L=0.15（主文本，最暗，高对比度）
+                    // 亮度设置规则（根据主题类型）：
+                    // 深色主题（baseHsl.l <= 0.5）：
+                    // - 包含 main/primary：L=0.85（亮文本，高对比度）
+                    // - 包含 second/muted：L=0.65（次要文本）
+                    // - 包含 disabled：L=0.45（禁用文本）
+                    // - 其他文本：L=0.75
+                    // 浅色主题（baseHsl.l > 0.5）：
+                    // - 包含 main/primary：L=0.15（暗文本，高对比度）
                     // - 包含 second/muted：L=0.40（次要文本）
                     // - 包含 disabled：L=0.60（禁用文本，较亮）
                     // - 其他文本：L=0.20
                     //
                     // disabled状态额外处理：
-                    // - L=0.55，S降至20%（灰化处理）
+                    // - 深色主题：L=0.45，S=0.2
+                    // - 浅色主题：L=0.55，S=0.2
                     // --------------------------------------------------------
+                    const isDarkTextTheme = baseHsl.l <= 0.5;
+                    
                     if (itemName.includes('main') || itemName.includes('primary')) {
-                        newHsl.l = 0.15;
+                        newHsl.l = isDarkTextTheme ? 0.85 : 0.15;
                     } else if (itemName.includes('second') || itemName.includes('muted')) {
-                        newHsl.l = 0.40;
+                        newHsl.l = isDarkTextTheme ? 0.65 : 0.40;
                     } else if (itemName.includes('disabled')) {
-                        newHsl.l = 0.60;
+                        newHsl.l = isDarkTextTheme ? 0.45 : 0.60;
                     } else {
-                        newHsl.l = 0.20;
+                        newHsl.l = isDarkTextTheme ? 0.75 : 0.20;
                     }
                     if (state === 'disabled') {
-                        newHsl.l = 0.55;
+                        newHsl.l = isDarkTextTheme ? 0.45 : 0.55;
                         newHsl.s = baseHsl.s * 0.2;
                     } else {
                         // 使用主题感知的亮度偏移
-                        const textIsDarkTheme = baseHsl.l <= 0.5;
-                        const textLightnessOffset = getLightnessOffset(state, textIsDarkTheme);
+                        const textLightnessOffset = getLightnessOffset(state, isDarkTextTheme);
                         newHsl.l = Math.max(0.1, Math.min(0.9, newHsl.l + textLightnessOffset));
                         newHsl.s = baseHsl.s * 0.5;
                     }
@@ -7152,21 +7160,40 @@
                     // 色相：继承基础色
                     // 饱和度：S = max(0.5, 基础饱和度 × 0.8)
                     //
-                    // 亮度：根据背景亮度范围动态调整
-                    // - 亮背景(avg>0.7)：L = min(0.4, avgBgLuminance - 0.3)
-                    // - 暗背景(avg<0.3)：L = max(0.6, avgBgLuminance + 0.3)
-                    // - 中等背景：L=0.5
+                    // 亮度：根据背景亮度范围和主题类型动态调整
+                    // 深色主题（avgBgLuminance <= 0.5）：
+                    // - 亮背景(avg>0.7)：L = min(0.9, avgBgLuminance + 0.35)
+                    // - 暗背景(avg<0.3)：L = min(0.85, avgBgLuminance + 0.45)
+                    // - 中等背景：L=0.8
+                    // 浅色主题（avgBgLuminance > 0.5）：
+                    // - 亮背景(avg>0.7)：L = max(0.1, avgBgLuminance - 0.35)
+                    // - 暗背景(avg<0.3)：L = max(0.15, avgBgLuminance - 0.45)
+                    // - 中等背景：L=0.2
                     // --------------------------------------------------------
                     newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
                     newHsl.s = Math.max(0.5, baseHsl.s * 0.8);
                     if (bgLuminanceRange) {
                         const avgBgLuminance = (bgLuminanceRange.min + bgLuminanceRange.max) / 2;
-                        if (avgBgLuminance > 0.7) {
-                            newHsl.l = Math.min(0.4, avgBgLuminance - 0.3);
-                        } else if (avgBgLuminance < 0.3) {
-                            newHsl.l = Math.max(0.6, avgBgLuminance + 0.3);
+                        const isDarkSvgTheme = avgBgLuminance <= 0.5;
+                        
+                        if (isDarkSvgTheme) {
+                            // 深色主题：SVG图标需要更亮以确保可见
+                            if (avgBgLuminance > 0.7) {
+                                newHsl.l = Math.min(0.9, avgBgLuminance + 0.35);
+                            } else if (avgBgLuminance < 0.3) {
+                                newHsl.l = Math.min(0.85, avgBgLuminance + 0.45);
+                            } else {
+                                newHsl.l = 0.8;
+                            }
                         } else {
-                            newHsl.l = 0.5;
+                            // 浅色主题：SVG图标需要更暗以确保可见
+                            if (avgBgLuminance > 0.7) {
+                                newHsl.l = Math.max(0.1, avgBgLuminance - 0.35);
+                            } else if (avgBgLuminance < 0.3) {
+                                newHsl.l = Math.max(0.15, avgBgLuminance - 0.45);
+                            } else {
+                                newHsl.l = 0.2;
+                            }
                         }
                     }
                     break;
