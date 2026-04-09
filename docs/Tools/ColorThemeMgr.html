@@ -6455,16 +6455,36 @@
             // ============================================================
             // 第五步：初始化颜色分类容器
             // 每个分类会应用不同的配色策略
+            // 注意：背景色按控件类型细分为多个子分类，实现差异化亮度分层
             // ============================================================
             const categorizedColors = {
-                background: [],    // 背景色
                 text: [],          // 文本色
                 semantic: [],      // 语义基础色（color_开头）
                 svg: [],           // SVG图片颜色
                 border: [],        // 边框色
                 accent: [],        // 强调色（supportAccent=true）
                 interactive: [],   // 交互色（窗口关闭按钮、btn_）
-                other: []          // 其他颜色
+                other: [],         // 其他颜色
+                // 背景色细分子分类（按控件类型）
+                bg_window_main: [],  // 主窗口背景
+                bg_window_card: [], // 卡片背景（比主窗口略亮）
+                bg_titlebar: [],    // 标题栏背景
+                bg_menu: [],       // 菜单背景
+                bg_menu_bar: [],   // 菜单栏背景
+                bg_list_box: [],   // 列表框背景
+                bg_tree_view: [],  // 树控件背景
+                bg_list_ctrl: [],  // 列表控件背景
+                bg_combo_box: [],  // 下拉框背景
+                bg_richedit: [],   // 编辑框背景
+                bg_tab_ctrl: [],   // 标签页背景
+                bg_control: [],    // 通用控件背景（容器、内容、页眉、蒙层等）
+                bg_button: [],     // 按钮背景
+                bg_progress: [],   // 进度条背景
+                bg_scrollbar: [],  // 滚动条背景
+                bg_split_line: [], // 分割线背景
+                bg_tooltip: [],    // 提示背景
+                bg_address_bar: [], // 地址栏背景
+                bg_property_grid: [], // 属性页背景
             };
 
             // ============================================================
@@ -6515,8 +6535,15 @@
                         // 按钮边框色：使用边框色的处理逻辑
                         categorizedColors.border.push({ item, state, baseName });
                     } else if (name.startsWith('bg_btn_') || baseName.includes('bg_btn')) {
-                        // 按钮背景色：使用背景色的处理逻辑
-                        categorizedColors.background.push({ item, state, baseName });
+                        // 按钮背景色：使用按钮背景的处理逻辑
+                        const itemType = item.type || '';
+                        if (itemType === 'button_window' || itemType === 'button_window_close') {
+                        categorizedColors.bg_window_main.push({ item, state, baseName, itemType });
+                        } else if (itemType === 'button_primary') {
+                            categorizedColors.bg_button.push({ item, state, baseName, itemType });
+                        } else {
+                            categorizedColors.bg_button.push({ item, state, baseName, itemType });
+                        }
                     } else if (name.startsWith('text_btn_') || baseName.includes('text_btn')) {
                         // 按钮文本色：使用文本色的处理逻辑
                         categorizedColors.text.push({ item, state, baseName });
@@ -6526,7 +6553,74 @@
                     }
                 } else if (name.startsWith('bg_') || name.includes('background')) {
                     // 背景色：bg_开头或包含background
-                    categorizedColors.background.push({ item, state, baseName });
+                    // 根据item.type细分到对应的背景色子分类
+                    const itemType = item.type || '';
+                    // 特殊处理：标题栏根据名称单独分类
+                    if (baseName.includes('titlebar')) {
+                        categorizedColors.bg_titlebar.push({ item, state, baseName, itemType: 'titlebar' });
+                    } else if (baseName.includes('card')) {
+                        categorizedColors.bg_window_card.push({ item, state, baseName, itemType: 'window' });
+                    } else if (itemType === 'window' || baseName.includes('window')) {
+                        categorizedColors.bg_window_main.push({ item, state, baseName, itemType });
+                    } else switch(itemType) {
+                        case 'window':
+                            categorizedColors.bg_window_main.push({ item, state, baseName, itemType });
+                            break;
+                        case 'menu':
+                            categorizedColors.bg_menu.push({ item, state, baseName, itemType });
+                            break;
+                        case 'menu_bar':
+                            categorizedColors.bg_menu_bar.push({ item, state, baseName, itemType });
+                            break;
+                        case 'list_box':
+                            categorizedColors.bg_list_box.push({ item, state, baseName, itemType });
+                            break;
+                        case 'tree_view':
+                            categorizedColors.bg_tree_view.push({ item, state, baseName, itemType });
+                            break;
+                        case 'list_ctrl':
+                            categorizedColors.bg_list_ctrl.push({ item, state, baseName, itemType });
+                            break;
+                        case 'combo_box':
+                            categorizedColors.bg_combo_box.push({ item, state, baseName, itemType });
+                            break;
+                        case 'richedit':
+                            categorizedColors.bg_richedit.push({ item, state, baseName, itemType });
+                            break;
+                        case 'tab_ctrl':
+                            categorizedColors.bg_tab_ctrl.push({ item, state, baseName, itemType });
+                            break;
+                        case 'control':
+                            categorizedColors.bg_control.push({ item, state, baseName, itemType });
+                            break;
+                        case 'button':
+                        case 'button_primary':
+                        case 'button_window':
+                        case 'button_exit':
+                            categorizedColors.bg_button.push({ item, state, baseName, itemType });
+                            break;
+                        case 'progress':
+                            categorizedColors.bg_progress.push({ item, state, baseName, itemType });
+                            break;
+                        case 'scroll_bar':
+                            categorizedColors.bg_scrollbar.push({ item, state, baseName, itemType });
+                            break;
+                        case 'split_line':
+                            categorizedColors.bg_split_line.push({ item, state, baseName, itemType });
+                            break;
+                        case 'tooltip':
+                            categorizedColors.bg_tooltip.push({ item, state, baseName, itemType });
+                            break;
+                        case 'address_bar':
+                            categorizedColors.bg_address_bar.push({ item, state, baseName, itemType });
+                            break;
+                        case 'property_grid':
+                            categorizedColors.bg_property_grid.push({ item, state, baseName, itemType });
+                            break;
+                        default:
+                            // 未能识别的类型，默认归入bg_control
+                            categorizedColors.bg_control.push({ item, state, baseName, itemType });
+                    }
                 } else if (name.startsWith('color_')) {
                     // 语义基础色：color_开头（color_blue/color_green/color_red等）
                     categorizedColors.semantic.push({ item, state, baseName });
@@ -6548,17 +6642,27 @@
             // ============================================================
             // 第七步：预计算背景色亮度范围
             // 用于后续的对比度保护和SVG颜色调整
+            // 遍历所有背景色子分类，收集亮度范围
             // ============================================================
             let bgLuminanceRange = { min: 0.5, max: 0.5 }; // 默认值
-            if (categorizedColors.background.length > 0) {
-                const bgLuminances = categorizedColors.background.map(entry => {
-                    const rgb = argbToRgb(entry.item.value);
-                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                    return hsl.l;
-                });
+            const bgCategories = ['bg_window_main', 'bg_window_card', 'bg_titlebar', 'bg_menu', 'bg_menu_bar', 'bg_list_box', 'bg_tree_view',
+                                  'bg_list_ctrl', 'bg_combo_box', 'bg_richedit', 'bg_tab_ctrl',
+                                  'bg_control', 'bg_button', 'bg_progress', 'bg_scrollbar',
+                                  'bg_split_line', 'bg_tooltip', 'bg_address_bar', 'bg_property_grid'];
+            const allBgLuminances = [];
+            bgCategories.forEach(cat => {
+                if (categorizedColors[cat] && categorizedColors[cat].length > 0) {
+                    categorizedColors[cat].forEach(entry => {
+                        const rgb = argbToRgb(entry.item.value);
+                        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                        allBgLuminances.push(hsl.l);
+                    });
+                }
+            });
+            if (allBgLuminances.length > 0) {
                 bgLuminanceRange = {
-                    min: Math.min(...bgLuminances),
-                    max: Math.max(...bgLuminances)
+                    min: Math.min(...allBgLuminances),
+                    max: Math.max(...allBgLuminances)
                 };
             }
 
@@ -6586,6 +6690,7 @@
                     // 这样灰色系能适应深浅主题，但不会变成彩色
                     // 但语义色、交互色、强调色不受此限制
                     // --------------------------------------------------
+                    const isBgCategory = category.startsWith('bg_');
                     const isSemanticOrInteractive = (category === 'semantic' || category === 'interactive' || category === 'accent');
                     const isGrayColor = keepGrayscale && isGrayscaleColor(item.value) && !isSemanticOrInteractive;
 
@@ -6628,7 +6733,7 @@
                         let targetSaturation = newHsl.s * satMultiplier;
 
                         // 根据分类设定饱和度范围，避免过灰或过艳
-                        if (category === 'background') {
+                        if (isBgCategory) {
                             // 背景色：低饱和度（0.05-0.3），避免过于鲜艳
                             targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
                         } else if (category === 'text') {
@@ -6651,17 +6756,24 @@
                     // 对比度保护
                     // 确保文本颜色与所有背景颜色都有足够对比度
                     // AA标准：正文文本对比度 >= 4.5:1
+                    // 收集所有背景色子分类中的颜色项
                     // --------------------------------------------------
-                    if (preserveContrast && category === 'text' && categorizedColors.background.length > 0) {
-                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHslWithTemp);
+                    const allBackgroundItems = [];
+                    bgCategories.forEach(cat => {
+                        if (categorizedColors[cat]) {
+                            allBackgroundItems.push(...categorizedColors[cat]);
+                        }
+                    });
+                    if (preserveContrast && category === 'text' && allBackgroundItems.length > 0) {
+                        ensureContrastWithAllBackgrounds(newHsl, allBackgroundItems, baseHslWithTemp);
                     }
 
                     // --------------------------------------------------
                     // SVG对比度保护
                     // 确保SVG颜色与窗口背景有足够对比度
                     // --------------------------------------------------
-                    if (preserveContrast && category === 'svg' && categorizedColors.background.length > 0) {
-                        ensureContrastWithAllBackgrounds(newHsl, categorizedColors.background, baseHslWithTemp);
+                    if (preserveContrast && category === 'svg' && allBackgroundItems.length > 0) {
+                        ensureContrastWithAllBackgrounds(newHsl, allBackgroundItems, baseHslWithTemp);
                     }
 
                     // 如果是灰度色且启用保留灰度选项，强制设为纯灰色（H=0, S=0），只保留新的亮度
@@ -6912,9 +7024,28 @@
 
             // ============================================================
             // 根据分类应用不同的配色策略
+            // 注意：背景色分类现在按控件类型细分为多个子分类
             // ============================================================
             switch(category) {
-                case 'background':
+                case 'bg_window_main':
+                case 'bg_window_card':
+                case 'bg_titlebar':
+                case 'bg_menu':
+                case 'bg_menu_bar':
+                case 'bg_list_box':
+                case 'bg_tree_view':
+                case 'bg_list_ctrl':
+                case 'bg_combo_box':
+                case 'bg_richedit':
+                case 'bg_tab_ctrl':
+                case 'bg_control':
+                case 'bg_button':
+                case 'bg_progress':
+                case 'bg_scrollbar':
+                case 'bg_split_line':
+                case 'bg_tooltip':
+                case 'bg_address_bar':
+                case 'bg_property_grid':
                     // --------------------------------------------------------
                     // 背景色处理策略
                     //
@@ -6931,49 +7062,116 @@
                     // 亮度边界限制：
                     // - 浅色主题：pressed 亮度不低于 0.80
                     // - 深色主题：pressed 亮度不高于 0.60
+                    //
+                    // 不同控件类型有不同的基础亮度偏移：
+                    // - bg_window_main: ±0（基准主窗口色）
+                    // - bg_window_card: +0.02/-0.02（卡片比主窗口略亮/暗）
+                    // - bg_titlebar: ±0.02/-0.02（标题栏与窗口有细微差异）
+                    // - bg_menu: -0.04 / +0.03（菜单与窗口略有区分）
+                    // - bg_menu_bar: ±0（与窗口一致）
+                    // - bg_list_box/tree_view/list_ctrl: ±0（列表控件与窗口一致）
+                    // - bg_combo_box: -0.03 / +0.02（下拉框略暗/亮）
+                    // - bg_richedit: -0.05 / +0.05（编辑框需要更明显的边框感）
+                    // - bg_tab_ctrl: -0.03 / +0.03（标签页与窗口有细微差异）
+                    // - bg_control: 根据名称进一步细分（container/content/header/overlay）
+                    // - bg_button: 按钮有自己独立的亮度逻辑
+                    // - bg_tooltip: +0.08 / -0.08（提示框更亮/暗以突出）
                     // --------------------------------------------------------
 
                     // 判断是否为深色主题
                     const isDarkBgTheme = baseHsl.l <= 0.5;
 
-                    // 计算基础亮度（根据容器类型分层）
+                    // 计算基础亮度（根据控件类型分层）
                     let baseLuminance = baseHsl.l;
-                    
-                    // 背景色分层处理 - 为不同类型的容器设置不同亮度
-                    if (baseName.includes('card') || baseName.includes('popup')) {
-                        // 卡片/弹窗背景：稍亮/暗
-                        if (isDarkBgTheme) {
-                            baseLuminance = Math.max(0.1, baseHsl.l - 0.08); // 更深
-                        } else {
-                            baseLuminance = Math.min(0.95, baseHsl.l + 0.08); // 更亮
-                        }
-                    } else if (baseName.includes('header')) {
-                        // 页眉背景：与主背景一致或稍暗
-                        if (isDarkBgTheme) {
-                            baseLuminance = Math.max(0.1, baseHsl.l - 0.05);
-                        } else {
-                            baseLuminance = Math.min(0.9, baseHsl.l - 0.05);
-                        }
-                    } else if (baseName.includes('container') || baseName.includes('content')) {
-                        // 通用容器/内容区域：与主窗口有细微差异
-                        if (isDarkBgTheme) {
-                            baseLuminance = Math.max(0.12, baseHsl.l - 0.03);
-                        } else {
-                            baseLuminance = Math.min(0.92, baseHsl.l + 0.03);
-                        }
-                    } else if (baseName.includes('menu')) {
-                        // 菜单背景：与主窗口一致或稍暗
-                        if (isDarkBgTheme) {
-                            baseLuminance = Math.max(0.1, baseHsl.l - 0.04);
-                        } else {
-                            baseLuminance = Math.min(0.9, baseHsl.l - 0.04);
-                        }
-                    } else if (baseName.includes('list') || baseName.includes('tree')) {
-                        // 列表/树控件背景：与主窗口一致
-                        baseLuminance = baseHsl.l;
-                    } else {
-                        // 主窗口背景：基础亮度
-                        baseLuminance = baseHsl.l;
+                    let stateSaturation = baseHsl.s * 0.3; // 默认饱和度
+
+                    // 根据控件类型设置基础亮度偏移
+                    switch(category) {
+                        case 'bg_window_main':
+                            // 主窗口背景：使用基准亮度
+                            baseLuminance = baseHsl.l;
+                            break;
+                        case 'bg_window_card':
+                            // 卡片背景：比主窗口略亮，浅色主题更亮，深色主题更暗以形成层次
+                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.02) : Math.min(0.96, baseHsl.l + 0.02);
+                            break;
+                        case 'bg_titlebar':
+                            // 标题栏背景：与窗口有细微差异，浅色主题略暗，深色主题略亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.02) : Math.max(0.88, baseHsl.l - 0.02);
+                            break;
+                        case 'bg_menu':
+                            // 菜单背景：与主窗口略有区分
+                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.04) : Math.min(0.95, baseHsl.l + 0.03);
+                            break;
+                        case 'bg_menu_bar':
+                            // 菜单栏背景：与窗口一致
+                            baseLuminance = baseHsl.l;
+                            break;
+                        case 'bg_list_box':
+                        case 'bg_tree_view':
+                        case 'bg_list_ctrl':
+                            // 列表/树控件背景：与窗口一致
+                            baseLuminance = baseHsl.l;
+                            break;
+                        case 'bg_combo_box':
+                            // 下拉框背景：与tab_ctrl区分，浅色主题变暗，深色主题略亮
+                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l + 0.02) : Math.max(0.88, baseHsl.l - 0.02);
+                            break;
+                        case 'bg_richedit':
+                            // 编辑框背景：需要更明显的边框感，差异稍大
+                            baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.05) : Math.min(0.92, baseHsl.l + 0.05);
+                            break;
+                        case 'bg_tab_ctrl':
+                            // 标签页背景：与窗口有细微差异，浅色主题略亮
+                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.03) : Math.min(0.95, baseHsl.l + 0.03);
+                            break;
+                        case 'bg_control':
+                            // 通用控件背景：进一步根据名称细分
+                            if (baseName.includes('header')) {
+                                // 页眉背景：与主背景略暗
+                                baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.05) : Math.min(0.90, baseHsl.l - 0.05);
+                            } else if (baseName.includes('container') || baseName.includes('content')) {
+                                // 通用容器/内容区域：与主窗口有细微差异
+                                baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.03) : Math.min(0.92, baseHsl.l + 0.03);
+                            } else if (baseName.includes('overlay')) {
+                                // 蒙层背景：透明度不同，亮度单独处理
+                                baseLuminance = isDarkBgTheme ? Math.max(0.15, baseHsl.l - 0.02) : Math.min(0.90, baseHsl.l + 0.02);
+                            } else {
+                                // 其他控件背景：使用基准
+                                baseLuminance = baseHsl.l;
+                            }
+                            break;
+                        case 'bg_button':
+                            // 按钮背景：有自己的独立处理逻辑，这里使用基准
+                            baseLuminance = baseHsl.l;
+                            stateSaturation = baseHsl.s * 0.4;
+                            break;
+                        case 'bg_progress':
+                            // 进度条背景：作为强调色载体，使用基准
+                            baseLuminance = baseHsl.l;
+                            break;
+                        case 'bg_scrollbar':
+                            // 滚动条背景：深色主题时滑块应更亮以形成对比，浅色主题时略暗
+                            baseLuminance = isDarkBgTheme ? Math.max(0.15, baseHsl.l + 0.05) : Math.min(0.90, baseHsl.l - 0.05);
+                            break;
+                        case 'bg_split_line':
+                            // 分割线背景：通常接近背景色
+                            baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.02) : Math.min(0.92, baseHsl.l + 0.02);
+                            break;
+                        case 'bg_tooltip':
+                            // 提示背景：更亮/暗以突出显示
+                            baseLuminance = isDarkBgTheme ? Math.min(0.90, baseHsl.l + 0.08) : Math.max(0.15, baseHsl.l - 0.08);
+                            break;
+                        case 'bg_address_bar':
+                            // 地址栏背景：略暗/亮
+                            baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.03) : Math.min(0.93, baseHsl.l + 0.03);
+                            break;
+                        case 'bg_property_grid':
+                            // 属性页背景：与窗口一致
+                            baseLuminance = baseHsl.l;
+                            break;
+                        default:
+                            baseLuminance = baseHsl.l;
                     }
 
                     // 设置基础亮度
@@ -7016,7 +7214,7 @@
                     } else {
                         // normal: 基准色，无偏移
                         newHsl.l = baseLuminance;
-                        newHsl.s = baseHsl.s * 0.3;  // 低饱和度
+                        newHsl.s = stateSaturation;  // 使用各控件预设的饱和度
                     }
                     break;
 
@@ -7527,6 +7725,42 @@
             return newHsl;
         }
 
+        function getBackgroundCategoryForItem(item) {
+            const itemType = item.type || '';
+            const itemName = item.name || '';
+            // 特殊处理：标题栏根据名称单独分类
+            if (itemName.toLowerCase().includes('titlebar')) {
+                return 'bg_titlebar';
+            }
+            // 特殊处理：卡片背景
+            if (itemName.toLowerCase().includes('card')) {
+                return 'bg_window_card';
+            }
+            switch(itemType) {
+                case 'window': return 'bg_window_main';
+                case 'menu': return 'bg_menu';
+                case 'menu_bar': return 'bg_menu_bar';
+                case 'list_box': return 'bg_list_box';
+                case 'tree_view': return 'bg_tree_view';
+                case 'list_ctrl': return 'bg_list_ctrl';
+                case 'combo_box': return 'bg_combo_box';
+                case 'richedit': return 'bg_richedit';
+                case 'tab_ctrl': return 'bg_tab_ctrl';
+                case 'control': return 'bg_control';
+                case 'button':
+                case 'button_primary':
+                case 'button_window':
+                case 'button_exit': return 'bg_button';
+                case 'progress': return 'bg_progress';
+                case 'scroll_bar': return 'bg_scrollbar';
+                case 'split_line': return 'bg_split_line';
+                case 'tooltip': return 'bg_tooltip';
+                case 'address_bar': return 'bg_address_bar';
+                case 'property_grid': return 'bg_property_grid';
+                default: return 'bg_control';
+            }
+        }
+
         /**
          * 确保文本色与所有背景色都有足够的对比度
          *
@@ -7552,7 +7786,8 @@
                 const bgItem = entry.item || entry;
                 const bgState = entry.state || 'none';
                 const bgBaseName = entry.baseName || (bgItem.name ? bgItem.name.toLowerCase() : '');
-                const bgHsl = generateSmartColor(baseHsl, bgItem, 'background', bgState, bgBaseName, 0, 1, 'monochromatic', 10, false);
+                const bgCategory = getBackgroundCategoryForItem(bgItem);
+                const bgHsl = generateSmartColor(baseHsl, bgItem, bgCategory, bgState, bgBaseName, 0, 1, 'monochromatic', 10, false);
                 const bgRgb = hslToRgb(bgHsl.h, bgHsl.s, bgHsl.l);
                 const textRgb = hslToRgb(textHsl.h, textHsl.s, textHsl.l);
 
@@ -7570,7 +7805,8 @@
 
             if (worstContrast < MIN_CONTRAST_NORMAL && worstBgItem) {
                 const worstBgItemName = worstBgItem.baseName || (worstBgItem.item ? worstBgItem.item.name.toLowerCase() : '');
-                const bgHsl = generateSmartColor(baseHsl, worstBgItem.item, 'background', worstBgItem.state || 'none', worstBgItemName, 0, 1, 'monochromatic', 10, false);
+                const worstBgCategory = getBackgroundCategoryForItem(worstBgItem.item);
+                const bgHsl = generateSmartColor(baseHsl, worstBgItem.item, worstBgCategory, worstBgItem.state || 'none', worstBgItemName, 0, 1, 'monochromatic', 10, false);
                 const bgRgb = hslToRgb(bgHsl.h, bgHsl.s, bgHsl.l);
                 const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
 
