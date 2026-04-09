@@ -7122,34 +7122,6 @@
                 case 'bg_property_grid':
                     // --------------------------------------------------------
                     // 背景色处理策略
-                    //
-                    // 背景色处理遵循 UI 标准规范：
-                    // - 所有状态色均基于基础亮度推导，仅调整亮度，不改变色相和饱和度
-                    // - 根据深/浅主题自动调整偏移方向
-                    // - 有明确的亮度边界限制
-                    // - 背景色分层：主窗口、卡片、容器、页眉等有不同亮度
-                    //
-                    // 深浅主题判断：
-                    // - 浅色主题（baseHsl.l > 0.5）：hover/pressed 变暗
-                    // - 深色主题（baseHsl.l <= 0.5）：hover/pressed 变亮
-                    //
-                    // 亮度边界限制：
-                    // - 浅色主题：pressed 亮度不低于 0.80
-                    // - 深色主题：pressed 亮度不高于 0.60
-                    //
-                    // 不同控件类型有不同的基础亮度偏移：
-                    // - bg_window_main: ±0（基准主窗口色）
-                    // - bg_window_card: +0.02/-0.02（卡片比主窗口略亮/暗）
-                    // - bg_titlebar: ±0.02/-0.02（标题栏与窗口有细微差异）
-                    // - bg_menu: -0.04 / +0.03（菜单与窗口略有区分）
-                    // - bg_menu_bar: ±0（与窗口一致）
-                    // - bg_list_box/tree_view/list_ctrl: ±0（列表控件与窗口一致）
-                    // - bg_combo_box: -0.03 / +0.02（下拉框略暗/亮）
-                    // - bg_richedit: -0.05 / +0.05（编辑框需要更明显的边框感）
-                    // - bg_tab_ctrl: -0.03 / +0.03（标签页与窗口有细微差异）
-                    // - bg_control: 根据名称进一步细分（container/content/header/overlay）
-                    // - bg_button: 按钮有自己独立的亮度逻辑
-                    // - bg_tooltip: +0.08 / -0.08（提示框更亮/暗以突出）
                     // --------------------------------------------------------
 
                     // 使用全局 isDarkTheme 判断深浅主题
@@ -7166,24 +7138,24 @@
                             baseLuminance = baseHsl.l;
                             break;
                         case 'bg_window_card':
-                            // 卡片背景：比主窗口略亮，浅色主题更亮，深色主题更暗以形成层次
-                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.02) : Math.min(0.96, baseHsl.l + 0.02);
+                            // 卡片背景：比主窗口略亮，浅色主题更亮，深色主题更亮以形成层次
+                            baseLuminance = isDarkBgTheme ? Math.min(0.16, baseHsl.l + 0.025) : Math.min(0.98, baseHsl.l + 0.04);
                             break;
                         case 'bg_titlebar':
-                            // 标题栏背景：与窗口有细微差异，浅色主题略暗，深色主题略亮
-                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.02) : Math.max(0.88, baseHsl.l - 0.02);
+                            // 标题栏背景：与主窗口完全同色
+                            baseLuminance = baseHsl.l;
                             break;
                         case 'bg_container':
-                            // 容器背景：与窗口有细微差异，浅色主题略暗，深色主题略亮
-                            baseLuminance = isDarkBgTheme ? Math.min(0.12, baseHsl.l + 0.02) : Math.max(0.90, baseHsl.l - 0.02);
+                            // 容器背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.98, baseHsl.l + 0.02);
                             break;
                         case 'bg_content':
-                            // 内容背景：与窗口一致或略亮
-                            baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.01) : Math.min(0.95, baseHsl.l + 0.01);
+                            // 内容背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.98, baseHsl.l + 0.02);
                             break;
                         case 'bg_menu':
-                            // 菜单背景：与主窗口略有区分
-                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.04) : Math.min(0.95, baseHsl.l + 0.03);
+                            // 菜单背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.16, baseHsl.l + 0.04) : Math.min(0.98, baseHsl.l + 0.03);
                             break;
                         case 'bg_menu_bar':
                             // 菜单栏背景：与窗口一致
@@ -7192,32 +7164,32 @@
                         case 'bg_list_box':
                         case 'bg_tree_view':
                         case 'bg_list_ctrl':
-                            // 列表/树控件背景：与窗口一致
-                            baseLuminance = baseHsl.l;
+                            // 列表/树控件背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.98, baseHsl.l + 0.02);
                             break;
                         case 'bg_combo_box':
-                            // 下拉框背景：与tab_ctrl区分，浅色主题变暗，深色主题略亮
-                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l + 0.02) : Math.max(0.88, baseHsl.l - 0.02);
+                            // 下拉框背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.16, baseHsl.l + 0.04) : Math.min(0.98, baseHsl.l + 0.03);
                             break;
                         case 'bg_richedit':
-                            // 编辑框背景：需要更明显的边框感，差异稍大
-                            baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.05) : Math.min(0.92, baseHsl.l + 0.05);
+                            // 编辑框背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.17, baseHsl.l + 0.05) : Math.min(0.99, baseHsl.l + 0.05);
                             break;
                         case 'bg_tab_ctrl':
-                            // 标签页背景：与窗口有细微差异，浅色主题略亮
-                            baseLuminance = isDarkBgTheme ? Math.max(0.08, baseHsl.l - 0.03) : Math.min(0.95, baseHsl.l + 0.03);
+                            // 标签页背景：浅色更亮，深色更亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.97, baseHsl.l + 0.03);
                             break;
                         case 'bg_control':
                             // 通用控件背景：进一步根据名称细分
                             if (baseName.includes('header')) {
-                                // 页眉背景：与主背景略暗
-                                baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.05) : Math.min(0.90, baseHsl.l - 0.05);
+                                // 页眉背景：与主背景一致
+                                baseLuminance = baseHsl.l;
                             } else if (baseName.includes('container') || baseName.includes('content')) {
-                                // 通用容器/内容区域：与主窗口有细微差异
-                                baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.03) : Math.min(0.92, baseHsl.l + 0.03);
+                                // 通用容器/内容区域：浅色略暗，深色略亮
+                                baseLuminance = isDarkBgTheme ? Math.min(0.14, baseHsl.l + 0.02) : Math.max(0.92, baseHsl.l - 0.02);
                             } else if (baseName.includes('overlay')) {
                                 // 蒙层背景：透明度不同，亮度单独处理
-                                baseLuminance = isDarkBgTheme ? Math.max(0.15, baseHsl.l - 0.02) : Math.min(0.90, baseHsl.l + 0.02);
+                                baseLuminance = isDarkBgTheme ? Math.min(0.18, baseHsl.l + 0.06) : Math.max(0.86, baseHsl.l - 0.06);
                             } else {
                                 // 其他控件背景：使用基准
                                 baseLuminance = baseHsl.l;
@@ -7242,15 +7214,15 @@
                             break;
                         case 'bg_tooltip':
                             // 提示背景：更亮/暗以突出显示
-                            baseLuminance = isDarkBgTheme ? Math.min(0.90, baseHsl.l + 0.08) : Math.max(0.15, baseHsl.l - 0.08);
+                            baseLuminance = isDarkBgTheme ? Math.min(0.22, baseHsl.l + 0.10) : Math.max(0.90, baseHsl.l - 0.10);
                             break;
                         case 'bg_address_bar':
                             // 地址栏背景：略暗/亮
-                            baseLuminance = isDarkBgTheme ? Math.max(0.10, baseHsl.l - 0.03) : Math.min(0.93, baseHsl.l + 0.03);
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.97, baseHsl.l + 0.03);
                             break;
                         case 'bg_property_grid':
-                            // 属性页背景：与窗口一致
-                            baseLuminance = baseHsl.l;
+                            // 属性页背景：略暗/亮
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.97, baseHsl.l + 0.03);
                             break;
                         default:
                             baseLuminance = baseHsl.l;
