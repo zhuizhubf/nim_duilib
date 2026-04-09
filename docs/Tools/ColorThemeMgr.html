@@ -6884,7 +6884,13 @@
                         newAdjustFormula = isDarkTheme ? 'lightness:+6' : 'lightness:-5';
                     } 
                     else if (['selected', 'checked'].includes(state)) {
-                        newAdjustFormula = isDarkTheme ? 'lightness:+14' : 'lightness:-9';
+                        if (item.name === 'bg_tab_ctrl_item_selected') {
+                            //标签选择状态，特殊处理
+                            newAdjustFormula = isDarkTheme ? 'lightness:+10' : 'lightness:+5';
+                        } else {
+                            newAdjustFormula = isDarkTheme ? 'lightness:+14' : 'lightness:-9';
+                        }
+                        
                     } 
                     else {
                         newAdjustFormula = item.adjust;
@@ -7142,8 +7148,9 @@
                             baseLuminance = isDarkBgTheme ? Math.min(0.16, baseHsl.l + 0.025) : Math.min(0.98, baseHsl.l + 0.04);
                             break;
                         case 'bg_titlebar':
-                            // 标题栏背景：与主窗口完全同色
-                            baseLuminance = baseHsl.l;
+                        case 'bg_tab_ctrl':
+                            // 标题栏背景：浅色略暗，深色略亮，形成柔和层次
+                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.04) : Math.max(0.88, baseHsl.l - 0.04);
                             break;
                         case 'bg_container':
                             // 容器背景：浅色更亮，深色更亮
@@ -7174,10 +7181,6 @@
                         case 'bg_richedit':
                             // 编辑框背景：浅色更亮，深色更亮
                             baseLuminance = isDarkBgTheme ? Math.min(0.17, baseHsl.l + 0.05) : Math.min(0.99, baseHsl.l + 0.05);
-                            break;
-                        case 'bg_tab_ctrl':
-                            // 标签页背景：浅色更亮，深色更亮
-                            baseLuminance = isDarkBgTheme ? Math.min(0.15, baseHsl.l + 0.03) : Math.min(0.97, baseHsl.l + 0.03);
                             break;
                         case 'bg_control':
                             // 通用控件背景：进一步根据名称细分
