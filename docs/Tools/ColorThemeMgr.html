@@ -2679,6 +2679,7 @@
         let isAllExpanded = true;
         let isDarkPreview = false;
         let isDarkMode = false;
+        let isDarkTheme = false; // 全局主题风格标志：在XML加载时根据<Theme style="dark">设置，true表示深色主题，false表示浅色主题
 
         // ========== Undo/Redo 历史记录 ==========
         const MAX_HISTORY_LENGTH = 50;
@@ -2984,6 +2985,7 @@
                 themeStyleEl.textContent = `风格: ${themeStyle}`;
                 themeTypeEl.textContent = `类型: ${themeType}${accentSupport === 'true' ? ' (支持强调色)' : '(不支持强调色)'}`;
                 isDarkPreview = themeStyle.toLowerCase() === 'dark';
+                isDarkTheme = themeStyle.toLowerCase() === 'dark'; // 全局主题风格标志
             }
 
             const themeMetaNode = xmlDoc.querySelector('ThemeMeta');
@@ -6855,10 +6857,9 @@
                     
                     const sourceRgb = argbToRgb(sourceValue);
                     const sourceHsl = rgbToHsl(sourceRgb.r, sourceRgb.g, sourceRgb.b);
-                    const isDarkTheme = sourceHsl.l <= 0.5;
                     let newAdjustFormula = '';
 
-                    // 统一状态判断，消除重复逻辑
+                    // 使用全局 isDarkTheme 判断深浅主题（基于XML中Theme style属性）
                     if (['hovered', 'hover'].includes(state)) {
                         newAdjustFormula = isDarkTheme ? 'lightness:+12' : 'lightness:-10';
                     } else if (['pressed', 'press'].includes(state)) {
@@ -6881,15 +6882,40 @@
                     if (newAdjustFormula) {
                         let newArgb = computeDerivedColor(sourceValue, newAdjustFormula);
 
-                        // 如果是灰度色且启用保留灰度选项，强制设为纯灰色（H=0, S=0）
+                        // 统一灰度保留逻辑：强制设为纯灰色（H=0, S=0）
                         if (isGrayColor && newArgb) {
-                            const originalAlpha = newArgb.slice(1, 3);  // 保留原始 Alpha 通道
+                            const originalAlpha = newArgb.slice(1, 3);
                             const rgb = argbToRgb(newArgb);
                             const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                            if (hsl.s > 0) {  // 只有非零时才需要强制转换
-                                hsl.h = 0;
-                                hsl.s = 0;
+                            hsl.h = 0;
+                            hsl.s = 0;
+                            const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+                            newArgb = `#${originalAlpha}${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
+                        }
+
+                        // 为派生颜色应用饱和度范围限制（与Phase 1一致）
+                        if (!isGrayColor && newArgb) {
+                            const rgb = argbToRgb(newArgb);
+                            let hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                            const isBgCategory = category.startsWith('bg_');
+
+                            let targetSaturation = hsl.s;
+                            if (isBgCategory) {
+                                targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
+                            } else if (category === 'text') {
+                                targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
+                            } else if (category.startsWith('border_')) {
+                                targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
+                            } else if (category === 'semantic') {
+                                targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
+                            } else if (category === 'svg') {
+                                targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
+                            }
+
+                            if (Math.abs(hsl.s - targetSaturation) > 0.01) {
+                                hsl.s = targetSaturation;
                                 const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+                                const originalAlpha = newArgb.slice(1, 3);
                                 newArgb = `#${originalAlpha}${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
                             }
                         }
