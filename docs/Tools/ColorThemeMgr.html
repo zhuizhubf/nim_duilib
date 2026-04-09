@@ -7072,6 +7072,7 @@
                     switch(state) {
                         case 'hovered': return 0.12;   // 悬浮状态：变亮
                         case 'pressed': return 0.18;   // 按下状态：更亮
+                        case 'selected': return 0.15;  // 选中状态：更亮（突出显示）
                         case 'disabled': return 0.03;  // 禁用状态：轻微变亮
                         case 'focused': return 0.08;   // 聚焦状态：轻微变亮
                         default: return 0;
@@ -7081,6 +7082,7 @@
                     switch(state) {
                         case 'hovered': return -0.06;  // 悬浮状态：变暗
                         case 'pressed': return -0.14;  // 按下状态：更暗
+                        case 'selected': return -0.12; // 选中状态：更暗（突出显示）
                         case 'disabled': return 0.01;  // 禁用状态：轻微变亮
                         case 'focused': return 0.08;   // 聚焦状态：轻微变亮
                         default: return 0;
