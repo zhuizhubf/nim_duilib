@@ -8587,14 +8587,86 @@
                 }
             });
 
-            if (modifiedCount > 0) {
+            // -------------------- 第二阶段：确保文本颜色对比度达标 --------------------
+            const MIN_CONTRAST_RATIO = 4.5;
+            let contrastFixedCount = 0;
+
+            // 创建一个辅助函数：确保前景色与背景色的对比度 >= 最小值
+            function ensureContrast(fgArgb, bgArgb, minRatio = MIN_CONTRAST_RATIO) {
+                if (!fgArgb || !bgArgb) return fgArgb;
+
+                const ratio = calculateContrastRatio(fgArgb, bgArgb);
+                if (ratio >= minRatio) return fgArgb;
+
+                // 需要调整前景色以满足对比度要求
+                const fgRgb = hexToRgb('#' + fgArgb.slice(3));
+                const bgRgb = hexToRgb('#' + bgArgb.slice(3));
+
+                // 计算背景亮度
+                const bgL = rgbToHsl(bgRgb.r, bgRgb.g, bgRgb.b).l;
+
+                // 转换为 HSL
+                let fgHsl = rgbToHsl(fgRgb.r, fgRgb.g, fgRgb.b);
+
+                // 如果背景是深色，文字变亮；背景是浅色，文字变暗
+                if (bgL < 0.5) {
+                    // 深色背景，需要白色文字
+                    fgHsl.l = 0.95;  // 接近白色
+                    fgHsl.s = Math.min(fgHsl.s, 0.3);  // 降低饱和度使白色更柔和
+                } else {
+                    // 浅色背景，需要深色文字
+                    fgHsl.l = 0.10;  // 接近黑色
+                    fgHsl.s = Math.min(fgHsl.s, 0.5);  // 降低饱和度使深色更柔和
+                }
+
+                // 转回 RGB
+                const adjustedRgb = hslToRgb(fgHsl.h, fgHsl.s, fgHsl.l);
+                const adjustedHex = `#${rgbToHex(adjustedRgb.r)}${rgbToHex(adjustedRgb.g)}${rgbToHex(adjustedRgb.b)}`;
+                return `#${fgArgb.slice(1, 3)}${adjustedHex.slice(1)}`;
+            }
+
+            // 对所有有 contrast_bg 属性的文本颜色进行对比度检查和调整
+            allColorItems.forEach(item => {
+                if (item.fixed) return;
+                if (!item.contrastBg || item.contrastBg.trim() === '') return;
+
+                // 只处理文本颜色
+                const itemNameLower = item.name.toLowerCase();
+
+                // 解析多个背景色
+                const bgNames = item.contrastBg.split(',').map(bg => bg.trim()).filter(bg => bg);
+
+                bgNames.forEach(bgName => {
+                    const bgColor = getColorValue(bgName, null);
+                    if (!bgColor) return;
+
+                    const currentRatio = calculateContrastRatio(item.value, bgColor);
+                    if (currentRatio < MIN_CONTRAST_RATIO) {
+                        // 对比度不达标，需要调整
+                        const adjustedColor = ensureContrast(item.value, bgColor, MIN_CONTRAST_RATIO);
+                        if (adjustedColor !== item.value) {
+                            item.value = adjustedColor;
+                            currentColorMap.set(item.name, item);
+                            updateAllGroupedValues(item.name, adjustedColor);
+                            contrastFixedCount++;
+                        }
+                    }
+                });
+            });
+
+            if (modifiedCount > 0 || contrastFixedCount > 0) {
                 calculateGroupStatistics();
                 renderColorCategories();
                 updatePreview();
                 updateAnalytics();
                 updateContrastResults();
                 saveToHistory('高对比度主题');
-                showToast(`已应用高对比度主题，修改了 ${modifiedCount} 个颜色`, 'success');
+
+                let message = `已应用高对比度主题，修改了 ${modifiedCount} 个颜色`;
+                if (contrastFixedCount > 0) {
+                    message += `，调整了 ${contrastFixedCount} 个文本颜色对比度`;
+                }
+                showToast(message, 'success');
             }
         }
 
