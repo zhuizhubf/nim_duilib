@@ -6971,9 +6971,6 @@
                     const isDerivedColor = item.derivedFrom && item.derivedFrom.trim() !== '';
                     if (!isDerivedColor) { return; }
                     
-                    //是否为按钮背景色
-                    const isBgButton = (category === 'bg_button');
-
                     const sourceColor = currentColorMap.get(item.derivedFrom);
                     let sourceValue;
                     
@@ -7009,10 +7006,17 @@
                         if (item.name === 'bg_tab_ctrl_item_selected') {
                             //标签选择状态，特殊处理
                             newAdjustFormula = isDarkTheme ? 'lightness:+10' : 'lightness:+5';
+                        }
+                        else if (item.name === 'bg_list_ctrl_frame_selected') {
+                            // ListCtrl 选中框背景（浅色=淡蓝，深色=通透高亮）
+                            newAdjustFormula = isDarkTheme ? 'saturation:+30,lightness:+12' : 'saturation:+40,lightness:+2';
+                        }   
+                        else if (item.name === 'border_list_ctrl_frame_selected') {
+                            // ListCtrl 选中框边框
+                            newAdjustFormula = isDarkTheme ? 'saturation:+40,lightness:+15' : 'saturation:+50,lightness:-10';
                         } else {
                             newAdjustFormula = isDarkTheme ? 'lightness:+14' : 'lightness:-9';
                         }
-                        
                     } 
                     else {
                         newAdjustFormula = item.adjust;
