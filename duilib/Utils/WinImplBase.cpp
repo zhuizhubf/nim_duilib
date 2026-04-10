@@ -211,7 +211,7 @@ void WindowImplBase::OnSelectLanguage(Control* pBtnSelectLanguage)
     ClientToScreen(point);
 
     //显示选择语言菜单
-    ui::Menu* menu = new ui::Menu(this);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    ui::Menu* menu = new ui::Menu(this, pBtnSelectLanguage);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
     //设置菜单xml所在的目录
     menu->SetSkinFolder(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu/"));
     DString xml(_T("lang_menu.xml"));
@@ -269,7 +269,7 @@ void WindowImplBase::OnSelectTheme(Control* pBtnSelectTheme)
     ClientToScreen(point);
 
     //显示选择主题菜单
-    ui::Menu* menu = new ui::Menu(this);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    ui::Menu* menu = new ui::Menu(this, pBtnSelectTheme);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
     //设置菜单xml所在的目录
     menu->SetSkinFolder(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu/"));
     DString xml(_T("theme_menu.xml"));
