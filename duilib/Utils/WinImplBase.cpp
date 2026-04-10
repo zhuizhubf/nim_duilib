@@ -212,6 +212,8 @@ void WindowImplBase::OnSelectLanguage(Control* pBtnSelectLanguage)
 
     //显示选择语言菜单
     ui::Menu* menu = new ui::Menu(this, pBtnSelectLanguage);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    WindowPtr spMenuWnd(menu);
+
     //设置菜单xml所在的目录
     menu->SetSkinFolder(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu/"));
     DString xml(_T("lang_menu.xml"));
@@ -231,6 +233,9 @@ void WindowImplBase::OnSelectLanguage(Control* pBtnSelectLanguage)
     for (auto& lang : languageList) {
         const DString fileName = lang.first;
         DString& displayName = lang.second;
+        if (spMenuWnd == nullptr) {
+            break;
+        }
 
         MenuItem* pMenuItem = new MenuItem(menu);
         pMenuItem->SetClass(_T("menu_element"));
@@ -270,6 +275,7 @@ void WindowImplBase::OnSelectTheme(Control* pBtnSelectTheme)
 
     //显示选择主题菜单
     ui::Menu* menu = new ui::Menu(this, pBtnSelectTheme);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    WindowPtr spMenuWnd(menu);
     //设置菜单xml所在的目录
     menu->SetSkinFolder(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu/"));
     DString xml(_T("theme_menu.xml"));
@@ -281,8 +287,11 @@ void WindowImplBase::OnSelectTheme(Control* pBtnSelectTheme)
     ThemeManager& theme = GlobalManager::Instance().Theme();
     theme.GetAllThemes(themePathList, themeInfoList);
 
-    //动态添加菜单项
+    //动态添加菜单项    
     for (const auto& themeInfo : themeInfoList) {
+        if (spMenuWnd == nullptr) {
+            break;
+        }
         MenuItem* pMenuItem = new MenuItem(menu);
         pMenuItem->SetClass(_T("menu_element"));
         CheckBox* pCheckBox = new CheckBox(menu);
