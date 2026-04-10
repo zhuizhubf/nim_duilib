@@ -9044,29 +9044,27 @@
             const roleColors = allColorItems.filter(item => item.role && item.role.trim() !== '').length;
             const derivedColors = allColorItems.filter(item => item.derivedFrom && item.derivedFrom.trim() !== '').length;
 
-            // 计算更全面的对比度达标率
-            const windowBg = getColorValue('bg_window_base', '#FFFFFFFF');
-            const buttonBg = getColorValue('btn_normal_bg', '#FF0078D4');
-            let totalChecks = 0;
-            let passCount = 0;
+            // 计算对比度达标率（使用与 updateContrastResults 相同的逻辑）
+            let contrastTotal = 0;
+            let contrastPass = 0;
 
-            // 检查多种颜色组合
             allColorItems.forEach(item => {
-                // 文本与窗口背景
-                if ((item.category.includes('text') || item.name.includes('text_')) && !item.name.includes('btn')) {
-                    totalChecks++;
-                    const ratio = calculateContrastRatio(item.value, windowBg);
-                    if (ratio >= 4.5) passCount++;
+                if (!item.contrastBg || item.contrastBg.trim() === '') {
+                    return;
                 }
-                // 按钮文本与按钮背景
-                if (item.name.includes('btn') && item.name.includes('text')) {
-                    totalChecks++;
-                    const ratio = calculateContrastRatio(item.value, buttonBg);
-                    if (ratio >= 4.5) passCount++;
-                }
+                const bgNames = item.contrastBg.split(',').map(bg => bg.trim()).filter(bg => bg);
+                bgNames.forEach(bgName => {
+                    const bgColor = getColorValue(bgName, null);
+                    if (!bgColor) return;
+                    const ratio = calculateContrastRatio(item.value, bgColor);
+                    contrastTotal++;
+                    if (ratio >= 4.5) {
+                        contrastPass++;
+                    }
+                });
             });
 
-            const contrastRate = totalChecks > 0 ? Math.round((passCount / totalChecks) * 100) : 0;
+            const contrastRate = contrastTotal > 0 ? Math.round((contrastPass / contrastTotal) * 100) : 0;
 
             // 更新显示
             document.getElementById('analyticsTotal').textContent = totalColors;
