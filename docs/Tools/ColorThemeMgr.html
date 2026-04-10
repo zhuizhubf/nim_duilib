@@ -2348,8 +2348,8 @@
                     </div>
                 </div>
             </div>
-            <div class="preview-window has-scroll" id="previewContrastCheck" style="display: flex; flex-direction: column; background-color: #fafafa;">
-                <div class="preview-window-header" style="background-color: #f8fafc;">
+            <div class="preview-window has-scroll" id="previewContrastCheck" style="display: flex; flex-direction: column;">
+                <div class="preview-window-header" style="">
                     <div class="preview-window-title">对比度检查 (WCAG 2.1)</div>
                     <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">说明：检查前景色与背景色之间的对比度，标准为文字(AA≥4.5:1, AAA≥7:1)</div>
                 </div>
@@ -8639,8 +8639,11 @@
             const listBg = getColorValue('bg_list', '#FFFFFFFF');
 
             // 语义颜色
-            const greenColor = getColorValue('color_green', '#FF00B050');
-            const redColor = getColorValue('color_red', '#FFE81123');
+            const greenColor = getColorValue('color_green', '#FF29A329');
+            const greenLightColor = getColorValue('color_green_light', '#FF5CD65C');
+            const redColor = getColorValue('color_red', '#FFA32929');
+            const redLightColor = getColorValue('color_red_light', '#FFD65C5C');
+            const blueColor = getColorValue('color_blue', '#FF2966A3');
 
             // ========== 获取更多状态颜色 ==========
             // 次要按钮状态
@@ -8721,6 +8724,16 @@
             windowHeaderEl.style.color = argbToRgbaCss(textDefault);
             windowContent.style.backgroundColor = argbToRgbaCss(windowBg);
             contentArea.style.backgroundColor = argbToRgbaCss(windowBg);
+
+            // ========== 对比度检查面板样式 ==========
+            // const contrastCheckPanel = document.getElementById('previewContrastCheck');
+            // const contrastCheckHeader = document.querySelector('#previewContrastCheck .preview-window-header');
+            // if (contrastCheckPanel) {
+            //     contrastCheckPanel.style.backgroundColor = argbToRgbaCss(windowBg);
+            // }
+            // if (contrastCheckHeader) {
+            //     contrastCheckHeader.style.backgroundColor = argbToRgbaCss(titleBarBg);
+            // }
 
             // ========== 文本样式 ==========
             textPrimaryEl.style.color = argbToRgbaCss(textDefault);
@@ -8816,7 +8829,7 @@
             // ========== 徽章 ==========
             badgeSuccess.style.backgroundColor = argbToRgbaCss(greenColor);
             badgeSuccess.style.color = '#FFFFFF';
-            badgeWarning.style.backgroundColor = '#FFF59E0B';
+            badgeWarning.style.backgroundColor = argbToRgbaCss(redLightColor);
             badgeWarning.style.color = '#FFFFFF';
             badgeError.style.backgroundColor = argbToRgbaCss(redColor);
             badgeError.style.color = '#FFFFFF';
@@ -8836,7 +8849,7 @@
                 alertSuccess.style.color = argbToRgbaCss(textDefault);
             }
             if (alertWarning) {
-                alertWarning.style.borderLeftColor = '#FFF59E0B';
+                alertWarning.style.borderLeftColor = argbToRgbaCss(redLightColor);
                 alertWarning.style.color = argbToRgbaCss(textDefault);
             }
             if (alertError) {
