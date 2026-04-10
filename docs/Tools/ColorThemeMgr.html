@@ -8628,9 +8628,9 @@
             const btnTextDisabled = getColorValue('text_btn_disabled', '#FFA0A0A0');
 
             // 主要按钮
-            const primaryBtnNormalBg = getColorValue('bg_primary_btn_normal', '#FF0078D4');
-            const primaryBtnNormalBorder = getColorValue('border_primary_btn_normal', '#FF005A9E');
-            const primaryBtnText = getColorValue('text_primary_btn_normal', '#FFFFFFFF');
+            const primaryBtnNormalBg = getColorValue('bg_primary_btn_normal', '#FFE6E6E6');
+            const primaryBtnNormalBorder = getColorValue('border_primary_btn_normal', '#FFE6E6E6');
+            const primaryBtnText = getColorValue('text_primary_btn_normal', '#FF6C6C6C');
 
             // 菜单
             const menuBg = getColorValue('bg_menu', '#FFFFFFFF');
@@ -8649,16 +8649,20 @@
             // 次要按钮状态
             const btnHoveredBg = getColorValue('bg_btn_hovered', '#FFE5E5E5');
             const btnPressedBg = getColorValue('bg_btn_pressed', '#FFDBDBDB');
-            const btnFocusedBg = getColorValue('bg_btn_focused', '#FFE5E5E5');
+            // btn_focused 不存在，使用 btn_hovered 作为 fallback
+            const btnFocusedBg = getColorValue('bg_btn_focused', null) || btnHoveredBg;
             const btnHoveredBorder = getColorValue('border_btn_hovered', '#FFBFBFBF');
             const btnPressedBorder = getColorValue('border_btn_pressed', '#FFB5B5B5');
-            const btnFocusedBorder = getColorValue('border_btn_focused', '#FFB0B0B0');
+            // border_btn_focused 不存在，使用 border_btn_hovered 作为 fallback
+            const btnFocusedBorder = getColorValue('border_btn_focused', null) || btnHoveredBorder;
 
             // 主要按钮状态
-            const primaryBtnHoveredBg = getColorValue('bg_primary_btn_hovered', '#FF106EBE');
-            const primaryBtnPressedBg = getColorValue('bg_primary_btn_pressed', '#FF0058A3');
-            const primaryBtnFocusedBg = getColorValue('bg_primary_btn_focused', '#FF106EBE');
-            const primaryBtnFocusedBorder = getColorValue('border_primary_btn_focused', '#FF005A9E');
+            const primaryBtnHoveredBg = getColorValue('bg_primary_btn_hovered', '#FFD7D7D7');
+            const primaryBtnPressedBg = getColorValue('bg_primary_btn_pressed', '#FFCDCDCD');
+            // bg_primary_btn_focused 不存在，使用 bg_primary_btn_hovered 作为 fallback
+            const primaryBtnFocusedBg = getColorValue('bg_primary_btn_focused', null) || primaryBtnHoveredBg;
+            // border_primary_btn_focused 不存在，使用 border_primary_btn_hovered 作为 fallback
+            const primaryBtnFocusedBorder = getColorValue('border_primary_btn_focused', null) || getColorValue('border_primary_btn_hovered', '#FFD7D7D7');
 
             // 窗口按钮状态
             const btnWindowNormalBg = getColorValue('bg_btn_window_normal', '#FFF4F4F4');
@@ -8670,19 +8674,21 @@
             const borderPressed = getColorValue('border_control_pressed', '#FFA0A0A0');
 
             // 列表项状态
-            const listItemNormalBg = getColorValue('bg_list_ctrl_item_normal', '#FFFFFFFF');
-            const listItemHoveredBg = getColorValue('bg_list_ctrl_item_hovered', '#FFF0F0F0');
+            const listItemNormalBg = getColorValue('bg_list_ctrl_item_normal', '#FFF9F9F9');
+            const listItemHoveredBg = getColorValue('bg_list_ctrl_item_hovered', '#FFEAEAEA');
             const listItemPressedBg = getColorValue('bg_list_ctrl_item_pressed', '#FFE0E0E0');
-            const listItemSelectedBg = getColorValue('bg_list_ctrl_item_selected', '#FFE5F0FF');
-            const listItemFocusedBg = getColorValue('bg_list_ctrl_item_focused', '#FFF8F8F8');
+            const listItemSelectedBg = getColorValue('bg_list_ctrl_item_selected', '#FFE2E2E2');
+            // bg_list_ctrl_item_focused 不存在，使用 bg_list_ctrl_item_hovered 作为 fallback
+            const listItemFocusedBg = getColorValue('bg_list_ctrl_item_focused', null) || listItemHoveredBg;
 
             // Tab 项状态
-            const tabNormalBg = getColorValue('bg_tab_ctrl_item_normal', '#FFF4F4F4');
-            const tabHoveredBg = getColorValue('bg_tab_ctrl_item_hovered', '#FFE5E5E5');
-            const tabSelectedBg = getColorValue('bg_tab_ctrl_item_selected', '#FFFFFFFF');
-            const tabFocusedBorder = getColorValue('border_tab_ctrl_item_focused', '#FFB0B0B0');
-            const tabSelectedBorder = getColorValue('border_tab_ctrl_item_selected', '#FF0078D4');
-            const tabNormalBorder = getColorValue('border_tab_ctrl_item_normal', '#FFD0D0D0');
+            const tabNormalBg = getColorValue('bg_tab_ctrl_item_normal', '#FFEAEAEA');
+            const tabHoveredBg = getColorValue('bg_tab_ctrl_item_hovered', '#FFDBDBDB');
+            const tabSelectedBg = getColorValue('bg_tab_ctrl_item_selected', '#FFF7F7F7');
+            // border_tab_ctrl_item_* 不存在，使用 border_control_* 作为 fallback
+            const tabFocusedBorder = getColorValue('border_tab_ctrl_item_focused', null) || borderFocused;
+            const tabSelectedBorder = getColorValue('border_tab_ctrl_item_selected', null) || getColorValue('border_primary_btn_normal', '#FFE6E6E6');
+            const tabNormalBorder = getColorValue('border_tab_ctrl_item_normal', null) || getColorValue('border_control_normal', '#FFD0D0D0');
 
             // ========== 应用到预览窗口 ==========
             const previewWindow = document.getElementById('previewWindow');
