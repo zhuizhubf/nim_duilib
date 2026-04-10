@@ -6659,26 +6659,29 @@
                 } else if (name.includes('svg')) {
                     // SVG颜色：名称包含svg
                     categorizedColors.svg.push({ item, state, baseName });
-                } else if (name.includes('btn_') || name.includes('button')) {
+                } else if (name.includes('btn_') || name.includes('_btn') || name.includes('button')) {
                     // 交互按钮：包含btn_或button
                     // --------------------------------------------------------
                     // 按钮颜色进一步细分
                     // 根据按钮颜色的前缀（border_btn_/bg_btn_/text_btn_）进行分类
                     // 纯按钮颜色（如 btn_normal）归类到interactive
                     // --------------------------------------------------------
-                    if (name.startsWith('border_btn_') || baseName.includes('border_btn')) {
+                    if (name.startsWith('border_') || baseName.includes('border_btn')) {
                         // 按钮边框色：根据按钮类型细分
                         const itemType = item.type || '';
                         categorizedColors.border_button.push({ item, state, baseName, itemType });
-                    } else if (name.startsWith('bg_btn_') || baseName.includes('bg_btn')) {
+                    } else if (name.startsWith('bg_') || baseName.includes('bg_btn')) {
                         // 按钮背景色：使用按钮背景的处理逻辑
                         const itemType = item.type || '';
                         if (itemType === 'button_window' || itemType === 'button_window_close') {
-                        categorizedColors.bg_window_main.push({ item, state, baseName, itemType });
+                            categorizedColors.bg_window_main.push({ item, state, baseName, itemType });
+                        } else if (baseName.includes('primary_btn')) {
+                            // 主要按钮归类到 interactive，支持 buttonStyle 风格选择
+                            categorizedColors.interactive.push({ item, state, baseName, itemType });
                         } else {
                             categorizedColors.bg_button.push({ item, state, baseName, itemType });
                         }
-                    } else if (name.startsWith('text_btn_') || baseName.includes('text_btn')) {
+                    } else if (name.startsWith('text_') || baseName.includes('text_btn')) {
                         // 按钮文本色：使用文本色的处理逻辑
                         categorizedColors.text.push({ item, state, baseName });
                     } else {
@@ -6991,10 +6994,18 @@
                     if (['hovered', 'hover'].includes(state)) {
                         // 悬浮：比标准稍强，保证一眼能看到
                         newAdjustFormula = isDarkTheme ? 'lightness:+12' : 'lightness:-6';
+                        if (item.name === 'bg_btn_window_hovered') {
+                            //窗口按钮
+                            newAdjustFormula = isDarkTheme ? 'lightness:+15' : 'lightness:-12';
+                        }
                     } 
                     else if (['pressed', 'press'].includes(state)) {
                         // 按下：比 hover 再强一档，形成清晰层级
                         newAdjustFormula = isDarkTheme ? 'lightness:+18' : 'lightness:-10';
+                        if (item.name === 'bg_btn_window_pressed') {
+                            //窗口按钮
+                            newAdjustFormula = isDarkTheme ? 'lightness:+20' : 'lightness:-18';
+                        }
                     } 
                     else if (['disabled', 'disable'].includes(state)) {
                         newAdjustFormula = isDarkTheme ? 'lightness:-10,saturation:-50' : 'lightness:+10,saturation:-50';
@@ -7009,11 +7020,11 @@
                         }
                         else if (item.name === 'bg_list_ctrl_frame_selected') {
                             // ListCtrl 选中框背景（浅色=淡蓝，深色=通透高亮）
-                            newAdjustFormula = isDarkTheme ? 'saturation:+30,lightness:+12' : 'saturation:+40,lightness:+2';
+                            newAdjustFormula = isDarkTheme ? 'lightness:+12' : 'saturation:+40,lightness:+30';
                         }   
                         else if (item.name === 'border_list_ctrl_frame_selected') {
                             // ListCtrl 选中框边框
-                            newAdjustFormula = isDarkTheme ? 'saturation:+40,lightness:+15' : 'saturation:+50,lightness:-10';
+                            newAdjustFormula = isDarkTheme ? 'saturation:+90,hue:+58' : 'saturation:+75,lightness:-45,hue:+58';
                         } else {
                             newAdjustFormula = isDarkTheme ? 'lightness:+14' : 'lightness:-9';
                         }
@@ -7024,45 +7035,6 @@
 
                     if (newAdjustFormula) {
                         let newArgb = computeDerivedColor(sourceValue, newAdjustFormula);
-
-                        // 统一灰度保留逻辑：强制设为纯灰色（H=0, S=0）
-                        if (isGrayColor && newArgb) {
-                            const originalAlpha = newArgb.slice(1, 3);
-                            const rgb = argbToRgb(newArgb);
-                            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                            hsl.h = 0;
-                            hsl.s = 0;
-                            const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-                            newArgb = `#${originalAlpha}${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
-                        }
-
-                        // 为派生颜色应用饱和度范围限制（与Phase 1一致）
-                        if (!isGrayColor && newArgb) {
-                            const rgb = argbToRgb(newArgb);
-                            let hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-                            const isBgCategory = category.startsWith('bg_');
-
-                            let targetSaturation = hsl.s;
-                            if (isBgCategory) {
-                                targetSaturation = Math.max(0.05, Math.min(0.3, targetSaturation));
-                            } else if (category === 'text') {
-                                targetSaturation = Math.max(0.1, Math.min(0.5, targetSaturation));
-                            } else if (category.startsWith('border_')) {
-                                targetSaturation = Math.max(0.05, Math.min(0.25, targetSaturation));
-                            } else if (category === 'semantic') {
-                                targetSaturation = Math.max(0.5, Math.min(1, targetSaturation));
-                            } else if (category === 'svg') {
-                                targetSaturation = Math.max(0.4, Math.min(1, targetSaturation));
-                            }
-
-                            if (Math.abs(hsl.s - targetSaturation) > 0.01) {
-                                hsl.s = targetSaturation;
-                                const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-                                const originalAlpha = newArgb.slice(1, 3);
-                                newArgb = `#${originalAlpha}${rgbToHex(newRgb.r)}${rgbToHex(newRgb.g)}${rgbToHex(newRgb.b)}`;
-                            }
-                        }
-
                         if (newArgb !== item.value) {
                             item.value = newArgb;
                             if (saveDerivedFormulas) {
@@ -7799,6 +7771,11 @@
                             const isDarkAccentTheme = isDarkTheme;
 
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
+                            
+                            if (buttonStyle === 'accent' && category === 'interactive') {
+                                // 强制使用蓝色色相（H=220），这是强调色的标准蓝色
+                                newHsl.h = 220;
+                            }
                             // 确保强调色有足够饱和度
                             newHsl.s = Math.max(0.6, Math.min(1.0, newHsl.s));
 
