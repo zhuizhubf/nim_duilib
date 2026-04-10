@@ -595,6 +595,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            align-items: stretch;
         }
         @media (max-width: 768px) {
             .preview-container {
@@ -604,15 +605,16 @@
         .preview-window {
             border: 1px solid #ccc;
             border-radius: 8px;
-            overflow: hidden;
-            min-height: 300px;
+            overflow: visible;
+            height: 640px;
             transition: all 0.3s;
         }
         .preview-window.has-scroll {
-            overflow-y: auto;
-            max-height: 500px;
+            overflow: hidden;
+            height: 640px;
         }
         .preview-window-header {
+            flex-shrink: 0;
             padding: 10px 15px;
             display: flex;
             justify-content: space-between;
@@ -638,6 +640,8 @@
         }
         .preview-window-content {
             padding: 15px;
+            flex: 1;
+            overflow-y: auto;
         }
         .preview-content-area {
             padding: 15px;
@@ -675,6 +679,65 @@
             border: none;
         }
         .preview-btn-secondary {
+            background: transparent;
+        }
+        .preview-btn-window {
+            background: transparent;
+            border: 1px solid;
+        }
+        .preview-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin: 12px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #eee;
+        }
+        .preview-state-buttons, .preview-state-borders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .preview-state-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 100px;
+        }
+        .preview-state-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .preview-border-sample {
+            padding: 8px 12px;
+            border: 1px solid;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+            background: transparent;
+        }
+        .preview-list-states, .preview-tabs-states {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .preview-list-item-state {
+            padding: 8px 14px;
+            border: 1px solid;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .preview-tab-state {
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-bottom: 2px solid transparent;
+            font-size: 12px;
+            cursor: pointer;
             background: transparent;
         }
         .preview-input-area {
@@ -2079,7 +2142,7 @@
             <div class="preview-title">实时预览</div>
         </div>
         <div class="preview-container">
-            <div class="preview-window" id="previewWindow">
+            <div class="preview-window" id="previewWindow" style="display: flex; flex-direction: column;">
                 <div class="preview-window-header" id="previewWindowHeader">
                     <div class="preview-window-title" id="previewWindowTitle">应用程序窗口</div>
                     <div class="preview-window-controls">
@@ -2088,7 +2151,7 @@
                         <div class="preview-window-btn" id="previewBtnClose" style="background-color: #EF4444;"></div>
                     </div>
                 </div>
-                <div class="preview-window-content" id="previewWindowContent">
+                <div class="preview-window-content" id="previewWindowContent" style="flex: 1; overflow-y: auto;">
                     <!-- Tab 控件 -->
                     <div class="preview-tabs" id="previewTabs">
                         <div class="preview-tab active" data-tab="basic">基础组件</div>
@@ -2210,6 +2273,65 @@
                         
                         <!-- 状态反馈 -->
                         <div class="tab-pane hidden" id="tabFeedback">
+                            <!-- 按钮状态预览 -->
+                            <div class="preview-section-title">按钮状态预览</div>
+                            <div class="preview-state-buttons">
+                                <div class="preview-state-group">
+                                    <div class="preview-state-label">次要按钮</div>
+                                    <button class="preview-btn preview-btn-secondary" id="previewBtnNormal">Normal</button>
+                                    <button class="preview-btn preview-btn-secondary preview-state-hover" id="previewBtnHovered">Hovered</button>
+                                    <button class="preview-btn preview-btn-secondary preview-state-press" id="previewBtnPressed">Pressed</button>
+                                    <button class="preview-btn preview-btn-secondary" id="previewBtnDisabledState" disabled>Disabled</button>
+                                </div>
+                                <div class="preview-state-group">
+                                    <div class="preview-state-label">主要按钮</div>
+                                    <button class="preview-btn preview-btn-primary" id="previewBtnPrimaryNormal">Normal</button>
+                                    <button class="preview-btn preview-btn-primary preview-state-hover" id="previewBtnPrimaryHovered">Hovered</button>
+                                    <button class="preview-btn preview-btn-primary preview-state-press" id="previewBtnPrimaryPressed">Pressed</button>
+                                    <button class="preview-btn preview-btn-primary" id="previewBtnPrimaryDisabled" disabled>Disabled</button>
+                                </div>
+                                <div class="preview-state-group">
+                                    <div class="preview-state-label">窗口按钮</div>
+                                    <button class="preview-btn preview-btn-window" id="previewBtnWindowNormal">Normal</button>
+                                    <button class="preview-btn preview-btn-window preview-state-hover" id="previewBtnWindowHovered">Hovered</button>
+                                    <button class="preview-btn preview-btn-window preview-state-press" id="previewBtnWindowPressed">Pressed</button>
+                                </div>
+                            </div>
+                            <!-- 边框状态预览 -->
+                            <div class="preview-section-title">边框状态预览</div>
+                            <div class="preview-state-borders">
+                                <div class="preview-state-group">
+                                    <div class="preview-state-label">控件边框</div>
+                                    <div class="preview-border-sample" id="previewBorderNormal">Normal</div>
+                                    <div class="preview-border-sample preview-state-hover" id="previewBorderHovered">Hovered</div>
+                                    <div class="preview-border-sample preview-state-press" id="previewBorderPressed">Pressed</div>
+                                    <div class="preview-border-sample" id="previewBorderDisabled">Disabled</div>
+                                </div>
+                                <div class="preview-state-group">
+                                    <div class="preview-state-label">按钮边框</div>
+                                    <div class="preview-border-sample" id="previewBorderBtnNormal">Normal</div>
+                                    <div class="preview-border-sample preview-state-hover" id="previewBorderBtnHovered">Hovered</div>
+                                    <div class="preview-border-sample preview-state-press" id="previewBorderBtnPressed">Pressed</div>
+                                    <div class="preview-border-sample" id="previewBorderBtnDisabled">Disabled</div>
+                                </div>
+                            </div>
+                            <!-- 列表项状态预览 -->
+                            <div class="preview-section-title">列表项状态预览</div>
+                            <div class="preview-list-states" id="previewListStates">
+                                <div class="preview-list-item-state" id="previewListItemNormal">列表项 Normal</div>
+                                <div class="preview-list-item-state preview-state-hover" id="previewListItemHovered">列表项 Hovered</div>
+                                <div class="preview-list-item-state preview-state-press" id="previewListItemPressed">列表项 Pressed</div>
+                                <div class="preview-list-item-state preview-state-selected" id="previewListItemSelected">列表项 Selected</div>
+                                <div class="preview-list-item-state" id="previewListItemFocused">列表项 Focused</div>
+                            </div>
+                            <!-- Tab 项状态预览 -->
+                            <div class="preview-section-title">Tab 项状态预览</div>
+                            <div class="preview-tabs-states" id="previewTabsStates">
+                                <div class="preview-tab-state" id="previewTabNormal">Tab Normal</div>
+                                <div class="preview-tab-state preview-state-hover" id="previewTabHovered">Tab Hovered</div>
+                                <div class="preview-tab-state preview-state-selected" id="previewTabSelected">Tab Selected</div>
+                                <div class="preview-tab-state" id="previewTabFocused">Tab Focused</div>
+                            </div>
                             <div class="preview-alert preview-alert-info" id="alertInfo">
                                 <strong>信息提示：</strong>这是一条信息提示消息，用于展示常规信息。
                             </div>
@@ -8538,6 +8660,45 @@
             const greenColor = getColorValue('color_green', '#FF00B050');
             const redColor = getColorValue('color_red', '#FFE81123');
 
+            // ========== 获取更多状态颜色 ==========
+            // 次要按钮状态
+            const btnHoveredBg = getColorValue('bg_btn_hovered', '#FFE5E5E5');
+            const btnPressedBg = getColorValue('bg_btn_pressed', '#FFDBDBDB');
+            const btnFocusedBg = getColorValue('bg_btn_focused', '#FFE5E5E5');
+            const btnHoveredBorder = getColorValue('border_btn_hovered', '#FFBFBFBF');
+            const btnPressedBorder = getColorValue('border_btn_pressed', '#FFB5B5B5');
+            const btnFocusedBorder = getColorValue('border_btn_focused', '#FFB0B0B0');
+
+            // 主要按钮状态
+            const primaryBtnHoveredBg = getColorValue('bg_primary_btn_hovered', '#FF106EBE');
+            const primaryBtnPressedBg = getColorValue('bg_primary_btn_pressed', '#FF0058A3');
+            const primaryBtnFocusedBg = getColorValue('bg_primary_btn_focused', '#FF106EBE');
+            const primaryBtnFocusedBorder = getColorValue('border_primary_btn_focused', '#FF005A9E');
+
+            // 窗口按钮状态
+            const btnWindowNormalBg = getColorValue('bg_btn_window_normal', '#FFF4F4F4');
+            const btnWindowHoveredBg = getColorValue('bg_btn_window_hovered', '#FFE5E5E5');
+            const btnWindowPressedBg = getColorValue('bg_btn_window_pressed', '#FFDBDBDB');
+
+            // 控件边框状态
+            const borderFocused = getColorValue('border_control_focused', '#FF808080');
+            const borderPressed = getColorValue('border_control_pressed', '#FFA0A0A0');
+
+            // 列表项状态
+            const listItemNormalBg = getColorValue('bg_list_ctrl_item_normal', '#FFFFFFFF');
+            const listItemHoveredBg = getColorValue('bg_list_ctrl_item_hovered', '#FFF0F0F0');
+            const listItemPressedBg = getColorValue('bg_list_ctrl_item_pressed', '#FFE0E0E0');
+            const listItemSelectedBg = getColorValue('bg_list_ctrl_item_selected', '#FFE5F0FF');
+            const listItemFocusedBg = getColorValue('bg_list_ctrl_item_focused', '#FFF8F8F8');
+
+            // Tab 项状态
+            const tabNormalBg = getColorValue('bg_tab_ctrl_item_normal', '#FFF4F4F4');
+            const tabHoveredBg = getColorValue('bg_tab_ctrl_item_hovered', '#FFE5E5E5');
+            const tabSelectedBg = getColorValue('bg_tab_ctrl_item_selected', '#FFFFFFFF');
+            const tabFocusedBorder = getColorValue('border_tab_ctrl_item_focused', '#FFB0B0B0');
+            const tabSelectedBorder = getColorValue('border_tab_ctrl_item_selected', '#FF0078D4');
+            const tabNormalBorder = getColorValue('border_tab_ctrl_item_normal', '#FFD0D0D0');
+
             // ========== 应用到预览窗口 ==========
             const previewWindow = document.getElementById('previewWindow');
             const windowHeaderEl = document.getElementById('previewWindowHeader');
@@ -8699,6 +8860,178 @@
             if (alertError) {
                 alertError.style.borderLeftColor = argbToRgbaCss(redColor);
                 alertError.style.color = argbToRgbaCss(textDefault);
+            }
+
+            // ========== 按钮状态预览 ==========
+            const previewBtnNormal = document.getElementById('previewBtnNormal');
+            const previewBtnHovered = document.getElementById('previewBtnHovered');
+            const previewBtnPressed = document.getElementById('previewBtnPressed');
+            const previewBtnDisabledState = document.getElementById('previewBtnDisabledState');
+            const previewBtnPrimaryNormal = document.getElementById('previewBtnPrimaryNormal');
+            const previewBtnPrimaryHovered = document.getElementById('previewBtnPrimaryHovered');
+            const previewBtnPrimaryPressed = document.getElementById('previewBtnPrimaryPressed');
+            const previewBtnPrimaryDisabled = document.getElementById('previewBtnPrimaryDisabled');
+            const previewBtnWindowNormal = document.getElementById('previewBtnWindowNormal');
+            const previewBtnWindowHovered = document.getElementById('previewBtnWindowHovered');
+            const previewBtnWindowPressed = document.getElementById('previewBtnWindowPressed');
+
+            if (previewBtnNormal) {
+                previewBtnNormal.style.backgroundColor = argbToRgbaCss(btnNormalBg);
+                previewBtnNormal.style.color = argbToRgbaCss(btnTextNormal);
+                previewBtnNormal.style.borderColor = argbToRgbaCss(btnNormalBorder);
+            }
+            if (previewBtnHovered) {
+                previewBtnHovered.style.backgroundColor = argbToRgbaCss(btnHoveredBg);
+                previewBtnHovered.style.color = argbToRgbaCss(btnTextNormal);
+                previewBtnHovered.style.borderColor = argbToRgbaCss(btnHoveredBorder);
+            }
+            if (previewBtnPressed) {
+                previewBtnPressed.style.backgroundColor = argbToRgbaCss(btnPressedBg);
+                previewBtnPressed.style.color = argbToRgbaCss(btnTextNormal);
+                previewBtnPressed.style.borderColor = argbToRgbaCss(btnPressedBorder);
+            }
+            if (previewBtnDisabledState) {
+                previewBtnDisabledState.style.backgroundColor = argbToRgbaCss(btnDisabledBg);
+                previewBtnDisabledState.style.color = argbToRgbaCss(btnTextDisabled);
+                previewBtnDisabledState.style.borderColor = argbToRgbaCss(borderDisabled);
+            }
+            if (previewBtnPrimaryNormal) {
+                previewBtnPrimaryNormal.style.backgroundColor = argbToRgbaCss(primaryBtnNormalBg);
+                previewBtnPrimaryNormal.style.color = argbToRgbaCss(primaryBtnText);
+                previewBtnPrimaryNormal.style.borderColor = argbToRgbaCss(primaryBtnNormalBorder);
+            }
+            if (previewBtnPrimaryHovered) {
+                previewBtnPrimaryHovered.style.backgroundColor = argbToRgbaCss(primaryBtnHoveredBg);
+                previewBtnPrimaryHovered.style.color = argbToRgbaCss(primaryBtnText);
+                previewBtnPrimaryHovered.style.borderColor = argbToRgbaCss(primaryBtnNormalBorder);
+            }
+            if (previewBtnPrimaryPressed) {
+                previewBtnPrimaryPressed.style.backgroundColor = argbToRgbaCss(primaryBtnPressedBg);
+                previewBtnPrimaryPressed.style.color = argbToRgbaCss(primaryBtnText);
+                previewBtnPrimaryPressed.style.borderColor = argbToRgbaCss(primaryBtnNormalBorder);
+            }
+            if (previewBtnPrimaryDisabled) {
+                previewBtnPrimaryDisabled.style.backgroundColor = argbToRgbaCss(btnDisabledBg);
+                previewBtnPrimaryDisabled.style.color = argbToRgbaCss(btnTextDisabled);
+                previewBtnPrimaryDisabled.style.borderColor = argbToRgbaCss(borderDisabled);
+            }
+            if (previewBtnWindowNormal) {
+                previewBtnWindowNormal.style.backgroundColor = argbToRgbaCss(btnWindowNormalBg);
+                previewBtnWindowNormal.style.color = argbToRgbaCss(textDefault);
+                previewBtnWindowNormal.style.borderColor = argbToRgbaCss(btnNormalBorder);
+            }
+            if (previewBtnWindowHovered) {
+                previewBtnWindowHovered.style.backgroundColor = argbToRgbaCss(btnWindowHoveredBg);
+                previewBtnWindowHovered.style.color = argbToRgbaCss(textDefault);
+                previewBtnWindowHovered.style.borderColor = argbToRgbaCss(btnHoveredBorder);
+            }
+            if (previewBtnWindowPressed) {
+                previewBtnWindowPressed.style.backgroundColor = argbToRgbaCss(btnWindowPressedBg);
+                previewBtnWindowPressed.style.color = argbToRgbaCss(textDefault);
+                previewBtnWindowPressed.style.borderColor = argbToRgbaCss(btnPressedBorder);
+            }
+
+            // ========== 边框状态预览 ==========
+            const previewBorderNormal = document.getElementById('previewBorderNormal');
+            const previewBorderHovered = document.getElementById('previewBorderHovered');
+            const previewBorderPressed = document.getElementById('previewBorderPressed');
+            const previewBorderDisabled = document.getElementById('previewBorderDisabled');
+            const previewBorderBtnNormal = document.getElementById('previewBorderBtnNormal');
+            const previewBorderBtnHovered = document.getElementById('previewBorderBtnHovered');
+            const previewBorderBtnPressed = document.getElementById('previewBorderBtnPressed');
+            const previewBorderBtnDisabled = document.getElementById('previewBorderBtnDisabled');
+
+            if (previewBorderNormal) {
+                previewBorderNormal.style.borderColor = argbToRgbaCss(borderNormal);
+                previewBorderNormal.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderHovered) {
+                previewBorderHovered.style.borderColor = argbToRgbaCss(borderHovered);
+                previewBorderHovered.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderPressed) {
+                previewBorderPressed.style.borderColor = argbToRgbaCss(borderPressed);
+                previewBorderPressed.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderDisabled) {
+                previewBorderDisabled.style.borderColor = argbToRgbaCss(borderDisabled);
+                previewBorderDisabled.style.color = argbToRgbaCss(textDisabled);
+            }
+            if (previewBorderBtnNormal) {
+                previewBorderBtnNormal.style.borderColor = argbToRgbaCss(btnNormalBorder);
+                previewBorderBtnNormal.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderBtnHovered) {
+                previewBorderBtnHovered.style.borderColor = argbToRgbaCss(btnHoveredBorder);
+                previewBorderBtnHovered.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderBtnPressed) {
+                previewBorderBtnPressed.style.borderColor = argbToRgbaCss(btnPressedBorder);
+                previewBorderBtnPressed.style.color = argbToRgbaCss(textDefault);
+            }
+            if (previewBorderBtnDisabled) {
+                previewBorderBtnDisabled.style.borderColor = argbToRgbaCss(borderDisabled);
+                previewBorderBtnDisabled.style.color = argbToRgbaCss(textDisabled);
+            }
+
+            // ========== 列表项状态预览 ==========
+            const previewListItemNormal = document.getElementById('previewListItemNormal');
+            const previewListItemHovered = document.getElementById('previewListItemHovered');
+            const previewListItemPressed = document.getElementById('previewListItemPressed');
+            const previewListItemSelected = document.getElementById('previewListItemSelected');
+            const previewListItemFocused = document.getElementById('previewListItemFocused');
+
+            if (previewListItemNormal) {
+                previewListItemNormal.style.backgroundColor = argbToRgbaCss(listItemNormalBg);
+                previewListItemNormal.style.color = argbToRgbaCss(textDefault);
+                previewListItemNormal.style.borderColor = argbToRgbaCss(borderNormal);
+            }
+            if (previewListItemHovered) {
+                previewListItemHovered.style.backgroundColor = argbToRgbaCss(listItemHoveredBg);
+                previewListItemHovered.style.color = argbToRgbaCss(textDefault);
+                previewListItemHovered.style.borderColor = argbToRgbaCss(borderHovered);
+            }
+            if (previewListItemPressed) {
+                previewListItemPressed.style.backgroundColor = argbToRgbaCss(listItemPressedBg);
+                previewListItemPressed.style.color = argbToRgbaCss(textDefault);
+                previewListItemPressed.style.borderColor = argbToRgbaCss(borderPressed);
+            }
+            if (previewListItemSelected) {
+                previewListItemSelected.style.backgroundColor = argbToRgbaCss(listItemSelectedBg);
+                previewListItemSelected.style.color = argbToRgbaCss(textDefault);
+                previewListItemSelected.style.borderColor = argbToRgbaCss(primaryBtnNormalBorder);
+            }
+            if (previewListItemFocused) {
+                previewListItemFocused.style.backgroundColor = argbToRgbaCss(listItemFocusedBg);
+                previewListItemFocused.style.color = argbToRgbaCss(textDefault);
+                previewListItemFocused.style.borderColor = argbToRgbaCss(borderFocused);
+            }
+
+            // ========== Tab 项状态预览 ==========
+            const previewTabNormal = document.getElementById('previewTabNormal');
+            const previewTabHovered = document.getElementById('previewTabHovered');
+            const previewTabSelected = document.getElementById('previewTabSelected');
+            const previewTabFocused = document.getElementById('previewTabFocused');
+
+            if (previewTabNormal) {
+                previewTabNormal.style.backgroundColor = argbToRgbaCss(tabNormalBg);
+                previewTabNormal.style.color = argbToRgbaCss(textMuted);
+                previewTabNormal.style.borderBottomColor = argbToRgbaCss(tabNormalBorder);
+            }
+            if (previewTabHovered) {
+                previewTabHovered.style.backgroundColor = argbToRgbaCss(tabHoveredBg);
+                previewTabHovered.style.color = argbToRgbaCss(textDefault);
+                previewTabHovered.style.borderBottomColor = argbToRgbaCss(tabNormalBorder);
+            }
+            if (previewTabSelected) {
+                previewTabSelected.style.backgroundColor = argbToRgbaCss(tabSelectedBg);
+                previewTabSelected.style.color = argbToRgbaCss(textLink);
+                previewTabSelected.style.borderBottomColor = argbToRgbaCss(tabSelectedBorder);
+            }
+            if (previewTabFocused) {
+                previewTabFocused.style.backgroundColor = argbToRgbaCss(tabNormalBg);
+                previewTabFocused.style.color = argbToRgbaCss(textDefault);
+                previewTabFocused.style.borderBottomColor = argbToRgbaCss(tabFocusedBorder);
             }
         }
 
