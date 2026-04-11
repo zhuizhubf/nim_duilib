@@ -8,6 +8,8 @@
 
 #include "duilib/duilib_defs.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <vector>
 
 #pragma warning(push)
@@ -118,5 +120,7 @@ class OsrImeHandlerWin {
 };
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif  // CEF_TESTS_CEFCLIENT_BROWSER_OSR_IME_HANDLER_WIN_H_

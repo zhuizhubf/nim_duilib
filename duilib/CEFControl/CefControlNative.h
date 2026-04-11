@@ -8,6 +8,8 @@
 
 #include "CefControl.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 namespace ui {
 
 /** duilib的CEF控件，窗口模式
@@ -73,6 +75,7 @@ private:
     */
     bool m_bInGotFocusEvent;
 };
-}
+} //namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_NATIVE_CONTROL_H_

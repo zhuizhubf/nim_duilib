@@ -8,6 +8,8 @@
 
 #include "duilib/duilib_config.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
 #include "include/base/cef_lock.h"
@@ -45,5 +47,7 @@ class BytesWriteHandler : public CefWriteHandler {
 };
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif  // CEF_TESTS_CEFCLIENT_BROWSER_BYTES_WRITE_HANDLER_H_

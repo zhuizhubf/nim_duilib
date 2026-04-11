@@ -11,9 +11,21 @@
     #define DUILIB_BUILD_FOR_SDL    1
 #endif
 
+//WebView2控件功能开关
 #if (DUILIB_WEBVIEW2)
     //可以将msvc\PropertySheets\WebView2Settings.props文件中的WebView2Enabled改为1，以开启WebView2功能
     #define DUILIB_BUILD_FOR_WEBVIEW2   1
+#endif
+
+//CEF控件功能开关
+#ifndef DUILIB_CEF
+    //默认开启
+    #define DUILIB_BUILD_FOR_CEF        1
+#else
+    #if (DUILIB_CEF)
+        //可以将msvc\PropertySheets\CEFSettings.props文件中的LibCefEnabled改为1，以开启CEF功能
+        #define DUILIB_BUILD_FOR_CEF    1
+    #endif
 #endif
 
 /** RichEdit控件绘制优化选项是否开启（Windows版本的RichEdit控件）

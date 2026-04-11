@@ -1,4 +1,7 @@
 #include "CefManager.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefControlNative.h"
 #include "duilib/CEFControl/CefControlOffScreen.h"
 
@@ -462,3 +465,5 @@ bool CefManager::IsEnableF11() const
 }
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

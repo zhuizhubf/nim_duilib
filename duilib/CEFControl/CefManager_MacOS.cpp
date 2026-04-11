@@ -1,6 +1,6 @@
 #include "CefManager_MacOS.h"
 
-#ifdef DUILIB_BUILD_FOR_MACOS
+#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
 
 #include "duilib/CEFControl/internal/CefClientApp.h"
 #include "duilib/CEFControl/internal/CefBrowserHandler.h"
@@ -49,4 +49,4 @@ bool CefManager_MacOS::IsMultiThreadedMessageLoop() const
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_MACOS)
+#endif //defined (DUILIB_BUILD_FOR_MACOS/DUILIB_BUILD_FOR_CEF)

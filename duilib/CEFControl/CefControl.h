@@ -2,6 +2,9 @@
 #define UI_CEF_CONTROL_CEF_CONTROL_H_
 
 #include "duilib/Core/Control.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefControlEvent.h"
 #include "duilib/CEFControl/internal/CefBrowserHandlerDelegate.h"
 #include <memory>
@@ -702,6 +705,7 @@ private:
     //网站FavIcon图标的URL
     CefString m_favIconUrl;
 };
-}
+} //namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_CONTROL_H_

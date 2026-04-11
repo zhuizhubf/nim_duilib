@@ -3,7 +3,7 @@
 
 #include "duilib/CEFControl/CefManager.h"
 
-#ifdef DUILIB_BUILD_FOR_LINUX
+#if defined (DUILIB_BUILD_FOR_LINUX) && defined (DUILIB_BUILD_FOR_CEF)
 
 namespace ui
 {
@@ -42,6 +42,6 @@ public:
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_LINUX)
+#endif //defined (DUILIB_BUILD_FOR_LINUX/DUILIB_BUILD_FOR_CEF)
 
 #endif //UI_CEF_CONTROL_CEF_MANAGER_LINUX_H_

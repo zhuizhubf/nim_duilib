@@ -1,7 +1,7 @@
 #include "CefWindowUtils.h"
 #include "duilib/Core/Window.h"
 
-#ifdef DUILIB_BUILD_FOR_MACOS
+#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
 #include <Cocoa/Cocoa.h>
 
 namespace ui
@@ -226,4 +226,4 @@ void RemoveCefWindowFromParent(CefWindowHandle /*cefWindow*/)
 
 } //namespace ui
 
-#endif //DUILIB_BUILD_FOR_MACOS
+#endif //DUILIB_BUILD_FOR_MACOS/DUILIB_BUILD_FOR_CEF

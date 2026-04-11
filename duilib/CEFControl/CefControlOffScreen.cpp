@@ -1,5 +1,7 @@
 #include "CefControlOffScreen.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefManager.h"
 #include "duilib/CEFControl/internal/CefBrowserHandler.h"
 #include "duilib/CEFControl/internal/CefMemoryBlock.h"
@@ -1120,3 +1122,5 @@ void CefControlOffScreen::OnIMECancelCompositionEvent()
 #endif //defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

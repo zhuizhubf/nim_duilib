@@ -3,7 +3,7 @@
 
 #include "duilib/CEFControl/CefManager.h"
 
-#ifdef DUILIB_BUILD_FOR_MACOS
+#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
 
 namespace ui
 {
@@ -46,6 +46,6 @@ public:
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_MACOS)
+#endif //defined (DUILIB_BUILD_FOR_MACOS/DUILIB_BUILD_FOR_CEF)
 
 #endif //UI_CEF_CONTROL_CEF_MANAGER_MACOS_H_

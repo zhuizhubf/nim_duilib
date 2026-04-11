@@ -3,7 +3,7 @@
 
 #include "duilib/Core/ControlDropTarget.h"
 
-#ifdef DUILIB_BUILD_FOR_WIN
+#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
 
 namespace client {
     class DropTargetWin;
@@ -38,6 +38,6 @@ private:
 
 } //namespace ui
 
-#endif //DUILIB_BUILD_FOR_WIN
+#endif //DUILIB_BUILD_FOR_WIN/DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_OSR_DROP_TARGET_H_

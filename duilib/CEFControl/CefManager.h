@@ -3,6 +3,8 @@
 
 #include "duilib/Core/Callback.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
     #include "include/cef_app.h"
@@ -299,4 +301,5 @@ private:
 
 } //namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_MANAGER_H_

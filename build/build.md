@@ -3,9 +3,11 @@
 ## 该目录中的文件列表
 | FileName/文件名               | OS/操作系统   | Compiler/编译器                     |  Skia(必选项)   |CEF(可选项)      |WebView2(可选项) |Comment/备注     |
 | :---                          | :---          |:---                                 |:---             |:---             |:---             |:---             |
-| `build_duilib_all_in_one.bat` | Windows       |Visual Studio 2022                   |自动下载并编译|支持|支持|一键编译脚本，脚本完成所有源码下载（含skia等依赖项）<br>skia 编译以下选项: <br>llvm.x64.debug/llvm.x64.release<br>llvm.x86.debug/llvm.x86.release<br>CEF模块需要自己下载，参见文档[CEF.md](../docs/CEF.md)|
-| `duilib.sln`                  | Windows       |Visual Studio 2022                   |需预先下载并编译|支持|支持|Visual Studio的解决方案文件，包含lib，但不包含示例程序|
-| `examples.sln`                | Windows       |Visual Studio 2022                   |需预先下载并编译|支持|支持|Visual Studio的解决方案文件，包含lib，包含示例程序<br>CEF模块需要自己下载，参见文档[CEF.md](../docs/CEF.md)|
+| `build_duilib_all_in_one.bat` | Windows       |Visual Studio                        |自动下载并编译|支持|支持|一键编译脚本，脚本完成所有源码下载（含skia等依赖项）<br>skia 编译以下选项: <br>llvm.x64.debug/llvm.x64.release<br>llvm.x86.debug/llvm.x86.release<br>CEF模块需要自己下载，参见文档[CEF.md](../docs/CEF.md)|
+| `duilib.sln`                  | Windows       |Visual Studio                        |需预先下载并编译|支持，可关闭|支持，可关闭|Visual Studio的解决方案文件，包含lib，但不包含示例程序|
+| `duilib_no_cef.sln`           | Windows       |Visual Studio                        |需预先下载并编译|不支持|支持，可关闭|Visual Studio的解决方案文件，包含lib，但不包含示例程序|
+| `examples.sln`                | Windows       |Visual Studio                        |需预先下载并编译|支持|支持|Visual Studio的解决方案文件，包含lib，包含示例程序<br>CEF模块需要自己下载，参见文档[CEF.md](../docs/CEF.md)|
+| `examples_no_cef.sln`         | Windows       |Visual Studio                        |需预先下载并编译|不支持|支持，可关闭|Visual Studio的解决方案文件，包含lib，包含示例程序<br>CEF模块需要自己下载，参见文档[CEF.md](../docs/CEF.md)|
 | `msvc_build.bat`              | Windows       |cmake/MSVC                           |需预先下载并编译|支持|支持|命令行编译脚本，使用cmake编译，编译器为MSVC|
 | `gcc-mingw-w64_build.bat`     | Windows       |MinGW-w64 gcc/g++                    |需预先下载并编译|不支持|支持|MinGW-w64的编译脚本，编译器为gcc/g++|
 | `llvm-mingw-w64_build.bat`    | Windows       |MinGW-w64 clang/clang++              |需预先下载并编译|不支持|支持|MinGW-w64的编译脚本，编译器为clang/clang++|
@@ -24,7 +26,8 @@
 3. 临时文件（可清理）    
 （1）`${DUILIB_ROOT}/build/build_temp`: 编译的临时目录，可清理    
 （2）`${DUILIB_ROOT}/build/.vs`: 隐藏的目录，Visual Studio 生成的缓存目录，占有空间很大，且越来越大，可定期清理。    
-（3）`${DUILIB_ROOT}/cef_temp`: libCEF模块运行时的网络缓存目录，可删除。
+（3）`${DUILIB_ROOT}/cef_cache`: libCEF模块运行时的网络缓存目录，可删除。    
+（4）`${DUILIB_ROOT}/webview2_cache`: WebView2模块运行时的网络缓存目录，可删除。    
     
 ## 程序发布时所依赖的文件
 1. `${DUILIB_ROOT}/bin/resources`目录：保存的资源文件（XML文件、图片资源等）    

@@ -1,6 +1,8 @@
 #include "CefJSBridge.h"
-#include "CefIPCStringDefs.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
+#include "CefIPCStringDefs.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringUtil.h"
 
@@ -303,4 +305,6 @@ CefString CefJSBridge::Int64ToCefString(int64_t nValue)
     return CefString(str);
 }
 
-}
+} //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

@@ -6,6 +6,8 @@
 
 #include "osr_ime_handler_win.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <msctf.h>
 #include <windowsx.h>
 
@@ -412,3 +414,5 @@ void OsrImeHandlerWin::ChangeCompositionRange(
 }
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF

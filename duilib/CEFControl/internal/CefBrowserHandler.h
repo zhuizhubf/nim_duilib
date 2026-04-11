@@ -7,6 +7,9 @@
 #define UI_CEF_CONTROL_BROWSER_HANDLER_H_
 
 #include "duilib/duilib_config.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/internal/CefAutoUnregister.h"
 #include "duilib/CEFControl/internal/CefJSBridge.h"
 #include "duilib/CEFControl/internal/osr_dragdrop_events.h"
@@ -473,5 +476,7 @@ private:
     IMPLEMENT_REFCOUNTING(CefBrowserHandler);
 };
 }
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_BROWSER_HANDLER_H_

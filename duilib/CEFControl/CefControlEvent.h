@@ -3,6 +3,8 @@
 
 #include "duilib/duilib_config.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
 #include "include/cef_client.h"
@@ -428,8 +430,9 @@ public:
     virtual ~CefControlEvent() = default;
 };
 
-}
+}//namespace ui
 
 #pragma warning (pop)
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_CONTROL_EVENT_H_

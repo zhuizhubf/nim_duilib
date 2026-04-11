@@ -12,6 +12,9 @@
 // Uncomment this line to manually enable ATL support.
 // #define CEF_USE_ATL 1
 #include "duilib/duilib_defs.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <objidl.h>
 #include <stdio.h>
 
@@ -184,5 +187,7 @@ class DataObjectWin : public IDataObject {
 };
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif  // CEF_TESTS_CEFCLIENT_BROWSER_OSR_DRAGDROP_WIN_H_
