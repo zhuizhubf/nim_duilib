@@ -3,6 +3,8 @@
 // can be found in the LICENSE file.
 #include "util_win.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
 #include "include/base/cef_logging.h"
@@ -194,3 +196,5 @@ float GetDeviceScaleFactor() {
 }
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF

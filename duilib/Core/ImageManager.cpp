@@ -329,7 +329,7 @@ void ImageManager::ReleaseImage(const std::shared_ptr<IImage>& pImageData, const
     }
 
     const int32_t nDelaySeconds = 35;
-    auto delayReleaseImage = []() {
+    auto delayReleaseImage = [nDelaySeconds]() {
         ImageManager& imageManager = GlobalManager::Instance().Image();
         auto nowTime = std::chrono::steady_clock::now();
         auto iter = imageManager.m_delayReleaseImageList.begin();

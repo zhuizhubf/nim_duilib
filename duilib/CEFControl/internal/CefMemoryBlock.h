@@ -2,6 +2,9 @@
 #define UI_CEF_CONTROL_MEMORY_BLOCK_H_
 
 #include "duilib/duilib_config.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <mutex>
 #include <vector>
 
@@ -72,5 +75,7 @@ private:
 };
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_MEMORY_BLOCK_H_

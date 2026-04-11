@@ -1,4 +1,7 @@
-#include "CefClientApp.h" 
+#include "CefClientApp.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefManager.h"
 #include "duilib/Core/GlobalManager.h"
 
@@ -88,4 +91,6 @@ CefRefPtr<CefRequestContextHandler> CefClientApp::GetDefaultRequestContextHandle
 }
 #endif
 
-}
+} //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

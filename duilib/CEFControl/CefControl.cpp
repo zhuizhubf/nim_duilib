@@ -1,4 +1,7 @@
 #include "CefControl.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FilePathUtil.h"
@@ -1252,3 +1255,5 @@ std::shared_ptr<IBitmap> CefControl::MakeImageSnapshot()
 }
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

@@ -1,4 +1,7 @@
-#include "CefClientApp.h" 
+#include "CefClientApp.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefManager.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
@@ -117,4 +120,6 @@ CefRefPtr<CefRenderProcessHandler> CefClientApp::GetRenderProcessHandler()
     return this;
 }
 
-}
+} //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

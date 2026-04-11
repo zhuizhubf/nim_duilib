@@ -1,4 +1,7 @@
 #include "CefBrowserHandler.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefManager.h"
 #include "duilib/CEFControl/CefWindowUtils.h"
 #include "duilib/CEFControl/internal/CefIPCStringDefs.h"
@@ -1318,3 +1321,5 @@ void CefBrowserHandler::OnGotFocus(CefRefPtr<CefBrowser> browser)
 } //namespace ui
 
 #pragma warning (pop)
+
+#endif //DUILIB_BUILD_FOR_CEF

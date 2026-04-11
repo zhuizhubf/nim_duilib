@@ -1,4 +1,7 @@
 #include "CefMemoryBlock.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/Render/IRender.h"
 
 namespace ui {
@@ -146,3 +149,5 @@ int32_t CefMemoryBlock::GetHeight() const
 }
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

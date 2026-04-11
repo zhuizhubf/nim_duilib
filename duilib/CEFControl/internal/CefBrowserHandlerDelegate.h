@@ -8,6 +8,8 @@
 
 #include "duilib/Core/Callback.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
     #include "include/cef_client.h"
@@ -241,5 +243,7 @@ enum class CefCallbackID
 };
 
 }//namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_BROWSER_HANDLER_DELEGATE_H_

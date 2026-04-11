@@ -3,7 +3,7 @@
     <!-- 该文件中设置 WebView2 的 配置选项 -->
     <PropertyGroup Label="Globals">
 
-        <!-- 是否支持WebView2Enabled的宏定义： 0表示不支持；1 表示支持 -->
+        <!-- 是否支持WebView2的宏定义： 0表示不支持；1 表示支持 -->
         <WebView2Enabled>1</WebView2Enabled>
 
         <!-- WebView2库的lib路径 -->
@@ -11,7 +11,7 @@
         <WebView2LibDir Condition="'$(Platform)' == 'Win32'">$(SolutionDir)\..\duilib\third_party\Microsoft.Web.WebView2\build\native\x86</WebView2LibDir>
         
         <!-- WebView2库的lib名称 -->
-        <WebView2Libs Condition="'$(WebView2Enabled)' == '1'">WebView2LoaderStatic.lib</WebView2Libs>
+        <WebView2Libs Condition="'$(WebView2Enabled)' != '0'">WebView2LoaderStatic.lib</WebView2Libs>
         <WebView2Libs Condition="'$(WebView2Enabled)' == '0'"></WebView2Libs>
     </PropertyGroup>
 </Project>

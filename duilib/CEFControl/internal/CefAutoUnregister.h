@@ -2,6 +2,9 @@
 #define UI_CEF_CONTROL_AUTO_UNREGISTER_H_
 
 #include "duilib/Core/Callback.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <unordered_map>
 #include <functional>
 #include <list>
@@ -73,5 +76,7 @@ private:
 };
 
 }
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_AUTO_UNREGISTER_H_

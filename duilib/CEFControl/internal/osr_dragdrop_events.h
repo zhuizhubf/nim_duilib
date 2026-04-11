@@ -7,6 +7,8 @@
 
 #include "duilib/duilib_config.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #pragma warning (push)
 #pragma warning (disable:4100)
     #include "include/cef_render_handler.h"
@@ -37,4 +39,5 @@ class OsrDragEvents {
 
 }  // namespace client
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif  // CEF_TESTS_CEFCLIENT_BROWSER_OSR_DRAGDROP_EVENTS_H_

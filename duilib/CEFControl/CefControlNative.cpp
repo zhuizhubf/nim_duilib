@@ -1,4 +1,7 @@
 #include "CefControlNative.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefWindowUtils.h"
 #include "duilib/CEFControl/internal/CefBrowserHandler.h"
 
@@ -246,3 +249,5 @@ bool CefControlNative::IsCefNative() const
 }
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

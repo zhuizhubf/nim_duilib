@@ -1,4 +1,7 @@
 #include "CefJsHandler.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/internal/CefIPCStringDefs.h"
 #include "duilib/CEFControl/internal/CefJSBridge.h"
 #include "duilib/Utils/StringUtil.h"
@@ -90,4 +93,6 @@ bool CefJSHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> /*object
     return false;
 }
 
-}
+} //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

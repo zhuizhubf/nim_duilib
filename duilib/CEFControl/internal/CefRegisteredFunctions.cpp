@@ -1,4 +1,7 @@
 #include "CefRegisteredFunctions.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/Utils/StringUtil.h"
 
 namespace ui
@@ -204,3 +207,5 @@ void BrowserRegisteredFunctions::ClearAllCppFunctions()
 }
 
 } //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

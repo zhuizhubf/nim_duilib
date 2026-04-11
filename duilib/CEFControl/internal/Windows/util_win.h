@@ -7,6 +7,9 @@
 #pragma once
 
 #include "duilib/duilib_defs.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <string>
 
 #pragma warning (push)
@@ -43,5 +46,7 @@ bool IsKeyDown(WPARAM wparam);
 float GetDeviceScaleFactor();
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif  // UI_CEF_CONTROL_UTIL_WIN_H_
