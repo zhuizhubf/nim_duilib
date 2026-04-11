@@ -3,6 +3,8 @@
 
 #include "duilib/CEFControl/internal/CefRegisteredFunctions.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 namespace ui
 {
 
@@ -134,6 +136,8 @@ private:
 };
 
 }
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_CEF_JS_BRIDGE_H_
 

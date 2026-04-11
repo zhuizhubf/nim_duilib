@@ -1,4 +1,6 @@
-#include "CefClientApp.h" 
+#include "CefClientApp.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
 
 #include "duilib/CEFControl/internal/CefJsHandler.h"
 #include "duilib/CEFControl/internal/CefIPCStringDefs.h"
@@ -166,4 +168,6 @@ bool CefClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
     return false;
 }
-}
+} //namespace ui
+
+#endif //DUILIB_BUILD_FOR_CEF

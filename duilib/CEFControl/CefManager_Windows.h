@@ -4,7 +4,7 @@
 #include "duilib/CEFControl/CefManager.h"
 #include <memory>
 
-#ifdef DUILIB_BUILD_FOR_WIN
+#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
 
 namespace ui
 {
@@ -89,6 +89,6 @@ private:
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_WIN)
+#endif //defined (DUILIB_BUILD_FOR_WIN/DUILIB_BUILD_FOR_CEF)
 
 #endif //UI_CEF_CONTROL_CEF_MANAGER_WINDOWS_H_

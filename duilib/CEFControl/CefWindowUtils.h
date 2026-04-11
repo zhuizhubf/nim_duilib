@@ -2,6 +2,9 @@
 #define UI_CEF_CONTROL_CEF_WINDOW_UTILS_H_
 
 #include "CefControl.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <vector>
 
 namespace ui
@@ -32,4 +35,5 @@ void RemoveCefWindowFromParent(CefWindowHandle cefWindow);
 
 } //namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_WINDOW_UTILS_H_

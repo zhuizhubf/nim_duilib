@@ -3,6 +3,8 @@
 // can be found in the LICENSE file.
 #include "osr_dragdrop_win.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <shellapi.h>
 #include <shlobj.h>
 #include <windowsx.h>
@@ -702,3 +704,5 @@ DataObjectWin::DataObjectWin(FORMATETC* fmtetc, STGMEDIUM* stgmed, int count)
 }
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF

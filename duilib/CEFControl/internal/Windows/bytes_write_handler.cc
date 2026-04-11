@@ -3,6 +3,8 @@
 // can be found in the LICENSE file.
 #include "bytes_write_handler.h"
 
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -102,3 +104,5 @@ size_t BytesWriteHandler::Grow(size_t size) {
 }
 
 }  // namespace client
+
+#endif //DUILIB_BUILD_FOR_CEF

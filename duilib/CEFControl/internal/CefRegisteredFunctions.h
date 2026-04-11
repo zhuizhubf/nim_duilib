@@ -2,6 +2,7 @@
 #define UI_CEF_CONTROL_CEF_REGISTERED_FUNCTIONS_H_
 
 #include "duilib/CEFControl/CefControlEvent.h"
+#ifdef DUILIB_BUILD_FOR_CEF
 
 #pragma warning (push)
 #pragma warning (disable:4100)
@@ -112,4 +113,5 @@ private:
 
 }//namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_REGISTERED_FUNCTIONS_H_

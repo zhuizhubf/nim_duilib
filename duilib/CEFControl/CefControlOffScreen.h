@@ -7,6 +7,9 @@
 #define UI_CEF_CONTROL_CEF_OSR_CONTROL_H_
 
 #include "duilib/Core/Window.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/CefControl.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
@@ -199,6 +202,7 @@ private:
     bool m_bInGotFocusEvent;
 };
 
-}
+} //namespace ui
 
+#endif //DUILIB_BUILD_FOR_CEF
 #endif //UI_CEF_CONTROL_CEF_OSR_CONTROL_H_

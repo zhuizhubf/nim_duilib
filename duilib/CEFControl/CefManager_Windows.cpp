@@ -1,6 +1,6 @@
 #include "CefManager_Windows.h"
 
-#ifdef DUILIB_BUILD_FOR_WIN
+#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
 
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/ProcessSingleton.h"
@@ -216,4 +216,4 @@ void CefManager_Windows::OnBrowserAlreadyRunningAppRelaunch(const std::vector<DS
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_WIN)
+#endif //defined (DUILIB_BUILD_FOR_WIN/DUILIB_BUILD_FOR_CEF)

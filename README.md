@@ -183,7 +183,7 @@
 - FreeBSD
 
 ## 支持的编译器
-- Visual Studio 2022（Windows）
+- Visual Studio 2022/2026（Windows）
 - LLVM（Windows）
 - MinGW-W64：gcc/g++、clang/clang++（Windows）
 - gcc/g++（Linux）
@@ -199,7 +199,7 @@
 （3）到python.exe所在目录中，复制一份python.exe，改名为python3.exe: 确保命令行参数中可以访问到python3.exe   
 （4）在命令行验证：`> python3.exe --version` 可以查看python的版本号     
 2. 安装Git For Windows: 2.44版本，git需要添加到Path环境变量，确保命令行参数中可以访问到git.exe    
-3. 安装Visual Studio 2022社区版    
+3. 安装Visual Studio 2022/2026社区版    
 4. 安装LLVM：21.1.4 Win64 版本（其他版本也可以）    
 （1）安装目录：`C:\LLVM`    
 （2）注意事项：如果安装在其他目录，安装目录中不能有空格，否则编译会遇到问题。
@@ -236,10 +236,13 @@ if %errorlevel% neq 0 (
 （1）`git clone https://github.com/rhett-lee/nim_duilib`      
 （2）`git clone https://github.com/rhett-lee/skia_compile`    
 （3）`git clone https://github.com/google/skia.git`  
-2. 编译Skia源码    
+3. 编译Skia源码    
 （1）nim_duilib内部使用Skia作为界面绘制引擎，所以先要编译skia，优先用LLVM编译，运行流畅    
 （2）按照skia_compile目录中的[Windows下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Windows%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)文档中的方法，编译出skia相关的.lib文件      
-3. 编译nim_duilib：进入 `build` 目录，打开 `examples.sln`，可执行编译，编译完成的示例程序位于bin目录中。
+4. 编译nim_duilib：进入 `build` 目录，打开 `examples.sln`，可执行编译，编译完成的示例程序位于bin目录中。
+5. 备注1：CEF模块如果不需要可关闭，编辑`msvc\PropertySheets\CEFSettings.props`文件，将`LibCefEnabled`的值改为`0`即可。    
+   关闭CEF模块后，可使用`duilib_no_cef.sln`或者`examples_no_cef.sln`工程来编译，从而减少libCEF代码的编译。
+6. 备注2：WebView2模块如果不需要可关闭，编辑`msvc\PropertySheets\WebView2Settings.props`文件，将`WebView2Enabled`的值改为`0`即可。
 
 ## B. 编译过程（Linux平台）
 ### 一、准备工作：安装必备的软件

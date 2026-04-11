@@ -7,6 +7,9 @@
 #define UI_CEF_CONTROL_CLIENT_APP_H_
 
 #include "duilib/duilib_config.h"
+
+#ifdef DUILIB_BUILD_FOR_CEF
+
 #include "duilib/CEFControl/internal/CefJSBridge.h"
 
 #pragma warning (push)
@@ -71,5 +74,7 @@ private:
     IMPLEMENT_REFCOUNTING(CefClientApp);
 };
 }
+
+#endif //DUILIB_BUILD_FOR_CEF
 
 #endif //UI_CEF_CONTROL_CLIENT_APP_H_

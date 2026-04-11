@@ -1,6 +1,6 @@
 #include "CefOsrDropTarget.h"
 
-#ifdef DUILIB_BUILD_FOR_WIN
+#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
 
 #include "duilib/CEFControl/internal/CefBrowserHandler.h"
 #include "duilib/CEFControl/internal/Windows/osr_dragdrop_win.h"
@@ -74,4 +74,4 @@ int32_t CefOsrDropTarget::Drop(void* pDataObj, uint32_t grfKeyState, const UiPoi
 
 } //namespace ui
 
-#endif //DUILIB_BUILD_FOR_WIN
+#endif //DUILIB_BUILD_FOR_WIN/DUILIB_BUILD_FOR_CEF
