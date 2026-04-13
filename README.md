@@ -174,16 +174,18 @@
 * libpag库的主体授权协议为Apache License Version 2.0，其依赖的第三方组件的授权协议很多，<br>详见目录:`duilib/third_party/libpag/licenses`中的文件。<br>如果介意libpag的授权协议（包括主体协议/第三方组件协议），可以不启用libpag。
 
 ## 编程语言
-- C/C++: 编译器需要支持C++20
+- C/C++: 编译器需要支持C++20（`main`分支）
+- C/C++: 编译器需要支持C++17（`develop-cpp17`分支，该分支仅用于支持Windows系统的VS2017/VS2019编译器，其他环境请使用主分支）
 
 ## 支持的操作系统
-- Windows：Windows 7.0 版本及以上
+- Windows：7/10/11 及以上
 - Linux：OpenEuler、OpenKylin（开放麒麟）、UbuntuKylin（优麒麟）、中科方德、统信UOS、Ubuntu、Debian、Fedora、OpenSuse等
 - macOS：12+
 - FreeBSD
 
 ## 支持的编译器
 - Visual Studio 2022/2026（Windows）
+- Visual Studio 2017/2019（Windows，这两个版本的编译器仅在`develop-cpp17`分支代码支持，其他分支代码均不支持；使用VS2017时，不支持CEF模块）
 - LLVM（Windows）
 - MinGW-W64：gcc/g++、clang/clang++（Windows）
 - gcc/g++（Linux）
@@ -195,11 +197,12 @@
 ### 一、准备工作：安装必备的软件
 1. 安装python3（python的主版本需要是3，需要添加到Path环境变量）    
 （1）首先安装python3    
-（2）在Windows的设置里面，关闭python.exe和python3.exe的"应用执行别名"，否则编译skia的脚本执行有问题。Windows设置入口：设置 -> 应用 -> 高级应用设置 -> 应用执行别名    
-（3）到python.exe所在目录中，复制一份python.exe，改名为python3.exe: 确保命令行参数中可以访问到python3.exe   
-（4）在命令行验证：`> python3.exe --version` 可以查看python的版本号     
-2. 安装Git For Windows: 2.44版本，git需要添加到Path环境变量，确保命令行参数中可以访问到git.exe    
-3. 安装Visual Studio 2022/2026社区版    
+（2）到`python.exe`所在目录中，复制一份`python.exe`，改名为`python3.exe`: 确保命令行参数中可以访问到`python3.exe`   
+（3）在命令行验证：`> python3.exe --version` 可以查看python的版本号     
+2. 安装Git For Windows: 2.44版本（其他版本也可以），git需要添加到Path环境变量，确保命令行参数中可以访问到`git.exe`    
+3. 安装Visual Studio，安装过程中注意同时选择安装正确的Windows SDK版本    
+   推荐安装Windows 11 SDK，因为CEF模块需要依赖Windows 11 SDK，Windows 10 SDK会导致CEF相关模块编译不过；    
+   如果不使用CEF功能，使用Windows 10 SDK也可以
 4. 安装LLVM：21.1.4 Win64 版本（其他版本也可以）    
 （1）安装目录：`C:\LLVM`    
 （2）注意事项：如果安装在其他目录，安装目录中不能有空格，否则编译会遇到问题。
@@ -207,13 +210,14 @@
 ### 二、使用脚本自动编译（推荐）
 该脚本自动完成相关源码下载和编译工作。    
 选定一个工作目录（注意事项：路径中不能包含空格，否则编译脚本会出错），创建一个脚本`build.bat`，将下面已经整理好脚本复制进去，保存文件。    
-脚本文件内容如下：    
+* 对于Visual Studio 2022/2026，脚本文件内容如下：    
 ```
+REM For Visual Studio 2022/2026
 echo OFF
 set retry_delay=10
 
 :retry_clone_duilib
-if not exist ".\nim_duilib" (
+if not exist ".\nim_duilib\.git" (
     git clone https://github.com/rhett-lee/nim_duilib
 ) else (  
     git -C ./nim_duilib pull
@@ -222,9 +226,43 @@ if %errorlevel% neq 0 (
     timeout /t %retry_delay% >nul
     goto retry_clone_duilib
 )
+if not exist ".\nim_duilib\.git" (
+    echo clone duilib failed!
+    exit /b 1
+)
 .\nim_duilib\build\build_duilib_all_in_one.bat
 ```
-进入命令行控制台，运行该脚本： 
+* 对于Visual Studio 2017/2019（需要使用develop-cpp17分支代码），脚本文件内容如下：    
+```
+REM For Visual Studio 2017/2019
+echo OFF
+set retry_delay=10
+
+:retry_clone_duilib
+if not exist ".\nim_duilib\.git" (
+    git clone https://github.com/rhett-lee/nim_duilib
+) else (  
+    git -C ./nim_duilib pull
+)
+if %errorlevel% neq 0 (
+    timeout /t %retry_delay% >nul
+    goto retry_clone_duilib
+)
+if not exist ".\nim_duilib\.git" (
+    echo clone duilib failed!
+    exit /b 1
+)
+
+:retry_pull_duilib
+git -C ./nim_duilib checkout develop-cpp17
+git -C ./nim_duilib pull
+if %errorlevel% neq 0 (
+    timeout /t %retry_delay% >nul
+    goto retry_pull_duilib
+)
+.\nim_duilib\build\build_duilib_all_in_one.bat
+```
+* 脚本文件准备好以后，进入命令行控制台，运行该脚本： 
 ```
 .\build.bat
 ```
@@ -239,10 +277,16 @@ if %errorlevel% neq 0 (
 3. 编译Skia源码    
 （1）nim_duilib内部使用Skia作为界面绘制引擎，所以先要编译skia，优先用LLVM编译，运行流畅    
 （2）按照skia_compile目录中的[Windows下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Windows%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)文档中的方法，编译出skia相关的.lib文件      
-4. 编译nim_duilib：进入 `build` 目录，打开 `examples.sln`，可执行编译，编译完成的示例程序位于bin目录中。
-5. 备注1：CEF模块如果不需要可关闭，编辑`msvc\PropertySheets\CEFSettings.props`文件，将`LibCefEnabled`的值改为`0`即可。    
-   关闭CEF模块后，可使用`duilib_no_cef.sln`或者`examples_no_cef.sln`工程来编译，从而减少libCEF代码的编译。
-6. 备注2：WebView2模块如果不需要可关闭，编辑`msvc\PropertySheets\WebView2Settings.props`文件，将`WebView2Enabled`的值改为`0`即可。
+4. 如果使用的是Visual Studio 2017/2019，需要使用develop-cpp17分支代码，需要在命令运行以下命令：    
+   `git -C ./nim_duilib checkout develop-cpp17`
+5. 编译nim_duilib：进入 `build` 目录，打开 `examples.sln`（如果使用的是Visual Studio 2017，需要打开`examples_vs2017.sln`），可执行编译，编译完成的示例程序位于bin目录中。
+6. CEF模块的备注：    
+（1）CEF模块依赖Windows 11 SDK，如果是低版本SDK，会有编译错误。    
+（2）CEF模块仅支持Visual Studio 2019/2022/2026，不支持Visual Studio 2017。    
+（3）CEF模块如果不需要可关闭，编辑`msvc\PropertySheets\CEFSettings.props`文件，将`LibCefEnabled`的值改为`0`即可。    
+（4）关闭CEF模块后，可使用`duilib_no_cef.sln`或者`examples_no_cef.sln`工程来编译，从而减少libCEF代码的编译。    
+7. WebView2模块的备注：    
+（1）WebView2模块如果不需要可关闭，编辑`msvc\PropertySheets\WebView2Settings.props`文件，将`WebView2Enabled`的值改为`0`即可。
 
 ## B. 编译过程（Linux平台）
 ### 一、准备工作：安装必备的软件
