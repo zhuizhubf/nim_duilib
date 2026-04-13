@@ -48,7 +48,6 @@
     <ProjectGuid>{B8C41401-6A2B-488D-B198-B0564C2B7404}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>cximage</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <!-- duilib -->
