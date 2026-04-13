@@ -5,6 +5,7 @@
 
 #include "duilib/third_party/libwebp/src/webp/decode.h"
 #include "duilib/third_party/libwebp/src/webp/demux.h"
+#include <atomic>
 
 namespace ui
 {

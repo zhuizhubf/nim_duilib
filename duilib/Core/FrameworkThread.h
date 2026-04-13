@@ -9,6 +9,7 @@
 #include <chrono>
 #include <vector>
 #include <map>
+#include <atomic>
 
 namespace ui 
 {

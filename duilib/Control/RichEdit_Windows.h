@@ -1262,6 +1262,11 @@ private:
     */
     TxDrawData m_txDrawData;
 
+    /** 绘制的Alpha通道缓存
+    */
+    class FastBytes;
+    std::unique_ptr<FastBytes> m_pAlphaValues;
+
 private:
 #ifndef DUILIB_UNICODE
     /** MBCS时，输入的字符

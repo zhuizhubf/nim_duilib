@@ -4,6 +4,7 @@
 #include "duilib/Core/FrameworkThread.h"
 #include "duilib/Core/ControlPtrT.h"
 #include <map>
+#include <atomic>
 
 namespace ui 
 {

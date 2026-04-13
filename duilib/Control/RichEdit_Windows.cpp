@@ -2428,8 +2428,110 @@ bool RichEdit::TxDrawData::CheckCreateBitmap(HDC hWindowDC, int32_t nWidth, int3
     return (m_hBitmap != nullptr) && (m_pBitmapBits != nullptr) && (m_hDrawDC != nullptr);
 }
 
+// 极致性能的 uint8_t 专用容器，替代 std::vector<uint8_t>
+// 原因：在C++17/VS2017下，std::vector<uint8_t>容器的性能非常差
+class RichEdit::FastBytes
+{
+public:
+    // 默认构造函数：空容器，无内存分配
+    FastBytes() noexcept
+        : m_data(nullptr), m_size(0), m_capacity(0)
+    {}
+
+    // 析构函数：释放内存
+    ~FastBytes() noexcept
+    {
+        // 使用 free 比 delete[] 更快，无析构函数开销
+        if (m_data != nullptr) {
+            std::free(m_data);
+        }
+    }
+
+    // 禁用拷贝（追求极致速度可禁用；需要拷贝可自行实现）
+    FastBytes(const FastBytes&) = delete;
+    FastBytes& operator=(const FastBytes&) = delete;
+
+    // reserve：预分配内存，不改变大小，无初始化（最快）
+    void reserve(size_t new_capacity) noexcept
+    {
+        if (new_capacity <= m_capacity) {
+            return;
+        }
+
+        // 原生 malloc 分配，比 vector 的分配器快得多
+        uint8_t* new_data = static_cast<uint8_t*>(std::malloc(new_capacity));
+        if (!new_data) {
+            return; // 内存分配失败不处理（极致性能）
+        }
+
+        // 拷贝已有数据（仅拷贝有效数据，无冗余）
+        if (m_data != nullptr) {
+            if (m_size > 0) {
+                std::memcpy(new_data, m_data, m_size);
+            }
+            std::free(m_data);
+        }
+        m_data = new_data;
+        m_capacity = new_capacity;
+    }
+
+    // push_back：尾部添加元素，无异常，无冗余检查
+    inline void push_back(uint8_t value) noexcept
+    {
+        // 容量不足时自动扩容（1.5倍扩容，比2倍更省内存，速度接近）
+        if (m_size >= m_capacity) {
+            const size_t new_cap = (m_capacity == 0) ? 16 : m_capacity * 3 / 2;
+            reserve(new_cap);
+        }
+        m_data[m_size++] = value;
+    }
+
+    // size：返回当前元素数量（内联，直接读取）
+    inline size_t size() const noexcept
+    {
+        return m_size;
+    }
+
+    // size：返回当前容量（内联，直接读取）
+    inline size_t capacity() const noexcept
+    {
+        return m_capacity;
+    }
+
+    // 快速直接访问（比 at 更快，无检查，内部使用）
+    inline uint8_t operator[](size_t index) const noexcept
+    {
+        return m_data[index];
+    }
+
+    //数量清零
+    inline void clear() noexcept
+    {
+        // 只把大小置 0，内存保留，不释放、不拷贝、不初始化
+        // 速度 = 1 个指令，比 vector 快得多
+        m_size = 0;
+    }
+
+    //数量清零，同时释放资源
+    inline void clear_release() noexcept
+    {
+        m_size = 0;
+        m_capacity = 0;
+        if (m_data != nullptr) {
+            std::free(m_data);
+            m_data = nullptr;
+        }
+    }
+
+private:
+    uint8_t* m_data;    // 原生数据指针（无封装，最快访问）
+    size_t   m_size;    // 当前元素个数
+    size_t   m_capacity;// 已分配的内存容量
+};
+
 void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
 {
+    PerformanceStat statPerformance(_T("PaintWindow, RichEdit::PaintRichEdit"));
     if (pRender == nullptr) {
         return;
     }
@@ -2531,9 +2633,16 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
     uint8_t* pRowStart = nullptr; //每行Alpha通道值起始的位置
     uint8_t* pRowEnd = nullptr;   //每行Alpha通道值结束的位置
 
-    std::vector<uint8_t> alphaValues; //记住该区域内原来的Alpha值
+    if (m_pAlphaValues == nullptr) {
+        m_pAlphaValues = std::make_unique<FastBytes>();
+    }
+    FastBytes& alphaValues = *m_pAlphaValues; //记住该区域内原来的Alpha值
     int32_t nEstSize = (nBottom - nTop) * (nRight - nLeft);
     if (nEstSize > 0) {
+        if (alphaValues.capacity() > 2 * nEstSize) {
+            //当缓存过大时，释放内存，重新分配合适的内存，避免占用过多内存
+            alphaValues.clear_release();
+        }
         alphaValues.reserve(nEstSize);
     }
     bool bHasBkClolor = false; //标记是否设置了背景色

@@ -4,6 +4,7 @@
 #include "duilib/Render/IRender.h"
 
 #include "duilib/third_party/giflib/gif_lib.h"
+#include <atomic>
 
 namespace ui
 {
