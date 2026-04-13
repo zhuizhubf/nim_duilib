@@ -23,7 +23,6 @@
     <ProjectGuid>{2BFFA1EE-039D-479E-9BCC-2D12F8AEDD16}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>chat</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\..\msvc\PropertySheets\BinCommonSettings.props" />

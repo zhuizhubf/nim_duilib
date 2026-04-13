@@ -23,7 +23,6 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{34272a88-ef1f-4ad2-8101-512a9a316757}</ProjectGuid>
     <RootNamespace>WebView2Browser</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\..\msvc\PropertySheets\BinCommonSettingsWebView2.props" />
