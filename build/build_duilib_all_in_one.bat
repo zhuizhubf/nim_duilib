@@ -59,6 +59,17 @@ if not exist %MSVC_PATH% (
     exit /b 1
 )
 
+if %VS_MAJOR_VERSION% LSS 17 (
+    echo.
+    echo ==============================================
+    echo "ERROR: Visual Studio 2022 (version 17.0) or newer is required!"
+    echo "Detected VS Major Version: %VS_MAJOR_VERSION%"
+    echo ==============================================
+    echo.
+    cd /d %CURRENT_DIR%
+    exit /b 1
+)
+
 cd /d %SCRIPT_DIR%
 echo %cd%
 if not exist ".\nim_duilib\.git" (
@@ -176,7 +187,7 @@ if %errorlevel% equ 0 (
     exit /b 1
 )
 
-devenv "./nim_duilib/build/examples.sln" /Build "Release|x64"
+devenv "./nim_duilib/build/examples.sln" /Build "Debug|x64"
 
 cd /d %CURRENT_DIR%
 echo.
