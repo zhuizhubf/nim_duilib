@@ -1,10 +1,12 @@
 #include "duilib/Utils/TrayIcon.h"
+
+#ifdef DUILIB_BUILD_FOR_SDL
+
 #include "duilib/Core/Window.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FileUtil.h"
-
-#ifdef DUILIB_BUILD_FOR_SDL
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_tray.h>

@@ -12,6 +12,7 @@ class UILIB_API Path_Skia : public IPath
 {
 public:
     Path_Skia();
+    virtual ~Path_Skia() override;
     Path_Skia(const Path_Skia& r);
     Path_Skia& operator=(const Path_Skia& r) = delete;
 

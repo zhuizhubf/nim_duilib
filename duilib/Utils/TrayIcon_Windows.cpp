@@ -1,11 +1,13 @@
 #include "duilib/Utils/TrayIcon.h"
+
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+
 #include "duilib/Core/Window.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FileUtil.h"
 #include "duilib/Utils/ApiWrapper_Windows.h"
-
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
 
 #include <shellapi.h>
 
