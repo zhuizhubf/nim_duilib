@@ -149,42 +149,43 @@ typedef std::unordered_map<EventType, EventSource> EventMap;
 
 /** 辅助函数
 */
-namespace EventUtils
+class UILIB_API EventUtils
 {
+public:
     /** 从事件类型回调的map容器中删除指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    bool RemoveEventCallbackByID(EventMap& eventMap, EventCallbackID callbackID);
+    static bool RemoveEventCallbackByID(EventMap& eventMap, EventCallbackID callbackID);
 
     /** 从事件类型回调的map容器中删除指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] eventType 事件类型
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    bool RemoveEventCallbackByID(EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
+    static bool RemoveEventCallbackByID(EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
 
     /** 判断事件类型回调的map容器中是否包含指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    bool HasEventCallbackByID(const EventMap& eventMap, EventCallbackID callbackID);
+    static bool HasEventCallbackByID(const EventMap& eventMap, EventCallbackID callbackID);
 
     /** 判断事件类型回调的map容器中是否包含指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] eventType 事件类型
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    bool HasEventCallbackByID(const EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
+    static bool HasEventCallbackByID(const EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
 
     /** 将字符串转换为事件类型
     */
-    EventType StringToEventType(const DString& eventName);
+    static EventType StringToEventType(const DString& eventName);
 
     /** 将事件类型转换为字符串
     */
-    DString EventTypeToString(EventType eventType);
-}
+    static DString EventTypeToString(EventType eventType);
+};
 
 }// namespace ui
 

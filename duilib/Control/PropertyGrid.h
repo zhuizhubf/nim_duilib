@@ -34,7 +34,7 @@ class PropertyGridDirectoryProperty;    //文件夹
 
 /** 属性表控件
 */
-class PropertyGrid : public VBox
+class UILIB_API PropertyGrid : public VBox
 {
     typedef VBox BaseClass;
 public:
@@ -452,7 +452,7 @@ private:
 *        </HBox>
 *   </PropertyGridGroup>
 */
-class PropertyGridGroup : public TreeNode
+class UILIB_API PropertyGridGroup : public TreeNode
 {
     typedef TreeNode BaseClass;
 public:
