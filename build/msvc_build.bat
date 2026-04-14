@@ -1,5 +1,7 @@
 @echo OFF
 @REM Windows 平台编译脚本，编译器：Visual Studio 2022 / Visual Studio 2026
+set CURRENT_DIR=%cd%
+set SCRIPT_DIR=%~dp0
 
 @REM 确保本机已经安装了camke(最低版本号: v3.21)
 @REM 如果使用Visual Studio 2026 则cmake的最低版本需要 v4.2
@@ -14,7 +16,24 @@ SET SKIA_SRC_ROOT_DIR=%bat_parent_dir%
 echo SKIA_SRC_ROOT_DIR: "%SKIA_SRC_ROOT_DIR%"
 
 @REM # 检测VS版本
-call detect_vs_version.bat
+if exist "%SCRIPT_DIR%\detect_vs_version.bat" (
+    call %SCRIPT_DIR%\detect_vs_version.bat
+) else (
+    echo detect_vs_version.bat not found in %SCRIPT_DIR%
+    cd /d %CURRENT_DIR%
+    exit /b 1
+)
+
+if %VS_MAJOR_VERSION% LSS 17 (
+    echo.
+    echo ==============================================
+    echo "ERROR: Visual Studio 2022 (version 17.0) or newer is required!"
+    echo "Detected VS Major Version: %VS_MAJOR_VERSION%"
+    echo ==============================================
+    echo.
+    cd /d %CURRENT_DIR%
+    exit /b 1
+)
 
 @REM # 设置编译器
 SET DUILIB_COMPILER_ID=msvc

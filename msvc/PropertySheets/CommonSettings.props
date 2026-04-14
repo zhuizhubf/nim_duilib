@@ -25,46 +25,66 @@
         <TargetName>$(ProjectName)_d</TargetName>
     </PropertyGroup>
     
-    <!-- duilib项目，所有工程的支持VS2026(v145)和VS2022(v143) -->
+    <!-- duilib项目，支持VS2026(v145)和VS2022(v143)[主分支]，支持VS2019(v142)和VS2017(v141)[develop-cpp17分支] -->
     <PropertyGroup Condition="'$(VisualStudioVersion)' == '18.0'" Label="Configuration">
         <PlatformToolset>v145</PlatformToolset>
     </PropertyGroup>
     <PropertyGroup Condition="'$(VisualStudioVersion)' == '17.0'" Label="Configuration">
         <PlatformToolset>v143</PlatformToolset>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == '16.0'" Label="Configuration">
+        <PlatformToolset>v142</PlatformToolset>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == '15.0'" Label="Configuration">
+        <PlatformToolset>v141</PlatformToolset>
+    </PropertyGroup>
 
-    <!-- duilib项目，所有工程的编译选项配置 -->
+    <!-- duilib项目，所有工程的SDK版本选项配置: VS2017需要设置具体的版本号，其他高版本只需要设置主版本号即可 -->
+    <PropertyGroup Condition="'$(VisualStudioVersion)' != '15.0'" Label="Globals">
+        <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == '15.0'" Label="Globals">
+        <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
+    </PropertyGroup>
+
+    <!-- duilib项目，所有工程的编译选项配置: MT/MTd -->
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
         <ClCompile>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-            <LanguageStandard>stdcpp20</LanguageStandard>
-            <LanguageStandard_C>stdc17</LanguageStandard_C>
         </ClCompile>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
         <ClCompile>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-            <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-            <LanguageStandard>stdcpp20</LanguageStandard>
-            <LanguageStandard_C>stdc17</LanguageStandard_C>
         </ClCompile>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
         <ClCompile>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-            <LanguageStandard>stdcpp20</LanguageStandard>
-            <LanguageStandard_C>stdc17</LanguageStandard_C>
         </ClCompile>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <ClCompile>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+        </ClCompile>
+    </ItemDefinitionGroup>
+
+    <!-- duilib项目，支持VS2026和VS2022[主分支]：使用C++20标准 -->
+    <ItemDefinitionGroup Condition="'$(VisualStudioVersion)' != '15.0' And '$(VisualStudioVersion)' != '16.0'">
+        <ClCompile>
             <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <LanguageStandard_C>stdc17</LanguageStandard_C>
         </ClCompile>
     </ItemDefinitionGroup>
-    
+
+    <!-- duilib项目，支持VS2019和VS2017[develop-cpp17]：使用C++17标准 -->
+    <ItemDefinitionGroup Condition="'$(VisualStudioVersion)' == '15.0' Or '$(VisualStudioVersion)' == '16.0'">
+        <ClCompile>
+            <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+            <LanguageStandard>stdcpp17</LanguageStandard>
+            <LanguageStandard_C>stdc11</LanguageStandard_C>
+        </ClCompile>
+    </ItemDefinitionGroup>
+
 </Project>

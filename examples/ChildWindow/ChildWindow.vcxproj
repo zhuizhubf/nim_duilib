@@ -23,7 +23,6 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{a1430125-b369-44ba-ab20-ce4f54437f89}</ProjectGuid>
     <RootNamespace>ChildWindow</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\..\msvc\PropertySheets\BinCommonSettings.props" />
