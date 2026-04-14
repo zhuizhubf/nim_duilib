@@ -7,7 +7,7 @@ namespace ui
 {
 /** GIF格式的图片解码器接口
 */
-class ImageDecoder_GIF: public IImageDecoder
+class UILIB_API ImageDecoder_GIF: public IImageDecoder
 {
 public:
     ImageDecoder_GIF();

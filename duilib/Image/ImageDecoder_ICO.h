@@ -7,7 +7,7 @@ namespace ui
 {
 /** ICO/CUR格式的图片解码器接口
 */
-class ImageDecoder_ICO: public IImageDecoder
+class UILIB_API ImageDecoder_ICO: public IImageDecoder
 {
 public:
     ImageDecoder_ICO();

@@ -7,7 +7,7 @@ namespace ui
 {
 /** PNG/APNG格式的图片数据
 */
-class Image_PNG: public IAnimationImage
+class UILIB_API Image_PNG: public IAnimationImage
 {
 public:
     Image_PNG();

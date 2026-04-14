@@ -14,14 +14,14 @@ typedef std::function<void(void)> StdClosure;
 
 /** weak_ptr智能指针的类型标志
 */
-class UILIB_API WeakFlag
+class WeakFlag
 {
 };
 
 /** 基于weak_ptr的回调类
 */
 template<typename T>
-class UILIB_API WeakCallback
+class WeakCallback
 {
 public:
     WeakCallback(const std::weak_ptr<WeakFlag>& weak_flag, const T& t) :

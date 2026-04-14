@@ -339,7 +339,7 @@ public:
 
 /** 图片解码器接口
 */
-class IImageDecoder
+class UILIB_API IImageDecoder
 {
 public:
     virtual ~IImageDecoder() = default;

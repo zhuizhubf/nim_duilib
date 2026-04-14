@@ -10,7 +10,7 @@ namespace ui
 {
 /** 拖动过程中显示的窗口
 */
-class DragWindow : public WindowImplBase
+class UILIB_API DragWindow : public WindowImplBase
 {
 public:
     DragWindow();

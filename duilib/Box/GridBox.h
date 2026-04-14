@@ -10,7 +10,7 @@ namespace ui
 /** 网格布局的容器(模板类)
 */
 template<typename InheritType = Box>
-class UILIB_API GridBoxT : public InheritType
+class GridBoxT : public InheritType
 {
     typedef GridBoxT<InheritType> BaseClass;
 public:
