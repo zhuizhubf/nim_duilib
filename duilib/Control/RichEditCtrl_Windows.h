@@ -22,7 +22,7 @@ namespace ui
 
 /** RichEdit控件主要功能封装（来自WTL源码）
 */
-class RichEditCtrl
+class UILIB_API RichEditCtrl
 {
 public:
 // Constructors

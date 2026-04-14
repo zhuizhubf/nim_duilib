@@ -7,7 +7,7 @@ namespace ui
 {
 /** IconManager管理的图片解码器接口
 */
-class ImageDecoder_Icon: public IImageDecoder
+class UILIB_API ImageDecoder_Icon: public IImageDecoder
 {
 public:
     ImageDecoder_Icon();

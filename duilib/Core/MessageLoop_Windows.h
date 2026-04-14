@@ -10,7 +10,7 @@ namespace ui {
 
 /** 主线程的消息循环
 */
-class MessageLoop_Windows
+class UILIB_API MessageLoop_Windows
 {
 public:
     MessageLoop_Windows();

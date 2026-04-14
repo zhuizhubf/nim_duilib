@@ -7,7 +7,7 @@ namespace ui
 {
 /** GIF格式的图片数据
 */
-class Image_GIF: public IAnimationImage
+class UILIB_API Image_GIF: public IAnimationImage
 {
 public:
     Image_GIF();

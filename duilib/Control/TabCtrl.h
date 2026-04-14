@@ -10,7 +10,7 @@ namespace ui
 /** 多标签控件（类似浏览器的多标签）
 */
 class TabBox;
-class TabCtrl: public ListBox
+class UILIB_API TabCtrl: public ListBox
 {
     typedef ListBox BaseClass;
 public:
@@ -112,7 +112,7 @@ private:
 
 /** 多标签控件的一个标签页
 */
-class TabCtrlItem : public ControlDragableT<ListBoxItemH>
+class UILIB_API TabCtrlItem : public ControlDragableT<ListBoxItemH>
 {
     typedef ControlDragableT<ListBoxItemH> BaseClass;
 public:

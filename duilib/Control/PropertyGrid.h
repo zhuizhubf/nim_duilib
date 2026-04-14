@@ -550,7 +550,7 @@ enum class PropertyGridPropertyType
 *        </HBox>
 *   </PropertyGridProperty>
 */
-class PropertyGridProperty: public TreeNode
+class UILIB_API PropertyGridProperty: public TreeNode
 {
     typedef TreeNode BaseClass;
 public:
@@ -710,7 +710,7 @@ private:
 
 /** 文本类型的属性：使用RichEdit编辑
 */
-class PropertyGridTextProperty : public PropertyGridProperty
+class UILIB_API PropertyGridTextProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -785,7 +785,7 @@ private:
 
 /** 下拉框类型的属性：使用Combo编辑
 */
-class PropertyGridComboProperty : public PropertyGridProperty
+class UILIB_API PropertyGridComboProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -890,7 +890,7 @@ private:
 
 /** 设置字体名称的属性
 */
-class PropertyGridFontProperty : public PropertyGridComboProperty
+class UILIB_API PropertyGridFontProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
 public:
@@ -927,7 +927,7 @@ protected:
 
 /** 设置字体大小的属性
 */
-class PropertyGridFontSizeProperty : public PropertyGridComboProperty
+class UILIB_API PropertyGridFontSizeProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
 public:
@@ -989,7 +989,7 @@ private:
 
 /** 设置颜色的属性
 */
-class PropertyGridColorProperty : public PropertyGridProperty
+class UILIB_API PropertyGridColorProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1053,7 +1053,7 @@ private:
 
 /** 设置日期时间的属性(仅Windows平台提供此功能)
 */
-class PropertyGridDateTimeProperty : public PropertyGridProperty
+class UILIB_API PropertyGridDateTimeProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1110,7 +1110,7 @@ private:
 
 /** 设置IP地址的属性
 */
-class PropertyGridIPAddressProperty : public PropertyGridProperty
+class UILIB_API PropertyGridIPAddressProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1162,7 +1162,7 @@ private:
 
 /** 设置热键的属性
 */
-class PropertyGridHotKeyProperty : public PropertyGridProperty
+class UILIB_API PropertyGridHotKeyProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1209,7 +1209,7 @@ private:
 
 /** 设置文件路径属性
 */
-class PropertyGridFileProperty : public PropertyGridTextProperty
+class UILIB_API PropertyGridFileProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
 public:
@@ -1275,7 +1275,7 @@ private:
 
 /** 设置文件夹属性
 */
-class PropertyGridDirectoryProperty : public PropertyGridTextProperty
+class UILIB_API PropertyGridDirectoryProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
 public:

@@ -14,7 +14,7 @@ namespace ui
 
 /** 调用Canvas绘制Skia的图片
 */
-class DrawSkiaImage
+class UILIB_API DrawSkiaImage
 {
 public:
 

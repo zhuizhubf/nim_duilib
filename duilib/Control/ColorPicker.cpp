@@ -12,7 +12,7 @@ namespace ui
 {
 /** 颜色预览的控件
 */
-class ColorPreviewLabel: public Label
+class UILIB_API ColorPreviewLabel: public Label
 {
     typedef Label BaseClass;
 public:
@@ -284,7 +284,7 @@ UiColor ColorPicker::GetSelectedColor() const
 
 /** 屏幕取色预览控件
 */
-class ScreenColorPreview : public Label
+class UILIB_API ScreenColorPreview : public Label
 {
     typedef Label BaseClass;
 public:
@@ -369,7 +369,7 @@ private:
 
 /** 屏幕取色控件
 */
-class ScreenColorPicker : public Control
+class UILIB_API ScreenColorPicker : public Control
 {
     typedef Control BaseClass;
 public:
@@ -672,7 +672,7 @@ private:
 
 /** 从屏幕取色的窗口（全屏）
 */
-class ScreenColorPickerWnd : public WindowImplBase
+class UILIB_API ScreenColorPickerWnd : public WindowImplBase
 {
     typedef WindowImplBase BaseClass;
 public:

@@ -25,7 +25,7 @@ class CefMemoryBlock;
 
 /** duilib的CEF控件，离屏渲染模式
 */
-class CefControlOffScreen :public CefControl
+class UILIB_API CefControlOffScreen :public CefControl
 {
     typedef CefControl BaseClass;
 public:

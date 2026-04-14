@@ -13,12 +13,12 @@ namespace ui
 class UILIB_API FilePath
 {
 public:
-    FilePath() = default;
-    FilePath(const FilePath&) = default;
-    FilePath(FilePath&&) = default;
-    ~FilePath() = default;
-    FilePath& operator=(const FilePath&) = default;
-    FilePath& operator=(FilePath&&) noexcept = default;
+    FilePath();
+    FilePath(const FilePath&);
+    FilePath(FilePath&&);
+    ~FilePath();
+    FilePath& operator=(const FilePath&);
+    FilePath& operator=(FilePath&&) noexcept;
 
     /** 从字符串构造
     * @param [in] filePath 路径字符串，UTF8编码

@@ -9,7 +9,7 @@ class HotKeyRichEdit;
 
 /** 热键控件
 */
-class HotKey: public HBox
+class UILIB_API HotKey: public HBox
 {
     typedef HBox BaseClass;
 public:
