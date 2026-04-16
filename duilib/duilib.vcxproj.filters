@@ -1828,6 +1828,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="duilib.ruleset" />
+    <None Include="duilib.ruleset">
+      <Filter>duilib</Filter>
+    </None>
+    <None Include="..\msvc\PropertySheets\duilib_dll.flag">
+      <Filter>duilib</Filter>
+    </None>
   </ItemGroup>
 </Project>

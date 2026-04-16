@@ -30,7 +30,7 @@
         <DuilibBinLibIncludeDir>$(SkiaLibDir);$(SDLLibDir);$(JpegTurboLibDir);$(LibPagLibDir);$(SolutionDir)\..\lib\$(Platform)\</DuilibBinLibIncludeDir>
 
         <!-- 库文件列表 -->
-        <DuilibBinLibList>$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);opengl32.lib;Imm32.lib;comctl32.lib;shlwapi.lib;</DuilibBinLibList>
+        <DuilibBinLibList>$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);$(DuilibSystemLibs);</DuilibBinLibList>
     </PropertyGroup>
 
     <!-- 设置库文件Include路径、lib列表、宏定义-->
