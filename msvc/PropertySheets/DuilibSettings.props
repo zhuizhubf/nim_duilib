@@ -50,8 +50,11 @@
         <ClCompile>
             <PreprocessorDefinitions>UILIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
         </ClCompile>
-        <Link>
-            <ImportLibrary>$(SolutionDir)\..\lib\$(Platform)\$(TargetName).lib</ImportLibrary>
+        <Link Condition="'$(Configuration)'=='Debug'">
+            <ImportLibrary>$(SolutionDir)\..\lib\$(Platform)\$(ProjectName)_d.lib</ImportLibrary>
+        </Link>
+        <Link Condition="'$(Configuration)'=='Release'">
+            <ImportLibrary>$(SolutionDir)\..\lib\$(Platform)\$(ProjectName).lib</ImportLibrary>
         </Link>
     </ItemDefinitionGroup>
     
@@ -96,7 +99,7 @@
         <DuilibBinLibIncludeDir>$(SkiaLibDir);$(SDLLibDir);$(JpegTurboLibDir);$(LibPagLibDir);$(SolutionDir)\..\lib\$(Platform)\</DuilibBinLibIncludeDir>
 
         <!-- 库文件列表 -->
-        <DuilibBinLibList>$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);opengl32.lib;Imm32.lib;comctl32.lib;shlwapi.lib;</DuilibBinLibList>
+        <DuilibBinLibList>$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);$(DuilibThirdLibs);$(DuilibSystemLibs);</DuilibBinLibList>
     </PropertyGroup>
 
     <!-- duilib项目，当使用DLL时，设置库文件Include路径、lib列表-->
@@ -117,27 +120,5 @@
 
     <!-- duilib项目，当使用DLL时，添加嵌入的Manifest配置文件 -->
     <Import Project="BinManifestSettings.props" Condition="'$(EnableDuilibDll)' == '1'"/>
-
-    <!-- duilib项目，当使用DLL时，添加依赖的工程 -->
-    <ItemGroup Condition="'$(EnableDuilibDll)' == '1'">
-        <ProjectReference Include="third_party\cximage\cximage.vcxproj">
-            <Project>{b8c41401-6a2b-488d-b198-b0564c2b7404}</Project>
-        </ProjectReference>
-        <ProjectReference Include="third_party\libpng\projects\vstudio\libpng\libpng.vcxproj">
-            <Project>{d6973076-9317-4ef2-a0b8-b7a18ac0713e}</Project>
-        </ProjectReference>
-        <ProjectReference Include="third_party\libwebp\libwebp.vcxproj">
-            <Project>{9ce07309-2808-45fa-b1af-ef49510e83ab}</Project>
-        </ProjectReference>
-        <ProjectReference Include="third_party\zlib\win32\zlib.vcxproj">
-            <Project>{60f89955-91c6-3a36-8000-13c592fec2df}</Project>
-        </ProjectReference>
-        <ProjectReference Include="third_party\libcef\libcef_win\libcef_dll_wrapper.vcxproj" Condition="'$(LibCefEnabled)' != '0' And '$(LibCefVersion109)' == '0'">
-            <Project>{ba5c702f-bb68-37f9-a109-74f215fe14c5}</Project>
-        </ProjectReference>
-        <ProjectReference Include="..\..\duilib\third_party\libcef\libcef_win_109\libcef_dll_wrapper_109.vcxproj" Condition="'$(LibCefEnabled)' != '0' And '$(LibCefVersion109)' != '0'">
-            <Project>{34c50672-6115-3723-b8fd-09568aa8527e}</Project>
-        </ProjectReference>
-    </ItemGroup>
-
+    
 </Project>

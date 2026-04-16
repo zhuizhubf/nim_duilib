@@ -38,9 +38,10 @@
     </PropertyGroup>
 
     <!-- duilib项目，所有工程的编译选项配置: MT/MTd 或者 MD/MDd (根据当前文件所在目录是否存在duilib_dll.flag这个文件决定)-->
-    <PropertyGroup Label="Globals">        
-        <EnableDuilibDll Condition="!Exists('$(MSBuildThisFileDirectory)\duilib_dll.flag')">0</EnableDuilibDll>
-        <EnableDuilibDll Condition="Exists('$(MSBuildThisFileDirectory)\duilib_dll.flag')">1</EnableDuilibDll>
+    <PropertyGroup Label="Globals">
+        <DuilibDllFlagFile>$(MSBuildThisFileDirectory)\duilib_dll.flag</DuilibDllFlagFile>
+        <EnableDuilibDll Condition="!Exists('$(DuilibDllFlagFile)')">0</EnableDuilibDll>
+        <EnableDuilibDll Condition="Exists('$(DuilibDllFlagFile)')">1</EnableDuilibDll>
     </PropertyGroup>    
     <ItemDefinitionGroup>
         <ClCompile>
@@ -76,4 +77,13 @@
             <PreprocessorDefinitions>UILIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
         </ClCompile>
     </ItemDefinitionGroup>
+
+    <!-- duilib项目，自身的基础Lib名称列表，不含CEF、WebView2 -->
+    <PropertyGroup Label="Globals">
+        <DuilibSystemLibs>opengl32.lib;Imm32.lib;comctl32.lib;shlwapi.lib;</DuilibSystemLibs>
+        <DuilibThirdLibs Condition="'$(Configuration)'=='Debug'">zlib_d.lib;cximage_d.lib;libpng_d.lib;libwebp_d.lib</DuilibThirdLibs>
+        <DuilibThirdLibs Condition="'$(Configuration)'=='Release'">zlib.lib;cximage.lib;libpng.lib;libwebp.lib</DuilibThirdLibs>
+        <DuilibMainLib Condition="'$(Configuration)'=='Debug'">duilib_d.lib</DuilibMainLib>
+        <DuilibMainLib Condition="'$(Configuration)'=='Release'">duilib.lib</DuilibMainLib>
+    </PropertyGroup>
 </Project>

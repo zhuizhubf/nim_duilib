@@ -853,6 +853,7 @@
     <ClInclude Include="WebView2\WebView2Manager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\msvc\PropertySheets\duilib_dll.flag" />
     <None Include="duilib.ruleset" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
