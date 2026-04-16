@@ -70,12 +70,15 @@
         </ClCompile>
     </ItemDefinitionGroup>
     
-    <!-- duilib项目，当使用DLL时，禁用STL的一个编译警告 -->
+    <!-- duilib项目，当使用DLL时，禁用STL的一个编译警告，并添加DLL相关的宏定义 -->
     <ItemDefinitionGroup Condition="'$(EnableDuilibDll)' == '1'">
         <ClCompile>
             <DisableSpecificWarnings>%(DisableSpecificWarnings);4251</DisableSpecificWarnings>
             <PreprocessorDefinitions>DUILIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
         </ClCompile>
+        <ResourceCompile>
+            <PreprocessorDefinitions>DUILIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        </ResourceCompile>
     </ItemDefinitionGroup>
 
     <!-- duilib项目，自身的基础Lib名称列表，不含CEF、WebView2 -->
