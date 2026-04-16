@@ -14,7 +14,7 @@ enum class SkTextEncoding;
 namespace ui 
 {
 
-class DUILIB_API Render_Skia : public IRender
+class Render_Skia : public IRender
 {
 public:
     Render_Skia();

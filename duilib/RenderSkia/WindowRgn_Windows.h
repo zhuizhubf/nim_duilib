@@ -7,7 +7,7 @@
 
 namespace ui 
 {
-class DUILIB_API WindowRgn
+class WindowRgn
 {
 public:
     /** 设置窗口的形状为圆角矩形
