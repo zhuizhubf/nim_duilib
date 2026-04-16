@@ -186,7 +186,7 @@ bool NativeWindow_Windows::CreateWnd(NativeWindow_Windows* pParentWindow,
 
 /** Hook函数的单例对象
 */
-class DUILIB_API HookIsDialogMessage: public InlineHook
+class HookIsDialogMessage: public InlineHook
 {
 public:
     HookIsDialogMessage() = default;
