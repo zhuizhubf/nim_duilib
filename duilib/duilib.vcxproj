@@ -128,7 +128,7 @@
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;ME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -204,6 +204,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="..\msvc\dllRes\dllmain.cpp" />
     <ClCompile Include="Animation\AnimationManager.cpp" />
     <ClCompile Include="Animation\AnimationPlayer.cpp" />
     <ClCompile Include="Animation\EasingFunctions.cpp" />
@@ -542,6 +543,9 @@
     <ClInclude Include="..\..\skia\tools\window\GLWindowContext.h" />
     <ClInclude Include="..\..\skia\tools\window\RasterWindowContext.h" />
     <ClInclude Include="..\..\skia\tools\window\WindowContext.h" />
+    <ClInclude Include="..\msvc\dllRes\framework.h" />
+    <ClInclude Include="..\msvc\dllRes\resource.h" />
+    <ClInclude Include="..\msvc\dllRes\version.h" />
     <ClInclude Include="Animation\AnimationManager.h" />
     <ClInclude Include="Animation\AnimationPlayer.h" />
     <ClInclude Include="Animation\EasingFunctions.h" />
@@ -855,6 +859,9 @@
   <ItemGroup>
     <None Include="..\msvc\PropertySheets\duilib_dll.flag" />
     <None Include="duilib.ruleset" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\msvc\dllRes\duilib.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
