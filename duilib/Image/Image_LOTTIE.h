@@ -7,7 +7,7 @@ namespace ui
 {
 /** LOTTIE格式的图片数据
 */
-class DUILIB_API Image_LOTTIE : public IAnimationImage
+class Image_LOTTIE : public IAnimationImage
 {
 public:
     Image_LOTTIE();

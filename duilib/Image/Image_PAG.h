@@ -9,7 +9,7 @@ namespace ui
 {
 /** PAG格式的图片数据
 */
-class DUILIB_API Image_PAG: public IAnimationImage
+class Image_PAG: public IAnimationImage
 {
 public:
     Image_PAG();

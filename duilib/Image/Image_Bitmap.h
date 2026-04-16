@@ -8,7 +8,7 @@ namespace ui
 {
 /** 位图格式的图片数据
 */
-class DUILIB_API Image_Bitmap: public IImage
+class Image_Bitmap: public IImage
 {
 public:
     /** 创建一个位图的图片数据（ARGB格式）

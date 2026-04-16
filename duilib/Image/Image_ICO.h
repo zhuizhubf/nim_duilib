@@ -8,7 +8,7 @@ namespace ui
 {
 /** ICO格式的图片数据(多帧模式)
 */
-class DUILIB_API Image_ICO: public IAnimationImage
+class Image_ICO: public IAnimationImage
 {
 public:
     Image_ICO();
