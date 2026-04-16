@@ -7,7 +7,7 @@ namespace ui
 {
 /** WEBP格式的图片解码器接口
 */
-class DUILIB_API ImageDecoder_WEBP: public IImageDecoder
+class ImageDecoder_WEBP: public IImageDecoder
 {
 public:
     ImageDecoder_WEBP();

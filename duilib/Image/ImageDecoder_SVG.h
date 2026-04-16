@@ -7,7 +7,7 @@ namespace ui
 {
 /** SVG格式的图片解码器接口
 */
-class DUILIB_API ImageDecoder_SVG: public IImageDecoder
+class ImageDecoder_SVG: public IImageDecoder
 {
 public:
     ImageDecoder_SVG();

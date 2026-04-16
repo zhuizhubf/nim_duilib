@@ -8,7 +8,7 @@ namespace ui
 {
 /** Svg格式的图片数据(支持矢量缩放)
 */
-class DUILIB_API Image_Svg: public IImage
+class Image_Svg: public IImage
 {
 public:
     /** 创建一个位图的图片数据（ARGB格式）

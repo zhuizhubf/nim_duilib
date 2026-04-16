@@ -9,7 +9,7 @@ namespace ui
 {
 /** PAG格式的图片解码器接口
 */
-class DUILIB_API ImageDecoder_PAG: public IImageDecoder
+class ImageDecoder_PAG: public IImageDecoder
 {
 public:
     ImageDecoder_PAG();

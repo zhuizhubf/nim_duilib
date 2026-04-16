@@ -7,7 +7,7 @@ namespace ui
 {
 /** 通用图片解码器接口，支持多种图片格式解码，比如BMP格式等
 */
-class DUILIB_API ImageDecoder_Common: public IImageDecoder
+class ImageDecoder_Common: public IImageDecoder
 {
 public:
     ImageDecoder_Common();
