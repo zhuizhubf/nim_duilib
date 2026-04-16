@@ -9,7 +9,7 @@ namespace ui
 {
 /** JPEG格式的图片解码器接口
 */
-class UILIB_API ImageDecoder_JPEG: public IImageDecoder
+class DUILIB_API ImageDecoder_JPEG: public IImageDecoder
 {
 public:
     ImageDecoder_JPEG();

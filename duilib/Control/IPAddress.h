@@ -8,7 +8,7 @@ namespace ui
 /** IP地址控件
 */
 class RichEdit;
-class UILIB_API IPAddress: public HBox
+class DUILIB_API IPAddress: public HBox
 {
     typedef HBox BaseClass;
 public:

@@ -13,7 +13,7 @@ class ProcessSingleton;
 
 /** CEF组件管理器（Windows实现）
  */
-class UILIB_API CefManager_Windows : public CefManager
+class DUILIB_API CefManager_Windows : public CefManager
 {
     friend class CefManager;
     typedef CefManager BaseClass;

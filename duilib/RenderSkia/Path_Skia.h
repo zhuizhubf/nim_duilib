@@ -8,7 +8,7 @@ class SkPathBuilder;
 namespace ui 
 {
 
-class UILIB_API Path_Skia : public IPath
+class DUILIB_API Path_Skia : public IPath
 {
 public:
     Path_Skia();

@@ -8,7 +8,7 @@ class SkMatrix;
 namespace ui 
 {
 
-class UILIB_API Matrix_Skia : public IMatrix
+class DUILIB_API Matrix_Skia : public IMatrix
 {
 public:
     Matrix_Skia();

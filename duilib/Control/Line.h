@@ -7,7 +7,7 @@ namespace ui
 {
 /** 画线控件
 */
-class UILIB_API Line: public Control
+class DUILIB_API Line: public Control
 {
     typedef Control BaseClass;
 public:

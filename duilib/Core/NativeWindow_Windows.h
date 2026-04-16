@@ -18,7 +18,7 @@ class Control;
 
 /** 窗口功能的Windows平台实现
 */
-class UILIB_API NativeWindow_Windows
+class DUILIB_API NativeWindow_Windows
 {
 public:
     explicit NativeWindow_Windows(INativeWindow* pOwner);

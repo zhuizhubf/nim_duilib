@@ -16,7 +16,7 @@ class WeakFlag;
 
 /** 控件的事件通知的参数
 */
-struct UILIB_API EventArgs
+struct DUILIB_API EventArgs
 {
 public:
     /** 事件类型
@@ -96,7 +96,7 @@ typedef size_t EventCallbackID;
 
 /** 事件回调函数的容器
 */
-class UILIB_API EventSource
+class DUILIB_API EventSource
 {
 public:
     /** 添加一个回调函数
@@ -149,7 +149,7 @@ typedef std::unordered_map<EventType, EventSource> EventMap;
 
 /** 辅助函数
 */
-class UILIB_API EventUtils
+class DUILIB_API EventUtils
 {
 public:
     /** 从事件类型回调的map容器中删除指定ID的事件回调函数

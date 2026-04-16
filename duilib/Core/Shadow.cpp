@@ -9,7 +9,7 @@
 namespace ui 
 {
 
-class UILIB_API ShadowBox : public Box
+class DUILIB_API ShadowBox : public Box
 {
     typedef Box BaseClass;
 public:

@@ -66,7 +66,7 @@ enum class InsertAfterFlag
 class WindowBase;
 /** SetWindowPos 的 hWndInsertAfter 参数
 */
-class UILIB_API InsertAfterWnd
+class DUILIB_API InsertAfterWnd
 {
 public:
     InsertAfterWnd():
@@ -95,7 +95,7 @@ public:
 
 /** 窗口消息原始数据
 */
-class UILIB_API NativeMsg
+class DUILIB_API NativeMsg
 {
 public:
     NativeMsg():

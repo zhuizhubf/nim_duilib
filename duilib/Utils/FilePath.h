@@ -10,7 +10,7 @@ namespace ui
 {
 /** 文件路径(封装std::filesystem::path，所有函数均不会抛出异常)
 */
-class UILIB_API FilePath
+class DUILIB_API FilePath
 {
 public:
     FilePath();
