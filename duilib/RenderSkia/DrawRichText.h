@@ -17,7 +17,7 @@ class IRender;
 
 /** RichText格式文本的绘制实现
 */
-class DUILIB_API DrawRichText
+class DrawRichText
 {
 public:
     DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);

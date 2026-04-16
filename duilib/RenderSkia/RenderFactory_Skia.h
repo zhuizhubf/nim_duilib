@@ -8,7 +8,7 @@ class SkFontMgr;
 namespace ui 
 {
 
-class DUILIB_API RenderFactory_Skia : public IRenderFactory
+class RenderFactory_Skia : public IRenderFactory
 {
 public:
     RenderFactory_Skia();
