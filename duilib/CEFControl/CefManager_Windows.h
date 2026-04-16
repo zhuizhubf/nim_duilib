@@ -2,9 +2,10 @@
 #define UI_CEF_CONTROL_CEF_MANAGER_WINDOWS_H_
 
 #include "duilib/CEFControl/CefManager.h"
-#include <memory>
 
 #if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+
+#include <memory>
 
 namespace ui
 {
