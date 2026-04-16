@@ -8,7 +8,7 @@ namespace ui
 /** ListCtrl列表视图UI控件的基类（实现子项选择功能，包括方向键，快捷键，鼠标选择逻辑等）
 *   使用这个类的时候，需要用 ListCtrlItemTemplate 模板来形成子类作为ListBoxItem
 */
-class UILIB_API ListCtrlView : public VirtualListBox
+class DUILIB_API ListCtrlView : public VirtualListBox
 {
     typedef VirtualListBox BaseClass;
 public:
@@ -63,7 +63,7 @@ protected:
 
 /** ListCtrlView中子项数据的功能接口
 */
-class UILIB_API IListCtrlViewItem
+class DUILIB_API IListCtrlViewItem
 {
 public:
     virtual ~IListCtrlViewItem() = default;

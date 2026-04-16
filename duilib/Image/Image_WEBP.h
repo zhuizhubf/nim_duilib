@@ -7,7 +7,7 @@ namespace ui
 {
 /** WEBP格式的图片数据
 */
-class UILIB_API Image_WEBP: public IAnimationImage
+class DUILIB_API Image_WEBP: public IAnimationImage
 {
 public:
     Image_WEBP();

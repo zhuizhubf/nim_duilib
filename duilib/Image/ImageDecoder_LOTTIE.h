@@ -7,7 +7,7 @@ namespace ui
 {
 /** LOTTIE格式的图片解码器接口
 */
-class UILIB_API ImageDecoder_LOTTIE: public IImageDecoder
+class DUILIB_API ImageDecoder_LOTTIE: public IImageDecoder
 {
 public:
     ImageDecoder_LOTTIE();

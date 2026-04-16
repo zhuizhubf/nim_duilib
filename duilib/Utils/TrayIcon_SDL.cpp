@@ -16,7 +16,7 @@ namespace ui
 
 /** 托盘图标的SDL实现
 */
-class UILIB_API TrayIconImpl : public TrayIcon
+class TrayIconImpl : public TrayIcon
 {
 public:
     TrayIconImpl();

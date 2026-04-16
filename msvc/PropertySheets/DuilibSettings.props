@@ -48,7 +48,7 @@
     <!-- duilib项目，当使用DLL时，定义符号导出的宏 -->
     <ItemDefinitionGroup Condition="'$(EnableDuilibDll)' == '1'">
         <ClCompile>
-            <PreprocessorDefinitions>UILIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions>DUILIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
         </ClCompile>
         <Link Condition="'$(Configuration)'=='Debug'">
             <ImportLibrary>$(SolutionDir)\..\lib\$(Platform)\$(ProjectName)_d.lib</ImportLibrary>

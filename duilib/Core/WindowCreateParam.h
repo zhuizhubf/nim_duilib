@@ -62,7 +62,7 @@ enum WindowDefaultSize
 
 /** 创建窗口所需的参数
 */
-class UILIB_API WindowCreateParam
+class DUILIB_API WindowCreateParam
 {
 public:
     /** 默认构造函数

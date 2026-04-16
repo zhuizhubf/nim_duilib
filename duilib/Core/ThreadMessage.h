@@ -11,7 +11,7 @@ typedef std::function<void(uint32_t msgID, WPARAM wParam, LPARAM lParam)> Thread
 
 /** 与主线程通信的辅助类
 */
-class UILIB_API ThreadMessage
+class DUILIB_API ThreadMessage
 {
 public:
     ThreadMessage();

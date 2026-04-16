@@ -8,7 +8,7 @@
 
 namespace ui 
 {
-    class UILIB_API BitmapHelper
+    class DUILIB_API BitmapHelper
     {
     public:
         /** 创建一个Render对象，并复制HDC上的内容到Render

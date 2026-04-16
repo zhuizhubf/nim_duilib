@@ -10,7 +10,7 @@ namespace ui
 {
 /** JPEG格式的图片数据(加载时不做图像数据解码，在获取位图时解码图像数据)
 */
-class UILIB_API Image_JPEG: public IBitmapImage
+class DUILIB_API Image_JPEG: public IBitmapImage
 {
 public:
     /** 加载图片数据

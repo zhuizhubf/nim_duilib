@@ -8,7 +8,7 @@ class SkBitmap;
 namespace ui 
 {
 
-class UILIB_API Brush_Skia : public IBrush
+class DUILIB_API Brush_Skia : public IBrush
 {
 public:
     explicit Brush_Skia(UiColor color);

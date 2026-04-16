@@ -33,7 +33,7 @@ class IRenderPaint;
 /** 该类的来源：skia\tools\window\win\RasterWindowContext_win.cpp，做了修改
 *   函数和变量命名规则与Skia一致，以便于后续同步代码时方便比对代码修改。
 */
-class UILIB_API SkRasterWindowContext_SDL: public skwindow::internal::RasterWindowContext
+class DUILIB_API SkRasterWindowContext_SDL: public skwindow::internal::RasterWindowContext
 {
 public:
     SkRasterWindowContext_SDL(SDL_Window* sdlWindow, std::unique_ptr<const skwindow::DisplayParams> params);

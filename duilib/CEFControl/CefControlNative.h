@@ -14,7 +14,7 @@ namespace ui {
 
 /** duilib的CEF控件，窗口模式
 */
-class UILIB_API CefControlNative : public CefControl
+class DUILIB_API CefControlNative : public CefControl
 {
     typedef CefControl BaseClass;
 public:
