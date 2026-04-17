@@ -32,7 +32,7 @@
         
         <!-- 库文件列表: DLL模式仅依赖DLL导出的lib  -->
         <DuilibBinLibList Condition="'$(EnableDuilibDll)' == '1'">$(DuilibMainLib);</DuilibBinLibList>
-        <DuilibBinLibList Condition="'$(EnableDuilibDll)' != '1'">$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);$(DuilibThirdLibs);$(DuilibSystemLibs);</DuilibBinLibList>
+        <DuilibBinLibList Condition="'$(EnableDuilibDll)' != '1'">$(SkiaLibs);$(SDLLibs);$(JpegTurboLibs);$(LibPagLibs);$(DuilibMainLib);$(DuilibThirdLibs);$(DuilibSystemLibs);</DuilibBinLibList>
     </PropertyGroup>
 
     <!-- 设置库文件Include路径、lib列表、宏定义-->
@@ -44,6 +44,11 @@
         <Link>
             <AdditionalLibraryDirectories>$(DuilibBinLibIncludeDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>$(DuilibBinLibList);$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+        <Link>
+            <AdditionalOptions>/NODEFAULTLIB:"libcmt.lib" %(AdditionalOptions)</AdditionalOptions>
         </Link>
     </ItemDefinitionGroup>
 </Project>
