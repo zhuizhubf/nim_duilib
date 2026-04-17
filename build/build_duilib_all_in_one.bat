@@ -199,9 +199,9 @@ if %errorlevel% equ 0 (
 
 :: nim_duilib Runtime Library (/MT or /MD)
 if "%RuntimeLibraryDebug%" == "/MDd" (
-    .\nim_duilib\msvc\PropertySheets\DuilibUseDynamicRuntime.bat
+    .\nim_duilib\msvc\PropertySheets\DuilibUseDynamicRuntime.bat /S
 ) else (
-    .\nim_duilib\msvc\PropertySheets\DuilibUseStaticRuntime.bat
+    .\nim_duilib\msvc\PropertySheets\DuilibUseStaticRuntime.bat /S
 )
 
 devenv "./nim_duilib/build/examples.sln" /Build "Debug|x64"
