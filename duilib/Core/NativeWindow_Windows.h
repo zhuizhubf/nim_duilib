@@ -694,10 +694,6 @@ private:
     */
     HWND m_hParentWnd;
 
-    /** 资源模块句柄
-    */
-    HMODULE m_hResModule;
-
     /** 创建窗口时的初始化参数
     */
     WindowCreateParam m_createParam;
