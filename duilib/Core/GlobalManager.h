@@ -91,8 +91,11 @@ public:
     */
     bool ReloadResource(const ResourceParam& resParam, bool bInvalidate = false);
 
-    /** 获取平台相关数据（可选参数，如不填写则使用默认值：nullptr）
-    *   Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）
+    /** 设置平台相关数据，Windows平台使用，当使用动态链接库时，设置为DLL所在模块句柄（HMODULE）
+    */
+    void SetPlatformData(void* pPlatformData);
+
+    /** 获取平台相关数据，Windows平台使用，当使用动态链接库时，返回DLL所在模块句柄（HMODULE），如果为静态链接库，则返回nullptr
     */
     void* GetPlatformData() const;
 

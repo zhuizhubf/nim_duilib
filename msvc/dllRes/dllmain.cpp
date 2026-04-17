@@ -3,7 +3,9 @@
 
 #ifdef DUILIB_DLL
 
-BOOL APIENTRY DllMain( HMODULE /*hModule*/,
+#include "duilib/Core/GlobalManager.h"
+
+BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID /*lpReserved*/
                      )
@@ -11,9 +13,13 @@ BOOL APIENTRY DllMain( HMODULE /*hModule*/,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+        ui::GlobalManager::Instance().SetPlatformData((void*)hModule);
+        break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
+        break;
     case DLL_PROCESS_DETACH:
+        ui::GlobalManager::Instance().SetPlatformData(nullptr);
         break;
     }
     return TRUE;
