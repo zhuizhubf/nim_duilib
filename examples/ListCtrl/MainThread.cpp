@@ -10,7 +10,7 @@ MainThread::~MainThread()
 {
 }
 
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
     //初始化全局资源, 使用本地文件夹作为资源
     ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
@@ -21,6 +21,7 @@ void MainThread::OnInit()
     pWindow->CreateWnd(nullptr, ui::WindowCreateParam(_T("ListCtrl"), true));
     pWindow->PostQuitMsgWhenClosed(true);
     pWindow->ShowWindow(ui::kSW_SHOW_NORMAL);
+    return true;
 }
 
 void MainThread::OnCleanup()

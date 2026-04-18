@@ -14,9 +14,8 @@ MainThread::~MainThread()
 {
 }
 
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
-    //TODO：返回值，初始化失败则退出
     //初始化全局资源
     constexpr ui::ResourceType resType = ui::ResourceType::kLocalFiles;
     if (resType == ui::ResourceType::kLocalFiles) {
@@ -45,7 +44,7 @@ void MainThread::OnInit()
     }
 #endif
     else {
-        return;
+        return false;
     }
 
     // 创建一个默认带有阴影的居中窗口
@@ -54,6 +53,7 @@ void MainThread::OnInit()
     window->PostQuitMsgWhenClosed(true);
     window->ShowWindow(ui::kSW_SHOW_NORMAL);
     // window->ShowWindow(ui::kSW_SHOW_MAXIMIZED);
+    return true;
 }
 
 void MainThread::OnCleanup()

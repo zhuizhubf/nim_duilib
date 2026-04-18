@@ -10,7 +10,7 @@ MainThread::~MainThread()
 {
 }
 
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
     //初始化全局资源
     constexpr ui::ResourceType resType = ui::ResourceType::kLocalFiles;
@@ -28,7 +28,7 @@ void MainThread::OnInit()
         ui::GlobalManager::Instance().Startup(resParam);
     }
     else {
-        return;
+        return false;
     }
 
     // 创建一个默认带有阴影的居中窗口
@@ -37,6 +37,7 @@ void MainThread::OnInit()
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("ChildWindow"), true));
     window->PostQuitMsgWhenClosed(true);
     window->ShowWindow(ui::kSW_SHOW_NORMAL);
+    return true;
 }
 
 void MainThread::OnCleanup()

@@ -65,7 +65,11 @@ bool FrameworkThread::RunMessageLoop(bool bSupportIdle)
     }
     m_bRunning = true;
     m_bSupportIdle = bSupportIdle;
-    OnInit();
+    if (!OnInit()) {
+        //初始化失败，直接返回
+        m_bRunning = false;
+        return false;
+    }
     OnRunMessageLoop();
     OnCleanup();
     if (m_nThreadIdentifier != kThreadNone) {
@@ -405,7 +409,12 @@ void FrameworkThread::OnTaskMessage(uint32_t msgId, WPARAM wParam, LPARAM /*lPar
 void FrameworkThread::WorkerThreadProc()
 {
     m_nThisThreadId = std::this_thread::get_id();
-    OnInit();
+    if (!OnInit()) {
+        //初始化失败，退出线程
+        m_bRunning = false;
+        OnCleanup();
+        return;
+    }
     while (m_bRunning) {        
         std::unique_lock lk(m_penddingTaskMutex);
         std::vector<size_t> penddingTaskIds;
@@ -428,8 +437,9 @@ void FrameworkThread::WorkerThreadProc()
     OnCleanup();
 }
 
-void FrameworkThread::OnInit()
+bool FrameworkThread::OnInit()
 {
+    return true;
 }
 
 void FrameworkThread::OnRunMessageLoop()

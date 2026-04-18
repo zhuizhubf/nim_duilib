@@ -116,9 +116,10 @@ public:
     bool CancelTask(size_t nTaskId);
 
 protected:
-    /** 运行前初始化，在进入消息循环前调用
+    /** 运行前初始化，在进入消息循环前调用，如果初始化失败则不进入消息循环
+    * @return 初始化成功返回true，初始化失败返回false
     */
-    virtual void OnInit();
+    virtual bool OnInit();
 
     /** 运行消息循环，子类可以重写该函数，自己实现消息循环
     */

@@ -11,10 +11,11 @@ WorkerThread::~WorkerThread()
 {
 }
 
-void WorkerThread::OnInit()
+bool WorkerThread::OnInit()
 {
     //输出日志
     PrintLog(_T("WorkerThread::OnInit"));
+    return true;
 }
 
 void WorkerThread::OnCleanup()

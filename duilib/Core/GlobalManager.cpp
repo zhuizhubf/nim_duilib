@@ -53,12 +53,13 @@ public:
 private:
     /** 运行前初始化，在进入消息循环前调用
     */
-    virtual void OnInit() override
+    virtual bool OnInit() override
     {
 #if defined (DUILIB_BUILD_FOR_WIN)
         HRESULT hr = ::CoInitialize(nullptr);
         ASSERT_UNUSED_VARIABLE((hr == S_OK) || (hr == S_FALSE));
 #endif
+        return true;
     }
 
     /** 退出时清理，在退出消息循环后调用

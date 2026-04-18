@@ -15,7 +15,7 @@ MainThread::~MainThread()
 {
 }
 
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
     //初始化全局资源
     constexpr ui::ResourceType resType = ui::ResourceType::kLocalFiles;
@@ -45,7 +45,7 @@ void MainThread::OnInit()
     }
 #endif
     else {
-        return;
+        return false;
     }
 
     //在下面加入启动窗口代码
@@ -54,6 +54,7 @@ void MainThread::OnInit()
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("MultiLang"), true));
     window->PostQuitMsgWhenClosed(true);
     window->ShowWindow(ui::kSW_SHOW_NORMAL);
+    return true;
 }
 
 void MainThread::OnCleanup()

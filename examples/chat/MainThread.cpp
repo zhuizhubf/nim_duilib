@@ -10,7 +10,7 @@ MainThread::~MainThread()
 {
 }
 
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
     //初始化全局资源, 使用本地文件夹作为资源
     ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
@@ -21,6 +21,7 @@ void MainThread::OnInit()
 
     // 一个仿登录窗口的布局示例
     ChatForm::ShowCustomWindow(_T("login"), _T("chat"), _T("login.xml"));
+    return true;
 }
 
 void MainThread::OnCleanup()
