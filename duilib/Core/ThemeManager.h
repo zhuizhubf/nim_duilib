@@ -61,7 +61,7 @@ typedef std::function<void(const ThemeInfo& themeInfo)> ThemeChangedCallback;
 
 /** 主题管理器
 */
-class UILIB_API ThemeManager
+class DUILIB_API ThemeManager
 {
 public:
     ThemeManager();

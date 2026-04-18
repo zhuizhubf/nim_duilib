@@ -48,7 +48,7 @@ struct PropertyGridParam
 
 /** 属性表控件
 */
-class PropertyGrid : public VBox
+class DUILIB_API PropertyGrid : public VBox
 {
     typedef VBox BaseClass;
 public:
@@ -769,7 +769,7 @@ private:
 *        </HBox>
 *   </PropertyGridGroup>
 */
-class PropertyGridGroup : public TreeNode
+class DUILIB_API PropertyGridGroup : public TreeNode
 {
     typedef TreeNode BaseClass;
 public:
@@ -930,7 +930,7 @@ enum class PropertyGridPropertyType
 *        </HBox>
 *   </PropertyGridProperty>
 */
-class PropertyGridProperty: public TreeNode
+class DUILIB_API PropertyGridProperty: public TreeNode
 {
     typedef TreeNode BaseClass;
 public:
@@ -1204,7 +1204,7 @@ private:
 
 /** 文本类型的属性：使用RichEdit编辑
 */
-class PropertyGridTextProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridTextProperty : public PropertyGridProperty
 {
     typedef PropertyGridProperty BaseClass;
 public:
@@ -1324,7 +1324,7 @@ private:
 
 /** 下拉框类型的属性：使用Combo编辑
 */
-class PropertyGridComboProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridComboProperty : public PropertyGridProperty
 {
     typedef PropertyGridProperty BaseClass;
 public:
@@ -1503,7 +1503,7 @@ private:
 
 /** 设置字体名称的属性
 */
-class PropertyGridFontProperty : public PropertyGridComboProperty
+class DUILIB_API PropertyGridFontProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
 public:
@@ -1590,7 +1590,7 @@ private:
 
 /** 设置字体大小的属性
 */
-class PropertyGridFontSizeProperty : public PropertyGridComboProperty
+class DUILIB_API PropertyGridFontSizeProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
 public:
@@ -1743,7 +1743,7 @@ private:
 
 /** 设置颜色的属性
 */
-class PropertyGridColorProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridColorProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1837,7 +1837,7 @@ private:
 
 /** 设置日期时间的属性(仅Windows平台提供此功能)
 */
-class PropertyGridDateTimeProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridDateTimeProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -1925,7 +1925,7 @@ private:
 
 /** 设置IP地址的属性
 */
-class PropertyGridIPAddressProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridIPAddressProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -2003,7 +2003,7 @@ private:
 
 /** 设置热键的属性
 */
-class PropertyGridHotKeyProperty : public PropertyGridProperty
+class DUILIB_API PropertyGridHotKeyProperty : public PropertyGridProperty
 {
 public:
     /** 构造一个属性
@@ -2076,7 +2076,7 @@ private:
 
 /** 设置文件路径属性
 */
-class PropertyGridFileProperty : public PropertyGridTextProperty
+class DUILIB_API PropertyGridFileProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
 public:
@@ -2183,7 +2183,7 @@ private:
 
 /** 设置文件夹属性
 */
-class PropertyGridDirectoryProperty : public PropertyGridTextProperty
+class DUILIB_API PropertyGridDirectoryProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
 public:

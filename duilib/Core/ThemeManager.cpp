@@ -1,6 +1,7 @@
 #include "ThemeManager.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Utils/PerformanceUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/StringUtil.h"

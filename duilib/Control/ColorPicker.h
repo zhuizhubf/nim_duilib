@@ -15,7 +15,7 @@ class ColorPickerRegular;
 class ColorPickerStatard;
 class ColorPickerStatardGray;
 class ColorPickerCustom;
-class ColorPicker : public WindowImplBase
+class DUILIB_API ColorPicker : public WindowImplBase
 {
     typedef WindowImplBase BaseClass;
 public:
