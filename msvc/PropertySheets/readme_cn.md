@@ -6,20 +6,20 @@
 
 ```
 PropertySheets/
-├── CommonSettings.props          # 基础配置（必选）
+├── CommonSettings.props           # 基础配置（必选）
 ├── DuilibSettings.props           # duilib 库自身配置
 ├── BinCommonSettings.props        # 可执行程序公共配置
 ├── BinCommonSettingsCEF.props     # CEF 支持的可执行程序配置
 ├── BinCommonSettingsWebView2.props # WebView2 支持的可执行程序配置
-├── BinOutSettings.props          # 输出目录配置
-├── BinManifestSettings.props     # Manifest 清单配置
+├── BinOutSettings.props           # 输出目录配置
+├── BinManifestSettings.props      # Manifest 清单配置
 ├── SDLSettings.props              # SDL3 支持配置
 ├── SkiaSettings.props             # Skia 图形库配置（必选）
 ├── JpegTurboSettings.props        # libjpeg-turbo 配置
 ├── LibPagSettings.props           # libpag 配置
 ├── CEFSettings.props              # libCEF 配置
 ├── WebView2Settings.props         # WebView2 配置
-├── DuilibUseDynamicRuntime.bat   # 切换到动态运行库模式
+├── DuilibUseDynamicRuntime.bat    # 切换到动态运行库模式
 └── DuilibUseStaticRuntime.bat     # 切换到静态运行库模式
 ```
 
