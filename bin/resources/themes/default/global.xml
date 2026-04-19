@@ -624,7 +624,9 @@
                                      bkcolor="bg_richedit"/>
     
     <!-- TabCtrl控件 -->
-    <Class name="tab_ctrl" width="stretch" height="36" border_round="4,4" bkcolor="bg_tab_ctrl" vscrollbar="true"/>
+    <Class name="tab_ctrl" width="stretch" height="36" border_round="4,4" bkcolor="bg_tab_ctrl" vscrollbar="true"
+                           selected_tab_item_outline_width="1" selected_tab_item_outline_color="border_selected_tab_item_outline_color"
+                           tab_ctrl_bottom_line_height="1" tab_ctrl_bottom_line_color="border_tab_ctrl_bottom_line_color"/>
     <Class name="tab_ctrl_item" margin="0,4,0,0" height="32"  padding="10,0,0,0"
                                 hovered_color="bg_tab_ctrl_item_hovered" pressed_color="bg_tab_ctrl_item_pressed" fade_hovered_total_ms="150"
                                 selected_normal_color="bg_tab_ctrl_item_selected" selected_round_corner="12,12"

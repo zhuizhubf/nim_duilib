@@ -51,6 +51,45 @@ public:
     void AdjustItemLineStatus();
 
 public:
+    /** 设置选择标签项的外部轮廓边线的宽度
+    * @param [in] fOutlineWidth 外部轮廓边线的宽度，宽度值未进行DPI缩放
+    */
+    void SetSelectedTabItemOutlineWidth(float fOutlineWidth);
+
+    /** 获取选择标签项的外部轮廓边线的宽度
+    * @return 返回外部轮廓边线的宽度，宽度值未进行DPI缩放
+    */
+    float GetSelectedTabItemOutlineWidth() const;
+
+    /** 设置选择标签项的外部轮廓边线的颜色
+    * @param [in] outlineColor 轮廓边线的颜色
+    */
+    void SetSelectedTabItemOutlineColor(const DString& outlineColor);
+
+    /** 获取选择标签项的外部轮廓边线的颜色
+    */
+    const DString& GetSelectedTabItemOutlineColor() const;
+
+    /** 设置标签栏底部的边线高度（这个边线，选择标签的区域不绘制，其他区域绘制）
+    * @param [in] fLineHeight 标签栏底部的边线高度, 高度值未进行DPI缩放
+    */
+    void SetTabCtrlBottomLineHeight(float fLineHeight);
+
+    /** 获取标签栏底部的边线高度
+    * @return 标签栏底部的边线高度, 高度值未进行DPI缩放
+    */
+    float GetTabCtrlBottomLineHeight() const;
+
+    /** 设置标签栏底部的边线颜色(该底部边线，不包括选择标签项的区域)
+    * @param [in] lineColor 标签栏底部的边线颜色
+    */
+    void SetTabCtrlBottomLineColor(const DString& lineColor);
+
+    /** 设置标签栏底部的边线颜色
+    */
+    const DString& GetTabCtrlBottomLineColor() const;
+
+public:
     /** 设置子项的位置索引
      * @param [in] pControl 子项指针
      * @param [in] iIndex 索引号，范围是：[0, GetItemCount())
@@ -92,6 +131,10 @@ protected:
     */
     virtual void HandleEvent(const EventArgs& msg) override;
 
+    /** 绘制控件状态颜色的函数
+    */
+    virtual void PaintStateColors(IRender* pRender) override;
+
 private:
     /** 默认选择的子项
     */
@@ -108,6 +151,22 @@ private:
     /** 是否支持拖动改变列的顺序(功能开关)
     */
     bool m_bEnableDragOrder;
+
+    /** 选择标签项的外部轮廓边线的宽度，宽度值未进行DPI缩放
+    */
+    float m_fSelectedTabItemOutlineWidth;
+
+    /** 选择标签项的外部轮廓边线的颜色
+    */
+    DString m_selectedTabItemOutlineColor;
+
+    /** 标签栏底部的边线高度, 高度值未进行DPI缩放（这个边线，选择标签的区域不绘制，其他区域绘制）
+    */
+    float m_fTabCtrlBottomLineHeight;
+
+    /** 设置标签栏底部的边线颜色
+    */
+    DString m_tabCtrlBottomLineColor;
 };
 
 /** 多标签控件的一个标签页

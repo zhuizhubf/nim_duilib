@@ -176,6 +176,8 @@
     <ThemeColor name="bg_tab_ctrl_item_pressed" value="#FFD1D1D1" type="tab_ctrl" category="bg_color" role="neutral" derived_from="bg_tab_ctrl_item_normal" adjust="lightness:-10" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签项点击背景" comment_en="Tab item pressed bg"/>
     <ThemeColor name="bg_tab_ctrl_item_selected" value="#FFF7F7F7" type="tab_ctrl" category="bg_color" role="neutral" derived_from="bg_tab_ctrl" adjust="lightness:+5" fixed="false" support_accent="false" contrast_bg="" comment_cn="选中标签背景" comment_en="Selected tab background"/>
     <ThemeColor name="border_tab_ctrl_item" value="#FFDBDBDB" type="tab_ctrl" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签项边框" comment_en="Tab item border"/>
+    <ThemeColor name="border_selected_tab_item_outline_color" value="#FFDBDBDB" type="tab_ctrl" category="border_color" role="neutral" derived_from="border_tab_ctrl_item" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="选择标签项轮廓边框" comment_en="Selected tab item outline border bg"/>
+    <ThemeColor name="border_tab_ctrl_bottom_line_color" value="#FFDBDBDB" type="tab_ctrl" category="border_color" role="neutral" derived_from="border_tab_ctrl_item" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="标签底部边框" comment_en="Tab ctrl bottom border bg"/>
 
     <!-- ===================== 属性页颜色 (type: property_grid) ===================== -->
     <ThemeColor name="bg_property_grid" value="#FFF7F7F7" type="property_grid" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="属性页背景" comment_en="PropertyGrid background"/>
