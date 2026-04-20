@@ -31,7 +31,7 @@
         <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
         <Box bkcolor="bg_container">
             <VBox>
-                <HBox height="32" bkcolor="bg_window_main">
+                <HBox height="32" bkcolor="bg_tab_ctrl">
                     <Option class="color_picker_tab_option" group="color_picker_option_group" text_id="STRID_PUBLIC_COLORPICKER_COMMON">
                         <Event type="select" receiver="color_picker_tab" applyattribute="selected_id={0}" />
                     </Option>

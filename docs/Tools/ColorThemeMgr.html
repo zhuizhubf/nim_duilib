@@ -4104,6 +4104,7 @@
         /**
          * 重新计算所有派生颜色
          * @param {string} rootSource - 可选，只重新计算派生自某根源的颜色
+         * @returns {boolean} 是否发生了颜色变化
          */
         function recomputeDerivedColors(rootSource = null) {
             // 按派生链的层级顺序处理
@@ -4113,7 +4114,8 @@
             // 构建依赖关系图
             const dependencyMap = new Map();
             allColorItems.forEach(item => {
-                if (item.derivedFrom && item.adjust) {
+                // 允许adjust为空，只要有派生来源就加入依赖
+                if (item.derivedFrom) {
                     if (!dependencyMap.has(item.derivedFrom)) {
                         dependencyMap.set(item.derivedFrom, []);
                     }
@@ -4143,33 +4145,43 @@
 
                 const children = dependencyMap.get(current) || [];
                 children.forEach(child => {
+                    // 已处理则跳过
+                    if (processed.has(child.name)) return;
+
                     // 跳过锁定的颜色
                     if (child.fixed) return;
 
-                    if (child.adjust) {
-                        // 获取源颜色的最新值
-                        const sourceColor = currentColorMap.get(current);
+                    // 获取源颜色的最新值
+                    const sourceColor = currentColorMap.get(current);
 
-                        if (sourceColor && sourceColor.value) {
-                            const oldValue = child.value;
-                            const newValue = computeDerivedColor(sourceColor.value, child.adjust);
+                    if (sourceColor && sourceColor.value) {
+                        // adjust 为空时，直接等于源颜色；否则按公式计算
+                        const newValue = !child.adjust || child.adjust.trim() === ''
+                            ? sourceColor.value
+                            : computeDerivedColor(sourceColor.value, child.adjust);
 
-                            if (oldValue !== newValue) {                               
-                                child.value = newValue;
-                                currentColorMap.set(child.name, child);
-                                // 同步更新 allColorItems
-                                const allColorIndex = allColorItems.findIndex(c => c.name === child.name);
-                                if (allColorIndex !== -1) {
-                                    allColorItems[allColorIndex] = child;
-                                }
-                                hasChanges = true;
+                        const oldValue = child.value;
+
+                        if (oldValue !== newValue) {                               
+                            child.value = newValue;
+                            currentColorMap.set(child.name, child);
+                            // 同步更新 allColorItems
+                            const allColorIndex = allColorItems.findIndex(c => c.name === child.name);
+                            if (allColorIndex !== -1) {
+                                allColorItems[allColorIndex] = child;
                             }
+                            hasChanges = true;
                         }
                     }
-                    processQueue.push(child.name);
+
+                    // 防死循环：未处理过才入队
+                    if (!processed.has(child.name)) {
+                        processQueue.push(child.name);
+                    }
                 });
             }
 
+            // 有变化才刷新界面
             if (hasChanges) {
                 renderColorCategories();
                 updatePreview();
@@ -7008,7 +7020,7 @@
                         }
                     } 
                     else if (['disabled', 'disable'].includes(state)) {
-                        newAdjustFormula = isDarkTheme ? 'lightness:-10,saturation:-50' : 'lightness:+10,saturation:-50';
+                        newAdjustFormula = isDarkTheme ? 'lightness:-15,saturation:-50,alpha:=70' : 'lightness:+15,saturation:-50,alpha:=70';
                     } 
                     else if (['focused', 'focus'].includes(state)) {
                         newAdjustFormula = isDarkTheme ? 'lightness:+6' : 'lightness:-5';
@@ -7397,7 +7409,7 @@
                     // --------------------------------------------------------
                     const isDarkTextTheme = isDarkTheme;
                     
-                    if (itemName.includes('main') || itemName.includes('primary')) {
+                    if (itemName.includes('main') || itemName.includes('primary') || itemName.includes('default') ) {
                         newHsl.l = isDarkTextTheme ? 0.90 : 0.10;
                     } else if (itemName.includes('second') || itemName.includes('muted')) {
                         newHsl.l = isDarkTextTheme ? 0.70 : 0.45;
