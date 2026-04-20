@@ -117,7 +117,7 @@
                                   fade_hovered="true"/>
                         <Control margin="0,3,0,3" width="80" height="30"
                                   normal_image="autumn.png" hovered_image="svg_test.svg"
-                                  fade_hovered="true" fade_hot_total_ms="200" fade_hot_frame_interval_ms="16" fade_hot_easing_function="EaseInOutCubic"/>
+                                  fade_hovered="true" fade_hovered_total_ms="200" fade_hovered_frame_interval_ms="16" fade_hovered_easing_function="EaseInOutCubic"/>
                     </VBox>
                 </HBox>
             </VBox>

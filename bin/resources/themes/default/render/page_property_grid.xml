@@ -25,12 +25,6 @@
                     <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_PROPGRID_TAB_3_3" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签3-3 -->
                     <TabCtrlItem class="tab_ctrl_item" title_id="STRID_RENDER_PROPGRID_TAB_3_4" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签3-4 -->
                 </TabCtrl>
-                <VListBox margin="10,10,10,10" width="128">
-                    <TabCtrlItem class="tab_ctrl_item" drag_order="true" title_id="STRID_RENDER_PROPGRID_TAB_MINUS_1" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签-1 -->
-                    <TabCtrlItem class="tab_ctrl_item" drag_order="true" title_id="STRID_RENDER_PROPGRID_TAB_MINUS_2" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签-2 -->
-                    <TabCtrlItem class="tab_ctrl_item" drag_order="true" title_id="STRID_RENDER_PROPGRID_TAB_MINUS_3" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签-3 -->
-                    <TabCtrlItem class="tab_ctrl_item" drag_order="true" title_id="STRID_RENDER_PROPGRID_TAB_MINUS_4" icon="file='public/caption/logo.svg' valign='center' halign='center'"/> <!-- 标签-4 -->
-                </VListBox>
             </HBox>
             <VBox>
                 <VScrollBox vscrollbar="true" hscrollbar="true" width="stretch" height="stretch" padding="20,20,20,20">

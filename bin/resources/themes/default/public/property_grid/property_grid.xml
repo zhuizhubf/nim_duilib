@@ -45,7 +45,7 @@
                         combo_tree_node_class="tree_node"
                         combo_icon_class=""
                         combo_edit_class="bkcolor='bg_richedit' text_align='vcenter' text_padding='2,0,2,0' single_line='true' word_wrap='false' auto_hscroll='true'"
-                        combo_button_class="height={stretch} width={auto} margin={1,0,0,0} padding={1,0,0,0} border_size={1,0,0,0} nofocus={true} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
+                        combo_button_class="height={stretch} width={auto} margin={1,0,0,0} padding={1,0,0,0} border_size={1,0,0,0} nofocus={true} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hovered.svg' valign='center'}"/>
     <!--颜色选择下拉框-->
     <Class name="property_grid_combo_button" height="100%" width="100%" dropbox_size="200,250"
                                padding="1,1,1,1" border_size="1" hovered_border_color="border_combo_hovered" hovered_color="bg_combo_btn_hovered" pressed_color="bg_combo_btn_pressed"
@@ -53,7 +53,7 @@
                                left_button_class="height={stretch} width={stretch} bkcolor={bg_combo} padding={0,0,1,0} border_size={0,0,1,0} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center}"
                                left_button_top_label_class="width={stretch} height={16} margin={1,0,1,0} font={system_regular_12} text_align={bottom,hcenter}"
                                left_button_bottom_label_class="width={stretch} height={stretch} margin={2,0,2,1} bkcolor={bg_combo}"
-                               right_button_class="height={stretch} width={auto} padding={1,0,0,0} border_size={1,0,0,0} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hot.svg' valign='center'}"/>
+                               right_button_class="height={stretch} width={auto} padding={1,0,0,0} border_size={1,0,0,0} hovered_border_color={border_combo_hovered} pressed_border_color={border_combo_hovered} valign={center} hovered_color={bg_combo_btn_hovered} pressed_color={bg_combo_btn_pressed} normal_image={file='public/combo/arrow_normal.svg' valign='center'} hovered_image={file='public/combo/arrow_hovered.svg' valign='center'}"/>
 
     <!--日期时间-->
     <Class name="property_grid_date_time" bkcolor="bg_richedit" height="100%" width="100%"/>
