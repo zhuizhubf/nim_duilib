@@ -5022,9 +5022,14 @@
                 allColorItems[allColorIndex] = colorItem;
             }
 
-            // 重新计算派生颜色
-            calculateGroupStatistics();
+            // 重新计算派生颜色（必须在统计之前，因为会改变颜色值）
             recomputeDerivedColors();
+
+            // 保存当前编辑的颜色名称用于提示
+            const updatedColorName = currentEditingColor;
+
+            // 重新计算统计（在派生颜色重新计算之后）
+            calculateGroupStatistics();
 
             // 更新UI
             renderColorCategories();
@@ -5034,7 +5039,7 @@
             updateAnalytics();
 
             closeDerivationPanel();
-            showToast(`已更新 ${currentEditingColor} 的派生关系`, 'success');
+            showToast(`已更新 ${updatedColorName} 的派生关系`, 'success');
         }
 
         function breakDerivationLink() {
@@ -5043,20 +5048,29 @@
             const colorItem = currentColorMap.get(currentEditingColor);
             if (!colorItem) return;
 
+            // 保存当前编辑的颜色名称用于提示
+            const brokenColorName = currentEditingColor;
+
             // 清除派生关系
             colorItem.derivedFrom = '';
             colorItem.adjust = '';
 
-            currentColorMap.set(currentEditingColor, colorItem);
+            // 重置 originalValue 为当前 value，这样颜色就不再显示为"已修改"
+            colorItem.originalValue = colorItem.value;
+
+            currentColorMap.set(brokenColorName, colorItem);
 
             // 同步更新 allColorItems
-            const allColorIndex = allColorItems.findIndex(c => c.name === currentEditingColor);
+            const allColorIndex = allColorItems.findIndex(c => c.name === brokenColorName);
             if (allColorIndex !== -1) {
                 allColorItems[allColorIndex] = colorItem;
             }
 
-            // 更新UI
+            // 重新计算派生颜色（包括该颜色可能派生的子颜色）
             calculateGroupStatistics();
+            recomputeDerivedColors(brokenColorName);
+
+            // 更新UI
             renderColorCategories();
             renderDerivationTree();
             updatePreview();
@@ -5064,7 +5078,7 @@
             updateAnalytics();
 
             closeDerivationPanel();
-            showToast(`已断开 ${currentEditingColor} 的派生链接`, 'success');
+            showToast(`已断开 ${brokenColorName} 的派生链接`, 'success');
         }
 
         // ========== 派生链可视化功能 ==========
