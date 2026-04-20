@@ -3133,6 +3133,18 @@
                                 baseColorInput.value = rgbColor;
                             }
                         }
+                        else if (name === 'accent_color') {
+                            // 强调色的默认值
+                            const accentBaseColorInput = document.getElementById('accentBaseColor');
+                            if (accentBaseColorInput) {
+                                // 转换ARGB格式到RGB格式（去掉Alpha通道）
+                                let rgbColor = value;
+                                if (value.length === 9 && value.startsWith('#')) {
+                                    rgbColor = '#' + value.substring(3);
+                                }
+                                accentBaseColorInput.value = rgbColor;
+                            }
+                        }
                     }
                 });
             }
@@ -6808,7 +6820,12 @@
                     } else if (itemType === 'combo_box') {
                         categorizedColors.border_combo_box.push({ item, state, baseName, itemType });
                     } else if (itemType === 'richedit') {
-                        categorizedColors.border_richedit.push({ item, state, baseName, itemType });
+                        if (baseName === 'border_richedit_bottom') {
+                            // 强调色(border_richedit_bottom_focused)
+                            categorizedColors.accent.push({ item, state, baseName });
+                        } else {
+                            categorizedColors.border_richedit.push({ item, state, baseName, itemType });
+                        }
                     } else if (itemType === 'tab_ctrl') {
                         categorizedColors.border_tab_ctrl.push({ item, state, baseName, itemType });
                     } else if (itemType === 'list_ctrl') {
@@ -7784,7 +7801,7 @@
                                 newHsl.s = 0;
                                 newHsl.l = isDarkInteractiveTheme ? 0.25 : 0.90;
                             }
-                        } else {
+                        } else {                           
                             // --------------------------------------------------------
                             // 强调色风格：继承基础色的变体
                             // 根据深/浅主题自动调整偏移方向
@@ -7797,10 +7814,23 @@
                             const isDarkAccentTheme = isDarkTheme;
 
                             newHsl = generateColorByScheme(baseHsl, index, total, schemeType, brightnessStep);
-                            
+                            let bAccentColor = false;
                             if (buttonStyle === 'accent' && category === 'interactive') {
-                                // 强制使用蓝色色相（H=220），这是强调色的标准蓝色
-                                newHsl.h = 220;
+                                bAccentColor = true;
+                            } else if (category === 'accent') {                                
+                                bAccentColor = true;
+                            } 
+                            if (bAccentColor) {
+                                // 强调色：强制使用配置的强调色值
+                                const accentBaseColorInput = document.getElementById('accentBaseColor');
+                                if (accentBaseColorInput && accentBaseColorInput.value) {
+                                    const accentColorRgb = hexToRgb(accentBaseColorInput.value);
+                                    newHsl = rgbToHsl(accentColorRgb.r, accentColorRgb.g, accentColorRgb.b);
+                                }
+                                else {
+                                    // 强制使用蓝色色相（H=220），这是强调色的标准蓝色
+                                    newHsl.h = 220;
+                                }                                
                             }
                             // 确保强调色有足够饱和度
                             newHsl.s = Math.max(0.6, Math.min(1.0, newHsl.s));

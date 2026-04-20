@@ -123,7 +123,7 @@
     <Alias name="richedit_border_color" value="border_richedit_normal"/>
     <Alias name="richedit_hot_border_color" value="border_richedit_hovered"/>
     <Alias name="richedit_focus_border_color" value="border_richedit_focused"/>
-    <Alias name="richedit_focus_bottom_border_color" value="border_richedit_focused_bottom"/>
+    <Alias name="richedit_focus_bottom_border_color" value="border_richedit_bottom_focused"/>
     
     <!-- 按钮基类 -->
     <Class name="btn_global_base" fade_hovered="true"/>
@@ -436,7 +436,7 @@
                                        hovered_border_color="border_richedit_hovered" 
                                        focused_border_color="border_richedit_focused"
                                        focused_bottom_border_size="2"
-                                       focused_bottom_border_color="border_richedit_focused_bottom"/>
+                                       focused_bottom_border_color="border_richedit_bottom_focused"/>
     <Class name="prompt" prompt_mode="true" prompt_color="text_richedit_prompt"/>
     
     <!-- 编辑框Spin按钮 -->
