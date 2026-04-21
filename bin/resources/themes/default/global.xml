@@ -319,19 +319,19 @@
                                         selected_normal_color="bg_tree_view_node_selected" 
                                         icon_image_right_space="4" 
                                         fade_hovered="false"/>
-    <Class name="tree_node_checkbox" normal_image="file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' margin='2,0,0,0' valign='center'" 
-                                     disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' margin='2,0,0,0' valign='center' fade='80'" 
-                                     selected_normal_image="file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' margin='2,0,0,0' valign='center'" 
-                                     selected_disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' margin='2,0,0,0' valign='center' fade='80'" 
-                                     part_selected_normal_image="file='${PATH_CHECKBOX}/checkbox-outline-mixed.svg' margin='2,0,0,0' valign='center'" 
-                                     part_selected_disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-mixed.svg' margin='2,0,0,0' valign='center' fade='80'"
+    <Class name="tree_node_checkbox" normal_image="file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#808080|border_svg_image'" 
+                                     disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-unchecked.svg' margin='2,0,0,0' valign='center' fade='80' svg_replace_colors='#808080|border_svg_image'" 
+                                     selected_normal_image="file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#808080|border_svg_image'" 
+                                     selected_disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-checked.svg' margin='2,0,0,0' valign='center' fade='80' svg_replace_colors='#808080|border_svg_image'" 
+                                     part_selected_normal_image="file='${PATH_CHECKBOX}/checkbox-outline-mixed.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#808080|border_svg_image'" 
+                                     part_selected_disabled_image="file='${PATH_CHECKBOX}/checkbox-outline-mixed.svg' margin='2,0,0,0' valign='center' fade='80' svg_replace_colors='#808080|border_svg_image'"
                                      check_box_image_right_space="6"/>
-    <Class name="tree_node_expand" expand_normal_image="file='${PATH_TREE}/expand_normal.svg' margin='2,0,0,0' valign='center'" 
-                                   expand_hovered_image="file='${PATH_TREE}/expand_hovered.svg' margin='2,0,0,0' valign='center'" 
-                                   expand_disabled_image="file='${PATH_TREE}/expand_normal.svg' margin='2,0,0,0' valign='center' fade='80'" 
-                                   collapse_normal_image="file='${PATH_TREE}/collapse_normal.svg' margin='2,0,0,0' valign='center'" 
-                                   collapse_hovered_image="file='${PATH_TREE}/collapse_hovered.svg' margin='2,0,0,0' valign='center'" 
-                                   collapse_disabled_image="file='${PATH_TREE}/collapse_normal.svg' margin='2,0,0,0' valign='center' fade='80'"
+    <Class name="tree_node_expand" expand_normal_image="file='${PATH_TREE}/expand_normal.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#363636|border_svg_image'" 
+                                   expand_hovered_image="file='${PATH_TREE}/expand_hovered.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#0000ff|border_svg_image'" 
+                                   expand_disabled_image="file='${PATH_TREE}/expand_normal.svg' margin='2,0,0,0' valign='center' fade='80' svg_replace_colors='#363636|border_svg_image'" 
+                                   collapse_normal_image="file='${PATH_TREE}/collapse_normal.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#363636|border_svg_image'" 
+                                   collapse_hovered_image="file='${PATH_TREE}/collapse_hovered.svg' margin='2,0,0,0' valign='center' svg_replace_colors='#0000ff|border_svg_image'" 
+                                   collapse_disabled_image="file='${PATH_TREE}/collapse_normal.svg' margin='2,0,0,0' valign='center' fade='80' svg_replace_colors='#363636|border_svg_image'"
                                    icon_image_right_space="4"/>
     
     <!-- 进度条 -->
@@ -672,9 +672,11 @@
                                               hovered_color="bg_address_bar_btn_hovered" 
                                               pressed_color="bg_address_bar_btn_pressed"/>
     <Class name="address_bar_sub_path_root" padding="2,0,2,0" 
-                                            bkimage="file='${PATH_ADDRESS_BAR}/folder-root.svg' width='22' height='22' halign='center' valign='center'"/>
+                                            bkimage="file='${PATH_ADDRESS_BAR}/folder-root.svg' width='22' height='22' 
+                                            halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"/>
     <Class name="address_bar_path_separator" width="auto" height="100%" margin="0,0,0,0"
-                                             bkimage="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' halign='center' valign='center'"/>
+                                             bkimage="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' 
+                                             halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"/>
 
     <!-- Property Grid控件，部分属性在default/public/property_grid/property_grid.xml中定义-->
     <Class name="property_grid" bkcolor="bg_property_grid" 

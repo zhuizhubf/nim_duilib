@@ -131,6 +131,7 @@ public:
                 if ((svgDom != nullptr) && (nImageWidth == m_nImageWidth) && (nImageHeight == m_nImageHeight)) {
                     //重现加载成功
                     m_svgDom = svgDom;
+                    m_pBitmap.reset();
                 }
             }
         }
@@ -285,6 +286,7 @@ public:
                     //更新颜色值（一般是主题变化时，才会变化）
                     replaceText.colorValue = colorValue;
                     bColorChanged = true;
+                    break;
                 }
             }
         }
