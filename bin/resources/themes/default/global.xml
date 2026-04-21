@@ -550,8 +550,10 @@
                                         hovered_color="bg_list_ctrl_header_hovered" 
                                         pressed_color="bg_list_ctrl_header_pressed"            
                                         show_icon_at_top="true" icon_spacing="6"
-                                        sorted_up_image="file='${PATH_LISTCTRL}/arrow-sorted-up.svg' width='10' height='10' valign='center' halign='left'" 
-                                        sorted_down_image="file='${PATH_LISTCTRL}/arrow-sorted-down.svg' width='10' height='10' valign='center' halign='left'"/>
+                                        sorted_up_image="file='${PATH_LISTCTRL}/arrow-sorted-up.svg' width='10' height='10' 
+                                                         valign='center' halign='left' svg_replace_colors='#363636|border_svg_image'" 
+                                        sorted_down_image="file='${PATH_LISTCTRL}/arrow-sorted-down.svg' width='10' height='10' 
+                                                           valign='center' halign='left' svg_replace_colors='#363636|border_svg_image'"/>
     <Class name="list_ctrl_header_split_box" width="3" height="100%" enable_split_single="true"/>
     <Class name="list_ctrl_header_split_control" width="1" height="100%" margin="0,4,0,2" bkcolor="border_list_ctrl_header_split" halign="right"/>
     

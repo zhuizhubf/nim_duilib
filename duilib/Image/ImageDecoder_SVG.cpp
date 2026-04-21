@@ -128,7 +128,7 @@ public:
                 ASSERT(svgDom != nullptr);
                 ASSERT(nLoadedImageWidth == m_nImageWidth);
                 ASSERT(nLoadedImageHeight == m_nImageHeight);
-                if ((svgDom != nullptr) && (nImageWidth == m_nImageWidth) && (nImageHeight == m_nImageHeight)) {
+                if ((svgDom != nullptr) && (nLoadedImageWidth == m_nImageWidth) && (nLoadedImageHeight == m_nImageHeight)) {
                     //重现加载成功
                     m_svgDom = svgDom;
                     m_pBitmap.reset();
