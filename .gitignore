@@ -355,3 +355,5 @@ healthchecksdb
 /duilib/third_party/libpag/windows/lib-vc-x86
 /bin/libpag.dll
 /.temp
+/msvc/PropertySheets/duilib_dll.flag
+/bin/*.dll

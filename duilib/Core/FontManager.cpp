@@ -173,7 +173,18 @@ IFont* FontManager::GetIFont(const DString& fontId, uint32_t nZoomPercent)
             fontInfo.m_fontName = m_defaultFontFamilyNames.front();
         }
         else {
-            fontInfo.m_fontName = _T("Microsoft YaHei"); //微软雅黑，如果设置了默认字体，走不到这里
+            //保底设置(如果设置了默认字体，走不到这里)
+#ifdef DUILIB_BUILD_FOR_WIN
+            fontInfo.m_fontName = _T("Microsoft YaHei");
+#elif defined DUILIB_BUILD_FOR_MACOS
+            fontInfo.m_fontName = _T("PingFang SC");
+#elif defined DUILIB_BUILD_FOR_LINUX
+            fontInfo.m_fontName = _T("Noto Sans CJK SC");
+#elif defined DUILIB_BUILD_FOR_FREEBSD
+            fontInfo.m_fontName = _T("Noto Sans CJK SC");
+#else
+            fontInfo.m_fontName = _T("RobotoMono");            
+#endif
         }
     }
 
