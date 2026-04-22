@@ -23,8 +23,7 @@ VerticalDrawText::VerticalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoi
 {
 }
 
-
-UTF16String VerticalDrawText::GetDrawStringUTF16(const DString& strText, bool bSingleLineMode) const
+UTF32String VerticalDrawText::GetDrawStringUTF32(const DString& strText, bool bSingleLineMode) const
 {
     DString text = strText;
     StringUtil::ReplaceAll(_T("\r\n"), _T("\n"), text);
@@ -34,14 +33,16 @@ UTF16String VerticalDrawText::GetDrawStringUTF16(const DString& strText, bool bS
         StringUtil::ReplaceAll(_T("\n"), _T(" "), text);
     }
 #if defined DUILIB_UNICODE && defined WCHAR_T_IS_UTF16
+    return StringConvert::UTF16ToUTF32(text.c_str(), text.size());
+#elif defined DUILIB_UNICODE && defined WCHAR_T_IS_UTF32
     return text;
 #else
     std::string textUTF8 = StringConvert::TToUTF8(text);
-    return StringConvert::UTF8ToUTF16(textUTF8.c_str(), textUTF8.size());
+    return StringConvert::UTF8ToUTF32(textUTF8.c_str(), textUTF8.size());
 #endif
 }
 
-bool VerticalDrawText::NeedRotateForVertical(DUTF16Char ch) const
+bool VerticalDrawText::NeedRotateForVertical(DUTF32Char ch) const
 {
     // 拉丁字母、数字、通用符号：需要旋转
     if (
@@ -73,18 +74,18 @@ bool VerticalDrawText::NeedRotateForVertical(DUTF16Char ch) const
 */
 struct TVerticalChar
 {
-    DUTF16Char ch;
+    DUTF32Char ch;
     bool bNewLine;  //是否为换行符
     bool bRotate90; //该字符绘制时，需要旋转90度显示
     SkSize size;    //字符绘制后的宽度和高度
     SkRect bounds;  //字符绘制后的边界信息
 };
 
-bool VerticalDrawText::CalculateTextCharBounds(const UTF16String& textUTF16, const SkFont* pSkFont, const SkPaint* skPaint,
+bool VerticalDrawText::CalculateTextCharBounds(const UTF32String& textUTF32, const SkFont* pSkFont, const SkPaint* skPaint,
                                                bool bUseFontHeight, float fFontHeight, bool bRotate90ForAscii,
                                                std::vector<TVerticalChar>& charRects) const
 {
-    if (textUTF16.empty()) {
+    if (textUTF32.empty()) {
         return false;
     }
     ASSERT(fFontHeight > 0);
@@ -101,10 +102,10 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF16String& textUTF16, con
     }
     //每个字符绘制所占的矩形范围
     charRects.clear();
-    charRects.reserve(textUTF16.size());
+    charRects.reserve(textUTF32.size());
 
     TVerticalChar verticalChar;
-    for (DUTF16Char ch : textUTF16) {
+    for (DUTF32Char ch : textUTF32) {
         verticalChar.ch = ch;
         if (ch == L'\n') {
             //换行符
@@ -118,16 +119,16 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF16String& textUTF16, con
             verticalChar.bNewLine = false;
             verticalChar.bRotate90 = false;
             SkScalar fTextWidth = pSkFont->measureText(&ch,
-                                                       sizeof(DUTF16Char),
-                                                       SkTextEncoding::kUTF16,
+                                                       sizeof(DUTF32Char),
+                                                       SkTextEncoding::kUTF32,
                                                        &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
                                                        skPaint);
             if ((verticalChar.bounds.width() <= 0) || (verticalChar.bounds.height() <= 0)) {
                 //空格或者不可见字符(按小写字母确定显示区域)
                 ch = 'a';
                 fTextWidth = pSkFont->measureText(&ch,
-                                                  sizeof(DUTF16Char),
-                                                  SkTextEncoding::kUTF16,
+                                                  sizeof(DUTF32Char),
+                                                  SkTextEncoding::kUTF32,
                                                   &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
                                                   skPaint);
             }
@@ -146,8 +147,8 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF16String& textUTF16, con
             charRects.push_back(verticalChar);
         }
     }
-    ASSERT(charRects.size() == textUTF16.size());
-    return (charRects.size() == textUTF16.size());
+    ASSERT(charRects.size() == textUTF32.size());
+    return (charRects.size() == textUTF32.size());
 }
 
 SkRect VerticalDrawText::CalculateVerticalTextBounds(const std::vector<TVerticalChar>& charRects, int32_t height, bool bSingleLineMode,
@@ -341,11 +342,11 @@ float VerticalDrawText::CalculateDefaultCharWidth(const SkFont* pSkFont, const S
     if ((pSkFont == nullptr) || (skPaint == nullptr)) {
         return 0;
     }
-    DUTF16Char ch = L'W';
+    DUTF32Char ch = L'W';
     SkRect bounds;
     SkScalar fCharWidth = pSkFont->measureText(&ch,
-                                               sizeof(DUTF16Char),
-                                               SkTextEncoding::kUTF16,
+                                               sizeof(DUTF32Char),
+                                               SkTextEncoding::kUTF32,
                                                &bounds,//斜体字时，这个宽度包含了外延的宽度
                                                skPaint);
 
@@ -403,15 +404,15 @@ UiRect VerticalDrawText::MeasureString(const DString& strText, const MeasureStri
         return UiRect();
     }
 
-    //绘制文本始终使用UTF16编码
-    const UTF16String textUTF16 = GetDrawStringUTF16(strText, bSingleLineMode);
+    //绘制文本始终使用UTF32编码
+    const UTF32String textUTF32 = GetDrawStringUTF32(strText, bSingleLineMode);
 
     std::vector<TVerticalChar> charRects;
-    if (!CalculateTextCharBounds(textUTF16, pSkFont, &skPaint, measureParam.bUseFontHeight, (float)fFontHeight, measureParam.bRotate90ForAscii, charRects)) {
+    if (!CalculateTextCharBounds(textUTF32, pSkFont, &skPaint, measureParam.bUseFontHeight, (float)fFontHeight, measureParam.bRotate90ForAscii, charRects)) {
         return UiRect();
     }
-    ASSERT(charRects.size() == textUTF16.size());
-    if (charRects.size() != textUTF16.size()) {
+    ASSERT(charRects.size() == textUTF32.size());
+    if (charRects.size() != textUTF32.size()) {
         return UiRect();
     }
 
@@ -509,15 +510,15 @@ void VerticalDrawText::DrawString(const DString& strText, const DrawStringParam&
         fWordVerticalSpacing = 0;
     }
 
-    //绘制文本始终使用UTF16编码
-    const UTF16String textUTF16 = GetDrawStringUTF16(strText, bSingleLineMode);
+    //绘制文本始终使用UTF32编码
+    const UTF32String textUTF32 = GetDrawStringUTF32(strText, bSingleLineMode);
 
     std::vector<TVerticalChar> charRects;
-    if (!CalculateTextCharBounds(textUTF16, pSkFont, &skPaint, drawParam.bUseFontHeight, (float)fFontHeight, drawParam.bRotate90ForAscii, charRects)) {
+    if (!CalculateTextCharBounds(textUTF32, pSkFont, &skPaint, drawParam.bUseFontHeight, (float)fFontHeight, drawParam.bRotate90ForAscii, charRects)) {
         return;
     }
-    ASSERT(charRects.size() == textUTF16.size());
-    if (charRects.size() != textUTF16.size()) {
+    ASSERT(charRects.size() == textUTF32.size());
+    if (charRects.size() != textUTF32.size()) {
         return;
     }
 
@@ -540,7 +541,7 @@ void VerticalDrawText::DrawString(const DString& strText, const DrawStringParam&
     //记录每个字符的绘制位置，后续还需要处理对齐方式
     struct TDrawCharPos
     {
-        DUTF16Char ch = 0;          //字符
+        DUTF32Char ch = 0;          //字符
         bool bRotate90 = false;     //是否需要旋转90度绘制
         bool bDrew = false;         //该字符是否完成绘制（用于绘制删除线和下划线）
         int32_t nColumnIndex = 0;   //列序号
@@ -824,13 +825,13 @@ void VerticalDrawText::DrawString(const DString& strText, const DrawStringParam&
             int saveCount = skCanvas->save();
             skCanvas->translate(charPos.xPos, charPos.yPos);
             skCanvas->rotate(90);
-            skCanvas->drawSimpleText(&charPos.ch, sizeof(charPos.ch), SkTextEncoding::kUTF16,
+            skCanvas->drawSimpleText(&charPos.ch, sizeof(charPos.ch), SkTextEncoding::kUTF32,
                                      0, 0,
                                      *pSkFont, skPaint);
             skCanvas->restoreToCount(saveCount);
         }
         else {
-            skCanvas->drawSimpleText(&charPos.ch, sizeof(charPos.ch), SkTextEncoding::kUTF16,
+            skCanvas->drawSimpleText(&charPos.ch, sizeof(charPos.ch), SkTextEncoding::kUTF32,
                                      charPos.xPos, charPos.yPos,
                                      *pSkFont, skPaint);
         }

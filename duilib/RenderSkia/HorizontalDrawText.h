@@ -40,17 +40,17 @@ public:
     void DrawString(const DString& strText, const DrawStringParam& drawParam);
 
 private:
-    /** 获取UTF16字符串，并做预处理（横向绘制文本）
+    /** 获取UTF32字符串，并做预处理（横向绘制文本）
     */
-    UTF16String GetDrawStringUTF16(const DString& strText, bool bSingleLineMode) const;
+    UTF32String GetDrawStringUTF32(const DString& strText, bool bSingleLineMode) const;
 
     /** 计算每个字符的绘制所占的矩形范围
-    * @param [in] textUTF16 字符串
+    * @param [in] textUTF32 字符串
     * @param [in] pSkFont 字体
     * @param [in] skPaint 绘制属性
     * @param [in] fFontHeight 字体高度
     */
-    bool CalculateTextCharBounds(const UTF16String& textUTF16, const SkFont* pSkFont, const SkPaint* skPaint,
+    bool CalculateTextCharBounds(const UTF32String& textUTF32, const SkFont* pSkFont, const SkPaint* skPaint,
                                  float fFontHeight, std::vector<THorizontalChar>& charRects) const;
 
     /** 计算横向文本（从左到右、从上到下）的绘制区域总矩形
