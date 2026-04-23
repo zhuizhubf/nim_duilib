@@ -25,7 +25,7 @@
 
 #include "SkiaHeaderEnd.h"
 
-#include <map>
+#include <unordered_map>
 
 namespace ui
 {
@@ -185,12 +185,21 @@ public:
 
     /** 字体名称对应的FontStyleSet缓存（发现部分Linux系统创建字体时，速度特别慢，调用一次需要几十毫秒，所以有必要做缓存）
     */
-    std::map<std::string, sk_sp<SkFontStyleSet>> m_fontStyleSetMap;
+    std::unordered_map<std::string, sk_sp<SkFontStyleSet>> m_fontStyleSetMap;
+
+    /** 字体名称缓存
+    */
+    std::unordered_map<DString, bool> m_fontNameMap;
+
+    /** 字体回退管理器（生命周期由设置者管理）
+    */
+    IFallbackFontMgr* m_pFallbackFontMgr;
 };
 
 FontMgr_Skia::FontMgr_Skia()
 {
     m_impl = new TImpl;
+    m_impl->m_pFallbackFontMgr = nullptr;
 
     //创建Skia的字体管理器对象，进程内唯一
 #if defined(SK_BUILD_FOR_WIN)
@@ -256,6 +265,11 @@ bool FontMgr_Skia::HasFontName(const DString& fontName) const
     if (fontName.empty()) {
         return false;
     }
+    auto iterFontName = m_impl->m_fontNameMap.find(fontName);
+    if (iterFontName != m_impl->m_fontNameMap.end()) {
+        //优先从缓存中匹配
+        return iterFontName->second;
+    }
 
     ASSERT(m_impl->m_pSkFontMgr != nullptr);
     if (m_impl->m_pSkFontMgr == nullptr) {
@@ -301,6 +315,7 @@ bool FontMgr_Skia::HasFontName(const DString& fontName) const
             }
         }
     }
+    m_impl->m_fontNameMap[fontName] = bFound;
     return bFound;
 }
 
@@ -337,6 +352,7 @@ bool FontMgr_Skia::LoadFontFile(const DString& fontFilePath)
         //加载失败不加断言
         return false;
     }
+    m_impl->m_fontNameMap.clear();
     return m_impl->m_fontFileMgr.AddFontTypeface(spTypeface);
 }
 
@@ -353,16 +369,19 @@ bool FontMgr_Skia::LoadFontFileData(const void* data, size_t length)
         return false;
     }
     sk_sp<SkTypeface> spTypeface = m_impl->m_pSkFontMgr->makeFromData(skData);
+    m_impl->m_fontNameMap.clear();
     return m_impl->m_fontFileMgr.AddFontTypeface(spTypeface);
 }
 
 void FontMgr_Skia::ClearFontFiles()
 {
+    m_impl->m_fontNameMap.clear();
     m_impl->m_fontFileMgr.Clear();
 }
 
 void FontMgr_Skia::ClearFontCache()
 {
+    m_impl->m_fontNameMap.clear();
     m_impl->m_fontStyleSetMap.clear();
 }
 
@@ -463,6 +482,16 @@ void FontMgr_Skia::DeleteSkFont(SkFont* pSkFont)
 void* FontMgr_Skia::GetSkiaFontMgrPtr() const
 {
     return &(m_impl->m_pSkFontMgr);
+}
+
+void FontMgr_Skia::SetFallbackFontMgr(IFallbackFontMgr* pFallbackFontMgr)
+{
+    m_impl->m_pFallbackFontMgr = pFallbackFontMgr;
+}
+
+IFallbackFontMgr* FontMgr_Skia::GetFallbackFontMgr() const
+{
+    return m_impl->m_pFallbackFontMgr;
 }
 
 } // namespace ui

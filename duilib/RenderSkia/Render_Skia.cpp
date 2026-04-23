@@ -1480,12 +1480,12 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
     }
     if (drawParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
-        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
+        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(drawParam.pFont));
         return drawTextUtil.DrawString(strText, drawParam);
     }
     else if ((drawParam.uFormat & TEXT_HJUSTIFY) || (drawParam.fWordSpacing > 0.0001f)) {
         //当横向文本，对齐方式设置为两端对齐时，或者设置了字间距时，使用该实现方案（因为修改SkTextBox的实现比较困难，维护难度高）
-        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
+        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(drawParam.pFont));
         return drawTextUtil.DrawString(strText, drawParam);
     }
 
@@ -1613,12 +1613,12 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
     }
     if (measureParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
-        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
+        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(measureParam.pFont));
         return drawTextUtil.MeasureString(strText, measureParam);
     }
     else if ((measureParam.uFormat & TEXT_HJUSTIFY) || (measureParam.fWordSpacing > 0.0001f)) {
         //当横向文本，对齐方式设置为两端对齐时，或者设置了字间距时，使用该实现方案（因为修改SkTextBox的实现比较困难，维护难度高）
-        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
+        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(measureParam.pFont));
         return drawTextUtil.MeasureString(strText, measureParam);
     }
 
@@ -2144,6 +2144,23 @@ SkTextEncoding Render_Skia::GetTextEncoding() const
         return SkTextEncoding::kUTF8;
 #endif
     }
+}
+
+IFallbackFontMgr* Render_Skia::GetFallbackFontMgr(IFont* pFont) const
+{
+    IFallbackFontMgr* pFallbackFontMgr = nullptr;
+    if (pFont != nullptr) {
+        IFontMgr* pFontMgr = nullptr;
+        Font_Skia* pSkiaFont = dynamic_cast<Font_Skia*>(pFont);
+        ASSERT(pSkiaFont != nullptr);
+        if (pSkiaFont != nullptr) {
+            pFontMgr = pSkiaFont->GetFontMgr();
+        }
+        if (pFontMgr != nullptr) {
+            pFallbackFontMgr = pFontMgr->GetFallbackFontMgr();
+        }
+    }
+    return pFallbackFontMgr;
 }
 
 } // namespace ui

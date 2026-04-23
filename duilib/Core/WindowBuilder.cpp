@@ -883,8 +883,26 @@ void WindowBuilder::ParseWindowShareAttributes(Window* pWindow, const pugi::xml_
     }
 }
 
+/** 获取操作系统平台的字体属性名称
+*/
+static DString GetPlatformFontPropName()
+{
+#ifdef DUILIB_BUILD_FOR_WIN
+    return _T("windows");
+#elif defined DUILIB_BUILD_FOR_MACOS
+    return _T("macos");
+#elif defined DUILIB_BUILD_FOR_LINUX
+    return _T("linux");
+#elif defined DUILIB_BUILD_FOR_FREEBSD
+    return _T("freebsd");
+#else
+    return _T("value");
+#endif
+}
+
 void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
 {
+    const DString fontPropName = GetPlatformFontPropName();
     DString strClass;
     DString strName;
     DString strValue;
@@ -895,7 +913,7 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
             for (pugi::xml_attribute attr : node.attributes()) {
                 strName = attr.name();
                 strValue = attr.value();
-                if (strName == _T("value")) {
+                if (strName == fontPropName) {
                     GlobalManager::Instance().ExpandVarStrings(strValue);
                     defaultFontFamilyNames = strValue;
                     break;
@@ -903,6 +921,21 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
             }
             if (!defaultFontFamilyNames.empty()) {
                 GlobalManager::Instance().Font().SetDefaultFontFamilyNames(defaultFontFamilyNames);
+            }
+        }
+        else if (strClass == _T("FallbackFontFamilyNames")) {
+            DString fallbackFontFamilyNames;
+            for (pugi::xml_attribute attr : node.attributes()) {
+                strName = attr.name();
+                strValue = attr.value();
+                if (strName == fontPropName) {
+                    GlobalManager::Instance().ExpandVarStrings(strValue);
+                    fallbackFontFamilyNames = strValue;
+                    break;
+                }
+            }
+            if (!fallbackFontFamilyNames.empty()) {
+                GlobalManager::Instance().Font().SetFallbackFontFamilyNames(fallbackFontFamilyNames);
             }
         }
         else if (strClass == _T("FontFile")) {
@@ -981,6 +1014,7 @@ bool WindowBuilder::IsIgnoreNodeName(const DString& nodeName) const
 {
     //这些是公共资源的标签名字，有些是旧名（已废弃）
     if ((nodeName == _T("DefaultFontFamilyNames")) ||
+        (nodeName == _T("FallbackFontFamilyNames")) ||
         (nodeName == _T("Font")) ||
         (nodeName == _T("FontFile")) ||
         (nodeName == _T("FontResource")) ||

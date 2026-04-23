@@ -1,6 +1,10 @@
 #include "Font_Skia.h"
 #include "duilib/RenderSkia/FontMgr_Skia.h"
 
+#include "SkiaHeaderBegin.h"
+#include "include/core/SkFont.h"
+#include "SkiaHeaderEnd.h"
+
 namespace ui 
 {
 
@@ -51,6 +55,22 @@ const SkFont* Font_Skia::GetFontHandle()
         m_skFont = pSkiaFontMgr->CreateSkFont(m_uiFont);
     }
     return m_skFont;
+}
+
+bool Font_Skia::IsUnicodeCharSupported(uint32_t unicodeChar)
+{
+    if (unicodeChar != 0) {
+        const SkFont* pSkFont = GetFontHandle();
+        if (pSkFont != nullptr) {
+            return pSkFont->unicharToGlyph((SkUnichar)unicodeChar) != 0;
+        }
+    }
+    return false;
+}
+
+IFontMgr* Font_Skia::GetFontMgr() const
+{
+    return m_spFontMgr.get();
 }
 
 } // namespace ui

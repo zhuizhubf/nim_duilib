@@ -9,6 +9,7 @@ class SkPaint;
 struct SkRect;
 class SkFont;
 struct SkPoint;
+enum class SkTextEncoding;
 
 namespace ui
 {
@@ -21,7 +22,7 @@ struct THorizontalChar;
 class HorizontalDrawText
 {
 public:
-    HorizontalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);
+    HorizontalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg, IFallbackFontMgr* pFallbackFontMgr);
     HorizontalDrawText(const HorizontalDrawText& r) = delete;
     HorizontalDrawText& operator = (const HorizontalDrawText& r) = delete;
     ~HorizontalDrawText() = default;
@@ -46,11 +47,14 @@ private:
 
     /** 计算每个字符的绘制所占的矩形范围
     * @param [in] textUTF32 字符串
+    * @param [in] pFont 字体
     * @param [in] pSkFont 字体
     * @param [in] skPaint 绘制属性
     * @param [in] fFontHeight 字体高度
+    * @param [out] charRects 返回每个字符绘制所占的矩形范围
     */
-    bool CalculateTextCharBounds(const UTF32String& textUTF32, const SkFont* pSkFont, const SkPaint* skPaint,
+    bool CalculateTextCharBounds(const UTF32String& textUTF32, const IFont* pFont,
+                                 const SkFont* pSkFont, const SkPaint* skPaint,
                                  float fFontHeight, std::vector<THorizontalChar>& charRects) const;
 
     /** 计算横向文本（从左到右、从上到下）的绘制区域总矩形
@@ -65,6 +69,7 @@ private:
      * @param [out] pColumnRows 返回每列每行字符在charRects容器中对应的下标值
      * @param [out] pColumnWidths 返回每列的列宽
      * @param [out] pColumnHeights 返回每列的列高
+     * @return 包含所有字符的总绘制矩形（SkRect）
      */
     SkRect CalculateHorizontalTextBounds(const std::vector<THorizontalChar>& charRects, int32_t width, bool bSingleLineMode,
                                          float fSpacingMul, float fSpacingAdd, float fWordHorizontalSpacing,
@@ -75,7 +80,26 @@ private:
 
     /** 计算默认字符的宽度(用于空行的宽度计算)
     */
-    float CalculateDefaultCharWidth(const SkFont* pSkFont, const SkPaint* skPaint) const;
+    float CalculateDefaultCharWidth(const IFont* pFont, const SkFont* pSkFont, const SkPaint* skPaint) const;
+
+    /** 创建指定字体的回退字体接口
+    * @param [in] pFont 当前字体接口
+    * @param [in] unicodeChar UTF32字符，如果为0表示不支持字符检测
+    * @return 返回对应的回退字体接口
+    */
+    const SkFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar) const;
+
+    /** 评估文字的宽度和绘制区域，支持字体回退
+    */
+    float FontMeasureText(const IFont* pFont, const SkFont* pSkFont,
+                          const void* text, size_t byteLength, SkTextEncoding encoding,
+                          SkRect* bounds, const SkPaint* paint) const;
+
+    /** 绘制文本，支持字体回退
+    */
+    void DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
+                        float x, float y,
+                        const IFont* pFont, const SkFont& font, const SkPaint& paint) const;
 
 private:
     /** 绘制的画布
@@ -89,6 +113,10 @@ private:
     /** 视图的原点坐标
     */
     SkPoint* m_pSkPointOrg;
+
+    /** 字体回退管理器（生命周期由设置者管理）
+    */
+    IFallbackFontMgr* m_pFallbackFontMgr;
 };
 
 } // namespace ui

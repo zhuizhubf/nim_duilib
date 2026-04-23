@@ -9,6 +9,7 @@ class SkPaint;
 struct SkRect;
 class SkFont;
 struct SkPoint;
+enum class SkTextEncoding;
 
 namespace ui 
 {
@@ -21,7 +22,7 @@ struct TVerticalChar;
 class VerticalDrawText
 {
 public:
-    VerticalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);
+    VerticalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg, IFallbackFontMgr* pFallbackFontMgr);
     VerticalDrawText(const VerticalDrawText& r) = delete;
     VerticalDrawText& operator = (const VerticalDrawText& r) = delete;
     ~VerticalDrawText() = default;
@@ -46,6 +47,7 @@ private:
 
     /** 计算每个字符的绘制所占的矩形范围
     * @param [in] textUTF32 字符串
+    * @param [in] pFont 字体
     * @param [in] pSkFont 字体
     * @param [in] skPaint 绘制属性
     * @param [in] bUseFontHeight 纵向绘制时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
@@ -53,7 +55,8 @@ private:
     * @param [in] bRotate90ForAscii 纵向绘制时，对于字母数字等，旋转90度显示
     * @param [out] charRects 返回每个字符绘制所占的矩形范围
     */
-    bool CalculateTextCharBounds(const UTF32String& textUTF32, const SkFont* pSkFont, const SkPaint* skPaint,
+    bool CalculateTextCharBounds(const UTF32String& textUTF32, const IFont* pFont,
+                                 const SkFont* pSkFont, const SkPaint* skPaint,
                                  bool bUseFontHeight, float fFontHeight, bool bRotate90ForAscii,
                                  std::vector<TVerticalChar>& charRects) const;
 
@@ -80,13 +83,32 @@ private:
 
     /** 计算默认字符的宽度(用于空列的宽度计算)
     */
-    float CalculateDefaultCharWidth(const SkFont* pSkFont, const SkPaint* skPaint) const;
+    float CalculateDefaultCharWidth(const IFont* pFont, const SkFont* pSkFont, const SkPaint* skPaint) const;
 
     /** 判断竖排文本中字符是否需要旋转90度显示
-     * @param ch UTF32字符
+     * @param [in] ch UTF32字符
      * @return true：需要旋转90度；false：保持正立
     */
     bool NeedRotateForVertical(DUTF32Char ch) const;
+
+   /** 创建指定字体的回退字体接口
+    * @param [in] pFont 当前字体接口
+    * @param [in] unicodeChar UTF32字符，如果为0表示不支持字符检测
+    * @return 返回对应的回退字体接口
+    */
+    const SkFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar) const;
+
+    /** 评估文字的宽度和绘制区域，支持字体回退
+    */
+    float FontMeasureText(const IFont* pFont, const SkFont* pSkFont,
+                          const void* text, size_t byteLength, SkTextEncoding encoding,
+                          SkRect* bounds, const SkPaint* paint) const;
+
+    /** 绘制文本，支持字体回退
+    */
+    void DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
+                        float x, float y,
+                        const IFont* pFont, const SkFont& font, const SkPaint& paint) const;
 
 private:
     /** 绘制的画布
@@ -100,6 +122,10 @@ private:
     /** 视图的原点坐标
     */
     SkPoint* m_pSkPointOrg;
+
+    /** 字体回退管理器（生命周期由设置者管理）
+    */
+    IFallbackFontMgr* m_pFallbackFontMgr;
 };
 
 } // namespace ui

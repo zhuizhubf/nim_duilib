@@ -40,6 +40,24 @@ public:
     /** 字体的删除线状态
     */
     virtual bool IsStrikeOut() const = 0;
+
+    /** 当前字体是否支持指定的Unicode字符
+    * @param [in] unicodeChar UTF32字符
+    */
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar) = 0;
+};
+
+/** 字体回退管理器（当支持的字体无法显示字符时，会查询回退字体管理器，以正确显示文字）
+*/
+class DUILIB_API IFallbackFontMgr : public virtual SupportWeakCallback
+{
+public:
+    /** 创建指定字体的回退字体接口
+    * @param [in] pFont 当前字体接口
+    * @param [in] unicodeChar UTF32字符，如果为0表示不支持字符检测
+    * @return 返回对应的回退字体接口
+    */
+    virtual IFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar = 0) = 0;
 };
 
 /** 字体管理器接口
@@ -90,6 +108,16 @@ public:
     /** 清除字体缓存
     */
     virtual void ClearFontCache() = 0;
+
+    /** 设置字体回退管理器
+    * @param [in] 字体回退管理器(生命周期由设置者来管理)
+    */
+    virtual void SetFallbackFontMgr(IFallbackFontMgr* pFallbackFontMgr) = 0;
+
+    /** 获取字体回退管理器
+    * @return 返回字体回退管理器，外部不应存储该指针
+    */
+    virtual IFallbackFontMgr* GetFallbackFontMgr() const = 0;
 };
 
 /** Skia引擎需要传入Alpha类型

@@ -193,6 +193,11 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
         return false;
     }
 
+    //初始化字体回退管理器
+    if (m_renderFactory->GetFontMgr() != nullptr) {
+        m_renderFactory->GetFontMgr()->SetFallbackFontMgr(m_fontManager.GetFallbackFontMgr());
+    }
+
     //保存回调函数
     if (callback != nullptr) {
         m_pfnCreateControlCallbackList.push_back(callback);
@@ -243,11 +248,16 @@ void GlobalManager::Shutdown()
     }
     m_threadList.clear();
 
+    //清空字体回退管理器
+    if (m_renderFactory->GetFontMgr() != nullptr) {
+        m_renderFactory->GetFontMgr()->SetFallbackFontMgr(nullptr);
+    }
+
     m_threadManager.Clear();
     m_timerManager.Clear();
     if (m_pColorManager != nullptr) {
         m_pColorManager->Clear();
-    }    
+    }
     m_fontManager.RemoveAllFonts();
     m_fontManager.RemoveAllFontFiles();
     m_imageManager.RemoveAllImages();

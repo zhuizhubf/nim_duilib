@@ -47,10 +47,19 @@ public:
      */
     virtual bool IsStrikeOut() const override { return m_uiFont.m_bStrikeOut; }
 
+    /** 当前字体是否支持指定的Unicode字符
+    * @param [in] unicodeChar UTF32字符
+    */
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar) override;
+
 public:
     /** 获取字体句柄
     */
     const SkFont* GetFontHandle();
+
+    /** 获取字体管理器接口
+    */
+    IFontMgr* GetFontMgr() const;
 
 private:
     /** 删除Skia字体

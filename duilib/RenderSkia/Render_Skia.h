@@ -212,6 +212,10 @@ private:
     */
     float GetScaleFloat(float fValue) const;
 
+    /** 获取回退字体管理器
+    */
+    IFallbackFontMgr* GetFallbackFontMgr(IFont* pFont) const;
+
 private:
     /** Canval保存的状态
     */

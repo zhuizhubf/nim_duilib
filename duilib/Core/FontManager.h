@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 namespace ui 
 {
 class IFont;
+class IFallbackFontMgr;
 class DpiManager;
 
 /** 字体大小信息
@@ -72,6 +74,11 @@ public:
      */
     void RemoveAllFonts();
 
+    /** 字体回退管理器（当支持的字体无法显示字符时，会查询回退字体管理器，以正确显示文字）
+    */
+    IFallbackFontMgr* GetFallbackFontMgr() const;
+
+public:
     /** 获取默认字体ID
     */
     const DString& GetDefaultFontId() const;
@@ -80,6 +87,11 @@ public:
     * @param [in] defaultFontFamilyNames 字体列表，不同字体用逗号分割，比如："Microsoft YaHei,SimSun"
     */
     void SetDefaultFontFamilyNames(const DString& defaultFontFamilyNames);
+
+    /** 设置默认回退字体列表，用于显示Emoji字符/扩展汉字（2个UTF16字符表示的汉字）等
+    * @param [in] fallbackFontFamilyNames 回退字体列表，不同字体用逗号分割，比如："Segoe UI Emoji,Noto Color Emoji, MingLiU-ExtB"
+    */
+    void SetFallbackFontFamilyNames(const DString& fallbackFontFamilyNames);
 
 public:
     /** @brief 添加一个字体文件, 添加后可以按照正常字体使用
@@ -131,6 +143,14 @@ private:
     */
     DString GetDpiFontId(const DString& fontId, uint32_t nZoomPercent) const;
 
+    /** 初始化默认字体
+    */
+    void InitDefaultFont();
+
+    /** 一个IFont字体数据被移除了
+    */
+    void OnIFontDataRemoved(IFont* pIFont);
+
 private:
     /** 自定义字体数据：Key时FontID，Value是字体描述信息
     */
@@ -139,6 +159,16 @@ private:
     /** 自定义字体信息：Key是FontId
     */
     std::unordered_map<DString, IFont*> m_fontMap;
+
+    /** 回退字体管理器
+    */
+    class FallbackFontMgrImpl;
+    friend class FallbackFontMgrImpl;
+    std::unique_ptr<FallbackFontMgrImpl> m_pFallbackFontMgr;
+
+    /** 回退字体信息：Key是IFont*
+    */
+    std::unordered_map<const IFont*, std::vector<IFont*>> m_fallbackFontMap;
 
     /** 默认字体ID
     */
@@ -152,9 +182,17 @@ private:
     */
     std::vector<FontSizeInfo> m_fontSizeList;
 
+    /** 回退字体列表
+    */
+    std::vector<DString> m_fallbackFontFamilyNames;
+
     /** 默认字体列表是否已经完成初始化
     */
     bool m_bDefaultFontInited;
+
+    /** 回退字体列表是否已经完成初始化
+    */
+    bool m_bFallbackFontInited;
 };
 
 }
