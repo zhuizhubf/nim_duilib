@@ -175,7 +175,7 @@ public:
     /** 绘制文字（便捷封装函数）
      * @param [in] pSkCanvas 绘制画布
      * @param [in] pText 文本内容
-     * @param [in] nLen 文本长度（字节数）
+     * @param [in] nByteLen 文本长度（字节数）
      * @param [in] textEncoding 文本编码格式
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
@@ -185,19 +185,19 @@ public:
      *       Draw(canvas);
      */
     void Draw(SkCanvas* pSkCanvas,
-              const char pText[], size_t nLen, SkTextEncoding textEncoding,
+              const char pText[], size_t nByteLen, SkTextEncoding textEncoding,
               const SkFont& skFont, const SkPaint& skPaint,
               FallbackFontCreator fallbackFontCreator);
 
     /** 设置待绘制的文字
      * @param [in] pText 文本内容
-     * @param [in] nLen 文本长度（字节数）
+     * @param [in] nByteLen 文本长度（字节数）
      * @param [in] textEncoding 文本编码格式
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
      * @param [in] fallbackFontCreator 回退字体管理器
      */
-    void SetText(const char pText[], size_t nLen, SkTextEncoding textEncoding,
+    void SetText(const char pText[], size_t nByteLen, SkTextEncoding textEncoding,
                  const SkFont& skFont, const SkPaint& skPaint,
                  FallbackFontCreator fallbackFontCreator);
 
@@ -222,7 +222,7 @@ public:
     class Visitor {
     public:
         virtual ~Visitor() {}
-        virtual void operator()(const char* pText, size_t nLen, SkTextEncoding textEncoding,
+        virtual void operator()(const char* pText, size_t nByteLen, SkTextEncoding textEncoding,
                                 SkScalar x, SkScalar y,
                                 const SkFont& skFont, const SkPaint& skPaint,
                                 bool bHasMoreText, bool bIsLastLine,
@@ -286,9 +286,9 @@ private:
      */
     const char* m_pText;
 
-    /** 文字长度
+    /** 文字长度（字节数）
      */
-    size_t m_len;
+    size_t m_byteLen;
 
     /** 文字编码格式
      */
