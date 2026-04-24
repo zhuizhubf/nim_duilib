@@ -97,14 +97,14 @@ public:
     /** 获取路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
      * @return true：启用路径省略号模式；false：不启用
      * @note 仅限单行文本模式，多行文本模式不支持此属性。
-     *       如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     *       如果字符串包含反斜杠 (\\) 或正斜杠 (/) 字符，在最后一个分隔符之后保留尽可能多的文本。
      */
     bool GetPathEllipsis() const { return m_pathEllipsis; };
 
     /** 设置路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
      * @param [in] bPathEllipsis true：启用路径省略号模式；false：不启用
      * @note 仅限单行文本模式，多行文本模式不支持此属性。
-     *       如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     *       如果字符串包含反斜杠 (\\) 或正斜杠 (/) 字符，在最后一个分隔符之后保留尽可能多的文本。
      */
     void SetPathEllipsis(bool bPathEllipsis);
 
@@ -175,14 +175,14 @@ public:
     /** 绘制文字（便捷封装函数）
      * @param [in] pSkCanvas 绘制画布
      * @param [in] pText 文本内容
-     * @param [in] nLen 文本长度
+     * @param [in] nLen 文本长度（字节数）
      * @param [in] textEncoding 文本编码格式
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
      * @param [in] fallbackFontCreator 回退字体管理器
      * @note 等价于以下代码：
-     *       setText(text, len, textEncoding, font, paint);
-     *       draw(canvas);
+     *       SetText(text, len, textEncoding, font, paint);
+     *       Draw(canvas);
      */
     void Draw(SkCanvas* pSkCanvas,
               const char pText[], size_t nLen, SkTextEncoding textEncoding,
@@ -191,7 +191,7 @@ public:
 
     /** 设置待绘制的文字
      * @param [in] pText 文本内容
-     * @param [in] nLen 文本长度
+     * @param [in] nLen 文本长度（字节数）
      * @param [in] textEncoding 文本编码格式
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
@@ -228,6 +228,23 @@ public:
                                 bool bHasMoreText, bool bIsLastLine,
                                 FallbackFontCreator fallbackFontCreator) = 0;
     };
+
+public:
+    /** 绘制删除线/下划线的厚度因子（相对于字体大小）
+    */
+    static constexpr SkScalar kLineThicknessFactor = (SK_Scalar1 / 18);
+
+    /** 删除线高于基线的偏移量因子
+     */
+    static constexpr SkScalar kStrikeThroughOffset = (SK_Scalar1 * 65 / 252);
+
+    /** 下划线低于基线的偏移量因子
+     */
+    static constexpr SkScalar kUnderlineOffset = (SK_Scalar1 / 9);
+
+    /** 下划线厚度因子（相对于删除线的倍数）
+     */
+    static constexpr SkScalar kUnderlineThicknessFactor = (SK_Scalar1 * 3 / 2);
 
 private:
     /** 遍历访问每一行文字
@@ -294,7 +311,7 @@ private:
     bool m_endEllipsis;
 
     /** 路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
-     * @note 如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     * @note 如果字符串包含反斜杠 (\\) 或正斜杠 (/) 字符，在最后一个分隔符之后保留尽可能多的文本。
      *       仅限单行文本模式，多行文本模式不支持此属性。
      */
     bool m_pathEllipsis;

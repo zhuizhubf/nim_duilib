@@ -126,6 +126,18 @@ void SkTextBox::SetSpacing(SkScalar mul, SkScalar add)
 
 SkScalar SkTextBox::Visit(Visitor& visitor) const
 {
+    if (m_pText == nullptr || m_pFont == nullptr || m_pPaint == nullptr) {
+        SkASSERT(m_pText != nullptr);
+        SkASSERT(m_pFont != nullptr);
+        SkASSERT(m_pPaint != nullptr);
+        return 0;
+    }
+    //该值不强制检查，允许为nullptr
+    //if (m_fallbackFontCreator == nullptr) {
+    //    SkASSERT(m_fallbackFontCreator != nullptr);
+    //    return 0;
+    //}
+
     const char* pText = m_pText;
     size_t nLen = m_len;
     SkTextEncoding textEncoding = m_textEncoding;
@@ -138,36 +150,33 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
     uint8_t spacingAlign = m_spacingAlign;
     uint8_t textAlign = m_textAlign;
     FallbackFontCreator fallbackFontCreator = m_fallbackFontCreator;
-    SkASSERT(fallbackFontCreator != nullptr);
 
     SkScalar marginWidth = boxRect.width();
-
     if (marginWidth <= 0 || nLen == 0) {
         return boxRect.fTop;
     }
 
     const char* textStop = pText + nLen;
 
-    SkScalar scaledSpacing = 0;
-    SkScalar height = 0;
     SkScalar fontHeight = 0;
     SkFontMetrics metrics;
+    fontHeight = font.getMetrics(&metrics);
+    SkScalar scaledSpacing = fontHeight * spacingMul + spacingAdd;
+    SkScalar height = boxRect.height();
 
     SkScalar x = boxRect.fLeft;
     SkScalar y = boxRect.fTop;
-    fontHeight = font.getMetrics(&metrics);
-    scaledSpacing = fontHeight * spacingMul + spacingAdd;
-    height = boxRect.height();
 
-    //计算第一行文字的Y坐标位置
+    //计算第一行文字的Y坐标位置（处理纵向对齐）
     {
         SkScalar textHeight = fontHeight;
 
         if (spacingAlign != kStart_SpacingAlign) {
             int32_t nCount = DrawSkiaText::CountLines(pText, textStop - pText, textEncoding,
                                                      font, fallbackFontCreator, paint, marginWidth, lineMode);
-            SkASSERT(nCount > 0);
-            textHeight += scaledSpacing * (nCount - 1);
+            if (nCount > 0) {
+                textHeight += scaledSpacing * (nCount - 1);
+            }
         }
 
         switch (spacingAlign) {
@@ -178,25 +187,29 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
             y = SkScalarHalf(height - textHeight);
             if (y < 0) {
                 //如果居中对齐绘制区域不足，那么按照可显示的文字进行居中对齐
-                y = static_cast<SkScalar>((((int)height - (int)fontHeight) / 2));
+                y = SkScalarHalf(height - fontHeight);
             }
             break;
-        default:
-            SkASSERT(spacingAlign == kEnd_SpacingAlign);
+        case kEnd_SpacingAlign:
             y = height - textHeight;
+            break;
+        default:
+            SkASSERT(false);
+            y = 0;
             break;
         }
         y += boxRect.fTop - metrics.fAscent;
     }
 
+    //遍历每一行文字并调用visitor回调
     for (;;) {
         size_t trailing = 0;
         nLen = DrawSkiaText::Linebreak(pText, textStop, textEncoding,
-                                      font, fallbackFontCreator, paint,
-                                      marginWidth, lineMode,
-                                      &trailing);
+                                       font, fallbackFontCreator, paint,
+                                       marginWidth, lineMode,
+                                       &trailing);
         if (y + metrics.fDescent + metrics.fLeading > 0) {
-
+            //计算当前行的水平对齐位置
             if (textAlign == kLeft_Align) {
                 //横向：左对齐
                 x = boxRect.fLeft;
@@ -209,7 +222,7 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
                                                                nullptr, &paint, fallbackFontCreator);
                 if (textAlign == kCenter_Align) {
                     //横向：中对齐
-                    x = boxRect.fLeft + (marginWidth / 2) - textWidth / 2;
+                    x = boxRect.fLeft + SkScalarHalf(marginWidth - textWidth);
                     if (x < boxRect.fLeft) {
                         x = boxRect.fLeft;
                     }
@@ -241,6 +254,25 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
     return y + metrics.fDescent + metrics.fLeading;
 }
 
+/** 计算给定编码格式下一个字符的字节数
+ * @param [in] textEncoding 文本编码格式
+ * @return 字符字节数（UTF8:1, UTF16:2, UTF32:4）
+ */
+static inline size_t GetCharBytes(SkTextEncoding textEncoding)
+{
+    switch (textEncoding) {
+    case SkTextEncoding::kUTF8:
+        return 1;
+    case SkTextEncoding::kUTF16:
+        return 2;
+    case SkTextEncoding::kUTF32:
+        return 4;
+    default:
+        SkASSERT(false);
+        return 1;
+    }
+}
+
 template<typename T>
 static bool EllipsisTextUTF(const char pText[], size_t nLength, SkTextEncoding textEncoding,
                             bool bEndEllipsis, bool bPathEllipsis,
@@ -256,38 +288,35 @@ static bool EllipsisTextUTF(const char pText[], size_t nLength, SkTextEncoding t
     if ((pText == nullptr) || (nLength == 0)) {
         return false;
     }
+    if (destWidth <= 0) {
+        return false;
+    }
+
+    size_t charBytes = GetCharBytes(textEncoding);
+    SkScalar ellipsisWidth = DrawSkiaText::MeasureText(font, ellipsisStr.c_str(), ellipsisStr.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator);
+    if (ellipsisWidth >= destWidth) {
+        return false;
+    }
+
     T pathEnd;
     T string;
-
-    size_t charBytes = 1;
-    if (textEncoding == SkTextEncoding::kUTF8) {
-        charBytes = 1;
-    }
-    if (textEncoding == SkTextEncoding::kUTF16) {
-        charBytes = 2;
-    }
-    if (textEncoding == SkTextEncoding::kUTF32) {
-        charBytes = 4;
-    }
-    SkScalar ellipsisWidth = DrawSkiaText::MeasureText(font, ellipsisStr.c_str(), ellipsisStr.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator);
-    SkScalar pathEndWidth = 0;
     string.assign((const typename T::value_type*)pText, nLength / charBytes);
+
+    SkScalar pathEndWidth = 0;
     if (bPathEllipsis) {
-        int pos = (int)string.find_last_of(pathSep);
-        if (pos > 0) {
+        //查找路径分隔符（支持反斜杠和正斜杠）
+        size_t pos = string.find_last_of(pathSep);
+        if (pos != T::npos && pos > 0) {
             pathEnd = string.substr(pos);
             pathEndWidth = DrawSkiaText::MeasureText(font, pathEnd.c_str(), pathEnd.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator);
             if ((pathEndWidth + ellipsisWidth) > destWidth) {
                 //宽度不足以显示路径的最后一段文字
                 pathEnd.clear();
+                pathEndWidth = 0;
             }
-        }
-        if (pathEnd.empty()) {
-            bEndEllipsis = true;
-            pathEndWidth = 0;
-        }
-        else {
-            string = string.substr(0, pos);
+            else {
+                string = string.substr(0, pos);
+            }
         }
     }
 
@@ -301,15 +330,15 @@ static bool EllipsisTextUTF(const char pText[], size_t nLength, SkTextEncoding t
     }
 
     size_t textLen = DrawSkiaText::breakText(string.c_str(), string.size() * charBytes, textEncoding,
-                                          font, fallbackFontCreator, paint, leftWidth);
+                                             font, fallbackFontCreator, paint, leftWidth);
     textLen /= charBytes;
-    if ((textLen > 0) && (textLen <= (string.size()))) {
-        string = string.substr(0, textLen);
+    if ((textLen > 0) && (textLen <= string.size())) {
+        string.erase(textLen);
         string += ellipsisStr;
         string += pathEnd;
-        stringUtf = string.c_str();
+        stringUtf = string;
         if (pTextOut) {
-            *pTextOut = (const char*)stringUtf.c_str();
+            *pTextOut = reinterpret_cast<const char*>(stringUtf.c_str());
         }
         nLengthOut = stringUtf.size() * charBytes;
         return true;
@@ -326,7 +355,9 @@ static bool EllipsisText(const char pText[], size_t nLength, SkTextEncoding text
                          SkScalar destWidth,
                          const char** pTextOut, size_t& nLengthOut)
 {
-    if (textEncoding == SkTextEncoding::kUTF8) {
+    //路径分隔符同时支持反斜杠和正斜杠，以适应不同操作系统的路径格式
+    switch (textEncoding) {
+    case SkTextEncoding::kUTF8:
         return EllipsisTextUTF<std::string>(pText, nLength, SkTextEncoding::kUTF8,
                                             bEndEllipsis, bPathEllipsis,
                                             font, fallbackFontCreator, paint,
@@ -335,8 +366,7 @@ static bool EllipsisText(const char pText[], size_t nLength, SkTextEncoding text
                                             stringUtf8,
                                             "...",
                                             "\\/");
-    }
-    else if (textEncoding == SkTextEncoding::kUTF16) {
+    case SkTextEncoding::kUTF16:
         return EllipsisTextUTF<std::u16string>(pText, nLength, SkTextEncoding::kUTF16,
                                             bEndEllipsis, bPathEllipsis,
                                             font, fallbackFontCreator, paint,
@@ -345,8 +375,7 @@ static bool EllipsisText(const char pText[], size_t nLength, SkTextEncoding text
                                             stringUtf16,
                                             u"...",
                                             u"\\/");
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
+    case SkTextEncoding::kUTF32:
         return EllipsisTextUTF<std::u32string>(pText, nLength, SkTextEncoding::kUTF32,
                                             bEndEllipsis, bPathEllipsis,
                                             font, fallbackFontCreator, paint,
@@ -355,10 +384,47 @@ static bool EllipsisText(const char pText[], size_t nLength, SkTextEncoding text
                                             stringUtf32,
                                             U"...",
                                             U"\\/");
+    default:
+        SkASSERT(false);
+        return false;
     }
-    return false;
 }
 
+/** 绘制删除线或下划线
+ * @param [in] pSkCanvas 绘制画布
+ * @param [in] x 起始X坐标
+ * @param [in] y 基线Y坐标
+ * @param [in] width 线条宽度
+ * @param [in] textSize 字体大小
+ * @param [in] lineOffset 线条相对于基线的偏移因子（正值表示上方，负值表示下方）
+ * @param [in] thicknessFactor 线条厚度因子（相对于字体大小）
+ * @param [in] paint 绘制属性
+ */
+static void DrawTextLine(SkCanvas* pSkCanvas,
+                         SkScalar x, SkScalar y, SkScalar width, SkScalar textSize,
+                         SkScalar lineOffset, SkScalar thicknessFactor,
+                         const SkPaint& paint)
+{
+    SkScalar thickness = textSize * thicknessFactor;
+    SkScalar top = y + textSize * lineOffset - thickness / 2;
+    SkRect r = SkRect::MakeLTRB(x, top, x + width, top + thickness);
+    pSkCanvas->drawRect(r, paint);
+}
+
+/** 绘制带删除线/下划线的文本
+ * @param [in] pTextBox 文本框对象
+ * @param [in] pSkCanvas 绘制画布
+ * @param [in] pText 文本内容
+ * @param [in] nLength 文本长度
+ * @param [in] textEncoding 文本编码格式
+ * @param [in] x 绘制X坐标
+ * @param [in] y 绘制Y坐标（基线位置）
+ * @param [in] font 字体
+ * @param [in] paint 绘制属性
+ * @param [in] bHasMoreText 是否还有更多文本
+ * @param [in] bIsLastLine 是否是最后一行
+ * @param [in] fallbackFontCreator 回退字体管理器
+ */
 static void TextBox_DrawText(SkTextBox* pTextBox,
                              SkCanvas* pSkCanvas,
                              const char pText[], size_t nLength, SkTextEncoding textEncoding,
@@ -367,6 +433,11 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
                              bool bHasMoreText, bool bIsLastLine,
                              FallbackFontCreator fallbackFontCreator)
 {
+    SkASSERT(pTextBox != nullptr);
+    SkASSERT(pSkCanvas != nullptr);
+    if (pTextBox == nullptr || pSkCanvas == nullptr) {
+        return;
+    }
     //绘制一行文字
     SkRect boxRect;
     pTextBox->GetBox(&boxRect);
@@ -385,84 +456,69 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
 
     if (!bEndEllipsis && !bPathEllipsis && !bUnderline && !bStrikeOut) {
         DrawSkiaText::DrawSimpleText(pSkCanvas, pText, nLength, textEncoding, x, y, font, paint, fallbackFontCreator);
+        return;
     }
-    else {
-        bool needEllipsis = false;
-        if (bEndEllipsis || bPathEllipsis) {
-            if (isSingleLine) {
-                //单行模式
-                SkScalar textWidth = DrawSkiaText::MeasureText(font, pText, nLength, textEncoding, nullptr, &paint, fallbackFontCreator);
-                if ((x + textWidth) > boxRect.fRight) {
-                    //文字超出边界，需要增加"..."替代无法显示的文字
-                    needEllipsis = true;
-                }
+
+    bool needEllipsis = false;
+    if (bEndEllipsis || bPathEllipsis) {
+        if (isSingleLine) {
+            //单行模式
+            SkScalar textWidth = DrawSkiaText::MeasureText(font, pText, nLength, textEncoding, nullptr, &paint, fallbackFontCreator);
+            if ((x + textWidth) > boxRect.fRight) {
+                //文字超出边界，需要增加"..."替代无法显示的文字
+                needEllipsis = true;
             }
-            else {
-                //多行模式
-                if (bEndEllipsis && bIsLastLine && bHasMoreText) {
-                    //文字超出边界，需要增加"..."替代无法显示的文字
-                    needEllipsis = true;
-                }
-            }
-        }
-        if (!needEllipsis && !bUnderline && !bStrikeOut) {
-            DrawSkiaText::DrawSimpleText(pSkCanvas, pText, nLength, textEncoding, x, y, font, paint, fallbackFontCreator);
         }
         else {
-            std::string stringUtf8;
-            std::u16string stringUtf16;
-            std::u32string stringUtf32;
-            if (needEllipsis) {
-                const char* pTextOut = nullptr;
-                size_t nLengthOut = 0;
-                if (EllipsisText(pText, nLength, textEncoding,
-                                 stringUtf8, stringUtf16, stringUtf32,
-                                 bEndEllipsis, bPathEllipsis,
-                                 font, fallbackFontCreator, paint,
-                                 boxRect.fRight - x,
-                                 &pTextOut, nLengthOut)) {
-                    //修改text和length的值，但不改变textEncoding
-                    SkASSERT(pTextOut != nullptr);
-                    SkASSERT(nLengthOut != 0);
-                    pText = pTextOut;
-                    nLength = nLengthOut;
-                }
+            //多行模式
+            if (bEndEllipsis && bIsLastLine && bHasMoreText) {
+                //文字超出边界，需要增加"..."替代无法显示的文字
+                needEllipsis = true;
             }
-            //绘制文本
-            DrawSkiaText::DrawSimpleText(pSkCanvas, pText, nLength, textEncoding, x, y, font, paint, fallbackFontCreator);
-            if (bUnderline || bStrikeOut) {
-                SkScalar width = DrawSkiaText::MeasureText(font, pText, nLength, textEncoding, nullptr, &paint, fallbackFontCreator);
+        }
+    }
 
-                //绘制删除线/下划线的厚度因子（相对于字体大小）
-                static constexpr SkScalar kLineThicknessFactor = (SK_Scalar1 / 18);
-                //删除线高于基线的偏移量因子
-                const SkScalar kStrikeThroughOffset = (SK_Scalar1 * 65 / 252);
-                //下划线低于基线的偏移量因子
-                const SkScalar kUnderlineOffset = (SK_Scalar1 / 9);
+    if (!needEllipsis && !bUnderline && !bStrikeOut) {
+        DrawSkiaText::DrawSimpleText(pSkCanvas, pText, nLength, textEncoding, x, y, font, paint, fallbackFontCreator);
+        return;
+    }
 
-                if (bStrikeOut) {
-                    //绘制删除线
-                    SkScalar thickness_factor = kLineThicknessFactor;
-                    const SkScalar text_size = font.getSize();
-                    const SkScalar height = text_size * thickness_factor;
-                    const SkScalar top = y - text_size * kStrikeThroughOffset - height / 2;
-                    SkScalar x_scalar = SkIntToScalar(x);
-                    const SkRect r = SkRect::MakeLTRB(x_scalar, top, x_scalar + width, top + height);
-                    pSkCanvas->drawRect(r, paint);
-                }
-                if (bUnderline) {
-                    //绘制下划线
-                    SkScalar thickness_factor = 1.5;
-                    SkScalar x_scalar = SkIntToScalar(x);
-                    const SkScalar text_size = font.getSize();
-                    SkRect r = SkRect::MakeLTRB(
-                                                x_scalar, y + text_size * kUnderlineOffset, x_scalar + width,
-                                                y + (text_size *
-                                                    (kUnderlineOffset +
-                                                    (thickness_factor * kLineThicknessFactor))));
-                    pSkCanvas->drawRect(r, paint);
-                }
-            }
+    std::string stringUtf8;
+    std::u16string stringUtf16;
+    std::u32string stringUtf32;
+    const char* pDrawText = pText;
+    size_t nDrawLength = nLength;
+
+    if (needEllipsis) {
+        const char* pTextOut = nullptr;
+        size_t nLengthOut = 0;
+        if (EllipsisText(pText, nLength, textEncoding,
+                         stringUtf8, stringUtf16, stringUtf32,
+                         bEndEllipsis, bPathEllipsis,
+                         font, fallbackFontCreator, paint,
+                         boxRect.fRight - x,
+                         &pTextOut, nLengthOut)) {
+            pDrawText = pTextOut;
+            nDrawLength = nLengthOut;
+        }
+    }
+    //绘制文本
+    DrawSkiaText::DrawSimpleText(pSkCanvas, pDrawText, nDrawLength, textEncoding, x, y, font, paint, fallbackFontCreator);
+
+    if (bUnderline || bStrikeOut) {
+        SkScalar width = DrawSkiaText::MeasureText(font, pDrawText, nDrawLength, textEncoding, nullptr, &paint, fallbackFontCreator);
+        SkScalar textSize = font.getSize();
+
+        if (bStrikeOut) {
+            //绘制删除线
+            DrawTextLine(pSkCanvas, x, y, width, textSize,
+                         -SkTextBox::kStrikeThroughOffset, SkTextBox::kLineThicknessFactor, paint);
+        }
+        if (bUnderline) {
+            //绘制下划线
+            DrawTextLine(pSkCanvas, x, y, width, textSize,
+                         SkTextBox::kUnderlineOffset,
+                         SkTextBox::kLineThicknessFactor * SkTextBox::kUnderlineThicknessFactor, paint);
         }
     }
 }
@@ -473,9 +529,9 @@ class CanvasVisitor : public SkTextBox::Visitor {
     SkCanvas* m_pCanvas;
     SkTextBox* m_pTextBox;
 public:
-    CanvasVisitor(SkCanvas* pCanvas, SkTextBox* pTextBox):
-         m_pCanvas(pCanvas)
-        ,m_pTextBox(pTextBox) {
+    CanvasVisitor(SkCanvas* pCanvas, SkTextBox* pTextBox) :
+        m_pCanvas(pCanvas),
+        m_pTextBox(pTextBox) {
     }
 
     void operator()(const char pText[], size_t nLength, SkTextEncoding textEncoding,
@@ -505,21 +561,21 @@ void SkTextBox::SetText(const char pText[], size_t nLen, SkTextEncoding textEnco
     m_pPaint = &paint;
     m_pFont = &font;
     m_fallbackFontCreator = fallbackFontCreator;
-    SkASSERT(fallbackFontCreator != nullptr);
 
 #ifdef _DEBUG
-    //检查字符串序列是否正确
-    if (textEncoding == SkTextEncoding::kUTF8) {
+    switch (textEncoding) {
+    case SkTextEncoding::kUTF8:
         SkASSERT(SkUTF8_CountUnichars(pText, nLen) != -1);
-    }
-    else if (textEncoding == SkTextEncoding::kUTF16) {
+        break;
+    case SkTextEncoding::kUTF16:
         SkASSERT(SkUTF16_CountUnichars(pText, nLen) != -1);
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
+        break;
+    case SkTextEncoding::kUTF32:
         SkASSERT(SkUTF32_CountUnichars(pText, nLen) != -1);
-    }
-    else {
+        break;
+    default:
         SkASSERT(false);
+        break;
     }
 #endif
 }
@@ -540,38 +596,37 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas)
         return;
     }
 
-    SkASSERT(m_pText != nullptr);
-    if (m_pText == nullptr) {
-        return;
-    }
-    if (m_len == 0) {
-        return;
-    }
-    SkASSERT((m_textEncoding == SkTextEncoding::kUTF8) ||
-             (m_textEncoding == SkTextEncoding::kUTF16)||
-             (m_textEncoding == SkTextEncoding::kUTF32));
-    if ((m_textEncoding != SkTextEncoding::kUTF8)  &&
-        (m_textEncoding != SkTextEncoding::kUTF16) &&
-        (m_textEncoding != SkTextEncoding::kUTF32)) {
+    if (m_pText == nullptr || m_len == 0) {
         return;
     }
 
-    SkASSERT(m_pFont != nullptr);
-    SkASSERT(m_pPaint != nullptr);
-    if ((m_pPaint == nullptr) || (m_pFont == nullptr)) {
+    if ((m_textEncoding != SkTextEncoding::kUTF8) &&
+        (m_textEncoding != SkTextEncoding::kUTF16) &&
+        (m_textEncoding != SkTextEncoding::kUTF32)) {
+        SkASSERT(false);
+        return;
+    }
+
+    if (m_pFont == nullptr || m_pPaint == nullptr) {
+        SkASSERT(m_pFont != nullptr);
+        SkASSERT(m_pPaint != nullptr);
         return;
     }
 
 #ifdef _DEBUG
-    //检查字符串序列是否正确
-    if (m_textEncoding == SkTextEncoding::kUTF8) {
+    switch (m_textEncoding) {
+    case SkTextEncoding::kUTF8:
         SkASSERT(SkUTF8_CountUnichars(m_pText, m_len) != -1);
-    }
-    else if (m_textEncoding == SkTextEncoding::kUTF16) {
+        break;
+    case SkTextEncoding::kUTF16:
         SkASSERT(SkUTF16_CountUnichars(m_pText, m_len) != -1);
-    }
-    else if (m_textEncoding == SkTextEncoding::kUTF32) {
+        break;
+    case SkTextEncoding::kUTF32:
         SkASSERT(SkUTF32_CountUnichars(m_pText, m_len) != -1);
+        break;
+    default:
+        SkASSERT(false);
+        break;
     }
 #endif
 
@@ -580,8 +635,10 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas)
         saveCount = pSkCanvas->save();
         pSkCanvas->clipRect(m_box, true);
     }
+
     CanvasVisitor sink(pSkCanvas, this);
     this->Visit(sink);
+
     if (m_clipBox) {
         pSkCanvas->restoreToCount(saveCount);
     }
@@ -589,15 +646,25 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas)
 
 int32_t SkTextBox::CountLines() const
 {
+    if (m_pText == nullptr || m_pFont == nullptr || m_pPaint == nullptr) {
+        return 0;
+    }
+    if (m_len == 0) {
+        return 0;
+    }
     return DrawSkiaText::CountLines(m_pText, m_len, m_textEncoding,
                                     *m_pFont, m_fallbackFontCreator, *m_pPaint, m_box.width(),
-                                     m_lineMode);
+                                    m_lineMode);
 }
 
 SkScalar SkTextBox::GetTextHeight() const
 {
+    if (m_pFont == nullptr) {
+        return 0;
+    }
     SkScalar spacing = m_pFont->getSize() * m_spacingMul + m_spacingAdd;
-    return this->CountLines() * spacing;
+    int32_t nLines = this->CountLines();
+    return nLines * spacing;
 }
 
 }//namespace ui
