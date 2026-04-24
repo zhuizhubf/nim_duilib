@@ -22,7 +22,7 @@ struct THorizontalChar;
 class HorizontalDrawText
 {
 public:
-    HorizontalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg, IFallbackFontMgr* pFallbackFontMgr);
+    HorizontalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);
     HorizontalDrawText(const HorizontalDrawText& r) = delete;
     HorizontalDrawText& operator = (const HorizontalDrawText& r) = delete;
     ~HorizontalDrawText() = default;
@@ -82,25 +82,6 @@ private:
     */
     float CalculateDefaultCharWidth(const IFont* pFont, const SkFont* pSkFont, const SkPaint* skPaint) const;
 
-    /** 创建指定字体的回退字体接口
-    * @param [in] pFont 当前字体接口
-    * @param [in] unicodeChar UTF32字符，如果为0表示不支持字符检测
-    * @return 返回对应的回退字体接口
-    */
-    const SkFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar) const;
-
-    /** 评估文字的宽度和绘制区域，支持字体回退
-    */
-    float FontMeasureText(const IFont* pFont, const SkFont* pSkFont,
-                          const void* text, size_t byteLength, SkTextEncoding encoding,
-                          SkRect* bounds, const SkPaint* paint) const;
-
-    /** 绘制文本，支持字体回退
-    */
-    void DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
-                        float x, float y,
-                        const IFont* pFont, const SkFont& font, const SkPaint& paint) const;
-
 private:
     /** 绘制的画布
     */
@@ -113,10 +94,6 @@ private:
     /** 视图的原点坐标
     */
     SkPoint* m_pSkPointOrg;
-
-    /** 字体回退管理器（生命周期由设置者管理）
-    */
-    IFallbackFontMgr* m_pFallbackFontMgr;
 };
 
 } // namespace ui

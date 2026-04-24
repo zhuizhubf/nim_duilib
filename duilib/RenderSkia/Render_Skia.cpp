@@ -1,9 +1,9 @@
 #include "Render_Skia.h"
-#include "VerticalDrawText.h"
-#include "HorizontalDrawText.h"
-#include "DrawRichText.h"
-
-#include "SkUtils.h"
+#include "duilib/RenderSkia/VerticalDrawText.h"
+#include "duilib/RenderSkia/HorizontalDrawText.h"
+#include "duilib/RenderSkia/DrawRichText.h"
+#include "duilib/RenderSkia/DrawSkiaText.h"
+#include "duilib/RenderSkia/SkUtils.h"
 #include "duilib/RenderSkia/Bitmap_Skia.h"
 #include "duilib/RenderSkia/Path_Skia.h"
 #include "duilib/RenderSkia/Matrix_Skia.h"
@@ -1480,12 +1480,12 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
     }
     if (drawParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
-        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(drawParam.pFont));
+        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
         return drawTextUtil.DrawString(strText, drawParam);
     }
     else if ((drawParam.uFormat & TEXT_HJUSTIFY) || (drawParam.fWordSpacing > 0.0001f)) {
         //当横向文本，对齐方式设置为两端对齐时，或者设置了字间距时，使用该实现方案（因为修改SkTextBox的实现比较困难，维护难度高）
-        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(drawParam.pFont));
+        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
         return drawTextUtil.DrawString(strText, drawParam);
     }
 
@@ -1544,7 +1544,7 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
     skTextBox.setBox(rcSkDest);
     if (drawParam.uFormat & DrawStringFormat::TEXT_SINGLELINE) {
         //单行文本
-        skTextBox.setLineMode(SkTextBox::kOneLine_Mode);
+        skTextBox.setLineMode(TextBoxLineMode::kOneLine_Mode);
     }
 
     //设置行间距
@@ -1597,12 +1597,18 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
         //纵向对齐：上对齐
         skTextBox.setSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
+
+    FallbackFontCreator fallbackFontCreator = [this, drawParam](uint32_t ch) {
+        return DrawSkiaText::CreateFallbackFont(drawParam.pFont, ch);
+        };
+
     skTextBox.draw(skCanvas, 
                    (const char*)strText.c_str(), 
                    strText.size() * sizeof(DString::value_type),
                    textEncoding, 
                    *pSkFont,
-                   skPaint);
+                   skPaint,
+                   fallbackFontCreator);
 }
 
 UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringParam& measureParam)
@@ -1613,12 +1619,12 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
     }
     if (measureParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
-        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(measureParam.pFont));
+        VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
         return drawTextUtil.MeasureString(strText, measureParam);
     }
     else if ((measureParam.uFormat & TEXT_HJUSTIFY) || (measureParam.fWordSpacing > 0.0001f)) {
         //当横向文本，对齐方式设置为两端对齐时，或者设置了字间距时，使用该实现方案（因为修改SkTextBox的实现比较困难，维护难度高）
-        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg, GetFallbackFontMgr(measureParam.pFont));
+        HorizontalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
         return drawTextUtil.MeasureString(strText, measureParam);
     }
 
@@ -1637,6 +1643,10 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
     if (skCanvas == nullptr) {
         return UiRect();
     }
+
+    FallbackFontCreator fallbackFontCreator = [this, measureParam](uint32_t ch) {
+        return DrawSkiaText::CreateFallbackFont(measureParam.pFont, ch);
+        };
 
     //获取字体接口
     Font_Skia* pSkiaFont = dynamic_cast<Font_Skia*>(measureParam.pFont);
@@ -1665,11 +1675,9 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
     if (bSingleLineMode) {
         //单行模式
         SkRect bounds; //斜体字时，这个宽度包含了外延的宽度
-        SkScalar textWidth = pSkFont->measureText(strText.c_str(),
-                                                  strText.size() * sizeof(DString::value_type),
-                                                  GetTextEncoding(),
-                                                  &bounds,
-                                                  &skPaint);
+        SkScalar textWidth = DrawSkiaText::MeasureText(*pSkFont, strText.c_str(),
+                                                       strText.size() * sizeof(DString::value_type), GetTextEncoding(),
+                                                       &bounds, &skPaint, fallbackFontCreator);
         textWidth = std::max(textWidth, bounds.width());
         int textIWidth = SkScalarTruncToInt(textWidth + 0.5f);
         if (textWidth > textIWidth) {
@@ -1695,17 +1703,17 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
             nRectWidth = INT32_MAX;
         }
         std::vector<size_t> lineLenList; //每行文本数据的长度（字节）
-        int lineCount = SkTextLineBreaker::CountLines((const char*)strText.c_str(),
-                                                      strText.size() * sizeof(DString::value_type),
-                                                      GetTextEncoding(),
-                                                      *pSkFont,
-                                                      skPaint,
-                                                      SkScalar(nRectWidth),
-                                                      SkTextBox::kWordBreak_Mode,
-                                                      &lineLenList);
+        int32_t lineCount = DrawSkiaText::CountLines((const char*)strText.c_str(),
+                                                     strText.size() * sizeof(DString::value_type),
+                                                     GetTextEncoding(),
+                                                     *pSkFont, fallbackFontCreator,
+                                                     skPaint,
+                                                     SkScalar(nRectWidth),
+                                                     TextBoxLineMode::kWordBreak_Mode,
+                                                     &lineLenList);
         //计算所需宽度
         int32_t textWidth = 0;
-        ASSERT((int)lineLenList.size() == lineCount);
+        ASSERT((int32_t)lineLenList.size() == lineCount);
         if (!lineLenList.empty()) {
             std::vector<DString> lineTextList; //每行的文本
             size_t nTextPos = 0;
@@ -1718,11 +1726,9 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
             for (const DString& lineText : lineTextList) {
                 //按单行评估每行文本，取最大宽度
                 SkRect bounds; //斜体字时，这个宽度包含了外延的宽度
-                SkScalar lineTextLen = pSkFont->measureText(lineText.c_str(),
-                                                            lineText.size() * sizeof(DString::value_type),
-                                                            GetTextEncoding(),
-                                                            &bounds,
-                                                            &skPaint);
+                SkScalar lineTextLen = DrawSkiaText::MeasureText(*pSkFont, lineText.c_str(),
+                                                                 lineText.size() * sizeof(DString::value_type),
+                                                                 GetTextEncoding(), &bounds, &skPaint, fallbackFontCreator);
                 lineTextLen = std::max(lineTextLen, bounds.width());
                 int32_t lineTextIWidth = SkScalarTruncToInt(lineTextLen + 0.5f);
                 if (lineTextLen > lineTextIWidth) {
@@ -2144,23 +2150,6 @@ SkTextEncoding Render_Skia::GetTextEncoding() const
         return SkTextEncoding::kUTF8;
 #endif
     }
-}
-
-IFallbackFontMgr* Render_Skia::GetFallbackFontMgr(IFont* pFont) const
-{
-    IFallbackFontMgr* pFallbackFontMgr = nullptr;
-    if (pFont != nullptr) {
-        IFontMgr* pFontMgr = nullptr;
-        Font_Skia* pSkiaFont = dynamic_cast<Font_Skia*>(pFont);
-        ASSERT(pSkiaFont != nullptr);
-        if (pSkiaFont != nullptr) {
-            pFontMgr = pSkiaFont->GetFontMgr();
-        }
-        if (pFontMgr != nullptr) {
-            pFallbackFontMgr = pFontMgr->GetFallbackFontMgr();
-        }
-    }
-    return pFallbackFontMgr;
 }
 
 } // namespace ui

@@ -386,6 +386,7 @@
     <ClCompile Include="RenderSkia\Brush_Skia.cpp" />
     <ClCompile Include="RenderSkia\DrawRichText.cpp" />
     <ClCompile Include="RenderSkia\DrawSkiaImage.cpp" />
+    <ClCompile Include="RenderSkia\DrawSkiaText.cpp" />
     <ClCompile Include="RenderSkia\FontMgr_Skia.cpp" />
     <ClCompile Include="RenderSkia\Font_Skia.cpp" />
     <ClCompile Include="RenderSkia\HorizontalDrawText.cpp" />
@@ -775,6 +776,7 @@
     <ClInclude Include="RenderSkia\Brush_Skia.h" />
     <ClInclude Include="RenderSkia\DrawRichText.h" />
     <ClInclude Include="RenderSkia\DrawSkiaImage.h" />
+    <ClInclude Include="RenderSkia\DrawSkiaText.h" />
     <ClInclude Include="RenderSkia\FontMgr_Skia.h" />
     <ClInclude Include="RenderSkia\Font_Skia.h" />
     <ClInclude Include="RenderSkia\HorizontalDrawText.h" />

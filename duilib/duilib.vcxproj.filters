@@ -891,6 +891,9 @@
     <ClCompile Include="..\msvc\dllRes\dllmain.cpp">
       <Filter>duilibDLL</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSkia\DrawSkiaText.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1846,6 +1849,9 @@
     </ClInclude>
     <ClInclude Include="..\msvc\dllRes\version.h">
       <Filter>duilibDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\DrawSkiaText.h">
+      <Filter>RenderSkia</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

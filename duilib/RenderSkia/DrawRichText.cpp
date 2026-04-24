@@ -1,6 +1,7 @@
 #include "DrawRichText.h"
 #include "duilib/RenderSkia/Font_Skia.h"
 #include "duilib/RenderSkia/SkTextBox.h"
+#include "duilib/RenderSkia/DrawSkiaText.h"
 
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
@@ -239,6 +240,10 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             lastFont = textData.m_pFontInfo;
         }
 
+        FallbackFontCreator fallbackFontCreator = [this, spSkiaFont](uint32_t ch) {
+            return DrawSkiaText::CreateFallbackFont(spSkiaFont.get(), ch);
+            };
+
         const SkFont& skFont = *pSkFont;
         SkFontMetrics metrics;
         SkScalar fFontHeight = skFont.getMetrics(&metrics);     //字体高度，换行时使用
@@ -328,12 +333,12 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     const DStringW blank = L"    ";
                     size_t nBlankCount = nRowCharCount % blank.size();
                     nBlankCount = blank.size() - nBlankCount;
-                    nDrawLength = SkTextBox::breakText(blank.c_str(),
-                                                       nBlankCount * sizeof(DStringW::value_type), textEncoding,
-                                                       skFont, skPaint,
-                                                       maxWidth, &textMeasuredWidth, &textMeasuredHeight,
-                                                       glyphs, glyphChars, glyphWidths,
-                                                       pGlyphCharList, pGlyphWidthList);
+                    nDrawLength = DrawSkiaText::breakText(blank.c_str(),
+                                                          nBlankCount * sizeof(DStringW::value_type), textEncoding,
+                                                          skFont, fallbackFontCreator, skPaint,
+                                                          maxWidth, &textMeasuredWidth, &textMeasuredHeight,
+                                                          glyphs, glyphChars, glyphWidths,
+                                                          pGlyphCharList, pGlyphWidthList);
                     if (nDrawLength > 0) {
                         nDrawLength = textCount * sizeof(DStringW::value_type);
                         if (glyphs.empty()) {
@@ -350,12 +355,12 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 }
                 else {
                     //breakText函数执行时间占比约30%
-                    nDrawLength = SkTextBox::breakText(lineTextView.data() + textStartIndex,
-                                                       byteLength, textEncoding,
-                                                       skFont, skPaint,
-                                                       maxWidth, &textMeasuredWidth, &textMeasuredHeight,
-                                                       glyphs, glyphChars, glyphWidths,
-                                                       pGlyphCharList, pGlyphWidthList);
+                    nDrawLength = DrawSkiaText::breakText(lineTextView.data() + textStartIndex,
+                                                          byteLength, textEncoding,
+                                                          skFont, fallbackFontCreator, skPaint,
+                                                          maxWidth, &textMeasuredWidth, &textMeasuredHeight,
+                                                          glyphs, glyphChars, glyphWidths,
+                                                          pGlyphCharList, pGlyphWidthList);
                 }
                 
                 if (nDrawLength == 0) {
@@ -1168,7 +1173,7 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
     skTextBox.setBox(rcSkDest);
     if (uFormat & DrawStringFormat::TEXT_SINGLELINE) {
         //单行文本
-        skTextBox.setLineMode(SkTextBox::kOneLine_Mode);
+        skTextBox.setLineMode(TextBoxLineMode::kOneLine_Mode);
     }
 
     //绘制区域不足时，自动在末尾绘制省略号
@@ -1218,7 +1223,10 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
         //纵向对齐：上对齐
         skTextBox.setSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
-    skTextBox.draw(skCanvas, text, len, textEncoding, *pSkFont, skPaint);
+    FallbackFontCreator fallbackFontCreator = [this, pFont](uint32_t ch) {
+        return DrawSkiaText::CreateFallbackFont(pFont, ch);
+        };
+    skTextBox.draw(skCanvas, text, len, textEncoding, *pSkFont, skPaint, fallbackFontCreator);
 }
 
 SkTextEncoding DrawRichText::GetTextEncoding() const
