@@ -16,158 +16,296 @@
 
 namespace ui
 {
-/** \class SkTextBox
 
-    SkTextBox is a helper class for drawing 1 or more lines of text
-    within a rectangle. The textbox is positioned and clipped by its Frame.
-    The Margin rectangle controls where the text is drawn relative to
-    the Frame. Line-breaks occur inside the Margin rectangle.
-
-    Spacing is a linear equation used to compute the distance between lines
-    of text. Spacing consists of two scalars: mul and add, and the spacing
-    between lines is computed as: spacing = font.getSize() * mul + add
-*/
-class SkTextBox 
+/** SkTextBox 文字排版类
+ *
+ * SkTextBox 是一个用于在矩形区域内绘制单行或多行文本的帮助类。
+ * 文本框通过其绘制区域（Frame）进行定位和裁剪。
+ * 边距矩形控制文本相对于绘制区域的绘制位置。
+ * 换行发生在边距矩形内部。
+ *
+ * 间距是一个线性方程，用于计算文本行之间的距离。
+ * 间距由两个标量组成：mul（倍数）和 add（附加量），
+ * 行间距的计算公式为：spacing = font.getSize() * mul + add
+ */
+class SkTextBox
 {
 public:
     SkTextBox();
 
 public:
-    TextBoxLineMode getLineMode() const { return fLineMode; }
-    void setLineMode(TextBoxLineMode);
+    /** 获取换行模式
+     * @return 换行模式
+     */
+    TextBoxLineMode GetLineMode() const { return m_lineMode; }
 
-    //纵向对齐方式
+    /** 设置换行模式
+     * @param [in] lineMode 换行模式
+     */
+    void SetLineMode(TextBoxLineMode lineMode);
+
+    /** 文字纵向对齐方式
+    */
     enum SpacingAlign {
-        kStart_SpacingAlign,  //上对齐，相当于：top 对齐(默认)
-        kCenter_SpacingAlign, //中对齐，相当于：vcener 对齐
-        kEnd_SpacingAlign,    //下对齐，相当于：bottom 对齐
+        kStart_SpacingAlign,     //上对齐，相当于：top 对齐(默认)
+        kCenter_SpacingAlign,    //中对齐，相当于：vcenter 对齐
+        kEnd_SpacingAlign,       //下对齐，相当于：bottom 对齐
 
         kSpacingAlignCount
     };
-    SpacingAlign getSpacingAlign() const { return (SpacingAlign)fSpacingAlign; }
-    void         setSpacingAlign(SpacingAlign);
 
-    //横向对齐方式
+    /** 获取纵向对齐方式
+     * @return 纵向对齐方式
+     */
+    SpacingAlign GetSpacingAlign() const { return (SpacingAlign)m_spacingAlign; }
+
+    /** 设置纵向对齐方式
+     * @param [in] align 纵向对齐方式
+     */
+    void SetSpacingAlign(SpacingAlign align);
+
+    /** 文字横向对齐方式
+    */
     enum TextAlign {
-        kLeft_Align,        //左对齐(默认)
-        kCenter_Align,      //中对齐
-        kRight_Align,       //右对齐
+        kLeft_Align,     //左对齐(默认)
+        kCenter_Align,   //中对齐
+        kRight_Align,    //右对齐
 
         kAlignCount
     };
-    TextAlign getTextAlign() const { return (TextAlign)fTextAlign; }
-    void      setTextAlign(TextAlign);
 
-    //绘制区域不足时，自动在末尾绘制省略号
-    bool getEndEllipsis() const { return fEndEllipsis; };
-    void setEndEllipsis(bool);
+    /** 获取横向对齐方式
+     * @return 横向对齐方式
+     */
+    TextAlign GetTextAlign() const { return (TextAlign)m_textAlign; }
 
-    //绘制区域不足时，自动在绘制省略号代替文本(仅限单行文本模式，多行文本模式不支持此属性)
-    //如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
-    bool getPathEllipsis() const { return fPathEllipsis; };
-    void setPathEllipsis(bool);
+    /** 设置横向对齐方式
+     * @param [in] align 横向对齐方式
+     */
+    void SetTextAlign(TextAlign align);
 
-    //字体属性：下划线
-    bool getUnderline() const { return fUnderline; }
-    void setUnderline(bool);
+    /** 获取省略号模式：绘制区域不足时，自动在末尾绘制省略号
+     * @return true：启用省略号模式；false：不启用
+     */
+    bool GetEndEllipsis() const { return m_endEllipsis; };
 
-    //字体属性：删除线
-    bool getStrikeOut() const { return fStrikeOut; }
-    void setStrikeOut(bool);
+    /** 设置省略号模式：绘制区域不足时，自动在末尾绘制省略号
+     * @param [in] bEndEllipsis true：启用省略号模式；false：不启用
+     */
+    void SetEndEllipsis(bool bEndEllipsis);
 
-    void getBox(SkRect*) const;
-    void setBox(const SkRect&);
-    void setBox(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
+    /** 获取路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
+     * @return true：启用路径省略号模式；false：不启用
+     * @note 仅限单行文本模式，多行文本模式不支持此属性。
+     *       如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     */
+    bool GetPathEllipsis() const { return m_pathEllipsis; };
 
-    //设置是否对Box区域做裁剪，设置裁剪可以避免文字绘制超出边界
-    bool getClipBox() const { return fClipBox; }
-    void setClipBox(bool bClipBox);
+    /** 设置路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
+     * @param [in] bPathEllipsis true：启用路径省略号模式；false：不启用
+     * @note 仅限单行文本模式，多行文本模式不支持此属性。
+     *       如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     */
+    void SetPathEllipsis(bool bPathEllipsis);
 
-    //行间距：mul为行间距的倍数，add 为增加多少
-    //设置后，实际的行间距为：fontHeight * mul + add;
-    void getSpacing(SkScalar* mul, SkScalar* add) const;
-    void setSpacing(SkScalar mul, SkScalar add);
+    /** 获取下划线属性
+     * @return true：启用下划线；false：不启用
+     */
+    bool GetUnderline() const { return m_underline; }
 
-    /** 绘制文字，该函数为draw(SkCanvas*)和setText的便利性封装。
-    *   等价于以下代码：
-    *       setText(text, len, textEncoding, font, paint);
-    *       draw(canvas);
-    */
-    void draw(SkCanvas*, 
-              const char text[], size_t len, SkTextEncoding, 
-              const SkFont&, const SkPaint&,
+    /** 设置下划线属性
+     * @param [in] bUnderline true：启用下划线；false：不启用
+     */
+    void SetUnderline(bool bUnderline);
+
+    /** 获取删除线属性
+     * @return true：启用删除线；false：不启用
+     */
+    bool GetStrikeOut() const { return m_strikeOut; }
+
+    /** 设置删除线属性
+     * @param [in] bStrikeOut true：启用删除线；false：不启用
+     */
+    void SetStrikeOut(bool bStrikeOut);
+
+    /** 获取绘制区域
+     * @param [out] pBox 绘制区域
+     */
+    void GetBox(SkRect* pBox) const;
+
+    /** 设置绘制区域
+     * @param [in] box 绘制区域
+     */
+    void SetBox(const SkRect& box);
+
+    /** 设置绘制区域
+     * @param [in] left 左边距
+     * @param [in] top 上边距
+     * @param [in] right 右边距
+     * @param [in] bottom 下边距
+     */
+    void SetBox(SkScalar left, SkScalar top, SkScalar right, SkScalar bottom);
+
+    /** 获取是否对Box区域做裁剪
+     * @return true：启用裁剪；false：不启用裁剪
+     * @note 设置裁剪可以避免文字绘制超出边界
+     */
+    bool GetClipBox() const { return m_clipBox; }
+
+    /** 设置是否对Box区域做裁剪
+     * @param [in] bClipBox true：启用裁剪；false：不启用裁剪
+     * @note 设置裁剪可以避免文字绘制超出边界
+     */
+    void SetClipBox(bool bClipBox);
+
+    /** 获取行间距
+     * @param [out] pMul 行间距倍数
+     * @param [out] pAdd 行间距附加量
+     * @note 实际行间距 = fontHeight * mul + add
+     */
+    void GetSpacing(SkScalar* pMul, SkScalar* pAdd) const;
+
+    /** 设置行间距
+     * @param [in] mul 行间距倍数
+     * @param [in] add 行间距附加量
+     * @note 实际行间距 = fontHeight * mul + add
+     */
+    void SetSpacing(SkScalar mul, SkScalar add);
+
+    /** 绘制文字（便捷封装函数）
+     * @param [in] pSkCanvas 绘制画布
+     * @param [in] pText 文本内容
+     * @param [in] nLen 文本长度
+     * @param [in] textEncoding 文本编码格式
+     * @param [in] skFont 字体
+     * @param [in] skPaint 绘制属性
+     * @param [in] fallbackFontCreator 回退字体管理器
+     * @note 等价于以下代码：
+     *       setText(text, len, textEncoding, font, paint);
+     *       draw(canvas);
+     */
+    void Draw(SkCanvas* pSkCanvas,
+              const char pText[], size_t nLen, SkTextEncoding textEncoding,
+              const SkFont& skFont, const SkPaint& skPaint,
               FallbackFontCreator fallbackFontCreator);
 
-    void setText(const char text[], size_t len, SkTextEncoding, 
-                 const SkFont&, const SkPaint&,
+    /** 设置待绘制的文字
+     * @param [in] pText 文本内容
+     * @param [in] nLen 文本长度
+     * @param [in] textEncoding 文本编码格式
+     * @param [in] skFont 字体
+     * @param [in] skPaint 绘制属性
+     * @param [in] fallbackFontCreator 回退字体管理器
+     */
+    void SetText(const char pText[], size_t nLen, SkTextEncoding textEncoding,
+                 const SkFont& skFont, const SkPaint& skPaint,
                  FallbackFontCreator fallbackFontCreator);
-    void draw(SkCanvas*);
 
-    int32_t countLines() const;
-    SkScalar getTextHeight() const;
+    /** 执行文字绘制
+     * @param [in] pSkCanvas 绘制画布
+     */
+    void Draw(SkCanvas* pSkCanvas);
 
+    /** 获取行数
+     * @return 行数
+     */
+    int32_t CountLines() const;
+
+    /** 获取文字总高度
+     * @return 文字总高度
+     */
+    SkScalar GetTextHeight() const;
+
+    /** 文字绘制访客器接口
+     * @note 用于遍历每一行文字的绘制回调
+     */
     class Visitor {
     public:
         virtual ~Visitor() {}
-        virtual void operator()(const char*, size_t, SkTextEncoding, 
-                                SkScalar x, SkScalar y, 
-                                const SkFont&, const SkPaint&,
-                                bool hasMoreText, bool isLastLine,
+        virtual void operator()(const char* pText, size_t nLen, SkTextEncoding textEncoding,
+                                SkScalar x, SkScalar y,
+                                const SkFont& skFont, const SkPaint& skPaint,
+                                bool bHasMoreText, bool bIsLastLine,
                                 FallbackFontCreator fallbackFontCreator) = 0;
     };
 
 private:
-    SkScalar visit(Visitor& visitor) const;
+    /** 遍历访问每一行文字
+     * @param [in] visitor 访客器
+     * @return 绘制后的Y坐标
+     */
+    SkScalar Visit(Visitor& visitor) const;
 
 private:
-    //文字绘制区域
-    SkRect fBox;
+    /** 文字绘制区域
+     */
+    SkRect m_box;
 
-    //是否对Box区域做裁剪，默认为true
-    bool fClipBox;
+    /** 是否对Box区域做裁剪，默认为true
+     */
+    bool m_clipBox;
 
-    //行间距设置参数
-    SkScalar fSpacingMul, fSpacingAdd;
+    /** 行间距倍数
+     */
+    SkScalar m_spacingMul;
 
-    //换行模式
-    TextBoxLineMode fLineMode;
+    /** 行间距附加量
+     */
+    SkScalar m_spacingAdd;
 
-    //文字纵向对齐方式
-    uint8_t fSpacingAlign;
+    /** 换行模式
+     */
+    TextBoxLineMode m_lineMode;
 
-    //文字横向对齐方式
-    uint8_t fTextAlign;
+    /** 文字纵向对齐方式
+     */
+    uint8_t m_spacingAlign;
 
-    //文字数据
-    const char* fText;
+    /** 文字横向对齐方式
+     */
+    uint8_t m_textAlign;
 
-    //文字长度
-    size_t fLen;
+    /** 文字数据
+     */
+    const char* m_pText;
 
-    //文字编码
-    SkTextEncoding fTextEncoding;
+    /** 文字长度
+     */
+    size_t m_len;
 
-    //绘制属性设置
-    const SkPaint* fPaint;
+    /** 文字编码格式
+     */
+    SkTextEncoding m_textEncoding;
 
-    //绘制字体设置
-    const SkFont* fFont;
+    /** 绘制属性
+     */
+    const SkPaint* m_pPaint;
 
-    //回退字体管理器
-    FallbackFontCreator fFallbackFontCreator;
+    /** 绘制字体
+     */
+    const SkFont* m_pFont;
 
-    //绘制区域不足时，自动在末尾绘制省略号
-    bool fEndEllipsis;
+    /** 回退字体管理器
+     */
+    FallbackFontCreator m_fallbackFontCreator;
 
-    //绘制区域不足时，自动在绘制省略号代替文本
-    //如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
-    bool fPathEllipsis;
+    /** 省略号模式：绘制区域不足时，自动在末尾绘制省略号
+     */
+    bool m_endEllipsis;
 
-    //字体属性：下划线
-    bool fUnderline;
+    /** 路径省略号模式：绘制区域不足时，自动在绘制省略号代替文本
+     * @note 如果字符串包含反斜杠 (\\) 字符，在最后一个反斜杠之后保留尽可能多的文本。
+     *       仅限单行文本模式，多行文本模式不支持此属性。
+     */
+    bool m_pathEllipsis;
 
-    //字体属性：删除线
-    bool fStrikeOut;
+    /** 下划线属性
+     */
+    bool m_underline;
+
+    /** 删除线属性
+     */
+    bool m_strikeOut;
 };
 
 } //namespace ui

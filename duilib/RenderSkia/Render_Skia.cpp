@@ -1541,71 +1541,71 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
 
     //设置绘制属性
     SkTextBox skTextBox;
-    skTextBox.setBox(rcSkDest);
+    skTextBox.SetBox(rcSkDest);
     if (drawParam.uFormat & DrawStringFormat::TEXT_SINGLELINE) {
         //单行文本
-        skTextBox.setLineMode(TextBoxLineMode::kOneLine_Mode);
+        skTextBox.SetLineMode(TextBoxLineMode::kOneLine_Mode);
     }
 
     //设置行间距
-    skTextBox.setSpacing(drawParam.fSpacingMul, drawParam.fSpacingAdd);
+    skTextBox.SetSpacing(drawParam.fSpacingMul, drawParam.fSpacingAdd);
 
     //绘制区域不足时，自动在末尾绘制省略号
     bool bEndEllipsis = false;
     if (drawParam.uFormat & DrawStringFormat::TEXT_END_ELLIPSIS) {
         bEndEllipsis = true;
     }
-    skTextBox.setEndEllipsis(bEndEllipsis);
+    skTextBox.SetEndEllipsis(bEndEllipsis);
 
     bool bPathEllipsis = false;
     if (drawParam.uFormat & DrawStringFormat::TEXT_PATH_ELLIPSIS) {
         bPathEllipsis = true;
     }
-    skTextBox.setPathEllipsis(bPathEllipsis);
+    skTextBox.SetPathEllipsis(bPathEllipsis);
 
     //绘制文字时，不使用裁剪区域（可能会导致文字绘制超出边界）
     if (drawParam.uFormat & DrawStringFormat::TEXT_NOCLIP) {
-        skTextBox.setClipBox(false);
+        skTextBox.SetClipBox(false);
     }
     //删除线
-    skTextBox.setStrikeOut(drawParam.pFont->IsStrikeOut());
+    skTextBox.SetStrikeOut(drawParam.pFont->IsStrikeOut());
     //下划线
-    skTextBox.setUnderline(drawParam.pFont->IsUnderline());
+    skTextBox.SetUnderline(drawParam.pFont->IsUnderline());
 
     if (drawParam.uFormat & DrawStringFormat::TEXT_HCENTER) {
         //横向对齐：居中对齐
-        skTextBox.setTextAlign(SkTextBox::kCenter_Align);
+        skTextBox.SetTextAlign(SkTextBox::kCenter_Align);
     }
     else if (drawParam.uFormat & DrawStringFormat::TEXT_RIGHT) {
         //横向对齐：右对齐
-        skTextBox.setTextAlign(SkTextBox::kRight_Align);
+        skTextBox.SetTextAlign(SkTextBox::kRight_Align);
     }
     else {
         //横向对齐：左对齐
-        skTextBox.setTextAlign(SkTextBox::kLeft_Align);
+        skTextBox.SetTextAlign(SkTextBox::kLeft_Align);
     }
 
     if (drawParam.uFormat & DrawStringFormat::TEXT_VCENTER) {
         //纵向对齐：居中对齐
-        skTextBox.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
+        skTextBox.SetSpacingAlign(SkTextBox::kCenter_SpacingAlign);
     }
     else if (drawParam.uFormat & DrawStringFormat::TEXT_BOTTOM) {
         //纵向对齐：下对齐
-        skTextBox.setSpacingAlign(SkTextBox::kEnd_SpacingAlign);
+        skTextBox.SetSpacingAlign(SkTextBox::kEnd_SpacingAlign);
     }
     else {
         //纵向对齐：上对齐
-        skTextBox.setSpacingAlign(SkTextBox::kStart_SpacingAlign);
+        skTextBox.SetSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
 
     FallbackFontCreator fallbackFontCreator = [this, drawParam](uint32_t ch) {
         return DrawSkiaText::CreateFallbackFont(drawParam.pFont, ch);
         };
 
-    skTextBox.draw(skCanvas, 
-                   (const char*)strText.c_str(), 
+    skTextBox.Draw(skCanvas,
+                   (const char*)strText.c_str(),
                    strText.size() * sizeof(DString::value_type),
-                   textEncoding, 
+                   textEncoding,
                    *pSkFont,
                    skPaint,
                    fallbackFontCreator);
