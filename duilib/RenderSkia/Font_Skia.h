@@ -49,8 +49,9 @@ public:
 
     /** 当前字体是否支持指定的Unicode字符
     * @param [in] unicodeChar UTF32字符
+    * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     */
-    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar) override;
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId) override;
 
 public:
     /** 获取字体句柄

@@ -176,6 +176,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     std::vector<uint8_t> glyphCharList;   //每个字由几个字符构成
     std::vector<SkScalar> glyphWidthList; //每个字符的宽度
 
+    MeasureTextTempData measureTempData;  //内部临时变量，为提升执行速度，在外部声明变量
+
     //按换行符进行文本切分
     std::vector<std::wstring_view> lineTextViewList;
 
@@ -240,8 +242,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             lastFont = textData.m_pFontInfo;
         }
 
-        FallbackFontCreator fallbackFontCreator = [this, spSkiaFont](uint32_t ch) {
-            return DrawSkiaText::CreateFallbackFont(spSkiaFont.get(), ch);
+        FallbackFontCreator fallbackFontCreator = [this, spSkiaFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+            return DrawSkiaText::CreateFallbackFont(spSkiaFont.get(), unicodeChar, glyphId);
             };
 
         const SkFont& skFont = *pSkFont;
@@ -333,12 +335,13 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     const DStringW blank = L"    ";
                     size_t nBlankCount = nRowCharCount % blank.size();
                     nBlankCount = blank.size() - nBlankCount;
-                    nDrawLength = DrawSkiaText::breakText(blank.c_str(),
+                    nDrawLength = DrawSkiaText::BreakText(blank.c_str(),
                                                           nBlankCount * sizeof(DStringW::value_type), textEncoding,
                                                           skFont, fallbackFontCreator, skPaint,
                                                           maxWidth, &textMeasuredWidth, &textMeasuredHeight,
                                                           glyphs, glyphChars, glyphWidths,
-                                                          pGlyphCharList, pGlyphWidthList);
+                                                          pGlyphCharList, pGlyphWidthList,
+                                                          measureTempData);
                     if (nDrawLength > 0) {
                         nDrawLength = textCount * sizeof(DStringW::value_type);
                         if (glyphs.empty()) {
@@ -355,12 +358,13 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 }
                 else {
                     //breakText函数执行时间占比约30%
-                    nDrawLength = DrawSkiaText::breakText(lineTextView.data() + textStartIndex,
+                    nDrawLength = DrawSkiaText::BreakText(lineTextView.data() + textStartIndex,
                                                           byteLength, textEncoding,
                                                           skFont, fallbackFontCreator, skPaint,
                                                           maxWidth, &textMeasuredWidth, &textMeasuredHeight,
                                                           glyphs, glyphChars, glyphWidths,
-                                                          pGlyphCharList, pGlyphWidthList);
+                                                          pGlyphCharList, pGlyphWidthList,
+                                                          measureTempData);
                 }
                 
                 if (nDrawLength == 0) {
@@ -1223,8 +1227,8 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
         //纵向对齐：上对齐
         skTextBox.SetSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
-    FallbackFontCreator fallbackFontCreator = [this, pFont](uint32_t ch) {
-        return DrawSkiaText::CreateFallbackFont(pFont, ch);
+    FallbackFontCreator fallbackFontCreator = [this, pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+        return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
         };
     skTextBox.Draw(skCanvas, text, len, textEncoding, *pSkFont, skPaint, fallbackFontCreator);
 }

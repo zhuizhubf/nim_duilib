@@ -226,7 +226,8 @@ public:
                                 SkScalar x, SkScalar y,
                                 const SkFont& skFont, const SkPaint& skPaint,
                                 bool bHasMoreText, bool bIsLastLine,
-                                FallbackFontCreator fallbackFontCreator) = 0;
+                                FallbackFontCreator fallbackFontCreator,
+                                MeasureTextTempData& measureTempData) = 0;
     };
 
 public:

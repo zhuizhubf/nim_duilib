@@ -43,8 +43,9 @@ public:
 
     /** 当前字体是否支持指定的Unicode字符
     * @param [in] unicodeChar UTF32字符
+    * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     */
-    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar) = 0;
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId) = 0;
 };
 
 /** 字体回退管理器（当支持的字体无法显示字符时，会查询回退字体管理器，以正确显示文字）
@@ -55,9 +56,10 @@ public:
     /** 创建指定字体的回退字体接口
     * @param [in] pFont 当前字体接口
     * @param [in] unicodeChar UTF32字符，如果为0表示不支持字符检测
+    * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     * @return 返回对应的回退字体接口
     */
-    virtual IFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar = 0) = 0;
+    virtual IFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar, uint16_t* glyphId) = 0;
 };
 
 /** 字体管理器接口

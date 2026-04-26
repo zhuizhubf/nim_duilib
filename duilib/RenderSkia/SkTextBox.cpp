@@ -16,6 +16,7 @@
 #include "SkiaHeaderEnd.h"
 
 #include "duilib/RenderSkia/DrawSkiaText.h"
+#include "duilib/Utils/PerformanceUtil.h"
 
 //该文件原始文件的出处：skia/chrome_67/src/utils/SkTextBox.cpp
 //基于原始文件，有修改，以兼容最新版本的skia代码（2023-06-25）
@@ -138,6 +139,8 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
     //    return 0;
     //}
 
+    MeasureTextTempData measureTempData;  //内部临时变量，为提升执行速度，在外部声明变量
+
     const char* pText = m_pText;
     const size_t nByteLen = m_byteLen;
     SkTextEncoding textEncoding = m_textEncoding;
@@ -207,7 +210,7 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
         const size_t nLineByteLen = DrawSkiaText::Linebreak(pText, textStop, textEncoding,
                                                             font, fallbackFontCreator, paint,
                                                             marginWidth, lineMode,
-                                                            &trailing);
+                                                            measureTempData, &trailing);
         if (y + metrics.fDescent + metrics.fLeading > 0) {
             //计算当前行的水平对齐位置
             if (textAlign == kLeft_Align) {
@@ -219,7 +222,7 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
                 SkScalar textWidth = DrawSkiaText::MeasureText(font, pText,
                                                                nLineByteLen - trailing,
                                                                textEncoding,
-                                                               nullptr, &paint, fallbackFontCreator);
+                                                               nullptr, &paint, fallbackFontCreator, measureTempData);
                 if (textAlign == kCenter_Align) {
                     //横向：中对齐
                     x = boxRect.fLeft + SkScalarHalf(marginWidth - textWidth);
@@ -240,7 +243,7 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
             //当前是否为最后一行
             bool bIsLastLine = (y + scaledSpacing + metrics.fAscent / 2) >= boxRect.fBottom;
 
-            visitor(pText, nLineByteLen - trailing, textEncoding, x, y, font, paint, bHasMoreText, bIsLastLine, fallbackFontCreator);
+            visitor(pText, nLineByteLen - trailing, textEncoding, x, y, font, paint, bHasMoreText, bIsLastLine, fallbackFontCreator, measureTempData);
         }
         pText += nLineByteLen;
         if (pText >= textStop) {
@@ -283,7 +286,8 @@ static bool EllipsisTextUTF(const char pText[], size_t nByteLen, SkTextEncoding 
                             size_t& nByteLenOut,
                             T& stringUtf,
                             const T& ellipsisStr,
-                            const T& pathSep)
+                            const T& pathSep,
+                            MeasureTextTempData& measureTempData)
 {
     if ((pText == nullptr) || (nByteLen == 0)) {
         return false;
@@ -293,7 +297,7 @@ static bool EllipsisTextUTF(const char pText[], size_t nByteLen, SkTextEncoding 
     }
 
     size_t charBytes = GetCharBytes(textEncoding);
-    SkScalar ellipsisWidth = DrawSkiaText::MeasureText(font, ellipsisStr.c_str(), ellipsisStr.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator);
+    SkScalar ellipsisWidth = DrawSkiaText::MeasureText(font, ellipsisStr.c_str(), ellipsisStr.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator, measureTempData);
     if (ellipsisWidth >= destWidth) {
         return false;
     }
@@ -308,7 +312,7 @@ static bool EllipsisTextUTF(const char pText[], size_t nByteLen, SkTextEncoding 
         size_t pos = string.find_last_of(pathSep);
         if (pos != T::npos && pos > 0) {
             pathEnd = string.substr(pos);
-            pathEndWidth = DrawSkiaText::MeasureText(font, pathEnd.c_str(), pathEnd.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator);
+            pathEndWidth = DrawSkiaText::MeasureText(font, pathEnd.c_str(), pathEnd.size() * charBytes, textEncoding, nullptr, &paint, fallbackFontCreator, measureTempData);
             if ((pathEndWidth + ellipsisWidth) > destWidth) {
                 //宽度不足以显示路径的最后一段文字
                 pathEnd.clear();
@@ -329,8 +333,8 @@ static bool EllipsisTextUTF(const char pText[], size_t nByteLen, SkTextEncoding 
         return false;
     }
 
-    size_t textByteLen = DrawSkiaText::breakText(string.c_str(), string.size() * charBytes, textEncoding,
-                                             font, fallbackFontCreator, paint, leftWidth);
+    size_t textByteLen = DrawSkiaText::BreakText(string.c_str(), string.size() * charBytes, textEncoding,
+                                                 font, fallbackFontCreator, paint, leftWidth, nullptr, nullptr, measureTempData);
     textByteLen /= charBytes;
     if ((textByteLen > 0) && (textByteLen <= string.size())) {
         string.erase(textByteLen);
@@ -353,7 +357,7 @@ static bool EllipsisText(const char pText[], size_t nByteLen, SkTextEncoding tex
                          bool bEndEllipsis, bool bPathEllipsis,
                          const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
                          SkScalar destWidth,
-                         const char** pTextOut, size_t& nByteLenOut)
+                         const char** pTextOut, size_t& nByteLenOut, MeasureTextTempData& measureTempData)
 {
     //路径分隔符同时支持反斜杠和正斜杠，以适应不同操作系统的路径格式
     switch (textEncoding) {
@@ -365,7 +369,8 @@ static bool EllipsisText(const char pText[], size_t nByteLen, SkTextEncoding tex
                                             pTextOut, nByteLenOut,
                                             stringUtf8,
                                             "...",
-                                            "\\/");
+                                            "\\/",
+                                            measureTempData);
     case SkTextEncoding::kUTF16:
         return EllipsisTextUTF<std::u16string>(pText, nByteLen, SkTextEncoding::kUTF16,
                                             bEndEllipsis, bPathEllipsis,
@@ -374,7 +379,8 @@ static bool EllipsisText(const char pText[], size_t nByteLen, SkTextEncoding tex
                                             pTextOut, nByteLenOut,
                                             stringUtf16,
                                             u"...",
-                                            u"\\/");
+                                            u"\\/",
+                                            measureTempData);
     case SkTextEncoding::kUTF32:
         return EllipsisTextUTF<std::u32string>(pText, nByteLen, SkTextEncoding::kUTF32,
                                             bEndEllipsis, bPathEllipsis,
@@ -383,7 +389,8 @@ static bool EllipsisText(const char pText[], size_t nByteLen, SkTextEncoding tex
                                             pTextOut, nByteLenOut,
                                             stringUtf32,
                                             U"...",
-                                            U"\\/");
+                                            U"\\/",
+                                            measureTempData);
     default:
         SkASSERT(false);
         return false;
@@ -431,7 +438,8 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
                              SkScalar x, SkScalar y,
                              const SkFont& font, const SkPaint& paint,
                              bool bHasMoreText, bool bIsLastLine,
-                             FallbackFontCreator fallbackFontCreator)
+                             FallbackFontCreator fallbackFontCreator,
+                             MeasureTextTempData& measureTempData)
 {
     SkASSERT(pTextBox != nullptr);
     SkASSERT(pSkCanvas != nullptr);
@@ -463,7 +471,7 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
     if (bEndEllipsis || bPathEllipsis) {
         if (isSingleLine) {
             //单行模式
-            SkScalar textWidth = DrawSkiaText::MeasureText(font, pText, nByteLen, textEncoding, nullptr, &paint, fallbackFontCreator);
+            SkScalar textWidth = DrawSkiaText::MeasureText(font, pText, nByteLen, textEncoding, nullptr, &paint, fallbackFontCreator, measureTempData);
             if ((x + textWidth) > boxRect.fRight) {
                 //文字超出边界，需要增加"..."替代无法显示的文字
                 needEllipsis = true;
@@ -497,7 +505,7 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
                          bEndEllipsis, bPathEllipsis,
                          font, fallbackFontCreator, paint,
                          boxRect.fRight - x,
-                         &pTextOut, nLengthOut)) {
+                         &pTextOut, nLengthOut, measureTempData)) {
             pDrawText = pTextOut;
             nDrawByteLen = nLengthOut;
         }
@@ -506,7 +514,7 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
     DrawSkiaText::DrawSimpleText(pSkCanvas, pDrawText, nDrawByteLen, textEncoding, x, y, font, paint, fallbackFontCreator);
 
     if (bUnderline || bStrikeOut) {
-        SkScalar width = DrawSkiaText::MeasureText(font, pDrawText, nDrawByteLen, textEncoding, nullptr, &paint, fallbackFontCreator);
+        SkScalar width = DrawSkiaText::MeasureText(font, pDrawText, nDrawByteLen, textEncoding, nullptr, &paint, fallbackFontCreator, measureTempData);
         SkScalar textSize = font.getSize();
 
         if (bStrikeOut) {
@@ -538,7 +546,8 @@ public:
                     SkScalar x, SkScalar y,
                     const SkFont& font, const SkPaint& paint,
                     bool bHasMoreText, bool bIsLastLine,
-                    FallbackFontCreator fallbackFontCreator) override
+                    FallbackFontCreator fallbackFontCreator,
+                    MeasureTextTempData& measureTempData) override
     {
         //调用单独封装的函数绘制文字，便于扩展
         TextBox_DrawText(m_pTextBox,
@@ -547,7 +556,7 @@ public:
                          x, y,
                          font, paint,
                          bHasMoreText, bIsLastLine,
-                         fallbackFontCreator);
+                         fallbackFontCreator, measureTempData);
     }
 };
 
@@ -591,6 +600,7 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas,
 
 void SkTextBox::Draw(SkCanvas* pSkCanvas)
 {
+    PerformanceStat stat(_T("SkTextBox::Draw"));
     SkASSERT(pSkCanvas != nullptr);
     if (pSkCanvas == nullptr) {
         return;

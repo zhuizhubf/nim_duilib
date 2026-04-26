@@ -3,7 +3,7 @@
 
 #include "duilib/duilib_defs.h"
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <chrono>
 #include <algorithm>
 
@@ -57,7 +57,7 @@ private:
         std::chrono::microseconds maxTime = std::chrono::microseconds::zero();
     };
 
-    std::map<DString, TStat> m_stat;
+    std::unordered_map<DString, TStat> m_stat;
 };
 
 class PerformanceStat

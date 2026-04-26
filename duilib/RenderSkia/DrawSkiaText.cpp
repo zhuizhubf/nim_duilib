@@ -2,6 +2,7 @@
 #include "duilib/RenderSkia/Font_Skia.h"
 #include "duilib/RenderSkia/SkUtils.h"
 #include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/PerformanceUtil.h"
 
 namespace ui 
 {
@@ -22,12 +23,13 @@ IFallbackFontMgr* DrawSkiaText::GetFallbackFontMgr(const IFont* pFont)
     return pFallbackFontMgr;
 }
 
-const SkFont* DrawSkiaText::CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar)
+const SkFont* DrawSkiaText::CreateFallbackFont(const IFont* pFont, SkUnichar unicodeChar, SkGlyphID* glyphId)
 {
     IFont* pFallbackFont = nullptr;
     IFallbackFontMgr* pFallbackFontMgr = GetFallbackFontMgr(pFont);
     if (pFallbackFontMgr != nullptr) {
-        pFallbackFont = pFallbackFontMgr->CreateFallbackFont(pFont, unicodeChar);
+        ASSERT(sizeof(SkUnichar) == sizeof(uint32_t));
+        pFallbackFont = pFallbackFontMgr->CreateFallbackFont(pFont, (uint32_t)unicodeChar, glyphId);
     }
 
     const SkFont* pFallbackSkFont = nullptr;
@@ -68,8 +70,8 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
                                    const IFont* pFont)
 {
     if (pFont != nullptr) {
-        FallbackFontCreator fallbackFontCreator = [pFont](uint32_t ch) {
-            return DrawSkiaText::CreateFallbackFont(pFont, ch);
+        FallbackFontCreator fallbackFontCreator = [pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+            return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
             };
         return MeasureText(font, ch, bounds, paint, fallbackFontCreator);
     }
@@ -83,14 +85,16 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
                                    SkRect* bounds, const SkPaint* paint,
                                    FallbackFontCreator fallbackFontCreator)
 {
-    if (font.unicharToGlyph((SkUnichar)ch) != 0) {
-        return font.measureText(&ch, sizeof(ch), SkTextEncoding::kUTF32, bounds, paint);
+    SkGlyphID glyphId = font.unicharToGlyph((SkUnichar)ch);
+    if (glyphId != 0) {
+        return font.measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, bounds, paint);
     }
     else if (fallbackFontCreator != nullptr) {
         //当前设置的字体不支持这个字，需要使用回退字体
-        const SkFont* pFallbackSkFont = fallbackFontCreator(ch);
+        glyphId = 0;
+        const SkFont* pFallbackSkFont = fallbackFontCreator(ch, &glyphId);
         if (pFallbackSkFont != nullptr) {
-            return pFallbackSkFont->measureText(&ch, sizeof(ch), SkTextEncoding::kUTF32, bounds, paint);
+            return pFallbackSkFont->measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, bounds, paint);
         }
     }
     return 0.0f;
@@ -98,42 +102,125 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
 
 SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                    SkRect* bounds, const SkPaint* paint,
-                                   const IFont* pFont)
+                                   const IFont* pFont,
+                                   MeasureTextTempData& tempData)
 {
     if (pFont != nullptr) {
-        FallbackFontCreator fallbackFontCreator = [pFont](uint32_t ch) {
-            return DrawSkiaText::CreateFallbackFont(pFont, ch);
+        FallbackFontCreator fallbackFontCreator = [pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+            return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
             };
-        return MeasureText(font, text, byteLength, textEncoding, bounds, paint, fallbackFontCreator);
+        return MeasureText(font, text, byteLength, textEncoding, bounds, paint, fallbackFontCreator, tempData);
     }
     else {
         return font.measureText(text, byteLength, textEncoding, bounds, paint);
     }
 }
 
+/** 计算给定编码格式下一个字符的字节数
+ * @param [in] textEncoding 文本编码格式
+ * @return 字符字节数（UTF8:1, UTF16:2, UTF32:4）
+ */
+static inline size_t GetCharBytes(SkTextEncoding textEncoding)
+{
+    switch (textEncoding) {
+    case SkTextEncoding::kUTF8:
+        return 1;
+    case SkTextEncoding::kUTF16:
+        return 2;
+    case SkTextEncoding::kUTF32:
+        return 4;
+    default:
+        SkASSERT(false);
+        break;
+    }
+    return 1;
+}
 
 SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                    SkRect* bounds, const SkPaint* paint,
-                                   FallbackFontCreator fallbackFontCreator)
+                                   FallbackFontCreator fallbackFontCreator,
+                                   MeasureTextTempData& tempData)
 {
+    PerformanceStat statPerformance(_T("DrawSkiaText::MeasureText-str"));
     if ((text == nullptr) || (byteLength == 0)) {
         return 0.0f;
-    }
+    }    
     if (fallbackFontCreator != nullptr) {
-        SkScalar fTotalWidth = 0;
-        SkRect totalBounds;
-        SkRect oneBounds;
-        oneBounds.fLeft = 0;
-        UTF32String utf32 = GetDrawStringUTF32(text, byteLength, textEncoding);
-        const size_t nCount = utf32.size();
-        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-            fTotalWidth += MeasureText(font, utf32[nIndex], bounds != nullptr ? &oneBounds : nullptr, paint, fallbackFontCreator);
-            if (bounds != nullptr) {
-                totalBounds.fTop = std::min(totalBounds.fTop, oneBounds.fTop);
-                totalBounds.fBottom = std::max(totalBounds.fBottom, oneBounds.fBottom);
-                oneBounds.fRight += std::max(0.0f, totalBounds.width());
+        //UTF32字符列表
+        std::vector<SkUnichar>& unicharList = tempData.unicharList;
+        unicharList.clear();
+        unicharList.reserve(byteLength / GetCharBytes(textEncoding));
+
+        EnumTextCallback enumTextCallback = [&](SkUnichar unicodeChar, size_t /*charByteLength*/) {
+            unicharList.push_back(unicodeChar);
+            return true;
+            };
+        DrawSkiaText::EnumTextChars(text, byteLength, textEncoding, enumTextCallback);
+        if (unicharList.empty()) {
+            return 0.0f;
+        }
+
+        //GlyphID列表
+        std::vector<SkGlyphID>& glyphIDList = tempData.glyphIDList;
+        glyphIDList.clear();
+        glyphIDList.resize(unicharList.size());
+        font.unicharsToGlyphs(SkSpan(unicharList.data(), unicharList.size()), SkSpan(glyphIDList.data(), glyphIDList.size()));
+
+        bool bNeedFallback = false;
+        for (SkGlyphID glyphID : glyphIDList) {
+            if (glyphID == 0) {
+                bNeedFallback = true;
+                break;
             }
         }
+        if (!bNeedFallback) {
+            //不需要字体回退，直接计算
+            return font.measureText(glyphIDList.data(), glyphIDList.size() * sizeof(SkGlyphID), SkTextEncoding::kGlyphID, bounds, paint);
+        }
+
+        //需要字体回退，拆分为两个部分（不需要字体回退的SkGlyphID列表，需要字体回退的UTF32字符列表）
+        std::vector<SkGlyphID>& normalGlyphIDList = tempData.normalGlyphIDList;
+        std::vector<SkUnichar>& fallbackUnicharList = tempData.fallbackUnicharList;
+        normalGlyphIDList.clear();
+        fallbackUnicharList.clear();
+        normalGlyphIDList.reserve(unicharList.size());
+        fallbackUnicharList.reserve(unicharList.size());
+        const size_t nUnicharCount = unicharList.size();
+        for (size_t nIndex = 0; nIndex < nUnicharCount; ++nIndex) {
+            if (glyphIDList[nIndex] == 0) {
+                fallbackUnicharList.push_back(unicharList[nIndex]);
+            }
+            else {
+                normalGlyphIDList.push_back(glyphIDList[nIndex]);
+            }
+        }
+
+        //先计算正常的字列表
+        SkScalar fTotalWidth = 0;
+        SkRect totalBounds;
+        const bool bHasBounds = bounds != nullptr;
+        SkRect* calcBounds = bHasBounds ? &totalBounds : nullptr;
+        if (!normalGlyphIDList.empty()) {
+            fTotalWidth = font.measureText(normalGlyphIDList.data(),
+                                           normalGlyphIDList.size() * sizeof(SkGlyphID),
+                                           SkTextEncoding::kGlyphID,
+                                           calcBounds, paint);
+        }
+
+        //再计算需要字体回退的字符
+        EnumTextCallback enumTextCallback2 = [&](SkUnichar unicodeChar, size_t /*charByteLength*/) {
+            fTotalWidth += MeasureText(font, unicodeChar, calcBounds, paint, fallbackFontCreator);
+            if (bHasBounds) {
+                totalBounds.fTop = std::min(totalBounds.fTop, calcBounds->fTop);
+                totalBounds.fBottom = std::max(totalBounds.fBottom, calcBounds->fBottom);
+                totalBounds.fRight += std::max(0.0f, calcBounds->width());
+            }
+            return true;
+            };
+        DrawSkiaText::EnumTextChars(fallbackUnicharList.data(),
+                                    fallbackUnicharList.size() * sizeof(SkUnichar),
+                                    SkTextEncoding::kUTF32, enumTextCallback2);
+
         if (bounds != nullptr) {
             *bounds = totalBounds;
         }
@@ -151,8 +238,8 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
 {
     SkScalar fWidth = 0;
     if (pFont != nullptr) {
-        FallbackFontCreator fallbackFontCreator = [pFont](uint32_t ch) {
-            return DrawSkiaText::CreateFallbackFont(pFont, ch);
+        FallbackFontCreator fallbackFontCreator = [pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+            return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
             };
         fWidth = DrawSimpleText(skCanvas, ch, x, y, font, paint, fallbackFontCreator);
     }
@@ -160,7 +247,7 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
         SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
         if (glyphID != 0) {
             fWidth = font.getWidth(glyphID);
-            skCanvas->drawSimpleText(&ch, sizeof(ch), SkTextEncoding::kUTF32, x, y, font, paint);
+            skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
         }
     }
     return fWidth;
@@ -177,15 +264,15 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch, SkScala
     SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
     if (glyphID != 0) {
         fWidth = font.getWidth(glyphID);
-        skCanvas->drawSimpleText(&ch, sizeof(ch), SkTextEncoding::kUTF32, x, y, font, paint);
+        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
     }
     else if (fallbackFontCreator != nullptr) {
         //该字体无法绘制，需要请求回退字体绘制
-        const SkFont* pFallbackSkFont = fallbackFontCreator((uint32_t)ch);
+        glyphID = 0;
+        const SkFont* pFallbackSkFont = fallbackFontCreator((uint32_t)ch, &glyphID);
         if (pFallbackSkFont != nullptr) {
-            glyphID = pFallbackSkFont->unicharToGlyph((SkUnichar)ch);
             fWidth = pFallbackSkFont->getWidth(glyphID);
-            skCanvas->drawSimpleText(&ch, sizeof(ch), SkTextEncoding::kUTF32, x, y, *pFallbackSkFont, paint);
+            skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, *pFallbackSkFont, paint);
         }
     }
     return fWidth;
@@ -197,8 +284,8 @@ void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t b
                                       const IFont* pFont)
 {
     if (pFont != nullptr) {
-        FallbackFontCreator fallbackFontCreator = [pFont](uint32_t ch) {
-            return DrawSkiaText::CreateFallbackFont(pFont, ch);
+        FallbackFontCreator fallbackFontCreator = [pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+            return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
             };
         return DrawSimpleText(skCanvas, text, byteLength, textEncoding, x, y, font, paint, fallbackFontCreator);
     }
@@ -212,6 +299,7 @@ void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t b
                                   const SkFont& font, const SkPaint& paint,
                                   FallbackFontCreator fallbackFontCreator)
 {
+    PerformanceStat statPerformance(_T("DrawSkiaText::DrawSimpleText"));
     if ((skCanvas == nullptr) || (text == nullptr) || (byteLength == 0)) {
         return;
     }
@@ -228,20 +316,21 @@ void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t b
     }
 }
 
-size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
+size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                const SkFont& font, FallbackFontCreator fallbackFontCreator,
                                const SkPaint& paint, SkScalar maxWidth,
-                               SkScalar* measuredWidth, SkScalar* measuredHeight)
+                               SkScalar* measuredWidth, SkScalar* measuredHeight,
+                               MeasureTextTempData& tempData)
 {
     std::vector<SkGlyphID> glyphs;
     std::vector<uint8_t> glyphChars;
     std::vector<SkScalar> glyphWidths;
-    return breakText(text, byteLength, textEncoding,
+    return BreakText(text, byteLength, textEncoding,
                      font, fallbackFontCreator, paint, maxWidth, measuredWidth, measuredHeight,
-                     glyphs, glyphChars, glyphWidths, nullptr, nullptr);
+                     glyphs, glyphChars, glyphWidths, nullptr, nullptr, tempData);
 }
 
-size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
+size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                const SkFont& font, FallbackFontCreator fallbackFontCreator,
                                const SkPaint& paint, SkScalar maxWidth,
                                SkScalar* measuredWidth, SkScalar* measuredHeight,
@@ -249,8 +338,10 @@ size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncodi
                                std::vector<uint8_t>& glyphChars,
                                std::vector<SkScalar>& glyphWidths,
                                std::vector<uint8_t>* glyphCharList,
-                               std::vector<SkScalar>* glyphWidthList)
+                               std::vector<SkScalar>* glyphWidthList,
+                               MeasureTextTempData& tempData)
 {
+    PerformanceStat statPerformance(_T("DrawSkiaText::breakText"));
     if ((text == nullptr) || (maxWidth <= 0) || (byteLength == 0)){
         if (measuredWidth != nullptr) {
             *measuredWidth = 0;
@@ -259,7 +350,7 @@ size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncodi
     }
     bool bWantGlyphData = (glyphCharList != nullptr) || (glyphWidthList != nullptr);
     SkRect bounds = SkRect::MakeEmpty();
-    SkScalar width = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, &bounds, &paint, fallbackFontCreator);
+    SkScalar width = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, &bounds, &paint, fallbackFontCreator, tempData);
     if (measuredHeight != nullptr) {
         *measuredHeight = bounds.height();
         SkASSERT(*measuredHeight > 0);
@@ -272,6 +363,9 @@ size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncodi
             return byteLength;
         }
     }
+
+    //TODO：
+    //后面的逻辑，合并到MeasureText中，提供新的函数
 
     glyphs.clear();     //保存每个glyphs字符
     glyphChars.clear(); //保存每个glyphs对应的字符个数
@@ -301,7 +395,7 @@ size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncodi
 
     glyphWidths.clear(); //保存每个glyphs字符的宽度
     glyphWidths.resize(glyphs.size(), 0);
-    font.getWidthsBounds(SkSpan<const SkGlyphID>(glyphs.data(), glyphs.size()),
+    font.getWidthsBounds(SkSpan<const SkGlyphID>(glyphs.data(), glyphs.size()), //TODO：getWidthsBounds函数替换
                          SkSpan<SkScalar>(glyphWidths.data(), glyphWidths.size()),
                          SkSpan<SkRect>(), &paint);
 
@@ -357,6 +451,7 @@ size_t DrawSkiaText::breakText(const void* text, size_t byteLength, SkTextEncodi
 bool DrawSkiaText::TextToGlyphs(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                 const SkFont& font, std::vector<SkGlyphID>& glyphs, size_t& charBytes)
 {
+    PerformanceStat statPerformance(_T("DrawSkiaText::TextToGlyphs"));
     glyphs.clear();
     glyphs.resize(byteLength, { 0, });
     SkSpan<SkGlyphID> glyphsSpan(glyphs.data(), glyphs.size());
@@ -495,7 +590,7 @@ static inline bool SkUTF_IsLineBreaker(int c)
     return true;
 }
 
-static SkUnichar SkUTF_NextUnichar(const void** ptr, SkTextEncoding textEncoding)
+static inline SkUnichar SkUTF_NextUnichar(const void** ptr, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF16) {
         return SkUTF16_NextUnichar((const uint16_t**)ptr);
@@ -512,7 +607,7 @@ static SkUnichar SkUTF_NextUnichar(const void** ptr, SkTextEncoding textEncoding
     }
 }
 
-static SkUnichar SkUTF_ToUnichar(const void* utf, SkTextEncoding textEncoding)
+static inline SkUnichar SkUTF_ToUnichar(const void* utf, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF16) {
         const uint16_t* srcPtr = (const uint16_t*)utf;
@@ -528,7 +623,7 @@ static SkUnichar SkUTF_ToUnichar(const void* utf, SkTextEncoding textEncoding)
     }
 }
 
-static int SkUTF_CountUTFBytes(const void* utf, SkTextEncoding textEncoding)
+static inline int SkUTF_CountUTFBytes(const void* utf, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF16) {
         // 2 or 4
@@ -556,13 +651,14 @@ static int SkUTF_CountUTFBytes(const void* utf, SkTextEncoding textEncoding)
 
 size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncoding textEncoding,
                                const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
-                               SkScalar margin, TextBoxLineMode lineMode,
+                               SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
                                size_t* trailing)
 {
     size_t lengthBreak = stop - text;//单行模式
     if (lineMode != TextBoxLineMode::kOneLine_Mode) {
         //多行模式
-        lengthBreak = DrawSkiaText::breakText(text, stop - text, textEncoding, font, fallbackFontCreator, paint, margin);
+        lengthBreak = DrawSkiaText::BreakText(text, stop - text, textEncoding, font, fallbackFontCreator,
+                                              paint, margin, nullptr, nullptr, tempData);
     }
 
     //Check for white space or line breakers before the lengthBreak
@@ -678,12 +774,13 @@ int32_t DrawSkiaText::CountLines(const char text[], size_t len, SkTextEncoding t
                                  SkScalar width, TextBoxLineMode lineMode,
                                  std::vector<size_t>* lineLenList)
 {
+    MeasureTextTempData tempData;
     const char* stop = text + len;
     int32_t count = 0;
     if (width > 0) {
         do {
             count += 1;
-            size_t lineLen = DrawSkiaText::Linebreak(text, stop, textEncoding, font, fallbackFontCreator, paint, width, lineMode);
+            size_t lineLen = DrawSkiaText::Linebreak(text, stop, textEncoding, font, fallbackFontCreator, paint, width, lineMode, tempData);
             if (lineLenList != nullptr) {
                 lineLenList->push_back(lineLen);
             }
@@ -691,6 +788,94 @@ int32_t DrawSkiaText::CountLines(const char text[], size_t len, SkTextEncoding t
         } while (text < stop);
     }
     return count;
+}
+
+bool DrawSkiaText::EnumTextChars(const void* text, size_t byteLength, SkTextEncoding textEncoding, EnumTextCallback callback)
+{
+    if ((text == nullptr) || (byteLength == 0)) {
+        return true;
+    }
+    if (textEncoding == SkTextEncoding::kUTF8) {
+        const uint8_t* utf8 = static_cast<const uint8_t*>(text);
+        const uint8_t* stop = utf8 + byteLength;
+        int32_t type = 0;
+        SkUnichar unichar = 0;
+        size_t charByteLen = 1;
+        while (utf8 < stop) {
+            type = SkUTF8_ByteType(*utf8);
+            if (!SkUTF8_TypeIsValidLeadingByte(type) || utf8 + type > stop) {
+                return false;
+            }
+            unichar = 0;
+            charByteLen = 1;
+            if (type == 0) {
+                unichar = *utf8;
+            }
+            else if (type == 1) {
+                unichar = ((utf8[0] & 0x1F) << 6) | (utf8[1] & 0x3F);
+                charByteLen = 2;
+            }
+            else if (type == 2) {
+                unichar = ((utf8[0] & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | (utf8[2] & 0x3F);
+                charByteLen = 3;
+            }
+            else if (type == 3) {
+                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
+                charByteLen = 4;
+            }
+            else if (type == 4) {
+                return false;
+            }
+            if (!callback(unichar, charByteLen)) {
+                return true;
+            }
+            utf8 += charByteLen;
+        }
+    }
+    else if (textEncoding == SkTextEncoding::kUTF16) {
+        const uint16_t* utf16 = static_cast<const uint16_t*>(text);
+        const uint16_t* stop = utf16 + (byteLength >> 1);
+        uint16_t c = 0;
+        size_t charByteLen = 0;
+        SkUnichar unichar = 0;
+        uint16_t low = 0;
+        const SkUnichar unicharLowOffset = (0x10000 - (0xD800 << 10) - 0xDC00);
+        while (utf16 < stop) {
+            c = *utf16++;
+            charByteLen = sizeof(uint16_t);
+            unichar = c;
+            if (SkUTF16_IsHighSurrogate(c)) {
+                if (utf16 >= stop) {
+                    return true;
+                }
+                low = *utf16++;
+                if (!SkUTF16_IsLowSurrogate(low)) {
+                    return false;
+                }
+                unichar = (c << 10) + low + unicharLowOffset;
+                charByteLen = sizeof(uint32_t);
+            }
+            if (!callback(unichar, charByteLen)) {
+                return true;
+            }
+        }
+    }
+    else if (textEncoding == SkTextEncoding::kUTF32) {
+        SkASSERT(byteLength % sizeof(SkUnichar) == 0);
+        const SkUnichar* utf32 = static_cast<const SkUnichar*>(text);
+        const SkUnichar* stop = utf32 + (byteLength / sizeof(SkUnichar));
+        while (utf32 < stop) {
+            if (!callback(*utf32, sizeof(SkUnichar))) {
+                return true;
+            }
+            ++utf32;
+        }
+    }
+    else {
+        SkASSERT(false);
+        return false;
+    }
+    return true;
 }
 
 } // namespace ui

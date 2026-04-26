@@ -39,13 +39,13 @@ template <typename S> constexpr uint8_t  SkToU8(S x) { return SkTo<uint8_t>(x); 
 template <typename S> constexpr uint16_t SkToU16(S x) { return SkTo<uint16_t>(x); }
 template <typename S> constexpr int      SkToInt(S x) { return SkTo<int>(x); }
 
-static bool utf8_byte_is_valid(uint8_t c) {
+static inline bool utf8_byte_is_valid(uint8_t c) {
     return c < 0xF5 && (c & 0xFE) != 0xC0;
 }
-static bool utf8_byte_is_continuation(uint8_t c) {
+static inline bool utf8_byte_is_continuation(uint8_t c) {
     return  (c & 0xC0) == 0x80;
 }
-static bool utf8_byte_is_leading_byte(uint8_t c) {
+static inline bool utf8_byte_is_leading_byte(uint8_t c) {
     return utf8_byte_is_valid(c) && !utf8_byte_is_continuation(c);
 }
 
@@ -72,7 +72,7 @@ static bool utf8_byte_is_leading_byte(uint8_t c) {
  *
  * I.e.: if return value > 0, then gives length of sequence.
 */
-static int utf8_byte_type(uint8_t c) {
+static inline int utf8_byte_type(uint8_t c) {
     if (c < 0x80) {
         return 1;
     } else if (c < 0xC0) {
@@ -83,7 +83,7 @@ static int utf8_byte_type(uint8_t c) {
         return -1;
     }
 }
-static bool utf8_type_is_valid_leading_byte(int type) { return type > 0; }
+static inline bool utf8_type_is_valid_leading_byte(int type) { return type > 0; }
 
 int SkUTF8_ByteType(uint8_t c)
 {

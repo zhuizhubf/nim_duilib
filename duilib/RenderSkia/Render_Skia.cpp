@@ -1598,8 +1598,8 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
         skTextBox.SetSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
 
-    FallbackFontCreator fallbackFontCreator = [this, drawParam](uint32_t ch) {
-        return DrawSkiaText::CreateFallbackFont(drawParam.pFont, ch);
+    FallbackFontCreator fallbackFontCreator = [this, drawParam](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+        return DrawSkiaText::CreateFallbackFont(drawParam.pFont, unicodeChar, glyphId);
         };
 
     skTextBox.Draw(skCanvas,
@@ -1644,8 +1644,8 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
         return UiRect();
     }
 
-    FallbackFontCreator fallbackFontCreator = [this, measureParam](uint32_t ch) {
-        return DrawSkiaText::CreateFallbackFont(measureParam.pFont, ch);
+    FallbackFontCreator fallbackFontCreator = [this, measureParam](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+        return DrawSkiaText::CreateFallbackFont(measureParam.pFont, unicodeChar, glyphId);
         };
 
     //获取字体接口
@@ -1672,12 +1672,14 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
     SkFontMetrics fontMetrics;
     SkScalar fontHeight = pSkFont->getMetrics(&fontMetrics);
 
+    MeasureTextTempData measureTempData;  //内部临时变量，为提升执行速度，在外部声明变量
+
     if (bSingleLineMode) {
         //单行模式
         SkRect bounds; //斜体字时，这个宽度包含了外延的宽度
         SkScalar textWidth = DrawSkiaText::MeasureText(*pSkFont, strText.c_str(),
                                                        strText.size() * sizeof(DString::value_type), GetTextEncoding(),
-                                                       &bounds, &skPaint, fallbackFontCreator);
+                                                       &bounds, &skPaint, fallbackFontCreator, measureTempData);
         textWidth = std::max(textWidth, bounds.width());
         int textIWidth = SkScalarTruncToInt(textWidth + 0.5f);
         if (textWidth > textIWidth) {
@@ -1728,7 +1730,8 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
                 SkRect bounds; //斜体字时，这个宽度包含了外延的宽度
                 SkScalar lineTextLen = DrawSkiaText::MeasureText(*pSkFont, lineText.c_str(),
                                                                  lineText.size() * sizeof(DString::value_type),
-                                                                 GetTextEncoding(), &bounds, &skPaint, fallbackFontCreator);
+                                                                 GetTextEncoding(), &bounds, &skPaint, fallbackFontCreator,
+                                                                 measureTempData);
                 lineTextLen = std::max(lineTextLen, bounds.width());
                 int32_t lineTextIWidth = SkScalarTruncToInt(lineTextLen + 0.5f);
                 if (lineTextLen > lineTextIWidth) {
