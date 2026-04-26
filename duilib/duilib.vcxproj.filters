@@ -894,6 +894,9 @@
     <ClCompile Include="RenderSkia\DrawSkiaText.cpp">
       <Filter>RenderSkia</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSkia\SkiaTextData.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1851,6 +1854,9 @@
       <Filter>duilibDLL</Filter>
     </ClInclude>
     <ClInclude Include="RenderSkia\DrawSkiaText.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkiaTextData.h">
       <Filter>RenderSkia</Filter>
     </ClInclude>
   </ItemGroup>

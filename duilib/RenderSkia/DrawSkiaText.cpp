@@ -4,8 +4,9 @@
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
-namespace ui 
+namespace ui
 {
+
 IFallbackFontMgr* DrawSkiaText::GetFallbackFontMgr(const IFont* pFont)
 {
     IFallbackFontMgr* pFallbackFontMgr = nullptr;
@@ -155,7 +156,8 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
             unicharList.push_back(unicodeChar);
             return true;
             };
-        DrawSkiaText::EnumTextChars(text, byteLength, textEncoding, enumTextCallback);
+        SkiaTextData textData(text, byteLength, textEncoding);
+        textData.EnumChars(enumTextCallback);
         if (unicharList.empty()) {
             return 0.0f;
         }
@@ -217,9 +219,9 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
             }
             return true;
             };
-        DrawSkiaText::EnumTextChars(fallbackUnicharList.data(),
-                                    fallbackUnicharList.size() * sizeof(SkUnichar),
-                                    SkTextEncoding::kUTF32, enumTextCallback2);
+
+        SkiaTextData textData2(fallbackUnicharList.data(), fallbackUnicharList.size() * sizeof(SkUnichar), SkTextEncoding::kUTF32);
+        textData2.EnumChars(enumTextCallback2);
 
         if (bounds != nullptr) {
             *bounds = totalBounds;
@@ -790,92 +792,72 @@ int32_t DrawSkiaText::CountLines(const char text[], size_t len, SkTextEncoding t
     return count;
 }
 
-bool DrawSkiaText::EnumTextChars(const void* text, size_t byteLength, SkTextEncoding textEncoding, EnumTextCallback callback)
+SkScalar DrawSkiaText::MeasureText(const SkFont& font, const SkiaTextData& textData,
+                                   SkRect* bounds, const SkPaint* paint,
+                                   const IFont* pFont,
+                                   MeasureTextTempData& tempData)
 {
-    if ((text == nullptr) || (byteLength == 0)) {
-        return true;
-    }
-    if (textEncoding == SkTextEncoding::kUTF8) {
-        const uint8_t* utf8 = static_cast<const uint8_t*>(text);
-        const uint8_t* stop = utf8 + byteLength;
-        int32_t type = 0;
-        SkUnichar unichar = 0;
-        size_t charByteLen = 1;
-        while (utf8 < stop) {
-            type = SkUTF8_ByteType(*utf8);
-            if (!SkUTF8_TypeIsValidLeadingByte(type) || utf8 + type > stop) {
-                return false;
-            }
-            unichar = 0;
-            charByteLen = 1;
-            if (type == 0) {
-                unichar = *utf8;
-            }
-            else if (type == 1) {
-                unichar = ((utf8[0] & 0x1F) << 6) | (utf8[1] & 0x3F);
-                charByteLen = 2;
-            }
-            else if (type == 2) {
-                unichar = ((utf8[0] & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | (utf8[2] & 0x3F);
-                charByteLen = 3;
-            }
-            else if (type == 3) {
-                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
-                charByteLen = 4;
-            }
-            else if (type == 4) {
-                return false;
-            }
-            if (!callback(unichar, charByteLen)) {
-                return true;
-            }
-            utf8 += charByteLen;
-        }
-    }
-    else if (textEncoding == SkTextEncoding::kUTF16) {
-        const uint16_t* utf16 = static_cast<const uint16_t*>(text);
-        const uint16_t* stop = utf16 + (byteLength >> 1);
-        uint16_t c = 0;
-        size_t charByteLen = 0;
-        SkUnichar unichar = 0;
-        uint16_t low = 0;
-        const SkUnichar unicharLowOffset = (0x10000 - (0xD800 << 10) - 0xDC00);
-        while (utf16 < stop) {
-            c = *utf16++;
-            charByteLen = sizeof(uint16_t);
-            unichar = c;
-            if (SkUTF16_IsHighSurrogate(c)) {
-                if (utf16 >= stop) {
-                    return true;
-                }
-                low = *utf16++;
-                if (!SkUTF16_IsLowSurrogate(low)) {
-                    return false;
-                }
-                unichar = (c << 10) + low + unicharLowOffset;
-                charByteLen = sizeof(uint32_t);
-            }
-            if (!callback(unichar, charByteLen)) {
-                return true;
-            }
-        }
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
-        SkASSERT(byteLength % sizeof(SkUnichar) == 0);
-        const SkUnichar* utf32 = static_cast<const SkUnichar*>(text);
-        const SkUnichar* stop = utf32 + (byteLength / sizeof(SkUnichar));
-        while (utf32 < stop) {
-            if (!callback(*utf32, sizeof(SkUnichar))) {
-                return true;
-            }
-            ++utf32;
-        }
-    }
-    else {
-        SkASSERT(false);
-        return false;
-    }
-    return true;
+    return MeasureText(font, textData.GetText(), textData.GetByteLength(), textData.GetTextEncoding(),
+                       bounds, paint, pFont, tempData);
+}
+
+SkScalar DrawSkiaText::MeasureText(const SkFont& font, const SkiaTextData& textData,
+                                   SkRect* bounds, const SkPaint* paint,
+                                   FallbackFontCreator fallbackFontCreator,
+                                   MeasureTextTempData& tempData)
+{
+    return MeasureText(font, textData.GetText(), textData.GetByteLength(), textData.GetTextEncoding(),
+                       bounds, paint, fallbackFontCreator, tempData);
+}
+
+void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const SkiaTextData& textData,
+                                   SkScalar x, SkScalar y,
+                                   const SkFont& font, const SkPaint& paint,
+                                   const IFont* pFont)
+{
+    DrawSimpleText(skCanvas, textData.GetText(), textData.GetByteLength(), textData.GetTextEncoding(),
+                   x, y, font, paint, pFont);
+}
+
+void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const SkiaTextData& textData,
+                                   SkScalar x, SkScalar y,
+                                   const SkFont& font, const SkPaint& paint,
+                                   FallbackFontCreator fallbackFontCreator)
+{
+    DrawSimpleText(skCanvas, textData.GetText(), textData.GetByteLength(), textData.GetTextEncoding(),
+                   x, y, font, paint, fallbackFontCreator);
+}
+
+size_t DrawSkiaText::BreakText(const SkiaTextData& textData,
+                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
+                               const SkPaint& paint, SkScalar maxWidth,
+                               SkScalar* measuredWidth,
+                               SkScalar* measuredHeight,
+                               MeasureTextTempData& tempData)
+{
+    return BreakText(textData.GetText(), textData.GetByteLength(), textData.GetTextEncoding(),
+                     font, fallbackFontCreator, paint, maxWidth,
+                     measuredWidth, measuredHeight, tempData);
+}
+
+int32_t DrawSkiaText::CountLines(const SkiaTextData& textData,
+                                  const SkFont& font, FallbackFontCreator fallbackFontCreator,
+                                  const SkPaint& paint, SkScalar width, TextBoxLineMode lineMode,
+                                  std::vector<size_t>* lineLenList)
+{
+    const char* text = static_cast<const char*>(textData.GetText());
+    return CountLines(text, textData.GetByteLength(), textData.GetTextEncoding(),
+                      font, fallbackFontCreator, paint, width, lineMode, lineLenList);
+}
+
+size_t DrawSkiaText::Linebreak(const SkiaTextData& textData, const char* stop,
+                                const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
+                                SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
+                                size_t* trailing)
+{
+    const char* text = static_cast<const char*>(textData.GetText());
+    return Linebreak(text, stop, textData.GetTextEncoding(),
+                     font, fallbackFontCreator, paint, margin, lineMode, tempData, trailing);
 }
 
 } // namespace ui

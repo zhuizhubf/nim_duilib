@@ -1230,7 +1230,7 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
     FallbackFontCreator fallbackFontCreator = [this, pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
         return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
         };
-    skTextBox.Draw(skCanvas, text, len, textEncoding, *pSkFont, skPaint, fallbackFontCreator);
+    skTextBox.Draw(skCanvas, SkiaTextData(text, len, textEncoding), *pSkFont, skPaint, fallbackFontCreator);
 }
 
 SkTextEncoding DrawRichText::GetTextEncoding() const

@@ -174,30 +174,26 @@ public:
 
     /** 绘制文字（便捷封装函数）
      * @param [in] pSkCanvas 绘制画布
-     * @param [in] pText 文本内容
-     * @param [in] nByteLen 文本长度（字节数）
-     * @param [in] textEncoding 文本编码格式
+     * @param [in] textData 文本数据
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
      * @param [in] fallbackFontCreator 回退字体管理器
      * @note 等价于以下代码：
-     *       SetText(text, len, textEncoding, font, paint);
+     *       SetText(textData, font, paint);
      *       Draw(canvas);
      */
     void Draw(SkCanvas* pSkCanvas,
-              const char pText[], size_t nByteLen, SkTextEncoding textEncoding,
+              const SkiaTextData& textData,
               const SkFont& skFont, const SkPaint& skPaint,
               FallbackFontCreator fallbackFontCreator);
 
     /** 设置待绘制的文字
-     * @param [in] pText 文本内容
-     * @param [in] nByteLen 文本长度（字节数）
-     * @param [in] textEncoding 文本编码格式
+     * @param [in] textData 文本数据
      * @param [in] skFont 字体
      * @param [in] skPaint 绘制属性
      * @param [in] fallbackFontCreator 回退字体管理器
      */
-    void SetText(const char pText[], size_t nByteLen, SkTextEncoding textEncoding,
+    void SetText(const SkiaTextData& textData,
                  const SkFont& skFont, const SkPaint& skPaint,
                  FallbackFontCreator fallbackFontCreator);
 
@@ -222,7 +218,7 @@ public:
     class Visitor {
     public:
         virtual ~Visitor() {}
-        virtual void operator()(const char* pText, size_t nByteLen, SkTextEncoding textEncoding,
+        virtual void operator()(const SkiaTextData& textData,
                                 SkScalar x, SkScalar y,
                                 const SkFont& skFont, const SkPaint& skPaint,
                                 bool bHasMoreText, bool bIsLastLine,
@@ -283,17 +279,9 @@ private:
      */
     uint8_t m_textAlign;
 
-    /** 文字数据
+    /** 文本数据
      */
-    const char* m_pText;
-
-    /** 文字长度（字节数）
-     */
-    size_t m_byteLen;
-
-    /** 文字编码格式
-     */
-    SkTextEncoding m_textEncoding;
+    SkiaTextData m_textData;
 
     /** 绘制属性
      */

@@ -398,6 +398,7 @@
     <ClCompile Include="RenderSkia\Render_Skia_SDL.cpp" />
     <ClCompile Include="RenderSkia\Render_Skia_Windows.cpp" />
     <ClCompile Include="RenderSkia\SkGLWindowContext_Windows.cpp" />
+    <ClCompile Include="RenderSkia\SkiaTextData.cpp" />
     <ClCompile Include="RenderSkia\SkRasterWindowContext_SDL.cpp" />
     <ClCompile Include="RenderSkia\SkRasterWindowContext_Windows.cpp" />
     <ClCompile Include="RenderSkia\SkTextBox.cpp" />
@@ -790,6 +791,7 @@
     <ClInclude Include="RenderSkia\SkGLWindowContext_Windows.h" />
     <ClInclude Include="RenderSkia\SkiaHeaderBegin.h" />
     <ClInclude Include="RenderSkia\SkiaHeaderEnd.h" />
+    <ClInclude Include="RenderSkia\SkiaTextData.h" />
     <ClInclude Include="RenderSkia\SkRasterWindowContext_SDL.h" />
     <ClInclude Include="RenderSkia\SkRasterWindowContext_Windows.h" />
     <ClInclude Include="RenderSkia\SkTextBox.h" />

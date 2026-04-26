@@ -2,19 +2,9 @@
 #define UI_RENDER_SKIA_DRAW_SKIA_TEXT_H_
 
 #include "duilib/Render/IRender.h"
+#include "duilib/RenderSkia/SkiaTextData.h"
 
-#include "SkiaHeaderBegin.h"
-#include "include/core/SkCanvas.h"
-#include "include/core/SkPaint.h"
-#include "include/core/SkFont.h"
-#include "SkiaHeaderEnd.h"
-
-#include <vector>
-#include <functional>
-
-class SkFont;
-
-namespace ui 
+namespace ui
 {
 /** 回退字体管理器
 * @param [in] unicodeChar UTF32字符
@@ -22,11 +12,6 @@ namespace ui
 * @return 返回对应的Skia字体接口
 */
 typedef std::function<const SkFont* (SkUnichar unicodeChar, SkGlyphID* glyphId)> FallbackFontCreator;
-
-/** 枚举字符串的回调函数
-* @return 返回 true 继续枚举，返回 false 停止枚举
-*/
-typedef std::function<bool (SkUnichar unicodeChar, size_t charByteLength)> EnumTextCallback;
 
 /** 换行模式
 */
@@ -97,6 +82,24 @@ public:
                                 FallbackFontCreator fallbackFontCreator,
                                 MeasureTextTempData& tempData);
 
+    /** 评估文字的宽度和绘制区域，支持字体回退
+    * @param [in] textData 文本数据
+    * @return 返回字符宽度
+    */
+    static SkScalar MeasureText(const SkFont& font, const SkiaTextData& textData,
+                                SkRect* bounds, const SkPaint* paint,
+                                const IFont* pFont,
+                                MeasureTextTempData& tempData);
+
+    /** 评估文字的宽度和绘制区域，支持字体回退
+    * @param [in] textData 文本数据
+    * @return 返回字符宽度
+    */
+    static SkScalar MeasureText(const SkFont& font, const SkiaTextData& textData,
+                                SkRect* bounds, const SkPaint* paint,
+                                FallbackFontCreator fallbackFontCreator,
+                                MeasureTextTempData& tempData);
+
 public:
     /** 绘制文本，支持字体回退
     */
@@ -120,6 +123,22 @@ public:
     /** 绘制文本，支持字体回退
     */
     static void DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t byteLength, SkTextEncoding textEncoding,
+                               SkScalar x, SkScalar y,
+                               const SkFont& font, const SkPaint& paint,
+                               FallbackFontCreator fallbackFontCreator);
+
+    /** 绘制文本，支持字体回退
+    * @param [in] textData 文本数据
+    */
+    static void DrawSimpleText(SkCanvas* skCanvas, const SkiaTextData& textData,
+                               SkScalar x, SkScalar y,
+                               const SkFont& font, const SkPaint& paint,
+                               const IFont* pFont);
+
+    /** 绘制文本，支持字体回退
+    * @param [in] textData 文本数据
+    */
+    static void DrawSimpleText(SkCanvas* skCanvas, const SkiaTextData& textData,
                                SkScalar x, SkScalar y,
                                const SkFont& font, const SkPaint& paint,
                                FallbackFontCreator fallbackFontCreator);
@@ -165,6 +184,24 @@ public:
                             std::vector<SkScalar>* glyphWidthList,
                             MeasureTextTempData& tempData);
 
+    /** 返回适合最大宽度的文本字节
+    * @param [in] textData 文本数据
+    * @param [in] font 字体
+    * @param [in] fallbackFontCreator 回退字体管理器
+    * @param [in] paint 绘制属性
+    * @param [in] maxWidth 绘制的最大宽度
+    * @param [out] measuredWidth  返回估算的绘制宽度，小于或等于 maxWidth, 可以为nullptr
+    * @param [out] measuredHeight 返回估算的绘制高度, 可以为nullptr
+    * @param [in] tempData 临时变量，用以提高性能
+    * @return 返回本行可绘制的字节数，总是小于或者等于byteLength
+    */
+    static size_t BreakText(const SkiaTextData& textData,
+                            const SkFont& font, FallbackFontCreator fallbackFontCreator,
+                            const SkPaint& paint, SkScalar maxWidth,
+                            SkScalar* measuredWidth,
+                            SkScalar* measuredHeight,
+                            MeasureTextTempData& tempData);
+
 public:
     /** 统计绘制需要多少行
      * @param [in] text 文本字符串的起始地址
@@ -178,6 +215,20 @@ public:
      * @param [out] lineLenList 返回每行文本数据的长度（字节）
      */
     static int32_t CountLines(const char text[], size_t len, SkTextEncoding textEncoding,
+                              const SkFont& font, FallbackFontCreator fallbackFontCreator,
+                              const SkPaint& paint, SkScalar width, TextBoxLineMode lineMode,
+                              std::vector<size_t>* lineLenList = nullptr);
+
+    /** 统计绘制需要多少行
+    * @param [in] textData 文本数据
+    * @param [in] font 字体
+    * @param [in] fallbackFontCreator 回退字体管理器
+    * @param [in] paint 绘制属性
+    * @param [in] width 绘制区域的宽度
+    * @param [in] lineMode 换行模式
+    * @param [out] lineLenList 返回每行文本数据的长度（字节）
+    */
+    static int32_t CountLines(const SkiaTextData& textData,
                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
                               const SkPaint& paint, SkScalar width, TextBoxLineMode lineMode,
                               std::vector<size_t>* lineLenList = nullptr);
@@ -200,16 +251,21 @@ public:
                             SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
                             size_t* trailing = nullptr);
 
-public:
-    /** 枚举文本中的每个字符，高效遍历接口
-    * @param [in] text 文本的起始地址
-    * @param [in] byteLength 文本长度（字节数）
-    * @param [in] textEncoding 文本编码，支持 SkTextEncoding::kUTF8/SkTextEncoding::kUTF16/SkTextEncoding::kUTF32
-    * @param [in] callback 回调函数，参数依次为：(SkUnichar unicodeChar, size_t charByteLength)
-    *                      返回 true 继续枚举，返回 false 停止枚举
-    * @return 返回枚举是否成功（即使被callback中断也返回true，只有数据错误才返回false）
+    /** 返回适合最大宽度的文本字节
+    * @param [in] textData 文本数据
+    * @param [in] stop 结束位置
+    * @param [in] font 字体
+    * @param [in] fallbackFontCreator 回退字体管理器
+    * @param [in] paint 绘制属性
+    * @param [in] margin 绘制区域的宽度
+    * @param [in] lineMode 换行模式
+    * @param [in] tempData 临时变量，用以提高性能
+    * @param [out] trailing 返回尾部的字符占几个字节（字节）
     */
-    static bool EnumTextChars(const void* text, size_t byteLength, SkTextEncoding textEncoding, EnumTextCallback callback);
+    static size_t Linebreak(const SkiaTextData& textData, const char* stop,
+                            const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
+                            SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
+                            size_t* trailing = nullptr);
 
 private:
     /** 获取UTF32字符串，内部操作时按UTF32编码处理

@@ -1602,13 +1602,8 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
         return DrawSkiaText::CreateFallbackFont(drawParam.pFont, unicodeChar, glyphId);
         };
 
-    skTextBox.Draw(skCanvas,
-                   (const char*)strText.c_str(),
-                   strText.size() * sizeof(DString::value_type),
-                   textEncoding,
-                   *pSkFont,
-                   skPaint,
-                   fallbackFontCreator);
+    SkiaTextData textData((const char*)strText.c_str(), strText.size() * sizeof(DString::value_type), textEncoding);
+    skTextBox.Draw(skCanvas, textData, *pSkFont, skPaint, fallbackFontCreator);
 }
 
 UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringParam& measureParam)
