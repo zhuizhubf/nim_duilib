@@ -327,384 +327,99 @@ size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncodi
                      font, fallbackFontCreator, paint, maxWidth,
                      measuredWidth, tempData, nullptr);
 }
-//
-//size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
-//                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
-//                               const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
-//                               MeasureTextTempData& tempData,
-//                               BreakTextTempData* breakTextData)
-//{
-//    PerformanceStat statPerformance(_T("DrawSkiaText::BreakText"));
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = 0;
-//    }
-//    if (breakTextData != nullptr) {
-//        breakTextData->glyphIDs.clear();
-//        breakTextData->glyphChars.clear();
-//        breakTextData->glyphWidths.clear();
-//    }
-//    if ((text == nullptr) || (maxWidth <= 0) || (byteLength == 0) || (textEncoding == SkTextEncoding::kGlyphID)) {
-//        return 0;
-//    }
-//    // 标记是否需要返回Glyph数据（获取数据会影响性能）
-//    const bool bWantGlyphData = (breakTextData != nullptr) ? breakTextData->bNeedReturnValidData : false;
-//    if (!bWantGlyphData && (maxWidth > byteLength * 256)) {
-//        //无需返回Glyph数据, 并且不限制宽度的模式(估算)
-//        SkScalar fMeasuredWidth = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, nullptr,
-//                                                            &paint, fallbackFontCreator, tempData);
-//        if (fMeasuredWidth <= maxWidth) {
-//            //该区域内可以全部绘制文字
-//            if (measuredWidth != nullptr) {
-//                *measuredWidth = fMeasuredWidth;
-//            }
-//            return byteLength;
-//        }
-//        //该区域内，无法完整绘制全部文字，走后续流程
-//    }
-//
-//    //逐个字符计算（文本较短时对性能影响有限，文本较长时可大幅提升性能）
-//    tempData.unicharList.clear();
-//    tempData.glyphChars.clear();
-//    const size_t charBytes = GetCharBytes(textEncoding);
-//    tempData.unicharList.reserve(byteLength / charBytes);
-//    tempData.glyphChars.reserve(byteLength / charBytes);
-//
-//    EnumTextCallback enumTextCallback = [&tempData](SkUnichar unicodeChar, size_t charByteLength) {
-//        tempData.unicharList.push_back(unicodeChar);
-//        tempData.glyphChars.push_back((uint8_t)charByteLength);
-//        return true;
-//        };
-//    SkiaTextData textData(text, byteLength, textEncoding);
-//    textData.EnumChars(enumTextCallback);
-//
-//    ASSERT(!tempData.unicharList.empty() && (tempData.unicharList.size() == tempData.glyphChars.size()));
-//    if (tempData.unicharList.empty() || (tempData.unicharList.size() != tempData.glyphChars.size())) {
-//        return 0;
-//    }
-//
-//    const bool bHasBreakTextData = breakTextData != nullptr;
-//    if (bHasBreakTextData) {
-//        breakTextData->glyphIDs.resize(tempData.unicharList.size(), 0);
-//        breakTextData->glyphChars.swap(tempData.glyphChars);
-//        breakTextData->glyphWidths.resize(tempData.unicharList.size(), 0);
-//    }
-//
-//    SkScalar totalWidth = 0; //绘制字符的总宽度
-//    SkScalar glyphWidth = 0; //单个字符的宽度
-//    SkGlyphID glyphId = 0;
-//    const size_t nUnicharCount = tempData.unicharList.size();
-//    size_t nGlyphCount = nUnicharCount;  //符合要求的字形的数量
-//    for (size_t nUnicharIndex = 0; nUnicharIndex < nUnicharCount; ++nUnicharIndex) {        
-//        glyphWidth = 0;
-//        glyphId = font.unicharToGlyph(tempData.unicharList[nUnicharIndex]);
-//        if (glyphId != 0) {
-//            glyphWidth = font.measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//        }
-//        else if (fallbackFontCreator != nullptr) {
-//            //当前设置的字体不支持这个字，需要使用回退字体
-//            const SkFont* pFallbackSkFont = fallbackFontCreator(tempData.unicharList[nUnicharIndex], &glyphId);
-//            if (pFallbackSkFont != nullptr) {
-//                glyphWidth = pFallbackSkFont->measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//            }
-//        }
-//
-//        if (bHasBreakTextData) {
-//            breakTextData->glyphIDs[nUnicharIndex] = glyphId;
-//            breakTextData->glyphWidths[nUnicharIndex] = glyphWidth;
-//        }
-//
-//        if ((nGlyphCount > 0) && ((totalWidth + glyphWidth) > maxWidth)) {
-//            //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-//            nGlyphCount = nUnicharIndex;
-//            break;
-//        }
-//
-//        totalWidth += glyphWidth;
-//    }
-//
-//    if (bHasBreakTextData) {
-//        if (nGlyphCount > 0) {
-//            breakTextData->glyphIDs.resize(nGlyphCount);
-//            breakTextData->glyphChars.resize(nGlyphCount);
-//            breakTextData->glyphWidths.resize(nGlyphCount);
-//        }
-//        else {
-//            breakTextData->glyphIDs.clear();
-//            breakTextData->glyphChars.clear();
-//            breakTextData->glyphWidths.clear();
-//        }
-//    }
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = totalWidth;
-//    }
-//    
-//    //计算可绘制的字节数
-//    size_t breakTextBytes = 0;
-//    const FastVector<uint8_t>& glyphChars = bHasBreakTextData ? breakTextData->glyphChars : tempData.glyphChars;
-//    const size_t nCalcCharCount = std::min(nGlyphCount, glyphChars.size());
-//    for (size_t nIndex = 0; nIndex < nCalcCharCount; ++nIndex) {
-//        breakTextBytes += glyphChars[nIndex];
-//    }
-//    return breakTextBytes;
-//}
-//
-//size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
-//                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
-//                               const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
-//                               MeasureTextTempData& tempData,
-//                               BreakTextTempData* breakTextData)
-//{
-//    PerformanceStat statPerformance(_T("DrawSkiaText::BreakText"));
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = 0;
-//    }
-//    if (breakTextData != nullptr) {
-//        breakTextData->glyphIDs.clear();
-//        breakTextData->glyphChars.clear();
-//        breakTextData->glyphWidths.clear();
-//    }
-//    if ((text == nullptr) || (maxWidth <= 0) || (byteLength == 0) || (textEncoding == SkTextEncoding::kGlyphID)) {
-//        return 0;
-//    }
-//    // 标记是否需要返回Glyph数据（获取数据会影响性能）
-//    const bool bWantGlyphData = (breakTextData != nullptr) ? breakTextData->bNeedReturnValidData : false;
-//    if (!bWantGlyphData && (maxWidth > byteLength * 256)) {
-//        //无需返回Glyph数据, 并且不限制宽度的模式(估算)
-//        SkScalar fMeasuredWidth = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, nullptr,
-//                                                            &paint, fallbackFontCreator, tempData);
-//        if (fMeasuredWidth <= maxWidth) {
-//            //该区域内可以全部绘制文字
-//            if (measuredWidth != nullptr) {
-//                *measuredWidth = fMeasuredWidth;
-//            }
-//            return byteLength;
-//        }
-//        //该区域内，无法完整绘制全部文字，走后续流程
-//    }
-//
-//    //逐个字符计算（文本较短时对性能影响有限，文本较长时可大幅提升性能）
-//    size_t breakTextBytes = 0;
-//    SkScalar totalWidth = 0; //绘制字符的总宽度
-//    SkScalar glyphWidth = 0; //单个字符的宽度
-//    SkGlyphID glyphId = 0;
-//    EnumTextCallback enumTextCallback = [&](SkUnichar unicodeChar, size_t charByteLength) {
-//            glyphWidth = 0;
-//            glyphId = font.unicharToGlyph(unicodeChar);
-//            if (glyphId != 0) {
-//                glyphWidth = font.measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//            }
-//            else if (fallbackFontCreator != nullptr) {
-//                //当前设置的字体不支持这个字，需要使用回退字体
-//                const SkFont* pFallbackSkFont = fallbackFontCreator(unicodeChar, &glyphId);
-//                if (pFallbackSkFont != nullptr) {
-//                    glyphWidth = pFallbackSkFont->measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//                }
-//            }
-//
-//            if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
-//                //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-//                return false;
-//            }
-//
-//            totalWidth += glyphWidth;
-//            breakTextBytes += charByteLength;
-//            if (bWantGlyphData) {
-//                breakTextData->glyphIDs.push_back(glyphId);
-//                breakTextData->glyphWidths.push_back(glyphWidth);
-//                breakTextData->glyphChars.push_back((uint8_t)charByteLength);
-//            }
-//            return true;
-//        };
-//    SkiaTextData textData(text, byteLength, textEncoding);
-//    textData.EnumChars(enumTextCallback);
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = totalWidth;
-//    }
-//    return breakTextBytes;
-//}
-//
-//size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
-//                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
-//                               const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
-//                               MeasureTextTempData& tempData,
-//                               BreakTextTempData* breakTextData)
-//{
-//    PerformanceStat statPerformance(_T("DrawSkiaText::BreakText"));
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = 0;
-//    }
-//    if (breakTextData != nullptr) {
-//        breakTextData->glyphIDs.clear();
-//        breakTextData->glyphChars.clear();
-//        breakTextData->glyphWidths.clear();
-//    }
-//    if ((text == nullptr) || (maxWidth <= 0) || (byteLength == 0) || (textEncoding == SkTextEncoding::kGlyphID)) {
-//        return 0;
-//    }
-//    // 标记是否需要返回Glyph数据（获取数据会影响性能）
-//    const bool bWantGlyphData = (breakTextData != nullptr) ? breakTextData->bNeedReturnValidData : false;
-//    if (!bWantGlyphData && (maxWidth > byteLength * 256)) {
-//        //无需返回Glyph数据, 并且不限制宽度的模式(估算)
-//        SkScalar fMeasuredWidth = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, nullptr,
-//                                                            &paint, fallbackFontCreator, tempData);
-//        if (fMeasuredWidth <= maxWidth) {
-//            //该区域内可以全部绘制文字
-//            if (measuredWidth != nullptr) {
-//                *measuredWidth = fMeasuredWidth;
-//            }
-//            return byteLength;
-//        }
-//        //该区域内，无法完整绘制全部文字，走后续流程
-//    }
-//
-//    //逐个字符计算（文本较短时对性能影响有限，文本较长时可大幅提升性能）
-//    tempData.glyphIDList.clear();
-//    tempData.glyphChars.clear();
-//    const size_t charBytes = GetCharBytes(textEncoding);
-//    tempData.glyphIDList.reserve(byteLength / charBytes);
-//    tempData.glyphChars.reserve(byteLength / charBytes);
-//    const SkFont* pLastSkFont = nullptr;
-//    const SkFont* pCurrentSkFont = nullptr;
-//    const bool bHasFallbackFontCreator = fallbackFontCreator != nullptr;
-//
-//    size_t breakTextBytes = 0;
-//    SkScalar totalWidth = 0; //绘制字符的总宽度
-//    SkScalar glyphWidth = 0; //单个字符的宽度
-//    SkGlyphID glyphId = 0;
-//
-//    //需要返回Glyph数据的计算方式（使用getWidths实现）
-//    auto CalculateGlyphIDListWantGlyphData = [&]() {
-//            if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
-//                return false;
-//            }
-//            //处理队列中的数据（批量处理）
-//            glyphWidth = pLastSkFont->measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
-//            if ((totalWidth + glyphWidth) > maxWidth) {
-//                //已经达到宽度限制, 不需要再计算
-//                const size_t nCount = tempData.glyphIDList.size();
-//                for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-//                    glyphWidth = pLastSkFont->measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//                    if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
-//                        //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-//                        return false;
-//                    }
-//                    totalWidth += glyphWidth;
-//                    breakTextBytes += tempData.glyphChars[nIndex];
-//                    if (bWantGlyphData) {
-//                        breakTextData->glyphIDs.push_back(glyphId);
-//                        breakTextData->glyphWidths.push_back(glyphWidth);
-//                        breakTextData->glyphChars.push_back(tempData.glyphChars[nIndex]);
-//                    }
-//                }
-//                return false;
-//            }
-//            else {
-//                totalWidth += glyphWidth;
-//                const size_t nCount = tempData.glyphIDList.size();
-//                for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-//                    breakTextBytes += tempData.glyphChars[nIndex];
-//                    if (bWantGlyphData) {
-//                        breakTextData->glyphIDs.push_back(glyphId);
-//                        breakTextData->glyphChars.push_back(tempData.glyphChars[nIndex]);
-//                    }
-//                }
-//                //获取单个字符的宽度
-//                if (bWantGlyphData) {
-//                    FastVector<SkScalar> localGlyphWidths;
-//                    localGlyphWidths.resize(tempData.glyphIDList.size());
-//                    pLastSkFont->getWidths(SkSpan<const SkGlyphID>(tempData.glyphIDList.data(), tempData.glyphIDList.size()),
-//                        SkSpan<SkScalar>(localGlyphWidths.data(), localGlyphWidths.size()));
-//                    for (SkScalar width : localGlyphWidths) {
-//                        breakTextData->glyphWidths.push_back(width);
-//                    }
-//                }
-//                tempData.glyphIDList.clear();
-//                tempData.glyphChars.clear();
-//                return true;
-//            }
-//        };
-//
-//    //不需要返回Glyph数据的计算方式（使用measureText实现）
-//    auto CalculateGlyphIDListNoGlyphData = [&]() {
-//            if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
-//                return false;
-//            }
-//            //处理队列中的数据（批量处理）
-//            glyphWidth = pLastSkFont->measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
-//            if ((totalWidth + glyphWidth) > maxWidth) {
-//                //已经达到宽度限制, 不需要再计算
-//                const size_t nCount = tempData.glyphIDList.size();
-//                for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-//                    glyphWidth = pLastSkFont->measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-//                    if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
-//                        //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-//                        return false;
-//                    }
-//                    totalWidth += glyphWidth;
-//                    breakTextBytes += tempData.glyphChars[nIndex];
-//                }
-//                return false;
-//            }
-//            else {
-//                totalWidth += glyphWidth;
-//                const size_t nCount = tempData.glyphIDList.size();
-//                for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-//                    breakTextBytes += tempData.glyphChars[nIndex];
-//                }
-//                tempData.glyphIDList.clear();
-//                tempData.glyphChars.clear();
-//                return true;
-//            }
-//        };
-//
-//    EnumTextCallback enumTextCallback = [&](SkUnichar unicodeChar, size_t charByteLength) {
-//            glyphId = font.unicharToGlyph(unicodeChar);
-//            pCurrentSkFont = &font;
-//            if (bHasFallbackFontCreator && (glyphId == 0)) {
-//                //当前设置的字体不支持这个字，需要使用回退字体
-//                const SkFont* pFallbackSkFont = fallbackFontCreator(unicodeChar, &glyphId);
-//                if (pFallbackSkFont != nullptr) {
-//                    //字体回退成功
-//                    pCurrentSkFont = pFallbackSkFont;;
-//                }
-//            }
-//
-//            if (!tempData.glyphIDList.empty() && (pLastSkFont != pCurrentSkFont)) {
-//                //处理队列中的数据（批量处理）
-//                if (bWantGlyphData) {
-//                    if (!CalculateGlyphIDListWantGlyphData()) {
-//                        return false;
-//                    }
-//                }
-//                else {
-//                    if (!CalculateGlyphIDListNoGlyphData()) {
-//                        return false;
-//                    }
-//                }
-//            }
-//            pLastSkFont = pCurrentSkFont;
-//            tempData.glyphIDList.push_back(glyphId);
-//            tempData.glyphChars.push_back((uint8_t)charByteLength);
-//            return true;
-//        };
-//    SkiaTextData textData(text, byteLength, textEncoding);
-//    textData.EnumChars(enumTextCallback);
-//
-//    if (!tempData.glyphIDList.empty() && (pLastSkFont != nullptr)) {
-//        //处理队列中的数据（批量处理）
-//        if (bWantGlyphData) {
-//            CalculateGlyphIDListWantGlyphData();
-//        }
-//        else {
-//            CalculateGlyphIDListNoGlyphData();
-//        }
-//    }
-//    if (measuredWidth != nullptr) {
-//        *measuredWidth = totalWidth;
-//    }
-//    return breakTextBytes;
-//}
 
+/** 需要返回Glyph的计算方法
+*/
+static bool CalculateGlyphIDListWantGlyphData(const SkFont& font, const SkPaint& paint, const SkScalar& maxWidth,
+                                              MeasureTextTempData& tempData, BreakTextTempData& breakTextData,
+                                              size_t& breakTextBytes, SkScalar& totalWidth, SkGlyphID& glyphId)
+{
+    if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
+        return false;
+    }
+    //处理队列中的数据（批量处理）
+    SkScalar glyphWidth = font.measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
+    if ((totalWidth + glyphWidth) > maxWidth) {
+        //已经达到宽度限制, 不需要再计算
+        const size_t nCount = tempData.glyphIDList.size();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            glyphWidth = font.measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
+            if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
+                //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
+                return false;
+            }
+            totalWidth += glyphWidth;
+            breakTextBytes += tempData.glyphChars[nIndex];
+            breakTextData.glyphIDs.push_back(glyphId);
+            breakTextData.glyphWidths.push_back(glyphWidth);
+            breakTextData.glyphChars.push_back(tempData.glyphChars[nIndex]);
+        }
+        return false;
+    }
+    else {
+        totalWidth += glyphWidth;
+        const size_t nCount = tempData.glyphIDList.size();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            breakTextBytes += tempData.glyphChars[nIndex];
+            breakTextData.glyphIDs.push_back(glyphId);
+            breakTextData.glyphChars.push_back(tempData.glyphChars[nIndex]);
+        }
+        //获取单个字符的宽度
+        FastVector<SkScalar> localGlyphWidths;
+        localGlyphWidths.resize(tempData.glyphIDList.size());
+        font.getWidths(SkSpan<const SkGlyphID>(tempData.glyphIDList.data(), tempData.glyphIDList.size()),
+                                               SkSpan<SkScalar>(localGlyphWidths.data(), localGlyphWidths.size()));
+        for (SkScalar width : localGlyphWidths) {
+            breakTextData.glyphWidths.push_back(width);
+        }
+        tempData.glyphIDList.clear();
+        tempData.glyphChars.clear();
+        return true;
+    }
+}
+
+/** 不需要返回Glyph的计算方法
+*/
+static bool CalculateGlyphIDListNoGlyphData(const SkFont& font, const SkPaint& paint, const SkScalar& maxWidth,
+                                            MeasureTextTempData& tempData, size_t& breakTextBytes, SkScalar& totalWidth)
+{
+    if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
+        return false;
+    }
+    //处理队列中的数据（批量处理）
+    SkScalar glyphWidth = font.measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
+    if ((totalWidth + glyphWidth) > maxWidth) {
+        //已经达到宽度限制, 不需要再计算
+        const size_t nCount = tempData.glyphIDList.size();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            glyphWidth = font.measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
+            if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
+                //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
+                return false;
+            }
+            totalWidth += glyphWidth;
+            breakTextBytes += tempData.glyphChars[nIndex];
+        }
+        return false;
+    }
+    else {
+        totalWidth += glyphWidth;
+        const size_t nCount = tempData.glyphIDList.size();
+        for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
+            breakTextBytes += tempData.glyphChars[nIndex];
+        }
+        tempData.glyphIDList.clear();
+        tempData.glyphChars.clear();
+        return true;
+    }
+}
+
+/** 是否直接按行估算（需要较高的命中率才能改进性能）
+*/
+inline static bool CanMeasureText(SkScalar maxWidth, size_t byteLength, SkTextEncoding textEncoding)
+{
+    return maxWidth > (byteLength / GetCharBytes(textEncoding)) * 64;
+}
 
 size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                                const SkFont& font, FallbackFontCreator fallbackFontCreator,
@@ -726,7 +441,7 @@ size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncodi
     }
     // 标记是否需要返回Glyph数据（获取数据会影响性能）
     const bool bWantGlyphData = (breakTextData != nullptr) ? true : false;
-    if (!bWantGlyphData && (maxWidth > byteLength * 256)) {
+    if (!bWantGlyphData && CanMeasureText(maxWidth, byteLength, textEncoding)) {
         //无需返回Glyph数据, 并且不限制宽度的模式(估算)
         SkScalar fMeasuredWidth = DrawSkiaText::MeasureText(font, text, byteLength, textEncoding, nullptr,
                                                             &paint, fallbackFontCreator, tempData);
@@ -750,117 +465,33 @@ size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncodi
     const SkFont* pCurrentSkFont = nullptr;
     const bool bHasFallbackFontCreator = fallbackFontCreator != nullptr;
 
-    size_t breakTextBytes = 0;
-    SkScalar totalWidth = 0; //绘制字符的总宽度
-    SkScalar glyphWidth = 0; //单个字符的宽度
-    SkGlyphID glyphId = 0;
-
-    //需要返回Glyph数据的计算方式（使用getWidths实现）
-    auto CalculateGlyphIDListWantGlyphData = [&]() {
-        if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
-            return false;
-        }
-        //处理队列中的数据（批量处理）
-        glyphWidth = pLastSkFont->measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
-        if ((totalWidth + glyphWidth) > maxWidth) {
-            //已经达到宽度限制, 不需要再计算
-            const size_t nCount = tempData.glyphIDList.size();
-            for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                glyphWidth = pLastSkFont->measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-                if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
-                    //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-                    return false;
-                }
-                totalWidth += glyphWidth;
-                breakTextBytes += tempData.glyphChars[nIndex];
-                if (bWantGlyphData) {
-                    breakTextData->glyphIDs.push_back(glyphId);
-                    breakTextData->glyphWidths.push_back(glyphWidth);
-                    breakTextData->glyphChars.push_back(tempData.glyphChars[nIndex]);
-                }
-            }
-            return false;
-        }
-        else {
-            totalWidth += glyphWidth;
-            const size_t nCount = tempData.glyphIDList.size();
-            for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                breakTextBytes += tempData.glyphChars[nIndex];
-                if (bWantGlyphData) {
-                    breakTextData->glyphIDs.push_back(glyphId);
-                    breakTextData->glyphChars.push_back(tempData.glyphChars[nIndex]);
-                }
-            }
-            //获取单个字符的宽度
-            if (bWantGlyphData) {
-                FastVector<SkScalar> localGlyphWidths;
-                localGlyphWidths.resize(tempData.glyphIDList.size());
-                pLastSkFont->getWidths(SkSpan<const SkGlyphID>(tempData.glyphIDList.data(), tempData.glyphIDList.size()),
-                                       SkSpan<SkScalar>(localGlyphWidths.data(), localGlyphWidths.size()));
-                for (SkScalar width : localGlyphWidths) {
-                    breakTextData->glyphWidths.push_back(width);
-                }
-            }
-            tempData.glyphIDList.clear();
-            tempData.glyphChars.clear();
-            return true;
-        }
-        };
-
-    //不需要返回Glyph数据的计算方式（使用measureText实现）
-    auto CalculateGlyphIDListNoGlyphData = [&]() {
-        if (tempData.glyphIDList.empty() || (tempData.glyphIDList.size() != tempData.glyphChars.size())) {
-            return false;
-        }
-        //处理队列中的数据（批量处理）
-        glyphWidth = pLastSkFont->measureText(tempData.glyphIDList.data(), sizeof(SkGlyphID) * tempData.glyphIDList.size(), SkTextEncoding::kGlyphID, nullptr, &paint);
-        if ((totalWidth + glyphWidth) > maxWidth) {
-            //已经达到宽度限制, 不需要再计算
-            const size_t nCount = tempData.glyphIDList.size();
-            for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                glyphWidth = pLastSkFont->measureText(&tempData.glyphIDList[nIndex], sizeof(SkGlyphID), SkTextEncoding::kGlyphID, nullptr, &paint);
-                if ((totalWidth > 0.01) && ((totalWidth + glyphWidth) > maxWidth)) {
-                    //已经达到宽度限制, 不需要再计算(但至少需要绘制一个字符，避免宽度过窄时，无法绘制)
-                    return false;
-                }
-                totalWidth += glyphWidth;
-                breakTextBytes += tempData.glyphChars[nIndex];
-            }
-            return false;
-        }
-        else {
-            totalWidth += glyphWidth;
-            const size_t nCount = tempData.glyphIDList.size();
-            for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                breakTextBytes += tempData.glyphChars[nIndex];
-            }
-            tempData.glyphIDList.clear();
-            tempData.glyphChars.clear();
-            return true;
-        }
-        };
+    size_t breakTextBytes = 0;  //可绘制文本数据的字节数
+    SkScalar totalWidth = 0;    //绘制字符的总宽度    
+    SkGlyphID glyphId = 0;      //Glyph字符ID
+    const SkFont* pFallbackSkFont = nullptr; //回退字体的接口
 
     EnumTextCallback enumTextCallback = [&](SkUnichar unicodeChar, size_t charByteLength) {
         glyphId = font.unicharToGlyph(unicodeChar);
         pCurrentSkFont = &font;
         if (bHasFallbackFontCreator && (glyphId == 0)) {
             //当前设置的字体不支持这个字，需要使用回退字体
-            const SkFont* pFallbackSkFont = fallbackFontCreator(unicodeChar, &glyphId);
+            pFallbackSkFont = fallbackFontCreator(unicodeChar, &glyphId);
             if (pFallbackSkFont != nullptr) {
                 //字体回退成功
-                pCurrentSkFont = pFallbackSkFont;;
+                pCurrentSkFont = pFallbackSkFont;
             }
         }
 
         if (!tempData.glyphIDList.empty() && (pLastSkFont != pCurrentSkFont)) {
             //处理队列中的数据（批量处理）
             if (bWantGlyphData) {
-                if (!CalculateGlyphIDListWantGlyphData()) {
+                if (!CalculateGlyphIDListWantGlyphData(*pLastSkFont, paint, maxWidth, tempData, *breakTextData,
+                                                       breakTextBytes, totalWidth, glyphId)) {
                     return false;
                 }
             }
             else {
-                if (!CalculateGlyphIDListNoGlyphData()) {
+                if (!CalculateGlyphIDListNoGlyphData(*pLastSkFont, paint, maxWidth, tempData, breakTextBytes, totalWidth)) {
                     return false;
                 }
             }
@@ -876,10 +507,11 @@ size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncodi
     if (!tempData.glyphIDList.empty() && (pLastSkFont != nullptr)) {
         //处理队列中的数据（批量处理）
         if (bWantGlyphData) {
-            CalculateGlyphIDListWantGlyphData();
+            CalculateGlyphIDListWantGlyphData(*pLastSkFont, paint, maxWidth, tempData, *breakTextData,
+                                              breakTextBytes, totalWidth, glyphId);
         }
         else {
-            CalculateGlyphIDListNoGlyphData();
+            CalculateGlyphIDListNoGlyphData(*pLastSkFont, paint, maxWidth, tempData, breakTextBytes, totalWidth);
         }
     }
     if (measuredWidth != nullptr) {
