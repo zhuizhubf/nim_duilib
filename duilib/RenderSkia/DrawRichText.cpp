@@ -194,6 +194,10 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     //本行（逻辑行）已经绘制了多少个字符（不含回车和换行）
     size_t nRowCharCount = 0;
 
+    // const DString statHashBreakName = _T("DrawRichText::InternalDrawRichText Break");
+    // PerformanceUtil::Instance().AddStat(statHashBreakName);
+    // static const size_t statHashBreak = std::hash<DString>{}(statHashBreakName); //2710 ms
+
     for (size_t index = 0; index < richTextData.size(); ++index) {
         const RichTextData& textData = richTextData[index];
         if (textData.m_textView.empty()) {
@@ -253,6 +257,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
         const SkFont& skFont = *pSkFont;
         SkFontMetrics fontMetrics;
         SkScalar fFontHeight = skFont.getMetrics(&fontMetrics);     //字体高度，换行时使用
+        const SkScalar textMeasuredHeight = fontMetrics.fDescent - fontMetrics.fAscent; //当前要绘制的文本所需高度(使用字体的高度)
         fFontHeight = textData.m_fRowSpacingMul * fFontHeight + textData.m_fRowSpacingAdd; //运用行间距倍数和行间距附加量
         const int32_t nFontHeight = SkScalarCeilToInt(fFontHeight);   //行高对齐到像素
         nRowHeight = std::max(nRowHeight, nFontHeight);
@@ -322,8 +327,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 //    ASSERT(maxWidth > 0);
                 //}
                 maxWidth = std::max(maxWidth, 0.0f);
-                SkScalar textMeasuredWidth = 0;  //当前要绘制的文本，估算的所需宽度
-                const SkScalar textMeasuredHeight = fontMetrics.fDescent - fontMetrics.fAscent; //当前要绘制的文本所需高度(使用字体的高度)
+                SkScalar textMeasuredWidth = 0;  //当前要绘制的文本，估算的所需宽度                
 
                 breakTextData.glyphIDs.clear();
                 breakTextData.glyphChars.clear();
@@ -353,7 +357,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     }
                 }
                 else {
-                    //breakText函数执行时间占比约30%
+                    //breakText函数执行时间占比约40%
+                    //PerformanceStatFast ssStatHashBreak(statHashBreak);
                     nDrawLength = DrawSkiaText::BreakText(lineTextView.data() + textStartIndex,
                                                           byteLength, textEncoding,
                                                           skFont, fallbackFontCreator, skPaint,
@@ -390,7 +395,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     }
                 }
                 else {
-                    TPendingDrawRichText newPendingTextData;
+                    TPendingDrawRichText& newPendingTextData = pendingTextData.emplace_back();
                     newPendingTextData.m_nDataIndex = (uint32_t)index;
                     newPendingTextData.m_nLineNumber = nLineNumber;
                     newPendingTextData.m_nRowIndex = nRowIndex;
@@ -408,7 +413,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     newPendingTextData.m_destRect.right = SkScalarCeilToInt(fRight);
                     newPendingTextData.m_destRect.top = yPos;
                     newPendingTextData.m_destRect.bottom = yPos + SkScalarCeilToInt(textMeasuredHeight); //记录字符的真实高度
-                    pendingTextData.emplace_back(std::move(newPendingTextData));
 
                     if (pLineInfoParam != nullptr) {
                         //评估每个字符的矩形范围
