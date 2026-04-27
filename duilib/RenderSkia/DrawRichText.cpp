@@ -22,7 +22,7 @@
 namespace ui {
 
 //待绘制的文本
-struct TPendingDrawRichText : public NVRefCount<TPendingDrawRichText>
+struct TPendingDrawRichText
 {
     //在richTextData中的索引号
     uint32_t m_nDataIndex = 0;
@@ -70,7 +70,7 @@ public:
 
     /** 生成好的待绘制的数据
     */
-    std::vector<SharePtr<TPendingDrawRichText>> m_pendingTextData;
+    std::vector<TPendingDrawRichText> m_pendingTextData;
 };
 
 DrawRichText::DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg) :
@@ -137,7 +137,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     //当绘制超过目标矩形边界时，是否继续绘制
     const bool bBreakWhenOutOfRect = !bMeasureOnly && (pDrawRichTextCache == nullptr);
 
-    std::vector<SharePtr<TPendingDrawRichText>> pendingTextData;
+    std::vector<TPendingDrawRichText> pendingTextData;
     pendingTextData.reserve(richTextData.size());
 
     const int32_t nTextRectRightMax = (int32_t)rcTextRect.right;   //绘制区域的最右侧
@@ -390,25 +390,25 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     }
                 }
                 else {
-                    SharePtr<TPendingDrawRichText> spTextData(new TPendingDrawRichText);
-                    spTextData->m_nDataIndex = (uint32_t)index;
-                    spTextData->m_nLineNumber = nLineNumber;
-                    spTextData->m_nRowIndex = nRowIndex;
-                    spTextData->m_textView = std::wstring_view(lineTextView.data() + textStartIndex, nDrawLength / textCharSize);
-                    spTextData->m_spFont = spSkiaFont;
+                    TPendingDrawRichText newPendingTextData;
+                    newPendingTextData.m_nDataIndex = (uint32_t)index;
+                    newPendingTextData.m_nLineNumber = nLineNumber;
+                    newPendingTextData.m_nRowIndex = nRowIndex;
+                    newPendingTextData.m_textView = std::wstring_view(lineTextView.data() + textStartIndex, nDrawLength / textCharSize);
+                    newPendingTextData.m_spFont = spSkiaFont;
 
-                    spTextData->m_bgColor = textData.m_bgColor;
-                    spTextData->m_textColor = textData.m_textColor;
-                    spTextData->m_textStyle = textData.m_textStyle;
+                    newPendingTextData.m_bgColor = textData.m_bgColor;
+                    newPendingTextData.m_textColor = textData.m_textColor;
+                    newPendingTextData.m_textStyle = textData.m_textStyle;
 
                     //绘制文字所需的矩形区域
-                    spTextData->m_destRect.left = SkScalarTruncToInt(xPos); //左值：直接截断，如果有小数部分，直接去掉小数即可
+                    newPendingTextData.m_destRect.left = SkScalarTruncToInt(xPos); //左值：直接截断，如果有小数部分，直接去掉小数即可
 
                     SkScalar fRight = xPos + textMeasuredWidth;             //右值：如果有小数，则需要增加1个像素
-                    spTextData->m_destRect.right = SkScalarCeilToInt(fRight);
-                    spTextData->m_destRect.top = yPos;
-                    spTextData->m_destRect.bottom = yPos + SkScalarCeilToInt(textMeasuredHeight); //记录字符的真实高度
-                    pendingTextData.emplace_back(std::move(spTextData));
+                    newPendingTextData.m_destRect.right = SkScalarCeilToInt(fRight);
+                    newPendingTextData.m_destRect.top = yPos;
+                    newPendingTextData.m_destRect.bottom = yPos + SkScalarCeilToInt(textMeasuredHeight); //记录字符的真实高度
+                    pendingTextData.emplace_back(std::move(newPendingTextData));
 
                     if (pLineInfoParam != nullptr) {
                         //评估每个字符的矩形范围
@@ -492,8 +492,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
 
     //更新每行的行高(只有提前确定行高，才能正确绘制纵向对齐的文本)
-    for (const SharePtr<TPendingDrawRichText>& spTextData : pendingTextData) {
-        TPendingDrawRichText& textData = *spTextData;
+    for (TPendingDrawRichText& textData : pendingTextData) {
         if (textData.m_nRowIndex < rowHeightVector.size()) {
             textData.m_destRect.bottom = textData.m_destRect.top + rowHeightVector[textData.m_nRowIndex];
         }
@@ -502,8 +501,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     if (pRichTextRects != nullptr) {
         pRichTextRects->clear();
         pRichTextRects->resize(richTextData.size());
-        for (const SharePtr<TPendingDrawRichText>& spTextData : pendingTextData) {
-            const TPendingDrawRichText& textData = *spTextData;
+        for (const TPendingDrawRichText& textData : pendingTextData) {
             //保存绘制的目标区域，同一个文本，可能会有多个区域（换行时）
             ASSERT(textData.m_nDataIndex < pRichTextRects->size());
             std::vector<UiRect>& textRects = (*pRichTextRects)[textData.m_nDataIndex];
@@ -525,8 +523,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     }
     else if (!bMeasureOnly) {
         UiRect rcTemp;
-        for (const SharePtr<TPendingDrawRichText>& spTextData : pendingTextData) {
-            const TPendingDrawRichText& textData = *spTextData;
+        for (const TPendingDrawRichText& textData : pendingTextData) {
             //执行绘制            
             const UiRect& rcDestRect = textData.m_destRect;
             if (!UiRect::Intersect(rcTemp, rcDestRect, rcTextRect)) {
@@ -816,7 +813,7 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
         }
         const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
         for (int32_t nIndex = nCount - 1; nIndex >= 0; --nIndex) {
-            const TPendingDrawRichText& pendingData = *oldData.m_pendingTextData[nIndex];
+            const TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
             if (deletedLineSet.find(pendingData.m_nLineNumber) != deletedLineSet.end()) {
                 oldData.m_pendingTextData.erase(oldData.m_pendingTextData.begin() + nIndex);
             }
@@ -845,7 +842,7 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
             //将新的绘制缓存，合并到原绘制缓存中
             const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
             for (int32_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                const TPendingDrawRichText& pendingData = *oldData.m_pendingTextData[nIndex];
+                const TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
                 if (pendingData.m_nLineNumber > nStartLine) {
                     oldData.m_pendingTextData.insert(oldData.m_pendingTextData.begin() + nIndex, updateData.m_pendingTextData.begin(), updateData.m_pendingTextData.end());
                     nUpdateCacheStartIndex = nIndex + updateData.m_pendingTextData.size();
@@ -869,7 +866,7 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     bool bUpdateLineRows = false;
     const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
     for (int32_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        TPendingDrawRichText& pendingData = *oldData.m_pendingTextData[nIndex];
+        TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
         if (!bUpdateLineRows && bUpdateIndex) {
             if ((nUpdateCacheStartIndex != (size_t)-1)) {
                 //更新行号(有修改，并且修改点不再最后)
@@ -985,8 +982,8 @@ bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& first, cons
 
     const size_t nCount = first.m_pendingTextData.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        const TPendingDrawRichText& v1 = *first.m_pendingTextData[nIndex];
-        const TPendingDrawRichText& v2 = *second.m_pendingTextData[nIndex];
+        const TPendingDrawRichText& v1 = first.m_pendingTextData[nIndex];
+        const TPendingDrawRichText& v2 = second.m_pendingTextData[nIndex];
 
         //m_nDataIndex 此值不需要比较
         ASSERT(v1.m_nLineNumber == v2.m_nLineNumber);
@@ -1072,7 +1069,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     const SkTextEncoding textEncoding = spDrawRichTextCache->m_textEncoding;
     const size_t textCharSize = spDrawRichTextCache->m_textCharSize;
 
-    const std::vector<SharePtr<TPendingDrawRichText>>& pendingTextData = spDrawRichTextCache->m_pendingTextData;
+    const std::vector<TPendingDrawRichText>& pendingTextData = spDrawRichTextCache->m_pendingTextData;
 
     UiRect rcTemp;
     UiRect rcDestRect;
@@ -1089,8 +1086,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     }
 
     UiColor textColor;
-    for (const SharePtr<TPendingDrawRichText>& spTextData : pendingTextData) {
-        const TPendingDrawRichText& textData = *spTextData;
+    for (const TPendingDrawRichText& textData : pendingTextData) {
         //通过缓存绘制的时候，不能使用textData.m_nDataIndex值，此值再增量绘制的情况下是不正确的
         
         //执行绘制        
