@@ -1,4 +1,4 @@
-#include "RichEdit_SDL.h"
+#include "RichEdit2.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Core/WindowMessage.h"
@@ -17,14 +17,15 @@
 #include "duilib/Box/VBox.h"
 
 #ifdef DUILIB_BUILD_FOR_SDL
-#include <SDL3/SDL.h>
+    #include <SDL3/SDL.h>
+#endif //DUILIB_BUILD_FOR_SDL
 
 //缩放百分比的最大值
 #define MAX_ZOOM_PERCENT 800
 
 namespace ui {
 
-RichEdit::RichEdit(Window* pWindow) :
+RichEdit2::RichEdit2(Window* pWindow) :
     ScrollBox(pWindow, new Layout),
     m_bWantTab(false),
     m_bWantReturn(false),
@@ -96,7 +97,7 @@ RichEdit::RichEdit(Window* pWindow) :
     m_pTextData = new RichEditData(this);
 }
 
-RichEdit::~RichEdit()
+RichEdit2::~RichEdit2()
 {
     if (m_pFocusedImage != nullptr) {
         delete m_pFocusedImage;
@@ -113,9 +114,9 @@ RichEdit::~RichEdit()
     }
 }
 
-DString RichEdit::GetType() const { return DUI_CTR_RICHEDIT; }
+DString RichEdit2::GetType() const { return DUI_CTR_RICHEDIT2; }
 
-void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
+void RichEdit2::SetAttribute(const DString& strName, const DString& strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
@@ -354,7 +355,7 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
     }
 }
 
-void RichEdit::OnInit()
+void RichEdit2::OnInit()
 {
     if (IsInited()) {
         return;
@@ -378,7 +379,7 @@ void RichEdit::OnInit()
     }
 }
 
-void RichEdit::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
+void RichEdit2::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
 {
     if (!Dpi().CheckDisplayScaleFactor(nNewDpiScale)) {
         return;
@@ -396,47 +397,47 @@ void RichEdit::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-bool RichEdit::IsWantTab() const
+bool RichEdit2::IsWantTab() const
 {
     return m_bWantTab;
 }
 
-void RichEdit::SetWantTab(bool bWantTab)
+void RichEdit2::SetWantTab(bool bWantTab)
 {
     m_bWantTab = bWantTab;
 }
 
-bool RichEdit::CanPlaceCaptionBar() const
+bool RichEdit2::CanPlaceCaptionBar() const
 {
     return true;
 }
 
-bool RichEdit::IsWantReturn() const
+bool RichEdit2::IsWantReturn() const
 {
     return m_bWantReturn;
 }
 
-void RichEdit::SetWantReturn(bool bWantReturn)
+void RichEdit2::SetWantReturn(bool bWantReturn)
 {
     m_bWantReturn = bWantReturn;
 }
 
-bool RichEdit::IsWantCtrlReturn() const
+bool RichEdit2::IsWantCtrlReturn() const
 {
     return m_bWantCtrlReturn;
 }
 
-void RichEdit::SetWantCtrlReturn(bool bWantCtrlReturn)
+void RichEdit2::SetWantCtrlReturn(bool bWantCtrlReturn)
 {
     m_bWantCtrlReturn = bWantCtrlReturn;
 }
 
-bool RichEdit::IsReadOnly() const
+bool RichEdit2::IsReadOnly() const
 {
     return m_bReadOnly;
 }
 
-void RichEdit::SetReadOnly(bool bReadOnly)
+void RichEdit2::SetReadOnly(bool bReadOnly)
 {
     if (m_bReadOnly != bReadOnly) {
         m_bReadOnly = bReadOnly;
@@ -444,7 +445,7 @@ void RichEdit::SetReadOnly(bool bReadOnly)
     }    
 }
 
-bool RichEdit::RemoveInvalidPasswordChar(DStringA& text)
+bool RichEdit2::RemoveInvalidPasswordChar(DStringA& text)
 {
     bool bRet = false;
     if (!text.empty()) {
@@ -459,7 +460,7 @@ bool RichEdit::RemoveInvalidPasswordChar(DStringA& text)
     return bRet;
 }
 
-bool RichEdit::RemoveInvalidPasswordChar(DStringW& text)
+bool RichEdit2::RemoveInvalidPasswordChar(DStringW& text)
 {
     bool bRet = false;
     if (!text.empty()) {
@@ -474,7 +475,7 @@ bool RichEdit::RemoveInvalidPasswordChar(DStringW& text)
     return bRet;
 }
 
-void RichEdit::ReplacePasswordChar(DStringW& text) const
+void RichEdit2::ReplacePasswordChar(DStringW& text) const
 {
     const size_t nTextLen = text.size();
     if (!IsShowPassword() && (nTextLen > 0)) {
@@ -488,12 +489,12 @@ void RichEdit::ReplacePasswordChar(DStringW& text) const
     }
 }
 
-int32_t RichEdit::GetTextLimitLength() const
+int32_t RichEdit2::GetTextLimitLength() const
 {
     return GetLimitText();
 }
 
-void RichEdit::StopFlashPasswordChar()
+void RichEdit2::StopFlashPasswordChar()
 {
     if (m_bInputPasswordChar) {
         m_bInputPasswordChar = false;
@@ -501,12 +502,12 @@ void RichEdit::StopFlashPasswordChar()
     }
 }
 
-bool RichEdit::IsPasswordMode() const
+bool RichEdit2::IsPasswordMode() const
 {
     return m_bPasswordMode;
 }
 
-void RichEdit::SetPasswordMode(bool bPasswordMode)
+void RichEdit2::SetPasswordMode(bool bPasswordMode)
 {
     if (m_bPasswordMode != bPasswordMode) {
         m_bPasswordMode = bPasswordMode;
@@ -526,7 +527,7 @@ void RichEdit::SetPasswordMode(bool bPasswordMode)
     }
 }
 
-void RichEdit::SetShowPassword(bool bShow)
+void RichEdit2::SetShowPassword(bool bShow)
 {
     if (m_bShowPassword != bShow) {
         m_bShowPassword = bShow;
@@ -535,12 +536,12 @@ void RichEdit::SetShowPassword(bool bShow)
     }
 }
 
-bool RichEdit::IsShowPassword() const
+bool RichEdit2::IsShowPassword() const
 {
     return m_bShowPassword;
 }
 
-void RichEdit::SetPasswordChar(DStringW::value_type ch)
+void RichEdit2::SetPasswordChar(DStringW::value_type ch)
 {
     if (m_chPasswordChar != ch) {
         m_chPasswordChar = ch;
@@ -551,53 +552,53 @@ void RichEdit::SetPasswordChar(DStringW::value_type ch)
     }
 }
 
-DStringW::value_type RichEdit::GetPasswordChar() const
+DStringW::value_type RichEdit2::GetPasswordChar() const
 {
     return m_chPasswordChar;
 }
 
-void RichEdit::SetFlashPasswordChar(bool bFlash)
+void RichEdit2::SetFlashPasswordChar(bool bFlash)
 {
     m_bFlashPasswordChar = bFlash;
 }
 
-bool RichEdit::IsFlashPasswordChar() const
+bool RichEdit2::IsFlashPasswordChar() const
 {
     return m_bFlashPasswordChar;
 }
 
-bool RichEdit::IsNumberOnly() const
+bool RichEdit2::IsNumberOnly() const
 {
     return m_bNumberOnly;
 }
 
-void RichEdit::SetNumberOnly(bool bNumberOnly)
+void RichEdit2::SetNumberOnly(bool bNumberOnly)
 {
     //只影响输入，不影响其他方式（比如SetText等方式改变文本）
     m_bNumberOnly = bNumberOnly;
 }
 
-void RichEdit::SetMaxNumber(int32_t maxNumber)
+void RichEdit2::SetMaxNumber(int32_t maxNumber)
 {
     m_maxNumber = maxNumber;
 }
 
-int32_t RichEdit::GetMaxNumber() const
+int32_t RichEdit2::GetMaxNumber() const
 {
     return m_maxNumber;
 }
 
-void RichEdit::SetMinNumber(int32_t minNumber)
+void RichEdit2::SetMinNumber(int32_t minNumber)
 {
     m_minNumber = minNumber;
 }
 
-int32_t RichEdit::GetMinNumber() const
+int32_t RichEdit2::GetMinNumber() const
 {
     return m_minNumber;
 }
 
-void RichEdit::SetNumberFormat64(const DString& numberFormat)
+void RichEdit2::SetNumberFormat64(const DString& numberFormat)
 {
     DString format = numberFormat;
 #if defined (DUILIB_BUILD_FOR_WIN)
@@ -608,17 +609,17 @@ void RichEdit::SetNumberFormat64(const DString& numberFormat)
     m_numberFormat = format;
 }
 
-DString RichEdit::GetNumberFormat64() const
+DString RichEdit2::GetNumberFormat64() const
 {
     return m_numberFormat.c_str();
 }
 
-bool RichEdit::IsWordWrap() const
+bool RichEdit2::IsWordWrap() const
 {
     return m_bWordWrap;
 }
 
-void RichEdit::SetWordWrap(bool bWordWrap)
+void RichEdit2::SetWordWrap(bool bWordWrap)
 {
     if (m_bWordWrap != bWordWrap) {
         m_bWordWrap = bWordWrap;
@@ -627,12 +628,12 @@ void RichEdit::SetWordWrap(bool bWordWrap)
     }
 }
 
-bool RichEdit::IsMultiLine() const
+bool RichEdit2::IsMultiLine() const
 {
     return !m_pTextData->IsSingleLineMode();
 }
 
-void RichEdit::SetMultiLine(bool bMultiLine)
+void RichEdit2::SetMultiLine(bool bMultiLine)
 {
     bool bSingleLineMode = !bMultiLine;
     if (m_pTextData->IsSingleLineMode() != bSingleLineMode) {
@@ -642,7 +643,7 @@ void RichEdit::SetMultiLine(bool bMultiLine)
     }
 }
 
-void RichEdit::SetFontId(const DString& strFontId)
+void RichEdit2::SetFontId(const DString& strFontId)
 {
     if (m_sFontId != strFontId) {
         m_sFontId = strFontId;
@@ -655,17 +656,17 @@ void RichEdit::SetFontId(const DString& strFontId)
     }
 }
 
-DString RichEdit::GetFontId() const
+DString RichEdit2::GetFontId() const
 {
     return m_sFontId.c_str();
 }
 
-DString RichEdit::GetInternalFontId() const
+DString RichEdit2::GetInternalFontId() const
 {
     return StringUtil::Printf(_T("RichEdit_SDL(0x%p)"), this);
 }
 
-DString RichEdit::GetCurrentFontId() const
+DString RichEdit2::GetCurrentFontId() const
 {
     DString fontId = GetInternalFontId();
     if (!GlobalManager::Instance().Font().HasFontId(fontId)) {
@@ -674,7 +675,7 @@ DString RichEdit::GetCurrentFontId() const
     return fontId;
 }
 
-void RichEdit::SetFontIdInternal(const DString& fontId)
+void RichEdit2::SetFontIdInternal(const DString& fontId)
 {
     //创建光标
     IFont* pFont = GetIFontInternal(fontId);
@@ -708,7 +709,7 @@ void RichEdit::SetFontIdInternal(const DString& fontId)
     m_nSelXPos = -1;
 }
 
-IFont* RichEdit::GetIFontInternal(const DString& fontId) const
+IFont* RichEdit2::GetIFontInternal(const DString& fontId) const
 {
     ASSERT(!fontId.empty());
     const DpiManager& dpi = Dpi();
@@ -720,7 +721,7 @@ IFont* RichEdit::GetIFontInternal(const DString& fontId) const
     return pFont;
 }
 
-UiFont RichEdit::GetFontInfo() const
+UiFont RichEdit2::GetFontInfo() const
 {
     UiFont uiFont;
     IFont* pFont = GlobalManager::Instance().Font().GetIFont(GetCurrentFontId(), Dpi());
@@ -735,7 +736,7 @@ UiFont RichEdit::GetFontInfo() const
     return uiFont;
 }
 
-bool RichEdit::SetFontInfo(const UiFont& fontInfo)
+bool RichEdit2::SetFontInfo(const UiFont& fontInfo)
 {
     ASSERT(fontInfo.m_fontSize > 0);
     if (fontInfo.m_fontSize <= 0) {
@@ -776,14 +777,14 @@ bool RichEdit::SetFontInfo(const UiFont& fontInfo)
     return true;
 }
 
-void RichEdit::OnFontChanged(const DString& fontId)
+void RichEdit2::OnFontChanged(const DString& fontId)
 {
     SetFontIdInternal(fontId);
     //清除绘制缓存，并重绘
     ClearCacheAndRedraw();
 }
 
-void RichEdit::OnZoomPercentChanged(uint32_t nOldZoomPercent, uint32_t nNewZoomPercent)
+void RichEdit2::OnZoomPercentChanged(uint32_t nOldZoomPercent, uint32_t nNewZoomPercent)
 {
     //删除旧的字体缓存，以释放内存
     if (nOldZoomPercent != 100) {
@@ -807,7 +808,7 @@ void RichEdit::OnZoomPercentChanged(uint32_t nOldZoomPercent, uint32_t nNewZoomP
     SendEvent(kEventZoom, (WPARAM)nNewZoomPercent, 0);
 }
 
-void RichEdit::SetTextColor(const DString& dwTextColor)
+void RichEdit2::SetTextColor(const DString& dwTextColor)
 {
     if (m_sTextColor != dwTextColor) {
         m_sTextColor = dwTextColor;
@@ -817,7 +818,7 @@ void RichEdit::SetTextColor(const DString& dwTextColor)
     }    
 }
 
-DString RichEdit::GetTextColor() const
+DString RichEdit2::GetTextColor() const
 {
     if (!m_sTextColor.empty()) {
         return m_sTextColor.c_str();
@@ -827,7 +828,7 @@ DString RichEdit::GetTextColor() const
     }
 }
 
-void RichEdit::SetDisabledTextColor(const DString& dwTextColor)
+void RichEdit2::SetDisabledTextColor(const DString& dwTextColor)
 {
     if (m_sDisabledTextColor != dwTextColor) {
         m_sDisabledTextColor = dwTextColor;
@@ -837,7 +838,7 @@ void RichEdit::SetDisabledTextColor(const DString& dwTextColor)
     }    
 }
 
-DString RichEdit::GetDisabledTextColor() const
+DString RichEdit2::GetDisabledTextColor() const
 {
     if (!m_sDisabledTextColor.empty()) {
         return m_sDisabledTextColor.c_str();
@@ -850,7 +851,7 @@ DString RichEdit::GetDisabledTextColor() const
     }
 }
 
-void RichEdit::SetSelectionBkColor(const DString& selectionBkColor)
+void RichEdit2::SetSelectionBkColor(const DString& selectionBkColor)
 {
     if (m_sSelectionBkColor != selectionBkColor) {
         m_sSelectionBkColor = selectionBkColor;
@@ -858,12 +859,12 @@ void RichEdit::SetSelectionBkColor(const DString& selectionBkColor)
     }
 }
 
-DString RichEdit::GetSelectionBkColor() const
+DString RichEdit2::GetSelectionBkColor() const
 {
     return m_sSelectionBkColor.c_str();
 }
 
-void RichEdit::SetInactiveSelectionBkColor(const DString& selectionBkColor)
+void RichEdit2::SetInactiveSelectionBkColor(const DString& selectionBkColor)
 {
     if (m_sInactiveSelectionBkColor != selectionBkColor) {
         m_sInactiveSelectionBkColor = selectionBkColor;
@@ -871,37 +872,37 @@ void RichEdit::SetInactiveSelectionBkColor(const DString& selectionBkColor)
     }
 }
 
-DString RichEdit::GetInactiveSelectionBkColor() const
+DString RichEdit2::GetInactiveSelectionBkColor() const
 {
     return m_sInactiveSelectionBkColor.c_str();
 }
 
-void RichEdit::SetCurrentRowBkColor(const DString& currentRowBkColor)
+void RichEdit2::SetCurrentRowBkColor(const DString& currentRowBkColor)
 {
     m_sCurrentRowBkColor = currentRowBkColor;
 }
 
-DString RichEdit::GetCurrentRowBkColor() const
+DString RichEdit2::GetCurrentRowBkColor() const
 {
     return m_sCurrentRowBkColor.c_str();
 }
 
-void RichEdit::SetInactiveCurrentRowBkColor(const DString& currentRowBkColor)
+void RichEdit2::SetInactiveCurrentRowBkColor(const DString& currentRowBkColor)
 {
     m_sInactiveCurrentRowBkColor = currentRowBkColor;
 }
 
-DString RichEdit::GetInactiveCurrentRowBkColor() const
+DString RichEdit2::GetInactiveCurrentRowBkColor() const
 {
     return m_sInactiveCurrentRowBkColor.c_str();
 }
 
-float RichEdit::GetRowSpacingMul() const
+float RichEdit2::GetRowSpacingMul() const
 {
     return m_fRowSpacingMul;
 }
 
-void RichEdit::SetRowSpacingMul(float fRowSpacingMul)
+void RichEdit2::SetRowSpacingMul(float fRowSpacingMul)
 {
     if (m_fRowSpacingMul != fRowSpacingMul) {
         m_fRowSpacingMul = fRowSpacingMul;
@@ -913,12 +914,12 @@ void RichEdit::SetRowSpacingMul(float fRowSpacingMul)
     }
 }
 
-float RichEdit::GetRowSpacingAdd() const
+float RichEdit2::GetRowSpacingAdd() const
 {
     return m_fRowSpacingAdd;
 }
 
-void RichEdit::SetRowSpacingAdd(float fRowSpacingAdd)
+void RichEdit2::SetRowSpacingAdd(float fRowSpacingAdd)
 {
     if (m_fRowSpacingAdd != fRowSpacingAdd) {
         m_fRowSpacingAdd = fRowSpacingAdd;
@@ -930,12 +931,12 @@ void RichEdit::SetRowSpacingAdd(float fRowSpacingAdd)
     }
 }
 
-int32_t RichEdit::GetLimitText() const
+int32_t RichEdit2::GetLimitText() const
 {
     return m_nLimitText;
 }
 
-void RichEdit::SetLimitText(int32_t iChars)
+void RichEdit2::SetLimitText(int32_t iChars)
 {
     if (iChars < 0) {
         iChars = 0;
@@ -953,7 +954,7 @@ void RichEdit::SetLimitText(int32_t iChars)
     }    
 }
 
-DString RichEdit::GetLimitChars() const
+DString RichEdit2::GetLimitChars() const
 {
     if (m_pLimitChars != nullptr) {
         return StringConvert::WStringToT(m_pLimitChars.get());
@@ -963,7 +964,7 @@ DString RichEdit::GetLimitChars() const
     }
 }
 
-void RichEdit::SetLimitChars(const DString& limitChars)
+void RichEdit2::SetLimitChars(const DString& limitChars)
 {
     m_pLimitChars.reset();
     DStringW limitCharsW = StringConvert::TToWString(limitChars);
@@ -975,19 +976,19 @@ void RichEdit::SetLimitChars(const DString& limitChars)
     }
 }
 
-int32_t RichEdit::GetTextLength() const
+int32_t RichEdit2::GetTextLength() const
 {
     return (int32_t)m_pTextData->GetTextLength();
 }
 
-int32_t RichEdit::InsertText(int32_t nInsertAfterChar, const DString& text, bool bCanUndo)
+int32_t RichEdit2::InsertText(int32_t nInsertAfterChar, const DString& text, bool bCanUndo)
 {
     int32_t nRet = SetSel(nInsertAfterChar, nInsertAfterChar);
     ReplaceSel(text, bCanUndo);
     return nRet;
 }
 
-int32_t RichEdit::AppendText(const DString& text, bool bCanUndo, bool bScrollBottom)
+int32_t RichEdit2::AppendText(const DString& text, bool bCanUndo, bool bScrollBottom)
 {
     int32_t nRet = SetSel(-1, -1);
     ReplaceSel(text, bCanUndo);
@@ -1000,12 +1001,12 @@ int32_t RichEdit::AppendText(const DString& text, bool bCanUndo, bool bScrollBot
     return nRet;
 }
 
-bool RichEdit::IsEmpty() const
+bool RichEdit2::IsEmpty() const
 {
     return m_pTextData->IsEmpty();
 }
 
-DString RichEdit::GetText() const
+DString RichEdit2::GetText() const
 {
     
 #ifdef DUILIB_UNICODE
@@ -1015,17 +1016,17 @@ DString RichEdit::GetText() const
 #endif
 }
 
-DStringA RichEdit::GetTextA() const
+DStringA RichEdit2::GetTextA() const
 {
     return StringConvert::WStringToUTF8(m_pTextData->GetText());
 }
 
-DStringW RichEdit::GetTextW() const
+DStringW RichEdit2::GetTextW() const
 {
     return m_pTextData->GetText();
 }
 
-void RichEdit::SetText(const DStringW& strText)
+void RichEdit2::SetText(const DStringW& strText)
 {
     //目前内存占用情况：2MB的UTF16格式文本，Debug版本：占用约23MB的内存，Release版本：占用约12MB的内存。
     bool bChanged = false;
@@ -1051,7 +1052,7 @@ void RichEdit::SetText(const DStringW& strText)
     }
 }
 
-void RichEdit::SetText(const DStringA& strText)
+void RichEdit2::SetText(const DStringA& strText)
 {
     //目前内存占用情况：2MB的UTF16格式文本，Debug版本：占用约23MB的内存，Release版本：占用约12MB的内存。
     bool bChanged = false;
@@ -1078,7 +1079,7 @@ void RichEdit::SetText(const DStringA& strText)
     }
 }
 
-void RichEdit::SetTextNoEvent(const DString& strText)
+void RichEdit2::SetTextNoEvent(const DString& strText)
 {
     bool bOldValue = m_bDisableTextChangeEvent;
     m_bDisableTextChangeEvent = true;
@@ -1086,23 +1087,23 @@ void RichEdit::SetTextNoEvent(const DString& strText)
     m_bDisableTextChangeEvent = bOldValue;
 }
 
-void RichEdit::SetTextId(const DString& strTextId)
+void RichEdit2::SetTextId(const DString& strTextId)
 {
     DString strText = GlobalManager::Instance().Lang().GetStringByID(strTextId);
     SetText(strText);
 }
 
-bool RichEdit::GetModify() const
+bool RichEdit2::GetModify() const
 { 
     return m_bModified;
 }
 
-void RichEdit::SetModify(bool bModified)
+void RichEdit2::SetModify(bool bModified)
 { 
     m_bModified = bModified;
 }
 
-void RichEdit::GetSel(int32_t& nStartChar, int32_t& nEndChar) const
+void RichEdit2::GetSel(int32_t& nStartChar, int32_t& nEndChar) const
 {
     const int32_t nTextLen = GetTextLength();
     nStartChar = m_nSelStartIndex;
@@ -1116,7 +1117,7 @@ void RichEdit::GetSel(int32_t& nStartChar, int32_t& nEndChar) const
     }
 }
 
-int32_t RichEdit::SetSel(int32_t nStartChar, int32_t nEndChar)
+int32_t RichEdit2::SetSel(int32_t nStartChar, int32_t nEndChar)
 {
     m_nSelXPos = -1;
     int32_t nSelStartChar = InternalSetSel(nStartChar, nEndChar);
@@ -1125,7 +1126,7 @@ int32_t RichEdit::SetSel(int32_t nStartChar, int32_t nEndChar)
     return nSelStartChar;
 }
 
-int32_t RichEdit::InternalSetSel(int32_t nStartChar, int32_t nEndChar)
+int32_t RichEdit2::InternalSetSel(int32_t nStartChar, int32_t nEndChar)
 {
     if (nStartChar < 0) {
         nStartChar = -1;
@@ -1200,7 +1201,7 @@ int32_t RichEdit::InternalSetSel(int32_t nStartChar, int32_t nEndChar)
     return nStartChar;
 }
 
-void RichEdit::EnsureCharVisible(int32_t nCharIndex)
+void RichEdit2::EnsureCharVisible(int32_t nCharIndex)
 {
     UiRect rcDrawRect = GetTextDrawRect(GetRect());
     if (rcDrawRect.IsEmpty()) {
@@ -1238,7 +1239,7 @@ void RichEdit::EnsureCharVisible(int32_t nCharIndex)
     }
 }
 
-bool RichEdit::FindRichText(const FindTextParam& findParam, TextCharRange& chrgText) const
+bool RichEdit2::FindRichText(const FindTextParam& findParam, TextCharRange& chrgText) const
 {
     DStringW findText = StringConvert::TToWString(findParam.findText);
     if (findText.empty()) {
@@ -1254,23 +1255,23 @@ bool RichEdit::FindRichText(const FindTextParam& findParam, TextCharRange& chrgT
     return bRet;
 }
 
-bool RichEdit::IsRichText() const
+bool RichEdit2::IsRichText() const
 {
     return false;
 }
 
-DString RichEdit::GetSelectionTextColor() const
+DString RichEdit2::GetSelectionTextColor() const
 {
     ASSERT(0);
     return DString();
 }
 
-void RichEdit::SetSelectionTextColor(const DString& /*textColor*/)
+void RichEdit2::SetSelectionTextColor(const DString& /*textColor*/)
 {
     ASSERT(0);
 }
 
-bool RichEdit::ReplaceSel(const DString& newText, bool bCanUndo)
+bool RichEdit2::ReplaceSel(const DString& newText, bool bCanUndo)
 {
     if (IsReadOnly() || !IsEnabled()) {
         //只读或者Disable状态，禁止编辑
@@ -1297,7 +1298,7 @@ bool RichEdit::ReplaceSel(const DString& newText, bool bCanUndo)
     return bRet;
 }
 
-DString RichEdit::GetSelText() const
+DString RichEdit2::GetSelText() const
 {
     int32_t nStartChar = -1;
     int32_t nEndChar = -1;
@@ -1310,7 +1311,7 @@ DString RichEdit::GetSelText() const
 #endif
 }
 
-bool RichEdit::HasSelText() const
+bool RichEdit2::HasSelText() const
 {
     ASSERT((int32_t)m_pTextData->GetText().size() == GetTextLength());
 
@@ -1320,27 +1321,27 @@ bool RichEdit::HasSelText() const
     return (nSelEndChar - nSelStartChar) > 0 ? true : false;
 }
 
-int32_t RichEdit::SetSelAll()
+int32_t RichEdit2::SetSelAll()
 {
     return SetSel(0, -1);
 }
 
-void RichEdit::SetSelNone()
+void RichEdit2::SetSelNone()
 {
     SetSel(-1, 0);
 }
 
-DString RichEdit::GetTextRange(int32_t nStartChar, int32_t nEndChar) const
+DString RichEdit2::GetTextRange(int32_t nStartChar, int32_t nEndChar) const
 {
     return StringConvert::WStringToT(m_pTextData->GetTextRange(nStartChar, nEndChar));
 }
 
-void RichEdit::HideSelection(bool bHideSelection)
+void RichEdit2::HideSelection(bool bHideSelection)
 {
     SetHideSelection(bHideSelection);
 }
 
-void RichEdit::SetHideSelection(bool bHideSelection)
+void RichEdit2::SetHideSelection(bool bHideSelection)
 {
     if (m_bHideSelection != bHideSelection) {
         m_bHideSelection = bHideSelection;
@@ -1348,12 +1349,12 @@ void RichEdit::SetHideSelection(bool bHideSelection)
     }
 }
 
-bool RichEdit::IsHideSelection() const
+bool RichEdit2::IsHideSelection() const
 {
     return m_bHideSelection;
 }
 
-void RichEdit::SetFocusedBottomBorderSize(int32_t nBottomBorderSize)
+void RichEdit2::SetFocusedBottomBorderSize(int32_t nBottomBorderSize)
 {
     ASSERT(nBottomBorderSize > 0);
     if (nBottomBorderSize < 0) {
@@ -1362,22 +1363,22 @@ void RichEdit::SetFocusedBottomBorderSize(int32_t nBottomBorderSize)
     m_nFocusBottomBorderSize = ui::TruncateToUInt8(nBottomBorderSize);
 }
 
-int32_t RichEdit::GetFocusedBottomBorderSize() const
+int32_t RichEdit2::GetFocusedBottomBorderSize() const
 {
     return (int32_t)(uint32_t)m_nFocusBottomBorderSize;
 }
 
-void RichEdit::SetFocusedBottomBorderColor(const DString& bottomBorderColor)
+void RichEdit2::SetFocusedBottomBorderColor(const DString& bottomBorderColor)
 {
     m_sFocusBottomBorderColor = bottomBorderColor;
 }
 
-DString RichEdit::GetFocusedBottomBorderColor() const
+DString RichEdit2::GetFocusedBottomBorderColor() const
 {
     return m_sFocusBottomBorderColor.c_str();
 }
 
-bool RichEdit::CanRedo() const
+bool RichEdit2::CanRedo() const
 {
     if (IsReadOnly() || !IsEnabled()) {
         return false;
@@ -1385,7 +1386,7 @@ bool RichEdit::CanRedo() const
     return m_pTextData->CanRedo();
 }
 
-bool RichEdit::Redo()
+bool RichEdit2::Redo()
 {
     if (!CanRedo()) {
         return false;
@@ -1400,7 +1401,7 @@ bool RichEdit::Redo()
     return bRet;
 }
 
-bool RichEdit::CanUndo() const
+bool RichEdit2::CanUndo() const
 {
     if (IsReadOnly() || !IsEnabled()) {
         return false;
@@ -1408,7 +1409,7 @@ bool RichEdit::CanUndo() const
     return m_pTextData->CanUndo();
 }
 
-bool RichEdit::Undo()
+bool RichEdit2::Undo()
 {
     if (!CanUndo()) {
         return false;
@@ -1423,7 +1424,7 @@ bool RichEdit::Undo()
     return bRet;
 }
 
-void RichEdit::Clear()
+void RichEdit2::Clear()
 {
     if (IsReadOnly() || !IsEnabled() || !HasSelText()) {
         return;
@@ -1445,7 +1446,7 @@ void RichEdit::Clear()
     }
 }
 
-void RichEdit::Copy()
+void RichEdit2::Copy()
 {
     if (IsPasswordMode()) {
         //密码模式下，不支持复制
@@ -1458,7 +1459,7 @@ void RichEdit::Copy()
     Clipboard::SetClipboardText(text);
 }
 
-void RichEdit::Cut()
+void RichEdit2::Cut()
 {
     if (IsReadOnly() || !IsEnabled() || IsPasswordMode()) {
         //只读模式，密码模式，Disable状态下，不支持剪切
@@ -1483,7 +1484,7 @@ void RichEdit::Cut()
     }
 }
 
-void RichEdit::Paste()
+void RichEdit2::Paste()
 {
     if (!CanPaste()) {
         return;
@@ -1510,7 +1511,7 @@ void RichEdit::Paste()
     }
 }
 
-bool RichEdit::CanPaste() const
+bool RichEdit2::CanPaste() const
 {
     if (IsReadOnly() || !IsEnabled()) {
         return false;
@@ -1521,12 +1522,12 @@ bool RichEdit::CanPaste() const
     return true;
 }
 
-int32_t RichEdit::GetLineCount() const
+int32_t RichEdit2::GetLineCount() const
 {
     return m_pTextData->GetRowCount();
 }
 
-DString RichEdit::GetLine(int32_t nIndex, int32_t nMaxLength) const
+DString RichEdit2::GetLine(int32_t nIndex, int32_t nMaxLength) const
 {
     if (nMaxLength < 1) {
         return DString();
@@ -1538,17 +1539,17 @@ DString RichEdit::GetLine(int32_t nIndex, int32_t nMaxLength) const
     return StringConvert::WStringToT(rowText);
 }
 
-int32_t RichEdit::LineIndex(int32_t nLine) const
+int32_t RichEdit2::LineIndex(int32_t nLine) const
 {
     return m_pTextData->RowIndex(nLine);
 }
 
-int32_t RichEdit::LineLength(int32_t nLine) const
+int32_t RichEdit2::LineLength(int32_t nLine) const
 {
     return m_pTextData->RowLength(nLine);
 }
 
-bool RichEdit::LineScroll(int32_t nLines)
+bool RichEdit2::LineScroll(int32_t nLines)
 {
     int32_t nCharIndex = m_pTextData->RowIndex(nLines);
     if (nCharIndex < 0) {
@@ -1574,23 +1575,23 @@ bool RichEdit::LineScroll(int32_t nLines)
     return true;
 }
 
-int32_t RichEdit::LineFromChar(int32_t nIndex) const
+int32_t RichEdit2::LineFromChar(int32_t nIndex) const
 {
     return m_pTextData->RowFromChar(nIndex);
 }
 
-void RichEdit::EmptyUndoBuffer()
+void RichEdit2::EmptyUndoBuffer()
 {
     m_pTextData->EmptyUndoBuffer();
 }
 
-void RichEdit::SetUndoLimit(uint32_t nLimit)
+void RichEdit2::SetUndoLimit(uint32_t nLimit)
 {
     m_pTextData->SetUndoLimit(nLimit);
 }
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-HWND RichEdit::GetWindowHWND() const
+HWND RichEdit2::GetWindowHWND() const
 {
     auto window = GetWindow();
     return window ? window->NativeWnd()->GetHWND() : nullptr;
@@ -1598,7 +1599,7 @@ HWND RichEdit::GetWindowHWND() const
 
 #endif
 
-void RichEdit::OnScrollOffsetChanged(const UiSize& /*oldScrollOffset*/, const UiSize& newScrollOffset)
+void RichEdit2::OnScrollOffsetChanged(const UiSize& /*oldScrollOffset*/, const UiSize& newScrollOffset)
 {
     //滚动条位置变化后，需要重新绘制，但不需要重新计算，以免影响绘制速度
     Invalidate();
@@ -1606,7 +1607,7 @@ void RichEdit::OnScrollOffsetChanged(const UiSize& /*oldScrollOffset*/, const Ui
     m_pTextData->SetScrollOffset(newScrollOffset);
 }
 
-void RichEdit::SetWindow(Window* pWindow)
+void RichEdit2::SetWindow(Window* pWindow)
 {
     BaseClass::SetWindow(pWindow);
     if (pWindow != nullptr) {
@@ -1623,17 +1624,17 @@ void RichEdit::SetWindow(Window* pWindow)
     }
 }
 
-void RichEdit::LineUp(int32_t deltaValue)
+void RichEdit2::LineUp(int32_t deltaValue)
 {
     BaseClass::LineUp(deltaValue);
 }
 
-void RichEdit::LineDown(int32_t deltaValue)
+void RichEdit2::LineDown(int32_t deltaValue)
 {
     BaseClass::LineDown(deltaValue);
 }
 
-void RichEdit::PageUp()
+void RichEdit2::PageUp()
 {
     UiSize64 sz = GetScrollPos();
     int32_t iOffset = GetPageScrollDeltaValue(false);
@@ -1641,7 +1642,7 @@ void RichEdit::PageUp()
     SetScrollPos(sz);
 }
 
-void RichEdit::PageDown()
+void RichEdit2::PageDown()
 {
     UiSize64 sz = GetScrollPos();
     int32_t iOffset = GetPageScrollDeltaValue(true);
@@ -1649,47 +1650,47 @@ void RichEdit::PageDown()
     SetScrollPos(sz);
 }
 
-void RichEdit::HomeUp()
+void RichEdit2::HomeUp()
 {
     BaseClass::HomeUp();
 }
 
-void RichEdit::EndDown(bool arrange)
+void RichEdit2::EndDown(bool arrange)
 {
     BaseClass::EndDown(arrange);
 }
 
-void RichEdit::LineLeft(int32_t deltaValue)
+void RichEdit2::LineLeft(int32_t deltaValue)
 {
     BaseClass::LineLeft(deltaValue);
 }
 
-void RichEdit::LineRight(int32_t deltaValue)
+void RichEdit2::LineRight(int32_t deltaValue)
 {
     BaseClass::LineRight(deltaValue);
 }
 
-void RichEdit::PageLeft()
+void RichEdit2::PageLeft()
 {
     BaseClass::PageLeft();
 }
 
-void RichEdit::PageRight()
+void RichEdit2::PageRight()
 {
     BaseClass::PageRight();
 }
 
-void RichEdit::HomeLeft()
+void RichEdit2::HomeLeft()
 {
     BaseClass::HomeLeft();
 }
 
-void RichEdit::EndRight()
+void RichEdit2::EndRight()
 {
     BaseClass::EndRight();
 }
 
-void RichEdit::OnSetEnabled(bool bChanged)
+void RichEdit2::OnSetEnabled(bool bChanged)
 {
     BaseClass::OnSetEnabled(bChanged);
     if (IsEnabled()) {
@@ -1703,19 +1704,19 @@ void RichEdit::OnSetEnabled(bool bChanged)
     }
 }
 
-bool RichEdit::IsScrollBoxLayoutByActualAreaSize() const
+bool RichEdit2::IsScrollBoxLayoutByActualAreaSize() const
 {
     //当处于ScrollBox中时，是否预先计算实际区域大小，然后再按实际区域大小对子控件进行布局
     //返回false，避免每次在ScrollBox::SetPosInternally函数中都调用两次CalcRequiredSize，以减少对性能的影响
     return false;
 }
 
-uint32_t RichEdit::GetControlFlags() const
+uint32_t RichEdit2::GetControlFlags() const
 {
     return IsEnabled() && IsAllowTabStop() ? UIFLAG_TABSTOP : UIFLAG_DEFAULT;
 }
 
-bool RichEdit::IsInLimitChars(DStringW::value_type charValue) const
+bool RichEdit2::IsInLimitChars(DStringW::value_type charValue) const
 {
     //返回false时：禁止输入
     if (m_pLimitChars == nullptr) {
@@ -1736,7 +1737,7 @@ bool RichEdit::IsInLimitChars(DStringW::value_type charValue) const
     return bInLimitChars;
 }
 
-bool RichEdit::IsPasteLimited() const
+bool RichEdit2::IsPasteLimited() const
 {
     if (m_pLimitChars != nullptr) {
         //有设置限制字符
@@ -1781,7 +1782,7 @@ bool RichEdit::IsPasteLimited() const
     return false;
 }
 
-void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
+void RichEdit2::Paint(IRender* pRender, const UiRect& rcPaint)
 {
     if (pRender == nullptr) {
         return;
@@ -1901,7 +1902,7 @@ void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
     PaintCaret(pRender, rcPaint);
 }
 
-void RichEdit::PaintChild(IRender* pRender, const UiRect& rcPaint)
+void RichEdit2::PaintChild(IRender* pRender, const UiRect& rcPaint)
 {
     UiRect rcTemp;
     if (!UiRect::Intersect(rcTemp, rcPaint, GetRect())) {
@@ -1979,7 +1980,7 @@ void RichEdit::PaintChild(IRender* pRender, const UiRect& rcPaint)
     }
 }
 
-void RichEdit::PaintBorder(IRender* pRender)
+void RichEdit2::PaintBorder(IRender* pRender)
 {
     BaseClass::PaintBorder(pRender);
     if (!IsFocused() || IsReadOnly() || !IsEnabled()) {
@@ -2004,7 +2005,7 @@ void RichEdit::PaintBorder(IRender* pRender)
     }
 }
 
-void RichEdit::CreateCaret(int32_t xWidth, int32_t yHeight)
+void RichEdit2::CreateCaret(int32_t xWidth, int32_t yHeight)
 {
     m_iCaretWidth = xWidth;
     m_iCaretHeight = yHeight;
@@ -2016,19 +2017,19 @@ void RichEdit::CreateCaret(int32_t xWidth, int32_t yHeight)
     }
 }
 
-void RichEdit::GetCaretSize(int32_t& xWidth, int32_t& yHeight) const
+void RichEdit2::GetCaretSize(int32_t& xWidth, int32_t& yHeight) const
 {
     xWidth = m_iCaretWidth;
     yHeight = m_iCaretHeight;
 }
 
-void RichEdit::ShowCaret(bool fShow)
+void RichEdit2::ShowCaret(bool fShow)
 {
     Window* pWindow = GetWindow();
     if (fShow && (pWindow != nullptr)) {
         m_bIsCaretVisiable = true;
         m_drawCaretFlag.Cancel();
-        std::function<void()> closure = UiBind(&RichEdit::ChangeCaretVisiable, this);
+        std::function<void()> closure = UiBind(&RichEdit2::ChangeCaretVisiable, this);
         GlobalManager::Instance().Timer().AddTimer(m_drawCaretFlag.GetWeakFlag(), closure, 500);
     }
     else {
@@ -2071,17 +2072,17 @@ void RichEdit::ShowCaret(bool fShow)
     Invalidate();
 }
 
-void RichEdit::SetCaretColor(const DString& dwColor)
+void RichEdit2::SetCaretColor(const DString& dwColor)
 {
     m_sCaretColor = dwColor;
 }
 
-DString RichEdit::GetCaretColor() const
+DString RichEdit2::GetCaretColor() const
 {
     return m_sCaretColor.c_str();
 }
 
-UiRect RichEdit::GetCaretRect() const
+UiRect RichEdit2::GetCaretRect() const
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
@@ -2095,24 +2096,24 @@ UiRect RichEdit::GetCaretRect() const
     return rc;
 }
 
-void RichEdit::SetCaretPos(int32_t xPos, int32_t yPos)
+void RichEdit2::SetCaretPos(int32_t xPos, int32_t yPos)
 {
     SetCaretPos(UiPoint(xPos, yPos));
 }
 
-void RichEdit::SetCaretPos(const UiPoint& pt)
+void RichEdit2::SetCaretPos(const UiPoint& pt)
 {
     int32_t nCharPosIndex = CharFromPos(pt);
     SetCaretPos(nCharPosIndex);
 }
 
-void RichEdit::SetCaretPos(int32_t nCharPosIndex)
+void RichEdit2::SetCaretPos(int32_t nCharPosIndex)
 {
     UiPoint cursorPos = m_pTextData->CaretPosFromChar(nCharPosIndex);
     SetCaretPosInternal(cursorPos.x, cursorPos.y);
 }
 
-void RichEdit::SetCaretPosInternal(int32_t xPos, int32_t yPos)
+void RichEdit2::SetCaretPosInternal(int32_t xPos, int32_t yPos)
 {
     //光标的坐标是以当前控件的左上角为原点的坐标
     UiSize szScrollOffset = GetScrollOffset();
@@ -2124,7 +2125,7 @@ void RichEdit::SetCaretPosInternal(int32_t xPos, int32_t yPos)
     ShowCaret(m_bActive && !HasSelText());   
 }
 
-void RichEdit::GetCaretPos(int32_t& xPos, int32_t& yPos) const
+void RichEdit2::GetCaretPos(int32_t& xPos, int32_t& yPos) const
 {
     xPos = m_iCaretPosX;
     yPos = m_iCaretPosY;
@@ -2134,13 +2135,13 @@ void RichEdit::GetCaretPos(int32_t& xPos, int32_t& yPos) const
     yPos -= szScrollOffset.cy;
 }
 
-void RichEdit::ChangeCaretVisiable()
+void RichEdit2::ChangeCaretVisiable()
 {
     m_bIsCaretVisiable = !m_bIsCaretVisiable;
     Invalidate();
 }
 
-void RichEdit::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
+void RichEdit2::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
@@ -2186,7 +2187,7 @@ void RichEdit::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
     }
 }
 
-void RichEdit::PaintCurrentRowBkColor(IRender* pRender, const UiRect& /*rcPaint*/)
+void RichEdit2::PaintCurrentRowBkColor(IRender* pRender, const UiRect& /*rcPaint*/)
 {
     if (pRender == nullptr) {
         return;
@@ -2222,7 +2223,7 @@ void RichEdit::PaintCurrentRowBkColor(IRender* pRender, const UiRect& /*rcPaint*
     }
 }
 
-void RichEdit::PaintSelectionColor(IRender* pRender, const UiRect& /*rcPaint*/)
+void RichEdit2::PaintSelectionColor(IRender* pRender, const UiRect& /*rcPaint*/)
 {
     if (pRender == nullptr) {
         //无需绘制选择背景
@@ -2295,7 +2296,7 @@ void RichEdit::PaintSelectionColor(IRender* pRender, const UiRect& /*rcPaint*/)
     }
 }
 
-void RichEdit::SetPromptMode(bool bPrompt)
+void RichEdit2::SetPromptMode(bool bPrompt)
 {
     if (bPrompt != m_bAllowPrompt) {
         m_bAllowPrompt = bPrompt;
@@ -2303,12 +2304,12 @@ void RichEdit::SetPromptMode(bool bPrompt)
     }    
 }
 
-bool RichEdit::AllowPromptMode() const
+bool RichEdit2::AllowPromptMode() const
 {
     return m_bAllowPrompt;
 }
 
-DString RichEdit::GetPromptText() const
+DString RichEdit2::GetPromptText() const
 {
     DString strText = m_sPromptText.c_str();
     if (strText.empty() && !m_sPromptTextId.empty()) {
@@ -2317,7 +2318,7 @@ DString RichEdit::GetPromptText() const
     return strText;
 }
 
-void RichEdit::SetPromptText(const DString& strText)
+void RichEdit2::SetPromptText(const DString& strText)
 {
     if (m_sPromptText != strText) {
         m_sPromptText = strText;
@@ -2325,7 +2326,7 @@ void RichEdit::SetPromptText(const DString& strText)
     }
 }
 
-void RichEdit::SetPromptTextId(const DString& strTextId)
+void RichEdit2::SetPromptTextId(const DString& strTextId)
 {
     if (m_sPromptTextId != strTextId) {
         m_sPromptTextId = strTextId;
@@ -2333,7 +2334,7 @@ void RichEdit::SetPromptTextId(const DString& strTextId)
     }
 }
 
-void RichEdit::SetPromptTextColor(const DString& promptColor)
+void RichEdit2::SetPromptTextColor(const DString& promptColor)
 {
     if (m_sPromptColor != promptColor) {
         m_sPromptColor = promptColor;
@@ -2341,7 +2342,7 @@ void RichEdit::SetPromptTextColor(const DString& promptColor)
     }
 }
 
-DString RichEdit::GetPromptTextColor() const
+DString RichEdit2::GetPromptTextColor() const
 {
     if (!m_sPromptColor.empty()) {
         return m_sPromptColor.c_str();
@@ -2355,7 +2356,7 @@ DString RichEdit::GetPromptTextColor() const
     return DString();
 }
 
-void RichEdit::PaintPromptText(IRender* pRender)
+void RichEdit2::PaintPromptText(IRender* pRender)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
@@ -2388,7 +2389,7 @@ void RichEdit::PaintPromptText(IRender* pRender)
     pRender->DrawString(promptText, drawParam);
 }
 
-DString RichEdit::GetFocusedImage()
+DString RichEdit2::GetFocusedImage()
 {
     if (m_pFocusedImage != nullptr) {
         return m_pFocusedImage->GetImageString();
@@ -2396,7 +2397,7 @@ DString RichEdit::GetFocusedImage()
     return DString();
 }
 
-void RichEdit::SetFocusedImage( const DString& strImage )
+void RichEdit2::SetFocusedImage( const DString& strImage )
 {
     if (m_pFocusedImage == nullptr) {
         m_pFocusedImage = new Image;
@@ -2405,7 +2406,7 @@ void RichEdit::SetFocusedImage( const DString& strImage )
     Invalidate();
 }
 
-void RichEdit::PaintStateImages(IRender* pRender)
+void RichEdit2::PaintStateImages(IRender* pRender)
 {
     if (IsReadOnly()) {
         return;
@@ -2423,22 +2424,22 @@ void RichEdit::PaintStateImages(IRender* pRender)
     }
 }
 
-void RichEdit::SetNoSelOnKillFocus(bool bNoSel)
+void RichEdit2::SetNoSelOnKillFocus(bool bNoSel)
 {
     m_bNoSelOnKillFocus = bNoSel;
 }
 
-void RichEdit::SetSelAllOnFocus(bool bSelAll)
+void RichEdit2::SetSelAllOnFocus(bool bSelAll)
 {
     m_bSelAllOnFocus = bSelAll;
 }
 
-void RichEdit::SetNoCaretReadonly()
+void RichEdit2::SetNoCaretReadonly()
 {
     m_bNoCaretReadonly = true;
 }
 
-void RichEdit::ClearImageCache()
+void RichEdit2::ClearImageCache()
 {
     BaseClass::ClearImageCache();
     if (m_pFocusedImage != nullptr) {
@@ -2446,7 +2447,7 @@ void RichEdit::ClearImageCache()
     }    
 }
 
-void RichEdit::SetTextPadding(UiPadding padding, bool bNeedDpiScale)
+void RichEdit2::SetTextPadding(UiPadding padding, bool bNeedDpiScale)
 {
     ASSERT((padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
     if ((padding.left < 0) || (padding.top < 0) ||
@@ -2465,22 +2466,22 @@ void RichEdit::SetTextPadding(UiPadding padding, bool bNeedDpiScale)
     }
 }
 
-UiPadding RichEdit::GetTextPadding() const
+UiPadding RichEdit2::GetTextPadding() const
 {
     return UiPadding(m_rcTextPadding.left, m_rcTextPadding.top, m_rcTextPadding.right, m_rcTextPadding.bottom);
 }
 
-void RichEdit::SetUseControlCursor(bool bUseControlCursor)
+void RichEdit2::SetUseControlCursor(bool bUseControlCursor)
 {
     m_bUseControlCursor = bUseControlCursor;
 }
 
-void RichEdit::AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID)
+void RichEdit2::AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID)
 { 
     AttachEvent(kEventSelChanged, callback, callbackID);
 }
 
-void RichEdit::SetZoomPercent(uint32_t nZoomPercent)
+void RichEdit2::SetZoomPercent(uint32_t nZoomPercent)
 {
     ASSERT(nZoomPercent != 0);
     if (nZoomPercent == 0) {
@@ -2498,22 +2499,22 @@ void RichEdit::SetZoomPercent(uint32_t nZoomPercent)
     }
 }
 
-uint32_t RichEdit::GetZoomPercent() const
+uint32_t RichEdit2::GetZoomPercent() const
 {
     return m_nZoomPercent;
 }
 
-void RichEdit::SetEnableWheelZoom(bool bEnable)
+void RichEdit2::SetEnableWheelZoom(bool bEnable)
 {
     m_bEnableWheelZoom = bEnable;
 }
 
-bool RichEdit::IsEnableWheelZoom(void) const
+bool RichEdit2::IsEnableWheelZoom(void) const
 {
     return m_bEnableWheelZoom;
 }
 
-void RichEdit::SetEnableDefaultContextMenu(bool bEnable)
+void RichEdit2::SetEnableDefaultContextMenu(bool bEnable)
 {
     if (m_bEnableDefaultContextMenu != bEnable) {
         m_bEnableDefaultContextMenu = bEnable;
@@ -2540,14 +2541,14 @@ void RichEdit::SetEnableDefaultContextMenu(bool bEnable)
     }
 }
 
-bool RichEdit::IsEnableDefaultContextMenu() const
+bool RichEdit2::IsEnableDefaultContextMenu() const
 {
     return m_bEnableDefaultContextMenu;
 }
 
-void RichEdit::ShowPopupMenu(const ui::UiPoint& point)
+void RichEdit2::ShowPopupMenu(const ui::UiPoint& point)
 {
-    RichEdit* pRichEdit = this;
+    RichEdit2* pRichEdit = this;
     if ((pRichEdit == nullptr) || !pRichEdit->IsEnabled() || pRichEdit->IsPasswordMode()) {
         return;
     }
@@ -2678,7 +2679,7 @@ void RichEdit::ShowPopupMenu(const ui::UiPoint& point)
     }
 }
 
-void RichEdit::OnTextChanged()
+void RichEdit2::OnTextChanged()
 {
     //设置已修改标志
     SetModify(true);
@@ -2687,7 +2688,7 @@ void RichEdit::OnTextChanged()
     }
 }
 
-bool RichEdit::SetSpinClass(const DString& spinClass)
+bool RichEdit2::SetSpinClass(const DString& spinClass)
 {
     DString spinBoxClass;
     DString spinBtnUpClass;
@@ -2790,7 +2791,7 @@ bool RichEdit::SetSpinClass(const DString& spinClass)
     return false;
 }
 
-bool RichEdit::SetEnableSpin(bool bEnable, const DString& spinClass, int32_t nMin, int32_t nMax)
+bool RichEdit2::SetEnableSpin(bool bEnable, const DString& spinClass, int32_t nMin, int32_t nMax)
 {
     bool bRet = false;
     if (bEnable) {
@@ -2820,7 +2821,7 @@ bool RichEdit::SetEnableSpin(bool bEnable, const DString& spinClass, int32_t nMi
     return bRet;
 }
 
-int64_t RichEdit::GetTextNumber() const
+int64_t RichEdit2::GetTextNumber() const
 {
     DString text = GetText();
     if (text.empty()) {
@@ -2830,7 +2831,7 @@ int64_t RichEdit::GetTextNumber() const
     return n;
 }
 
-void RichEdit::SetTextNumber(int64_t nValue)
+void RichEdit2::SetTextNumber(int64_t nValue)
 {
     int32_t nSelStartChar = -1;
     int32_t nSelEndChar = -1;
@@ -2846,7 +2847,7 @@ void RichEdit::SetTextNumber(int64_t nValue)
     }
 }
 
-void RichEdit::AdjustTextNumber(int32_t nDelta)
+void RichEdit2::AdjustTextNumber(int32_t nDelta)
 {
     ASSERT(IsNumberOnly());
     if (IsNumberOnly()) {
@@ -2876,32 +2877,32 @@ void RichEdit::AdjustTextNumber(int32_t nDelta)
     }
 }
 
-void RichEdit::StartAutoAdjustTextNumberTimer(int32_t nDelta)
+void RichEdit2::StartAutoAdjustTextNumberTimer(int32_t nDelta)
 {
     if (nDelta != 0) {
         //启动定时器
         m_flagAdjustTextNumber.Cancel();
-        std::function<void()> closure = UiBind(&RichEdit::StartAutoAdjustTextNumber, this, nDelta);
+        std::function<void()> closure = UiBind(&RichEdit2::StartAutoAdjustTextNumber, this, nDelta);
         GlobalManager::Instance().Timer().AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 1000, 1);
     }
 }
 
-void RichEdit::StartAutoAdjustTextNumber(int32_t nDelta)
+void RichEdit2::StartAutoAdjustTextNumber(int32_t nDelta)
 {
     if (nDelta != 0) {
         //启动定时器
         m_flagAdjustTextNumber.Cancel();
-        std::function<void()> closure = UiBind(&RichEdit::AdjustTextNumber, this, nDelta);
+        std::function<void()> closure = UiBind(&RichEdit2::AdjustTextNumber, this, nDelta);
         GlobalManager::Instance().Timer().AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 120);
     }
 }
 
-void RichEdit::StopAutoAdjustTextNumber()
+void RichEdit2::StopAutoAdjustTextNumber()
 {
     m_flagAdjustTextNumber.Cancel();
 }
 
-void RichEdit::SetClearBtnClass(const DString& btnClass)
+void RichEdit2::SetClearBtnClass(const DString& btnClass)
 {
     if (!btnClass.empty()) {
         ASSERT(m_pClearButton == nullptr);
@@ -2923,7 +2924,7 @@ void RichEdit::SetClearBtnClass(const DString& btnClass)
     }
 }
 
-void RichEdit::SetShowPasswordBtnClass(const DString& btnClass)
+void RichEdit2::SetShowPasswordBtnClass(const DString& btnClass)
 {
     if (!btnClass.empty()) {
         ASSERT(m_pShowPasswordButton == nullptr);
@@ -2963,7 +2964,7 @@ void RichEdit::SetShowPasswordBtnClass(const DString& btnClass)
     }
 }
 
-void RichEdit::SetTextHAlignType(HorAlignType alignType)
+void RichEdit2::SetTextHAlignType(HorAlignType alignType)
 {
     if (m_pTextData->GetHAlignType() != alignType) {
         m_pTextData->SetTextHAlignType(alignType);
@@ -2972,12 +2973,12 @@ void RichEdit::SetTextHAlignType(HorAlignType alignType)
     }
 }
 
-HorAlignType RichEdit::GetHAlignType() const
+HorAlignType RichEdit2::GetHAlignType() const
 {
     return m_pTextData->GetHAlignType();
 }
 
-void RichEdit::SetTextVAlignType(VerAlignType alignType)
+void RichEdit2::SetTextVAlignType(VerAlignType alignType)
 {
     if (m_pTextData->GetVAlignType() != alignType) {
         m_pTextData->SetTextVAlignType(alignType);
@@ -2986,23 +2987,23 @@ void RichEdit::SetTextVAlignType(VerAlignType alignType)
     }
 }
 
-VerAlignType RichEdit::GetVAlignType() const
+VerAlignType RichEdit2::GetVAlignType() const
 {
     return m_pTextData->GetVAlignType();
 }
 
-UiPoint RichEdit::PosFromChar(int32_t lChar) const
+UiPoint RichEdit2::PosFromChar(int32_t lChar) const
 {
     return m_pTextData->PosFromChar(lChar);
 }
 
-int32_t RichEdit::CharFromPos(UiPoint pt)
+int32_t RichEdit2::CharFromPos(UiPoint pt)
 {
     pt.Offset(GetScrollOffsetInScrollBox());
     return m_pTextData->CharFromPos(pt);
 }
 
-uint16_t RichEdit::GetTextStyle() const
+uint16_t RichEdit2::GetTextStyle() const
 {
     uint32_t uTextStyle = 0;
     HorAlignType hAlignType = GetHAlignType();
@@ -3039,7 +3040,7 @@ uint16_t RichEdit::GetTextStyle() const
     return ui::TruncateToUInt16(uTextStyle);
 }
 
-bool RichEdit::GetRichTextForDraw(std::vector<RichTextData>& richTextDataList) const
+bool RichEdit2::GetRichTextForDraw(std::vector<RichTextData>& richTextDataList) const
 {
     std::vector<std::wstring_view> textView;
     m_pTextData->GetTextView(textView);
@@ -3047,7 +3048,7 @@ bool RichEdit::GetRichTextForDraw(std::vector<RichTextData>& richTextDataList) c
     return !richTextDataList.empty();
 }
 
-bool RichEdit::GetRichTextForDraw(const std::vector<std::wstring_view>& textView,
+bool RichEdit2::GetRichTextForDraw(const std::vector<std::wstring_view>& textView,
                                   std::vector<RichTextData>& richTextDataList,
                                   size_t nStartLine,
                                   const std::vector<size_t>& modifiedLines) const
@@ -3132,17 +3133,17 @@ bool RichEdit::GetRichTextForDraw(const std::vector<std::wstring_view>& textView
     return !richTextDataList.empty();
 }
 
-UiRect RichEdit::GetRichTextDrawRect() const
+UiRect RichEdit2::GetRichTextDrawRect() const
 {
     return GetTextDrawRect(GetRect());
 }
 
-uint8_t RichEdit::GetDrawAlpha() const
+uint8_t RichEdit2::GetDrawAlpha() const
 {
     return GetAlpha();
 }
 
-void RichEdit::OnTextRectsChanged()
+void RichEdit2::OnTextRectsChanged()
 {
     //更新光标的位置
     int32_t nSelStartChar = -1;
@@ -3157,22 +3158,22 @@ void RichEdit::OnTextRectsChanged()
     UpdateScrollRange();
 }
 
-int32_t RichEdit::GetTextRowHeight() const
+int32_t RichEdit2::GetTextRowHeight() const
 {
     return m_nRowHeight;
 }
 
-int32_t RichEdit::GetTextCaretWidth() const
+int32_t RichEdit2::GetTextCaretWidth() const
 {
     return m_iCaretWidth;
 }
 
-bool RichEdit::IsTextPasswordMode() const
+bool RichEdit2::IsTextPasswordMode() const
 {
     return IsPasswordMode();
 }
 
-UiSize RichEdit::EstimateText(UiSize szAvailable)
+UiSize RichEdit2::EstimateText(UiSize szAvailable)
 {
     UiSize fixedSize;
     IRender* pRender = nullptr;
@@ -3240,7 +3241,7 @@ UiSize RichEdit::EstimateText(UiSize szAvailable)
     return fixedSize;
 }
 
-UiRect RichEdit::GetTextDrawRect(const UiRect& rc) const
+UiRect RichEdit2::GetTextDrawRect(const UiRect& rc) const
 {
     UiRect rcAvailable = rc;
     rcAvailable.Deflate(GetTextPadding());
@@ -3262,7 +3263,7 @@ UiRect RichEdit::GetTextDrawRect(const UiRect& rc) const
     return rcAvailable;
 }
 
-UiSize64 RichEdit::CalcRequiredSize(const UiRect& rc, bool bEstimateOnly)
+UiSize64 RichEdit2::CalcRequiredSize(const UiRect& rc, bool bEstimateOnly)
 {
     //计算子控件的大小
     UiSize64 requiredSize = BaseClass::CalcRequiredSize(rc, bEstimateOnly);
@@ -3316,14 +3317,14 @@ UiSize64 RichEdit::CalcRequiredSize(const UiRect& rc, bool bEstimateOnly)
     return szSize;
 }
 
-void RichEdit::Redraw()
+void RichEdit2::Redraw()
 {
     m_nSelXPos = -1;
     m_pTextData->ClearDrawRichTextCache();
     Invalidate();
 }
 
-void RichEdit::ClearCacheAndRedraw()
+void RichEdit2::ClearCacheAndRedraw()
 {
     m_pTextData->SetCacheDirty(true);
     Redraw();
@@ -3331,7 +3332,7 @@ void RichEdit::ClearCacheAndRedraw()
 }
 
 ////////////////////////////////////////////////////////////
-bool RichEdit::OnSetCursor(const EventArgs& msg)
+bool RichEdit2::OnSetCursor(const EventArgs& msg)
 {
     if (m_bUseControlCursor) {
         //使用Control设置的光标
@@ -3346,7 +3347,7 @@ bool RichEdit::OnSetCursor(const EventArgs& msg)
     return true;
 }
 
-bool RichEdit::OnSetFocus(const EventArgs& /*msg*/)
+bool RichEdit2::OnSetFocus(const EventArgs& /*msg*/)
 {
     m_bActive = true;
 
@@ -3398,7 +3399,7 @@ bool RichEdit::OnSetFocus(const EventArgs& /*msg*/)
     return true;
 }
 
-bool RichEdit::OnKillFocus(const EventArgs& msg)
+bool RichEdit2::OnKillFocus(const EventArgs& msg)
 {
     m_bActive = false;
     ShowCaret(false);
@@ -3417,7 +3418,7 @@ bool RichEdit::OnKillFocus(const EventArgs& msg)
     return BaseClass::OnKillFocus(msg);
 }
 
-void RichEdit::CheckSelAllOnFocus()
+void RichEdit2::CheckSelAllOnFocus()
 {
     if (IsEnabled() && !m_bSelAllEver) {
         m_bSelAllEver = true;
@@ -3433,7 +3434,7 @@ void RichEdit::CheckSelAllOnFocus()
     }
 }
 
-bool RichEdit::OnImeStartComposition(const EventArgs& /*msg*/)
+bool RichEdit2::OnImeStartComposition(const EventArgs& /*msg*/)
 {
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
     HWND hWnd = GetWindowHWND();
@@ -3473,7 +3474,7 @@ bool RichEdit::OnImeStartComposition(const EventArgs& /*msg*/)
     return true;
 }
 
-bool RichEdit::OnImeEndComposition(const EventArgs& /*msg*/)
+bool RichEdit2::OnImeEndComposition(const EventArgs& /*msg*/)
 {
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
     m_bIsComposition = false;
@@ -3481,7 +3482,7 @@ bool RichEdit::OnImeEndComposition(const EventArgs& /*msg*/)
     return true;
 }
 
-void RichEdit::HandleEvent(const EventArgs& msg)
+void RichEdit2::HandleEvent(const EventArgs& msg)
 {
     if (IsDisabledEvents(msg)) {
         //如果是鼠标键盘消息，并且控件是Disabled的，转发给上层控件
@@ -3511,7 +3512,7 @@ void RichEdit::HandleEvent(const EventArgs& msg)
     BaseClass::HandleEvent(msg);
 }
 
-bool RichEdit::OnKeyDown(const EventArgs& msg)
+bool RichEdit2::OnKeyDown(const EventArgs& msg)
 {
     //该函数实现支持的各种快捷键
     if (msg.vkCode == kVK_SHIFT) {
@@ -3590,7 +3591,7 @@ bool RichEdit::OnKeyDown(const EventArgs& msg)
     return true;
 }
 
-bool RichEdit::OnCtrlArrowKeyDownScrollView(const EventArgs& msg)
+bool RichEdit2::OnCtrlArrowKeyDownScrollView(const EventArgs& msg)
 {
     bool bCtrlArrowKeyDown = false;
     if (IsKeyDown(msg, ModifierKey::kControl)) {
@@ -3669,7 +3670,7 @@ bool RichEdit::OnCtrlArrowKeyDownScrollView(const EventArgs& msg)
     return true;
 }
 
-bool RichEdit::OnArrowKeyDown(const EventArgs& msg)
+bool RichEdit2::OnArrowKeyDown(const EventArgs& msg)
 {
     bool bArrowKeyDown = false;
     if ((msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT) ||
@@ -4004,7 +4005,7 @@ bool RichEdit::OnArrowKeyDown(const EventArgs& msg)
     return true;
 }
 
-int32_t RichEdit::GetLineScrollDeltaValue(bool bLineDown) const
+int32_t RichEdit2::GetLineScrollDeltaValue(bool bLineDown) const
 {
     int32_t nLineDeltaValue = DUI_NOSET_VALUE;
     if (m_nRowHeight > 0) {
@@ -4023,7 +4024,7 @@ int32_t RichEdit::GetLineScrollDeltaValue(bool bLineDown) const
     return nLineDeltaValue;
 }
 
-int32_t RichEdit::GetPageScrollDeltaValue(bool bPageDown) const
+int32_t RichEdit2::GetPageScrollDeltaValue(bool bPageDown) const
 {
     UiRect rcDrawRect = GetTextDrawRect(GetRect());
     int32_t nPageDeltaValue = rcDrawRect.Height();
@@ -4047,7 +4048,7 @@ int32_t RichEdit::GetPageScrollDeltaValue(bool bPageDown) const
     return nPageDeltaValue;
 }
 
-void RichEdit::CheckKeyDownStartIndex(const EventArgs& msg)
+void RichEdit2::CheckKeyDownStartIndex(const EventArgs& msg)
 {
     if ((m_nShiftStartIndex != -1) && !IsKeyDown(msg, ModifierKey::kShift)) {
         //恢复选择的起始位置
@@ -4059,13 +4060,13 @@ void RichEdit::CheckKeyDownStartIndex(const EventArgs& msg)
     }
 }
 
-bool RichEdit::OnKeyUp(const EventArgs& msg)
+bool RichEdit2::OnKeyUp(const EventArgs& msg)
 {
     CheckKeyDownStartIndex(msg);
     return BaseClass::OnKeyUp(msg);
 }
 
-bool RichEdit::OnChar(const EventArgs& msg)
+bool RichEdit2::OnChar(const EventArgs& msg)
 {
     if (msg.modifierKey & ModifierKey::kIsSystemKey) {
         //不处理
@@ -4080,7 +4081,7 @@ bool RichEdit::OnChar(const EventArgs& msg)
     return true;
 }
 
-bool RichEdit::ButtonDown(const EventArgs& msg)
+bool RichEdit2::ButtonDown(const EventArgs& msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -4093,7 +4094,7 @@ bool RichEdit::ButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::ButtonUp(const EventArgs& msg)
+bool RichEdit2::ButtonUp(const EventArgs& msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     if (msg.IsSenderExpired()) {
@@ -4103,7 +4104,7 @@ bool RichEdit::ButtonUp(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::ButtonDoubleClick(const EventArgs& msg)
+bool RichEdit2::ButtonDoubleClick(const EventArgs& msg)
 {
     bool bRet = BaseClass::ButtonDoubleClick(msg);
     if (msg.IsSenderExpired()) {
@@ -4113,7 +4114,7 @@ bool RichEdit::ButtonDoubleClick(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::RButtonDown(const EventArgs& msg)
+bool RichEdit2::RButtonDown(const EventArgs& msg)
 {
     bool bRet = BaseClass::RButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -4123,7 +4124,7 @@ bool RichEdit::RButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::RButtonUp(const EventArgs& msg)
+bool RichEdit2::RButtonUp(const EventArgs& msg)
 {
     bool bRet = BaseClass::RButtonUp(msg);
     if (msg.IsSenderExpired()) {
@@ -4133,7 +4134,7 @@ bool RichEdit::RButtonUp(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::MouseMove(const EventArgs& msg)
+bool RichEdit2::MouseMove(const EventArgs& msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     if (msg.IsSenderExpired()) {
@@ -4143,7 +4144,7 @@ bool RichEdit::MouseMove(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::MouseWheel(const EventArgs& msg)
+bool RichEdit2::MouseWheel(const EventArgs& msg)
 {
     bool bRet = BaseClass::MouseWheel(msg);
     if (msg.IsSenderExpired()) {
@@ -4153,7 +4154,7 @@ bool RichEdit::MouseWheel(const EventArgs& msg)
     return bRet;
 }
 
-bool RichEdit::OnWindowKillFocus(const EventArgs& msg)
+bool RichEdit2::OnWindowKillFocus(const EventArgs& msg)
 {
     bool bRet = BaseClass::OnWindowKillFocus(msg);
     if (msg.IsSenderExpired()) {
@@ -4163,7 +4164,7 @@ bool RichEdit::OnWindowKillFocus(const EventArgs& msg)
     return bRet;
 }
 
-void RichEdit::OnLButtonDown(const UiPoint& ptMouse, Control* pSender, bool bShiftDown)
+void RichEdit2::OnLButtonDown(const UiPoint& ptMouse, Control* pSender, bool bShiftDown)
 {
     if (m_bInMouseMove) {
         m_bInMouseMove = false;
@@ -4192,7 +4193,7 @@ void RichEdit::OnLButtonDown(const UiPoint& ptMouse, Control* pSender, bool bShi
     CheckSelAllOnFocus();
 }
 
-void RichEdit::OnLButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
+void RichEdit2::OnLButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
 {
     if (m_bInMouseMove) {
         m_bInMouseMove = false;
@@ -4203,7 +4204,7 @@ void RichEdit::OnLButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
     m_pMouseSender = nullptr;
 }
 
-void RichEdit::OnLButtonDoubleClick(const UiPoint& ptMouse, Control* /*pSender*/)
+void RichEdit2::OnLButtonDoubleClick(const UiPoint& ptMouse, Control* /*pSender*/)
 {
     if (IsReadOnly()) {
         //只读模式下，双击则全选文本
@@ -4221,7 +4222,7 @@ void RichEdit::OnLButtonDoubleClick(const UiPoint& ptMouse, Control* /*pSender*/
     }
 }
 
-void RichEdit::OnRButtonDown(const UiPoint& ptMouse, Control* pSender)
+void RichEdit2::OnRButtonDown(const UiPoint& ptMouse, Control* pSender)
 {
     if (m_bInMouseMove) {
         m_bInMouseMove = false;
@@ -4244,7 +4245,7 @@ void RichEdit::OnRButtonDown(const UiPoint& ptMouse, Control* pSender)
     CheckSelAllOnFocus();
 }
 
-void RichEdit::OnRButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
+void RichEdit2::OnRButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
 {
     if (m_bInMouseMove) {
         m_bInMouseMove = false;
@@ -4255,7 +4256,7 @@ void RichEdit::OnRButtonUp(const UiPoint& /*ptMouse*/, Control* /*pSender*/)
     m_pMouseSender = nullptr;
 }
 
-void RichEdit::OnMouseMove(const UiPoint& ptMouse, Control* pSender)
+void RichEdit2::OnMouseMove(const UiPoint& ptMouse, Control* pSender)
 {
     if ((m_bMouseDown || m_bRMouseDown) &&
         (pSender != nullptr) &&
@@ -4285,7 +4286,7 @@ void RichEdit::OnMouseMove(const UiPoint& ptMouse, Control* pSender)
     }
 }
 
-void RichEdit::OnMouseWheel(int32_t wheelDelta, bool bCtrlDown)
+void RichEdit2::OnMouseWheel(int32_t wheelDelta, bool bCtrlDown)
 {
     if (bCtrlDown && IsEnableWheelZoom()) {
         bool bZoomIn = wheelDelta > 0 ? true : false;
@@ -4294,7 +4295,7 @@ void RichEdit::OnMouseWheel(int32_t wheelDelta, bool bCtrlDown)
     }
 }
 
-uint32_t RichEdit::GetNextZoomPercent(uint32_t nOldZoomPercent, bool bZoomIn) const
+uint32_t RichEdit2::GetNextZoomPercent(uint32_t nOldZoomPercent, bool bZoomIn) const
 {
     //通过查表的方式设置缩放比例(放大和缩小的时候，能够按照原来的比例复原)
     std::vector<uint32_t> zoomPercentList;
@@ -4374,7 +4375,7 @@ uint32_t RichEdit::GetNextZoomPercent(uint32_t nOldZoomPercent, bool bZoomIn) co
     return nZoomPercent;
 }
 
-void RichEdit::OnWindowKillFocus()
+void RichEdit2::OnWindowKillFocus()
 {
     if (m_bInMouseMove) {
         Invalidate();
@@ -4386,7 +4387,7 @@ void RichEdit::OnWindowKillFocus()
     m_pMouseSender = nullptr;
 }
 
-void RichEdit::OnCheckScrollView()
+void RichEdit2::OnCheckScrollView()
 {
     if (!m_bInMouseMove) {
         //取消定时器
@@ -4437,7 +4438,7 @@ void RichEdit::OnCheckScrollView()
         //启动定时器
         m_scrollViewFlag.Cancel();
         GlobalManager::Instance().Timer().AddTimer(m_scrollViewFlag.GetWeakFlag(),
-                                                   UiBind(&RichEdit::OnCheckScrollView, this),
+                                                   UiBind(&RichEdit2::OnCheckScrollView, this),
                                                    50, 1); //只执行一次
     }
     else {
@@ -4448,7 +4449,7 @@ void RichEdit::OnCheckScrollView()
     OnFrameSelection(m_ptMouseDown, m_ptMouseMove);
 }
 
-void RichEdit::OnFrameSelection(UiSize64 ptMouseDown64, UiSize64 ptMouseMove64)
+void RichEdit2::OnFrameSelection(UiSize64 ptMouseDown64, UiSize64 ptMouseMove64)
 {
     const UiSize64 scrollPos = GetScrollPos();//用于恢复字符绘制区域的坐标系
     UiPoint ptMouseDown;    
@@ -4470,13 +4471,13 @@ void RichEdit::OnFrameSelection(UiSize64 ptMouseDown64, UiSize64 ptMouseMove64)
     m_nSelXPos = -1;
 }
 
-void RichEdit::UpdateScrollRange()
+void RichEdit2::UpdateScrollRange()
 {
     //通过基类的SetPos完成
     SetPos(GetPos());
 }
 
-void RichEdit::OnInputChar(const EventArgs& msg)
+void RichEdit2::OnInputChar(const EventArgs& msg)
 {
     m_nSelXPos = -1;
     if (IsReadOnly() || !IsEnabled()) {
@@ -4543,6 +4544,7 @@ void RichEdit::OnInputChar(const EventArgs& msg)
     //获取本次输入的文本
     DStringW text;
     if ((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB) || (msg.vkCode == kVK_DELETE) || (msg.vkCode == kVK_BACK)) {
+#ifdef DUILIB_BUILD_FOR_SDL
         //回车键, TAB键, 删除键，退格键的处理逻辑，无输入文本
         ASSERT(msg.eventData != SDL_EVENT_TEXT_INPUT);
         if (msg.vkCode == kVK_RETURN) {
@@ -4557,14 +4559,21 @@ void RichEdit::OnInputChar(const EventArgs& msg)
             //TAB键
             text = L"\t";
         }
+#else
+        ASSERT(0);
+#endif
     }
     else {
+#ifdef DUILIB_BUILD_FOR_SDL
         ASSERT(msg.eventData == SDL_EVENT_TEXT_INPUT);
         ASSERT(msg.vkCode == kVK_None);
         if ((msg.eventData == SDL_EVENT_TEXT_INPUT) && (msg.wParam != 0) && (msg.lParam > 0)) {
             //当前输入的字符或者字符串（比如中文输入时，候选词是一次输入，而不像Windows SDK那样按字符逐次输入）
             text = (DStringW::value_type*)msg.wParam;
         }
+#else
+        ASSERT(0);
+#endif
     }
 
     //密码模式下：删除非法字符
@@ -4687,7 +4696,7 @@ void RichEdit::OnInputChar(const EventArgs& msg)
     if (IsPasswordMode() && !IsShowPassword() && IsFlashPasswordChar()) {
         if (nNewSelChar == GetTextLength()) {
             m_bInputPasswordChar = true;            
-            std::function<void()> closure = UiBind(&RichEdit::StopFlashPasswordChar, this);
+            std::function<void()> closure = UiBind(&RichEdit2::StopFlashPasswordChar, this);
             GlobalManager::Instance().Timer().AddTimer(m_falshPasswordFlag.GetWeakFlag(), closure, 1500);
         }
     }
@@ -4726,5 +4735,3 @@ void RichEdit::OnInputChar(const EventArgs& msg)
 }
 
 } // namespace ui
-
-#endif //DUILIB_BUILD_FOR_SDL

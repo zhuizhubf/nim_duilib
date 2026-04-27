@@ -100,6 +100,7 @@ namespace ui
     #define  DUI_CTR_DIRECTORY_TREE                  (_T("DirectoryTree"))
 
     #define  DUI_CTR_RICHEDIT                        (_T("RichEdit"))
+    #define  DUI_CTR_RICHEDIT2                       (_T("RichEdit2"))
     #define  DUI_CTR_COMBO                           (_T("Combo"))
     #define  DUI_CTR_COMBO_BUTTON                    (_T("ComboButton"))
     #define  DUI_CTR_FILTER_COMBO                    (_T("FilterCombo"))

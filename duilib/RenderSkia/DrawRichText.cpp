@@ -336,24 +336,28 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 size_t nDrawLength = 0;
                 if (bDrawTabChar) {
                     ASSERT(textCount == 1);
-                    //绘制TAB键, 按4个字符对齐
-                    const DStringW blank = L"    ";
-                    size_t nBlankCount = nRowCharCount % blank.size();
-                    nBlankCount = blank.size() - nBlankCount;
-                    nDrawLength = DrawSkiaText::BreakText(blank.c_str(),
-                                                          nBlankCount * sizeof(DStringW::value_type), textEncoding,
-                                                          skFont, fallbackFontCreator, skPaint,
-                                                          maxWidth, &textMeasuredWidth,
-                                                          measureTempData, &breakTextData);
+                    // 获取当前字体下一个空格的宽度
+                    const DStringW blank = L"0";
+                    SkScalar standardCharWidth = skFont.measureText(blank.c_str(), sizeof(DStringW::value_type), textEncoding, nullptr, &skPaint);
+                    // 每个制表位 = 4个标准字符宽度
+                    const int TAB_COUNT = 4;
+                    SkScalar tabStopWidth = standardCharWidth * TAB_COUNT;
+
+                    // 计算当前位置需要补齐多少宽度才到下一个制表位
+                    SkScalar currentX = xPos;
+                    SkScalar remainder = fmod(currentX, tabStopWidth);
+                    SkScalar tabWidth = tabStopWidth - remainder; // 最终制表符宽度
+
+                    // 最终制表符宽度
+                    textMeasuredWidth = tabWidth;
+                    nDrawLength = textCount * sizeof(DStringW::value_type);
                     if (nDrawLength > 0) {
-                        nDrawLength = textCount * sizeof(DStringW::value_type);
-                        if (breakTextData.glyphIDs.empty()) {
-                            breakTextData.glyphChars.clear();
-                            breakTextData.glyphWidths.clear();
-                            breakTextData.glyphIDs.resize(1, 0);
-                            breakTextData.glyphChars.resize(2, 0);
-                            breakTextData.glyphWidths.resize(1, textMeasuredWidth);
-                        }
+                        //TAB键按一个字符处理
+                        breakTextData.glyphChars.clear();
+                        breakTextData.glyphWidths.clear();
+                        breakTextData.glyphIDs.resize(1, 0);
+                        breakTextData.glyphChars.resize(1, sizeof(DStringW::value_type));
+                        breakTextData.glyphWidths.resize(1, tabWidth);
                     }
                 }
                 else {

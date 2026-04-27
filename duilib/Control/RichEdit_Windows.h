@@ -1,8 +1,7 @@
 #ifndef UI_CONTROL_RICHEDIT_WINDOWS_H_
 #define UI_CONTROL_RICHEDIT_WINDOWS_H_
 
-#include "duilib/Box/ScrollBox.h"
-#include "duilib/Image/Image.h"
+#include "duilib/Control/RichEditDefs.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
 
@@ -15,28 +14,12 @@
 namespace ui 
 {
 
-/** 字符的索引号范围
-*/
-struct TextCharRange
-{
-    int32_t cpMin = -1; //字符的起始索引值
-    int32_t cpMax = -1; //字符的结束索引值
-};
-
-/** 字符查找的参数
-*/
-struct FindTextParam
-{
-    bool bMatchCase = true;      //查找时是否区分大小写
-    bool bMatchWholeWord = true; //查找时，是否按词匹配
-    bool bFindDown = true;       //是否向后查找，为true表示向后查找，false表示反向查找
-    TextCharRange chrg;          //字符的查找范围
-    DString findText;            //查找的文本
-};
-
 class RichEditHost;
 class ControlDropTarget_Windows;
 class VBox;
+
+/** RichEdit Windows平台使用Windows API实现，仅支持Windows平台
+*/
 class DUILIB_API RichEdit : public ScrollBox
 {
     typedef ScrollBox BaseClass;

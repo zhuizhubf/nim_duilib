@@ -1,11 +1,8 @@
 #ifndef UI_CONTROL_RICHEDIT_SDL_H_
 #define UI_CONTROL_RICHEDIT_SDL_H_
 
-#include "duilib/Box/ScrollBox.h"
-#include "duilib/Image/Image.h"
+#include "duilib/Control/RichEditDefs.h"
 #include "duilib/Control/RichEditData.h"
-
-#ifdef DUILIB_BUILD_FOR_SDL
 
 namespace ui 
 {
@@ -13,33 +10,16 @@ namespace ui
 class VBox;
 class DrawRichTextCache;
 
-/** 字符的索引号范围
+/** RichEdit2 跨平台，自己实现，支持所有平台
 */
-struct TextCharRange
-{
-    int32_t cpMin = -1; //字符的起始索引值
-    int32_t cpMax = -1; //字符的结束索引值
-};
-
-/** 字符查找的参数
-*/
-struct FindTextParam
-{
-    bool bMatchCase = true;      //查找时是否区分大小写
-    bool bMatchWholeWord = true; //查找时，是否按词匹配
-    bool bFindDown = true;       //是否向后查找，为true表示向后查找，false表示反向查找
-    TextCharRange chrg;          //字符的查找范围
-    DString findText;            //查找的文本
-};
-
-class DUILIB_API RichEdit : public ScrollBox, protected IRichTextData
+class DUILIB_API RichEdit2 : public ScrollBox, protected IRichTextData
 {
     typedef ScrollBox BaseClass;
 public:
-    explicit RichEdit(Window* pWindow);
-    RichEdit(const RichEdit& r) = delete;
-    RichEdit& operator=(const RichEdit& r) = delete;
-    virtual ~RichEdit() override;
+    explicit RichEdit2(Window* pWindow);
+    RichEdit2(const RichEdit2& r) = delete;
+    RichEdit2& operator=(const RichEdit2& r) = delete;
+    virtual ~RichEdit2() override;
 public:
     //基类的虚函数重写
     virtual DString GetType() const override;
@@ -1306,8 +1286,26 @@ private:
     WeakCallbackFlag m_falshPasswordFlag;
 };
 
-} // namespace ui
+#if defined (DUILIB_BUILD_FOR_WIN)
+    #if defined(DUILIB_BUILD_FOR_SDL)
+        #define DUILIB_NO_RICHEDIT 1
+    #endif
+#else
+    #define DUILIB_NO_RICHEDIT 1
+#endif
 
-#endif // DUILIB_BUILD_FOR_SDL
+#ifdef DUILIB_NO_RICHEDIT
+    class DUILIB_API RichEdit : public RichEdit2
+    {
+    public:
+        explicit RichEdit(Window* pWindow) : RichEdit2(pWindow) {}
+        RichEdit(const RichEdit2& r) = delete;
+        RichEdit& operator=(const RichEdit& r) = delete;
+        virtual ~RichEdit() override {};
+        virtual DString GetType() const override { return DUI_CTR_RICHEDIT; }
+    };
+#endif // ! DUILIB_NO_RICHEDIT
+
+} // namespace ui
 
 #endif // UI_CONTROL_RICHEDIT_SDL_H_
