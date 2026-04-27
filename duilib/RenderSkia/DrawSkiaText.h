@@ -3,6 +3,7 @@
 
 #include "duilib/Render/IRender.h"
 #include "duilib/RenderSkia/SkiaTextData.h"
+#include "duilib/RenderSkia/FastVector.h"
 
 namespace ui
 {
@@ -27,10 +28,21 @@ enum TextBoxLineMode {
 */
 struct MeasureTextTempData
 {
-    std::vector<SkUnichar> unicharList;
-    std::vector<SkGlyphID> glyphIDList;
-    std::vector<SkGlyphID> normalGlyphIDList;
-    std::vector<SkUnichar> fallbackUnicharList;
+    FastVector<SkUnichar> unicharList;
+    FastVector<SkGlyphID> glyphIDList;
+    FastVector<SkGlyphID> normalGlyphIDList;
+    FastVector<SkUnichar> fallbackUnicharList;
+    FastVector<uint8_t> glyphChars;  //每个Glyph字符，占几个字节
+};
+
+/** 评估可绘制字符数量的临时变量（外部管理，以减少内存分配，提高性能）
+*   外部定义变量时，应放置在循环的最外层
+*/
+struct BreakTextTempData
+{
+    FastVector<SkGlyphID> glyphIDs;    //文本对应的SkGlyphID列表（只可用于统计字符数量，不可用于绘制，因为对应的字体可能不同）
+    FastVector<uint8_t> glyphChars;    //每个SkGlyphID对应的输入字节数，容器大小与glyphIDs容器相同
+    FastVector<SkScalar> glyphWidths;  //每个SkGlyphID字符的所占的宽度，该宽度与字体名称和字体大小、是否斜体等属性均相关，容器大小与glyphIDs容器相同
 };
 
 /** 调用Canvas绘制Skia的文本，二次封装Skia文本相关函数以支持回退字体的功能
@@ -154,35 +166,23 @@ public:
      * @param [in] paint 绘制属性
      * @param [in] maxWidth 绘制的最大宽度
      * @param [out] measuredWidth  返回估算的绘制宽度，小于或等于 maxWidth, 可以为nullptr
-     * @param [out] measuredHeight 返回估算的绘制高度, 可以为nullptr
      * @param [in] tempData 临时变量，用以提高性能
      * @return 返回本行可绘制的字节数，总是小于或者等于byteLength     
      */
     static size_t BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                             const SkFont& font, FallbackFontCreator fallbackFontCreator,
-                            const SkPaint& paint, SkScalar maxWidth,
-                            SkScalar* measuredWidth,
-                            SkScalar* measuredHeight,
+                            const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
                             MeasureTextTempData& tempData);
 
     /** 特殊版本，临时变量（glyphs，glyphChars，glyphWidths）由外部提供，以改进执行性能
-    * @param [out] glyphs 绘制了多少个Glyph字符(临时变量)
-    * @param [out] glyphChars 返回每个Glyph字符占几个输入字符(临时变量)
-    * @param [out] glyphWidths 返回每个Glyph字符绘制的宽度(临时变量)
-    * @param [out] glyphCharList 返回每个glyph字符由几个输入字符构成的(返回给应用层)
-    * @param [out] glyphWidthList 返回每个glyph字符的输出宽度值(返回给应用层)
     * @param [in] tempData 临时变量，用以提高性能
+    * @param [int/out] breakTextData Break计算相关临时变量，用以提高性能，也可以返回有效数据
     */
     static size_t BreakText(const void* text, size_t byteLength, SkTextEncoding textEncoding,
                             const SkFont& font, FallbackFontCreator fallbackFontCreator,
-                            const SkPaint& paint, SkScalar maxWidth,
-                            SkScalar* measuredWidth, SkScalar* measuredHeight,
-                            std::vector<SkGlyphID>& glyphs,
-                            std::vector<uint8_t>& glyphChars,
-                            std::vector<SkScalar>& glyphWidths,
-                            std::vector<uint8_t>* glyphCharList,
-                            std::vector<SkScalar>* glyphWidthList,
-                            MeasureTextTempData& tempData);
+                            const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
+                            MeasureTextTempData& tempData,
+                            BreakTextTempData* breakTextData);
 
     /** 返回适合最大宽度的文本字节
     * @param [in] textData 文本数据
@@ -191,15 +191,12 @@ public:
     * @param [in] paint 绘制属性
     * @param [in] maxWidth 绘制的最大宽度
     * @param [out] measuredWidth  返回估算的绘制宽度，小于或等于 maxWidth, 可以为nullptr
-    * @param [out] measuredHeight 返回估算的绘制高度, 可以为nullptr
     * @param [in] tempData 临时变量，用以提高性能
     * @return 返回本行可绘制的字节数，总是小于或者等于byteLength
     */
     static size_t BreakText(const SkiaTextData& textData,
                             const SkFont& font, FallbackFontCreator fallbackFontCreator,
-                            const SkPaint& paint, SkScalar maxWidth,
-                            SkScalar* measuredWidth,
-                            SkScalar* measuredHeight,
+                            const SkPaint& paint, SkScalar maxWidth, SkScalar* measuredWidth,
                             MeasureTextTempData& tempData);
 
 public:
@@ -271,26 +268,6 @@ private:
     /** 获取UTF32字符串，内部操作时按UTF32编码处理
     */
     static UTF32String GetDrawStringUTF32(const void* text, size_t byteLength, SkTextEncoding textEncoding);
-
-    /** 将文本转换为Glyphs
-    * @param [in] text 文本的起始地址
-    * @param [in] byteLength 文本长度（字节数）
-    * @param [in] textEncoding 文本编码SkTextEncoding::kUTF8 or kUTF16 or kUTF32
-    * @param [in] font 字体
-    * @param [out] glyphs 转换结果Glyphs
-    * @param [out] 每个字符占的字节数
-    */
-    static bool TextToGlyphs(const void* text, size_t byteLength, SkTextEncoding textEncoding, 
-                             const SkFont& font, std::vector<SkGlyphID>& glyphs, size_t& charBytes);
-
-    /** 计算每个文本的每个字符所占的字节数
-    * @param [in] text 文本的起始地址
-    * @param [in] byteLength 文本长度（字节数）
-    * @param [in] textEncoding 文本编码SkTextEncoding::kUTF8 or kUTF16 or kUTF32
-    * @param [out] glyphs 转换结果Glyphs
-    */
-    static bool TextGlyphChars(const void* text, size_t byteLength, SkTextEncoding textEncoding,
-                               std::vector<uint8_t>& glyphChars);
 };
 
 } // namespace ui

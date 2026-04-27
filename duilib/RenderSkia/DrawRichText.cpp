@@ -169,14 +169,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     }
     UiColor textColor;
 
-    std::vector<SkGlyphID> glyphs;      //内部临时变量，为提升执行速度，在外部声明变量
-    std::vector<uint8_t> glyphChars;    //内部临时变量，为提升执行速度，在外部声明变量
-    std::vector<SkScalar> glyphWidths;  //内部临时变量，为提升执行速度，在外部声明变量
-
-    std::vector<uint8_t> glyphCharList;   //每个字由几个字符构成
-    std::vector<SkScalar> glyphWidthList; //每个字符的宽度
-
-    MeasureTextTempData measureTempData;  //内部临时变量，为提升执行速度，在外部声明变量
+    BreakTextTempData breakTextData;            //评估可绘制字符数量的临时变量（外部管理，以减少内存分配，提高性能）
+    MeasureTextTempData measureTempData;        //内部临时变量，为提升执行速度，在外部声明变量
 
     //按换行符进行文本切分
     std::vector<std::wstring_view> lineTextViewList;
@@ -247,8 +241,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             };
 
         const SkFont& skFont = *pSkFont;
-        SkFontMetrics metrics;
-        SkScalar fFontHeight = skFont.getMetrics(&metrics);     //字体高度，换行时使用
+        SkFontMetrics fontMetrics;
+        SkScalar fFontHeight = skFont.getMetrics(&fontMetrics);     //字体高度，换行时使用
         fFontHeight = textData.m_fRowSpacingMul * fFontHeight + textData.m_fRowSpacingAdd; //运用行间距倍数和行间距附加量
         const int32_t nFontHeight = SkScalarCeilToInt(fFontHeight);   //行高对齐到像素
         nRowHeight = std::max(nRowHeight, nFontHeight);
@@ -319,14 +313,11 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 //}
                 maxWidth = std::max(maxWidth, 0.0f);
                 SkScalar textMeasuredWidth = 0;  //当前要绘制的文本，估算的所需宽度
-                SkScalar textMeasuredHeight = 0; //当前要绘制的文本，估算的所需高度
+                const SkScalar textMeasuredHeight = fontMetrics.fDescent - fontMetrics.fAscent; //当前要绘制的文本所需高度(使用字体的高度)
 
-                glyphCharList.clear();
-                glyphWidthList.clear();
-
-                //评估每个字符的矩形范围
-                std::vector<uint8_t>* pGlyphCharList = &glyphCharList;
-                std::vector<SkScalar>* pGlyphWidthList = &glyphWidthList;
+                breakTextData.glyphIDs.clear();
+                breakTextData.glyphChars.clear();
+                breakTextData.glyphWidths.clear();
 
                 size_t nDrawLength = 0;
                 if (bDrawTabChar) {
@@ -338,22 +329,17 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     nDrawLength = DrawSkiaText::BreakText(blank.c_str(),
                                                           nBlankCount * sizeof(DStringW::value_type), textEncoding,
                                                           skFont, fallbackFontCreator, skPaint,
-                                                          maxWidth, &textMeasuredWidth, &textMeasuredHeight,
-                                                          glyphs, glyphChars, glyphWidths,
-                                                          pGlyphCharList, pGlyphWidthList,
-                                                          measureTempData);
+                                                          maxWidth, &textMeasuredWidth,
+                                                          measureTempData, &breakTextData);
                     if (nDrawLength > 0) {
                         nDrawLength = textCount * sizeof(DStringW::value_type);
-                        if (glyphs.empty()) {
-                            glyphs.resize(1);
-                            glyphChars.resize(1);
-                            glyphChars[0] = 1;
-                            glyphWidths.resize(1, textMeasuredWidth);
+                        if (breakTextData.glyphIDs.empty()) {
+                            breakTextData.glyphChars.clear();
+                            breakTextData.glyphWidths.clear();
+                            breakTextData.glyphIDs.resize(1, 0);
+                            breakTextData.glyphChars.resize(2, 0);
+                            breakTextData.glyphWidths.resize(1, textMeasuredWidth);
                         }
-                        pGlyphCharList->resize(1);
-                        (*pGlyphCharList)[0] = 1;
-                        pGlyphWidthList->resize(1);
-                        (*pGlyphWidthList)[0] = textMeasuredWidth;
                     }
                 }
                 else {
@@ -361,10 +347,29 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     nDrawLength = DrawSkiaText::BreakText(lineTextView.data() + textStartIndex,
                                                           byteLength, textEncoding,
                                                           skFont, fallbackFontCreator, skPaint,
-                                                          maxWidth, &textMeasuredWidth, &textMeasuredHeight,
-                                                          glyphs, glyphChars, glyphWidths,
-                                                          pGlyphCharList, pGlyphWidthList,
-                                                          measureTempData);
+                                                          maxWidth, &textMeasuredWidth, 
+                                                          measureTempData, &breakTextData);
+                }
+
+                //校验
+                bool bBreakTextError = false;
+                if (nDrawLength == 0) {
+                    ASSERT(breakTextData.glyphIDs.empty() && breakTextData.glyphChars.empty() && breakTextData.glyphWidths.empty());
+                    if (!breakTextData.glyphChars.empty() || !breakTextData.glyphChars.empty() || !breakTextData.glyphWidths.empty()) {
+                        bBreakTextError = true;
+                    }
+                }
+                else {
+                    ASSERT(!breakTextData.glyphIDs.empty() && !breakTextData.glyphChars.empty() && !breakTextData.glyphWidths.empty());
+                    if ((breakTextData.glyphIDs.size() != breakTextData.glyphChars.size()) ||
+                        (breakTextData.glyphIDs.size() != breakTextData.glyphWidths.size())) {
+                        bBreakTextError = true;
+                    }
+                }
+                if (bBreakTextError) {
+                    //出错了(BreakText函数返回了不正常的值)
+                    bBreakAll = true;
+                    break;
                 }
                 
                 if (nDrawLength == 0) {
@@ -397,25 +402,24 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
 
                     if (pLineInfoParam != nullptr) {
                         //评估每个字符的矩形范围
-                        ASSERT(!glyphCharList.empty());
-                        ASSERT(glyphCharList.size() == glyphWidthList.size());
-                        if (glyphCharList.size() == glyphWidthList.size()) {
-                            const size_t glyphCount = glyphCharList.size();
-                            SkScalar glyphWidth = 0;
-                            uint8_t glyphCharCount = 0;
-                            SkScalar glyphLeft = (SkScalar)SkScalarTruncToInt(xPos);
-                            for (size_t glyphIndex = 0; glyphIndex < glyphCount; ++glyphIndex) {
-                                glyphWidth = glyphWidthList[glyphIndex];//字符宽度
-                                glyphCharCount = glyphCharList[glyphIndex];  //该字占几个字符（UTF16编码，可能是1或者2）
-                                ASSERT((glyphCharCount == 1) || (glyphCharCount == 2));
-                                OnDrawUnicodeChar(pLineInfoParam, 0, glyphCharCount, glyphCount, nLineNumber, nLineTextRowIndex, glyphLeft, yPos, glyphWidth, nRowHeight);
-                                glyphLeft += glyphWidth;
-                            }
+                        const size_t glyphCount = breakTextData.glyphChars.size();
+                        SkScalar glyphWidth = 0;
+                        uint8_t glyphCharCount = 0;
+                        SkScalar glyphLeft = (SkScalar)SkScalarTruncToInt(xPos);
+                        for (size_t glyphIndex = 0; glyphIndex < glyphCount; ++glyphIndex) {
+                            glyphWidth = breakTextData.glyphWidths[glyphIndex];     //字符宽度
+                            glyphCharCount = breakTextData.glyphChars[glyphIndex];  //该字占几个字节，2或者4
+                            ASSERT((glyphCharCount == 2) || (glyphCharCount == 4));
+                            ASSERT((glyphCharCount % sizeof(DStringW::value_type)) == 0);
+                            glyphCharCount /= sizeof(DStringW::value_type); //转换为StringW编码字符数，内部使用
+                            ASSERT((glyphCharCount == 1) || (glyphCharCount == 2)); //该字占几个字符（UTF16编码，可能是1或者2）
+                            OnDrawUnicodeChar(pLineInfoParam, 0, glyphCharCount, glyphCount, nLineNumber, nLineTextRowIndex, glyphLeft, yPos, glyphWidth, nRowHeight);
+                            glyphLeft += glyphWidth;
                         }
                     }
 
                     //统计本逻辑行已经绘制了多少个字符
-                    nRowCharCount += glyphs.size();
+                    nRowCharCount += breakTextData.glyphIDs.size();
                 }
 
                 bool bNextRow = false; //是否需要换行的标志

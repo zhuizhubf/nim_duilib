@@ -1859,6 +1859,9 @@
     <ClInclude Include="RenderSkia\SkiaTextData.h">
       <Filter>RenderSkia</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSkia\FastVector.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="duilib.ruleset">

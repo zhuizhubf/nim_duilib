@@ -778,6 +778,7 @@
     <ClInclude Include="RenderSkia\DrawRichText.h" />
     <ClInclude Include="RenderSkia\DrawSkiaImage.h" />
     <ClInclude Include="RenderSkia\DrawSkiaText.h" />
+    <ClInclude Include="RenderSkia\FastVector.h" />
     <ClInclude Include="RenderSkia\FontMgr_Skia.h" />
     <ClInclude Include="RenderSkia\Font_Skia.h" />
     <ClInclude Include="RenderSkia\HorizontalDrawText.h" />

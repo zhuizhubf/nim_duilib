@@ -331,7 +331,7 @@ static bool EllipsisTextUTF(const char pText[], size_t nByteLen, SkTextEncoding 
     }
 
     size_t textByteLen = DrawSkiaText::BreakText(string.c_str(), string.size() * charBytes, textEncoding,
-                                                 font, fallbackFontCreator, paint, leftWidth, nullptr, nullptr, measureTempData);
+                                                 font, fallbackFontCreator, paint, leftWidth, nullptr, measureTempData);
     textByteLen /= charBytes;
     if ((textByteLen > 0) && (textByteLen <= string.size())) {
         string.erase(textByteLen);
