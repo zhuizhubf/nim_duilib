@@ -139,17 +139,22 @@ void ScrollBox::DoSetPos(UiRect rc, bool bScrollProcess)
     }
 }
 
-void ScrollBox::SetPosInternally(const UiRect& rc, bool bScrollProcess)
+bool ScrollBox::IsScrollBoxLayoutByActualAreaSize() const
 {
-    Control::SetPos(rc);
     Layout* pLayout = GetLayout();
     ASSERT(pLayout != nullptr);
     if (pLayout == nullptr) {
-        return;
+        return false;
     }
+    return pLayout->LayoutByActualAreaSize();
+}
+
+void ScrollBox::SetPosInternally(const UiRect& rc, bool bScrollProcess)
+{
+    Control::SetPos(rc);    
     bool bArrangedChildren = false;
     UiSize64 requiredSize;
-    if (pLayout->LayoutByActualAreaSize()) {
+    if (IsScrollBoxLayoutByActualAreaSize()) {
         //该布局在支持滚动条的容器中，拉伸类型的子控件的布局与目标区域大小相关，需要预先计算目标区域大小
         requiredSize = CalcRequiredSize(rc, true);//只计算子控件的大小和位置，不调整
         if ((requiredSize.cx > 0) && (requiredSize.cy > 0)) {

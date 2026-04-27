@@ -1703,6 +1703,13 @@ void RichEdit::OnSetEnabled(bool bChanged)
     }
 }
 
+bool RichEdit::IsScrollBoxLayoutByActualAreaSize() const
+{
+    //当处于ScrollBox中时，是否预先计算实际区域大小，然后再按实际区域大小对子控件进行布局
+    //返回false，避免每次在ScrollBox::SetPosInternally函数中都调用两次CalcRequiredSize，以减少对性能的影响
+    return false;
+}
+
 uint32_t RichEdit::GetControlFlags() const
 {
     return IsEnabled() && IsAllowTabStop() ? UIFLAG_TABSTOP : UIFLAG_DEFAULT;
@@ -3280,7 +3287,7 @@ UiSize64 RichEdit::CalcRequiredSize(const UiRect& rc, bool bEstimateOnly)
     }
 
     //估算文本区域大小, 函数计算时，已经包含了内边距
-    UiSize textSize = EstimateText(szAvailable);
+    UiSize textSize = EstimateText(UiSize(rc.Width(), rc.Height()));
     //文本区域，需要包含滚动条的宽度和高度(仅当滚动条设置为非浮动时)
     if (!GetScrollBarFloat() && (GetVScrollBar() != nullptr) && GetVScrollBar()->IsValid()) {
         if (IsVScrollBarAtLeft()) {

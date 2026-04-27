@@ -892,6 +892,13 @@ protected:
     */
     virtual void OnSetEnabled(bool bChanged) override;
 
+    /** 当处于ScrollBox中时，是否预先计算实际区域大小，然后再按实际区域大小对子控件进行布局
+     *  对于部分布局，当处于ScrollBox中时，必须按实际区域大小布局，而不是按显示区域布局（影响因素：是否有拉伸类型的子控件，水平和垂直对齐方式）
+     * @return 返回true表示当处于ScrollBox中时，预先计算实际区域大小，然后再按实际区域大小对子控件进行布局
+     *         返回false当处于ScrollBox中时，不需要特殊处理，直接对子控件进行布局
+     */
+    virtual bool IsScrollBoxLayoutByActualAreaSize() const override;
+
 private:
     void OnLButtonDown(const UiPoint& ptMouse, Control* pSender, bool bShiftDown);
     void OnLButtonUp(const UiPoint& ptMouse, Control* pSender);
