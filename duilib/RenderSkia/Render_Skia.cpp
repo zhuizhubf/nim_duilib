@@ -1759,7 +1759,7 @@ void Render_Skia::MeasureRichText(const UiRect& textRect,
                                   const std::vector<RichTextData>& richTextData,
                                   std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText"));
+    //PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText"));
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, nullptr, nullptr, pRichTextRects);
 }
@@ -1771,7 +1771,7 @@ void Render_Skia::MeasureRichText2(const UiRect& textRect,
                                    RichTextLineInfoParam* pLineInfoParam,
                                    std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText2"));
+    //PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText2"));
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, pLineInfoParam, nullptr, pRichTextRects);
 }
@@ -1784,7 +1784,7 @@ void Render_Skia::MeasureRichText3(const UiRect& textRect,
                                    std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
                                    std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText3"));
+    //PerformanceStat statPerformance(_T("Render_Skia::MeasureRichText3"));
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint, m_pSkPointOrg);
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, pLineInfoParam, &spDrawRichTextCache, pRichTextRects);
 }

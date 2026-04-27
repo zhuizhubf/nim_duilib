@@ -141,17 +141,6 @@ public:
         m_size = 0;
     }
 
-    // 数量清零 + 释放所有内存
-    inline void clear_release() noexcept
-    {
-        m_size = 0;
-        m_capacity = 0;
-        if (m_data != nullptr) {
-            std::free(m_data);
-            m_data = nullptr;
-        }
-    }
-
     // swap函数
     inline void swap(FastVector& other) noexcept
     {

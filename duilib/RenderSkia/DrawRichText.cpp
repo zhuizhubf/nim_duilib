@@ -81,6 +81,15 @@ DrawRichText::DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPa
 {
 }
 
+//设置行高数据
+inline static void SaveRowHeight(FastVector<int32_t>& rowHeightVector, uint32_t nRowIndex, int32_t nRowHeight)
+{
+    if (nRowIndex >= rowHeightVector.size()) {
+        rowHeightVector.resize(nRowIndex + 1);
+    }
+    rowHeightVector[nRowIndex] = nRowHeight;
+}
+
 void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                                         const UiSize& szScrollOffset,
                                         IRenderFactory* pRenderFactory, 
@@ -140,7 +149,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     uint32_t nLineNumber = 0; //物理行号
     uint32_t nRowIndex = 0;   //逻辑行号
 
-    std::unordered_map<uint32_t, uint32_t> rowHeightMap;  //每行的实际行高表
+    FastVector<int32_t> rowHeightVector; //每行的实际行高表
+    rowHeightVector.reserve(richTextData.size() * 2);
 
     //字体缓存(由于创建字体比较耗时，所以尽量复用相同的对象)
     SharePtr<UiFontEx> lastFont;
@@ -286,7 +296,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                         xPos = (SkScalar)rcDrawRect.left;
                         ASSERT(((int64_t)yPos + (int64_t)nRowHeight) < INT32_MAX);
                         yPos += nRowHeight;
-                        rowHeightMap[nRowIndex] = nRowHeight;
+                        SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                         nRowHeight = nFontHeight;
                         ++nRowIndex;
                         nRowCharCount = 0;
@@ -456,7 +466,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     xPos = (SkScalar)rcDrawRect.left;
                     ASSERT(((int64_t)yPos + (int64_t)nRowHeight) < INT32_MAX);
                     yPos += nRowHeight;
-                    rowHeightMap[nRowIndex] = nRowHeight;
+                    SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                     nRowHeight = nFontHeight;
                     ++nRowIndex;
                     nRowCharCount = 0;
@@ -479,15 +489,13 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     }
 
     //记录最后一行的行高
-    rowHeightMap[nRowIndex] = nRowHeight;
+    SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
 
     //更新每行的行高(只有提前确定行高，才能正确绘制纵向对齐的文本)
     for (const SharePtr<TPendingDrawRichText>& spTextData : pendingTextData) {
         TPendingDrawRichText& textData = *spTextData;
-        auto iter = rowHeightMap.find(textData.m_nRowIndex);
-        ASSERT(iter != rowHeightMap.end());
-        if (iter != rowHeightMap.end()) {
-            textData.m_destRect.bottom = textData.m_destRect.top + iter->second;
+        if (textData.m_nRowIndex < rowHeightVector.size()) {
+            textData.m_destRect.bottom = textData.m_destRect.top + rowHeightVector[textData.m_nRowIndex];
         }
     }
 
@@ -552,6 +560,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             }
         }
     }
+    return;
 }
 
 void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uint32_t>& lineSeprators, std::vector<std::wstring_view>& lineTextViewList)
