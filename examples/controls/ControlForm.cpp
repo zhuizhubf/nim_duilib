@@ -170,7 +170,7 @@ void ControlForm::OnInitWindow()
 
     //注册一个Context Menu，演示功能（用这两种方法都可以注册上下文菜单功能）
     AttachRichEditEvents(dynamic_cast<ui::RichEdit*>(FindControl(_T("edit"))));
-    AttachRichEditEvents(dynamic_cast<ui::RichEdit*>(FindControl(_T("edit2"))));
+    AttachRichEditEvents(dynamic_cast<ui::RichEdit2*>(FindControl(_T("edit2"))));
 
     //显示模态对话框的拾色器
     ui::Button* pShowColorPicker = dynamic_cast<ui::Button*>(FindControl(_T("show_color_picker")));
@@ -320,32 +320,11 @@ void ControlForm::OnCloseWindow()
     BaseClass::OnCloseWindow();
 }
 
-void ControlForm::AttachRichEditEvents(ui::RichEdit* edit)
+void ControlForm::AttachRichEditEvents(ui::Control* edit)
 {
     if (edit == nullptr) {
         return;
     }
-    //右键菜单
-    edit->AttachContextMenu([this](const ui::EventArgs& args) {
-        if (args.eventType == ui::kEventContextMenu) {
-            ui::UiPoint pt = args.ptMouse;
-            if ((pt.x != -1) && (pt.y != -1)) {
-                ui::Control* pControl = (ui::Control*)args.lParam;//当前点击点所在的控件
-
-                //鼠标消息产生的上下文菜单
-                ClientToScreen(pt);
-                ShowPopupMenu(pt, nullptr);
-            }
-            else {
-                //按Shift + F10，由系统产生上下文菜单
-                pt = { 100, 100 };
-                ClientToScreen(pt);
-                ShowPopupMenu(pt, nullptr);
-            }
-        }
-        return true;
-        });
-
     //文件拖入支持
     edit->AttachDropData([this, edit](const ui::EventArgs& args) {
         ui::FilePath filePath;
@@ -369,8 +348,15 @@ void ControlForm::AttachRichEditEvents(ui::RichEdit* edit)
                 std::wstring result;
                 if (ui::StringCharset::GetDataAsString((const char*)fileData.data(), (uint32_t)fileData.size(), result)) {
                     DString text = ui::StringConvert::WStringToT(result);
-                    if (edit != nullptr) {
-                        edit->SetText(text);
+                    ui::RichEdit* pRichEdit = dynamic_cast<ui::RichEdit*>(edit);
+                    if (pRichEdit != nullptr) {
+                        pRichEdit->SetText(text);
+                    }
+                    else {
+                        ui::RichEdit2* pRichEdit2 = dynamic_cast<ui::RichEdit2*>(edit);
+                        if (pRichEdit2 != nullptr) {
+                            pRichEdit2->SetText(text);
+                        }
                     }
                 }
             }
@@ -494,7 +480,7 @@ void ControlForm::ShowPopupMenu(const ui::UiPoint& point, ui::Control* pRelatedC
     menu->ShowMenu(xml, point);
 
     //在二级菜单中，添加子菜单项
-    ui::MenuItem* menu_fourth = static_cast<ui::MenuItem*>(menu->FindControl(_T("fourth")));
+    ui::MenuItem* menu_fourth = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("fourth")));
     if (menu_fourth != nullptr) {
         ui::MenuItem* menu_item = new ui::MenuItem(menu);
         menu_item->SetText(_T("Dynamically created"));
@@ -548,7 +534,7 @@ void ControlForm::ShowPopupMenu(const ui::UiPoint& point, ui::Control* pRelatedC
 
 
     /* About menu */
-    ui::MenuItem* menu_about = static_cast<ui::MenuItem*>(menu->FindControl(_T("about")));
+    ui::MenuItem* menu_about = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("about")));
     if (menu_about != nullptr) {
         menu_about->AttachClick([this](const ui::EventArgs& args) {
             AboutForm* about_form = new AboutForm();
@@ -603,16 +589,23 @@ void ControlForm::OnResourceFileLoaded(const DString& xml)
     if (xml.empty()) {
         return;
     }
-    ui::RichEdit* pRichEdit = static_cast<ui::RichEdit*>(FindControl(_T("edit2")));
-    if (pRichEdit) {
-        pRichEdit->SetText(xml);
-        pRichEdit->HomeUp();
-    }
-    pRichEdit = static_cast<ui::RichEdit*>(FindControl(_T("edit")));
-    if (pRichEdit) {
-        pRichEdit->SetText(xml);
-        pRichEdit->SetFocus();
-        pRichEdit->HomeUp();
+    std::vector<ui::Control*> richEdits;
+    richEdits.push_back(FindControl(_T("edit")));
+    richEdits.push_back(FindControl(_T("edit2")));
+    for (ui::Control* pControl: richEdits) {
+        ui::RichEdit2* pRichEdit2 = dynamic_cast<ui::RichEdit2*>(pControl);
+        if (pRichEdit2) {
+            pRichEdit2->SetText(xml);
+            pRichEdit2->HomeUp();
+        }
+        else {
+            ui::RichEdit* pRichEdit = dynamic_cast<ui::RichEdit*>(pControl);
+            if (pRichEdit) {
+                pRichEdit->SetText(xml);
+                pRichEdit->SetFocus();
+                pRichEdit->HomeUp();
+            }
+        }
     }
 }
 
@@ -620,12 +613,12 @@ void ControlForm::OnProgressValueChagned(float value)
 {
     //回调给的进度范围是：[0, 99), 转换为[0, 100]
     value = value * 100 / 99 + 0.5f;
-    auto progress = static_cast<ui::Progress*>(FindControl(_T("progress")));
+    auto progress = dynamic_cast<ui::Progress*>(FindControl(_T("progress")));
     if (progress) {
         progress->SetValue(value);
     }
 
-    auto circleprogress = static_cast<ui::Progress*>(FindControl(_T("circleprogress")));
+    auto circleprogress = dynamic_cast<ui::Progress*>(FindControl(_T("circleprogress")));
     if (circleprogress)    {
         circleprogress->SetValue(value);
         circleprogress->SetText(ui::StringUtil::Printf(_T("%.0f%%"), value));
@@ -707,35 +700,35 @@ void ControlForm::ShowTrayMenu(int32_t x, int32_t y)
     menu->ShowMenu(xml, ui::UiPoint(x, y));
 
     //菜单项点击响应
-    ui::MenuItem* pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_1")));
+    ui::MenuItem* pMenuItem = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_1")));
     if (pMenuItem != nullptr) {
         pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
             ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_1 clicked!"), _T("TrayIconTest"));
             return true;
             });
     }
-    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_2")));
+    pMenuItem = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_2")));
     if (pMenuItem != nullptr) {
         pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
             ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_2 clicked!"), _T("TrayIconTest"));
             return true;
             });
     }
-    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_3")));
+    pMenuItem = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_3")));
     if (pMenuItem != nullptr) {
         pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
             ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_3 clicked!"), _T("TrayIconTest"));
             return true;
             });
     }
-    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_4")));
+    pMenuItem = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_item_4")));
     if (pMenuItem != nullptr) {
         pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
             ui::SystemUtil::ShowMessageBox(this, _T("tray_menu_item_4 clicked!"), _T("TrayIconTest"));
             return true;
             });
     }
-    pMenuItem = static_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_exit")));
+    pMenuItem = dynamic_cast<ui::MenuItem*>(menu->FindControl(_T("tray_menu_exit")));
     if (pMenuItem != nullptr) {
         pMenuItem->AttachClick([this](const ui::EventArgs& /*args*/) {
             this->CloseWnd();

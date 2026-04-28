@@ -1108,7 +1108,6 @@ private:
     RichEditHost* m_pRichHost;
 
     float m_fRowSpacingMul;     //行间距倍数
-    bool m_bVScrollBarFixing;   //滚动条修正标志
     bool m_bWantTab;            //是否接收TAB键，如果为true的时候，TAB键会当作文本输入，否则过滤掉TAB键
     bool m_bWantReturn;         //是否接收回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
     bool m_bWantCtrlReturn;     //是否接收Ctrl + 回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键

@@ -198,15 +198,20 @@
             <HBox>
                 <RichEdit class="prompt" name="edit" bkcolor="bg_richedit" width="stretch" height="stretch"
                             hide_selection="false" multi_line="true" auto_vscroll="true"
-                            vscrollbar="true" hscrollbar="true"
-                            want_return_msg="true" rich="false"
+                            vscrollbar="true" hscrollbar="true" scrollbar_float="false" 
+                            vscrollbar_style="auto_hide_scroll='true'" 
+                            hscrollbar_style="auto_hide_scroll='true'"
+                            want_return="true" want_tab="true" rich="false" default_context_menu="true"
                             enable_drag_drop="true" enable_drop_file="true" drop_file_types=".txt;.md"/>
-                <RichEdit class="prompt" name="edit2" bkcolor="bg_richedit" width="stretch" height="stretch"
+                <!-- 纵向分割条，用于调整左右区域大小 -->
+                <Split class="split_vertical"/>
+                <RichEdit2 class="prompt" name="edit2" bkcolor="bg_richedit" width="stretch" height="stretch"
                             hide_selection="false" multi_line="true" auto_vscroll="true"
-                            vscrollbar="true" hscrollbar="true" scrollbar_float="true"
+                            vscrollbar="true" hscrollbar="true" scrollbar_float="false"
                             vscrollbar_class="vscrollbar2" hscrollbar_class="hscrollbar2"
-                            vscrollbar_style="auto_hide_scroll='false'" hscrollbar_style="auto_hide_scroll='false'"
-                            want_return_msg="true" rich="false"
+                            vscrollbar_style="auto_hide_scroll='false'" 
+                            hscrollbar_style="auto_hide_scroll='false'"
+                            want_return="true" want_tab="true" rich="false" default_context_menu="true"
                             margin="4,0,0,0"
                             enable_drag_drop="true" enable_drop_file="false"/>
             </HBox>

@@ -326,7 +326,6 @@ private:
 RichEdit::RichEdit(Window* pWindow) :
     ScrollBox(pWindow, new Layout),
     m_pRichHost(nullptr), 
-    m_bVScrollBarFixing(false), 
     m_bWantTab(false),
     m_bWantReturn(false),
     m_bWantCtrlReturn(false),
@@ -1818,16 +1817,44 @@ void RichEdit::SetPos(UiRect rc)
 {
     Control::SetPos(rc);
     rc = GetRectWithoutPadding();
-    bool bVScrollBarVisible = false;
     ScrollBar* pVScrollBar = GetVScrollBar();
     if ((pVScrollBar != nullptr) && pVScrollBar->IsValid()) {
-        bVScrollBarVisible = true;
-        rc.right -= pVScrollBar->GetFixedWidth().GetInt32();
+        if (!GetScrollBarFloat()) {
+            rc.right -= pVScrollBar->GetFixedWidth().GetInt32();
+        }
     }
     ScrollBar* pHScrollBar = GetHScrollBar();
     if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
-        rc.bottom -= pHScrollBar->GetFixedHeight().GetInt32();
+        if (!GetScrollBarFloat()) {
+            rc.bottom -= pHScrollBar->GetFixedHeight().GetInt32();
+        }
     }
+    if ((pVScrollBar != nullptr) && pVScrollBar->IsValid()) {
+        int32_t nHScrollbarHeight = 0; //横向滚动条的高度
+        UiRect rcVScrollBarPos(rc.right, rc.top, rc.right + pVScrollBar->GetFixedWidth().GetInt32(), rc.bottom);
+        if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
+            //纵向滚动条的底部，需要到容器的底部
+            nHScrollbarHeight = pHScrollBar->GetFixedHeight().GetInt32();
+            rcVScrollBarPos.bottom += nHScrollbarHeight;
+        }
+        pVScrollBar->SetHScrollbarHeight(nHScrollbarHeight);
+        if (GetScrollBarFloat()) {
+            rcVScrollBarPos.left = rc.right - pVScrollBar->GetFixedWidth().GetInt32();
+            rcVScrollBarPos.right = rc.right;
+        }
+        pVScrollBar->SetPos(rcVScrollBarPos);
+    }
+    if (pHScrollBar != nullptr && pHScrollBar->IsValid()) {
+        UiRect rcHScrollBarPos(rc.left, rc.bottom, rc.right, rc.bottom + pHScrollBar->GetFixedHeight().GetInt32());
+        if (GetScrollBarFloat()) {
+            rcHScrollBarPos.top = rc.bottom - pHScrollBar->GetFixedHeight().GetInt32();
+            rcHScrollBarPos.bottom = rc.bottom;
+        }
+        pHScrollBar->SetPos(rcHScrollBarPos);
+    }
+
+    //排列子控件
+    ArrangeChildren(m_items);
 
     if (m_pRichHost != nullptr) {
         //调整编辑框的位置, 剪去文本内边距
@@ -1835,43 +1862,7 @@ void RichEdit::SetPos(UiRect rc)
         UiPadding rcTextPadding = GetTextPadding();
         textRect.Deflate(rcTextPadding);
         m_pRichHost->SetClientRect(textRect);
-        if (bVScrollBarVisible && (pVScrollBar != nullptr) && (!pVScrollBar->IsValid() || m_bVScrollBarFixing)) {
-            LONG lWidth = rc.Width() + pVScrollBar->GetFixedWidth().GetInt32();
-            LONG lHeight = 0;
-            UiSize szNaturalSize = GetNaturalSize(lWidth, lHeight);
-            lWidth = szNaturalSize.cx;
-            lHeight = szNaturalSize.cy;
-            if (lHeight > rc.Height()) {
-                pVScrollBar->SetScrollPos(0);
-                m_bVScrollBarFixing = true;
-            }
-            else {
-                if (m_bVScrollBarFixing) {
-                    pVScrollBar->SetScrollRange(0);
-                    m_bVScrollBarFixing = false;
-                }
-            }
-        }
     }
-
-    if ((pVScrollBar != nullptr) && pVScrollBar->IsValid()) {        
-        int32_t nHScrollbarHeight = 0; //横向滚动条的高度
-        UiRect rcScrollBarPos(rc.right, rc.top, rc.right + pVScrollBar->GetFixedWidth().GetInt32(), rc.bottom);
-        if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
-            //纵向滚动条的底部，需要到容器的底部
-            nHScrollbarHeight = pHScrollBar->GetFixedHeight().GetInt32();
-            rcScrollBarPos.bottom += nHScrollbarHeight;
-        }
-        pVScrollBar->SetHScrollbarHeight(nHScrollbarHeight);
-        pVScrollBar->SetPos(rcScrollBarPos);
-    }
-    if (pHScrollBar != nullptr && pHScrollBar->IsValid()) {
-        UiRect rcScrollBarPos(rc.left, rc.bottom, rc.right, rc.bottom + pHScrollBar->GetFixedHeight().GetInt32());
-        pHScrollBar->SetPos(rcScrollBarPos);
-    }
-
-    //排列子控件
-    ArrangeChildren(m_items);
 }
 
 void RichEdit::ArrangeChildren(const std::vector<Control*>& items) const
@@ -2343,15 +2334,6 @@ void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
     if (bNeedPaint) {
         PaintRichEdit(pRender, rcPaint);
     }
-
-    ScrollBar* pVScrollBar = GetVScrollBar();
-    if (m_bVScrollBarFixing && (pVScrollBar != nullptr)) {
-        LONG lWidth = rc.Width() + pVScrollBar->GetFixedWidth().GetInt32();
-        UiSize szNaturalSize = GetNaturalSize(lWidth, 0);
-        if(szNaturalSize.cy <= rc.Height() ) {
-            Arrange();
-        }
-    }
 }
 
 RichEdit::TxDrawData::TxDrawData():
@@ -2791,13 +2773,14 @@ void RichEdit::PaintChild(IRender* pRender, const UiRect& rcPaint)
     ScrollBar* pHScrollBar = GetHScrollBar();
     if (m_items.size() > 0) {
         UiRect rc = GetRectWithoutPadding();
-        if ((pVScrollBar != nullptr) && pVScrollBar->IsValid()) {
-            rc.right -= pVScrollBar->GetFixedWidth().GetInt32();
+        if (!!GetScrollBarFloat()) {
+            if ((pVScrollBar != nullptr) && pVScrollBar->IsValid()) {
+                rc.right -= pVScrollBar->GetFixedWidth().GetInt32();
+            }
+            if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
+                rc.bottom -= pHScrollBar->GetFixedHeight().GetInt32();
+            }
         }
-        if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
-            rc.bottom -= pHScrollBar->GetFixedHeight().GetInt32();
-        }
-
         if (!UiRect::Intersect(rcTemp, rcPaint, rc)) {
             for (auto it = m_items.begin(); it != m_items.end(); ++it) {
                 auto pControl = *it;
