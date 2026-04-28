@@ -1,5 +1,5 @@
 #ifndef UI_CONTROL_RICHEDIT_DEFS_H_
-#define UI_CONTROL_RICHEDIT_H_
+#define UI_CONTROL_RICHEDIT_DEFS_H_
 
 /** RichEdit与RichEdit2类的公共部分定义
 */

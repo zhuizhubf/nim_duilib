@@ -4547,6 +4547,7 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
 #ifdef DUILIB_BUILD_FOR_SDL
         //回车键, TAB键, 删除键，退格键的处理逻辑，无输入文本
         ASSERT(msg.eventData != SDL_EVENT_TEXT_INPUT);
+#endif
         if (msg.vkCode == kVK_RETURN) {
             //回车: 转换成换行："\r\n" 或者 "\n"
 #if defined (DUILIB_BUILD_FOR_WIN)
@@ -4559,9 +4560,6 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
             //TAB键
             text = L"\t";
         }
-#else
-        ASSERT(0);
-#endif
     }
     else {
 #ifdef DUILIB_BUILD_FOR_SDL
@@ -4572,7 +4570,8 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
             text = (DStringW::value_type*)msg.wParam;
         }
 #else
-        ASSERT(0);
+        //Windows API模式：一次输入一个字符
+        text = (DStringW::value_type)msg.vkCode;
 #endif
     }
 
