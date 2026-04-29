@@ -16,7 +16,7 @@ bool Clipboard::GetClipboardText(DStringW& text)
                 wchar_t* buf = (wchar_t*)::GlobalLock(h);
                 if (buf != nullptr) {
                     DStringW str(buf, GlobalSize(h) / sizeof(wchar_t));
-                    text = str;
+                    text = DStringW(str).c_str();//避免出现字符中包含尾0的情况
                     ::GlobalUnlock(h);
                 }
             }
@@ -27,7 +27,7 @@ bool Clipboard::GetClipboardText(DStringW& text)
                 char* buf = (char*)::GlobalLock(h);
                 if (buf != nullptr) {
                     std::string str(buf, GlobalSize(h));
-                    text = StringConvert::MBCSToUnicode(str);
+                    text = StringConvert::MBCSToUnicode(str).c_str();
                     ::GlobalUnlock(h);
                 }
             }

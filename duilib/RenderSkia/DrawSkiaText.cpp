@@ -282,7 +282,7 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch, SkScala
         const SkFont* pFallbackSkFont = fallbackFontCreator((uint32_t)ch, &glyphID);
         if (pFallbackSkFont != nullptr) {
             skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, *pFallbackSkFont, paint);
-            GetSkGlyphCharWidth(font, paint, glyphID, fWidth);
+            GetSkGlyphCharWidth(*pFallbackSkFont, paint, glyphID, fWidth);
         }
     }
     if (glyphID == 0) {
