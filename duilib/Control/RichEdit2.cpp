@@ -37,7 +37,12 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_bNoCaretReadonly(false),
     m_bIsCaretVisiable(false),
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    m_bIsComposition(false),
+    m_bIsComposition(false),    
+    #ifdef DUILIB_UNICODE
+        m_chHighSurrogate(L'\0'),
+    #else
+        m_dwLastCharTime(0),
+    #endif
 #endif
     m_iCaretPosX(0),
     m_iCaretPosY(0),
@@ -1054,29 +1059,8 @@ void RichEdit2::SetText(const DStringW& strText)
 
 void RichEdit2::SetText(const DStringA& strText)
 {
-    //目前内存占用情况：2MB的UTF16格式文本，Debug版本：占用约23MB的内存，Release版本：占用约12MB的内存。
-    bool bChanged = false;
     DStringW text = StringConvert::UTF8ToWString(strText);
-    if (IsPasswordMode()) {
-        //密码模式
-        DStringW passwordText = text;
-        RemoveInvalidPasswordChar(passwordText);
-        bChanged = m_pTextData->SetText(passwordText);
-    }
-    else {
-        bChanged = m_pTextData->SetText(text);
-    }
-    if (bChanged && IsInited()) {
-        //重新计算字符区域
-        Redraw();
-
-        //文本变化时，选择点放到文本末端
-        int32_t nTextLen = (int32_t)m_pTextData->GetTextLength();
-        InternalSetSel(nTextLen, nTextLen);
-
-        UpdateScrollRange();
-        OnTextChanged();
-    }
+    SetText(text);
 }
 
 void RichEdit2::SetTextNoEvent(const DString& strText)
@@ -2025,8 +2009,7 @@ void RichEdit2::GetCaretSize(int32_t& xWidth, int32_t& yHeight) const
 
 void RichEdit2::ShowCaret(bool fShow)
 {
-    Window* pWindow = GetWindow();
-    if (fShow && (pWindow != nullptr)) {
+    if (fShow) {
         m_bIsCaretVisiable = true;
         m_drawCaretFlag.Cancel();
         std::function<void()> closure = UiBind(&RichEdit2::ChangeCaretVisiable, this);
@@ -2065,8 +2048,11 @@ void RichEdit2::ShowCaret(bool fShow)
         ASSERT(m_nRowHeight > 0);
 
         //设置输入区域
-        int32_t nCursorOffset = xWidth + Dpi().GetScaleInt(1); //输入法的候选框与光标当前位置的距离（水平方向）, 避免遮盖光标        
-        pWindow->NativeWnd()->SetTextInputArea(&inputRect, nCursorOffset);
+        int32_t nCursorOffset = xWidth + Dpi().GetScaleInt(1); //输入法的候选框与光标当前位置的距离（水平方向）, 避免遮盖光标
+        Window* pWindow = GetWindow();
+        if (pWindow != nullptr) {
+            pWindow->NativeWnd()->SetTextInputArea(&inputRect, nCursorOffset);
+        }
     }
 
     Invalidate();
@@ -3535,20 +3521,14 @@ bool RichEdit2::OnKeyDown(const EventArgs& msg)
     else if (OnArrowKeyDown(msg)) {
         return true;
     }
-    else if ((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB)) {
+    else if ((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB) ||
+             (msg.vkCode == kVK_DELETE) || (msg.vkCode == kVK_BACK)) {
+        //在KeyDown的时候，处理回车键, TAB键, 删除键，退格键
         OnInputChar(msg);
     }
     else if (msg.vkCode == kVK_ESCAPE) {
         //ESC键
         SendEvent(kEventEsc);
-    }
-    else if (msg.vkCode == kVK_DELETE) {
-        //删除键：删除后一个字符
-        OnInputChar(msg);
-    }
-    else if (msg.vkCode == kVK_BACK) {
-        //Backspace键：删除前一个字符
-        OnInputChar(msg);
     }
     else if ((msg.vkCode == 'A') && IsKeyDown(msg, ModifierKey::kControl)) {
         //Ctrl + A: 全选
@@ -4068,14 +4048,6 @@ bool RichEdit2::OnKeyUp(const EventArgs& msg)
 
 bool RichEdit2::OnChar(const EventArgs& msg)
 {
-    if (msg.modifierKey & ModifierKey::kIsSystemKey) {
-        //不处理
-        return true;
-    }
-    if ((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB) || (msg.vkCode == kVK_DELETE) || (msg.vkCode == kVK_BACK)) {
-        //回车键, TAB键, 删除键，退格键的处理逻辑，统一在KEYDOWN处理
-        return true;
-    }
     //输入一个字符
     OnInputChar(msg);
     return true;
@@ -4477,35 +4449,141 @@ void RichEdit2::UpdateScrollRange()
     SetPos(GetPos());
 }
 
+#ifndef DUILIB_BUILD_FOR_SDL
+/** 获取输入的字符(Windows API实现部分)
+*/
+DStringW RichEdit2::GetInputTextW(UINT uMsg, WPARAM wParam)
+{
+    ASSERT((uMsg == WM_CHAR) || (uMsg == WM_UNICHAR));
+    DStringW text;
+    if ((uMsg != WM_CHAR) && (uMsg != WM_UNICHAR)) {
+        return text;
+    }
+    // 过滤：所有其他 0~31 控制符 + DEL
+    if (wParam <= 0x1F || wParam == 0x7F) {
+#ifdef DUILIB_UNICODE
+        m_chHighSurrogate = L'\0';
+#else
+        m_pendingChars.clear();
+        m_dwLastCharTime = 0;
+#endif
+        return text;
+    }
+
+    if (uMsg == WM_UNICHAR) {
+        text = (DStringW::value_type)wParam;
+        return text;
+    }
+
+#ifdef DUILIB_UNICODE
+    //Windows API模式：一次输入一个字符
+    if (IS_HIGH_SURROGATE(wParam)) {
+        m_chHighSurrogate = (WCHAR)wParam;
+    }
+    else {
+        WCHAR utf16[3];
+        utf16[0] = m_chHighSurrogate ? m_chHighSurrogate : (WCHAR)wParam;
+        utf16[1] = m_chHighSurrogate ? (WCHAR)wParam : L'\0';
+        utf16[2] = L'\0';
+        text = utf16;
+        m_chHighSurrogate = L'\0';
+    }
+#else
+    //MBCS模式: 只支持1字节和2字节的文字输入，不支持4字节的文字输入
+    bool bHandled = false;
+    if (m_pendingChars.empty()) {
+        if (IsDBCSLeadByte((BYTE)wParam)) {
+            m_pendingChars.push_back((BYTE)wParam);
+            bHandled = true;
+        }
+    }
+    else {
+        if (m_pendingChars.size() == 1) {
+            BYTE chMBCS[8] = { m_pendingChars.front(), (BYTE)wParam, 0, };
+            DStringW::value_type chWideChar[4] = { 0, };
+            ::MultiByteToWideChar(CP_ACP, 0, (const char*)chMBCS, 2, chWideChar, 4);
+            if (chWideChar[0] != 0) {
+                text = chWideChar;//获取到文本内容
+                bHandled = true;
+            }
+            m_pendingChars.clear();
+        }
+        else {
+            ASSERT(false);
+            m_pendingChars.clear();
+        }
+    }
+    m_dwLastCharTime = ::GetTickCount();
+    if (!bHandled) {
+        BYTE chMBCS[8] = { (BYTE)wParam, 0, 0, };
+        DStringW::value_type chWideChar[4] = { 0, };
+        ::MultiByteToWideChar(CP_ACP, 0, (const char*)chMBCS, 2, chWideChar, 4);
+        if (chWideChar[0] != 0) {
+            text = chWideChar;//获取到文本内容
+        }
+    }
+#endif // DUILIB_UNICODE
+    return text;
+}
+#endif
+
 void RichEdit2::OnInputChar(const EventArgs& msg)
 {
+    //校验当前状态是否可以编辑
     m_nSelXPos = -1;
     if (IsReadOnly() || !IsEnabled()) {
         //只读或者Disable状态，禁止编辑
         return;
     }
 
-    //对TAB键和回车键的预处理
-    bool bEnableInputChar = true;
+    //校验输入参数是否合法
+    if (msg.eventType == ui::kEventKeyDown) {
+        //仅处理：回车键, TAB键, 删除键，退格键的处理逻辑
+        ASSERT((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB) || (msg.vkCode == kVK_DELETE) || (msg.vkCode == kVK_BACK));
+        if ((msg.vkCode != kVK_RETURN) && (msg.vkCode != kVK_TAB) && (msg.vkCode != kVK_DELETE) && (msg.vkCode != kVK_BACK)) {            
+            return;
+        }
+    }
+    else {
+        ASSERT(msg.eventType == ui::kEventChar);
+        if (msg.eventType != ui::kEventChar) {
+            return;
+        }
+#ifdef DUILIB_BUILD_FOR_SDL
+        ASSERT(msg.eventData == SDL_EVENT_TEXT_INPUT);
+        if (msg.eventData != SDL_EVENT_TEXT_INPUT) {
+            return;
+        }
+#elif defined (DUILIB_BUILD_FOR_WIN)
+        ASSERT((msg.eventData == WM_CHAR) || (msg.eventData == WM_SYSCHAR) || (msg.eventData == WM_UNICHAR));
+        if (msg.eventData == WM_SYSCHAR) {
+            //该消息不处理
+            return;
+        }
+#endif
+    }
+
+    //对TAB键和回车键的预处理（这两个键是可配置的，根据选项确定是否可以输入）    
     if (msg.vkCode == kVK_TAB) {
         //按下TAB键
+        bool bEnableInputChar = true;
         if (!m_bWantTab) {
             //不接受TAB键，触发TAB按键事件
             bEnableInputChar = false;
             SendEvent(kEventTab);
         }
-        else {
-            //接受TAB键，当作输入字符
-            bEnableInputChar = true;
-        }
-
         if (bEnableInputChar && IsPasswordMode()) {
             //密码模式下，不支持输入TAB键字符
             bEnableInputChar = false;
         }
+        if (!bEnableInputChar) {
+            //无需编辑文本
+            return;
+        }
     }
-    if (msg.vkCode == kVK_RETURN) {
+    else if (msg.vkCode == kVK_RETURN) {
         //按下回车键
+        bool bEnableInputChar = true;
         bool bShiftDown = IsKeyDown(msg, ModifierKey::kShift);
         bool bCtrlDown = IsKeyDown(msg, ModifierKey::kControl);
         if (bCtrlDown && !bShiftDown) {
@@ -4514,10 +4592,6 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
                 bEnableInputChar = false;
                 SendEvent(kEventReturn);
             }
-            else {
-                //接受Ctrl + Enter，当作输入字符
-                bEnableInputChar = true;
-            }
         }
         else {
             if (!m_bWantReturn) {
@@ -4525,29 +4599,20 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
                 bEnableInputChar = false;
                 SendEvent(kEventReturn);                
             }
-            else {
-                //接受Enter键，当作输入字符
-                bEnableInputChar = true;
-            }
         }
         if (bEnableInputChar && (!IsMultiLine() || IsPasswordMode())) {
             //单行模式下，或者密码模式下，不支持输入换行符
             bEnableInputChar = false;
         }
-    }
-
-    if (!bEnableInputChar) {
-        //无需编辑文本
-        return;
+        if (!bEnableInputChar) {
+            //无需编辑文本
+            return;
+        }
     }
 
     //获取本次输入的文本
     DStringW text;
-    if ((msg.vkCode == kVK_RETURN) || (msg.vkCode == kVK_TAB) || (msg.vkCode == kVK_DELETE) || (msg.vkCode == kVK_BACK)) {
-#ifdef DUILIB_BUILD_FOR_SDL
-        //回车键, TAB键, 删除键，退格键的处理逻辑，无输入文本
-        ASSERT(msg.eventData != SDL_EVENT_TEXT_INPUT);
-#endif
+    if (msg.eventType == ui::kEventKeyDown) {
         if (msg.vkCode == kVK_RETURN) {
             //回车: 转换成换行："\r\n" 或者 "\n"
 #if defined (DUILIB_BUILD_FOR_WIN)
@@ -4560,8 +4625,24 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
             //TAB键
             text = L"\t";
         }
+        else if (msg.vkCode == kVK_DELETE) {
+            text.clear();
+        }
+        else if (msg.vkCode == kVK_BACK) {
+            text.clear();
+        }
+        else {
+            ASSERT(0);
+            return;
+        }
     }
     else {
+        //文字输入
+        ASSERT(msg.eventType == ui::kEventChar);
+        if (msg.eventType != ui::kEventChar) {
+            return;
+        }
+        text.clear();
 #ifdef DUILIB_BUILD_FOR_SDL
         ASSERT(msg.eventData == SDL_EVENT_TEXT_INPUT);
         ASSERT(msg.vkCode == kVK_None);
@@ -4570,9 +4651,13 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
             text = (DStringW::value_type*)msg.wParam;
         }
 #else
-        //Windows API模式：一次输入一个字符
-        text = (DStringW::value_type)msg.vkCode;
-#endif
+        //Windows API实现
+        text = GetInputTextW((UINT)msg.eventData, msg.wParam);
+#endif  //DUILIB_BUILD_FOR_SDL
+        if (text.empty()) {
+            //无有效文本输入
+            return;
+        }
     }
 
     //密码模式下：删除非法字符

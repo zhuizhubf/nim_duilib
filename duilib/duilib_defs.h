@@ -334,7 +334,10 @@ namespace ui
         kEventKeyBegin,
         kEventKeyDown,              //Window类：当收到WM_KEYDOWN消息时触发，发送给Focus控件
         kEventKeyUp,                //Window类：当收到WM_KEYUP消息时触发，发送给WM_KEYDOWN事件中的那个Focus控件
-        kEventChar,                 //Window类：当收到WM_CHAR消息时触发，发送给WM_KEYDOWN事件中的那个Focus控件
+        kEventChar,                 //Window类：Windows API实现时：当收到WM_CHAR/WM_SYSCHAR/WM_UNICHAR消息时触发，发送给WM_KEYDOWN事件中的那个Focus控件
+                                    //                            WM_CHAR/WM_SYSCHAR/WM_UNICHAR消息的值存储在EventArgs::eventData属性中
+                                    //         使用SDL实现时：当收到SDL_EVENT_TEXT_INPUT消息时触发，发送给KEYDOWN事件中的那个Focus控件
+                                    //                       SDL_EVENT_TEXT_INPUT消息的值存储在EventArgs::eventData属性中
         kEventKeyEnd,
 
         //鼠标消息

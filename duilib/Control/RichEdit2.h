@@ -803,10 +803,22 @@ protected:
     virtual bool OnKillFocus(const EventArgs& msg) override;
     virtual bool OnImeStartComposition(const EventArgs& msg) override;
     virtual bool OnImeEndComposition(const EventArgs& msg) override;
-    
+
+    /** 文本字符输入消息
+    * @param msg 文本输入的具体参数信息，参数取值详细内容如下
+    *            ASSERT(msg.eventType == ui::kEventChar)
+    *            1. Windows API实现时：
+    *               ASSERT((msg.eventData == WM_CHAR) || (msg.eventData == WM_SYSCHAR) || (msg.eventData == WM_UNICHAR));
+    *               wParam和lParam参数值就是操作系统消息对应的wParam和lParam参数值
+    *            2. SDL实现时, 获取文本的方法如下(wParam是DStringW::value_type*指针，lParam是字符串的长度)：
+    *               DStringW text;
+    *               if((msg.eventData == SDL_EVENT_TEXT_INPUT) && (msg.wParam != 0) && (msg.lParam > 0)) {
+    *                   text = (DStringW::value_type*)msg.wParam;
+    *               }
+    */
+    virtual bool OnChar(const EventArgs& msg) override;
     virtual bool OnKeyDown(const EventArgs& msg) override;
     virtual bool OnKeyUp(const EventArgs& msg) override;
-    virtual bool OnChar(const EventArgs& msg) override;
 
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
     virtual bool ButtonDown(const EventArgs& msg) override;
@@ -1087,6 +1099,12 @@ private:
     */
     void CheckSelAllOnFocus();
 
+#ifndef DUILIB_BUILD_FOR_SDL
+    /** 获取输入的字符(Windows API实现部分)
+    */
+    DStringW GetInputTextW(UINT uMsg, WPARAM wParam);
+#endif
+
 private:
     bool m_bWantTab;            //是否接收TAB键，如果为true的时候，TAB键会当作文本输入，否则过滤掉TAB键
     bool m_bWantReturn;         //是否接收回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
@@ -1098,7 +1116,13 @@ private:
     bool m_bSelAllOnFocus;      //获取焦点的时候，全选文本（针对 m_bEnabled && !IsReadOnly()）
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    bool m_bIsComposition;      //输入法合成窗口是否可见
+    bool m_bIsComposition;      //输入法合成窗口是否可见    
+    #ifdef DUILIB_UNICODE
+        WCHAR m_chHighSurrogate;          //文字输入字符的第一部分
+    #else
+        std::vector<BYTE> m_pendingChars; // MBCS时，输入的字符
+        DWORD m_dwLastCharTime;           // 上次输入的时间
+    #endif
 #endif
 
     bool m_bReadOnly;           //是否为只读模式

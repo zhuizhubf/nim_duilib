@@ -2051,17 +2051,12 @@ void RichEdit::CheckSelAllOnFocus()
     }
 }
 
-bool RichEdit::OnChar(const EventArgs& msg)
+bool RichEdit::IsInvalidInputChar(DStringW::value_type charValue) const
 {
-    //TAB
-    if (::GetKeyState(VK_TAB) < 0 && !m_bWantTab) {
-        SendEvent(kEventTab);
-        return true;
-    }
     //Number
     if (IsNumberOnly()) {
-        if (msg.vkCode < '0' || msg.vkCode > '9') {
-            if (msg.vkCode == _T('-')) {
+        if (charValue < L'0' || charValue > L'9') {
+            if (charValue == L'-') {
                 if (GetTextLength() > 0) {
                     //不是第一个字符，禁止输入负号
                     return true;
@@ -2079,22 +2074,49 @@ bool RichEdit::OnChar(const EventArgs& msg)
 
     //限制允许输入的字符
     if (m_pLimitChars != nullptr) {
-        if (!IsInLimitChars((DStringW::value_type)msg.vkCode)) {
+        if (!IsInLimitChars(charValue)) {
             //字符不在列表里面，禁止输入
             return true;
         }
     }
+    return false;
+}
+
+bool RichEdit::OnChar(const EventArgs& msg)
+{
+    ASSERT((msg.eventData == WM_CHAR) || (msg.eventData == WM_SYSCHAR) || (msg.eventData == WM_UNICHAR));
+    if ((msg.eventData != WM_CHAR) && (msg.eventData != WM_SYSCHAR) && (msg.eventData != WM_UNICHAR)) {
+        return true;
+    }
+    if (msg.eventData == WM_SYSCHAR) {
+        m_richCtrl.TxSendMessage(WM_SYSCHAR, msg.wParam, msg.lParam);
+        return true;
+    }
+    //TAB
+    if (::GetKeyState(VK_TAB) < 0 && !m_bWantTab) {
+        SendEvent(kEventTab);
+        return true;
+    }
+
+    // 过滤：所有其他 0~31 控制符 + DEL
+    if (msg.wParam <= 0x1F || msg.wParam == 0x7F) {
+        return true;
+    }
+    
 #ifdef DUILIB_UNICODE
+    if (IsInvalidInputChar((DStringW::value_type)msg.wParam)) {
+        return true;
+    }
     WPARAM wParam = msg.wParam;
     WPARAM lParam = msg.lParam;
-    if (msg.modifierKey & ModifierKey::kIsSystemKey) {
-        m_richCtrl.TxSendMessage(WM_SYSCHAR, wParam, lParam);
+    if (msg.eventData == WM_UNICHAR) {
+        m_richCtrl.TxSendMessage(WM_UNICHAR, wParam, lParam);
     }
     else {
         m_richCtrl.TxSendMessage(WM_CHAR, wParam, lParam);
     }    
 #else
-    //只支持1字节和2字节的文字输入，不支持4字节的文字输入
+    //MBCS模式: 只支持1字节和2字节的文字输入，不支持4字节的文字输入
     if ((::GetTickCount() - m_dwLastCharTime) > 5000) {
         m_pendingChars.clear();
     }
@@ -2112,7 +2134,9 @@ bool RichEdit::OnChar(const EventArgs& msg)
             ::MultiByteToWideChar(CP_ACP, 0, (const char*)chMBCS, 2, chWideChar, 4);
             if (chWideChar[0] != 0) {
                 WPARAM wParam = chWideChar[0];
-                m_richCtrl.TxSendMessage(WM_CHAR, wParam, msg.lParam);                
+                if (!IsInvalidInputChar((DStringW::value_type)wParam)) {
+                    m_richCtrl.TxSendMessage(WM_CHAR, wParam, msg.lParam);
+                }
                 bHandled = true;
             }
             m_pendingChars.clear();
@@ -2123,7 +2147,7 @@ bool RichEdit::OnChar(const EventArgs& msg)
         }
     }
     m_dwLastCharTime = ::GetTickCount();
-    if (!bHandled) {
+    if (!bHandled && !IsInvalidInputChar((DStringW::value_type)msg.wParam)) {
         m_richCtrl.TxSendMessage(WM_CHAR, msg.wParam, msg.lParam);
     }    
 #endif    

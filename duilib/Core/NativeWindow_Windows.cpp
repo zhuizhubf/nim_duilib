@@ -123,7 +123,7 @@ bool NativeWindow_Windows::CreateWnd(NativeWindow_Windows* pParentWindow,
 
     //在模块退出时，注销该ATOM
     GlobalManager::Instance().AddAtExitFunction([className, hModule]() {
-        ::UnregisterClassW(className.c_str(), hModule);
+        ::UnregisterClass(className.c_str(), hModule);
         });
 
     //保存参数
@@ -390,7 +390,7 @@ bool NativeWindow_Windows::CreateChildWnd(NativeWindow_Windows* pParentWindow, i
 
     //在模块退出时，注销该ATOM
     GlobalManager::Instance().AddAtExitFunction([className, hModule]() {
-        ::UnregisterClassW(className.c_str(), hModule);
+        ::UnregisterClass(className.c_str(), hModule);
         });
 
     //保存参数
@@ -1725,6 +1725,7 @@ bool NativeWindow_Windows::GetModifiers(UINT message, WPARAM wParam, LPARAM lPar
     switch (message) {
     case WM_SYSCHAR:
     case WM_CHAR:
+    case WM_UNICHAR:
         if (0 == (lParam & (1 << 30))) {
             modifierKey |= ModifierKey::kFirstPress;
         }
@@ -1806,7 +1807,6 @@ bool NativeWindow_Windows::GetModifiers(UINT message, WPARAM wParam, LPARAM lPar
     ASSERT(bRet);
     return bRet;
 }
-
 
 int32_t NativeWindow_Windows::SetWindowHotKey(uint8_t wVirtualKeyCode, uint8_t wModifiers)
 {
@@ -2800,6 +2800,19 @@ LRESULT NativeWindow_Windows::ProcessWindowMessage(UINT uMsg, WPARAM wParam, LPA
         lResult = m_pOwner->OnNativeKeyUpMsg(vkCode, modifierKey, NativeMsg(uMsg, wParam, lParam), bHandled);
         break;
     }
+    case WM_UNICHAR:
+        if (wParam == UNICODE_NOCHAR) {
+            //测试是否支持该消息，应返回1
+            lResult = 1;
+            bHandled = true;
+        }
+        else {
+            VirtualKeyCode vkCode = static_cast<VirtualKeyCode>(wParam);
+            uint32_t modifierKey = 0;
+            GetModifiers(uMsg, wParam, lParam, modifierKey);
+            lResult = m_pOwner->OnNativeCharMsg(vkCode, modifierKey, NativeMsg(uMsg, wParam, lParam), bHandled);
+        }
+        break;
     case WM_CHAR:
     case WM_SYSCHAR:
     {
