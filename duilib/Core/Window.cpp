@@ -43,21 +43,21 @@ Window::~Window()
 
 void Window::SetAttribute(const DString& strName, const DString& strValue)
 {
-    if (strName == _T("shadow_type")) {
-        //设置窗口的阴影类型
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
-        if (Shadow::GetShadowType(strValue, nShadowType)) {
-            SetShadowType(nShadowType);
-        }
+    if (strName == _T("use_system_caption")) {
+        //是否使用操作系统默认的标题栏
+        SetUseSystemCaption(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("shadow_attached")) {
         //是否开启阴影
         SetShadowAttached(StringUtil::IsValueTrue(strValue));
     }
-    else if (strName == _T("drag_drop")) {
-        //是否允许拖放操作
-        SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
-    }
+    else if (strName == _T("shadow_type")) {
+        //设置窗口的阴影类型
+        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+        if (Shadow::GetShadowType(strValue, nShadowType)) {
+            SetShadowType(nShadowType);
+        }
+    }    
     else if (strName == _T("layered_window")) {
         //是否为分层窗口
         SetLayeredWindow(StringUtil::IsValueTrue(strValue), true);
@@ -65,6 +65,10 @@ void Window::SetAttribute(const DString& strName, const DString& strValue)
     else if (strName == _T("layered_window_alpha")) {
         //分层窗口的透明度
         SetLayeredWindowAlpha(StringUtil::StringToInt32(strValue));
+    }
+    else if (strName == _T("drag_drop")) {
+        //是否允许拖放操作
+        SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
     }
 }
 

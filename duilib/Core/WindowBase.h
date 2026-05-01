@@ -1335,19 +1335,19 @@ private:
 
 private:
     //来自实现窗口的事件
-    virtual void OnNativeWindowEnterFullscreen() override final;
-    virtual void OnNativeWindowExitFullscreen() override final;
-    virtual UiRect OnNativeGetSizeBox() const override final;
-    virtual void OnNativeGetShadowCorner(UiPadding& rcShadow) const override final;
     virtual const DpiManager& OnNativeGetDpi() const override final;
+    virtual void OnNativeGetShadowCorner(UiPadding& rcShadow) const override final;
+    virtual UiRect OnNativeGetSizeBox() const override final;
+    virtual void OnNativeUseSystemCaptionBarChanged() override final;
     virtual void OnNativeGetCaptionRect(UiRect& captionRect) const override final;
     virtual void OnNativeGetSysMenuRect(UiRect& sysMenuRect) const override final;
     virtual bool OnNativeIsPtInCaptionBarControl(const UiPoint& pt) const override final;
     virtual bool OnNativeHasMinMaxBox(bool& bMinimizeBox, bool& bMaximizeBox) const override final;
     virtual bool OnNativeIsPtInMaximizeRestoreButton(const UiPoint& pt) const override final;
+    virtual void OnNativeWindowEnterFullscreen() override final;
+    virtual void OnNativeWindowExitFullscreen() override final;
     virtual void OnNativePreCloseWindow() override final;
     virtual void OnNativePostCloseWindow() override final;
-    virtual void OnNativeUseSystemCaptionBarChanged() override final;
     virtual bool OnNativePreparePaint() override final;
     virtual IRender* OnNativeGetRender() const override final;
     virtual Control* OnNativeFindControl(const UiPoint& pt) const override final;

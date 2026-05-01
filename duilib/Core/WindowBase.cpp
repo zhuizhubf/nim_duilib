@@ -951,9 +951,9 @@ void WindowBase::OnNativeWindowExitFullscreen()
     SendWindowEvent(kWindowExitFullscreenMsg);
 }
 
-UiRect WindowBase::OnNativeGetSizeBox() const
+const DpiManager& WindowBase::OnNativeGetDpi() const
 {
-    return GetSizeBox();
+    return Dpi();
 }
 
 void WindowBase::OnNativeGetShadowCorner(UiPadding& rcShadow) const
@@ -961,9 +961,14 @@ void WindowBase::OnNativeGetShadowCorner(UiPadding& rcShadow) const
     GetCurrentShadowCorner(rcShadow);
 }
 
-const DpiManager& WindowBase::OnNativeGetDpi() const
+UiRect WindowBase::OnNativeGetSizeBox() const
 {
-    return Dpi();
+    return GetSizeBox();
+}
+
+void WindowBase::OnNativeUseSystemCaptionBarChanged()
+{
+    OnUseSystemCaptionBarChanged();
 }
 
 void WindowBase::OnNativeGetCaptionRect(UiRect& captionRect) const
@@ -1001,11 +1006,6 @@ void WindowBase::OnNativePreCloseWindow()
 void WindowBase::OnNativePostCloseWindow()
 {
     PostCloseWindow();
-}
-
-void WindowBase::OnNativeUseSystemCaptionBarChanged()
-{
-    OnUseSystemCaptionBarChanged();
 }
 
 bool WindowBase::OnNativePreparePaint()

@@ -45,6 +45,10 @@ public:
     */
     virtual UiRect OnNativeGetSizeBox() const = 0;
 
+    /** 切换系统标题栏与自绘标题栏
+    */
+    virtual void OnNativeUseSystemCaptionBarChanged() = 0;
+
     /** 获取窗口标题栏区域（可拖动区域），对应 XML 中 caption 属性
     * @param [out] captionRect 返回标题栏区域的矩形范围(rcClient代表窗口的客户区矩形范围)：
     *              标题栏的left  : rcClient.left + rcCaption.left
@@ -88,10 +92,6 @@ public:
     /** 当窗口已经关闭时调用此函数，供子类中做一些收尾工作
     */
     virtual void OnNativePostCloseWindow() = 0;
-
-    /** 切换系统标题栏与自绘标题栏
-    */
-    virtual void OnNativeUseSystemCaptionBarChanged() = 0;
 
     /** 准备绘制
     * @return 返回true表示继续绘制，返回false表示不再继续绘制
