@@ -507,6 +507,7 @@
     <ClCompile Include="Utils\Clipboard_SDL.cpp" />
     <ClCompile Include="Utils\Clipboard_Windows.cpp" />
     <ClCompile Include="Utils\DiskUtils_Windows.cpp" />
+    <ClCompile Include="Utils\DllManager_Windows.cpp" />
     <ClCompile Include="Utils\FileDialog_SDL.cpp" />
     <ClCompile Include="Utils\FileDialog_Windows.cpp" />
     <ClCompile Include="Utils\FilePath.cpp" />
@@ -826,6 +827,7 @@
     <ClInclude Include="Utils\BitmapHelper_Windows.h" />
     <ClInclude Include="Utils\Clipboard.h" />
     <ClInclude Include="Utils\DiskUtils_Windows.h" />
+    <ClInclude Include="Utils\DllManager_Windows.h" />
     <ClInclude Include="Utils\FileDialog.h" />
     <ClInclude Include="Utils\FilePath.h" />
     <ClInclude Include="Utils\FilePathUtil.h" />

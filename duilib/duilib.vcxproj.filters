@@ -891,6 +891,9 @@
     <ClCompile Include="Control\RichEdit2.cpp">
       <Filter>Control</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\DllManager_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1855,6 +1858,9 @@
     </ClInclude>
     <ClInclude Include="Control\RichEdit2.h">
       <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\DllManager_Windows.h">
+      <Filter>Utils\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

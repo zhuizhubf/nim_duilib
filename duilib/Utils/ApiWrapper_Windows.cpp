@@ -2,10 +2,11 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
+#include "duilib/Core/GlobalManager.h"
+#include "duilib/Utils/DllManager_Windows.h"
+#include "duilib/Render/IRender.h"
 #include <VersionHelpers.h>
 #include <map>
-#include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
 
 namespace ui
 {
@@ -308,7 +309,7 @@ bool IsDragWindowContentsEnabled()
         HKEY hKey
         );
 
-    HMODULE hModAdvapi32 = LoadLibraryW(L"Advapi32.dll");
+    HMODULE hModAdvapi32 = DllManager::Instance().LoadDll(_T("Advapi32.dll"));
     if (NULL == hModAdvapi32) {
         return false;
     }
@@ -319,7 +320,6 @@ bool IsDragWindowContentsEnabled()
     PFUNC_RegCloseKey pfnRegCloseKey = (PFUNC_RegCloseKey)GetProcAddress(hModAdvapi32, "RegCloseKey");
 
     if (NULL == pfnRegOpenKeyExW || NULL == pfnRegQueryValueExW || NULL == pfnRegCloseKey) {
-        FreeLibrary(hModAdvapi32);
         return false;
     }
 
@@ -343,7 +343,6 @@ bool IsDragWindowContentsEnabled()
         if (hKey) {
             pfnRegCloseKey(hKey);
         }
-        FreeLibrary(hModAdvapi32);      // 释放DLL句柄
         return false;
     }
 
@@ -386,9 +385,6 @@ bool IsDragWindowContentsEnabled()
 
     // 关闭注册表句柄
     pfnRegCloseKey(hKey);
-
-    //释放已加载的DLL
-    FreeLibrary(hModAdvapi32);
     return bEnabled;
 }
 
@@ -416,7 +412,7 @@ bool IsSystemThemeDarkMode()
         HKEY hKey
         );
 
-    HMODULE hModAdvapi32 = LoadLibraryW(L"Advapi32.dll");
+    HMODULE hModAdvapi32 = DllManager::Instance().LoadDll(_T("Advapi32.dll"));
     if (NULL == hModAdvapi32) {
         return bDarkMode;
     }
@@ -427,7 +423,6 @@ bool IsSystemThemeDarkMode()
     PFUNC_RegCloseKey pfnRegCloseKey = (PFUNC_RegCloseKey)GetProcAddress(hModAdvapi32, "RegCloseKey");
 
     if (NULL == pfnRegOpenKeyExW || NULL == pfnRegQueryValueExW || NULL == pfnRegCloseKey) {
-        FreeLibrary(hModAdvapi32);
         return bDarkMode;
     }
 
@@ -447,7 +442,6 @@ bool IsSystemThemeDarkMode()
         if (hKey) {
             pfnRegCloseKey(hKey);
         }
-        FreeLibrary(hModAdvapi32);      // 释放DLL句柄
         return bDarkMode;
     }
 
@@ -463,9 +457,6 @@ bool IsSystemThemeDarkMode()
 
     // 关闭注册表句柄
     pfnRegCloseKey(hKey);
-
-    //释放已加载的DLL
-    FreeLibrary(hModAdvapi32);
     return bDarkMode;
 }
 
