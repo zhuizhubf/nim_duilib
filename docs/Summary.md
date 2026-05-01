@@ -45,7 +45,6 @@
 | WindowBuilder | [duilib/Core/WindowBuilder.h](../duilib/Core/WindowBuilder.h) | 解析XML文件，并创建窗口、容器布局和控件等|
 | Shadow | [duilib/Core/Shadow.h](../duilib/Core/Shadow.h) | 窗口阴影属性|
 | WindowImplBase | [duilib/Utils/WinImplBase.h](../duilib/Utils/WinImplBase.h) | 提供给应用层的窗口基类，实现一个带有标题栏的窗体，带有最大化、最小化、还原按钮的支持，提供带有 WS_EX_LAYERED 属性窗口阴影|
-| ShadowWnd | [duilib/Utils/ShadowWnd.h](../duilib/Utils/ShadowWnd.h) | 是WinImplBase的子类，使用附加阴影窗口实现的基类，实现了创建窗口并附加的功能，提供没有 WS_EX_LAYERED 属性的窗口阴影|
 | EventType | [duilib/duilib_defs.h](../duilib/duilib_defs.h) | 定义所有消息类型|
 | EventArgs | [duilib/Core/EventArgs.h](../duilib/Core/EventArgs.h) | 窗口消息与控件事件通知的参数|
 | WindowDropTarget | [duilib/Core/WindowDropTarget.h](../duilib/Core/WindowDropTarget.h) | 窗口中控件的拖放支持|
