@@ -53,7 +53,7 @@ void Window::SetAttribute(const DString& strName, const DString& strValue)
     }
     else if (strName == _T("shadow_type")) {
         //设置窗口的阴影类型
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+        ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetShadowType(nShadowType);
         }
@@ -303,11 +303,7 @@ void Window::PreInitWindow()
     }
 
     //创建窗口阴影
-    m_shadow = std::make_unique<Shadow>(this);
-    if (m_shadow->IsUseDefaultShadowAttached()) {
-        m_shadow->SetShadowAttached(IsLayeredWindow());
-        m_shadow->SetUseDefaultShadowAttached(true);
-    }
+    m_shadow = std::make_unique<Shadow>(this, IsLayeredWindow());
 
     //添加到全局管理器
     GlobalManager::Instance().Windows().AddWindow(this);
@@ -760,11 +756,6 @@ void Window::OnUseSystemCaptionBarChanged()
 void Window::OnLayeredWindowChanged()
 {
     //根据窗口是否为层窗口，重新初始化阴影附加属性值(层窗口为true，否则为false)
-    Shadow* pShadow = GetShadow();
-    if ((pShadow != nullptr) && pShadow->IsUseDefaultShadowAttached()) {
-        pShadow->SetShadowAttached(IsLayeredWindow());
-        pShadow->SetUseDefaultShadowAttached(true);
-    }
     InvalidateAll();
 }
 
@@ -868,7 +859,7 @@ void Window::SetShadowAttached(bool bShadowAttached)
     }
 }
 
-void Window::SetShadowType(Shadow::ShadowType nShadowType)
+void Window::SetShadowType(ShadowType nShadowType)
 {
     Shadow* pShadow = GetShadow();
     if (pShadow != nullptr) {
@@ -879,9 +870,9 @@ void Window::SetShadowType(Shadow::ShadowType nShadowType)
     }
 }
 
-Shadow::ShadowType Window::GetShadowType() const
+ShadowType Window::GetShadowType() const
 {
-    Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowDefault;
+    ShadowType nShadowType = ShadowType::kShadowDefault;
     Shadow* pShadow = GetShadow();
     if (pShadow != nullptr) {
         nShadowType = pShadow->GetShadowType();
@@ -963,25 +954,6 @@ bool Window::IsShadowAttached() const
     }
     else {
         return false;
-    }
-}
-
-bool Window::IsUseDefaultShadowAttached() const
-{
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        return pShadow->IsUseDefaultShadowAttached();
-    } 
-    else {
-        return false;
-    }    
-}
-
-void Window::SetUseDefaultShadowAttached(bool bDefault)
-{
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetUseDefaultShadowAttached(bDefault);
     }
 }
 

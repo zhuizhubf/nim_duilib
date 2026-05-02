@@ -208,9 +208,8 @@ private:
     Shadow* m_pShadow;
 };
 
-Shadow::Shadow(Window* pWindow):
-    m_bShadowAttached(true),
-    m_bUseDefaultShadowAttached(true),
+Shadow::Shadow(Window* pWindow, bool bShadowAttached):
+    m_bShadowAttached(bShadowAttached),
     m_isMaximized(false),
     m_pShadowBox(nullptr),
     m_pWindow(pWindow),
@@ -241,17 +240,7 @@ Shadow::Shadow(Window* pWindow):
     }
 
     //设置默认的阴影类型
-    SetShadowType(Shadow::ShadowType::kShadowDefault);
-}
-
-bool Shadow::IsUseDefaultShadowAttached() const
-{
-    return m_bUseDefaultShadowAttached;
-}
-
-void Shadow::SetUseDefaultShadowAttached(bool bDefault)
-{
-    m_bUseDefaultShadowAttached = bDefault;
+    SetShadowType(ShadowType::kShadowDefault);
 }
 
 Box* Shadow::AttachShadow(Box* pXmlRoot)
@@ -342,8 +331,6 @@ void Shadow::DoAttachShadow(Box* pNewRoot, Box* pOrgRoot, bool bNewAttach, bool 
 void Shadow::SetShadowAttached(bool bShadowAttached)
 {
     m_bShadowAttached = bShadowAttached;
-    //外部设置后，即更新为非默认值
-    m_bUseDefaultShadowAttached = false;
     OnShadowAttached(GetShadowType());
 }
 
@@ -352,28 +339,19 @@ bool Shadow::IsShadowAttached() const
     return m_bShadowAttached;
 }
 
-void Shadow::SetShadowType(Shadow::ShadowType nShadowType)
+void Shadow::SetShadowType(ShadowType nShadowType)
 {
-    ASSERT(nShadowType >= Shadow::ShadowType::kShadowFirst);
-    ASSERT(nShadowType < Shadow::ShadowType::kShadowCount);
-    if ((nShadowType >= Shadow::ShadowType::kShadowFirst) &&
-        (nShadowType < Shadow::ShadowType::kShadowCount)) {
-        m_nShadowType = nShadowType;
+    if (nShadowType == ShadowType::kShadowDefault) {
+        nShadowType = ShadowType::kShadowBigRound;
     }
-    else {
-        return;
-    }
+    m_nShadowType = nShadowType;
 
     //开启阴影
     m_bShadowAttached = true;
-
-    //外部设置后，即更新为非默认值
-    m_bUseDefaultShadowAttached = false;
-
     OnShadowAttached(GetShadowType());
 }
 
-Shadow::ShadowType Shadow::GetShadowType() const
+ShadowType Shadow::GetShadowType() const
 {
     return m_nShadowType;
 }
@@ -381,34 +359,34 @@ Shadow::ShadowType Shadow::GetShadowType() const
 bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
 {
     if (typeString == _T("big")) {
-        nShadowType = Shadow::ShadowType::kShadowBig;
+        nShadowType = ShadowType::kShadowBig;
     }
     else if (typeString == _T("big_round")) {
-        nShadowType = Shadow::ShadowType::kShadowBigRound;
+        nShadowType = ShadowType::kShadowBigRound;
     }
     else if (typeString == _T("small")) {
-        nShadowType = Shadow::ShadowType::kShadowSmall;
+        nShadowType = ShadowType::kShadowSmall;
     }
     else if (typeString == _T("small_round")) {
-        nShadowType = Shadow::ShadowType::kShadowSmallRound;
+        nShadowType = ShadowType::kShadowSmallRound;
     }
     else if (typeString == _T("menu")) {
-        nShadowType = Shadow::ShadowType::kShadowMenu;
+        nShadowType = ShadowType::kShadowMenu;
     }
     else if (typeString == _T("menu_round")) {
-        nShadowType = Shadow::ShadowType::kShadowMenuRound;
+        nShadowType = ShadowType::kShadowMenuRound;
     }
     else if (typeString == _T("none")) {
-        nShadowType = Shadow::ShadowType::kShadowNone;
+        nShadowType = ShadowType::kShadowNone;
     }
     else if (typeString == _T("none_round")) {
-        nShadowType = Shadow::ShadowType::kShadowNoneRound;
+        nShadowType = ShadowType::kShadowNoneRound;
     }
     else if (typeString == _T("custom")) {
-        nShadowType = Shadow::ShadowType::kShadowCustom;
+        nShadowType = ShadowType::kShadowCustom;
     }
     else if (typeString == _T("default")) {
-        nShadowType = Shadow::ShadowType::kShadowDefault;
+        nShadowType = ShadowType::kShadowDefault;
     }
     else {
         ASSERT(0);
@@ -429,7 +407,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
     if ((pShadowObj != nullptr) && !pShadowObj->GetShadowBorderColor().empty()) {
         svgReplaceColors = StringUtil::Printf(_T("svg_replace_colors='#B5B5B5|%s'"), pShadowObj->GetShadowBorderColor().c_str());
     }
-    if (nShadowType == Shadow::ShadowType::kShadowBig) {
+    if (nShadowType == ShadowType::kShadowBig) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(30, 30, 34, 36);
@@ -441,7 +419,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                              rcShadowCorner.bottom + szBorderRound.cx,
                                              svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowBigRound) {
+    else if (nShadowType == ShadowType::kShadowBigRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(30, 30, 34, 36);
@@ -453,7 +431,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                          rcShadowCorner.bottom + szBorderRound.cx,
                                          svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowSmall) {
+    else if (nShadowType == ShadowType::kShadowSmall) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
@@ -465,7 +443,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                              rcShadowCorner.bottom + szBorderRound.cx,
                                              svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowSmallRound) {
+    else if (nShadowType == ShadowType::kShadowSmallRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
@@ -477,7 +455,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                          rcShadowCorner.bottom + szBorderRound.cx,
                                          svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowMenu) {
+    else if (nShadowType == ShadowType::kShadowMenu) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
@@ -489,7 +467,7 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                              rcShadowCorner.bottom + szBorderRound.cx,
                                              svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowMenuRound) {
+    else if (nShadowType == ShadowType::kShadowMenuRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(24, 24, 28, 30);
@@ -501,19 +479,19 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
                                          rcShadowCorner.bottom + szBorderRound.cx,
                                          svgReplaceColors.c_str());
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowNone) {
+    else if (nShadowType == ShadowType::kShadowNone) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(0, 0, 0, 0);//设置一个像素，容纳边线（参考后续代码）
         shadowImage.clear();
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowNoneRound) {
+    else if (nShadowType == ShadowType::kShadowNoneRound) {
         bRet = true;
         szBorderRound = UiSize(6, 6);
         rcShadowCorner = UiPadding(0, 0, 0, 0);//设置一个像素，容纳边线（参考后续代码）
         shadowImage.clear();
     }
-    else if (nShadowType == Shadow::ShadowType::kShadowCustom) {
+    else if (nShadowType == ShadowType::kShadowCustom) {
         bRet = true;
         szBorderRound = UiSize(0, 0);
         rcShadowCorner = UiPadding(0, 0, 0, 0);
@@ -525,8 +503,8 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
         shadowImage.clear();
     }
 
-    if ((pShadowObj != nullptr) && ((nShadowType == Shadow::ShadowType::kShadowNone) ||
-                                    (nShadowType == Shadow::ShadowType::kShadowNoneRound))) {
+    if ((pShadowObj != nullptr) && ((nShadowType == ShadowType::kShadowNone) ||
+                                    (nShadowType == ShadowType::kShadowNoneRound))) {
         int32_t nShadowBorderSize = pShadowObj->GetShadowBorderSize();
         if (pShadowObj->GetShadowBorderColor().empty()) {
             nShadowBorderSize = 0;
@@ -545,14 +523,14 @@ bool Shadow::GetShadowParam(ShadowType nShadowType,
     return bRet;
 }
 
-void Shadow::OnShadowAttached(Shadow::ShadowType nShadowType)
+void Shadow::OnShadowAttached(ShadowType nShadowType)
 {
     UiSize szBorderRound;
     UiPadding rcShadowCorner;
     DString shadowImage;
     if (GetShadowParam(nShadowType, szBorderRound, rcShadowCorner, shadowImage, this)) {
         //用户自定义类型：不覆盖原值，以用户设置的为准
-        if (nShadowType != Shadow::ShadowType::kShadowCustom) {
+        if (nShadowType != ShadowType::kShadowCustom) {
             SetShadowCorner(rcShadowCorner);
             SetShadowBorderRound(szBorderRound);
             SetShadowImage(shadowImage);
@@ -764,8 +742,8 @@ void Shadow::CheckMouseClickOnShadow(EventType eventType, const UiPoint& pt)
     if (!IsEnableClickThroughWindow()) {
         return;
     }
-    Shadow::ShadowType shadowType = GetShadowType();
-    if ((shadowType == Shadow::ShadowType::kShadowNone) || (shadowType == Shadow::ShadowType::kShadowNoneRound)) {
+    ShadowType shadowType = GetShadowType();
+    if ((shadowType == ShadowType::kShadowNone) || (shadowType == ShadowType::kShadowNoneRound)) {
         //无阴影模式
         return;
     }

@@ -308,7 +308,7 @@ Combo::Combo(Window* pWindow) :
     m_pButtonControl(nullptr),
     m_comboType(kCombo_DropDown),
     m_bDropListShown(false),
-    m_nShadowType(Shadow::ShadowType::kShadowMenu)
+    m_nShadowType(ShadowType::kShadowMenu)
 {
     SetDropBoxSize({0, 150}, true);
     m_treeView.SetSelectNextWhenActiveRemoved(false);
@@ -348,7 +348,7 @@ void Combo::SetAttribute(const DString& strName, const DString& strValue2)
     }
     else if (strName == _T("shadow_type")) {
         //设置下拉窗口的阴影类型
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+        ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
@@ -383,7 +383,7 @@ void Combo::SetAttribute(const DString& strName, const DString& strValue2)
     }
 }
 
-void Combo::SetComboWndShadowType(Shadow::ShadowType nShadowType)
+void Combo::SetComboWndShadowType(ShadowType nShadowType)
 {
     m_nShadowType = nShadowType;
     if (m_pWindow != nullptr) {
@@ -391,7 +391,7 @@ void Combo::SetComboWndShadowType(Shadow::ShadowType nShadowType)
     }
 }
 
-Shadow::ShadowType Combo::GetComboWndShadowType() const
+ShadowType Combo::GetComboWndShadowType() const
 {
     return m_nShadowType;
 }

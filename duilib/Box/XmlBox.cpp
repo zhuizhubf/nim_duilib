@@ -172,15 +172,15 @@ bool XmlBox::LoadXmlData(const FilePath& xmlPath)
             bShadowAttached = (iter->second == _T("true")) ? true : false;
         }
 
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowDefault;
+        ShadowType nShadowType = ShadowType::kShadowDefault;
         if (!shadowTypeString.empty() && !Shadow::GetShadowType(shadowTypeString, nShadowType)) {
             bShadowAttached = false;
         }
-        else if (nShadowType == Shadow::ShadowType::kShadowCustom) {
+        else if (nShadowType == ShadowType::kShadowCustom) {
             bShadowAttached = false;
         }
         if (bShadowAttached) {
-            m_pShadow = std::make_unique<Shadow>(GetWindow());
+            m_pShadow = std::make_unique<Shadow>(GetWindow(), true);
             m_pShadow->SetEnableShadowSnap(false);
             m_pShadow->SetEnableClickThroughWindow(false);
             m_pShadow->SetShadowType(nShadowType);

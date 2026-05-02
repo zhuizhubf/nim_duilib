@@ -114,21 +114,13 @@ public:
     */
     bool IsShadowAttached() const;
 
-    /** 当前阴影效果值，是否为默认值
-    */
-    bool IsUseDefaultShadowAttached() const;
-
-    /** 设置当前阴影效果值，是否为默认值
-    */
-    void SetUseDefaultShadowAttached(bool bDefault);
-
     /** 设置阴影类型
     */
-    void SetShadowType(Shadow::ShadowType nShadowType);
+    void SetShadowType(ShadowType nShadowType);
 
     /** 获取阴影类型
     */
-    Shadow::ShadowType GetShadowType() const;
+    ShadowType GetShadowType() const;
 
     /** 获取阴影图片
     */

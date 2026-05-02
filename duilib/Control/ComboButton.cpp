@@ -255,7 +255,7 @@ ComboButton::ComboButton(Window* pWindow) :
     m_pLabelBottom(nullptr),
     m_pRightButton(nullptr),
     m_bDropListShown(false),
-    m_nShadowType(Shadow::ShadowType::kShadowMenu)
+    m_nShadowType(ShadowType::kShadowMenu)
 {
     m_pComboBox = new Box(pWindow);
     SetDropBoxSize({0, 150}, true);
@@ -339,7 +339,7 @@ void ComboButton::SetAttribute(const DString& strName, const DString& strValue2)
     }
     else if (strName == _T("shadow_type")) {
         //设置下拉窗口的阴影类型
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+        ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
@@ -349,7 +349,7 @@ void ComboButton::SetAttribute(const DString& strName, const DString& strValue2)
     }
 }
 
-void ComboButton::SetComboWndShadowType(Shadow::ShadowType nShadowType)
+void ComboButton::SetComboWndShadowType(ShadowType nShadowType)
 {
     m_nShadowType = nShadowType;
     if (m_pWindow != nullptr) {
@@ -357,7 +357,7 @@ void ComboButton::SetComboWndShadowType(Shadow::ShadowType nShadowType)
     }
 }
 
-Shadow::ShadowType ComboButton::GetComboWndShadowType() const
+ShadowType ComboButton::GetComboWndShadowType() const
 {
     return m_nShadowType;
 }

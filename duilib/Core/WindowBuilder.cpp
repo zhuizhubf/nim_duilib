@@ -368,7 +368,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(WindowCreateAttributes& createAt
     //阴影相关参数
     bool bShadowAttached = false;
     bool bHasShadowAttached = false;
-    Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowDefault;
+    ShadowType nShadowType = ShadowType::kShadowDefault;
     UiPadding rcShadowCorner;
 
     RenderBackendType backendType = RenderBackendType::kRaster_BackendType;
@@ -594,7 +594,7 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
     //窗口阴影是否开启
     bool bShadowAttached = false;
     bool bHasShadowAttached = false;
-    Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+    ShadowType nShadowType = ShadowType::kShadowDefault;
 
     //注：如果use_system_caption为true，则层窗口关闭（因为这两个属性互斥的）
     for (pugi::xml_attribute attr : root.attributes()) {
@@ -667,10 +667,8 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         else if (strName == _T("shadow_type")) {
             knownNames.insert(strName);
             //设置阴影类型
-            Shadow::GetShadowType(strValue, nShadowType);
-            if ((nShadowType >= Shadow::ShadowType::kShadowFirst) &&
-                (nShadowType < Shadow::ShadowType::kShadowCount)) {
-                pWindow->SetShadowType((Shadow::ShadowType)nShadowType);
+            if (Shadow::GetShadowType(strValue, nShadowType)) {
+                pWindow->SetShadowType(nShadowType);
             }
         }
         else if ((strName == _T("shadow_image")) || (strName == _T("shadowimage"))) {

@@ -260,7 +260,7 @@ CheckCombo::CheckCombo(Window* pWindow) :
     m_szDropBox(0, 0),
     m_bPopupTop(false),
     m_iOrgHeight(CHECK_COMBO_DEFAULT_HEIGHT),
-    m_nShadowType(Shadow::ShadowType::kShadowMenu)
+    m_nShadowType(ShadowType::kShadowMenu)
 {
     SetDropBoxSize({0, 150}, true);
     SetMaxHeight(m_iOrgHeight * 3, true);
@@ -321,7 +321,7 @@ void CheckCombo::SetAttribute(const DString& strName, const DString& strValue2)
     }
     else if (strName == _T("shadow_type")) {
         //设置下拉窗口的阴影类型
-        Shadow::ShadowType nShadowType = Shadow::ShadowType::kShadowCount;
+        ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
@@ -531,7 +531,7 @@ Window* CheckCombo::GetCheckComboWnd() const
     return m_pCheckComboWnd;
 }
 
-void CheckCombo::SetComboWndShadowType(Shadow::ShadowType nShadowType)
+void CheckCombo::SetComboWndShadowType(ShadowType nShadowType)
 {
     m_nShadowType = nShadowType;
     if (m_pCheckComboWnd != nullptr) {
@@ -539,7 +539,7 @@ void CheckCombo::SetComboWndShadowType(Shadow::ShadowType nShadowType)
     }
 }
 
-Shadow::ShadowType CheckCombo::GetComboWndShadowType() const
+ShadowType CheckCombo::GetComboWndShadowType() const
 {
     return m_nShadowType;
 }

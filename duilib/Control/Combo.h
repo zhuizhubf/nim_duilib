@@ -224,11 +224,11 @@ public:
 
     /** 设置下拉窗口的阴影类型
     */
-    void SetComboWndShadowType(Shadow::ShadowType nShadowType);
+    void SetComboWndShadowType(ShadowType nShadowType);
 
     /** 获取下拉窗口的阴影类型
     */
-    Shadow::ShadowType GetComboWndShadowType() const;
+    ShadowType GetComboWndShadowType() const;
 
 public:
     /** 监听子项被选择事件
@@ -398,7 +398,7 @@ private:
 
     /** 阴影类型
     */
-    Shadow::ShadowType m_nShadowType;
+    ShadowType m_nShadowType;
 
     /** 下拉列表的大小（宽度和高度）
     */
