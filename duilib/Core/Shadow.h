@@ -147,6 +147,10 @@ public:
     */
     Box* GetAttachedXmlRoot() const;
 
+    /** 将顶层容器与阴影解除绑定
+    */
+    Box* DettachShadow();
+
     /** 设置窗口最大化还是还原状态
      * @param[in] isMaximized 设置为 true 表示最大化，false 为还原初始状态
      */
@@ -205,6 +209,10 @@ private:
     /** 更新窗口的贴边属性
     */
     void UpdateWindowPosSnap();
+
+private:
+    //默认阴影类型
+    static ShadowType m_nShadowTypeDefault;
 
 private:
     //是否支持阴影效果

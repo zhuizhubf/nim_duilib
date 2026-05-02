@@ -208,6 +208,9 @@ private:
     Shadow* m_pShadow;
 };
 
+//默认阴影类型
+ShadowType Shadow::m_nShadowTypeDefault = ShadowType::kShadowBigRound;
+
 Shadow::Shadow(Window* pWindow, bool bShadowAttached):
     m_bShadowAttached(bShadowAttached),
     m_isMaximized(false),
@@ -240,7 +243,8 @@ Shadow::Shadow(Window* pWindow, bool bShadowAttached):
     }
 
     //设置默认的阴影类型
-    SetShadowType(ShadowType::kShadowDefault);
+    m_nShadowType = m_nShadowTypeDefault;
+    OnShadowAttached(m_nShadowType);
 }
 
 Box* Shadow::AttachShadow(Box* pXmlRoot)
@@ -264,6 +268,27 @@ Box* Shadow::AttachShadow(Box* pXmlRoot)
     m_pShadowBox->AddItem(pXmlRoot);
     DoAttachShadow(m_pShadowBox, pXmlRoot, true, m_isMaximized);
     return m_pShadowBox;
+}
+
+Box* Shadow::DettachShadow()
+{
+    ASSERT(!m_bShadowAttached && (m_pShadowBox != nullptr));
+    if (m_bShadowAttached || (m_pShadowBox == nullptr)) {
+        return nullptr;
+    }
+    Box* pXmlRoot = nullptr;
+    if (m_pShadowBox->GetItemCount() > 0) {
+        pXmlRoot = dynamic_cast<Box*>(m_pShadowBox->GetItemAt(0));
+    }
+    ASSERT(pXmlRoot != nullptr);
+    if (pXmlRoot == nullptr) {
+        return nullptr;
+    }
+    m_pShadowBox->SetAutoDestroyChild(false);
+    m_pShadowBox->RemoveItem(pXmlRoot);
+    delete m_pShadowBox;
+    m_pShadowBox = nullptr;
+    return pXmlRoot;
 }
 
 Box* Shadow::GetShadowBox() const
@@ -342,7 +367,7 @@ bool Shadow::IsShadowAttached() const
 void Shadow::SetShadowType(ShadowType nShadowType)
 {
     if (nShadowType == ShadowType::kShadowDefault) {
-        nShadowType = ShadowType::kShadowBigRound;
+        nShadowType = m_nShadowTypeDefault;
     }
     m_nShadowType = nShadowType;
 
@@ -386,7 +411,7 @@ bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
         nShadowType = ShadowType::kShadowCustom;
     }
     else if (typeString == _T("default")) {
-        nShadowType = ShadowType::kShadowDefault;
+        nShadowType = m_nShadowTypeDefault;
     }
     else {
         ASSERT(0);

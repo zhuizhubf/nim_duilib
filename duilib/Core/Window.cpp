@@ -850,11 +850,47 @@ Box* Window::AttachShadow(Box* pRoot)
     }
 }
 
+void Window::ProcessWindowShadowTypeChanged()
+{
+    Shadow* pShadow = GetShadow();
+    if (pShadow == nullptr) {
+        return;
+    }
+    if (m_pRoot == nullptr) {
+        return;//尚未绑定
+    }
+    //控件全屏时，禁止访问阴影相关操作
+    if (m_bControlFullscreen) {
+        return;
+    }
+    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    if (pFullscreenBox != nullptr) {
+        return;
+    }
+
+    if (pShadow->IsShadowAttached()) {
+        //需要绑定
+        if (!pShadow->HasShadowBox()) {
+            m_pRoot = pShadow->AttachShadow(m_pRoot.get());
+        }
+    }
+    else {
+        //不需要绑定
+        if (pShadow->HasShadowBox() && (pShadow->GetAttachedXmlRoot() != nullptr)) {
+
+        }
+    }
+
+    //重绘窗口，否则会有绘制异常
+    InvalidateAll();
+}
+
 void Window::SetShadowAttached(bool bShadowAttached)
 {
     Shadow* pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowAttached(bShadowAttached);
+        ProcessWindowShadowTypeChanged();
         OnWindowShadowTypeChanged();
     }
 }
@@ -864,8 +900,7 @@ void Window::SetShadowType(ShadowType nShadowType)
     Shadow* pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowType(nShadowType);
-        //重绘窗口，否则会有绘制异常
-        InvalidateAll();
+        ProcessWindowShadowTypeChanged();
         OnWindowShadowTypeChanged();
     }
 }
@@ -2404,11 +2439,17 @@ void Window::ArrangeRoot()
     if (pRoot == nullptr) {
         return;
     }
+
+    //允许Root设置Margin
+    UiRect rcRoot = rcClient;
+    UiMargin rcRootMargin = pRoot->GetMargin();
+    rcRoot.Deflate(rcRootMargin);
+
     if (m_bIsArranged) {
         m_bIsArranged = false;
-        if (pRoot->IsArranged() || (pRoot->GetPos() != rcClient)) {
+        if (pRoot->IsArranged() || (pRoot->GetPos() != rcRoot)) {
             //所有控件的布局全部重排
-            pRoot->SetPos(rcClient);
+            pRoot->SetPos(rcRoot);
         }
         else {
             //仅对有更新的控件的布局全部重排
@@ -2424,9 +2465,9 @@ void Window::ArrangeRoot()
             OnFirstLayout();
         }
     }
-    else if (pRoot->GetPos() != rcClient) {
+    else if (pRoot->GetPos() != rcRoot) {
         //所有控件的布局全部重排
-        pRoot->SetPos(rcClient);
+        pRoot->SetPos(rcRoot);
     }
 }
 
@@ -2591,7 +2632,7 @@ void Window::SetWindowMaximizedMargin()
         Dpi().ScaleWindowSize(cyClient);
     }
     if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) {
-        //全屏时，设置外边距，避免客户区的内容溢出屏幕
+        //最大化时，设置外边距，避免客户区的内容溢出屏幕
         UiRect rcWork;
         GetMonitorWorkRect(rcWork);
 

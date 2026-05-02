@@ -1062,6 +1062,10 @@ private:
     */
     void RestoreWindowMaximizedMargin();
 
+    /** 窗口的阴影类型发生了变化, 处理绑定逻辑
+    */
+    void ProcessWindowShadowTypeChanged();
+
 private:
     //焦点控件
     ControlPtr m_pFocus;
