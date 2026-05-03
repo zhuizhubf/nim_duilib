@@ -22,7 +22,6 @@ Window::Window() :
     m_pEventToolTip(nullptr),
     m_pEventClick(nullptr),
     m_pEventKey(nullptr),
-    m_rcAlphaFix(0, 0, 0, 0),
     m_bFirstLayout(false),
     m_bInitLayout(false),
     m_bIsArranged(false),
@@ -775,22 +774,6 @@ bool Window::IsPtInMaximizeRestoreButton(const UiPoint& /*pt*/) const
     return false;
 }
 
-const UiRect& Window::GetAlphaFixCorner() const
-{
-    return m_rcAlphaFix;
-}
-
-void Window::SetAlphaFixCorner(const UiRect& rc, bool bNeedDpiScale)
-{
-    ASSERT((rc.left >= 0) && (rc.top >= 0) && (rc.right >= 0) && (rc.bottom >= 0));
-    if ((rc.left >= 0) && (rc.top >= 0) && (rc.right >= 0) && (rc.bottom >= 0)) {
-        m_rcAlphaFix = rc;
-        if (bNeedDpiScale) {
-            Dpi().ScaleRect(m_rcAlphaFix);
-        }
-    }
-}
-
 Box* Window::AttachShadow(Box* pRoot)
 {
     return m_windowRoot->AttachShadow(pRoot);
@@ -917,7 +900,6 @@ void Window::OnDisplayScaleChanged(uint32_t nOldScaleFactor, uint32_t nNewScaleF
     m_windowRoot->ChangeDpiScale(Dpi(), nOldScaleFactor, nNewScaleFactor);
 
     //更新窗口自身的DPI关联属性
-    m_rcAlphaFix = Dpi().GetScaleRect(m_rcAlphaFix, nOldScaleFactor);
     m_renderOffset = Dpi().GetScalePoint(m_renderOffset, nOldScaleFactor);
 
     //更新布局和控件的DPI关联属性
@@ -1139,17 +1121,11 @@ bool Window::Paint(const UiRect& rcPaint)
             pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要回复
         }
         else {
-            UiRect rcAlphaFixCorner = GetAlphaFixCorner();
-            if ((rcAlphaFixCorner.left > 0) || (rcAlphaFixCorner.top > 0) ||
-                (rcAlphaFixCorner.right > 0) || (rcAlphaFixCorner.bottom > 0)) {
-                UiRect rcNewPaint = rcPaint;
-                UiRect rcRootPaddingPos = pRoot->GetPosWithoutPadding();
-                rcRootPaddingPos.Deflate(rcAlphaFixCorner.left, rcAlphaFixCorner.top,
-                                         rcAlphaFixCorner.right, rcAlphaFixCorner.bottom);
-                rcNewPaint.Intersect(rcRootPaddingPos);
-                UiPadding rcRootPadding;
-                pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要回复
-            }
+            UiRect rcNewPaint = rcPaint;
+            UiRect rcRootPaddingPos = pRoot->GetPosWithoutPadding();
+            rcNewPaint.Intersect(rcRootPaddingPos);
+            UiPadding rcRootPadding;
+            pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要回复
         }
     }
 #endif

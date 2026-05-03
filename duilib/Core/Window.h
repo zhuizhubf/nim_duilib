@@ -292,16 +292,6 @@ public:
     void UpdateToolTip();
 
 public:
-    /** 获取透明通道修补范围的的九宫格描述，对应 XML 中 alphafixcorner 属性
-    */
-    const UiRect& GetAlphaFixCorner() const;
-
-    /** 设置透明通道修补范围的的九宫格描述
-    * @param [in] rc 要设置的修补范围
-    * @param [in] bNeedDpiScale 是否进行DPI缩放
-    */
-    void SetAlphaFixCorner(const UiRect& rc, bool bNeedDpiScale);
-
     /** 设置窗口初始大小, 对应XML文件中的 size 属性
     * @param [in] cx 宽度，已做过DPI缩放
     * @param [in] cy 高度，已做过DPI缩放
@@ -1066,9 +1056,6 @@ private:
     std::unique_ptr<WindowRoot> m_windowRoot;
 
 private:
-    //透明通道修补范围的的九宫格描述
-    UiRect m_rcAlphaFix;
-
     //布局是否变化，如果变化(true)则需要重新计算布局
     bool m_bIsArranged;
 

@@ -647,12 +647,6 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
             AttributeUtil::ParseSizeValue(strValue.c_str(), size);
             pWindow->SetRoundCorner(size.cx, size.cy, true);
         }
-        else if (strName == _T("alpha_fix_corner") || strName == _T("alphafixcorner")) {
-            knownNames.insert(strName);
-            UiRect rc;
-            AttributeUtil::ParseRectValue(strValue.c_str(), rc);
-            pWindow->SetAlphaFixCorner(rc, true);
-        }
         else if (strName == _T("size_contain_shadow")) {
             knownNames.insert(strName);
             //窗口配置的size是否包含阴影
