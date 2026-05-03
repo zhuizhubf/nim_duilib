@@ -17,6 +17,7 @@ class Box;
 class Control;
 class ToolTip;
 class WindowBuilder;
+class WindowRoot;
 
 /** 窗口类
 *  //外部调用需要初始化的基本流程:
@@ -489,6 +490,10 @@ public:
     */
     void NotifyThemeChanged();
 
+    /** 清除鼠标键盘操作状态
+    */
+    void ClearInputStatus();
+
 protected:
     /** 正在初始化窗口数据(内部函数，子类重写后，必须调用基类函数，否则影响功能)
     */
@@ -953,9 +958,6 @@ private:
     //鼠标等弹起消息处理函数
     void OnButtonUp(EventType eventType, const UiPoint& pt, const NativeMsg& nativeMsg, uint32_t modifierKey);
 
-    //清除鼠标键盘操作状态
-    void ClearStatus();
-
     /** 判断是否需要发送鼠标进入或离开消息
     * @param [in] pt 鼠标当前位置
     * @param [in] modifierKey 按键标志
@@ -1034,39 +1036,6 @@ private:
     Shadow* GetShadow() const;
 
 private:
-    /** 处理窗口最大化事件
-    */
-    void ProcessWindowMaximized();
-
-    /** 处理窗口还原事件
-    */
-    void ProcessWindowRestored();
-
-    /** 处理窗口进入全屏事件
-    */
-    void ProcessWindowEnterFullscreen();
-
-    /** 处理窗口退出全屏事件
-    */
-    void ProcessWindowExitFullscreen();
-
-    /** 处理全屏按钮的动态显示
-    */
-    void ProcessFullscreenButtonMouseMove(const UiPoint& pt);
-
-    /** 保存并设置全屏状态下的容器外边距
-    */
-    void SetWindowMaximizedMargin();
-
-    /** 恢复全屏状态下的容器外边距
-    */
-    void RestoreWindowMaximizedMargin();
-
-    /** 窗口的阴影类型发生了变化, 处理绑定逻辑
-    */
-    void ProcessWindowShadowTypeChanged();
-
-private:
     //焦点控件
     ControlPtr m_pFocus;
 
@@ -1092,17 +1061,9 @@ private:
     */
     ControlFinder m_controlFinder;
 
-    /** 窗口关联的容器，根节点
+    /** 窗口根节点管理类（包含Root容器、阴影、控件全屏状态等）
     */
-    BoxPtr m_pRoot;
-
-    /** 窗口阴影
-    */
-    std::unique_ptr<Shadow> m_shadow;
-
-    /** 当前是否处于控件全屏状态
-    */
-    bool m_bControlFullscreen;
+    std::unique_ptr<WindowRoot> m_windowRoot;
 
 private:
     //透明通道修补范围的的九宫格描述
@@ -1122,9 +1083,6 @@ private:
 
     //绘制时的偏移量（动画用）
     UiPoint m_renderOffset;
-
-    //窗口最大化状态下的外边距（Windows平台，窗口最大化时，窗口的区域是溢出屏幕区域的，所以需要增加外边距，避免窗口的内容也溢出屏幕）
-    UiMargin m_rcWindowMaximizedMargin;
 
     //绘制引擎
     std::unique_ptr<IRender> m_render;

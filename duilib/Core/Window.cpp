@@ -7,6 +7,7 @@
 #include "duilib/Core/ToolTip.h"
 #include "duilib/Core/Keyboard.h"
 #include "duilib/Core/WindowMessage.h"
+#include "duilib/Core/WindowRoot.h"
 #include "duilib/Render/IRender.h"
 #include "duilib/Render/AutoClip.h"
 #include "duilib/Utils/PerformanceUtil.h"
@@ -16,7 +17,6 @@
 namespace ui
 {
 Window::Window() :
-    m_pRoot(nullptr),
     m_pFocus(nullptr),
     m_pEventHover(nullptr),
     m_pEventToolTip(nullptr),
@@ -29,16 +29,18 @@ Window::Window() :
     m_bPostQuitMsgWhenClosed(false),
     m_renderBackendType(RenderBackendType::kRaster_BackendType),
     m_bWindowAttributesApplied(false),
-    m_bCheckSetWindowFocus(false),
-    m_bControlFullscreen(false)
+    m_bCheckSetWindowFocus(false)
 {
     m_toolTip = std::make_unique<ToolTip>();
+    m_windowRoot = std::make_unique<WindowRoot>(this);
+    m_windowRoot->SetControlFinder(&m_controlFinder);
 }
 
 Window::~Window()
 {
     ASSERT(!IsWindow());
     ClearWindow();
+    m_windowRoot.reset();
 }
 
 void Window::SetAttribute(const DString& strName, const DString& strValue)
@@ -296,17 +298,15 @@ void Window::PreInitWindow()
     if (!IsWindow()) {
         return;
     }
-    //根据窗口是否为层窗口，重新初始化阴影附加属性值(层窗口为true，否则为false)
-    ASSERT(m_shadow == nullptr);
-    if (m_shadow != nullptr) {
+    //添加到全局管理器
+    ASSERT(!GlobalManager::Instance().Windows().HasWindow(this));
+    GlobalManager::Instance().Windows().AddWindow(this);
+
+    ASSERT(m_windowRoot != nullptr);
+    if (m_windowRoot == nullptr) {
         return;
     }
-
-    //创建窗口阴影
-    m_shadow = std::make_unique<Shadow>(this, IsLayeredWindow());
-
-    //添加到全局管理器
-    GlobalManager::Instance().Windows().AddWindow(this);
+    m_windowRoot->CreateShadow(IsLayeredWindow());
 
     //解析窗口关联的XML文件
     if (m_windowBuilder == nullptr) {
@@ -369,7 +369,7 @@ void Window::PostInitWindow()
 
 void Window::PreCloseWindow()
 {
-    ClearStatus();
+    ClearInputStatus();
     OnPreCloseWindow();
 
     //销毁Tooltp窗口
@@ -411,15 +411,8 @@ void Window::ClearWindow()
 
     m_controlFinder.Clear();
     m_toolTip.reset();
-    m_shadow.reset();
-    m_render.reset();
-
-    Box* pRoot = m_pRoot.get();
-    m_pRoot.reset();
-    if (pRoot != nullptr) {
-        delete pRoot;
-        pRoot = nullptr;
-    }
+    m_render.reset();    
+    m_windowRoot->Clear();
 
     RemoveAllClass();
     RemoveAllOptionGroups();
@@ -433,44 +426,22 @@ bool Window::AttachBox(Box* pRoot)
     m_pEventHover = nullptr;
     m_pEventToolTip = nullptr;
     m_pEventClick = nullptr;
-    // Remove the existing control-tree. We might have gotten inside this function as
-    // a result of an event fired or similar, so we cannot just delete the objects and
-    // pull the internal memory of the calling code. We'll delay the cleanup.
-    if ((m_pRoot != nullptr) && (pRoot != m_pRoot)) {
-        Box* pOldRoot = m_pRoot.get();
-        m_pRoot.reset();
-        if (pOldRoot != nullptr) {
-            delete pOldRoot;
-            pOldRoot = nullptr;
-        }
-    }
-    // Set the dialog root element
-    m_pRoot = pRoot;
-    m_controlFinder.SetRoot(pRoot);
-    // Go ahead...
+    m_windowRoot->AttachBox(pRoot);
+    m_controlFinder.SetRoot(m_windowRoot->GetRoot());
     m_bIsArranged = true;
     m_bFirstLayout = false;
     m_bInitLayout = false;
-    // Initiate all control
-    return InitControls(m_pRoot.get());
+    return InitControls(m_windowRoot->GetRoot());
 }
 
 Box* Window::GetRoot() const
 {
-    return m_pRoot.get();
+    return m_windowRoot->GetRoot();
 }
 
 Box* Window::GetXmlRoot() const
 {
-    Box* pXmlRoot = nullptr;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pXmlRoot = pShadow->GetAttachedXmlRoot();
-    }
-    if (pXmlRoot == nullptr) {
-        pXmlRoot = m_pRoot.get();
-    }
-    return pXmlRoot;
+    return m_windowRoot->GetXmlRoot();
 }
 
 bool Window::InitControls(Control* pControl)
@@ -732,17 +703,7 @@ bool Window::IsKeyDown(const EventArgs& msg, ModifierKey modifierKey) const
 
 void Window::ClearImageCache()
 {
-    Control* pRoot = nullptr;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pRoot = pShadow->GetShadowBox();
-    }
-    if (pRoot) {
-        pRoot->ClearImageCache();
-    }
-    else if (m_pRoot != nullptr) {
-        m_pRoot->ClearImageCache();
-    }
+    m_windowRoot->ClearImageCache();
 }
 
 void Window::OnUseSystemCaptionBarChanged()
@@ -785,20 +746,12 @@ void Window::OnWindowDisplayScaleChanged(uint32_t /*nOldScaleFactor*/, uint32_t 
 
 void Window::GetShadowCorner(UiPadding& rcShadow) const
 {
-    rcShadow.Clear();
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        rcShadow = pShadow->GetShadowCorner();
-    }
+    rcShadow = m_windowRoot->GetShadowCorner();
 }
 
 void Window::GetCurrentShadowCorner(UiPadding& rcShadow) const
 {
-    rcShadow.Clear();
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        rcShadow = pShadow->GetCurrentShadowCorner();
-    }
+    rcShadow = m_windowRoot->GetCurrentShadowCorner();
 }
 
 bool Window::IsPtInCaptionBarControl(const UiPoint& pt) const
@@ -840,210 +793,102 @@ void Window::SetAlphaFixCorner(const UiRect& rc, bool bNeedDpiScale)
 
 Box* Window::AttachShadow(Box* pRoot)
 {
-    //将阴影附加到窗口
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        return pShadow->AttachShadow(pRoot);
-    }
-    else {
-        return pRoot;
-    }
-}
-
-void Window::ProcessWindowShadowTypeChanged()
-{
-    Shadow* pShadow = GetShadow();
-    if (pShadow == nullptr) {
-        return;
-    }
-    if (m_pRoot == nullptr) {
-        return;//尚未绑定
-    }
-    //控件全屏时，禁止访问阴影相关操作
-    if (m_bControlFullscreen) {
-        return;
-    }
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        return;
-    }
-
-    if (pShadow->IsShadowAttached()) {
-        //需要绑定
-        if (!pShadow->HasShadowBox()) {
-            m_pRoot = pShadow->AttachShadow(m_pRoot.get());
-        }
-    }
-    else {
-        //不需要绑定
-        if (pShadow->HasShadowBox() && (pShadow->GetAttachedXmlRoot() != nullptr)) {
-
-        }
-    }
-
-    //重绘窗口，否则会有绘制异常
-    InvalidateAll();
+    return m_windowRoot->AttachShadow(pRoot);
 }
 
 void Window::SetShadowAttached(bool bShadowAttached)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowAttached(bShadowAttached);
-        ProcessWindowShadowTypeChanged();
-        OnWindowShadowTypeChanged();
+    ASSERT(!m_windowRoot->IsControlFullscreen());
+    if (m_windowRoot->IsControlFullscreen()) {
+        return;
     }
+    m_windowRoot->SetShadowAttached(bShadowAttached);
+    OnWindowShadowTypeChanged();
 }
 
 void Window::SetShadowType(ShadowType nShadowType)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowType(nShadowType);
-        ProcessWindowShadowTypeChanged();
-        OnWindowShadowTypeChanged();
+    ASSERT(!m_windowRoot->IsControlFullscreen());
+    if (m_windowRoot->IsControlFullscreen()) {
+        return;
     }
+    m_windowRoot->SetShadowType(nShadowType);
+    OnWindowShadowTypeChanged();
 }
 
 ShadowType Window::GetShadowType() const
 {
-    ShadowType nShadowType = ShadowType::kShadowDefault;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        nShadowType = pShadow->GetShadowType();
-    }
-    return nShadowType;
+    return m_windowRoot->GetShadowType();
 }
 
 DString Window::GetShadowImage() const
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        return pShadow->GetShadowImage();
-    }
-    else {
-        return DString();
-    }
+    return m_windowRoot->GetShadowImage();
 }
 
 void Window::SetShadowImage(const DString& shadowImage)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowImage(shadowImage);
-    }
+    m_windowRoot->SetShadowImage(shadowImage);
 }
 
 void Window::SetShadowBorderSize(int32_t nShadowBorderSize)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowBorderSize(nShadowBorderSize);
-    }
+    m_windowRoot->SetShadowBorderSize(nShadowBorderSize);
 }
 
 int32_t Window::GetShadowBorderSize() const
 {
-    Shadow* pShadow = GetShadow();
-    int32_t nShadowBorderSize = 0;    
-    if (pShadow != nullptr) {
-        nShadowBorderSize = pShadow->GetShadowBorderSize();
-    }
-    return nShadowBorderSize;
+    return m_windowRoot->GetShadowBorderSize();
 }
 
 void Window::SetShadowBorderColor(const DString& shadowBorderColor)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowBorderColor(shadowBorderColor);
-    }
+    m_windowRoot->SetShadowBorderColor(shadowBorderColor);
 }
 
 DString Window::GetShadowBorderColor() const
 {
-    Shadow* pShadow = GetShadow();
-    DString shadowBorderColor;
-    if (pShadow != nullptr) {
-        shadowBorderColor = pShadow->GetShadowBorderColor();
-    }
-    return shadowBorderColor;
+    return m_windowRoot->GetShadowBorderColor();
 }
 
 UiPadding Window::GetCurrentShadowCorner() const
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        return pShadow->GetCurrentShadowCorner();
-    }
-    else {
-        return UiPadding();
-    }
+    return m_windowRoot->GetCurrentShadowCorner();
 }
 
 bool Window::IsShadowAttached() const
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        return pShadow->IsShadowAttached();
-    }
-    else {
-        return false;
-    }
+    return m_windowRoot->IsShadowAttached();
 }
 
 UiPadding Window::GetShadowCorner() const
 {
-    UiPadding rcShadowCorner;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        rcShadowCorner = pShadow->GetShadowCorner();
-    }
-    return rcShadowCorner;
+    return m_windowRoot->GetShadowCorner();
 }
 
 void Window::SetShadowCorner(const UiPadding& rcShadowCorner)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowCorner(rcShadowCorner);
-    }
+    m_windowRoot->SetShadowCorner(rcShadowCorner);
 }
 
 void Window::SetShadowBorderRound(UiSize szBorderRound)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetShadowBorderRound(szBorderRound);
-    }
+    m_windowRoot->SetShadowBorderRound(szBorderRound);
 }
 
 void Window::SetEnableShadowSnap(bool bEnable)
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetEnableShadowSnap(bEnable);
-    }
+    m_windowRoot->SetEnableShadowSnap(bEnable);
 }
 
 bool Window::IsEnableShadowSnap() const
 {
-    bool bRet = false;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        bRet = pShadow->IsEnableShadowSnap();
-    }
-    return bRet;
+    return m_windowRoot->IsEnableShadowSnap();
 }
 
 UiSize Window::GetShadowBorderRound() const
 {
-    UiSize szBorderRound;
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        szBorderRound = pShadow->GetShadowBorderRound();
-    }
-    return szBorderRound;
+    return m_windowRoot->GetShadowBorderRound();
 }
 
 void Window::SetInitSize(int cx, int cy)
@@ -1069,10 +914,7 @@ void Window::OnDisplayScaleChanged(uint32_t nOldScaleFactor, uint32_t nNewScaleF
     WindowBase::OnDisplayScaleChanged(nOldScaleFactor, nNewScaleFactor);
 
     //窗口阴影
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->ChangeDpiScale(Dpi(), nOldScaleFactor, nNewScaleFactor);
-    }
+    m_windowRoot->ChangeDpiScale(Dpi(), nOldScaleFactor, nNewScaleFactor);
 
     //更新窗口自身的DPI关联属性
     m_rcAlphaFix = Dpi().GetScaleRect(m_rcAlphaFix, nOldScaleFactor);
@@ -1122,11 +964,11 @@ LRESULT Window::OnSizeMsg(WindowSizeType sizeType, const UiSize& /*newWindowSize
     }
     if (sizeType == WindowSizeType::kSIZE_MAXIMIZED) {
         //最大化
-        ProcessWindowMaximized();        
+        m_windowRoot->ProcessWindowMaximized();
     }
     else if (sizeType == WindowSizeType::kSIZE_RESTORED) {
         //还原
-        ProcessWindowRestored();
+        m_windowRoot->ProcessWindowRestored();
     }
     if (m_pFocus != nullptr) {        
         EventArgs msgData;
@@ -1281,7 +1123,7 @@ bool Window::Paint(const UiRect& rcPaint)
     //开始绘制前，进行alpha通道修复
     if (IsLayeredWindow()) {
         PerformanceStat statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
-        Shadow* pShadow = GetShadow();
+        Shadow* pShadow = m_windowRoot->GetShadow();
         if ((pShadow != nullptr) && pShadow->IsShadowAttached() &&
             (m_renderOffset.x == 0) && (m_renderOffset.y == 0)) {
             //补救由于Gdi绘制造成的alpha通道为0
@@ -1703,9 +1545,7 @@ LRESULT Window::OnMouseMoveMsg(const UiPoint& pt, uint32_t modifierKey, bool bFr
     }
 
     //全屏按钮的动态显示
-    if (m_bControlFullscreen) {
-        ProcessFullscreenButtonMouseMove(pt);
-    }
+    m_windowRoot->ProcessFullscreenButtonMouseMove(pt);
 
     EventArgs msgData;
     msgData.modifierKey = modifierKey;
@@ -2007,10 +1847,7 @@ void Window::OnWindowPosSnapped(bool bLeftSnap, bool bRightSnap, bool bTopSnap, 
     if (rcSizeBox.bottom <= 0) {
         bBottomSnap = false;
     }
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->SetWindowPosSnap(bLeftSnap, bRightSnap, bTopSnap, bBottomSnap);
-    }
+    m_windowRoot->SetWindowPosSnap(bLeftSnap, bRightSnap, bTopSnap, bBottomSnap);
 }
 
 void Window::OnButtonDown(EventType eventType, const UiPoint& pt, const NativeMsg& nativeMsg, uint32_t modifierKey)
@@ -2030,7 +1867,7 @@ void Window::OnButtonDown(EventType eventType, const UiPoint& pt, const NativeMs
             return;
         }
     }
-    Shadow* pShadow = GetShadow();
+    Shadow* pShadow = m_windowRoot->GetShadow();
     SetLastMousePos(pt);
     Control* pControl = FindControl(pt);
     if (pControl != nullptr) {
@@ -2106,7 +1943,7 @@ void Window::OnButtonUp(EventType eventType, const UiPoint& pt, const NativeMsg&
     }
 }
 
-void Window::ClearStatus()
+void Window::ClearInputStatus()
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     m_pEventToolTip = nullptr;
@@ -2568,287 +2405,34 @@ Control* Window::FindSubControlByName(Control* pParent, const DString& strName) 
 
 Shadow* Window::GetShadow() const
 {
-    ASSERT(m_shadow != nullptr);
-    if (m_bControlFullscreen) {
-        //控件全屏时，禁止访问阴影相关操作
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-        if (pFullscreenBox != nullptr) {
-            return nullptr;
-        }
-    }
-    return m_shadow.get();
+    return m_windowRoot->GetShadow();
 }
 
 void Window::NotifyWindowEnterFullscreen()
 {
-    //窗口进入全屏状态
-    ProcessWindowEnterFullscreen();
+    //全屏时，需要还原最大化时设置的外边距
+    m_windowRoot->ProcessWindowEnterFullscreen();
 }
 
 void Window::NotifyWindowExitFullscreen()
 {
     //窗口退出全屏状态
-    ProcessWindowExitFullscreen();
-}
-
-void Window::ProcessWindowMaximized()
-{
-    if (!IsUseSystemCaption() && !IsWindowFullscreen()) {
-        //最大化时，保存并设置全屏状态下的容器外边距
-        SetWindowMaximizedMargin();        
-    }
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->MaximizedOrRestored(true);
-    }
-}
-
-void Window::ProcessWindowRestored()
-{
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->MaximizedOrRestored(false);
-    }
-    //还原时，恢复外边距
-    RestoreWindowMaximizedMargin();
-}
-
-void Window::SetWindowMaximizedMargin()
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        return;
-    }
-    UiRect rcWindow;
-    GetWindowRect(rcWindow);
-    UiRect rcClientRect;
-    GetClientRect(rcClientRect);
-    int32_t cxClient = rcClientRect.Width();
-    int32_t cyClient = rcClientRect.Height();
-    if (Dpi().HasPixelDensity()) {
-        Dpi().UnscaleInt(cxClient);
-        Dpi().UnscaleInt(cyClient);
-        Dpi().ScaleWindowSize(cxClient);
-        Dpi().ScaleWindowSize(cyClient);
-    }
-    if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) {
-        //最大化时，设置外边距，避免客户区的内容溢出屏幕
-        UiRect rcWork;
-        GetMonitorWorkRect(rcWork);
-
-        UiMargin rcFullscreenMargin;
-        if (rcWindow.left < rcWork.left) {
-            rcFullscreenMargin.left = rcWork.left - rcWindow.left;
-        }
-        if (rcWindow.top < rcWork.top) {
-            rcFullscreenMargin.top = rcWork.top - rcWindow.top;
-        }
-        if (rcWindow.right > rcWork.right) {
-            rcFullscreenMargin.right = rcWindow.right - rcWork.right;
-        }
-        if (rcWindow.bottom > rcWork.bottom) {
-            rcFullscreenMargin.bottom = rcWindow.bottom - rcWork.bottom;
-        }
-        if (Dpi().HasPixelDensity()) {
-            rcFullscreenMargin.left = (int32_t)std::round(rcFullscreenMargin.left * Dpi().GetPixelDensity());
-            rcFullscreenMargin.top = (int32_t)std::round(rcFullscreenMargin.top * Dpi().GetPixelDensity());
-            rcFullscreenMargin.right = (int32_t)std::round(rcFullscreenMargin.right * Dpi().GetPixelDensity());
-            rcFullscreenMargin.bottom = (int32_t)std::round(rcFullscreenMargin.bottom * Dpi().GetPixelDensity());
-        }
-        bool bHasShadowBox = false;
-        Box* pXmlRoot = GetXmlRoot();
-        Shadow* pShadow = GetShadow();
-        if ((pShadow != nullptr) && pShadow->HasShadowBox()) {
-            bHasShadowBox = true;
-        }
-        if (pXmlRoot != nullptr) {
-            if (bHasShadowBox) {
-                //有阴影Box
-                UiMargin rcMargin = pXmlRoot->GetMargin();
-                rcMargin.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
-                rcMargin.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
-                rcMargin.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
-                rcMargin.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
-                m_rcWindowMaximizedMargin = rcFullscreenMargin;
-                pXmlRoot->SetMargin(rcMargin, false);
-            }
-            else {
-                //无阴影Box
-                UiPadding rcPadding = pXmlRoot->GetPadding();
-                rcPadding.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
-                rcPadding.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
-                rcPadding.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
-                rcPadding.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
-                m_rcWindowMaximizedMargin = rcFullscreenMargin;
-                pXmlRoot->SetPadding(rcPadding, false);
-            }
-        }
-    }
-}
-
-void Window::RestoreWindowMaximizedMargin()
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        return;
-    }
-    if (!m_rcWindowMaximizedMargin.IsEmpty()) {
-        bool bHasShadowBox = false;
-        Box* pXmlRoot = GetXmlRoot();
-        Shadow* pShadow = GetShadow();
-        if ((pShadow != nullptr) && pShadow->HasShadowBox()) {
-            bHasShadowBox = true;
-        }
-        if (pXmlRoot != nullptr) {
-            if (bHasShadowBox) {
-                //有阴影Box
-                UiMargin rcMargin = pXmlRoot->GetMargin();
-                rcMargin.left -= m_rcWindowMaximizedMargin.left;
-                rcMargin.top -= m_rcWindowMaximizedMargin.top;
-                rcMargin.right -= m_rcWindowMaximizedMargin.right;
-                rcMargin.bottom -= m_rcWindowMaximizedMargin.right;
-                pXmlRoot->SetMargin(rcMargin, false);
-            }
-            else {
-                //无阴影Box
-                UiPadding rcPadding = pXmlRoot->GetPadding();
-                rcPadding.left -= m_rcWindowMaximizedMargin.left;
-                rcPadding.top -= m_rcWindowMaximizedMargin.top;
-                rcPadding.right -= m_rcWindowMaximizedMargin.right;
-                rcPadding.bottom -= m_rcWindowMaximizedMargin.right;
-                pXmlRoot->SetPadding(rcPadding, false);
-            }
-        }
-        m_rcWindowMaximizedMargin.Clear();
-    }
-}
-
-void Window::ProcessWindowEnterFullscreen()
-{
-    //全屏时，需要还原最大化时设置的外边距
-    RestoreWindowMaximizedMargin();
-}
-
-void Window::ProcessWindowExitFullscreen()
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        //退出控件全屏状态
-        m_pRoot = pFullscreenBox->GetOldRoot();
-        ASSERT(m_pRoot != nullptr);
-        m_controlFinder.SetRoot(m_pRoot.get());
-        pFullscreenBox->ExitControlFullscreen();
-        if (m_pRoot != nullptr) {
-            m_pRoot->SetVisible(true);
-        }
-        delete pFullscreenBox;
-        pFullscreenBox = nullptr;
-    }
-    m_bControlFullscreen = false;
-}
-
-void Window::ProcessFullscreenButtonMouseMove(const UiPoint& pt)
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        pFullscreenBox->ProcessFullscreenButtonMouseMove(pt);
-    }
+    m_windowRoot->ProcessWindowExitFullscreen();
 }
 
 bool Window::SetFullscreenControl(Control* pFullscreenControl, const DString& exitButtonClass)
 {
-    ASSERT(pFullscreenControl != nullptr);
-    if (pFullscreenControl == nullptr) {
-        return false;
-    }
-    ASSERT(m_pRoot != nullptr);
-    if (m_pRoot == nullptr) {
-        return false;
-    }
-    ASSERT(m_pRoot.get() != pFullscreenControl);
-    if (m_pRoot.get() == pFullscreenControl) {
-        return false;
-    }
-
-    bool bRet = false;
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        //当前已经是控件全屏状态
-        if (pFullscreenBox->GetFullscreenControl() == pFullscreenControl) {
-            return true;
-        }
-        ASSERT(m_bControlFullscreen);
-        ASSERT(IsWindowFullscreen());
-        ASSERT(m_pRoot == pFullscreenBox);
-        ASSERT(m_controlFinder.GetRoot() == pFullscreenBox);
-        if (m_bControlFullscreen && IsWindowFullscreen() &&
-            (m_pRoot == pFullscreenBox) && (m_controlFinder.GetRoot() == pFullscreenBox)) {
-            //仅切换全屏控件，不改变全屏状态
-            if (pFullscreenBox->UpdateControlFullscreen(pFullscreenControl, exitButtonClass)) {
-                //复位控件的状态
-                ClearStatus();
-
-                //设置焦点
-                pFullscreenControl->SetFocus();
-                bRet = true;
-            }
-        }
-    }
-    else {
-        //原来不是控件全屏状态
-        pFullscreenBox = new FullscreenBox(this);
-        if (pFullscreenBox->EnterControlFullscreen(m_pRoot.get(), pFullscreenControl, exitButtonClass)) {
-            //成功进入控件全屏状态
-            m_controlFinder.SetRoot(pFullscreenBox);
-            m_pRoot = pFullscreenBox;
-            m_bControlFullscreen = true;
-
-            //窗口进入全屏状态
-            this->EnterFullscreen();
-
-            //复位控件的状态
-            ClearStatus();
-
-            //设置焦点
-            pFullscreenControl->SetFocus();
-            bRet = true;
-        }
-        else {
-            delete pFullscreenBox;
-            pFullscreenBox = nullptr;
-        }
-    }    
-    return bRet;
+    return m_windowRoot->SetFullscreenControl(pFullscreenControl, exitButtonClass);
 }
 
 void Window::ExitControlFullscreen()
 {
-    if (m_bControlFullscreen) {
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-        if (pFullscreenBox != nullptr) {
-            //退出控件全屏
-            bool bWindowOldFullscreen = pFullscreenBox->IsWindowOldFullscreen();
-            ProcessWindowExitFullscreen();
-            if (bWindowOldFullscreen) {
-                //窗口原来就是全屏，不需要退出窗口全屏状态
-                return;
-            }
-        }
-    }
-
-    //退出窗口全屏
-    ExitFullscreen();
+    m_windowRoot->ExitControlFullscreen();
 }
 
 Control* Window::GetFullscreenControl() const
 {
-    if (m_bControlFullscreen) {
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-        if (pFullscreenBox != nullptr) {
-            return pFullscreenBox->GetFullscreenControl();
-        }
-    }
-    return nullptr;
+    return m_windowRoot->GetFullscreenControl();
 }
 
 void Window::OnDropEnterMsg(ControlDropType /*dropType*/, void* /*pDropData*/)
