@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="75%,85%" min_size="300,200"
         caption="0,0,0,36" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
-        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
-        alpha="255" size_box="4,4,4,4" icon="public/caption/logo.ico">
+        shadow_type="default" size_box="4,4,4,4" icon="public/caption/logo.ico">
     <VBox bkcolor="bg_window_main" visible="true">
         <!-- 标题栏区域 -->
         <HBox name="window_title_bar" width="stretch" height="36" bkcolor="bg_titlebar">

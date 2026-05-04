@@ -407,7 +407,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
             //设置窗口的透明度（0 - 255），仅当使用层窗口时有效，在在UpdateLayeredWindow函数中作为参数使用
             int32_t nAlpha = StringUtil::StringToInt32(strValue);
             ASSERT(nAlpha >= 0 && nAlpha <= 255);
-            if ((nAlpha >= 0) && (nAlpha <= 255)) {
+            if ((nAlpha >= 0) && (nAlpha < 255)) {
                 createAttributes.m_nLayeredWindowAlpha = (uint8_t)nAlpha;
                 createAttributes.m_bLayeredWindowAlphaDefined = true;
             }
@@ -416,7 +416,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
             //设置窗口的不透明度（0 - 255），该值在SetLayeredWindowAttributes函数中作为参数使用(bAlpha)
             const int32_t nAlpha = StringUtil::StringToInt32(strValue);
             ASSERT(nAlpha >= 0 && nAlpha <= 255);
-            if ((nAlpha >= 0) && (nAlpha <= 255)) {
+            if ((nAlpha >= 0) && (nAlpha < 255)) {
                 createAttributes.m_nLayeredWindowOpacity = (uint8_t)nAlpha;
                 createAttributes.m_bLayeredWindowOpacityDefined = true;
             }
@@ -531,10 +531,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
     if (!createAttributes.m_bIsLayeredWindowDefined) {
         if (bShadowAttached) {
             //阴影启用
-            if (Shadow::IsSystemShadowType(nShadowType)) {
-                //使用系统阴影，不处理（默认不启用分层窗口属性）
-            }
-            else if (!bUseSystemCaption) {
+            if (!bUseSystemCaption && Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
                 //使用自绘阴影，默认需要开启分层窗口
                 createAttributes.m_bIsLayeredWindowDefined = true;
                 createAttributes.m_bIsLayeredWindow = true;
@@ -554,7 +551,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
     }    
     if (bShadowAttached) {
         //阴影启用
-        if (!Shadow::IsSystemShadowType(nShadowType)) {
+        if (Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
             //使用自绘阴影，需要启用分层窗口属性，否则绘制会有异常
             ASSERT(createAttributes.m_bIsLayeredWindow);
         }
@@ -565,10 +562,10 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
     if (backendType == RenderBackendType::kNativeGL_BackendType) {
         //使用OpenGL时，不能使用层窗口
-        if (!createAttributes.m_bLayeredWindowOpacityDefined || (createAttributes.m_nLayeredWindowOpacity == 255)) {
-            if (createAttributes.m_bIsLayeredWindowDefined) {
-                createAttributes.m_bIsLayeredWindow = false;
-            }
+        if (!createAttributes.m_bLayeredWindowOpacityDefined &&
+            createAttributes.m_bIsLayeredWindowDefined && createAttributes.m_bIsLayeredWindow) {
+            ASSERT(!createAttributes.m_bIsLayeredWindow);
+            createAttributes.m_bIsLayeredWindow = false;
         }
     }
 #else

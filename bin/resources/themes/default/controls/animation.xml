@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="600,500" min_size="80,50" text_id="STRID_CONTROLS_ANI_WINDOW_TITLE"
-        caption="0,0,0,36" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
-        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
-        alpha="255" size_box="4,4,4,4" icon="public/caption/logo.ico">
+        caption="0,0,0,36" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
+        shadow_type="default" shadow_snap="true" size_box="4,4,4,4" icon="public/caption/logo.ico">
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
     <VBox bkcolor="bg_window_main">
         <!-- 标题栏区域 -->

@@ -52,6 +52,10 @@ public:
     */
     static bool IsSystemShadowType(ShadowType nShadowType);
 
+    /** 该阴影类型是否需要分层窗口属性（支持透明度的窗口）
+    */
+    static bool IsShadowTypeNeedLayeredWindow(ShadowType nShadowType);
+
     /** 获取默认的阴影类型对应的参数
     * @param [in,out] nShadowType 阴影类型
     * @param [out] szBorderRound 返回圆角大小，未经DPI缩放

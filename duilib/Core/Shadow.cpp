@@ -566,6 +566,17 @@ bool Shadow::IsSystemShadowType(ShadowType nShadowType)
     return bRet;
 }
 
+bool Shadow::IsShadowTypeNeedLayeredWindow(ShadowType nShadowType)
+{
+    if (IsSystemShadowType(nShadowType)) {
+        return false;
+    }
+    if ((nShadowType == ShadowType::kShadowNone) || (nShadowType == ShadowType::kShadowNoneRound)) {
+        return false;
+    }
+    return true;
+}
+
 bool Shadow::GetShadowParam(const Window* pWindow,
                             ShadowType& nShadowType,
                             UiSize& szBorderRound,
