@@ -679,6 +679,7 @@
     <ClInclude Include="Core\LangManager.h" />
     <ClInclude Include="Core\MessageLoop_SDL.h" />
     <ClInclude Include="Core\MessageLoop_Windows.h" />
+    <ClInclude Include="Core\NativeWindowShadow.h" />
     <ClInclude Include="Core\NativeWindow_SDL.h" />
     <ClInclude Include="Core\NativeWindow_Windows.h" />
     <ClInclude Include="Core\PlaceHolder.h" />

@@ -2,6 +2,7 @@
 #define UI_CORE_NATIVE_WINDOW_SDL_H_
 
 #include "duilib/Core/INativeWindow.h"
+#include "duilib/Core/NativeWindowShadow.h"
 #include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Core/WindowCreateAttributes.h"
 #include "duilib/Utils/FilePath.h"
@@ -606,6 +607,23 @@ public:
     bool NeedCenterWindowAfterCreated() const;
 
 public:
+    /** 是否支持系统级别的窗口阴影
+    */
+    bool IsSystemShadowSupported() const;
+
+    /** 当前是否正在使用系统级别的窗口阴影（支持，并且已经开启）
+    */
+    bool IsSystemShadowEnabled() const;
+
+    /** 设置系统级别的窗口阴影
+    */
+    bool SetSystemShadowType(NativeWindowShadowType nativeShadowType);
+
+    /** 获取系统级别的窗口阴影
+    */
+    NativeWindowShadowType GetSystemShadowType() const;
+
+public:
     //几组支持高分屏的API接口
     bool GetWindowSize(int32_t* w, int32_t* h) const;
     bool GetWindowSizeInPixels(int32_t* w, int32_t* h) const;
@@ -835,6 +853,10 @@ private:
     /** 拖放的支持
     */
     std::unique_ptr<WindowDropTarget> m_pWindowDropTarget;
+
+    /** 操作系统级别的窗口阴影
+    */
+    NativeWindowShadowType m_systemShadowType;
 };
 
 /** 定义别名

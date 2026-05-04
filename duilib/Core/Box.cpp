@@ -525,6 +525,9 @@ bool Box::DoRemoveItem(Control* pControl)
                     delete pControl;
                 }                
             }
+            else {
+                pControl->SetParent(nullptr);
+            }
             Arrange();
             return true;
         }
@@ -539,6 +542,13 @@ void Box::RemoveAllItems()
     if (m_bAutoDestroyChild) {
         for(Control* pControl : items) {
             delete pControl;
+        }
+    }
+    else {
+        for (Control* pControl : items) {
+            if (pControl != nullptr) {
+                pControl->SetParent(nullptr);
+            }
         }
     }
     if (!items.empty()) {

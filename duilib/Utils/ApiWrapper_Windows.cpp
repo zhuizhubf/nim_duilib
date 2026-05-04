@@ -6,6 +6,7 @@
 #include "duilib/Utils/DllManager_Windows.h"
 #include "duilib/Render/IRender.h"
 #include <VersionHelpers.h>
+#include <dwmapi.h>
 #include <map>
 
 namespace ui
@@ -928,6 +929,85 @@ bool CreateIconsFromData(const std::vector<uint8_t>& iconFileData,
         return true;
     }
     return CreateIconsFromImageData(iconFileData, FilePath(imageFilePath), uDpiScaleFactor, hSmallIcon, hBigIcon);
+}
+
+//判断是否为Windows 11的函数
+bool UiIsWindows11OrGreater()
+{
+    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    DWORDLONG const dwlConditionMask = VerSetConditionMask(
+        VerSetConditionMask(
+            VerSetConditionMask(
+                0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+            VER_MINORVERSION, VER_GREATER_EQUAL),
+        VER_BUILDNUMBER, VER_GREATER_EQUAL);
+
+    osvi.dwMajorVersion = 10;
+    osvi.dwMinorVersion = 0;
+    osvi.dwBuildNumber = 22000; //需要根据Build版本号区分
+
+    return ::VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
+}
+
+// 动态加载并初始化 DWM 样式（以支持系统的窗口阴影）
+bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
+{
+    if (!::IsWindow(hWnd)) {
+        return false;
+    }
+    HMODULE hDwm = DllManager::Instance().LoadDll(_T("dwmapi.dll"));
+    if (hDwm == nullptr) {
+        return false;
+    }
+
+    // 动态 DWM API 定义
+    typedef HRESULT(WINAPI* DWM_SET_WINDOW_ATTRIBUTE)(HWND, DWORD, LPCVOID, DWORD);
+    typedef HRESULT(WINAPI* DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND, const MARGINS*);
+    typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND, const DWM_BLURBEHIND*);
+
+    DWM_SET_WINDOW_ATTRIBUTE DwmSetWindowAttribute = (DWM_SET_WINDOW_ATTRIBUTE)GetProcAddress(hDwm, "DwmSetWindowAttribute");
+    DWM_EXTEND_FRAME_INTO_CLIENT_AREA DwmExtendFrameIntoClientArea = (DWM_EXTEND_FRAME_INTO_CLIENT_AREA)GetProcAddress(hDwm, "DwmExtendFrameIntoClientArea");
+    //DWM_ENABLE_BLUR_BEHIND_WINDOW DwmEnableBlurBehindWindow = (DWM_ENABLE_BLUR_BEHIND_WINDOW)GetProcAddress(hDwm, "DwmEnableBlurBehindWindow");
+
+    // Win11+：设置圆角
+    if (UiIsWindows11OrGreater() && DwmSetWindowAttribute) {
+        DWORD corner = DWMWCP_DEFAULT;
+        switch (nativeShadowType) {
+        case NativeWindowShadowType::kShadowSystemDoNotRound:
+            corner = DWMWCP_DONOTROUND;
+            break;
+        case NativeWindowShadowType::kShadowSystemRound:
+            corner = DWMWCP_ROUND;
+            break;
+        case NativeWindowShadowType::kShadowSystemSmallRound:
+            corner = DWMWCP_ROUNDSMALL;
+            break;
+        default:
+            break;
+        }
+        HRESULT hr = DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(DWORD));
+        ASSERT_UNUSED_VARIABLE(SUCCEEDED(hr));
+    }
+
+    //// 启用模糊后景（全版本兼容）
+    //if (DwmEnableBlurBehindWindow) {
+    //    DWM_BLURBEHIND bb = { 0 };
+    //    bb.dwFlags = DWM_BB_ENABLE;
+    //    bb.fEnable = TRUE;
+    //    DwmEnableBlurBehindWindow(hWnd, &bb);
+    //}
+
+    // 扩展框架到整个客户区（全版本兼容, 该函数为关键函数）
+    HRESULT hr = E_FAIL;
+    if (DwmExtendFrameIntoClientArea) {
+        MARGINS margins = { -1, -1, -1, -1 };
+        if (nativeShadowType == NativeWindowShadowType::kShadowSystemDisabled) {
+            margins = { 0, 0, 0, 0 }; //关闭
+        }        
+        hr = DwmExtendFrameIntoClientArea(hWnd, &margins);
+        ASSERT_UNUSED_VARIABLE(SUCCEEDED(hr));
+    }
+    return SUCCEEDED(hr);
 }
 
 } //namespace ui

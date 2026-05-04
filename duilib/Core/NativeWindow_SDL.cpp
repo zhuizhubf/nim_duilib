@@ -15,6 +15,8 @@
     #include "SDL_MacOS.h"
 #elif defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
     #include "SDL_Linux.h"
+#elif defined (DUILIB_BUILD_FOR_WIN)
+    #include "duilib/Utils/ApiWrapper_Windows.h"
 #endif
 
 /** 主动绘制
@@ -202,6 +204,10 @@ public:
 
 void NativeWindow_SDL::CheckWindowSnap(SDL_Window* window)
 {
+    if (IsUseSystemCaption() || IsSystemShadowEnabled()) {
+        //使用系统标题栏或者系统阴影时，不需要执行自己实现的snap功能
+        return;
+    }
     // 检查窗口是否最大化或最小化
     if ((window == nullptr) || IsChildWindow()) {
         return;
@@ -722,7 +728,8 @@ NativeWindow_SDL::NativeWindow_SDL(INativeWindow* pOwner):
     m_bFullscreenExiting(false),
     m_bFullscreenMaximized(false),
     m_ptLastMousePos(-1, -1),
-    m_bInitWindowPosFlag(false)
+    m_bInitWindowPosFlag(false),
+    m_systemShadowType(NativeWindowShadowType::kShadowSystemDisabled)
 {
     ASSERT(m_pOwner != nullptr);    
 }
@@ -3268,6 +3275,38 @@ void NativeWindow_SDL::OnDropFiles(const DString& source, const std::vector<DStr
 void NativeWindow_SDL::OnDropLeave()
 {
     m_pOwner->OnNativeDropLeaveMsg();
+}
+
+bool NativeWindow_SDL::IsSystemShadowSupported() const
+{
+#if defined DUILIB_BUILD_FOR_WIN || defined DUILIB_BUILD_FOR_MACOS
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool NativeWindow_SDL::IsSystemShadowEnabled() const
+{
+    return IsSystemShadowSupported() && (GetSystemShadowType() != NativeWindowShadowType::kShadowSystemDisabled);
+}
+
+bool NativeWindow_SDL::SetSystemShadowType(NativeWindowShadowType nativeShadowType)
+{
+#if defined DUILIB_BUILD_FOR_WIN
+    if (ModifyDwmStyle(GetHWND(), nativeShadowType)) {
+        m_systemShadowType = nativeShadowType;
+        return true;
+    }
+#elif defined DUILIB_BUILD_FOR_MACOS
+    return false;    
+#endif
+    return false;
+}
+
+NativeWindowShadowType NativeWindow_Windows::GetSystemShadowType() const
+{
+    return m_systemShadowType;
 }
 
 bool NativeWindow_SDL::KillWindowFocus()

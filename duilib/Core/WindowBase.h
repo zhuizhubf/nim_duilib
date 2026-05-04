@@ -88,6 +88,10 @@ public:
     */
     bool IsUseSystemCaption() const;
 
+    /** 获取是否使用系统的窗口阴影
+    */
+    bool IsUseSystemShadow() const;
+
     /** 设置是否为层窗口
     * @param [in] bIsLayeredWindow true表示设置为层窗口，否则设置为非层窗口
     * @param [in] bRedraw 是否重绘窗口（属性更改后，如果不重绘，则界面可能显示异常）

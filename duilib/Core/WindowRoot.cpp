@@ -132,17 +132,26 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
         return;
     }
 
-    if (pShadow->IsShadowAttached()) {
+    if (pShadow->IsShadowAttached() && !pShadow->IsSystemShadowEnabled()) {
         //需要绑定
         if (!pShadow->HasShadowBox()) {
             Box* pNewRoot = pShadow->AttachShadow(m_pRoot.get());
-            AttachBox(pNewRoot);
+            if (pNewRoot != nullptr) {
+                m_pRoot.reset(); //先清空，避免被释放
+                AttachBox(pNewRoot);
+            }
         }
     }
     else {
         //不需要绑定
-        if (pShadow->HasShadowBox() && (pShadow->GetAttachedXmlRoot() != nullptr)) {
-
+        if ( pShadow->HasShadowBox() &&
+             (pShadow->GetShadowBox() == m_pRoot.get()) &&
+             (pShadow->GetAttachedXmlRoot() != nullptr)) {
+            Box* pNewRoot = pShadow->DettachShadow();
+            if (pNewRoot != nullptr) {
+                m_pRoot.reset(); //先清空，避免被释放
+                AttachBox(pNewRoot);
+            }
         }
     }
 

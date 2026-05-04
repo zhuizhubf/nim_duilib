@@ -28,7 +28,8 @@ Window::Window() :
     m_bPostQuitMsgWhenClosed(false),
     m_renderBackendType(RenderBackendType::kRaster_BackendType),
     m_bWindowAttributesApplied(false),
-    m_bCheckSetWindowFocus(false)
+    m_bCheckSetWindowFocus(false),
+    m_bWindowShadowInited(false)
 {
     m_toolTip = std::make_unique<ToolTip>();
     m_windowRoot = std::make_unique<WindowRoot>(this);
@@ -306,7 +307,6 @@ void Window::PreInitWindow()
         return;
     }
     m_windowRoot->CreateShadow(IsLayeredWindow());
-
     //解析窗口关联的XML文件
     if (m_windowBuilder == nullptr) {
         ParseWindowXml();
@@ -331,6 +331,12 @@ void Window::PreInitWindow()
 
         //关联Root对象
         AttachBox(pRoot);
+
+        //初始化阴影
+        if (!m_bWindowShadowInited) {
+            m_bWindowShadowInited = true;
+            SetShadowAttached(IsShadowAttached());
+        }
 
         //更新自绘制标题栏状态
         OnUseSystemCaptionBarChanged();
@@ -785,6 +791,7 @@ void Window::SetShadowAttached(bool bShadowAttached)
     if (m_windowRoot->IsControlFullscreen()) {
         return;
     }
+    m_bWindowShadowInited = true;
     m_windowRoot->SetShadowAttached(bShadowAttached);
     OnWindowShadowTypeChanged();
 }
@@ -795,6 +802,7 @@ void Window::SetShadowType(ShadowType nShadowType)
     if (m_windowRoot->IsControlFullscreen()) {
         return;
     }
+    m_bWindowShadowInited = true;
     m_windowRoot->SetShadowType(nShadowType);
     OnWindowShadowTypeChanged();
 }
@@ -1065,7 +1073,6 @@ LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/
     }
     return 0;
 }
-
 bool Window::Paint(const UiRect& rcPaint)
 {
     GlobalManager::Instance().AssertUIThread();
@@ -1106,7 +1113,7 @@ bool Window::Paint(const UiRect& rcPaint)
     if (IsLayeredWindow()) {
         PerformanceStat statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
         Shadow* pShadow = m_windowRoot->GetShadow();
-        if ((pShadow != nullptr) && pShadow->IsShadowAttached() &&
+        if ((pShadow != nullptr) && IsShadowAttached() &&
             (m_renderOffset.x == 0) && (m_renderOffset.y == 0)) {
             //补救由于Gdi绘制造成的alpha通道为0
             UiRect rcNewPaint = rcPaint;
@@ -1842,8 +1849,7 @@ void Window::OnButtonDown(EventType eventType, const UiPoint& pt, const NativeMs
         if (windowFlag.expired()) {
             return;
         }
-    }
-    Shadow* pShadow = m_windowRoot->GetShadow();
+    }    
     SetLastMousePos(pt);
     Control* pControl = FindControl(pt);
     if (pControl != nullptr) {
@@ -1883,9 +1889,12 @@ void Window::OnButtonDown(EventType eventType, const UiPoint& pt, const NativeMs
             }
         }
     }
-    else if (!IsUseSystemCaption() && (pShadow != nullptr) && IsShadowAttached()) {
+    else if (!IsUseSystemCaption()) {
         //检查是否点击在窗口阴影区域(实现鼠标点击阴影，穿透到后面窗口的功能)
-        pShadow->CheckMouseClickOnShadow(eventType, pt);
+        Shadow* pShadow = m_windowRoot->GetShadow();
+        if ((pShadow != nullptr) && IsShadowAttached()) {
+            pShadow->CheckMouseClickOnShadow(eventType, pt);
+        }        
     }
     if (!bWindowFocused && !windowFlag.expired()) {
         //确保被点击的窗口有输入焦点(解决CEF窗口模式下，输入焦点无法从页面切换到地址栏的问题)

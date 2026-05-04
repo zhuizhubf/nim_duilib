@@ -111,6 +111,11 @@ bool WindowBase::IsUseSystemCaption() const
     return m_pNativeWindow->IsUseSystemCaption();
 }
 
+bool WindowBase::IsUseSystemShadow() const
+{
+    return m_pNativeWindow->IsSystemShadowEnabled();
+}
+
 void WindowBase::SetLayeredWindowAlpha(int32_t nAlpha)
 {
     m_pNativeWindow->SetLayeredWindowAlpha(nAlpha);
@@ -908,7 +913,7 @@ void WindowBase::OnWindowSized(bool bRedraw)
         //不支持，立即返回
         return;
     }
-    if (IsUseSystemCaption() || IsWindowMinimized() || IsWindowMaximized()) {
+    if (IsUseSystemCaption() || IsUseSystemShadow() || IsWindowMinimized() || IsWindowMaximized()) {
         //使用系统工具栏，窗口最小化，窗口最大化的情况下，关闭RGN设置
         ClearWindowRgn(bRedraw);
     }

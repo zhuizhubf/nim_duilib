@@ -1112,10 +1112,6 @@ private:
     */
     std::unique_ptr<ToolTip> m_toolTip;
 
-    /** 窗口关闭的时候，发送退出消息循环的请求
-    */
-    bool m_bPostQuitMsgWhenClosed;
-
     /** 渲染引擎的后台绘制方式（CPU、OpenGL等）
     */
     RenderBackendType m_renderBackendType;
@@ -1124,9 +1120,17 @@ private:
     */
     UiSize m_szInitSize;
 
+    /** 窗口关闭的时候，发送退出消息循环的请求
+    */
+    bool m_bPostQuitMsgWhenClosed;
+
     /** 窗口的属性是否已经设置完成
     */
     bool m_bWindowAttributesApplied;
+
+    /** 窗口阴影是否进行过初始化
+    */
+    bool m_bWindowShadowInited;
 };
 
 } // namespace ui

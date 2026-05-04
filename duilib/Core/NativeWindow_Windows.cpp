@@ -5,34 +5,16 @@
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
 
-#include "duilib/Utils/ApiWrapper_Windows.h"
-#include "duilib/Utils/InlineHook_Windows.h"
 #include "duilib/Core/WindowDropTarget_Windows.h"
 #include "duilib/Core/ControlDropTargetImpl_Windows.h"
+#include "duilib/Utils/ApiWrapper_Windows.h"
+#include "duilib/Utils/InlineHook_Windows.h"
 
 #include <CommCtrl.h>
 #include <Olectl.h>
 #include <VersionHelpers.h>
 
 namespace ui {
-
-//判断是否为Windows 11的函数
-static bool UiIsWindows11OrGreater()
-{
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
-    DWORDLONG const dwlConditionMask = VerSetConditionMask(
-        VerSetConditionMask(
-            VerSetConditionMask(
-                0, VER_MAJORVERSION, VER_GREATER_EQUAL),
-            VER_MINORVERSION, VER_GREATER_EQUAL),
-        VER_BUILDNUMBER, VER_GREATER_EQUAL);
-
-    osvi.dwMajorVersion = 10;
-    osvi.dwMinorVersion = 0;
-    osvi.dwBuildNumber = 22000; //需要根据Build版本号区分
-
-    return ::VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
-}
 
 //系统菜单延迟显示的定时器ID
 #define UI_SYS_MEMU_TIMER_ID 711
@@ -66,7 +48,8 @@ NativeWindow_Windows::NativeWindow_Windows(INativeWindow* pOwner):
     m_pWindowDropTarget(nullptr),
     m_nWindowDpiScaleFactor(100),
     m_bChildWindow(false),
-    m_pDataObj(nullptr)
+    m_pDataObj(nullptr),
+    m_systemShadowType(NativeWindowShadowType::kShadowSystemDisabled)
 {
     ASSERT(m_pOwner != nullptr);
     m_rcLastWindowPlacement = { sizeof(WINDOWPLACEMENT), };
@@ -2222,6 +2205,7 @@ LRESULT NativeWindow_Windows::OnNcHitTestMsg(UINT uMsg, WPARAM /*wParam*/, LPARA
 {
     ASSERT_UNUSED_VARIABLE(uMsg == WM_NCHITTEST);
     if (IsUseSystemCaption()) {
+        //使用系统标题栏时，不需要处理，系统默认即可
         bHandled = false;
         return 0;
     }
@@ -2637,6 +2621,10 @@ LRESULT NativeWindow_Windows::OnPointerMsgs(UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void NativeWindow_Windows::CheckWindowSnap(HWND hWnd)
 {
+    if (IsUseSystemCaption() || IsSystemShadowEnabled()) {
+        //使用系统标题栏或者系统阴影时，不需要执行自己实现的snap功能
+        return;
+    }
     if (::IsZoomed(hWnd) || ::IsIconic(hWnd) || IsChildWindow()) {
         //最大化/最小化/子窗口时，不处理
         return;
@@ -2686,7 +2674,7 @@ LRESULT NativeWindow_Windows::ProcessWindowMessage(UINT uMsg, WPARAM wParam, LPA
         break;
     }
     case WM_SIZE:
-    {        
+    {
         WindowSizeType sizeType = static_cast<WindowSizeType>(wParam);
         UiSize newWindowSize;
         newWindowSize.cx = (int)(short)LOWORD(lParam);
@@ -3343,6 +3331,45 @@ HRESULT NativeWindow_Windows::OnDrop(IDataObject* pDataObj, DWORD grfKeyState, P
         *pdwEffect = data.m_dwEffect;
     }
     return data.m_hResult;
+}
+
+bool NativeWindow_Windows::IsSystemShadowSupported() const
+{
+    return true;
+}
+
+bool NativeWindow_Windows::IsSystemShadowEnabled() const
+{
+    return IsSystemShadowSupported() && (GetSystemShadowType() != NativeWindowShadowType::kShadowSystemDisabled);
+}
+
+bool NativeWindow_Windows::SetSystemShadowType(NativeWindowShadowType nativeShadowType)
+{
+    if (m_systemShadowType == nativeShadowType) {
+        return true;
+    }
+    if (IsChildWindow()) {
+        return false;
+    }
+    if ((nativeShadowType == NativeWindowShadowType::kShadowSystemDefault) ||
+        (nativeShadowType == NativeWindowShadowType::kShadowSystemDoNotRound)) {
+        //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
+        ASSERT(!IsLayeredWindow());
+    }
+    if (ModifyDwmStyle(m_hWnd, nativeShadowType)) {
+        m_systemShadowType = nativeShadowType;
+        if (IsSystemShadowEnabled()) {
+            //启用系统阴影时，必须清除RGN，否则显示不正确
+            ClearWindowRgn(true);
+        }
+        return true;
+    }
+    return false;
+}
+
+NativeWindowShadowType NativeWindow_Windows::GetSystemShadowType() const
+{
+    return m_systemShadowType;
 }
 
 } // namespace ui

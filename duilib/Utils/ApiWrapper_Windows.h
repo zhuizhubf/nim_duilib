@@ -5,6 +5,8 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
+#include "duilib/Core/NativeWindowShadow.h"
+
 namespace ui
 {
     //获取指定窗口的DPI值，如果失败则返回0
@@ -65,6 +67,12 @@ namespace ui
                              const DString& imageFilePath,
                              uint32_t uDpiScaleFactor,
                              HICON* hSmallIcon, HICON* hBigIcon);
+
+    //判断是否为Windows 11的函数
+    bool UiIsWindows11OrGreater();
+
+    // 设置系统的窗口阴影属性
+    bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType);
 }
 
 #endif //DUILIB_BUILD_FOR_WIN
