@@ -44,14 +44,23 @@ public:
     */
     static bool GetShadowType(const DString& typeString, ShadowType& nShadowType);
 
+    /** 根据窗口属性获取支持的阴影类型
+    */
+    static ShadowType GetSupportedShadowType(const Window* pWindow, ShadowType nShadowType);
+
+    /** 是否为系统阴影类型
+    */
+    static bool IsSystemShadowType(ShadowType nShadowType);
+
     /** 获取默认的阴影类型对应的参数
-    * @param [in] nShadowType 阴影类型
+    * @param [in,out] nShadowType 阴影类型
     * @param [out] szBorderRound 返回圆角大小，未经DPI缩放
     * @param [out] rcShadowCorner 返回阴影素材的九宫格属性，未经DPI缩放
     * @param [out] shadowImage 返回阴影图片的属性，包含阴影图片的九宫格属性
     * @param [in] pShadowObj 关联的阴影对象
     */
-    static bool GetShadowParam(ShadowType nShadowType,
+    static bool GetShadowParam(const Window* pWindow,
+                               ShadowType& nShadowType,
                                UiSize& szBorderRound,
                                UiPadding& rcShadowCorner,
                                DString& shadowImage,

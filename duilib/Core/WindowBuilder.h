@@ -92,7 +92,7 @@ public:
     /** 解析出窗口的属性
     *   (只解析出部分创建窗口依赖的属性，有些窗口属性只能在创建的时候指定，创建窗口后不支持修改，所以必须先读取出来，创建窗口时作为传入参数)
     */
-    bool ParseWindowCreateAttributes(WindowCreateAttributes& createAttributes);
+    bool ParseWindowCreateAttributes(Window* pWindow, WindowCreateAttributes& createAttributes);
 
     /** 从当前XML中解析出主题相关数据
     * @param [out] themeName 主题名称

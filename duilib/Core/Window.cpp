@@ -230,7 +230,7 @@ void Window::GetCreateWindowAttributes(WindowCreateAttributes& createAttributes)
 
     //解析出窗口的属性
     if (m_windowBuilder != nullptr) {
-        m_windowBuilder->ParseWindowCreateAttributes(createAttributes);
+        m_windowBuilder->ParseWindowCreateAttributes(this, createAttributes);
     }
 }
 

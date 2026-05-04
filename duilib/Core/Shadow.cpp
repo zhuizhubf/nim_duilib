@@ -268,35 +268,7 @@ void Shadow::SetShadowType(ShadowType nShadowType)
     if (m_pWindow->GetFullscreenControl() != nullptr) {
         return;
     }
-    if (nShadowType == ShadowType::kShadowDefault) {
-        nShadowType = m_nShadowTypeDefault;
-    }
-    if (!m_pWindow->NativeWnd()->IsSystemShadowSupported()) {
-        //当不支持系统阴影时，自动选择自绘阴影
-        if (nShadowType == ShadowType::kShadowSystemDefault) {
-            nShadowType = m_nShadowTypeDefault;
-        }
-        else if (nShadowType == ShadowType::kShadowSystemDoNotRound) {
-            nShadowType = ShadowType::kShadowNone;
-        }
-        else if (nShadowType == ShadowType::kShadowSystemRound) {
-            nShadowType = ShadowType::kShadowBigRound;
-        }
-        else if (nShadowType == ShadowType::kShadowSystemSmallRound) {
-            nShadowType = ShadowType::kShadowSmallRound;
-        }
-    }
-    else {
-        if ((nShadowType == ShadowType::kShadowSystemDefault) ||
-            (nShadowType == ShadowType::kShadowSystemDoNotRound)) {
-            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
-            ASSERT(!m_pWindow->IsLayeredWindow());
-            if (m_pWindow->IsLayeredWindow()) {
-                nShadowType = ShadowType::kShadowSystemRound;
-            }
-        }
-    }
-    m_nShadowType = nShadowType;
+    m_nShadowType = GetSupportedShadowType(m_pWindow, nShadowType);
 
     //开启阴影
     m_bShadowAttached = true;
@@ -326,7 +298,7 @@ void Shadow::OnShadowAttached(ShadowType nShadowType)
     UiSize szBorderRound;
     UiPadding rcShadowCorner;
     DString shadowImage;
-    if (GetShadowParam(nShadowType, szBorderRound, rcShadowCorner, shadowImage, this)) {
+    if (GetShadowParam(m_pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage, this)) {
         //用户自定义类型：不覆盖原值，以用户设置的为准
         if (nShadowType != ShadowType::kShadowCustom) {
             SetShadowCorner(rcShadowCorner);
@@ -545,12 +517,66 @@ bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
     return true;
 }
 
-bool Shadow::GetShadowParam(ShadowType nShadowType,
+ShadowType Shadow::GetSupportedShadowType(const Window* pWindow, ShadowType nShadowType)
+{
+    ASSERT(pWindow != nullptr);
+    if (pWindow == nullptr) {
+        return nShadowType;
+    }
+    if (nShadowType == ShadowType::kShadowDefault) {
+        nShadowType = m_nShadowTypeDefault;
+    }
+    if (!pWindow->NativeWnd()->IsSystemShadowSupported()) {
+        //当不支持系统阴影时，自动选择自绘阴影
+        if (nShadowType == ShadowType::kShadowSystemDefault) {
+            nShadowType = m_nShadowTypeDefault;
+        }
+        else if (nShadowType == ShadowType::kShadowSystemDoNotRound) {
+            nShadowType = ShadowType::kShadowNone;
+        }
+        else if (nShadowType == ShadowType::kShadowSystemRound) {
+            nShadowType = ShadowType::kShadowBigRound;
+        }
+        else if (nShadowType == ShadowType::kShadowSystemSmallRound) {
+            nShadowType = ShadowType::kShadowSmallRound;
+        }
+    }
+    else {
+        if ((nShadowType == ShadowType::kShadowSystemDefault) ||
+            (nShadowType == ShadowType::kShadowSystemDoNotRound)) {
+            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
+            ASSERT(!pWindow->IsLayeredWindow());
+            if (pWindow->IsLayeredWindow()) {
+                nShadowType = ShadowType::kShadowSystemRound;
+            }
+        }
+    }
+    return nShadowType;
+}
+
+bool Shadow::IsSystemShadowType(ShadowType nShadowType)
+{
+    bool bRet = false;
+    if ((nShadowType == ShadowType::kShadowSystemDefault) ||
+        (nShadowType == ShadowType::kShadowSystemDoNotRound) ||
+        (nShadowType == ShadowType::kShadowSystemRound) ||
+        (nShadowType == ShadowType::kShadowSystemSmallRound)) {
+        bRet = true;
+    }
+    return bRet;
+}
+
+bool Shadow::GetShadowParam(const Window* pWindow,
+                            ShadowType& nShadowType,
                             UiSize& szBorderRound,
                             UiPadding& rcShadowCorner,
                             DString& shadowImage,
                             Shadow* pShadowObj)
 {
+    nShadowType = GetSupportedShadowType(pWindow, nShadowType);
+    if (nShadowType == ShadowType::kShadowDefault) {
+        nShadowType = m_nShadowTypeDefault;
+    }
     bool bRet = false;
     //阴影边缘的颜色，与窗口边框的颜色保持一致
     DString svgReplaceColors;
