@@ -535,6 +535,10 @@ public:
     */
     NativeWindowShadowType GetSystemShadowType() const;
 
+    /** 获取系统阴影的边框线条宽度（视觉边线）
+    */
+    int32_t GetSystemShadowFrameBorderSize() const;
+
 private:
     /** 窗口过程函数
     * @param [in] hWnd 窗口句柄

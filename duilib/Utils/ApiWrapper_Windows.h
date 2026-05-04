@@ -73,6 +73,13 @@ namespace ui
 
     // 设置系统的窗口阴影属性
     bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType);
+
+    /* 获取窗口 DWM 可见边框厚度
+     * @param hWnd 目标窗口句柄
+     * @param outThickness 输出边框厚度（UINT 类型，像素值）
+     * @return 成功返回 true，失败返回 false
+     */
+    bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness);
 }
 
 #endif //DUILIB_BUILD_FOR_WIN

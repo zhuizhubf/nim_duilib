@@ -337,7 +337,7 @@ void Shadow::OnShadowAttached(ShadowType nShadowType)
     UpdateShadow();
 
     if (m_pWindow->NativeWnd()->IsSystemShadowSupported()) {
-        if (IsSystemShadowEnabled(nShadowType)) {
+        if (IsShadowAttached() && IsSystemShadowEnabled(nShadowType)) {
             //使用系统阴影
             NativeWindowShadowType nativeShadowType = NativeWindowShadowType::kShadowSystemDefault;
             if (nShadowType == ShadowType::kShadowSystemDefault) {

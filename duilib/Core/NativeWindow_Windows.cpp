@@ -1155,7 +1155,11 @@ bool NativeWindow_Windows::EnterFullscreen()
     DWORD dwFullscreenStyle = (m_dwLastStyle | WS_VISIBLE | WS_POPUP | WS_MAXIMIZE) & ~WS_CAPTION & ~WS_BORDER & ~WS_THICKFRAME & ~WS_DLGFRAME;
     ::SetWindowLongPtr(m_hWnd, GWL_STYLE, dwFullscreenStyle);
     ::SetWindowPos(m_hWnd, nullptr, rcMonitor.left, rcMonitor.top, rcMonitor.Width(), rcMonitor.Height(), SWP_FRAMECHANGED); // 设置位置和大小
-    
+
+    //全屏时，必须禁用系统阴影，否则内容显示不全
+    if (IsSystemShadowEnabled()) {
+        ModifyDwmStyle(m_hWnd, NativeWindowShadowType::kShadowSystemDisabled);
+    }    
     m_pOwner->OnNativeWindowEnterFullscreen();
     return true;
 }
@@ -1186,9 +1190,11 @@ bool NativeWindow_Windows::ExitFullscreen()
     m_bFullscreen = false;
     m_bFullscreenExiting = false;
 
+    if (IsSystemShadowEnabled()) {
+        ModifyDwmStyle(m_hWnd, m_systemShadowType);
+    }
     //触发位置和大小变化事件
     ::SetWindowPos(m_hWnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED);
-
     m_pOwner->OnNativeWindowExitFullscreen();
     return true;
 }
@@ -3370,6 +3376,16 @@ bool NativeWindow_Windows::SetSystemShadowType(NativeWindowShadowType nativeShad
 NativeWindowShadowType NativeWindow_Windows::GetSystemShadowType() const
 {
     return m_systemShadowType;
+}
+
+int32_t NativeWindow_Windows::GetSystemShadowFrameBorderSize() const
+{
+    if (IsChildWindow() || !IsSystemShadowEnabled() || IsUseSystemCaption()) {
+        return 0;
+    }
+    UINT outThickness = 0;
+    GetDwmVisibleFrameBorderThickness(m_hWnd, outThickness);
+    return (int32_t)outThickness;
 }
 
 } // namespace ui

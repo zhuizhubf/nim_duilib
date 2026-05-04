@@ -12,7 +12,8 @@ namespace ui
 WindowRoot::WindowRoot(Window* pWindow):
     m_pWindow(pWindow),
     m_bControlFullscreen(false),
-    m_pControlFinder(nullptr)
+    m_pControlFinder(nullptr),
+    m_nSystemShadowFrameBorderSize(0)
 {
 }
 
@@ -66,6 +67,7 @@ void WindowRoot::CreateShadow(bool bLayeredWindow)
         return;
     }
     m_shadow = std::make_unique<Shadow>(m_pWindow, bLayeredWindow);
+    m_nSystemShadowFrameBorderSize = 0;
 }
 
 Shadow* WindowRoot::GetShadow() const
@@ -99,6 +101,7 @@ bool WindowRoot::AttachBox(Box* pRoot)
     if (m_pControlFinder != nullptr) {
         m_pControlFinder->SetRoot(pRoot);
     }
+    m_nSystemShadowFrameBorderSize = 0;
     return true;
 }
 
@@ -154,6 +157,9 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
             }
         }
     }
+
+    //检查系统阴影的边框设置
+    CheckSystemShadowFrameBorderSize();
 
     //重绘窗口，否则会有绘制异常
     m_pWindow->InvalidateAll();
@@ -372,31 +378,15 @@ void WindowRoot::RestoreWindowMaximizedMargin()
         return;
     }
     if (!m_rcWindowMaximizedMargin.IsEmpty()) {
-        bool bHasShadowBox = false;
         Box* pXmlRoot = GetXmlRoot();
-        Shadow* pShadow = GetShadow();
-        if ((pShadow != nullptr) && pShadow->HasShadowBox()) {
-            bHasShadowBox = true;
-        }
         if (pXmlRoot != nullptr) {
-            if (bHasShadowBox) {
-                //有阴影Box
-                UiMargin rcMargin = pXmlRoot->GetMargin();
-                rcMargin.left -= m_rcWindowMaximizedMargin.left;
-                rcMargin.top -= m_rcWindowMaximizedMargin.top;
-                rcMargin.right -= m_rcWindowMaximizedMargin.right;
-                rcMargin.bottom -= m_rcWindowMaximizedMargin.right;
-                pXmlRoot->SetMargin(rcMargin, false);
-            }
-            else {
-                //无阴影Box
-                UiPadding rcPadding = pXmlRoot->GetPadding();
-                rcPadding.left -= m_rcWindowMaximizedMargin.left;
-                rcPadding.top -= m_rcWindowMaximizedMargin.top;
-                rcPadding.right -= m_rcWindowMaximizedMargin.right;
-                rcPadding.bottom -= m_rcWindowMaximizedMargin.right;
-                pXmlRoot->SetPadding(rcPadding, false);
-            }
+            UiMargin rcMargin = pXmlRoot->GetMargin();
+            rcMargin.left -= m_rcWindowMaximizedMargin.left;
+            rcMargin.top -= m_rcWindowMaximizedMargin.top;
+            rcMargin.right -= m_rcWindowMaximizedMargin.right;
+            rcMargin.bottom -= m_rcWindowMaximizedMargin.right;
+            rcMargin.Validate();
+            pXmlRoot->SetMargin(rcMargin, false);
         }
         m_rcWindowMaximizedMargin.Clear();
     }
@@ -446,33 +436,50 @@ void WindowRoot::SetWindowMaximizedMargin()
             rcFullscreenMargin.right = (int32_t)std::round(rcFullscreenMargin.right * dpi.GetPixelDensity());
             rcFullscreenMargin.bottom = (int32_t)std::round(rcFullscreenMargin.bottom * dpi.GetPixelDensity());
         }
-        bool bHasShadowBox = false;
         Box* pXmlRoot = GetXmlRoot();
-        Shadow* pShadow = GetShadow();
-        if ((pShadow != nullptr) && pShadow->HasShadowBox()) {
-            bHasShadowBox = true;
+        if ((pXmlRoot != nullptr) && !rcFullscreenMargin.IsEmpty()) {
+            UiMargin rcMargin = pXmlRoot->GetMargin();
+            rcMargin.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
+            rcMargin.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
+            rcMargin.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
+            rcMargin.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
+            rcMargin.Validate();
+            m_rcWindowMaximizedMargin = rcFullscreenMargin;
+            pXmlRoot->SetMargin(rcMargin, false);
+        }
+    }
+}
+
+void WindowRoot::CheckSystemShadowFrameBorderSize()
+{
+    Shadow* pShadow = GetShadow();
+    if (pShadow == nullptr) {
+        return;
+    }
+    int32_t nShadowFrameBorderSize = 0;
+    if (pShadow->IsShadowAttached()      &&
+        m_pWindow->IsUseSystemShadow()   &&
+        !m_pWindow->IsChildWindow()      &&
+        !m_pWindow->IsUseSystemCaption() &&
+        !m_pWindow->IsWindowMaximized()  &&
+        !m_pWindow->IsWindowMinimized()  &&
+        !m_pWindow->IsWindowFullscreen()) {
+        nShadowFrameBorderSize = m_pWindow->NativeWnd()->GetSystemShadowFrameBorderSize();
+    }
+    if (m_nSystemShadowFrameBorderSize != nShadowFrameBorderSize) {
+        Box* pXmlRoot = pShadow->GetAttachedXmlRoot();
+        if (pXmlRoot == nullptr) {
+            pXmlRoot = m_pRoot.get();
         }
         if (pXmlRoot != nullptr) {
-            if (bHasShadowBox) {
-                //有阴影Box
-                UiMargin rcMargin = pXmlRoot->GetMargin();
-                rcMargin.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
-                rcMargin.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
-                rcMargin.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
-                rcMargin.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
-                m_rcWindowMaximizedMargin = rcFullscreenMargin;
-                pXmlRoot->SetMargin(rcMargin, false);
-            }
-            else {
-                //无阴影Box
-                UiPadding rcPadding = pXmlRoot->GetPadding();
-                rcPadding.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
-                rcPadding.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
-                rcPadding.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
-                rcPadding.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
-                m_rcWindowMaximizedMargin = rcFullscreenMargin;
-                pXmlRoot->SetPadding(rcPadding, false);
-            }
+            UiMargin rcMargin = pXmlRoot->GetMargin();
+            rcMargin.left += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
+            rcMargin.top += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
+            rcMargin.right += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
+            rcMargin.bottom += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
+            rcMargin.Validate();
+            pXmlRoot->SetMargin(rcMargin, false);
+            m_nSystemShadowFrameBorderSize = nShadowFrameBorderSize;
         }
     }
 }
@@ -483,7 +490,11 @@ void WindowRoot::ProcessWindowMaximized()
         //最大化时，保存并设置全屏状态下的容器外边距
         SetWindowMaximizedMargin();
     }
+    else {
+        RestoreWindowMaximizedMargin();
+    }
     MaximizedOrRestored(true);
+    ProcessWindowResized();
 }
 
 void WindowRoot::ProcessWindowRestored()
@@ -491,11 +502,18 @@ void WindowRoot::ProcessWindowRestored()
     MaximizedOrRestored(false);
     //还原时，恢复外边距
     RestoreWindowMaximizedMargin();
+    ProcessWindowResized();
+}
+
+void WindowRoot::ProcessWindowResized()
+{
+    CheckSystemShadowFrameBorderSize();
 }
 
 void WindowRoot::ProcessWindowEnterFullscreen()
 {
     RestoreWindowMaximizedMargin();
+    ProcessWindowResized();
 }
 
 void WindowRoot::ProcessWindowExitFullscreen()
@@ -516,6 +534,7 @@ void WindowRoot::ProcessWindowExitFullscreen()
         pFullscreenBox = nullptr;
     }
     m_bControlFullscreen = false;
+    ProcessWindowResized();
 }
 
 void WindowRoot::ProcessFullscreenButtonMouseMove(const UiPoint& pt)

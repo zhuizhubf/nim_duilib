@@ -1010,6 +1010,32 @@ bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
     return SUCCEEDED(hr);
 }
 
+bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness)
+{
+    // 初始化输出值
+    outThickness = 0;
+
+    // 句柄无效直接返回
+    if (!::IsWindow(hWnd)) {
+        return false;
+    }
+
+    // 动态加载 dwmapi.dll（使用 DllManager，不重复加载）
+    HMODULE hDwm = DllManager::Instance().LoadDll(_T("dwmapi.dll"));
+    if (hDwm == nullptr) {
+        return false;
+    }
+
+    // 获取函数地址
+    typedef HRESULT(WINAPI* DWM_GET_WINDOW_ATTRIBUTE)(HWND, DWORD, PVOID, DWORD);
+    DWM_GET_WINDOW_ATTRIBUTE pDwmGetWindowAttribute = reinterpret_cast<DWM_GET_WINDOW_ATTRIBUTE>(::GetProcAddress(hDwm, "DwmGetWindowAttribute"));
+    if (pDwmGetWindowAttribute == nullptr) {
+        return false;
+    }
+    HRESULT hr = pDwmGetWindowAttribute(hWnd, DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, &outThickness, sizeof(UINT));
+    return SUCCEEDED(hr);
+}
+
 } //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

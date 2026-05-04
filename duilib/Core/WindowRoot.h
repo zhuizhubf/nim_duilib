@@ -113,37 +113,23 @@ public:
     void ExitControlFullscreen();
 
 public:
-    /** 处理窗口最大化事件
-    *  当窗口从正常状态或最小化状态切换到最大化状态时调用
-    *  主要完成以下工作:
-    *  - 如果窗口不是系统标题栏且不是全屏状态，设置最大化时的外边距
-    *  - 更新阴影的最大化/还原状态
+    /** 处理窗口最大化事件, 当窗口从正常状态或最小化状态切换到最大化状态时调用
     */
     void ProcessWindowMaximized();
 
-    /** 处理窗口还原事件
-    *  当窗口从最大化状态切换到正常状态时调用
-    *  主要完成以下工作:
-    *  - 更新阴影的最大化/还原状态
-    *  - 恢复最大化时设置的外边距
+    /** 处理窗口还原事件, 当窗口从最大化状态切换到正常状态时调用
     */
     void ProcessWindowRestored();
 
-    /** 处理窗口进入全屏状态事件
-    *  当窗口进入全屏模式时调用
-    *  主要完成以下工作:
-    *  - 恢复最大化时设置的外边距（如果有）
+    /** 处理窗口大小变化事件
+    */
+    void ProcessWindowResized();
+
+    /** 处理窗口进入全屏状态事件, 当窗口进入全屏模式时调用 
     */
     void ProcessWindowEnterFullscreen();
 
-    /** 处理窗口退出全屏状态事件
-    *  当窗口退出全屏模式时调用
-    *  主要完成以下工作:
-    *  - 如果根容器是FullscreenBox，恢复原来的根容器
-    *  - 更新控件查找器的根节点
-    *  - 退出FullscreenBox的全屏模式
-    *  - 显示原来的根容器
-    *  - 重置控件全屏状态标志
+    /** 处理窗口退出全屏状态事件, 当窗口退出全屏模式时调用
     */
     void ProcessWindowExitFullscreen();
 
@@ -289,13 +275,7 @@ public:
     void Clear();
 
 private:
-    /** 处理窗口阴影类型变化事件
-    *  当窗口阴影类型发生改变时被调用
-    *  主要完成以下工作:
-    *  - 如果尚未绑定根容器，直接返回
-    *  - 如果处于控件全屏状态或根容器是FullscreenBox类型，不处理
-    *  - 如果启用了阴影附加且尚未创建阴影Box，创建并附加阴影
-    *  - 如果禁用了阴影附加且存在阴影Box，不处理
+    /** 处理窗口阴影类型变化事件, 当窗口阴影类型发生改变时被调用
     */
     void ProcessWindowShadowTypeChanged();
 
@@ -327,6 +307,10 @@ private:
     */
     void ClearShadow();
 
+    /** 更新系统阴影的边框对应的外边距，避免内容被遮盖
+    */
+    void CheckSystemShadowFrameBorderSize();
+
 private:
     /** 关联的窗口指针
     */
@@ -357,6 +341,10 @@ private:
     *  用于快速查找控件
     */
     ControlFinder* m_pControlFinder;
+
+    /** 系统阴影的边框对应的外边距(已经附加到Xml Root)，避免内容被遮盖
+    */
+    int32_t m_nSystemShadowFrameBorderSize;
 };
 
 } // namespace ui

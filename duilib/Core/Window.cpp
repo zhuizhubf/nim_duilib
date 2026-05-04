@@ -960,6 +960,10 @@ LRESULT Window::OnSizeMsg(WindowSizeType sizeType, const UiSize& /*newWindowSize
         //还原
         m_windowRoot->ProcessWindowRestored();
     }
+    else {
+        //大小变化
+        m_windowRoot->ProcessWindowResized();
+    }
     if (m_pFocus != nullptr) {        
         EventArgs msgData;
         msgData.eventData = (int32_t)sizeType;

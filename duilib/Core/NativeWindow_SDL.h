@@ -623,6 +623,10 @@ public:
     */
     NativeWindowShadowType GetSystemShadowType() const;
 
+    /** 获取系统阴影的边框线条宽度（视觉边线）
+    */
+    int32_t GetSystemShadowFrameBorderSize() const;
+
 public:
     //几组支持高分屏的API接口
     bool GetWindowSize(int32_t* w, int32_t* h) const;

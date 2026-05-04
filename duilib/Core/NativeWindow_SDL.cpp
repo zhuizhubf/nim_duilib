@@ -3304,9 +3304,23 @@ bool NativeWindow_SDL::SetSystemShadowType(NativeWindowShadowType nativeShadowTy
     return false;
 }
 
-NativeWindowShadowType NativeWindow_Windows::GetSystemShadowType() const
+NativeWindowShadowType NativeWindow_SDL::GetSystemShadowType() const
 {
     return m_systemShadowType;
+}
+
+int32_t NativeWindow_SDL::GetSystemShadowFrameBorderSize() const
+{
+    if (IsChildWindow() || !IsSystemShadowEnabled() || IsUseSystemCaption()) {
+        return 0;
+    }
+#if defined DUILIB_BUILD_FOR_WIN
+    UINT outThickness = 0;
+    GetDwmVisibleFrameBorderThickness(m_hWnd, outThickness);
+    return (int32_t)outThickness;
+#else
+    return 0;
+#endif    
 }
 
 bool NativeWindow_SDL::KillWindowFocus()
