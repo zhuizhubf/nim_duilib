@@ -793,6 +793,7 @@ void Window::SetShadowAttached(bool bShadowAttached)
     }
     m_bWindowShadowInited = true;
     m_windowRoot->SetShadowAttached(bShadowAttached);
+    UpdateWindowRGN(false); //处理RGN
     OnWindowShadowTypeChanged();
 }
 
@@ -804,6 +805,7 @@ void Window::SetShadowType(ShadowType nShadowType)
     }
     m_bWindowShadowInited = true;
     m_windowRoot->SetShadowType(nShadowType);
+    UpdateWindowRGN(false); //处理RGN
     OnWindowShadowTypeChanged();
 }
 

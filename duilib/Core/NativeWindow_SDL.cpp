@@ -2327,7 +2327,12 @@ bool NativeWindow_SDL::EnterFullscreen()
         //需要去掉可调整窗口大小的属性
         SDL_SetWindowResizable(m_sdlWindow, false);
     }
-    
+#if defined (DUILIB_BUILD_FOR_WIN)
+    //全屏时，必须禁用系统阴影，否则内容显示不全
+    if (IsSystemShadowEnabled()) {
+        ModifyDwmStyle(GetHWND(), NativeWindowShadowType::kShadowSystemDisabled);
+    }
+#endif
     m_pOwner->OnNativeWindowEnterFullscreen();
     return true;
 }
@@ -2362,6 +2367,12 @@ bool NativeWindow_SDL::ExitFullscreen()
         //如果窗口最大化，先还原，再进入全屏（因部分平台在最大化进入全屏后，退出全面时逻辑异常），退出全屏时再重新最大化
         SDL_MaximizeWindow(m_sdlWindow);
     }
+
+#if defined (DUILIB_BUILD_FOR_WIN)
+    if (IsSystemShadowEnabled()) {
+        ModifyDwmStyle(GetHWND(), m_systemShadowType);
+    }
+#endif
     m_pOwner->OnNativeWindowExitFullscreen();
     return true;
 }
@@ -3296,6 +3307,7 @@ bool NativeWindow_SDL::SetSystemShadowType(NativeWindowShadowType nativeShadowTy
 #if defined DUILIB_BUILD_FOR_WIN
     if (ModifyDwmStyle(GetHWND(), nativeShadowType)) {
         m_systemShadowType = nativeShadowType;
+        //启用系统阴影时，必须清除RGN，否则显示不正确(由调用方负责处理)
         return true;
     }
 #elif defined DUILIB_BUILD_FOR_MACOS
@@ -3316,7 +3328,7 @@ int32_t NativeWindow_SDL::GetSystemShadowFrameBorderSize() const
     }
 #if defined DUILIB_BUILD_FOR_WIN
     UINT outThickness = 0;
-    GetDwmVisibleFrameBorderThickness(m_hWnd, outThickness);
+    GetDwmVisibleFrameBorderThickness(GetHWND(), outThickness);
     return (int32_t)outThickness;
 #else
     return 0;
@@ -3415,92 +3427,3 @@ bool NativeWindow_SDL::IsEnableSysMenu() const
 } // namespace ui
 
 #endif //DUILIB_BUILD_FOR_SDL
-
-//
-//LRESULT NativeWindow_SDL::ProcessWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
-//{
-//    LRESULT lResult = 0;
-//    bHandled = false;
-//    switch (uMsg)
-//    {
-//
-//    case WM_IME_STARTCOMPOSITION://不支持
-//    {
-//        lResult = m_pOwner->OnNativeImeStartCompositionMsg(NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    case WM_IME_ENDCOMPOSITION://不支持
-//    {
-//        lResult = m_pOwner->OnNativeImeEndCompositionMsg(NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    case WM_SETCURSOR://不支持（需要处理）
-//    {
-//        if (LOWORD(lParam) == HTCLIENT) {
-//            //只处理设置客户区的光标
-//            lResult = m_pOwner->OnNativeSetCursorMsg(NativeMsg(uMsg, wParam, lParam), bHandled);
-//        }
-//        break;
-//    }
-//    case WM_CONTEXTMENU://不支持
-//    {
-//        UiPoint pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-//        if ((pt.x != -1) && (pt.y != -1)) {
-//            ScreenToClient(pt);
-//        }
-//        lResult = m_pOwner->OnNativeContextMenuMsg(pt, NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    case WM_CHAR:
-//    {
-//        VirtualKeyCode vkCode = static_cast<VirtualKeyCode>(wParam);
-//        uint32_t modifierKey = 0;
-//        GetModifiers(uMsg, wParam, lParam, modifierKey);
-//        lResult = m_pOwner->OnNativeCharMsg(vkCode, modifierKey, NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    case WM_HOTKEY://不支持
-//    {
-//        int32_t hotkeyId = (int32_t)wParam;
-//        VirtualKeyCode vkCode = static_cast<VirtualKeyCode>((int32_t)(int16_t)HIWORD(lParam));
-//        uint32_t modifierKey = 0;
-//        GetModifiers(uMsg, wParam, lParam, modifierKey);
-//        lResult = m_pOwner->OnNativeHotKeyMsg(hotkeyId, vkCode, modifierKey, NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    case WM_MOUSEHOVER://不支持
-//    {
-//        UiPoint pt;
-//        pt.x = GET_X_LPARAM(lParam);
-//        pt.y = GET_Y_LPARAM(lParam);
-//        uint32_t modifierKey = 0;
-//        GetModifiers(uMsg, wParam, lParam, modifierKey);
-//        lResult = m_pOwner->OnNativeMouseHoverMsg(pt, modifierKey, NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//
-//    case WM_CAPTURECHANGED://不支持
-//    {
-//        lResult = m_pOwner->OnNativeCaptureChangedMsg(NativeMsg(uMsg, wParam, lParam), bHandled);
-//        break;
-//    }
-//    default:
-//        break;
-//    }//end of switch
-//    return lResult;
-//}
-
-
-//SDL源码：
-//if (style & WS_POPUP) {
-//    window->flags |= SDL_WINDOW_BORDERLESS;
-//}
-//else {
-//    window->flags &= ~SDL_WINDOW_BORDERLESS;
-//}
-//if (style & WS_THICKFRAME) {
-//    window->flags |= SDL_WINDOW_RESIZABLE;
-//}
-//else {
-//    window->flags &= ~SDL_WINDOW_RESIZABLE;
-//}

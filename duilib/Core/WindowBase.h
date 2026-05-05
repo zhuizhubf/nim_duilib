@@ -1315,6 +1315,11 @@ protected:
     */
     void ClearWindowBase();
 
+    /** 窗口大小变化，处理内部业务（设置RGN）
+    * @param [in] bRedraw 是否重绘
+    */
+    void UpdateWindowRGN(bool bRedraw);
+
     /** 主动发起一个消息(kWindowMsgBegin - kWindowMsgEnd), 发送给该窗口的事件回调管理器中注册的消息处理函数
     * @param [in] eventType 转化后的消息体
     * @param [in] wParam 消息附加参数
@@ -1331,11 +1336,6 @@ private:
     /** 初始化窗口数据（内部函数，子类重写后，必须调用基类函数，否则影响功能）
     */
     void InitWindowBase();
-
-    /** 窗口大小变化，处理内部业务（设置RGN）
-    * @param [in] bRedraw 是否重绘
-    */
-    void OnWindowSized(bool bRedraw);
 
 private:
     //来自实现窗口的事件
@@ -1456,8 +1456,8 @@ private:
     //界面是否完成首次显示
     bool m_bWindowFirstShown;
 
-    //窗口大小变化事件是否触发
-    bool m_bWindowSized;
+    //窗口RGN是否已经更新
+    bool m_bWindowRgnUpdated;
 
     //窗口的状态
     WindowSizeState m_windowSizeState;

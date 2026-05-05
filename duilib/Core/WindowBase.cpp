@@ -11,7 +11,7 @@ WindowBase::WindowBase():
     m_pParentWindow(nullptr), 
     m_pNativeWindow(nullptr),
     m_bWindowFirstShown(false),
-    m_bWindowSized(false),
+    m_bWindowRgnUpdated(false),
     m_windowSizeState(WindowSizeState::kUnknown),
     m_bSendDragEnterMsg(false)
 {
@@ -905,9 +905,9 @@ DString WindowBase::GetWindowRenderName() const
 }
 #endif
 
-void WindowBase::OnWindowSized(bool bRedraw)
+void WindowBase::UpdateWindowRGN(bool bRedraw)
 {
-    m_bWindowSized = true;
+    m_bWindowRgnUpdated = true;
     //此函数的主要功能：设置窗口的RGN，从而实现窗口的圆角或者直角功能
     if (!NeedSetWindowRgnOnWindowResized()) {
         //不支持，立即返回
@@ -1108,7 +1108,7 @@ LRESULT WindowBase::OnNativeWindowPosChangedMsg(const NativeMsg& nativeMsg, bool
 LRESULT WindowBase::OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWindowSize, const NativeMsg& nativeMsg, bool& bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
-    OnWindowSized(true);
+    UpdateWindowRGN(true);
     LRESULT lResult = OnSizeMsg(sizeType, newWindowSize, nativeMsg, bHandled);
     if (windowFlag.expired()) {
         return lResult;
@@ -1190,9 +1190,9 @@ LRESULT WindowBase::OnNativePaintMsg(const UiRect& rcPaint, const NativeMsg& nat
         }
 
         //如果未触发窗口大小变化，则触发一次(设置RGN等)
-        if (!m_bWindowSized) {
-            m_bWindowSized = true;
-            OnWindowSized(false);
+        if (!m_bWindowRgnUpdated) {
+            m_bWindowRgnUpdated = true;
+            UpdateWindowRGN(false);
         }
     }
     return lResult;

@@ -556,7 +556,14 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
             ASSERT(createAttributes.m_bIsLayeredWindow);
         }
     }
+#endif
 
+#if defined (DUILIB_BUILD_FOR_SDL)
+    //默认开启支持透明度(SDL在Windows系统中，未使用分层窗口属性)
+    if (!createAttributes.m_bIsLayeredWindowDefined) {
+        createAttributes.m_bIsLayeredWindowDefined = true;
+        createAttributes.m_bIsLayeredWindow = true;
+    }
 #endif
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)

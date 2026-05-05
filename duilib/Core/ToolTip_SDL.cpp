@@ -211,7 +211,7 @@ void ToolTip::TImpl::ShowToolTip(WindowBase* pParentWnd,
     WindowBuilder windowBuilder;
     if (windowBuilder.ParseXmlFile(xmlPath)) {
         WindowCreateAttributes createAttributes;
-        if (windowBuilder.ParseWindowCreateAttributes(m_pTooltipWnd, createAttributes)) {
+        if (windowBuilder.ParseWindowCreateAttributes(m_pTooltipWnd.get(), createAttributes)) {
             rcShadowCorner = createAttributes.m_rcShadowCorner;
         }
     }

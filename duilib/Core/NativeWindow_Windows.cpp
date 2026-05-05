@@ -3364,10 +3364,7 @@ bool NativeWindow_Windows::SetSystemShadowType(NativeWindowShadowType nativeShad
     }
     if (ModifyDwmStyle(m_hWnd, nativeShadowType)) {
         m_systemShadowType = nativeShadowType;
-        if (IsSystemShadowEnabled()) {
-            //启用系统阴影时，必须清除RGN，否则显示不正确
-            ClearWindowRgn(true);
-        }
+        //启用系统阴影时，必须清除RGN，否则显示不正确(由调用方负责处理)
         return true;
     }
     return false;

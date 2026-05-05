@@ -324,7 +324,10 @@ void Shadow::OnShadowAttached(ShadowType nShadowType)
             else if (nShadowType == ShadowType::kShadowSystemSmallRound) {
                 nativeShadowType = NativeWindowShadowType::kShadowSystemSmallRound;
             }
-            m_pWindow->NativeWnd()->SetSystemShadowType(nativeShadowType);
+            if (m_pWindow->NativeWnd()->SetSystemShadowType(nativeShadowType)) {
+                //启用系统阴影时，必须清除RGN，否则显示不正确(由调用方负责处理)
+                m_pWindow->NativeWnd()->ClearWindowRgn(true);
+            }
         }
         else {
             m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDisabled);
@@ -544,11 +547,13 @@ ShadowType Shadow::GetSupportedShadowType(const Window* pWindow, ShadowType nSha
     else {
         if ((nShadowType == ShadowType::kShadowSystemDefault) ||
             (nShadowType == ShadowType::kShadowSystemDoNotRound)) {
-            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
+            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态(SDL实现在Windows平台未使用分层窗口属性)
+#ifndef DUILIB_BUILD_FOR_SDL
             ASSERT(!pWindow->IsLayeredWindow());
             if (pWindow->IsLayeredWindow()) {
                 nShadowType = ShadowType::kShadowSystemRound;
             }
+#endif
         }
     }
     return nShadowType;
