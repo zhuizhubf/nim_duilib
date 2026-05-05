@@ -544,18 +544,18 @@ ShadowType Shadow::GetSupportedShadowType(const Window* pWindow, ShadowType nSha
             nShadowType = ShadowType::kShadowSmallRound;
         }
     }
-    else {
-        if ((nShadowType == ShadowType::kShadowSystemDefault) ||
-            (nShadowType == ShadowType::kShadowSystemDoNotRound)) {
-            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态(SDL实现在Windows平台未使用分层窗口属性)
-#ifndef DUILIB_BUILD_FOR_SDL
-            ASSERT(!pWindow->IsLayeredWindow());
-            if (pWindow->IsLayeredWindow()) {
-                nShadowType = ShadowType::kShadowSystemRound;
-            }
-#endif
-        }
-    }
+//    else {
+//        if ((nShadowType == ShadowType::kShadowSystemDefault) ||
+//            (nShadowType == ShadowType::kShadowSystemDoNotRound)) {
+//            //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态(SDL实现在Windows平台未使用分层窗口属性)
+//#ifndef DUILIB_BUILD_FOR_SDL
+//            ASSERT(!pWindow->IsLayeredWindow());
+//            if (pWindow->IsLayeredWindow()) {
+//                nShadowType = ShadowType::kShadowSystemRound;
+//            }
+//#endif
+//        }
+//    }
     return nShadowType;
 }
 
@@ -576,10 +576,18 @@ bool Shadow::IsShadowTypeNeedLayeredWindow(ShadowType nShadowType)
     if (IsSystemShadowType(nShadowType)) {
         return false;
     }
-    if ((nShadowType == ShadowType::kShadowNone) || (nShadowType == ShadowType::kShadowNoneRound)) {
+    if (nShadowType == ShadowType::kShadowNone) {
         return false;
     }
     return true;
+}
+
+bool Shadow::IsShadowTypeNeedWindowRGN(ShadowType nShadowType)
+{
+    if (nShadowType == ShadowType::kShadowNone) {
+        return true;
+    }
+    return false;
 }
 
 bool Shadow::GetShadowParam(const Window* pWindow,

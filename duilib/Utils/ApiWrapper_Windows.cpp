@@ -1036,6 +1036,35 @@ bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness)
     return SUCCEEDED(hr);
 }
 
+bool SetDwmEnableBlurBehindWindow(HWND hWnd, bool bEnable)
+{
+    // 句柄无效直接返回
+    if (!::IsWindow(hWnd)) {
+        return false;
+    }
+
+    // 动态加载 dwmapi.dll（使用 DllManager，不重复加载）
+    HMODULE hDwm = DllManager::Instance().LoadDll(_T("dwmapi.dll"));
+    if (hDwm == nullptr) {
+        return false;
+    }
+    typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND hWnd, const DWM_BLURBEHIND* pBlurBehind);
+    DWM_ENABLE_BLUR_BEHIND_WINDOW pDwmEnableBlurBehindWindow = reinterpret_cast<DWM_ENABLE_BLUR_BEHIND_WINDOW>(::GetProcAddress(hDwm, "DwmEnableBlurBehindWindow"));
+    if (pDwmEnableBlurBehindWindow == nullptr) {
+        return false;
+    }
+
+    HRGN rgn = CreateRectRgn(-1, -1, 0, 0);
+    DWM_BLURBEHIND bb;
+    bb.dwFlags = (DWM_BB_ENABLE | DWM_BB_BLURREGION);
+    bb.fEnable = bEnable ? TRUE : FALSE;
+    bb.hRgnBlur = rgn;
+    bb.fTransitionOnMaximized = FALSE;
+    HRESULT hr = pDwmEnableBlurBehindWindow(hWnd, &bb);
+    DeleteObject(rgn);
+    return SUCCEEDED(hr);
+}
+
 } //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

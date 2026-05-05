@@ -949,10 +949,15 @@ protected:
     virtual Control* OnFindControl(const UiPoint& pt) const = 0;
 
 protected:
-    /** 在窗口大小改变时，是否自动设置窗口形状（Windows平台是指设置窗口的RGN）
+    /** 是否自动设置窗口形状（Windows平台是指设置窗口的RGN）
     *   默认情况下，子窗口不自动设置，顶层窗口自动设置
     */
-    virtual bool NeedSetWindowRgnOnWindowResized();
+    virtual bool NeedSetWindowRgn();
+
+    /** 根据当前窗口的阴影支持情况，设置窗口的RGN
+    * @param [in] bRedraw 是否重绘
+    */
+    virtual void UpdateWindowRGN(bool bRedraw);
 
     /** 设置窗口的形状为圆角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
@@ -972,6 +977,10 @@ protected:
     * @param [in] bRedraw 是否重绘
     */
     virtual void ClearWindowRgn(bool bRedraw);
+
+    /** 获取设置窗口RGN的圆角值, 默认为窗口的圆角值，如果窗口未设置圆角值，则获取阴影的圆角值
+    */
+    virtual UiSize GetWindowRgnRoundCorner() const;
 
 protected:
     /** @name 窗口消息处理相关
@@ -1315,11 +1324,6 @@ protected:
     */
     void ClearWindowBase();
 
-    /** 窗口大小变化，处理内部业务（设置RGN）
-    * @param [in] bRedraw 是否重绘
-    */
-    void UpdateWindowRGN(bool bRedraw);
-
     /** 主动发起一个消息(kWindowMsgBegin - kWindowMsgEnd), 发送给该窗口的事件回调管理器中注册的消息处理函数
     * @param [in] eventType 转化后的消息体
     * @param [in] wParam 消息附加参数
@@ -1456,8 +1460,11 @@ private:
     //界面是否完成首次显示
     bool m_bWindowFirstShown;
 
-    //窗口RGN是否已经更新
+    //窗口RGN是否已经更新(窗口第一次创建后，必须有一次设置，否则可能显示异常)
     bool m_bWindowRgnUpdated;
+
+    //当前是否已经设置窗口的RGN: true表示已经设置，false表示未设置
+    bool m_bWindowRgnSetFlag;
 
     //窗口的状态
     WindowSizeState m_windowSizeState;

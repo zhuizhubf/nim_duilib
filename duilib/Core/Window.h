@@ -588,6 +588,20 @@ protected:
     */
     virtual void GetCreateWindowAttributes(WindowCreateAttributes& createAttributes) override;
 
+    /** 是否自动设置窗口形状（Windows平台是指设置窗口的RGN）
+    *   默认情况下，子窗口不自动设置，顶层窗口自动设置
+    */
+    virtual bool NeedSetWindowRgn() override;
+
+    /** 获取设置窗口RGN的圆角值, 默认为窗口的圆角值，如果窗口未设置圆角值，则获取阴影的圆角值
+    */
+    virtual UiSize GetWindowRgnRoundCorner() const override;
+
+    /** 根据当前窗口的阴影支持情况，设置窗口的分层窗口属性（仅Windows平台，对应WS_EX_LAYERED属性，使用SDL时不需要）
+    * @param [in] bRedraw 是否重绘
+    */
+    virtual void UpdateLayeredWindowStyleEx(bool bRedraw);
+
     /** @name 窗口消息处理相关
         * @{
     */

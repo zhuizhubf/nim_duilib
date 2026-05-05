@@ -780,6 +780,39 @@ bool Window::IsPtInMaximizeRestoreButton(const UiPoint& /*pt*/) const
     return false;
 }
 
+bool Window::NeedSetWindowRgn()
+{
+    if (!WindowBase::NeedSetWindowRgn()) {
+        return false;
+    }
+    if (IsShadowAttached()) {
+        ShadowType shadowType = GetShadowType();
+        if (Shadow::IsShadowTypeNeedWindowRGN(shadowType)) {
+            return true;//需要设置RGN
+        }
+    }
+    return false;
+}
+
+UiSize Window::GetWindowRgnRoundCorner() const
+{
+    return WindowBase::GetWindowRgnRoundCorner();
+}
+
+void Window::UpdateLayeredWindowStyleEx(bool bRedraw)
+{
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    bool bNeedLayeredWindow = false;
+    if (IsShadowAttached()) {
+        ShadowType shadowType = GetShadowType();
+        bNeedLayeredWindow = Shadow::IsShadowTypeNeedLayeredWindow(shadowType);
+    }
+    if (IsLayeredWindow() != bNeedLayeredWindow) {
+        SetLayeredWindow(bNeedLayeredWindow, bRedraw);
+    }
+#endif
+}
+
 Box* Window::AttachShadow(Box* pRoot)
 {
     return m_windowRoot->AttachShadow(pRoot);
@@ -793,7 +826,8 @@ void Window::SetShadowAttached(bool bShadowAttached)
     }
     m_bWindowShadowInited = true;
     m_windowRoot->SetShadowAttached(bShadowAttached);
-    UpdateWindowRGN(false); //处理RGN
+    UpdateWindowRGN(true); //处理RGN
+    UpdateLayeredWindowStyleEx(true); //更新窗口的分层窗口属性
     OnWindowShadowTypeChanged();
 }
 
@@ -805,7 +839,8 @@ void Window::SetShadowType(ShadowType nShadowType)
     }
     m_bWindowShadowInited = true;
     m_windowRoot->SetShadowType(nShadowType);
-    UpdateWindowRGN(false); //处理RGN
+    UpdateWindowRGN(true); //处理RGN
+    UpdateLayeredWindowStyleEx(true); //更新窗口的分层窗口属性
     OnWindowShadowTypeChanged();
 }
 

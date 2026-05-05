@@ -80,6 +80,10 @@ namespace ui
      * @return 成功返回 true，失败返回 false
      */
     bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness);
+
+    /** DWM设置是是否支持透明属性
+    */
+    bool SetDwmEnableBlurBehindWindow(HWND hWnd, bool bEnable);
 }
 
 #endif //DUILIB_BUILD_FOR_WIN

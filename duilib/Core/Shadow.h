@@ -56,6 +56,10 @@ public:
     */
     static bool IsShadowTypeNeedLayeredWindow(ShadowType nShadowType);
 
+    /** 该阴影类型是否需要设置窗口的RGN（避免窗口的圆角影响阴影效果）
+    */
+    static bool IsShadowTypeNeedWindowRGN(ShadowType nShadowType);
+
     /** 获取默认的阴影类型对应的参数
     * @param [in,out] nShadowType 阴影类型
     * @param [out] szBorderRound 返回圆角大小，未经DPI缩放

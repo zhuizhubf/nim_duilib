@@ -3357,11 +3357,11 @@ bool NativeWindow_Windows::SetSystemShadowType(NativeWindowShadowType nativeShad
     if (IsChildWindow()) {
         return false;
     }
-    if ((nativeShadowType == NativeWindowShadowType::kShadowSystemDefault) ||
-        (nativeShadowType == NativeWindowShadowType::kShadowSystemDoNotRound)) {
-        //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
-        ASSERT(!IsLayeredWindow());
-    }
+    //if ((nativeShadowType == NativeWindowShadowType::kShadowSystemDefault) ||
+    //    (nativeShadowType == NativeWindowShadowType::kShadowSystemDoNotRound)) {
+    //    //这两个值时，窗口不能是分层窗口，否则会变成无阴影的状态
+    //    ASSERT(!IsLayeredWindow());
+    //}
     if (ModifyDwmStyle(m_hWnd, nativeShadowType)) {
         m_systemShadowType = nativeShadowType;
         //启用系统阴影时，必须清除RGN，否则显示不正确(由调用方负责处理)
