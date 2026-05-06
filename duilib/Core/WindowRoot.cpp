@@ -167,9 +167,15 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
 
 void WindowRoot::SetShadowAttached(bool bShadowAttached)
 {
-    ASSERT(!IsControlFullscreen());
+    ASSERT(!IsControlFullscreen());    
     if (IsControlFullscreen()) {
         return;
+    }
+    if (bShadowAttached) {
+        ASSERT(!m_pWindow->IsUseSystemCaption());
+        if (m_pWindow->IsUseSystemCaption()) {
+            return;
+        }
     }
     Shadow* pShadow = GetShadow();
     if (pShadow != nullptr) {

@@ -270,8 +270,10 @@ void Shadow::SetShadowType(ShadowType nShadowType)
     }
     m_nShadowType = GetSupportedShadowType(m_pWindow, nShadowType);
 
-    //开启阴影
-    m_bShadowAttached = true;
+    if (!m_pWindow->IsUseSystemCaption()) {
+        //如果未启用系统标题栏，则自动开启阴影
+        m_bShadowAttached = true;
+    }    
     OnShadowAttached(GetShadowType());
 }
 

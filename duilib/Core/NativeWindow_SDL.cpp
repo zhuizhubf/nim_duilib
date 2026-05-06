@@ -879,6 +879,7 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
     pSdlWindow = SDL_CreateWindowWithProperties(props);
 #endif
 
+    ASSERT(SDL_GetWindowProperties(pSdlWindow) != props);
     SDL_DestroyProperties(props);
 
     if (pSdlWindow != nullptr) {
@@ -1045,10 +1046,13 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
         ASSERT(ret != 0 || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
 
         //在模块退出时，注销该ATOM
-        GlobalManager::Instance().AddAtExitFunction([className, hModule]() {
-            ::UnregisterClassW(className.c_str(), hModule);
-            });
-
+        static bool bAddAtExitFunction = false;
+        if (!bAddAtExitFunction) {
+            bAddAtExitFunction = true;
+            GlobalManager::Instance().AddAtExitFunction([className, hModule]() {
+                ::UnregisterClass(className.c_str(), hModule);
+                });
+        }
         // 创建Windows子窗口（WS_CHILD样式）
         hChild = ::CreateWindowEx( 0,
                                    className.c_str(),
@@ -1069,6 +1073,7 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
 
     m_bChildWindow = true;
     m_sdlWindow = SDL_CreateWindowWithProperties(props);
+    ASSERT(SDL_GetWindowProperties(m_sdlWindow) != props);
     SDL_DestroyProperties(props);
 
     if (m_sdlWindow != nullptr) {
@@ -1080,6 +1085,12 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
             m_sdlWindow = nullptr;
             return false;
         }
+        ASSERT(SDL_GetRenderer(m_sdlWindow) == m_sdlRenderer);
+#ifdef DUILIB_BUILD_FOR_WIN
+        SDL_PropertiesID childPropID = SDL_GetWindowProperties(m_sdlWindow);
+        ASSERT((HWND)SDL_GetPointerProperty(childPropID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr) == hChild);
+        UNUSED_VARIABLE(childPropID);
+#endif
 
         SDL_WindowID id = SDL_GetWindowID(m_sdlWindow);
         SetWindowFromID(id, this);
