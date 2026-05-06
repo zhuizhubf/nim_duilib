@@ -71,7 +71,12 @@ namespace ui
     //判断是否为Windows 11的函数
     bool UiIsWindows11OrGreater();
 
-    // 设置系统的窗口阴影属性
+    /** 判断DWM服务是否可用
+    */
+    bool IsDwmCompositionEnabled();
+
+    /** 设置系统的窗口阴影属性，以支持系统阴影
+    */
     bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType);
 
     /* 获取窗口 DWM 可见边框厚度

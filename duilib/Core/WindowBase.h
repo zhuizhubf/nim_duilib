@@ -801,6 +801,12 @@ public:
     */
     void AttachWindowDisplayResolutionChangedMsg(const EventCallback& callback, EventCallbackID callbackID = 0);
 
+    /** 监听DWM服务状态发生变化事件
+    * @param [in] callback 指定的回调函数，wParam为1表示DWM服务开启，为0表示DWM服务关闭
+    * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
+    */
+    void AttachWindowDwmCompositionChangedMsg(const EventCallback& callback, EventCallbackID callbackID = 0);
+
     /** 监听窗口窗口的语言切换事件（支持多国语言版）
     * @param [in] callback 指定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
@@ -1312,6 +1318,11 @@ protected:
     */
     virtual void OnDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity) = 0;
 
+    /** 处理DWM服务变化的系统通知消息(WM_DWMCOMPOSITIONCHANGED)
+    * @param [in] bDwmCompositionEnabled true表示DWM服务开启，false表示DWM服务关闭
+    */
+    virtual void OnDwmCompositionChangedMsg(bool bDwmCompositionEnabled) = 0;
+
     /** @}*/
 
 protected:
@@ -1373,6 +1384,7 @@ private:
     virtual void    OnNativeDisplayResolutionChangedMsg(int32_t nColorDepth, int32_t nScreenWidth, int32_t nScreenHeight) override final;
     virtual void    OnNativeProcessDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity) override final;
     virtual void    OnNativeDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity) override final;
+    virtual void    OnNativeDwmCompositionChangedMsg(bool bDwmCompositionEnabled) override final;
     virtual void    OnNativeCreateWndMsg(bool bDoModal, const NativeMsg& nativeMsg, bool& bHandled) override final;
     virtual LRESULT OnNativeWindowPosChangedMsg(const NativeMsg& nativeMsg, bool& bHandled) override final;
     virtual LRESULT OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWindowSize, const NativeMsg& nativeMsg, bool& bHandled) override final;

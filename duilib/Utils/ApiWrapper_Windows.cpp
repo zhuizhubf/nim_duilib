@@ -949,6 +949,23 @@ bool UiIsWindows11OrGreater()
     return ::VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
 }
 
+bool IsDwmCompositionEnabled()
+{
+    HMODULE hDwm = DllManager::Instance().LoadDll(_T("dwmapi.dll"));
+    if (hDwm == nullptr) {
+        return false;
+    }
+    BOOL bEnabled = FALSE;
+    if (hDwm) {
+        typedef HRESULT(WINAPI* LPDWMISCOMPOSITIONENABLED)(BOOL*);
+        LPDWMISCOMPOSITIONENABLED pfn = (LPDWMISCOMPOSITIONENABLED)GetProcAddress(hDwm, "DwmIsCompositionEnabled");
+        if (pfn) {
+            pfn(&bEnabled);
+        }
+    }
+    return (bEnabled == TRUE);
+}
+
 // 动态加载并初始化 DWM 样式（以支持系统的窗口阴影）
 bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
 {

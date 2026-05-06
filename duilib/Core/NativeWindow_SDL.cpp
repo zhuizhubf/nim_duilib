@@ -3303,7 +3303,7 @@ void NativeWindow_SDL::OnDropLeave()
 bool NativeWindow_SDL::IsSystemShadowSupported() const
 {
 #if defined DUILIB_BUILD_FOR_WIN || defined DUILIB_BUILD_FOR_MACOS
-    return true;
+    return IsDwmCompositionEnabled();
 #else
     return false;
 #endif

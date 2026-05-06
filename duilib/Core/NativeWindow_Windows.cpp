@@ -2085,6 +2085,7 @@ LRESULT NativeWindow_Windows::ProcessInternalMessage(UINT uMsg, WPARAM wParam, L
     case WM_ERASEBKGND:         lResult = OnEraseBkGndMsg(uMsg, wParam, lParam, bHandled); break;
     case WM_DISPLAYCHANGE:      lResult = OnDisplayChangedMsg(uMsg, wParam, lParam, bHandled); break;
     case WM_DPICHANGED:         lResult = OnDpiChangedMsg(uMsg, wParam, lParam, bHandled); break;
+    case WM_DWMCOMPOSITIONCHANGED: lResult = OnDwmCompositionChangedMsg(uMsg, wParam, lParam, bHandled); break;
     case WM_WINDOWPOSCHANGING:  lResult = OnWindowPosChangingMsg(uMsg, wParam, lParam, bHandled); break;
 
     case WM_NOTIFY:             lResult = OnNotifyMsg(uMsg, wParam, lParam, bHandled); break;
@@ -2448,6 +2449,14 @@ LRESULT NativeWindow_Windows::OnDpiChangedMsg(UINT uMsg, WPARAM wParam, LPARAM l
             m_pOwner->OnNativeDisplayScaleChangedMsg(fRealDisplayScale, fNewPixelDensity);
         }
     }
+    return 0;
+}
+
+LRESULT NativeWindow_Windows::OnDwmCompositionChangedMsg(UINT uMsg, WPARAM /*wParam*/, LPARAM /*lParam*/, bool& /*bHandled*/)
+{
+    ASSERT_UNUSED_VARIABLE(uMsg == WM_DWMCOMPOSITIONCHANGED);
+    bool bDwmCompositionEnabled = IsDwmCompositionEnabled();
+    m_pOwner->OnNativeDwmCompositionChangedMsg(bDwmCompositionEnabled);
     return 0;
 }
 
@@ -3346,7 +3355,7 @@ HRESULT NativeWindow_Windows::OnDrop(IDataObject* pDataObj, DWORD grfKeyState, P
 
 bool NativeWindow_Windows::IsSystemShadowSupported() const
 {
-    return true;
+    return IsDwmCompositionEnabled();
 }
 
 bool NativeWindow_Windows::IsSystemShadowEnabled() const

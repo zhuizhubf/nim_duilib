@@ -145,6 +145,11 @@ public:
     */
     virtual void OnNativeDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity) = 0;
 
+    /** 处理DWM服务变化的系统通知消息(WM_DWMCOMPOSITIONCHANGED)
+    * @param [in] bDwmCompositionEnabled true表示DWM服务开启，false表示DWM服务关闭
+    */
+    virtual void OnNativeDwmCompositionChangedMsg(bool bDwmCompositionEnabled) = 0;
+
     /** 窗口创建成功的事件(WM_CREATE/WM_INITDIALOG)
     * @param [in] bDoModal 当前是否为通过DoModal函数显示的模态对话框
     * @param [in] nativeMsg 从系统接收到的原始消息内容

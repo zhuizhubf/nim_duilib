@@ -2489,6 +2489,18 @@ void Window::OnDisplayScaleChangedMsg(float /*fNewDisplayScale*/, float /*fNewPi
 {
 }
 
+void Window::OnDwmCompositionChangedMsg(bool bDwmCompositionEnabled)
+{
+    if (!bDwmCompositionEnabled && IsShadowAttached()) {
+        //关闭DWM后（仅Window 7能关闭，Win 8 开始已经无法关闭DWM服务）
+        ShadowType shadowType = GetShadowType();
+        if (Shadow::IsSystemShadowType(shadowType)) {
+            //自动切换到可用的阴影类型
+            SetShadowType(ShadowType::kShadowNone);
+        }
+    }
+}
+
 void Window::NotifyLanguageChanged()
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();

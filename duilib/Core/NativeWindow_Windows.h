@@ -594,6 +594,7 @@ private:
     LRESULT OnEraseBkGndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
     LRESULT OnDisplayChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
     LRESULT OnDpiChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnDwmCompositionChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
     LRESULT OnWindowPosChangingMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
 
     LRESULT OnNotifyMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);

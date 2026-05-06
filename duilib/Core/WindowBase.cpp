@@ -1099,6 +1099,15 @@ void WindowBase::OnNativeDisplayScaleChangedMsg(float fNewDisplayScale, float fN
     }
 }
 
+void WindowBase::OnNativeDwmCompositionChangedMsg(bool bDwmCompositionEnabled)
+{
+    std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
+    OnDwmCompositionChangedMsg(bDwmCompositionEnabled);
+    if (!windowFlag.expired()) {
+        SendWindowEvent(kWindowDwmCompositionChangedMsg, bDwmCompositionEnabled ? 1 : 0);
+    }    
+}
+
 void WindowBase::OnNativeProcessDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity)
 {
     OnProcessDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
@@ -1839,6 +1848,11 @@ void WindowBase::AttachWindowDisplayScaleChangedMsg(const EventCallback& callbac
 void WindowBase::AttachWindowDisplayResolutionChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDisplayResolutionChangedMsg].AddEventCallback(callback, callbackID);
+}
+
+void WindowBase::AttachWindowDwmCompositionChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+{
+    m_windowEventMap[kWindowDwmCompositionChangedMsg].AddEventCallback(callback, callbackID);
 }
 
 void WindowBase::AttachWindowLanguageChangedMsg(const EventCallback& callback, EventCallbackID callbackID)

@@ -480,6 +480,7 @@ namespace ui
         kWindowMoveMsg,             //窗口位置发生改变
         kWindowDisplayScaleChangedMsg,      //窗口的DPI属性发生改变
         kWindowDisplayResolutionChangedMsg, //窗口所在的屏幕分辨率属性发生改变
+        kWindowDwmCompositionChangedMsg,    //窗口的DWM服务状态发生改变，wParam为1表示DWM服务开启，为0表示DWM服务关闭
         kWindowSetFocusMsg,         //窗口获得焦点
         kWindowKillFocusMsg,        //窗口失去焦点
         kWindowSetCursorMsg,        //窗口设置光标
