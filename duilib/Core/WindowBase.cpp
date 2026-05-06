@@ -14,7 +14,8 @@ WindowBase::WindowBase():
     m_bWindowRgnUpdated(false),
     m_bWindowRgnSetFlag(false),
     m_windowSizeState(WindowSizeState::kUnknown),
-    m_bSendDragEnterMsg(false)
+    m_bSendDragEnterMsg(false),
+    m_bLayeredWindowSetFlag(false)
 {
     m_pNativeWindow = new NativeWindow(this);
 }
@@ -117,10 +118,13 @@ bool WindowBase::IsUseSystemShadow() const
     return m_pNativeWindow->IsSystemShadowEnabled();
 }
 
-void WindowBase::SetLayeredWindowAlpha(int32_t nAlpha)
+bool WindowBase::SetLayeredWindowAlpha(int32_t nAlpha)
 {
-    m_pNativeWindow->SetLayeredWindowAlpha(nAlpha);
-    OnWindowAlphaChanged();
+    if (m_pNativeWindow->SetLayeredWindowAlpha(nAlpha)) {
+        OnWindowAlphaChanged();
+        return true;
+    }
+    return false;
 }
 
 uint8_t WindowBase::GetLayeredWindowAlpha() const
@@ -128,10 +132,13 @@ uint8_t WindowBase::GetLayeredWindowAlpha() const
     return m_pNativeWindow->GetLayeredWindowAlpha();
 }
 
-void WindowBase::SetLayeredWindowOpacity(int32_t nAlpha)
+bool WindowBase::SetLayeredWindowOpacity(int32_t nAlpha)
 {
-    m_pNativeWindow->SetLayeredWindowOpacity(nAlpha);
-    OnWindowAlphaChanged();
+    if (m_pNativeWindow->SetLayeredWindowOpacity(nAlpha)) {
+        OnWindowAlphaChanged();
+        return true;
+    }
+    return false;
 }
 
 uint8_t WindowBase::GetLayeredWindowOpacity() const
@@ -139,17 +146,38 @@ uint8_t WindowBase::GetLayeredWindowOpacity() const
     return m_pNativeWindow->GetLayeredWindowOpacity();
 }
 
-
 bool WindowBase::SetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
 {
+    m_bLayeredWindowSetFlag = true;
     bool bRet = m_pNativeWindow->SetLayeredWindow(bIsLayeredWindow, bRedraw);
-    OnLayeredWindowChanged();
+    if (bRet) {
+        OnLayeredWindowChanged();
+    }
     return bRet;
 }
 
 bool WindowBase::IsLayeredWindow() const
 {
     return m_pNativeWindow->IsLayeredWindow();
+}
+
+bool WindowBase::OnRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
+{
+    if (bIsLayeredWindow == IsLayeredWindow()) {
+        return true;
+    }
+    if (!m_bLayeredWindowSetFlag) {
+        //如果外部未设置分层窗口属性，则内部自动设置
+        bool bRet = m_pNativeWindow->SetLayeredWindow(bIsLayeredWindow, bRedraw);
+        if (bRet) {
+            OnLayeredWindowChanged();
+        }
+        return bRet;
+    }
+    else {
+        //如果外部设置了分层窗口属性，则内部不自动设置，以外部设置的为准
+        return false;
+    }
 }
 
 void WindowBase::CloseWnd(int32_t nRet)
@@ -1039,6 +1067,11 @@ IRender* WindowBase::OnNativeGetRender() const
 Control* WindowBase::OnNativeFindControl(const UiPoint& pt) const
 {
     return OnFindControl(pt);
+}
+
+bool WindowBase::OnNativeRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
+{
+    return OnRequestSetLayeredWindow(bIsLayeredWindow, bRedraw);
 }
 
 void WindowBase::OnNativeDisplayResolutionChangedMsg(int32_t nColorDepth, int32_t nScreenWidth, int32_t nScreenHeight)

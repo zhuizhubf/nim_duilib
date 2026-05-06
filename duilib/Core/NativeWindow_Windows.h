@@ -122,7 +122,7 @@ public:
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
     *             该参数在UpdateLayeredWindow函数中作为参数使用。
     */
-    void SetLayeredWindowAlpha(int32_t nAlpha);
+    bool SetLayeredWindowAlpha(int32_t nAlpha);
 
     /** 获取窗口透明度(仅当IsLayeredWindow()为true的时候有效)
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
@@ -133,7 +133,7 @@ public:
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
     *             该参数在SetLayeredWindowAttributes函数中作为参数使用(bAlpha)。
     */
-    void SetLayeredWindowOpacity(int32_t nAlpha);
+    bool SetLayeredWindowOpacity(int32_t nAlpha);
 
     /** 获取窗口不透明度(仅当IsLayeredWindow()为true的时候有效)
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。

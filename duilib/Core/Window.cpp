@@ -64,9 +64,13 @@ void Window::SetAttribute(const DString& strName, const DString& strValue)
         //是否为分层窗口
         SetLayeredWindow(StringUtil::IsValueTrue(strValue), true);
     }
-    else if (strName == _T("layered_window_alpha")) {
-        //分层窗口的透明度
+    else if ((strName == _T("alpha")) || (strName == _T("layered_window_alpha"))) {
+        //分层窗口的透明度, 该值在UpdateLayeredWindow函数中作为参数使用
         SetLayeredWindowAlpha(StringUtil::StringToInt32(strValue));
+    }
+    else if ((strName == _T("opacity")) || (strName == _T("layered_window_opacity"))) {
+        //分层窗口的透明度, 该值在SetLayeredWindowAttributes函数中作为参数使用
+        SetLayeredWindowOpacity(StringUtil::StringToInt32(strValue));
     }
     else if (strName == _T("drag_drop")) {
         //是否允许拖放操作
@@ -808,7 +812,7 @@ void Window::UpdateLayeredWindowStyleEx(bool bRedraw)
         bNeedLayeredWindow = Shadow::IsShadowTypeNeedLayeredWindow(shadowType);
     }
     if (IsLayeredWindow() != bNeedLayeredWindow) {
-        SetLayeredWindow(bNeedLayeredWindow, bRedraw);
+        OnRequestSetLayeredWindow(bNeedLayeredWindow, bRedraw);
     }
 #endif
 }

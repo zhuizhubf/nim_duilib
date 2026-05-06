@@ -1895,13 +1895,14 @@ bool NativeWindow_SDL::IsLayeredWindow() const
     return m_bIsLayeredWindow;
 }
 
-void NativeWindow_SDL::SetLayeredWindowAlpha(int32_t nAlpha)
+bool NativeWindow_SDL::SetLayeredWindowAlpha(int32_t nAlpha)
 {
     ASSERT(nAlpha >= 0 && nAlpha <= 255);
     if ((nAlpha < 0) || (nAlpha > 255)) {
-        return;
+        return false;
     }
     m_nLayeredWindowAlpha = static_cast<uint8_t>(nAlpha);
+    return true;
 }
 
 uint8_t NativeWindow_SDL::GetLayeredWindowAlpha() const
@@ -1909,15 +1910,15 @@ uint8_t NativeWindow_SDL::GetLayeredWindowAlpha() const
     return m_nLayeredWindowAlpha;
 }
 
-void NativeWindow_SDL::SetLayeredWindowOpacity(int32_t nAlpha)
+bool NativeWindow_SDL::SetLayeredWindowOpacity(int32_t nAlpha)
 {
     ASSERT(nAlpha >= 0 && nAlpha <= 255);
     if ((nAlpha < 0) || (nAlpha > 255)) {
-        return;
+        return false;
     }
     ASSERT(IsWindow());
     if (!IsWindow()) {
-        return;
+        return false;
     }
     m_nLayeredWindowOpacity = static_cast<uint8_t>(nAlpha);
     float opacity = 1.0f;//完全不透明
@@ -1927,6 +1928,7 @@ void NativeWindow_SDL::SetLayeredWindowOpacity(int32_t nAlpha)
     }
     bool nRet = SDL_SetWindowOpacity(m_sdlWindow, opacity);
     ASSERT_UNUSED_VARIABLE(nRet);
+    return nRet;
 }
 
 uint8_t NativeWindow_SDL::GetLayeredWindowOpacity() const
@@ -1960,9 +1962,9 @@ void NativeWindow_SDL::SetUseSystemCaption(bool bUseSystemCaption)
             bool nRet = SDL_SetWindowBordered(m_sdlWindow, true);
             ASSERT_UNUSED_VARIABLE(nRet);
         }
-        //关闭层窗口
+        //请求应用层关闭层窗口
         if (IsLayeredWindow()) {
-            SetLayeredWindow(false, false);
+            m_pOwner->OnNativeRequestSetLayeredWindow(false, false);
         }
 
         //设置Hit Test函数为默认
@@ -3196,8 +3198,7 @@ float NativeWindow_SDL::GetWindowPixelDensity() const
 bool NativeWindow_SDL::SetLayeredWindow(bool bIsLayeredWindow, bool /*bRedraw*/)
 {
     //不支持该功能
-    ASSERT_UNUSED_VARIABLE(bIsLayeredWindow == bIsLayeredWindow);
-    //m_bIsLayeredWindow = bIsLayeredWindow;
+    m_bIsLayeredWindow = bIsLayeredWindow;
     //SDL_WINDOW_TRANSPARENT 这个属性，不支持修改，所以此属性不支持修改，在创建窗口的时候已经设置正确的属性
     return true;
 }

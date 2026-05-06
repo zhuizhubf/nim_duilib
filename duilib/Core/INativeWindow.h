@@ -107,6 +107,13 @@ public:
     */
     virtual Control* OnNativeFindControl(const UiPoint& pt) const = 0;
 
+    /** 请求设置窗口的分层窗口属性（从而支持透明度）
+    * @param [in] bIsLayeredWindow true表示设置为层窗口，否则设置为非层窗口
+    * @param [in] bRedraw 是否重绘窗口（属性更改后，如果不重绘，则界面可能显示异常）
+    * @return 设置成功返回true，否则返回false
+    */
+    virtual bool OnNativeRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw) = 0;
+
 public:
     /** @name 窗口消息处理相关
      * @{

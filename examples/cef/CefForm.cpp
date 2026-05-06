@@ -24,24 +24,6 @@ DString CefForm::GetSkinFile()
 
 void CefForm::OnInitWindow()
 {
-#if !defined (DUILIB_BUILD_FOR_WIN)
-    //Linux平台：非离屏渲染模式下, 使用系统标题栏
-    if (!kEnableOffScreenRendering) {
-        SetUseSystemCaption(true);
-    }
-#endif
-
-    if (!IsUseSystemCaption()) {
-        if (ui::CefManager::GetInstance()->IsEnableOffScreenRendering()) {
-            //离屏渲染：开启分层窗口属性
-            SetLayeredWindow(true, true);
-        }
-        else {
-            //窗口模式: 关闭分层窗口属性
-            SetLayeredWindow(false, true);
-        }
-    }
-
     // 监听鼠标单击事件
     GetRoot()->AttachBubbledEvent(ui::kEventClick, UiBind(&CefForm::OnClicked, this, std::placeholders::_1), 0);
 

@@ -106,7 +106,7 @@ public:
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
     *             该参数在UpdateLayeredWindow函数中作为参数使用(BLENDFUNCTION.SourceConstantAlpha)。
     */
-    void SetLayeredWindowAlpha(int32_t nAlpha);
+    bool SetLayeredWindowAlpha(int32_t nAlpha);
 
     /** 获取窗口透明度(仅当IsLayeredWindow()为true的时候有效)
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
@@ -117,7 +117,7 @@ public:
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
     *             该参数在SetLayeredWindowAttributes函数中作为参数使用(bAlpha)。
     */
-    void SetLayeredWindowOpacity(int32_t nAlpha);
+    bool SetLayeredWindowOpacity(int32_t nAlpha);
 
     /** 获取窗口不透明度(仅当IsLayeredWindow()为true的时候有效)
     * @param [in] nAlpha 透明度数值[0, 255]，当 nAlpha 为 0 时，窗口是完全透明的。 当 nAlpha 为 255 时，窗口是不透明的。
@@ -948,6 +948,13 @@ protected:
     */
     virtual Control* OnFindControl(const UiPoint& pt) const = 0;
 
+    /** 请求设置窗口的分层窗口属性（从而支持透明度）
+    * @param [in] bIsLayeredWindow true表示设置为层窗口，否则设置为非层窗口
+    * @param [in] bRedraw 是否重绘窗口（属性更改后，如果不重绘，则界面可能显示异常）
+    * @return 设置成功返回true，否则返回false
+    */
+    virtual bool OnRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw);
+
 protected:
     /** 是否自动设置窗口形状（Windows平台是指设置窗口的RGN）
     *   默认情况下，子窗口不自动设置，顶层窗口自动设置
@@ -1359,6 +1366,7 @@ private:
     virtual bool OnNativePreparePaint() override final;
     virtual IRender* OnNativeGetRender() const override final;
     virtual Control* OnNativeFindControl(const UiPoint& pt) const override final;
+    virtual bool OnNativeRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw) override final;
 
     virtual void    OnNativeFinalMessage() override final;
     virtual LRESULT OnNativeWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) override final;
@@ -1471,6 +1479,9 @@ private:
 
     //是否发送了DragEnter消息，确保DragLeave消息匹配
     bool m_bSendDragEnterMsg;
+
+    //是否设置了分层窗口属性
+    bool m_bLayeredWindowSetFlag;
 };
 
 } // namespace ui

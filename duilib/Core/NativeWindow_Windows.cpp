@@ -679,13 +679,13 @@ bool NativeWindow_Windows::SetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
 {
     m_bIsLayeredWindow = bIsLayeredWindow;
     bool bChanged = false;
-    SetLayeredWindowStyle(bIsLayeredWindow, bChanged);
+    bool bRet = SetLayeredWindowStyle(bIsLayeredWindow, bChanged);
     if (bRedraw && bChanged && IsWindow()) {
         // 强制窗口重绘
         ::RedrawWindow(m_hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         ::SetWindowPos(m_hWnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
-    return true;
+    return bRet || !IsWindow();
 }
 
 bool NativeWindow_Windows::SetLayeredWindowStyle(bool bIsLayeredWindow, bool& bChanged) const
@@ -753,13 +753,14 @@ void NativeWindow_Windows::UpdateMinMaxBoxStyle() const
     }
 }
 
-void NativeWindow_Windows::SetLayeredWindowAlpha(int32_t nAlpha)
+bool NativeWindow_Windows::SetLayeredWindowAlpha(int32_t nAlpha)
 {
     ASSERT(nAlpha >= 0 && nAlpha <= 255);
     if ((nAlpha < 0) || (nAlpha > 255)) {
-        return;
+        return false;
     }
     m_nLayeredWindowAlpha = static_cast<uint8_t>(nAlpha);
+    return true;
 }
 
 uint8_t NativeWindow_Windows::GetLayeredWindowAlpha() const
@@ -767,12 +768,13 @@ uint8_t NativeWindow_Windows::GetLayeredWindowAlpha() const
     return m_nLayeredWindowAlpha;
 }
 
-void NativeWindow_Windows::SetLayeredWindowOpacity(int32_t nAlpha)
+bool NativeWindow_Windows::SetLayeredWindowOpacity(int32_t nAlpha)
 {
     ASSERT(nAlpha >= 0 && nAlpha <= 255);
     if ((nAlpha < 0) || (nAlpha > 255)) {
-        return;
+        return false;
     }
+    bool bRet = false;
     m_nLayeredWindowOpacity = static_cast<uint8_t>(nAlpha);
     if (m_nLayeredWindowOpacity == 255) {
         COLORREF crKey = 0;
@@ -780,16 +782,20 @@ void NativeWindow_Windows::SetLayeredWindowOpacity(int32_t nAlpha)
         DWORD dwFlags = LWA_ALPHA | LWA_COLORKEY;
         bool bAttributes = ::GetLayeredWindowAttributes(m_hWnd, &crKey, &bAlpha, &dwFlags) != FALSE;
         if (bAttributes) {
-            bool bRet = ::SetLayeredWindowAttributes(m_hWnd, 0, m_nLayeredWindowOpacity, LWA_ALPHA) != FALSE;
+            bRet = ::SetLayeredWindowAttributes(m_hWnd, 0, m_nLayeredWindowOpacity, LWA_ALPHA) != FALSE;
             ASSERT_UNUSED_VARIABLE(bRet);
         }
     }
     else {
         //必须先设置为分层窗口，然后才能设置成功
-        SetLayeredWindow(true, false);
-        bool bRet = ::SetLayeredWindowAttributes(m_hWnd, 0, m_nLayeredWindowOpacity, LWA_ALPHA) != FALSE;
+        if (!IsLayeredWindow()) {
+            m_pOwner->OnNativeRequestSetLayeredWindow(true, false);
+        }        
+        ASSERT(IsLayeredWindow());
+        bRet = ::SetLayeredWindowAttributes(m_hWnd, 0, m_nLayeredWindowOpacity, LWA_ALPHA) != FALSE;
         ASSERT_UNUSED_VARIABLE(bRet);
     }
+    return bRet;
 }
 
 uint8_t NativeWindow_Windows::GetLayeredWindowOpacity() const
@@ -822,10 +828,9 @@ void NativeWindow_Windows::SetUseSystemCaption(bool bUseSystemCaption)
                 bChanged = true; 
             }
         }
-        //关闭层窗口
+        //请求应用层关闭层窗口
         if (IsLayeredWindow()) {
-            bChanged = true;
-            SetLayeredWindow(false, false);
+            bChanged = m_pOwner->OnNativeRequestSetLayeredWindow(false, false);
         }
         if (bChanged) {
             // 强制窗口重绘

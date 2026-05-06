@@ -385,11 +385,6 @@ public:
     */
     virtual IRender* GetRender() const override;
 
-    /** 获取指定坐标点的控件接口
-    * @param [in] pt 客户区坐标点
-    */
-    virtual Control* OnFindControl(const UiPoint& pt) const override;
-
     /** 获取为Render使用的本窗口关联的DPI转换对象
     */
     std::shared_ptr<IRenderDpi> GetRenderDpi();
@@ -528,6 +523,11 @@ protected:
     virtual bool OnThemeChanged();
 
 protected:
+    /** 获取指定坐标点的控件接口
+    * @param [in] pt 客户区坐标点
+    */
+    virtual Control* OnFindControl(const UiPoint& pt) const override;
+
     /** 切换系统标题栏与自绘标题栏
     */
     virtual void OnUseSystemCaptionBarChanged() override;

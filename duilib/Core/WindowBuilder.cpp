@@ -754,9 +754,8 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         else if ((strName == _T("layered_window")) || (strName == _T("layeredwindow"))) {
             knownNames.insert(strName);
             //设置是否设置分层窗口属性（分层窗口还是普通窗口）
-            if (!pWindow->IsUseSystemCaption()) {
-                pWindow->SetLayeredWindow(StringUtil::IsValueTrue(strValue), false);
-            }
+            ASSERT(!pWindow->IsUseSystemCaption());
+            pWindow->SetLayeredWindow(StringUtil::IsValueTrue(strValue), false);
         }
         else if (strName == _T("alpha")) {
             knownNames.insert(strName);
