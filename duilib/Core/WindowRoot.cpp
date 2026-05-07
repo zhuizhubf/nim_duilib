@@ -399,8 +399,7 @@ UiMargin WindowRoot::GetWindowMaximizedMargin() const
         dpi.ScaleWindowSize(cyClient);
     }
     UiMargin rcFullscreenMargin;
-    ASSERT((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height()));
-    if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) {
+    if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) { //只有客户区大小和窗口大小一致时需要处理
         //最大化时，设置外边距，避免客户区的内容溢出屏幕
         UiRect rcWork;
         m_pWindow->GetMonitorWorkRect(rcWork);
