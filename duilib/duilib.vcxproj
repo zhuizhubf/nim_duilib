@@ -277,6 +277,7 @@
     <ClCompile Include="Control\PropertyGrid.cpp" />
     <ClCompile Include="Control\RichEdit2.cpp" />
     <ClCompile Include="Control\RichEditData.cpp" />
+    <ClCompile Include="Control\RichEditDropTargetHelper.cpp" />
     <ClCompile Include="Control\RichEditDropTarget_SDL.cpp" />
     <ClCompile Include="Control\RichEditDropTarget_Windows.cpp" />
     <ClCompile Include="Control\RichEditHost_Windows.cpp" />
@@ -638,6 +639,7 @@
     <ClInclude Include="Control\RichEditCtrl_Windows.h" />
     <ClInclude Include="Control\RichEditData.h" />
     <ClInclude Include="Control\RichEditDefs.h" />
+    <ClInclude Include="Control\RichEditDropTargetHelper.h" />
     <ClInclude Include="Control\RichEditDropTarget_SDL.h" />
     <ClInclude Include="Control\RichEditDropTarget_Windows.h" />
     <ClInclude Include="Control\RichEditHost_Windows.h" />

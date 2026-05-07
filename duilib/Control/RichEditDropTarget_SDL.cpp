@@ -3,11 +3,13 @@
 #ifdef DUILIB_BUILD_FOR_SDL
 
 #include "duilib/Control/RichEdit2.h"
-#include "duilib/Core/ControlDropTargetImpl_Windows.h"
+#include "duilib/Control/RichEditDropTargetHelper.h"
 #include "duilib/Core/ControlDropTargetUtils.h"
+#include "duilib/Core/DpiManager.h"
 
 namespace ui 
 {
+
 RichEditDropTarget_SDL::RichEditDropTarget_SDL(RichEdit2* pRichEdit) :
     m_pRichEdit(pRichEdit),
     m_nStartChar(0),
@@ -15,9 +17,9 @@ RichEditDropTarget_SDL::RichEditDropTarget_SDL(RichEdit2* pRichEdit) :
 {
 }
 
-int32_t RichEditDropTarget_SDL::OnDropBegin(const UiPoint& pt)
+int32_t RichEditDropTarget_SDL::OnDropBegin(const UiPoint& /*pt*/)
 {
-    if (m_pRichEdit == nullptr) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
         return S_FALSE;
     }
 
@@ -32,57 +34,9 @@ int32_t RichEditDropTarget_SDL::OnDropBegin(const UiPoint& pt)
 
 void RichEditDropTarget_SDL::OnDropPosition(const UiPoint& pt)
 {
-    if (m_pRichEdit == nullptr) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
         return;
     }
-
-    if (!m_dropTextList.empty()) {
-        if (!m_pRichEdit->IsMultiLine()) {
-            if (m_dropTextList.size() > 1) {
-                return;
-            }
-        }
-        if (m_pRichEdit->IsNumberOnly()) {
-            if (m_dropTextList.size() > 1) {
-                return;
-            }
-
-            DString dropText = m_dropTextList.front();
-            if (!dropText.empty()) {
-                size_t count = dropText.size();
-                for (size_t index = 0; index < count; ++index) {
-                    if (dropText[index] == L'\0') {
-                        break;
-                    }
-                    if ((dropText[index] > L'9') || (dropText[index] < L'0')) {
-                        return;
-                    }
-                }
-            }
-        }
-        DString limitChars = m_pRichEdit->GetLimitChars();
-        if (!limitChars.empty()) {
-            for (const DString& dropText : m_dropTextList) {
-                size_t count = dropText.size();
-                for (size_t index = 0; index < count; ++index) {
-                    if (dropText[index] == L'\0') {
-                        break;
-                    }
-                    bool bMatch = false;
-                    for (const DString::value_type ch : limitChars) {
-                        if (ch == dropText[index]) {
-                            bMatch = true;
-                            break;
-                        }
-                    }
-                    if (!bMatch) {
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     if (!m_pRichEdit->IsFocused()) {
         m_pRichEdit->SetFocus();
     }
@@ -91,105 +45,75 @@ void RichEditDropTarget_SDL::OnDropPosition(const UiPoint& pt)
         UiPoint charPt = m_pRichEdit->PosFromChar(pos);
         m_pRichEdit->SetCaretPos(charPt.x, charPt.y);
         m_pRichEdit->ShowCaret(true);
+
+        //检查是否需要滚动
+        CheckTextScroll(pt);
     }
 }
 
 void RichEditDropTarget_SDL::OnDropTexts(const std::vector<DString>& textList, const UiPoint& pt)
 {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
+        return;
+    }
+    if (textList.empty()) {
+        return;
+    }
+
     m_dropTextList = textList;
 
-    if (m_pRichEdit == nullptr) {
+    if (!CheckDropText()) {
         return;
     }
 
-    if (m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled()) {
-        return;
-    }
-
-    if (!m_pRichEdit->IsMultiLine()) {
-        if (textList.size() > 1) {
-            return;
-        }
-    }
-
-    if (m_pRichEdit->IsNumberOnly()) {
-        if (textList.size() > 1) {
-            return;
-        }
-
-        DString dropText = textList.front();
-        if (!dropText.empty()) {
-            size_t count = dropText.size();
-            for (size_t index = 0; index < count; ++index) {
-                if (dropText[index] == L'\0') {
-                    break;
-                }
-                if ((dropText[index] > L'9') || (dropText[index] < L'0')) {
-                    return;
-                }
+    int32_t nDropPos = m_pRichEdit->CharFromPos(pt);
+    if ((nDropPos >= 0) && !m_dropTextList.empty()) {
+        DString dropText;
+        for (size_t i = 0; i < m_dropTextList.size(); ++i) {
+            if (i > 0) {
+                dropText += _T("\n");
             }
+            dropText += m_dropTextList[i];
         }
+        m_pRichEdit->SetSel(nDropPos, nDropPos);
+        m_pRichEdit->ReplaceSel(dropText, true);
     }
 
-    DString limitChars = m_pRichEdit->GetLimitChars();
-    if (!limitChars.empty()) {
-        for (const DString& dropText : textList) {
-            size_t count = dropText.size();
-            for (size_t index = 0; index < count; ++index) {
-                if (dropText[index] == L'\0') {
-                    break;
-                }
-                bool bMatch = false;
-                for (const DString::value_type ch : limitChars) {
-                    if (ch == dropText[index]) {
-                        bMatch = true;
-                        break;
-                    }
-                }
-                if (!bMatch) {
-                    return;
-                }
-            }
-        }
-    }
-
-    DString dropText;
-    for (size_t i = 0; i < textList.size(); ++i) {
-        if (i > 0) {
-            dropText += _T("\n");
-        }
-        dropText += textList[i];
-    }
-
-    m_pRichEdit->ReplaceSel(dropText, true);
+    m_dropTextList.clear();
 }
 
-void RichEditDropTarget_SDL::OnDropFiles(const DString& /*source*/, const std::vector<DString>& fileList, const UiPoint& pt)
+void RichEditDropTarget_SDL::OnDropFiles(const DString& /*source*/, const std::vector<DString>& fileList, const UiPoint& /*pt*/)
 {
-    m_dropFileList = fileList;
-
-    if (m_pRichEdit == nullptr) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
+        return;
+    }
+    if (fileList.empty()) {
         return;
     }
 
+    m_dropFileList = fileList;
+
     if (!m_pRichEdit->IsEnableDropFile()) {
+        m_dropFileList.clear();
         return;
     }
 
     DString fileTypes = m_pRichEdit->GetDropFileTypes();
-    if (!ControlDropTargetUtils::IsFilteredFileTypes(fileTypes, fileList)) {
+    if (!ControlDropTargetUtils::IsFilteredFileTypes(fileTypes, m_dropFileList)) {
+        m_dropFileList.clear();
         return;
     }
 
-    std::vector<DString> filteredFileList = fileList;
+    std::vector<DString> filteredFileList = m_dropFileList;
     ControlDropTargetUtils::RemoveUnsupportedFiles(filteredFileList, fileTypes);
     if (filteredFileList.empty()) {
+        m_dropFileList.clear();
         return;
     }
 
     ControlDropData_SDL data;
-    data.m_ptClientX = pt.x;
-    data.m_ptClientY = pt.y;
+    data.m_ptClientX = 0;
+    data.m_ptClientY = 0;
     data.m_bTextData = false;
     data.m_source = _T("");
     data.m_fileList = filteredFileList;
@@ -201,22 +125,34 @@ void RichEditDropTarget_SDL::OnDropFiles(const DString& /*source*/, const std::v
     msg.vkCode = VirtualKeyCode::kVK_None;
     msg.wParam = kControlDropTypeSDL;
     msg.lParam = (LPARAM)&data;
-    msg.ptMouse = pt;
     msg.modifierKey = 0;
     msg.eventData = 0;
 
     m_pRichEdit->SendEventMsg(msg);
+
+    m_dropFileList.clear();
 }
 
 void RichEditDropTarget_SDL::OnDropLeave()
 {
-    m_dropTextList.clear();
-    m_dropFileList.clear();
-
     if (m_pRichEdit != nullptr) {
         m_pRichEdit->SetSel(m_nStartChar, m_nEndChar);
         m_pRichEdit->SetScrollPos(m_scrollPos);
     }
+    m_dropTextList.clear();
+    m_dropFileList.clear();
+}
+
+bool RichEditDropTarget_SDL::CheckDropText() const
+{
+    RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
+    return dropTargetHelper.CheckDropText();
+}
+
+void RichEditDropTarget_SDL::CheckTextScroll(const UiPoint& clientPt)
+{
+    RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
+    dropTargetHelper.CheckTextScroll(clientPt);
 }
 
 } // namespace ui

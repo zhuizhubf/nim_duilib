@@ -903,6 +903,9 @@
     <ClCompile Include="Control\RichEditDropTarget_SDL.cpp">
       <Filter>Control\SDL</Filter>
     </ClCompile>
+    <ClCompile Include="Control\RichEditDropTargetHelper.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1882,6 +1885,9 @@
     </ClInclude>
     <ClInclude Include="Control\RichEditDropTarget_SDL.h">
       <Filter>Control\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditDropTargetHelper.h">
+      <Filter>Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
