@@ -897,6 +897,12 @@
     <ClCompile Include="Core\WindowRoot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Control\RichEditDropTarget_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichEditDropTarget_SDL.cpp">
+      <Filter>Control\SDL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1870,6 +1876,12 @@
     </ClInclude>
     <ClInclude Include="Core\NativeWindowShadow.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditDropTarget_Windows.h">
+      <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditDropTarget_SDL.h">
+      <Filter>Control\SDL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

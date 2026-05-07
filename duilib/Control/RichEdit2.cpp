@@ -3,6 +3,7 @@
 #include "duilib/Core/Window.h"
 #include "duilib/Core/WindowMessage.h"
 #include "duilib/Core/ScrollBar.h"
+#include "duilib/Core/ControlDropTarget.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/AttributeUtil.h"
@@ -16,7 +17,12 @@
 #include "duilib/Control/Button.h"
 #include "duilib/Box/VBox.h"
 
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    #include "RichEditDropTarget_Windows.h"
+#endif
+
 #ifdef DUILIB_BUILD_FOR_SDL
+    #include "RichEditDropTarget_SDL.h"
     #include <SDL3/SDL.h>
 #endif //DUILIB_BUILD_FOR_SDL
 
@@ -97,7 +103,8 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_sInactiveCurrentRowBkColor(_T("")),
     m_nFocusBottomBorderSize(0),
     m_fRowSpacingMul(1.0f),
-    m_fRowSpacingAdd(0.0f)
+    m_fRowSpacingAdd(0.0f),
+    m_pControlDropTarget(nullptr)
 {
     m_pTextData = new RichEditData(this);
 }
@@ -112,6 +119,10 @@ RichEdit2::~RichEdit2()
     if (m_pTextData != nullptr) {
         delete m_pTextData;
         m_pTextData = nullptr;
+    }
+    if (m_pControlDropTarget != nullptr) {
+        delete m_pControlDropTarget;
+        m_pControlDropTarget = nullptr;
     }
     DString internalFontId = GetInternalFontId();
     if (GlobalManager::Instance().Font().HasFontId(internalFontId)) {
@@ -4816,6 +4827,57 @@ void RichEdit2::OnInputChar(const EventArgs& msg)
     if (bTextChanged) {
         OnTextChanged();
     }
+}
+
+void RichEdit2::SetEnableDragDrop(bool bEnable)
+{
+    BaseClass::SetEnableDragDrop(bEnable);
+    if (bEnable) {
+        if (m_pControlDropTarget == nullptr) {
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+            m_pControlDropTarget = new RichEditDropTarget_Windows(this);
+#elif defined (DUILIB_BUILD_FOR_SDL)
+            m_pControlDropTarget = new RichEditDropTarget_SDL(this);
+#endif
+        }
+    }
+    else {
+        if (m_pControlDropTarget != nullptr) {
+            delete m_pControlDropTarget;
+            m_pControlDropTarget = nullptr;
+        }
+    }
+}
+
+bool RichEdit2::IsEnableDragDrop() const
+{
+    return (m_pControlDropTarget != nullptr);
+}
+
+ControlDropTarget_Windows* RichEdit2::GetControlDropTarget()
+{
+    if (IsReadOnly() || IsPasswordMode() || !IsEnabled()) {
+        //只读模式、密码模式、不可用模式，关闭拖放功能
+        return nullptr;
+    }
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    return m_pControlDropTarget;
+#else
+    return nullptr;
+#endif
+}
+
+ControlDropTarget_SDL* RichEdit2::GetControlDropTarget_SDL()
+{
+    if (IsReadOnly() || IsPasswordMode() || !IsEnabled()) {
+        //只读模式、密码模式、不可用模式，关闭拖放功能
+        return nullptr;
+    }
+#ifdef DUILIB_BUILD_FOR_SDL
+    return m_pControlDropTarget;
+#else
+    return nullptr;
+#endif
 }
 
 } // namespace ui

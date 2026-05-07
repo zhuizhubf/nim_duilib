@@ -411,6 +411,24 @@ public:
     */
     bool SetEnableSpin(bool bEnable, const DString& spinClass, int32_t nMin = 0, int32_t nMax = 0);
 
+    /** 设置是否允许拖放功能
+    */
+    virtual void SetEnableDragDrop(bool bEnable) override;
+
+    /** 判断是否已经允许拖放功能
+    */
+    virtual bool IsEnableDragDrop() const override;
+
+    /** 获取拖放接口
+    * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
+    */
+    virtual ControlDropTarget_Windows* GetControlDropTarget() override;
+
+    /** 获取拖放接口（SDL）
+    * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
+    */
+    virtual ControlDropTarget_SDL* GetControlDropTarget_SDL() override;
+
     /** 设置文本水平对齐方式
     */
     void SetTextHAlignType(HorAlignType alignType);
@@ -1308,6 +1326,15 @@ private:
     /** 密码字符闪现功能的定时器取消机制
     */
     WeakCallbackFlag m_falshPasswordFlag;
+
+private:
+    /** 拖放功能的实现接口, 如果不为空表示功能已经开启
+    */
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    ControlDropTarget_Windows* m_pControlDropTarget;
+#elif defined (DUILIB_BUILD_FOR_SDL)
+    ControlDropTarget_SDL* m_pControlDropTarget;
+#endif
 };
 
 #if defined (DUILIB_BUILD_FOR_WIN)
