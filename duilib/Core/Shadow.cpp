@@ -919,9 +919,18 @@ void Shadow::CheckMouseClickOnShadow(EventType eventType, const UiPoint& pt)
     if (!IsEnableClickThroughWindow()) {
         return;
     }
+    if (m_pWindow->IsWindowMaximized() || m_pWindow->IsWindowFullscreen()) {
+        //窗口全屏或者最大化模式
+        return;
+    }
+
     ShadowType shadowType = GetShadowType();
     if ((shadowType == ShadowType::kShadowNone) || (shadowType == ShadowType::kShadowNoneRound)) {
         //无阴影模式
+        return;
+    }
+    if (IsSystemShadowType(shadowType)) {
+        //系统阴影模式
         return;
     }
 

@@ -1005,13 +1005,13 @@ LRESULT Window::OnSizeMsg(WindowSizeType sizeType, const UiSize& /*newWindowSize
         //大小变化
         m_windowRoot->ProcessWindowResized();
     }
+    if (windowFlag.expired()) {
+        return 0;
+    }
     if (m_pFocus != nullptr) {        
         EventArgs msgData;
         msgData.eventData = (int32_t)sizeType;
         m_pFocus->SendEvent(kEventWindowSize, msgData);
-        if (windowFlag.expired()) {
-            return 0;
-        }
     }
     return 0;
 }

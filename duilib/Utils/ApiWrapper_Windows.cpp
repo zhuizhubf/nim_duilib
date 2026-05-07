@@ -7,6 +7,7 @@
 #include "duilib/Render/IRender.h"
 #include <VersionHelpers.h>
 #include <dwmapi.h>
+#include <shellapi.h>
 #include <map>
 
 namespace ui
@@ -949,6 +950,11 @@ bool UiIsWindows11OrGreater()
     return ::VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
 }
 
+bool UiIsWindows7OrOlder()
+{
+    return ::IsWindows7OrGreater() && !::IsWindows8OrGreater();
+}
+
 bool IsDwmCompositionEnabled()
 {
     HMODULE hDwm = DllManager::Instance().LoadDll(_T("dwmapi.dll"));
@@ -1080,6 +1086,56 @@ bool SetDwmEnableBlurBehindWindow(HWND hWnd, bool bEnable)
     HRESULT hr = pDwmEnableBlurBehindWindow(hWnd, &bb);
     DeleteObject(rgn);
     return SUCCEEDED(hr);
+}
+
+bool IsTaskbarAutoHide()
+{
+    HMODULE hShell32 = DllManager::Instance().LoadDll(_T("shell32.dll"));
+    if (!hShell32) {
+        return false;
+    }
+
+    using FuncSHAppBarMessage = UINT(WINAPI*)(UINT, PAPPBARDATA);
+    auto pSHAppBarMessage = (FuncSHAppBarMessage)GetProcAddress(hShell32, "SHAppBarMessage");
+    if (!pSHAppBarMessage) {
+        return false;
+    }
+    APPBARDATA abd{};
+    abd.cbSize = sizeof(APPBARDATA);
+    // 获取任务栏状态
+    UINT state = pSHAppBarMessage(ABM_GETSTATE, &abd);
+    // ABS_AUTOHIDE：自动隐藏标记
+    return (state & ABS_AUTOHIDE) != 0;
+}
+
+TaskbarPosition GetTaskbarPosition()
+{
+    HMODULE hShell32 = DllManager::Instance().LoadDll(_T("shell32.dll"));
+    if (!hShell32) {
+        return TASKBAR_BOTTOM;
+    }
+
+    using FuncSHAppBarMessage = UINT(WINAPI*)(UINT, PAPPBARDATA);
+    FuncSHAppBarMessage pSHAppBarMessage = (FuncSHAppBarMessage)GetProcAddress(hShell32, "SHAppBarMessage");
+    if (!pSHAppBarMessage) {
+        return TASKBAR_BOTTOM;
+    }
+
+    // 调用 API 获取任务栏位置
+    APPBARDATA abd{};
+    abd.cbSize = sizeof(APPBARDATA);
+    abd.uEdge = TASKBAR_BOTTOM;
+    pSHAppBarMessage(ABM_GETTASKBARPOS, &abd);
+    TaskbarPosition pos = TASKBAR_BOTTOM;
+    switch (abd.uEdge)
+    {
+    case ABE_BOTTOM: pos = TASKBAR_BOTTOM; break;
+    case ABE_LEFT:   pos = TASKBAR_LEFT;   break;
+    case ABE_RIGHT:  pos = TASKBAR_RIGHT;  break;
+    case ABE_TOP:    pos = TASKBAR_TOP;   break;
+    default: break;
+    }
+    return pos;
 }
 
 } //namespace ui

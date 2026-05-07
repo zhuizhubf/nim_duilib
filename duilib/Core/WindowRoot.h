@@ -257,12 +257,6 @@ public:
     */
     void ChangeDpiScale(const DpiManager& dpi, uint32_t nOldScaleFactor, uint32_t nNewScaleFactor);
 
-    /** 设置窗口最大化或还原状态
-    * @param [in] isMaximized true-最大化状态，false-还原状态
-    * @note 用于更新阴影的显示状态
-    */
-    void MaximizedOrRestored(bool isMaximized);
-
 public:
     /** 设置控件查找器指针
     * @param [in] pControlFinder 控件查找器指针
@@ -287,15 +281,10 @@ private:
     */
     bool EnterControlFullscreen(Control* pFullscreenControl, const DString& exitButtonClass);
 
-    /** 恢复窗口最大化时的外边距（内部函数）
-    * @note 将外边距恢复到最大化之前的状态
-    */
-    void RestoreWindowMaximizedMargin();
-
-    /** 设置窗口最大化时的外边距（内部函数）
+    /** 获取窗口最大化时的外边距（内部函数）
     * @note 根据当前窗口大小和屏幕工作区计算并设置外边距
     */
-    void SetWindowMaximizedMargin();
+    UiMargin GetWindowMaximizedMargin() const;
 
     /** 清理根容器
     *  删除并清空当前的根容器指针
@@ -307,9 +296,9 @@ private:
     */
     void ClearShadow();
 
-    /** 更新系统阴影的边框对应的外边距，避免内容被遮盖
+    /** 更新系统阴影边框/窗口边框/全屏/最大化时对应的外边距，避免内容被遮盖
     */
-    void CheckSystemShadowFrameBorderSize();
+    void UpdateXmlRootMargin();
 
 private:
     /** 关联的窗口指针
@@ -331,20 +320,14 @@ private:
     */
     bool m_bControlFullscreen;
 
-    /** 窗口最大化状态下的外边距
-    *  Windows平台窗口最大化时，窗口区域会溢出屏幕，
-    *  需要通过调整这个外边距来避免窗口内容溢出屏幕
+    /** 根容器的原始Margin值
     */
-    UiMargin m_rcWindowMaximizedMargin;
+    UiMargin m_rcXmlRootMargin;
 
     /** 控件查找器指针
     *  用于快速查找控件
     */
     ControlFinder* m_pControlFinder;
-
-    /** 系统阴影的边框对应的外边距(已经附加到Xml Root)，避免内容被遮盖
-    */
-    int32_t m_nSystemShadowFrameBorderSize;
 };
 
 } // namespace ui

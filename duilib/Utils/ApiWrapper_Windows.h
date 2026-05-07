@@ -71,6 +71,9 @@ namespace ui
     //判断是否为Windows 11的函数
     bool UiIsWindows11OrGreater();
 
+    //判断是否为Windows 7的函数
+    bool UiIsWindows7OrOlder();
+
     /** 判断DWM服务是否可用
     */
     bool IsDwmCompositionEnabled();
@@ -89,6 +92,22 @@ namespace ui
     /** DWM设置是是否支持透明属性
     */
     bool SetDwmEnableBlurBehindWindow(HWND hWnd, bool bEnable);
+
+    /** 判断操作系统的任务栏是否自动隐藏
+    */
+    bool IsTaskbarAutoHide();
+
+    // 任务栏位置
+    enum TaskbarPosition
+    {
+        TASKBAR_BOTTOM = 0,
+        TASKBAR_LEFT,
+        TASKBAR_RIGHT,
+        TASKBAR_TOP
+    };
+    /** 获取任务栏的位置
+    */
+    TaskbarPosition GetTaskbarPosition();
 }
 
 #endif //DUILIB_BUILD_FOR_WIN

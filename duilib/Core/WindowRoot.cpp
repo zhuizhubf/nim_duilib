@@ -6,14 +6,17 @@
 #include "duilib/Core/ControlFinder.h"
 #include "duilib/Core/DpiManager.h"
 
+#ifdef DUILIB_BUILD_FOR_WIN
+    #include "duilib/Utils/ApiWrapper_Windows.h"
+#endif
+
 namespace ui
 {
 
 WindowRoot::WindowRoot(Window* pWindow):
     m_pWindow(pWindow),
     m_bControlFullscreen(false),
-    m_pControlFinder(nullptr),
-    m_nSystemShadowFrameBorderSize(0)
+    m_pControlFinder(nullptr)
 {
 }
 
@@ -67,7 +70,6 @@ void WindowRoot::CreateShadow(bool bLayeredWindow)
         return;
     }
     m_shadow = std::make_unique<Shadow>(m_pWindow, bLayeredWindow);
-    m_nSystemShadowFrameBorderSize = 0;
 }
 
 Shadow* WindowRoot::GetShadow() const
@@ -100,13 +102,21 @@ bool WindowRoot::AttachBox(Box* pRoot)
     m_pRoot = pRoot;
     if (m_pControlFinder != nullptr) {
         m_pControlFinder->SetRoot(pRoot);
-    }
-    m_nSystemShadowFrameBorderSize = 0;
+    }   
     return true;
 }
 
 Box* WindowRoot::AttachShadow(Box* pRoot)
 {
+    if (pRoot != nullptr) {
+        //保存其Margin值
+        m_rcXmlRootMargin = pRoot->GetMargin();
+    }
+    else {
+        m_rcXmlRootMargin.Clear();
+    }
+    m_rcXmlRootMargin.Validate();
+
     Shadow* pShadow = GetShadow();
     ASSERT(pShadow != nullptr);
     if (pShadow != nullptr) {
@@ -159,7 +169,7 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
     }
 
     //检查系统阴影的边框设置
-    CheckSystemShadowFrameBorderSize();
+    UpdateXmlRootMargin();
 
     //重绘窗口，否则会有绘制异常
     m_pWindow->InvalidateAll();
@@ -369,42 +379,12 @@ void WindowRoot::ChangeDpiScale(const DpiManager& dpi, uint32_t nOldScaleFactor,
     }
 }
 
-void WindowRoot::MaximizedOrRestored(bool isMaximized)
+UiMargin WindowRoot::GetWindowMaximizedMargin() const
 {
-    Shadow* pShadow = GetShadow();
-    if (pShadow != nullptr) {
-        pShadow->MaximizedOrRestored(isMaximized);
+    if (m_pWindow->IsUseSystemCaption() || !m_pWindow->IsWindowMaximized() || m_pWindow->IsWindowFullscreen()) {
+        //使用系统标题栏，全屏或者不是最大化时，均不需要设置
+        return UiMargin();
     }
-}
-
-void WindowRoot::RestoreWindowMaximizedMargin()
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        return;
-    }
-    if (!m_rcWindowMaximizedMargin.IsEmpty()) {
-        Box* pXmlRoot = GetXmlRoot();
-        if (pXmlRoot != nullptr) {
-            UiMargin rcMargin = pXmlRoot->GetMargin();
-            rcMargin.left -= m_rcWindowMaximizedMargin.left;
-            rcMargin.top -= m_rcWindowMaximizedMargin.top;
-            rcMargin.right -= m_rcWindowMaximizedMargin.right;
-            rcMargin.bottom -= m_rcWindowMaximizedMargin.right;
-            rcMargin.Validate();
-            pXmlRoot->SetMargin(rcMargin, false);
-        }
-        m_rcWindowMaximizedMargin.Clear();
-    }
-}
-
-void WindowRoot::SetWindowMaximizedMargin()
-{
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
-    if (pFullscreenBox != nullptr) {
-        return;
-    }
-
     UiRect rcWindow;
     m_pWindow->GetWindowRect(rcWindow);
     UiRect rcClientRect;
@@ -418,12 +398,12 @@ void WindowRoot::SetWindowMaximizedMargin()
         dpi.ScaleWindowSize(cxClient);
         dpi.ScaleWindowSize(cyClient);
     }
+    UiMargin rcFullscreenMargin;
+    ASSERT((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height()));
     if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) {
         //最大化时，设置外边距，避免客户区的内容溢出屏幕
         UiRect rcWork;
         m_pWindow->GetMonitorWorkRect(rcWork);
-
-        UiMargin rcFullscreenMargin;
         if (rcWindow.left < rcWork.left) {
             rcFullscreenMargin.left = rcWork.left - rcWindow.left;
         }
@@ -441,84 +421,84 @@ void WindowRoot::SetWindowMaximizedMargin()
             rcFullscreenMargin.top = (int32_t)std::round(rcFullscreenMargin.top * dpi.GetPixelDensity());
             rcFullscreenMargin.right = (int32_t)std::round(rcFullscreenMargin.right * dpi.GetPixelDensity());
             rcFullscreenMargin.bottom = (int32_t)std::round(rcFullscreenMargin.bottom * dpi.GetPixelDensity());
-        }
-        Box* pXmlRoot = GetXmlRoot();
-        if ((pXmlRoot != nullptr) && !rcFullscreenMargin.IsEmpty()) {
-            UiMargin rcMargin = pXmlRoot->GetMargin();
-            rcMargin.left += (rcFullscreenMargin.left - m_rcWindowMaximizedMargin.left);
-            rcMargin.top += (rcFullscreenMargin.top - m_rcWindowMaximizedMargin.top);
-            rcMargin.right += (rcFullscreenMargin.right - m_rcWindowMaximizedMargin.right);
-            rcMargin.bottom += (rcFullscreenMargin.bottom - m_rcWindowMaximizedMargin.bottom);
-            rcMargin.Validate();
-            m_rcWindowMaximizedMargin = rcFullscreenMargin;
-            pXmlRoot->SetMargin(rcMargin, false);
-        }
+        }        
     }
+    rcFullscreenMargin.Validate();
+    return rcFullscreenMargin;
 }
 
-void WindowRoot::CheckSystemShadowFrameBorderSize()
+void WindowRoot::UpdateXmlRootMargin()
 {
+    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    if (pFullscreenBox != nullptr) {
+        return;
+    }
+    if (m_pWindow->IsWindowMinimized()) {
+        //窗口最小化，不需要更新
+        return;
+    }
+    Box* pXmlRoot = GetXmlRoot();
+    if (pXmlRoot == nullptr) {
+        return;
+    }
     Shadow* pShadow = GetShadow();
     if (pShadow == nullptr) {
         return;
     }
-    int32_t nShadowFrameBorderSize = 0;
+    UiMargin rcWindowBorderMargin; //根容器的外边距
     if (pShadow->IsShadowAttached()      &&
         m_pWindow->IsUseSystemShadow()   &&
         !m_pWindow->IsChildWindow()      &&
         !m_pWindow->IsUseSystemCaption() &&
         !m_pWindow->IsWindowMaximized()  &&
-        !m_pWindow->IsWindowMinimized()  &&
         !m_pWindow->IsWindowFullscreen()) {
-        nShadowFrameBorderSize = m_pWindow->NativeWnd()->GetSystemShadowFrameBorderSize();
+        //非最大化时，窗口边缘存在视觉边线，占用客户区，会覆盖客户区的内容（比如根容器设置边线时，会被覆盖掉）
+        const int32_t nShadowFrameBorderSize = m_pWindow->NativeWnd()->GetSystemShadowFrameBorderSize();
+        rcWindowBorderMargin.left = nShadowFrameBorderSize;
+        rcWindowBorderMargin.top = nShadowFrameBorderSize;
+        rcWindowBorderMargin.right = nShadowFrameBorderSize;
+        rcWindowBorderMargin.bottom = nShadowFrameBorderSize;
     }
-    if (m_nSystemShadowFrameBorderSize != nShadowFrameBorderSize) {
-        Box* pXmlRoot = pShadow->GetAttachedXmlRoot();
-        if (pXmlRoot == nullptr) {
-            pXmlRoot = m_pRoot.get();
-        }
-        if (pXmlRoot != nullptr) {
-            UiMargin rcMargin = pXmlRoot->GetMargin();
-            rcMargin.left += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
-            rcMargin.top += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
-            rcMargin.right += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
-            rcMargin.bottom += (nShadowFrameBorderSize - m_nSystemShadowFrameBorderSize);
-            rcMargin.Validate();
-            pXmlRoot->SetMargin(rcMargin, false);
-            m_nSystemShadowFrameBorderSize = nShadowFrameBorderSize;
-        }
+    rcWindowBorderMargin.Validate(); //窗口边线的占用所需的Margin
+    UiMargin originXmlRootMargin = m_rcXmlRootMargin;       //XML Root Box原来的Margin
+    UiMargin maximizedMargin = GetWindowMaximizedMargin();  //窗口最大化或者全屏时所需要设置的Margin（此时窗口边缘溢出可视区域）
+    UiMargin rcRootBoxMargin;
+    rcRootBoxMargin.left = originXmlRootMargin.left + maximizedMargin.left + rcWindowBorderMargin.left;
+    rcRootBoxMargin.right = originXmlRootMargin.right + maximizedMargin.right + rcWindowBorderMargin.right;
+    rcRootBoxMargin.top = originXmlRootMargin.top + maximizedMargin.top + rcWindowBorderMargin.top;
+    rcRootBoxMargin.bottom = originXmlRootMargin.bottom + maximizedMargin.bottom + rcWindowBorderMargin.bottom;
+
+    UiMargin rcMargin = pXmlRoot->GetMargin();
+    if (rcRootBoxMargin != rcMargin) {
+        pXmlRoot->SetMargin(rcRootBoxMargin, false);
     }
 }
 
 void WindowRoot::ProcessWindowMaximized()
 {
-    if (!m_pWindow->IsUseSystemCaption() && !m_pWindow->IsWindowFullscreen()) {
-        //最大化时，保存并设置全屏状态下的容器外边距
-        SetWindowMaximizedMargin();
+    Shadow* pShadow = GetShadow();
+    if (pShadow != nullptr) {
+        pShadow->MaximizedOrRestored(true);
     }
-    else {
-        RestoreWindowMaximizedMargin();
-    }
-    MaximizedOrRestored(true);
     ProcessWindowResized();
 }
 
 void WindowRoot::ProcessWindowRestored()
 {
-    MaximizedOrRestored(false);
-    //还原时，恢复外边距
-    RestoreWindowMaximizedMargin();
+    Shadow* pShadow = GetShadow();
+    if (pShadow != nullptr) {
+        pShadow->MaximizedOrRestored(false);
+    }
     ProcessWindowResized();
 }
 
 void WindowRoot::ProcessWindowResized()
 {
-    CheckSystemShadowFrameBorderSize();
+    UpdateXmlRootMargin();
 }
 
 void WindowRoot::ProcessWindowEnterFullscreen()
 {
-    RestoreWindowMaximizedMargin();
     ProcessWindowResized();
 }
 
