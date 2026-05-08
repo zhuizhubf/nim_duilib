@@ -303,16 +303,16 @@ bool LangManager::LoadStringTableLine(const DString::value_type* lineData, int32
             StringUtil::ReplaceAll(_T("\\r"), _T("\r"), stringValue);
             StringUtil::ReplaceAll(_T("\\n"), _T("\n"), stringValue);
             StringUtil::ReplaceAll(_T("\\s"), _T(" "), stringValue);
-            m_stringTable[std::move(DString(stringIdTrim.ptr, stringIdTrim.len))] = std::move(stringValue);
+            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(stringValue);
         }
         else {
             //无转义字符
-            m_stringTable[std::move(DString(stringIdTrim.ptr, stringIdTrim.len))] = std::move(DString(stringValueTrim.ptr, stringValueTrim.len));
+            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(DString(stringValueTrim.ptr, stringValueTrim.len));
         }
     }
     else {
         //有字符串ID，但值为空
-        m_stringTable[std::move(DString(stringIdTrim.ptr, stringIdTrim.len))] = std::move(DString());
+        m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(DString());
     }
     return true;
 }
