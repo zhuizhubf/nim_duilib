@@ -10,7 +10,7 @@ RichEditDropTargetHelper::RichEditDropTargetHelper(RichEdit2* pRichEdit, const s
 {
 }
 
-bool RichEditDropTargetHelper::CheckDropText() const
+bool RichEditDropTargetHelper::CheckDropText(const UiPoint& clientPt) const
 {
     if (m_dropTextList.empty() || (m_pRichEdit == nullptr)) {
         return false;
@@ -67,7 +67,7 @@ bool RichEditDropTargetHelper::CheckDropText() const
             }
         }
     }
-    return true;
+    return m_pRichEdit->CanDropTextOnMousePosition(clientPt);
 }
 
 void RichEditDropTargetHelper::CheckTextScroll(const UiPoint& clientPt)

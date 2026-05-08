@@ -62,7 +62,7 @@ void RichEditDropTarget_SDL::OnDropTexts(const std::vector<DString>& textList, c
 
     m_dropTextList = textList;
 
-    if (!CheckDropText()) {
+    if (!CheckDropText(pt)) {
         return;
     }
 
@@ -75,6 +75,7 @@ void RichEditDropTarget_SDL::OnDropTexts(const std::vector<DString>& textList, c
             }
             dropText += m_dropTextList[i];
         }
+        m_pRichEdit->SetDropTextPosition(nDropPos);
         m_pRichEdit->SetSel(nDropPos, nDropPos);
         m_pRichEdit->ReplaceSel(dropText, true);
     }
@@ -143,10 +144,10 @@ void RichEditDropTarget_SDL::OnDropLeave()
     m_dropFileList.clear();
 }
 
-bool RichEditDropTarget_SDL::CheckDropText() const
+bool RichEditDropTarget_SDL::CheckDropText(const UiPoint& clientPt) const
 {
     RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
-    return dropTargetHelper.CheckDropText();
+    return dropTargetHelper.CheckDropText(clientPt);
 }
 
 void RichEditDropTarget_SDL::CheckTextScroll(const UiPoint& clientPt)

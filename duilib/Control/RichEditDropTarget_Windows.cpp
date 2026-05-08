@@ -96,7 +96,9 @@ int32_t RichEditDropTarget_Windows::DragOver(uint32_t /*grfKeyState*/, const UiP
         return S_OK;
     }
 
-    if (!CheckDropText()) {
+    UiPoint clientPt = pt;
+    m_pRichEdit->ScreenToClient(clientPt);
+    if (!CheckDropText(clientPt)) {
         //拖入文本操作：进行有效性判断
         return hr;
     }
@@ -105,8 +107,6 @@ int32_t RichEditDropTarget_Windows::DragOver(uint32_t /*grfKeyState*/, const UiP
         //必须设置为焦点控件，否则CharFromPos会失败
         m_pRichEdit->SetFocus();
     }
-    UiPoint clientPt = pt;
-    m_pRichEdit->ScreenToClient(clientPt);
     int32_t pos = m_pRichEdit->CharFromPos(clientPt);
     if (pos >= 0) {
         UiPoint charPt = m_pRichEdit->PosFromChar(pos);
@@ -201,14 +201,14 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t /*grfKeyState*
         return data.m_hResult;
     }
 
-    if (!CheckDropText()) {
+    UiPoint clientPt = pt;
+    m_pRichEdit->ScreenToClient(clientPt);
+    if (!CheckDropText(clientPt)) {
         //校验拖入的文本
         ClearDragStatus();
         return hr;
     }
 
-    UiPoint clientPt = pt;
-    m_pRichEdit->ScreenToClient(clientPt);
     int32_t nDropPos = m_pRichEdit->CharFromPos(clientPt);
     if ((nDropPos >= 0) && !m_dropTextList.empty()) {
         DString dropText;
@@ -218,21 +218,22 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t /*grfKeyState*
             }
             dropText += m_dropTextList[i];
         }
+        m_pRichEdit->SetDropTextPosition(nDropPos);
         m_pRichEdit->SetSel(nDropPos, nDropPos);
         m_pRichEdit->ReplaceSel(dropText, true);
         hr = S_OK;
     }
     if (pdwEffect != nullptr) {
-        *pdwEffect = DROPEFFECT_COPY;
+        *pdwEffect = DROPEFFECT_MOVE;
     }
     ClearDragStatus();
     return hr;
 }
 
-bool RichEditDropTarget_Windows::CheckDropText() const
+bool RichEditDropTarget_Windows::CheckDropText(const UiPoint& clientPt) const
 {
     RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
-    return dropTargetHelper.CheckDropText();
+    return dropTargetHelper.CheckDropText(clientPt);
 }
 
 void RichEditDropTarget_Windows::CheckTextScroll(const UiPoint& clientPt)

@@ -906,6 +906,9 @@
     <ClCompile Include="Control\RichEditDropTargetHelper.cpp">
       <Filter>Control</Filter>
     </ClCompile>
+    <ClCompile Include="Control\RichEditDragSource_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1888,6 +1891,9 @@
     </ClInclude>
     <ClInclude Include="Control\RichEditDropTargetHelper.h">
       <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditDragSource_Windows.h">
+      <Filter>Control\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

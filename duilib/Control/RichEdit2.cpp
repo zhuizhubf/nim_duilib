@@ -3,6 +3,7 @@
 #include "duilib/Core/Window.h"
 #include "duilib/Core/WindowMessage.h"
 #include "duilib/Core/ScrollBar.h"
+#include "duilib/Core/DpiManager.h"
 #include "duilib/Core/ControlDropTarget.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
@@ -19,6 +20,9 @@
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
     #include "RichEditDropTarget_Windows.h"
+    #include "RichEditDragSource_Windows.h"
+#elif defined (DUILIB_BUILD_FOR_WIN)
+    #include "RichEditDragSource_Windows.h"
 #endif
 
 #ifdef DUILIB_BUILD_FOR_SDL
@@ -104,7 +108,11 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_nFocusBottomBorderSize(0),
     m_fRowSpacingMul(1.0f),
     m_fRowSpacingAdd(0.0f),
-    m_pControlDropTarget(nullptr)
+    m_pControlDropTarget(nullptr),
+    m_bEnableDragOut(false),
+    m_bDraggingOut(false),
+    m_bDraggingOutMouseDown(false),
+    m_nDropTextPos(-1)
 {
     m_pTextData = new RichEditData(this);
 }
@@ -365,6 +373,10 @@ void RichEdit2::SetAttribute(const DString& strName, const DString& strValue2)
     }
     else if (strName == _T("row_spacing_add")) {
         SetRowSpacingAdd(StringUtil::StringToFloat(strValue.c_str(), nullptr));
+    }
+    else if (strName == _T("enable_drag_out")) {
+        //是否允许拖出功能（作为拖放源）
+        SetEnableDragOut(StringUtil::IsValueTrue(strValue));
     }
     else {
         ScrollBox::SetAttribute(strName, strValue);
@@ -4070,10 +4082,18 @@ bool RichEdit2::ButtonDown(const EventArgs& msg)
     if (msg.IsSenderExpired()) {
         return false;
     }
-    //鼠标点击时，检查按键状态（因按住Shift/Ctrl的时候，如果按组合键，则Shift/Ctrl的Up消息会丢失，导致状态异常）
-    CheckKeyDownStartIndex(msg);
 
-    OnLButtonDown(msg.ptMouse, msg.GetSender(), IsKeyDown(msg, ModifierKey::kShift));
+    // 记录鼠标按下位置，用于检测拖动文本功能
+    m_bDraggingOutMouseDown = false;
+    CheckDragOutStart(msg.ptMouse);
+
+    if (!m_bDraggingOutMouseDown) {
+        //鼠标点击时，检查按键状态（因按住Shift/Ctrl的时候，如果按组合键，则Shift/Ctrl的Up消息会丢失，导致状态异常）
+        CheckKeyDownStartIndex(msg);
+
+        //响应鼠标按下事件，记录状态
+        OnLButtonDown(msg.ptMouse, msg.GetSender(), IsKeyDown(msg, ModifierKey::kShift));
+    }
     return bRet;
 }
 
@@ -4084,6 +4104,7 @@ bool RichEdit2::ButtonUp(const EventArgs& msg)
         return false;
     }
     OnLButtonUp(msg.ptMouse, msg.GetSender());
+    m_bDraggingOutMouseDown = false;
     return bRet;
 }
 
@@ -4094,6 +4115,7 @@ bool RichEdit2::ButtonDoubleClick(const EventArgs& msg)
         return false;
     }
     OnLButtonDoubleClick(msg.ptMouse, msg.GetSender());
+    m_bDraggingOutMouseDown = false;
     return bRet;
 }
 
@@ -4104,6 +4126,7 @@ bool RichEdit2::RButtonDown(const EventArgs& msg)
         return false;
     }
     OnRButtonDown(msg.ptMouse, msg.GetSender());
+    m_bDraggingOutMouseDown = false;
     return bRet;
 }
 
@@ -4123,7 +4146,15 @@ bool RichEdit2::MouseMove(const EventArgs& msg)
     if (msg.IsSenderExpired()) {
         return false;
     }
-    OnMouseMove(msg.ptMouse, msg.GetSender());
+
+    if (IsEnableDragOut() && m_bDraggingOutMouseDown) {
+        // 检测拖放操作
+        CheckDoDragDrop(msg.ptMouse);
+    }
+    else {
+        //检测鼠标框选功能（通过按住鼠标，滑动位置来选择文本）
+        OnMouseMove(msg.ptMouse, msg.GetSender());
+    }   
     return bRet;
 }
 
@@ -4877,6 +4908,209 @@ ControlDropTarget_SDL* RichEdit2::GetControlDropTarget_SDL()
     return m_pControlDropTarget;
 #else
     return nullptr;
+#endif
+}
+
+void RichEdit2::SetEnableDragOut(bool bEnable)
+{
+#if defined(DUILIB_BUILD_FOR_WIN)
+    m_bEnableDragOut = bEnable;
+#else
+    (void)bEnable;
+#endif
+}
+
+bool RichEdit2::IsEnableDragOut() const
+{
+#if defined(DUILIB_BUILD_FOR_WIN)
+    return m_bEnableDragOut;
+#else
+    return false;
+#endif
+}
+
+void RichEdit2::CheckDragOutStart(const UiPoint& ptMouse)
+{
+    m_bDraggingOutMouseDown = false;
+    m_bDraggingOut = false;
+#if defined(DUILIB_BUILD_FOR_WIN)
+    if (IsEnableDragOut() && !IsPasswordMode() && IsEnabled()) {
+        const UiSize64 scrollPos = GetScrollPos();
+        m_ptDragOutStart.cx = ptMouse.x + scrollPos.cx;
+        m_ptDragOutStart.cy = ptMouse.y + scrollPos.cy;
+
+        if (IsMouseOnSelectionText(ptMouse)) {
+            //有选中文本, 并且鼠标点击在选中的文本上时，开始检测拖出操作
+            m_bDraggingOutMouseDown = true;
+        }
+    }
+#else
+    (void)ptMouse;
+#endif
+}
+
+bool RichEdit2::IsMouseOnSelectionText(const UiPoint& ptMouse)
+{
+    bool bRet = false;
+    int32_t nSelStartChar = -1;
+    int32_t nSelEndChar = -1;
+    GetSel(nSelStartChar, nSelEndChar);
+    if ((nSelEndChar > nSelStartChar) && (nSelStartChar >= 0)) {
+        //有选中文本, 并且鼠标点击在选中的文本上
+        int32_t nCharPosIndex = CharFromPos(ptMouse);
+        if ((nCharPosIndex >= nSelStartChar) && (nCharPosIndex < nSelEndChar)) {
+            bRet = true;
+        }
+    }
+    return bRet;
+}
+
+bool RichEdit2::CanDropTextOnMousePosition(const UiPoint& ptMouse)
+{
+#if defined(DUILIB_BUILD_FOR_WIN)
+    if (IsEnableDragOut() && !IsPasswordMode() && IsEnabled() && !IsReadOnly()) {
+        if (m_bDraggingOutMouseDown && m_bDraggingOut) {
+            if (IsMouseOnSelectionText(ptMouse)) {
+                //不能拖放到正在拖出的文本处
+                return false;
+            }
+        }
+    }
+    return true;
+#else
+    return true;
+#endif
+}
+
+void RichEdit2::SetDropTextPosition(int32_t nDropPos)
+{
+    m_nDropTextPos = nDropPos;
+}
+
+void RichEdit2::CheckDoDragDrop(const UiPoint& ptMouse)
+{
+#if defined(DUILIB_BUILD_FOR_WIN)
+    // 检查是否已启用拖出功能
+    if (!IsEnableDragOut() || IsPasswordMode() || !IsEnabled()) {
+        m_bDraggingOutMouseDown = false;
+        m_bDraggingOut = false;
+        return;
+    }
+
+    // 检查是否正在拖动（避免重复触发）
+    if (m_bDraggingOut) {
+        return;
+    }
+
+    // 检查是否有选中的文本
+    int32_t nDragOutStart = 0;
+    int32_t nDragOutEnd = 0;
+    GetSel(nDragOutStart, nDragOutEnd);
+    if (nDragOutStart >= nDragOutEnd) {
+        // 没有选中的文本
+        return;
+    }
+
+    // 计算鼠标移动距离
+    const UiSize64 scrollPos = GetScrollPos();
+    int64_t dx = abs(ptMouse.x + scrollPos.cx - m_ptDragOutStart.cx);
+    int64_t dy = abs(ptMouse.y + scrollPos.cy - m_ptDragOutStart.cy);
+    
+    // 定义拖动阈值（3像素）
+    const int32_t nDragThreshold = Dpi().GetScaleInt(3);
+    
+    // 如果移动超过阈值，开始拖放
+    if (dx > nDragThreshold || dy > nDragThreshold) {
+        m_bDraggingOut = true;
+        
+        // 获取选中的文本
+        DStringW selectedText = GetSelText();
+        if (!selectedText.empty()) {
+            // 执行拖放操作
+            m_nDropTextPos = -1;
+            uint32_t effect = DoDragDrop(selectedText);
+            
+            // 根据拖放结果处理
+            if ((effect == DROPEFFECT_MOVE) && !IsReadOnly()) {
+                // 移动操作：删除原文本
+                if (m_nDropTextPos == -1) {
+                    //Drop操作不在本RichEdit内部
+                    ReplaceSel(_T(""), true);
+                }
+                else {
+                    //Drop操作在本RichEdit内部
+                    if (m_nDropTextPos < nDragOutStart) {
+                        //Drop位置在选中文本之前
+                        int32_t nDropStart = 0;
+                        int32_t nDropEnd = 0;
+                        GetSel(nDropStart, nDropEnd);
+
+                        nDragOutStart += (int32_t)selectedText.size();
+                        nDragOutEnd += (int32_t)selectedText.size();
+                        SetSel(nDragOutStart, nDragOutEnd);
+                        ReplaceSel(_T(""), true);
+
+                        SetSel(nDropStart, nDropEnd);
+                    }
+                    else if (m_nDropTextPos >= nDragOutEnd) {
+                        //Drop位置在选中文本之后
+                        int32_t nDropStart = 0;
+                        int32_t nDropEnd = 0;
+                        GetSel(nDropStart, nDropEnd);
+
+                        SetSel(nDragOutStart, nDragOutEnd);
+                        ReplaceSel(_T(""), true);
+
+                        nDropStart -= (int32_t)selectedText.size();
+                        nDropEnd -= (int32_t)selectedText.size();
+                        SetSel(nDropStart, nDropEnd);
+                    }
+                    else {
+                        ASSERT(0);
+                    }
+                }
+            }
+        }
+        m_bDraggingOutMouseDown = false;
+        m_bDraggingOut = false;
+    }
+#else
+    (void)ptMouse;
+#endif
+}
+
+uint32_t RichEdit2::DoDragDrop(const DStringW& text)
+{
+#if defined(DUILIB_BUILD_FOR_WIN)
+    if (text.empty() || !IsEnableDragOut() || IsPasswordMode() || !IsEnabled()) {
+        return DROPEFFECT_NONE;
+    }
+
+    RichEditDataObject_Windows* pDataObject = RichEditDataObject_Windows::Create(text);
+    if (pDataObject == nullptr) {
+        return DROPEFFECT_NONE;
+    }
+    pDataObject->AddRef();
+
+    RichEditDragSource_Windows* pDropSource = RichEditDragSource_Windows::Create();
+    if (pDropSource == nullptr) {
+        pDataObject->Release();
+        return DROPEFFECT_NONE;
+    }
+    pDropSource->AddRef();
+
+    DWORD dwEffect = DROPEFFECT_COPY;
+    HRESULT hr = ::DoDragDrop(pDataObject, pDropSource, DROPEFFECT_COPY | DROPEFFECT_MOVE, &dwEffect);
+
+    pDropSource->Release();
+    pDataObject->Release();
+
+    if (hr != DRAGDROP_S_DROP) {
+        return DROPEFFECT_NONE;
+    }
+    return dwEffect;
+#else
+    return 0;
 #endif
 }
 

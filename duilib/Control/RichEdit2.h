@@ -429,6 +429,27 @@ public:
     */
     virtual ControlDropTarget_SDL* GetControlDropTarget_SDL() override;
 
+    /** 设置是否允许拖出功能（作为拖放源）
+    * @param [in] bEnable true表示允许拖出，false表示不允许
+    * @note 仅Windows平台支持
+    */
+    void SetEnableDragOut(bool bEnable);
+
+    /** 判断是否已经允许拖出功能
+    * @return 返回true表示已允许拖出，false表示不允许
+    */
+    bool IsEnableDragOut() const;
+
+    /** 检查是否可以在当前鼠标位置执行拖放操作
+    * @param [in] ptMouse 当前鼠标位置, 客户区坐标
+    */
+    bool CanDropTextOnMousePosition(const UiPoint& ptMouse);
+
+    /** 设置拖放操作的字符位置（以支持RichEdit内部拖放操作）
+    * @param [in] nDropPos 拖放的字符位置
+    */
+    void SetDropTextPosition(int32_t nDropPos);
+
     /** 设置文本水平对齐方式
     */
     void SetTextHAlignType(HorAlignType alignType);
@@ -1123,6 +1144,28 @@ private:
     DStringW GetInputTextW(UINT uMsg, WPARAM wParam);
 #endif
 
+    /** 检查是否可以开始拖放操作
+    * @param [in] ptMouse 当前鼠标位置, 客户区坐标
+    */
+    void CheckDragOutStart(const UiPoint& ptMouse);
+
+    /** 判断当前鼠标位置是否在所选的文本上
+    * @param [in] ptMouse 当前鼠标位置, 客户区坐标
+    */
+    bool IsMouseOnSelectionText(const UiPoint& ptMouse);
+
+    /** 检查是否开始执行拖放操作
+    * @param [in] ptMouse 当前鼠标位置, 客户区坐标
+    */
+    void CheckDoDragDrop(const UiPoint& ptMouse);
+
+    /** 执行拖放操作
+    * @param [in] text 要拖放的文本内容
+    * @return 返回拖放效果：DROPEFFECT_NONE表示取消，DROPEFFECT_COPY表示复制，DROPEFFECT_MOVE表示移动
+    * @note 仅Windows平台支持
+    */
+    uint32_t DoDragDrop(const DStringW& text);
+
 private:
     bool m_bWantTab;            //是否接收TAB键，如果为true的时候，TAB键会当作文本输入，否则过滤掉TAB键
     bool m_bWantReturn;         //是否接收回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
@@ -1335,6 +1378,27 @@ private:
 #elif defined (DUILIB_BUILD_FOR_SDL)
     ControlDropTarget_SDL* m_pControlDropTarget;
 #endif
+
+private:
+    /** 鼠标按下时的位置（用于检测拖动）
+    */
+    UiSize64 m_ptDragOutStart;
+
+    /** 是否允许拖出功能（作为拖放源）
+    */
+    bool m_bEnableDragOut;
+
+    /** 拖出功能鼠标按下标志
+    */
+    bool m_bDraggingOutMouseDown;
+
+    /** 是否正在拖动文本
+    */
+    bool m_bDraggingOut;
+
+    /** 拖放文本操作的位置（在此处执行Drop操作）
+    */
+    int32_t m_nDropTextPos;
 };
 
 #if defined (DUILIB_BUILD_FOR_WIN)

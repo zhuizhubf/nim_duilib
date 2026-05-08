@@ -592,6 +592,9 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("row_spacing_add")) {
         //不支持该属性，忽略
     }
+    else if (strName == _T("enable_drag_out")) {
+        //不支持该属性，忽略
+    }
 
 #ifdef DUILIB_RICHEDIT_SUPPORT_RICHTEXT
     else if (strName == _T("zoom")) {
