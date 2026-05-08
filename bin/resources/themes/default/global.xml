@@ -43,16 +43,20 @@
     
     <!-- ===================== 字体配置 ===================== -->  
     <!-- 默认正文字体（纯文本）：列表形式，依次匹配，直到发现第一个有效字体作为默认字体名称，多个字体名称用逗号分隔 -->
-    <DefaultFontFamilyNames windows="微软雅黑, 宋体, Segoe UI" 
-                            macos="PingFang SC, San Francisco" 
-                            linux="Noto Sans CJK SC"
-                            freebsd="Noto Sans CJK SC"/>
+    <DefaultFontFamilyNames
+        windows="Microsoft YaHei, SimSun, Segoe UI, Arial, sans-serif"
+        macos="PingFang SC, Helvetica Neue, Arial, sans-serif"
+        linux="Noto Sans CJK SC, Noto Sans, DejaVu Sans, sans-serif"
+        freebsd="Noto Sans CJK SC, Noto Sans, DejaVu Sans, sans-serif"
+    />
 
     <!-- 回退字体列表（独立于默认正文字体），用于支持Emoji文字和扩展汉字(2个UTF16字符表示的汉字)等 -->
-    <FallbackFontFamilyNames windows="Segoe UI Emoji, MingLiU-ExtB, Microsoft JhengHei-ExtB, SimSun-ExtB, SimSun-ExtG" 
-                             macos="Apple Color Emoji, PingFang TC" 
-                             linux="Noto Color Emoji, Source Han Serif, Source Han Sans" 
-                             freebsd="Noto Color Emoji, Source Han Serif, Source Han Sans"/>
+    <FallbackFontFamilyNames
+        windows="Segoe UI Emoji, MingLiU-ExtB, Microsoft JhengHei-ExtB, SimSun-ExtB, SimSun-ExtG"
+        macos="Apple Color Emoji, PingFang SC, Songti SC, Hiragino Sans GB"
+        linux="Noto Color Emoji, Source Han Serif CN, Source Han Sans CN"
+        freebsd="Noto Color Emoji, Source Han Serif CN, Source Han Sans CN"
+    />
     
     <!-- 系统字体：按 字体类型_样式_字号 命名 --> 
     <Font id="system_regular_12" name="system" size="12"/>
