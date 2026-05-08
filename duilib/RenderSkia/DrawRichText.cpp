@@ -191,9 +191,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     //是否正在绘制TAB键（按4个字符对齐）
     bool bDrawTabChar = false;
 
-    //本行（逻辑行）已经绘制了多少个字符（不含回车和换行）
-    size_t nRowCharCount = 0;
-
     // const DString statHashBreakName = _T("DrawRichText::InternalDrawRichText Break");
     // PerformanceUtil::Instance().AddStat(statHashBreakName);
     // static const size_t statHashBreak = std::hash<DString>{}(statHashBreakName); //2710 ms
@@ -304,7 +301,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                         SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                         nRowHeight = nFontHeight;
                         ++nRowIndex;
-                        nRowCharCount = 0;
                         ++nLineTextRowIndex;
                         ++nLineNumber;
                     }
@@ -435,9 +431,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                             glyphLeft += glyphWidth;
                         }
                     }
-
-                    //统计本逻辑行已经绘制了多少个字符
-                    nRowCharCount += breakTextData.glyphIDs.size();
                 }
 
                 bool bNextRow = false; //是否需要换行的标志
@@ -477,7 +470,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                     nRowHeight = nFontHeight;
                     ++nRowIndex;
-                    nRowCharCount = 0;
                     ++nLineTextRowIndex;
 
                     if (bBreakWhenOutOfRect && (yPos >= nTextRectBottomMax)) {

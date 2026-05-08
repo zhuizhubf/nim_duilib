@@ -307,12 +307,12 @@ bool LangManager::LoadStringTableLine(const DString::value_type* lineData, int32
         }
         else {
             //无转义字符
-            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(DString(stringValueTrim.ptr, stringValueTrim.len));
+            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = DString(stringValueTrim.ptr, stringValueTrim.len);
         }
     }
     else {
         //有字符串ID，但值为空
-        m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(DString());
+        m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = DString();
     }
     return true;
 }

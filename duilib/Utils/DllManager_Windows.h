@@ -60,8 +60,7 @@ private:
     std::unordered_map<DString, HMODULE> m_cache;
 };
 
+} //namespace ui
+
 #endif //DUILIB_BUILD_FOR_WIN
-
-} //namespace ui 
-
 #endif //UI_CORE_DLL_MANAGER_H_
