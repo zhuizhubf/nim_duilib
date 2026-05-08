@@ -986,7 +986,7 @@ bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
     // 动态 DWM API 定义
     typedef HRESULT(WINAPI* DWM_SET_WINDOW_ATTRIBUTE)(HWND, DWORD, LPCVOID, DWORD);
     typedef HRESULT(WINAPI* DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND, const MARGINS*);
-    typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND, const DWM_BLURBEHIND*);
+    //typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND, const DWM_BLURBEHIND*);
 
     DWM_SET_WINDOW_ATTRIBUTE DwmSetWindowAttribute = (DWM_SET_WINDOW_ATTRIBUTE)GetProcAddress(hDwm, "DwmSetWindowAttribute");
     DWM_EXTEND_FRAME_INTO_CLIENT_AREA DwmExtendFrameIntoClientArea = (DWM_EXTEND_FRAME_INTO_CLIENT_AREA)GetProcAddress(hDwm, "DwmExtendFrameIntoClientArea");
