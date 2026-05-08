@@ -450,7 +450,7 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
 
     std::unique_ptr<SkMemoryStream> spMemStream;
     if (svgReplaceTextList.empty()) {
-        spMemStream = std::move(SkMemoryStream::MakeCopy(fileData.data(), fileData.size()));
+        spMemStream = SkMemoryStream::MakeCopy(fileData.data(), fileData.size());
     }
     else {
         //替换文本
@@ -464,7 +464,7 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
             //没有替换(配置有错误)
             svgReplaceTextList.clear();
         }
-        spMemStream = std::move(SkMemoryStream::MakeCopy(newSvgText.data(), newSvgText.size()));
+        spMemStream = SkMemoryStream::MakeCopy(newSvgText.data(), newSvgText.size());
     }
 
     uint32_t nImageWidth = 0;

@@ -459,7 +459,7 @@ Control* WindowImplBase::GetBtnWindowByName(const DString& newCtrlName, const DS
 Control* WindowImplBase::GetWindowTitleBar() const
 {
     Control* pControl = FindControl(DUI_CTR_WINDOW_TITLE_BAR);
-    if ((pControl == nullptr)) {
+    if (pControl == nullptr) {
         pControl = FindControl(DUI_CTR_CAPTION_BAR);
     }
     return pControl;
