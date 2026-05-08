@@ -71,7 +71,7 @@ int32_t RichEditDropTarget_Windows::DragEnter(void* pDataObj, uint32_t /*grfKeyS
     return hr;
 }
 
-int32_t RichEditDropTarget_Windows::DragOver(uint32_t /*grfKeyState*/, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t RichEditDropTarget_Windows::DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
 {
     HRESULT hr = S_FALSE;
     if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
@@ -117,7 +117,13 @@ int32_t RichEditDropTarget_Windows::DragOver(uint32_t /*grfKeyState*/, const UiP
         CheckTextScroll(clientPt);
 
         if (pdwEffect != nullptr) {
-            *pdwEffect = DROPEFFECT_COPY;
+            //操作：按住Control键时，是复制，否则移动
+            if (grfKeyState & MK_CONTROL) {
+                *pdwEffect = DROPEFFECT_COPY;
+            }
+            else {
+                *pdwEffect = DROPEFFECT_MOVE;
+            }
         }
         return S_OK;
     }
@@ -135,7 +141,7 @@ int32_t RichEditDropTarget_Windows::DragLeave(void)
     return S_OK;
 }
 
-int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t /*grfKeyState*/, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
 {
     ASSERT(m_pDataObj == pDataObj);
     if (m_pDataObj != pDataObj) {
@@ -224,7 +230,13 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t /*grfKeyState*
         hr = S_OK;
     }
     if (pdwEffect != nullptr) {
-        *pdwEffect = DROPEFFECT_MOVE;
+        //操作：按住Control键时，是复制，否则移动
+        if (grfKeyState & MK_CONTROL) {
+            *pdwEffect = DROPEFFECT_COPY;
+        }
+        else {
+            *pdwEffect = DROPEFFECT_MOVE;
+        }
     }
     ClearDragStatus();
     return hr;
