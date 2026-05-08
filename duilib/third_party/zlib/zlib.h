@@ -31,8 +31,11 @@
 #ifndef ZLIB_H
 #define ZLIB_H
 
-//duilib适配VC和cmake编译(原名: zconf.h，各个平台生成的此文件均相同，所以固定使用msvc生成的文件，避免cmake动态生成覆盖的问题)
-#include "zconf_msvc.h"
+#ifdef ZLIB_BUILD
+#  include <zconf.h>
+#else
+# include "zconf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

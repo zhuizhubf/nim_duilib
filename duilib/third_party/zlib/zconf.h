@@ -7,13 +7,6 @@
 
 #ifndef ZCONF_H
 #define ZCONF_H
-/* #undef Z_PREFIX */
-
-#if defined(linux) || defined(__linux) || defined(__linux__)
-    #define Z_HAVE_UNISTD_H
-#elif defined(__APPLE__) && defined(__MACH__)
-    #define Z_HAVE_UNISTD_H
-#endif
 
 /*
  * If you *really* need a unique prefix for all types and library functions,
