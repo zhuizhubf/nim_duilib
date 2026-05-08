@@ -419,7 +419,7 @@ Slider 控件继承了 `Progress` 属性，更多可用属性请参考`Progress`
 
 CircleProgress 控件继承了 `Progress` 属性，更多可用属性请参考`Progress`的属性
 
-## RichEdit的属性
+## RichEdit/RichEdit2的属性
 | 属性名称 | 默认值 | 参数类型 | 用途 |
 | :--- | :--- | :--- | :--- |
 | vscrollbar | false | bool | 是否使用竖向滚动条,如"true"|
@@ -476,11 +476,15 @@ CircleProgress 控件继承了 `Progress` 属性，更多可用属性请参考`P
 | focused_bottom_border_color || string | 焦点状态时，底部边框的颜色 |
 | enable_drag_drop |false| bool   | 是否允许拖放操作|
 | enable_drop_file |false| bool   | 是否允许拖放文件操作|
+| enable_drag_out  |true | bool   | 是否允许文本拖出功能（作为拖放源），仅Windows平台支持，其他平台不支持，该选项仅在RichEdit2中支持|
 | drop_file_types  |     | string | 拖放文件操作支持的后缀名列表，比如:".txt;.csv"，表示仅支持txt和csv文件；如果为空，表示支持所有文件|
 | row_spacing_mul  | 1.0 | float  | 行间距倍数, 比如1.5代表1.5倍行间距<br>Windows平台：仅当rich_text属性"true"时有效，因为Windows平台的RichEdit控件只有富文本模式时支持设置行间距；<br>使用SDL时，始终有效，即其他平台时，行间距属性均有效|
 | row_spacing_add  |0    | float  | 行间距附加量: 是固定的附加像素值（默认值通常为 0），用于在比例调整的基础上增加固定偏移（像素），仅当使用SDL时有效|
 
-RichEdit 控件继承了 `ScrollBox` 属性，更多可用属性请参考`ScrollBox`的属性
+RichEdit 控件继承了 `ScrollBox` 属性，更多可用属性请参考`ScrollBox`的属性    
+RichEdit2类的功能说明：    
+（1）在Windows平台，RichEdit类是使用Windows系统本身的ITextServices接口实现的，RichEdit2是本项目自己实现的，两者实现方式不同，但功能基本一致    
+（2）在非Windows平台，RichEdit是RichEdit2的别名，两者没有区别。    
 
 ## RichText的属性
 RichText是带有格式的文本，其格式类似于HTML标签，格式文本以`<RichText>`开头，以`</RichText>`结尾。    

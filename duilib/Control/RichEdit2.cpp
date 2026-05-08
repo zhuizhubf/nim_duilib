@@ -109,7 +109,7 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_fRowSpacingMul(1.0f),
     m_fRowSpacingAdd(0.0f),
     m_pControlDropTarget(nullptr),
-    m_bEnableDragOut(false),
+    m_bEnableDragOut(true),
     m_bDraggingOut(false),
     m_bDraggingOutMouseDown(false),
     m_nDropTextPos(-1)
