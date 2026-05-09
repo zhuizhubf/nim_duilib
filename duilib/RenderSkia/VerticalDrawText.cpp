@@ -106,6 +106,7 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF32String& textUTF32, con
     charRects.clear();
     charRects.reserve(textUTF32.size());
 
+    constexpr SkScalar fMinCharSize = 0.01f;
     TVerticalChar verticalChar;
     for (DUTF32Char ch : textUTF32) {
         verticalChar.ch = ch;
@@ -120,13 +121,13 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF32String& textUTF32, con
         else {
             verticalChar.bNewLine = false;
             verticalChar.bRotate90 = false;
-            SkScalar fTextWidth = DrawSkiaText::MeasureText(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
-                                                            skPaint, pFont);
-            if ((verticalChar.bounds.width() <= 0) || (verticalChar.bounds.height() <= 0)) {
+            SkScalar fTextWidth = DrawSkiaText::MeasureTextChar(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
+                                                                skPaint, pFont, true);
+            if ((fTextWidth < fMinCharSize) || (verticalChar.bounds.width() < fMinCharSize) || (verticalChar.bounds.height() < fMinCharSize)) {
                 //空格或者不可见字符(按小写字母确定显示区域)
-                ch = 'a';
-                fTextWidth = DrawSkiaText::MeasureText(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
-                                                       skPaint, pFont);
+                ch = DrawSkiaText::GetMeasureDefaultChar();
+                fTextWidth = DrawSkiaText::MeasureTextChar(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
+                                                           skPaint, pFont, true);
             }
             if (bUseFontHeight) {
                 //用字体高度作为字的高度，所有字都等高
@@ -338,10 +339,10 @@ float VerticalDrawText::CalculateDefaultCharWidth(const IFont* pFont, const SkFo
     if ((pSkFont == nullptr) || (skPaint == nullptr)) {
         return 0;
     }
-    DUTF32Char ch = L'W';
+    DUTF32Char ch = DrawSkiaText::GetMeasureDefaultChar();
     SkRect bounds;
-    SkScalar fCharWidth = DrawSkiaText::MeasureText(*pSkFont, ch, &bounds,//斜体字时，这个宽度包含了外延的宽度
-                                                    skPaint, pFont);
+    SkScalar fCharWidth = DrawSkiaText::MeasureTextChar(*pSkFont, ch, &bounds,//斜体字时，这个宽度包含了外延的宽度
+                                                        skPaint, pFont, true);
 
     SkScalar nWidthDiff = 0;
     if (bounds.fLeft < 0) {

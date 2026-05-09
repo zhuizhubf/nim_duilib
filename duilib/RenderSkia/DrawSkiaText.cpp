@@ -66,28 +66,47 @@ UTF32String DrawSkiaText::GetDrawStringUTF32(const void* text, size_t byteLength
     return UTF32String();
 }
 
-SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
-                                   SkRect* bounds, const SkPaint* paint,
-                                   const IFont* pFont)
+DUTF32Char DrawSkiaText::GetMeasureDefaultChar()
+{
+    return L'A';
+}
+
+SkScalar DrawSkiaText::MeasureTextChar(const SkFont& font, DUTF32Char ch,
+                                       SkRect* bounds, const SkPaint* paint,
+                                       const IFont* pFont,
+                                       bool bUseDefaultCharWhenFailed)
 {
     if (pFont != nullptr) {
         FallbackFontCreator fallbackFontCreator = [pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
             return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
             };
-        return MeasureText(font, ch, bounds, paint, fallbackFontCreator);
+        return MeasureTextChar(font, ch, bounds, paint, fallbackFontCreator, bUseDefaultCharWhenFailed);
     }
-    else if (font.unicharToGlyph((SkUnichar)ch) != 0) {
-        return font.measureText(&ch, sizeof(ch), SkTextEncoding::kUTF32, bounds, paint);
+    else {
+        SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
+        if (glyphID != 0) {
+            //只有当前不为0时可以调用，否则skia内部会导致崩溃
+            return font.measureText(&ch, sizeof(ch), SkTextEncoding::kGlyphID, bounds, paint);
+        }        
+    }
+    if (bUseDefaultCharWhenFailed) {
+        DUTF32Char defaultChar = GetMeasureDefaultChar();
+        return font.measureText(&defaultChar, sizeof(defaultChar), SkTextEncoding::kUTF32, bounds, paint);
+    }
+    if (bounds != nullptr) {
+        bounds->setEmpty();
     }
     return 0.0f;
 }
 
-SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
-                                   SkRect* bounds, const SkPaint* paint,
-                                   FallbackFontCreator fallbackFontCreator)
+SkScalar DrawSkiaText::MeasureTextChar(const SkFont& font, DUTF32Char ch,
+                                       SkRect* bounds, const SkPaint* paint,
+                                       FallbackFontCreator fallbackFontCreator,
+                                       bool bUseDefaultCharWhenFailed)
 {
     SkGlyphID glyphId = font.unicharToGlyph((SkUnichar)ch);
     if (glyphId != 0) {
+        //只有当前不为0时可以调用，否则skia内部会导致崩溃
         return font.measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, bounds, paint);
     }
     else if (fallbackFontCreator != nullptr) {
@@ -97,6 +116,13 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, DUTF32Char ch,
         if (pFallbackSkFont != nullptr) {
             return pFallbackSkFont->measureText(&glyphId, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, bounds, paint);
         }
+    }
+    if (bUseDefaultCharWhenFailed) {
+        DUTF32Char defaultChar = GetMeasureDefaultChar();
+        return font.measureText(&defaultChar, sizeof(defaultChar), SkTextEncoding::kUTF32, bounds, paint);
+    }
+    if (bounds != nullptr) {
+        bounds->setEmpty();
     }
     return 0.0f;
 }
@@ -210,13 +236,22 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
         }
 
         //再计算需要字体回退的字符
+        SkScalar fCalcCharWidth = 0;
+        SkRect calcCharBounds;
+        calcBounds = bHasBounds ? &calcCharBounds : nullptr;
         EnumTextCallback enumTextCallback2 = [&](SkUnichar unicodeChar, size_t /*charByteLength*/) {
-            fTotalWidth += MeasureText(font, unicodeChar, calcBounds, paint, fallbackFontCreator);
+            fCalcCharWidth = MeasureTextChar(font, unicodeChar, calcBounds, paint, fallbackFontCreator, true);            
             if (bHasBounds) {
-                totalBounds.fTop = std::min(totalBounds.fTop, calcBounds->fTop);
-                totalBounds.fBottom = std::max(totalBounds.fBottom, calcBounds->fBottom);
-                totalBounds.fRight += std::max(0.0f, calcBounds->width());//TODO: 算法不正确
+                //算法保持与SkFont::measureText函数内部的实现保持一致
+                if (totalBounds.isEmpty()) {
+                    totalBounds = *calcBounds;
+                }
+                else {
+                    calcBounds->offset(fTotalWidth, 0);
+                    totalBounds.join(*calcBounds);
+                }
             }
+            fTotalWidth += fCalcCharWidth;
             return true;
             };
 

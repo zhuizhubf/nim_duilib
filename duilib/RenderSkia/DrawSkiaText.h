@@ -66,19 +66,38 @@ public:
     static const SkFont* CreateFallbackFont(const IFont* pFont, SkUnichar unicodeChar, SkGlyphID* glyphId);
 
 public:
-    /** 评估文字的宽度和绘制区域，支持字体回退
-    * @return 返回字符宽度，如果不支持绘制该字符，返回0
+    /** 估算的默认字符（UTF32字符）
+    * @return 返回估算默认使用的字符，仅当字符估算失败时使用
     */
-    static SkScalar MeasureText(const SkFont& font, DUTF32Char ch,
-                                SkRect* bounds, const SkPaint* paint,
-                                const IFont* pFont);
+    static DUTF32Char GetMeasureDefaultChar();
 
     /** 评估文字的宽度和绘制区域，支持字体回退
-    * @return 返回字符宽度，如果不支持绘制该字符，返回0
+    * @param [in] font 字体
+    * @param [in] ch 待估算的字符（UTF32字符）
+    * @param [out] bounds 如果不为nullptr则输出该字符的绘制范围
+    * @param [in] paint 绘制属性
+    * @param [in] pFont font字体关联的IFont接口，用于支持字体回退，如果为nullptr则不支持字体回退
+    * @param [in] bUseDefaultCharWhenFailed 当估算失败时，是否使用默认字符估算
+    * @return 返回字符宽度，如果不支持绘制该字符(当bUseDefaultCharWhenFailed为false时)，返回0
     */
-    static SkScalar MeasureText(const SkFont& font, DUTF32Char ch,
-                                SkRect* bounds, const SkPaint* paint,
-                                FallbackFontCreator fallbackFontCreator);
+    static SkScalar MeasureTextChar(const SkFont& font, DUTF32Char ch,
+                                    SkRect* bounds, const SkPaint* paint,
+                                    const IFont* pFont,
+                                    bool bUseDefaultCharWhenFailed);
+
+    /** 评估文字的宽度和绘制区域，支持字体回退
+    * @param [in] font 字体
+    * @param [in] ch 待估算的字符（UTF32字符）
+    * @param [out] bounds 如果不为nullptr则输出该字符的绘制范围
+    * @param [in] paint 绘制属性
+    * @param [in] fallbackFontCreator 字体回退函数，如果为nullptr则不支持字体回退
+    * @param [in] bUseDefaultCharWhenFailed 当估算失败时，是否使用默认字符估算
+    * @return 返回字符宽度，如果不支持绘制该字符(当bUseDefaultCharWhenFailed为false时)，返回0
+    */
+    static SkScalar MeasureTextChar(const SkFont& font, DUTF32Char ch,
+                                    SkRect* bounds, const SkPaint* paint,
+                                    FallbackFontCreator fallbackFontCreator,
+                                    bool bUseDefaultCharWhenFailed);
 
     /** 评估文字的宽度和绘制区域，支持字体回退
     * @return 返回字符宽度
