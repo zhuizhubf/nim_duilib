@@ -192,10 +192,6 @@ private:
     */
     void SetPaintByPen(SkPaint& skPaint, const IPen* pen);
 
-    /** 获取当前字所占的UTF16字符个数(1个或者2个)
-    */
-    size_t GetUTF16CharCount(const DStringW::value_type* srcPtr, size_t textStartIndex) const;
-
     /** 设置颜色渐变的绘制属性
     */
     void InitGradientColor(SkPaint& skPaint, const UiRectF& rc, UiColor dwColor, UiColor dwColor2, int8_t nColor2Direction) const;

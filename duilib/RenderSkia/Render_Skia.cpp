@@ -3,7 +3,6 @@
 #include "duilib/RenderSkia/HorizontalDrawText.h"
 #include "duilib/RenderSkia/DrawRichText.h"
 #include "duilib/RenderSkia/DrawSkiaText.h"
-#include "duilib/RenderSkia/SkUtils.h"
 #include "duilib/RenderSkia/Bitmap_Skia.h"
 #include "duilib/RenderSkia/Path_Skia.h"
 #include "duilib/RenderSkia/Matrix_Skia.h"
@@ -1865,20 +1864,6 @@ void Render_Skia::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>
                                               rowXOffset,
                                               uFade,
                                               pRichTextRects);
-}
-
-size_t Render_Skia::GetUTF16CharCount(const DStringW::value_type* srcPtr, size_t textStartIndex) const
-{
-    if (srcPtr != nullptr) {
-        ASSERT(sizeof(uint16_t) == sizeof(DStringW::value_type));
-        const uint16_t* src = (const uint16_t*)(srcPtr + textStartIndex);
-        ASSERT(!SkUTF16_IsLowSurrogate(*src));
-        if (SkUTF16_IsHighSurrogate(*src)) {
-            ASSERT(SkUTF16_IsLowSurrogate(*(src + 1)));
-            return 2;
-        }
-    }
-    return 1;
 }
 
 void Render_Skia::DrawBoxShadow(const UiRect& rc,
