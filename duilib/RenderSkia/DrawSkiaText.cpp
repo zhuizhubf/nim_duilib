@@ -1,6 +1,6 @@
 #include "DrawSkiaText.h"
 #include "duilib/RenderSkia/Font_Skia.h"
-#include "duilib/RenderSkia/SkUtils.h"
+#include "duilib/RenderSkia/SkUTF.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
@@ -131,7 +131,7 @@ static inline size_t GetCharBytes(SkTextEncoding textEncoding)
     case SkTextEncoding::kUTF32:
         return 4;
     default:
-        SkASSERT(false);
+        ASSERT(false);
         break;
     }
     return 1;
@@ -215,7 +215,7 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
             if (bHasBounds) {
                 totalBounds.fTop = std::min(totalBounds.fTop, calcBounds->fTop);
                 totalBounds.fBottom = std::max(totalBounds.fBottom, calcBounds->fBottom);
-                totalBounds.fRight += std::max(0.0f, calcBounds->width());
+                totalBounds.fRight += std::max(0.0f, calcBounds->width());//TODO: 算法不正确
             }
             return true;
             };
@@ -255,9 +255,8 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
     }
     else {
         SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
-        if (glyphID != 0) {
-            skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
-        }
+        //如果glyphID为0，绘制未知字符，实际会显示一个方框
+        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
         GetSkGlyphCharWidth(font, paint, glyphID, fWidth);
     }
     return fWidth;
@@ -463,66 +462,31 @@ static inline bool SkUTF_IsLineBreaker(int c)
     return true;
 }
 
-static inline SkUnichar SkUTF_NextUnichar(const void** ptr, SkTextEncoding textEncoding)
+/** 获取下一个Unicode（UTF32）字符
+* @param [in,out] ptr 输入当前字符串的起始地址，返回下一个字符的起始地址（ptr指针的值会增加）
+* @param [in] end 字符串结束地址
+* @param [in] textEncoding 文本编码
+* @return 返回ptr地址当前的Unicode（UTF32）字符, 如果出错返回-1
+*/
+static inline SkUnichar SkUTF_NextUnichar(const void** ptr, const void* end, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF16) {
-        return SkUTF16_NextUnichar((const uint16_t**)ptr);
+        return SkUTF::NextUTF16((const uint16_t**)ptr, (const uint16_t*)end);
     }
     else if (textEncoding == SkTextEncoding::kUTF32) {
-        const uint32_t** srcPtr = (const uint32_t**)ptr;
-        const uint32_t* src = *srcPtr;
-        SkUnichar c = *src;
-        *srcPtr = ++src;
-        return c;
+        return SkUTF::NextUTF32((const int32_t**)ptr, (const int32_t*)end);
+    }
+    else if (textEncoding == SkTextEncoding::kUTF8){
+        return SkUTF::NextUTF8((const char**)ptr, (const char*)end);
     }
     else {
-        return SkUTF8_NextUnichar((const char**)ptr);
+        ASSERT(0);
+        *ptr = end;
+        return -1;
     }
 }
 
-static inline SkUnichar SkUTF_ToUnichar(const void* utf, SkTextEncoding textEncoding)
-{
-    if (textEncoding == SkTextEncoding::kUTF16) {
-        const uint16_t* srcPtr = (const uint16_t*)utf;
-        return SkUTF16_NextUnichar(&srcPtr);
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
-        const uint32_t* srcPtr = (const uint32_t*)utf;
-        SkUnichar c = *srcPtr;
-        return c;
-    }
-    else {
-        return SkUTF8_ToUnichar((const char*)utf);
-    }
-}
-
-static inline int SkUTF_CountUTFBytes(const void* utf, SkTextEncoding textEncoding)
-{
-    if (textEncoding == SkTextEncoding::kUTF16) {
-        // 2 or 4
-        int numChars = 1;
-        const uint16_t* src = static_cast<const uint16_t*>(utf);
-        unsigned c = *src++;
-        if (SkUTF16_IsHighSurrogate(c)) {
-            c = *src++;
-            if (!SkUTF16_IsLowSurrogate(c)) {
-                SkASSERT(false);
-            }
-            numChars = 2;
-        }
-        return numChars * 2;
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
-        //only 4
-        return 4;
-    }
-    else {
-        //1 or 2 or 3 or 4
-        return SkUTF8_CountUTF8Bytes((const char*)utf);
-    }
-}
-
-size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncoding textEncoding,
+size_t DrawSkiaText::Linebreak(const char* text, const char* stop, SkTextEncoding textEncoding,
                                const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
                                SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
                                size_t* trailing)
@@ -546,9 +510,14 @@ size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncod
         *trailing = 0;
     }
 
+    SkUnichar uni = 0;
     while (text < stop) {
         const char* prevText = text;
-        SkUnichar uni = SkUTF_NextUnichar((const void**)&text, textEncoding);
+        uni = SkUTF_NextUnichar((const void**)&text, stop, textEncoding);
+        if (uni == -1) {
+            text = stop;//有错误
+            break;
+        }
 
         //当前字符是否为空格（或非可见字符）
         bool currIsWhiteSpace = SkUTF_IsWhiteSpace(uni);
@@ -569,8 +538,8 @@ size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncod
         if (text > start + lengthBreak) {
             if (currIsWhiteSpace) {
                 // eat the rest of the whitespace
-                while (text < stop && SkUTF_IsWhiteSpace(SkUTF_ToUnichar(text, textEncoding))) {
-                    text += SkUTF_CountUTFBytes(text, textEncoding);
+                while (text < stop && SkUTF_IsWhiteSpace(SkUTF_NextUnichar((const void**)&text, stop, textEncoding))) {
+                    ; //什么也不用做，SkUTF_NextUnichar函数会自动增加text的指针, 直到等于stop值
                 }
                 if (trailing) {
                     *trailing = text - prevText;
@@ -594,7 +563,7 @@ size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncod
             size_t ret = text - start;
             size_t lineBreakSize = 1;
             if (text < stop) {
-                uni = SkUTF_NextUnichar((const void**)&text, textEncoding);
+                uni = SkUTF_NextUnichar((const void**)&text, stop, textEncoding);
                 if ('\r' == uni) {
                     ret = text - start;
                     ++lineBreakSize;
@@ -618,7 +587,7 @@ size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncod
             size_t ret = text - start;
             size_t lineBreakSize = 1;
             if (text < stop) {
-                uni = SkUTF_NextUnichar((const void**)&text, textEncoding);
+                uni = SkUTF_NextUnichar((const void**)&text, stop, textEncoding);
                 if ('\n' == uni) {
                     ret = text - start;
                     ++lineBreakSize;
@@ -642,7 +611,7 @@ size_t DrawSkiaText::Linebreak(const char text[], const char stop[], SkTextEncod
     return text - start;
 }
 
-int32_t DrawSkiaText::CountLines(const char text[], size_t len, SkTextEncoding textEncoding,
+int32_t DrawSkiaText::CountLines(const char* text, size_t len, SkTextEncoding textEncoding,
                                  const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
                                  SkScalar width, TextBoxLineMode lineMode,
                                  std::vector<size_t>* lineLenList)

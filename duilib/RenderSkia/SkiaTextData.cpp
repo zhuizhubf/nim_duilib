@@ -1,5 +1,5 @@
 #include "duilib/RenderSkia/SkiaTextData.h"
-#include "duilib/RenderSkia/SkUtils.h"
+#include "duilib/RenderSkia/SkUTF.h"
 #include "duilib/Utils/StringConvert.h"
 
 namespace ui
@@ -24,20 +24,21 @@ void SkiaTextData::SetText(const void* text, size_t byteLength, SkTextEncoding t
     m_text = text;
     m_byteLength = byteLength;
     m_textEncoding = textEncoding;
+    ASSERT(textEncoding != SkTextEncoding::kGlyphID);
 #ifdef _DEBUG
     if (byteLength > 0) {
         switch (textEncoding) {
         case SkTextEncoding::kUTF8:
-            SkASSERT(SkUTF8_CountUnichars((const char*)pText, nByteLen) != -1);
+            ASSERT(SkUTF::CountUTF8((const char*)text, byteLength) != -1);
             break;
         case SkTextEncoding::kUTF16:
-            SkASSERT(SkUTF16_CountUnichars((const char*)pText, nByteLen) != -1);
+            ASSERT(SkUTF::CountUTF16((const uint16_t*)text, byteLength) != -1);
             break;
         case SkTextEncoding::kUTF32:
-            SkASSERT(SkUTF32_CountUnichars((const char*)pText, nByteLen) != -1);
+            ASSERT(SkUTF::CountUTF32((const int32_t*)text, byteLength) != -1);
             break;
         default:
-            SkASSERT(false);
+            ASSERT(false);
             break;
         }
     }
@@ -55,7 +56,7 @@ bool SkiaTextData::IsEmpty() const
     case SkTextEncoding::kUTF32:
         return false;
     default:
-        SkASSERT(false);
+        ASSERT(false);
         break;
     }
     return true;
@@ -64,16 +65,23 @@ bool SkiaTextData::IsEmpty() const
 size_t SkiaTextData::GetCharByteLength(const void* text, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF8) {
-        int32_t type = SkUTF8_ByteType(*(const uint8_t*)text);
-        if (type == 0) return 1;
-        if (type == 1) return 2;
-        if (type == 2) return 3;
-        if (type == 3) return 4;
+        int32_t type = SkUTF::SkUTF8_ByteType(*(const uint8_t*)text);
+        ASSERT((type >= 1) && (type <= 4));
+        // type == -1   → 非法
+        // type == 0    → 续流字节（不能在开头）
+        // type == 1    → 1字节（ASCII）
+        // type == 2    → 2字节序列
+        // type == 3    → 3字节序列
+        // type == 4    → 4字节序列
+        if (type == 1) return 1;
+        if (type == 2) return 2;
+        if (type == 3) return 3;
+        if (type == 4) return 4;
         return 1;
     }
     else if (textEncoding == SkTextEncoding::kUTF16) {
         uint16_t c = *(const uint16_t*)text;
-        if (SkUTF16_IsHighSurrogate(c)) {
+        if (SkUTF::IsLeadingSurrogateUTF16(c)) {
             return 4;
         }
         return 2;
@@ -90,36 +98,72 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
         return true;
     }
     if (textEncoding == SkTextEncoding::kUTF8) {
+        int32_t type = 0;
+        int32_t charByteLen = 0;
+        SkUnichar unichar = 0;
+
         const uint8_t* utf8 = static_cast<const uint8_t*>(text);
         const uint8_t* stop = utf8 + byteLength;
-        int32_t type = 0;
-        SkUnichar unichar = 0;
-        size_t charByteLen = 1;
         while (utf8 < stop) {
-            type = SkUTF8_ByteType(*utf8);
-            if (!SkUTF8_TypeIsValidLeadingByte(type) || utf8 + type > stop) {
+            // type == -1   → 非法
+            // type == 0    → 续流字节（不能在开头）
+            // type == 1    → 1字节（ASCII）
+            // type == 2    → 2字节序列
+            // type == 3    → 3字节序列
+            // type == 4    → 4字节序列
+            type = SkUTF::SkUTF8_ByteType(*utf8);
+
+            // -1 = 非法UTF8
+            if (type == -1) {
                 return false;
             }
-            unichar = 0;
-            charByteLen = 1;
+
+            // 0 = 续流字节，不能出现在开头
             if (type == 0) {
-                unichar = *utf8;
-            }
-            else if (type == 1) {
-                unichar = ((utf8[0] & 0x1F) << 6) | (utf8[1] & 0x3F);
-                charByteLen = 2;
-            }
-            else if (type == 2) {
-                unichar = ((utf8[0] & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | (utf8[2] & 0x3F);
-                charByteLen = 3;
-            }
-            else if (type == 3) {
-                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
-                charByteLen = 4;
-            }
-            else if (type == 4) {
                 return false;
             }
+
+            // type = 1/2/3/4 表示字节长度
+            charByteLen = type;
+            unichar = 0;
+
+            // 检查剩余长度是否足够
+            if (utf8 + charByteLen > stop) {
+                return false;
+            }
+
+            // --------------------------
+            // 【正确】按长度解码
+            // --------------------------
+            switch (charByteLen) {
+            case 1: // ASCII
+                unichar = *utf8;
+                break;
+
+            case 2:
+                unichar = ((utf8[0] & 0x1F) << 6) | ((utf8[1] & 0x3F));
+                break;
+
+            case 3:
+                unichar = ((utf8[0] & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | ((utf8[2] & 0x3F));
+                break;
+
+            case 4:
+                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | ((utf8[3] & 0x3F));
+                break;
+
+            default:
+                return false;
+            }
+
+            // --------------------------
+            // 检查是否为合法 Unicode
+            // --------------------------
+            /*if (!SkUTF::IsValidUnichar(unichar)) {
+                return false;
+            }*/
+
+            // 回调
             if (!callback(unichar, charByteLen)) {
                 return true;
             }
@@ -138,12 +182,12 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
             c = *utf16++;
             charByteLen = sizeof(uint16_t);
             unichar = c;
-            if (SkUTF16_IsHighSurrogate(c)) {
+            if (SkUTF::IsLeadingSurrogateUTF16(c)) {
                 if (utf16 >= stop) {
                     return true;
                 }
                 low = *utf16++;
-                if (!SkUTF16_IsLowSurrogate(low)) {
+                if (!SkUTF::IsTrailingSurrogateUTF16(low)) {
                     return false;
                 }
                 unichar = (c << 10) + low + unicharLowOffset;
@@ -155,7 +199,7 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
         }
     }
     else if (textEncoding == SkTextEncoding::kUTF32) {
-        SkASSERT(byteLength % sizeof(SkUnichar) == 0);
+        ASSERT(byteLength % sizeof(SkUnichar) == 0);
         const SkUnichar* utf32 = static_cast<const SkUnichar*>(text);
         const SkUnichar* stop = utf32 + (byteLength / sizeof(SkUnichar));
         while (utf32 < stop) {
@@ -166,7 +210,7 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
         }
     }
     else {
-        SkASSERT(false);
+        ASSERT(false);
         return false;
     }
     return true;

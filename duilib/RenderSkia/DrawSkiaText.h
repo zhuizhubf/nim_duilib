@@ -213,7 +213,7 @@ public:
      * @param [in] lineMode 换行模式
      * @param [out] lineLenList 返回每行文本数据的长度（字节）
      */
-    static int32_t CountLines(const char text[], size_t len, SkTextEncoding textEncoding,
+    static int32_t CountLines(const char* text, size_t len, SkTextEncoding textEncoding,
                               const SkFont& font, FallbackFontCreator fallbackFontCreator,
                               const SkPaint& paint, SkScalar width, TextBoxLineMode lineMode,
                               std::vector<size_t>* lineLenList = nullptr);
@@ -245,7 +245,7 @@ public:
      * @param [in] tempData 临时变量，用以提高性能
      * @param [out] trailing 返回尾部的字符占几个字节（字节）
      */
-    static size_t Linebreak(const char text[], const char stop[], SkTextEncoding textEncoding,
+    static size_t Linebreak(const char* text, const char* stop, SkTextEncoding textEncoding,
                             const SkFont& font, FallbackFontCreator fallbackFontCreator, const SkPaint& paint,
                             SkScalar margin, TextBoxLineMode lineMode, MeasureTextTempData& tempData,
                             size_t* trailing = nullptr);

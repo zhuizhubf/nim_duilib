@@ -198,9 +198,6 @@
     <ClCompile Include="RenderSkia\SkTextBox.cpp">
       <Filter>RenderSkia</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSkia\SkUtils.cpp">
-      <Filter>RenderSkia</Filter>
-    </ClCompile>
     <ClCompile Include="RenderSkia\Brush_Skia.cpp">
       <Filter>RenderSkia</Filter>
     </ClCompile>
@@ -909,6 +906,9 @@
     <ClCompile Include="Control\RichEditDragSource_Windows.cpp">
       <Filter>Control\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSkia\SkUTF.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1044,9 +1044,6 @@
       <Filter>RenderSkia</Filter>
     </ClInclude>
     <ClInclude Include="RenderSkia\SkTextBox.h">
-      <Filter>RenderSkia</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderSkia\SkUtils.h">
       <Filter>RenderSkia</Filter>
     </ClInclude>
     <ClInclude Include="RenderSkia\Brush_Skia.h">
@@ -1894,6 +1891,9 @@
     </ClInclude>
     <ClInclude Include="Control\RichEditDragSource_Windows.h">
       <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkUTF.h">
+      <Filter>RenderSkia</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
