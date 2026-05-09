@@ -6,7 +6,6 @@
  */
 
 #include "SkTextBox.h"
-#include "SkUtils.h"
 
 #include "SkiaHeaderBegin.h"
 #include "include/core/SkFont.h"
@@ -47,19 +46,19 @@ SkTextBox::SkTextBox()
 
 void SkTextBox::SetLineMode(TextBoxLineMode lineMode)
 {
-    SkASSERT((unsigned)lineMode < kModeCount);
+    ASSERT((unsigned)lineMode < kModeCount);
     m_lineMode = lineMode;
 }
 
 void SkTextBox::SetSpacingAlign(SpacingAlign align)
 {
-    SkASSERT((unsigned)align < kSpacingAlignCount);
+    ASSERT((unsigned)align < kSpacingAlignCount);
     m_spacingAlign = SkToU8(align);
 }
 
 void SkTextBox::SetTextAlign(TextAlign align)
 {
-    SkASSERT((unsigned)align < kAlignCount);
+    ASSERT((unsigned)align < kAlignCount);
     m_textAlign = SkToU8(align);
 }
 
@@ -124,14 +123,14 @@ void SkTextBox::SetSpacing(SkScalar mul, SkScalar add)
 SkScalar SkTextBox::Visit(Visitor& visitor) const
 {
     if (m_textData.IsEmpty() || m_pFont == nullptr || m_pPaint == nullptr) {
-        SkASSERT(!m_textData.IsEmpty());
-        SkASSERT(m_pFont != nullptr);
-        SkASSERT(m_pPaint != nullptr);
+        ASSERT(!m_textData.IsEmpty());
+        ASSERT(m_pFont != nullptr);
+        ASSERT(m_pPaint != nullptr);
         return 0;
     }
     //该值不强制检查，允许为nullptr
     //if (m_fallbackFontCreator == nullptr) {
-    //    SkASSERT(m_fallbackFontCreator != nullptr);
+    //    ASSERT(m_fallbackFontCreator != nullptr);
     //    return 0;
     //}
 
@@ -193,7 +192,7 @@ SkScalar SkTextBox::Visit(Visitor& visitor) const
             y = height - textHeight;
             break;
         default:
-            SkASSERT(false);
+            ASSERT(false);
             y = 0;
             break;
         }
@@ -268,7 +267,7 @@ static inline size_t GetCharBytes(SkTextEncoding textEncoding)
     case SkTextEncoding::kUTF32:
         return 4;
     default:
-        SkASSERT(false);
+        ASSERT(false);
         return 1;
     }
 }
@@ -389,7 +388,7 @@ static bool EllipsisText(const char pText[], size_t nByteLen, SkTextEncoding tex
                                             U"\\/",
                                             measureTempData);
     default:
-        SkASSERT(false);
+        ASSERT(false);
         return false;
     }
 }
@@ -436,8 +435,8 @@ static void TextBox_DrawText(SkTextBox* pTextBox,
                              FallbackFontCreator fallbackFontCreator,
                              MeasureTextTempData& measureTempData)
 {
-    SkASSERT(pTextBox != nullptr);
-    SkASSERT(pSkCanvas != nullptr);
+    ASSERT(pTextBox != nullptr);
+    ASSERT(pSkCanvas != nullptr);
     if (pTextBox == nullptr || pSkCanvas == nullptr) {
         return;
     }
@@ -575,7 +574,7 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas,
 void SkTextBox::Draw(SkCanvas* pSkCanvas)
 {
     PerformanceStat stat(_T("SkTextBox::Draw"));
-    SkASSERT(pSkCanvas != nullptr);
+    ASSERT(pSkCanvas != nullptr);
     if (pSkCanvas == nullptr) {
         return;
     }
@@ -585,8 +584,8 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas)
     }
 
     if (m_pFont == nullptr || m_pPaint == nullptr) {
-        SkASSERT(m_pFont != nullptr);
-        SkASSERT(m_pPaint != nullptr);
+        ASSERT(m_pFont != nullptr);
+        ASSERT(m_pPaint != nullptr);
         return;
     }
 
