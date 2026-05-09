@@ -5024,7 +5024,12 @@ void RichEdit2::CheckDoDragDrop(const UiPoint& ptMouse)
         m_bDraggingOut = true;
         
         // 获取选中的文本
+#ifdef DUILIB_UNICODE
         DStringW selectedText = GetSelText();
+#else
+        DStringW selectedText = StringConvert::UTF8ToWString(GetSelText());
+#endif
+        
         if (!selectedText.empty()) {
             // 执行拖放操作
             m_nDropTextPos = -1;

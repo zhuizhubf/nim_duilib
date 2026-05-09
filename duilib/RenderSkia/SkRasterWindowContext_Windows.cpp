@@ -14,7 +14,7 @@ SkRasterWindowContext_Windows::SkRasterWindowContext_Windows(HWND hWnd, std::uni
     fWidth = 0;
     fHeight = 0;
     if (m_hWnd != nullptr) {
-        SkASSERT(::IsWindow(m_hWnd));
+        ASSERT(::IsWindow(m_hWnd));
         if (!::IsWindow(m_hWnd)) {
             m_hWnd = nullptr;
         }
@@ -118,15 +118,15 @@ void SkRasterWindowContext_Windows::onSwapBuffers()
 bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRenderPaint* pRenderPaint)
 {
     HWND hWnd = m_hWnd;
-    SkASSERT(::IsWindow(hWnd));
+    ASSERT(::IsWindow(hWnd));
     if ((hWnd == nullptr) || !::IsWindow(hWnd)) {
         return false;
     }
-    SkASSERT(pRender != nullptr);
+    ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return false;
     }
-    SkASSERT(pRenderPaint != nullptr);
+    ASSERT(pRenderPaint != nullptr);
     if (pRenderPaint == nullptr) {
         return false;
     }

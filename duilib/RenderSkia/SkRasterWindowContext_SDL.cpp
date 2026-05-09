@@ -53,13 +53,13 @@ void SkRasterWindowContext_SDL::resize(int nWidth, int nHeight)
     }
     if ((fWidth == nWidth) && (fHeight == nHeight)) {
         if ((fWidth > 0) && (fHeight > 0)) {
-            SkASSERT(m_fSurfaceMemory != nullptr);
-            SkASSERT(m_fBackbufferSurface != nullptr);
+            ASSERT(m_fSurfaceMemory != nullptr);
+            ASSERT(m_fBackbufferSurface != nullptr);
         }
         return;
     }
     const skwindow::DisplayParams* pDisplayParams = getDisplayParams();
-    SkASSERT(pDisplayParams != nullptr);
+    ASSERT(pDisplayParams != nullptr);
     if (pDisplayParams == nullptr) {
         return;
     }
@@ -74,7 +74,7 @@ void SkRasterWindowContext_SDL::resize(int nWidth, int nHeight)
 
     m_fSurfaceMemory.reset(nWidth * nHeight * sizeof(uint32_t));
     void* pixels = m_fSurfaceMemory.get();
-    SkASSERT(pixels != nullptr);
+    ASSERT(pixels != nullptr);
     if (pixels == nullptr) {
         m_fSurfaceMemory.reset();
         fWidth = 0;
@@ -103,19 +103,19 @@ void SkRasterWindowContext_SDL::onSwapBuffers()
 
 bool SkRasterWindowContext_SDL::PaintAndSwapBuffers(IRender* pRender, IRenderPaint* pRenderPaint)
 {
-    SkASSERT(m_sdlWindow != nullptr);
+    ASSERT(m_sdlWindow != nullptr);
     if (m_sdlWindow == nullptr) {
         return false;
     }
-    SkASSERT(m_fBackbufferSurface != nullptr);
+    ASSERT(m_fBackbufferSurface != nullptr);
     if (m_fBackbufferSurface == nullptr) {
         return false;
     }
-    SkASSERT(pRender != nullptr);
+    ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return false;
     }
-    SkASSERT(pRenderPaint != nullptr);
+    ASSERT(pRenderPaint != nullptr);
     if (pRenderPaint == nullptr) {
         return false;
     }
