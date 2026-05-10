@@ -1988,12 +1988,14 @@ int32_t RichEditData::GetPrevValidWordIndex(int32_t nCharIndex)
                     i -= 1;//跳过该字符
                 }
 
+#if defined(WCHAR_T_IS_UTF16)
                 if (i > 0) {
                     const uint16_t* src = (const uint16_t*)(lineText.m_lineText.c_str() + i);
                     if (SkUTF16_IsLowSurrogate(*src)) {
                         i -= 1;//跳过低代理字符
                     }
                 }
+#endif
 
                 if (i <= 0) {
                     //已经到达行首
