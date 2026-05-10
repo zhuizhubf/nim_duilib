@@ -294,7 +294,7 @@ inline static SkScalar DrawSkGlyphChar(SkCanvas* skCanvas, const SkFont& font, c
     }
     else {
         //skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
-        SkPoint pt(x, y);
+        SkPoint pt = SkPoint::Make(x, y);
         skCanvas->drawGlyphs(SkSpan<const SkGlyphID>(&glyphID, 1), SkSpan<const SkPoint>(&pt, 1), SkPoint(), font, paint);
     }
     return fWidth;
