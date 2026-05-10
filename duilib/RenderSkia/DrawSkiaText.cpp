@@ -268,12 +268,36 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
     }
 }
 
-inline static void GetSkGlyphCharWidth(const SkFont& font, const SkPaint& paint, SkGlyphID glyphID, SkScalar& fWidth)
+/** 绘制一个Glyph字符，并返回其宽度
+* @param [in] skCanvas Canvas 接口
+* @param [in] font 字体
+* @param [in] paint 绘制属性
+* @param [in] x 绘制的x坐标
+* @param [in] y 绘制的y坐标
+* @param [in] glyphID 字符ID
+* @return 返回字符宽度
+*/
+inline static SkScalar DrawSkGlyphChar(SkCanvas* skCanvas, const SkFont& font, const SkPaint& paint,
+                                       SkScalar x, SkScalar y, SkGlyphID glyphID, DUTF32Char ch)
 {
-    //字体回退成功, 更新字符宽度
+    //如果glyphID为0，绘制未知字符，实际会显示一个方框
+    SkRect bounds;
+    SkScalar fWidth = 0;
     font.getWidthsBounds(SkSpan<const SkGlyphID>(&glyphID, 1),
                          SkSpan<SkScalar>(&fWidth, 1),
-                         {}, &paint);
+                         SkSpan<SkRect>(&bounds, 1),
+                         &paint);
+    if ((ch != L' ') && bounds.isEmpty()) {
+        //bounds是空的话，表示该字符无法显示，但此时fWidth却不是0，所以绘制一个方框，作为占位符
+        glyphID = 0;
+        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
+    }
+    else {
+        //skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
+        SkPoint pt(x, y);
+        skCanvas->drawGlyphs(SkSpan<const SkGlyphID>(&glyphID, 1), SkSpan<const SkPoint>(&pt, 1), SkPoint(), font, paint);
+    }
+    return fWidth;
 }
 
 SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
@@ -290,9 +314,8 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch,
     }
     else {
         SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
-        //如果glyphID为0，绘制未知字符，实际会显示一个方框
-        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
-        GetSkGlyphCharWidth(font, paint, glyphID, fWidth);
+        //如果glyphID为0，绘制未知字符，实际会显示一个方框        
+        fWidth = DrawSkGlyphChar(skCanvas, font, paint, x, y, glyphID, ch);
     }
     return fWidth;
 }
@@ -307,23 +330,19 @@ SkScalar DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, DUTF32Char ch, SkScala
     }
     SkGlyphID glyphID = font.unicharToGlyph((SkUnichar)ch);
     if (glyphID != 0) {
-        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
-        GetSkGlyphCharWidth(font, paint, glyphID, fWidth);
+        fWidth = DrawSkGlyphChar(skCanvas, font, paint, x, y, glyphID, ch);
     }
     else if (fallbackFontCreator != nullptr) {
         //该字体无法绘制，需要请求回退字体绘制
         glyphID = 0;
         const SkFont* pFallbackSkFont = fallbackFontCreator((uint32_t)ch, &glyphID);
-        if (pFallbackSkFont != nullptr) {
-            skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, *pFallbackSkFont, paint);
-            GetSkGlyphCharWidth(*pFallbackSkFont, paint, glyphID, fWidth);
+        if ((pFallbackSkFont != nullptr) && (glyphID != 0)) {
+            fWidth = DrawSkGlyphChar(skCanvas, *pFallbackSkFont, paint, x, y, glyphID, ch);
         }
     }
     if (glyphID == 0) {
         //使用默认字体获取宽度，避免不绘制，从而使得界面显示字符位置和实际位置不符
-        GetSkGlyphCharWidth(font, paint, glyphID, fWidth);
-        //绘制未知字符，实际会显示一个方框
-        skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
+        fWidth = DrawSkGlyphChar(skCanvas, font, paint, x, y, glyphID, ch);
     }
     return fWidth;
 }
