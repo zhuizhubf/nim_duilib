@@ -1697,8 +1697,10 @@ int32_t RichEditData::CharFromPos(UiPoint pt)
     return nCharPosIndex;
 }
 
-#define SkUTF16_IsHighSurrogate(c)  (((c) & 0xFC00) == 0xD800)
-#define SkUTF16_IsLowSurrogate(c)   (((c) & 0xFC00) == 0xDC00)
+#if defined(WCHAR_T_IS_UTF16)
+    #define SkUTF16_IsHighSurrogate(c)  (((c) & 0xFC00) == 0xD800)
+    #define SkUTF16_IsLowSurrogate(c)   (((c) & 0xFC00) == 0xDC00)
+#endif
 
 int32_t RichEditData::GetNextValidCharIndex(const int32_t nCharIndex)
 {
@@ -1730,6 +1732,7 @@ int32_t RichEditData::GetNextValidCharIndex(const int32_t nCharIndex)
             //在本行中寻找
             size_t i = nStartCharLineOffset + 1;
             while ( i < lineText.m_nLineTextLen) {
+#if defined(WCHAR_T_IS_UTF16)
                 const uint16_t* src = (const uint16_t*)(lineText.m_lineText.c_str() + i);
                 if (SkUTF16_IsHighSurrogate(*src)) {
                     ASSERT(SkUTF16_IsLowSurrogate(*(src + 1)));
@@ -1743,6 +1746,10 @@ int32_t RichEditData::GetNextValidCharIndex(const int32_t nCharIndex)
                     nNewCharIndex = (int32_t)(nStartCharBaseLen + i);
                     break;
                 }
+#else
+                nNewCharIndex = (int32_t)(nStartCharBaseLen + i);
+                break;
+#endif
             }
             size_t nNewOffset = (size_t)nNewCharIndex - nStartCharBaseLen;
             if ((nNewOffset == (lineText.m_nLineTextLen - 1)) && (lineText.m_lineText.data()[nNewOffset] == L'\n')) {
@@ -1796,6 +1803,7 @@ int32_t RichEditData::GetPrevValidCharIndex(int32_t nCharIndex)
             //在本行中寻找
             int32_t i = (int32_t)nStartCharLineOffset - 1;
             while (i >= 0) {
+#if defined(WCHAR_T_IS_UTF16)
                 const uint16_t* src = (const uint16_t*)(lineText.m_lineText.c_str() + i);
                 if (SkUTF16_IsHighSurrogate(*src)) {
                     ASSERT(SkUTF16_IsLowSurrogate(*(src + 1)));
@@ -1809,6 +1817,10 @@ int32_t RichEditData::GetPrevValidCharIndex(int32_t nCharIndex)
                     nNewCharIndex = (int32_t)(nStartCharBaseLen + i);
                     break;
                 }
+#else
+                nNewCharIndex = (int32_t)(nStartCharBaseLen + i);
+                break;
+#endif
             }
             if ((nNewCharIndex == nCharIndex) && (i <= 0) && (nIndex >= 1)) {
                 //已经在行首，跳到前一行的最后一个字符
@@ -1904,6 +1916,7 @@ int32_t RichEditData::GetNextValidWordIndex(int32_t nCharIndex)
                     nNewCharIndex = (int32_t)(nStartCharBaseLen + i);
                     break;
                 }
+#if defined(WCHAR_T_IS_UTF16)
                 const uint16_t* src = (const uint16_t*)(lineText.m_lineText.c_str() + i);
                 if (SkUTF16_IsHighSurrogate(*src)) {
                     ASSERT(SkUTF16_IsLowSurrogate(*(src + 1)));
@@ -1912,6 +1925,9 @@ int32_t RichEditData::GetNextValidWordIndex(int32_t nCharIndex)
                 else {
                     i += 1;//跳过该字符
                 }
+#else
+                i += 1;//跳过该字符
+#endif
             }
             size_t nNewOffset = (size_t)nNewCharIndex - nStartCharBaseLen;
             if ((nNewOffset == (lineText.m_nLineTextLen - 1)) && (lineText.m_lineText.data()[nNewOffset] == L'\n')) {
@@ -2111,6 +2127,7 @@ bool RichEditData::GetCurrentWordIndex(int32_t nCharIndex, int32_t& nWordStartIn
                     nWordEndIndex = (int32_t)(nStartCharBaseLen + i);
                     break;
                 }
+#if defined(WCHAR_T_IS_UTF16)
                 const uint16_t* src = (const uint16_t*)(lineText.m_lineText.c_str() + i);
                 if (SkUTF16_IsHighSurrogate(*src)) {
                     ASSERT(SkUTF16_IsLowSurrogate(*(src + 1)));
@@ -2119,6 +2136,9 @@ bool RichEditData::GetCurrentWordIndex(int32_t nCharIndex, int32_t& nWordStartIn
                 else {
                     i += 1;//跳过该字符
                 }
+#else
+                i += 1;//跳过该字符
+#endif
             }
             if (nWordEndIndex == -1) {
                 nWordEndIndex = (int32_t)lineText.m_nLineTextLen;
