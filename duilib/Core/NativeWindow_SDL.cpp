@@ -3325,7 +3325,11 @@ bool NativeWindow_SDL::SetSystemShadowType(NativeWindowShadowType nativeShadowTy
         return true;
     }
 #elif defined DUILIB_BUILD_FOR_MACOS
-    return false;    
+    if (ModifyNsWindowShadowType(GetNSWindow(), nativeShadowType)) {
+        m_systemShadowType = nativeShadowType;
+        //启用系统阴影成功
+        return true;
+    }
 #endif
     return false;
 }

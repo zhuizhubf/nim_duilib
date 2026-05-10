@@ -10,10 +10,10 @@ namespace ui
 enum class NativeWindowShadowType
 {
     kShadowSystemDisabled   = -1,   //禁用操作系统的阴影
-    kShadowSystemDefault    =  0,   //操作系统的默认阴影
-    kShadowSystemDoNotRound =  1,   //操作系统的阴影，非圆角阴影
-    kShadowSystemRound      =  2,   //操作系统的阴影，圆角阴影
-    kShadowSystemSmallRound =  3,   //操作系统的阴影，小圆角阴影
+    kShadowSystemDefault    =  0,   //操作系统的默认阴影（默认圆角）
+    kShadowSystemDoNotRound =  1,   //操作系统的阴影，直角
+    kShadowSystemRound      =  2,   //操作系统的阴影，圆角
+    kShadowSystemSmallRound =  3,   //操作系统的阴影，小圆角
 };
 
 } // namespace ui
