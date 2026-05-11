@@ -2321,12 +2321,9 @@ bool NativeWindow_SDL::EnterFullscreen()
         SDL_RestoreWindow(m_sdlWindow);
     }
 
-    bool nRet = SDL_SetWindowFullscreen(m_sdlWindow, true);
-    ASSERT_UNUSED_VARIABLE(nRet);
-
     m_lastWindowFlags = ::SDL_GetWindowFlags(m_sdlWindow);
     if (m_lastWindowFlags & SDL_WINDOW_RESIZABLE) {
-        //需要去掉可调整窗口大小的属性
+        //需要去掉可调整窗口大小的属性，否则在部分平台下无法正常设置全屏
         SDL_SetWindowResizable(m_sdlWindow, false);
     }
 #if defined (DUILIB_BUILD_FOR_WIN)
@@ -2335,6 +2332,10 @@ bool NativeWindow_SDL::EnterFullscreen()
         ModifyDwmStyle(GetHWND(), NativeWindowShadowType::kShadowSystemDisabled);
     }
 #endif
+
+    bool nRet = SDL_SetWindowFullscreen(m_sdlWindow, true);
+    ASSERT_UNUSED_VARIABLE(nRet);
+
     m_pOwner->OnNativeWindowEnterFullscreen();
     return true;
 }
