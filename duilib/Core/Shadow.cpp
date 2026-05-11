@@ -333,9 +333,9 @@ void Shadow::OnShadowAttached(ShadowType nShadowType)
         }
         else {
 #ifdef DUILIB_BUILD_FOR_MACOS
-            //MacOS系统中，如果使用系统标题栏，需要开启系统阴影，否则也不显示阴影
+            //MacOS系统中，如果使用系统标题栏，需要开启系统阴影(必须使用直角阴影，否则客户区周围都是圆角)，否则也不显示阴影
             if (m_pWindow->IsUseSystemCaption()) {
-                m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDefault);
+                m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDoNotRound);
                 //启用系统阴影时，必须清除RGN，否则显示不正确(由调用方负责处理)
                 m_pWindow->NativeWnd()->ClearWindowRgn(true);
             }
