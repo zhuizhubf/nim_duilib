@@ -365,6 +365,9 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
     //窗口配置的size是否包含阴影
     bool bSizeContainShadow = false;
 
+    //XML文件中是否定义了分层窗口属性
+    bool bIsLayeredWindowDefined = false;
+
     //阴影相关参数
     ShadowType nShadowType = ShadowType::kShadowDefault;
     UiPadding rcShadowCorner;
@@ -399,9 +402,22 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
             createAttributes.m_bShadowAttached = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bShadowAttachedDefined = true;
         }
+        else if (strName == _T("shadow_type")) {
+            //设置阴影类型
+            if (Shadow::GetShadowType(strValue, nShadowType)) {
+                UiSize szBorderRound;
+                DString shadowImage;
+                Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
+            }
+        }
+        else if ((strName == _T("shadow_corner")) || (strName == _T("shadowcorner"))) {
+            //设置窗口阴影的九宫格属性            
+            AttributeUtil::ParsePaddingValue(strValue.c_str(), rcShadowCorner);
+        }
         else if ((strName == _T("layered_window")) || (strName == _T("layeredwindow"))) {
             createAttributes.m_bIsLayeredWindow = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bIsLayeredWindowDefined = true;
+            bIsLayeredWindowDefined = true;
         }
         else if (strName == _T("alpha")) {
             //设置窗口的透明度（0 - 255），仅当使用层窗口时有效，在在UpdateLayeredWindow函数中作为参数使用
@@ -438,18 +454,6 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
         else if (strName == _T("sdl_render_name")) {
             //期望的SDL Render的名称
             createAttributes.m_sdlRenderName = strValue;
-        }
-        else if (strName == _T("shadow_type")) {
-            //设置阴影类型
-            if (Shadow::GetShadowType(strValue, nShadowType)) {
-                UiSize szBorderRound;
-                DString shadowImage;
-                Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
-            }
-        }
-        else if ((strName == _T("shadow_corner")) || (strName == _T("shadowcorner"))) {
-            //设置窗口阴影的九宫格属性            
-            AttributeUtil::ParsePaddingValue(strValue.c_str(), rcShadowCorner);
         }
     }
 
@@ -549,7 +553,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
     if (createAttributes.m_bLayeredWindowOpacityDefined) {
         ASSERT(createAttributes.m_bIsLayeredWindow);
     }    
-    if (bShadowAttached) {
+    if (bShadowAttached && !bUseSystemCaption) {
         //阴影启用
         if (Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
             //使用自绘阴影，需要启用分层窗口属性，否则绘制会有异常
@@ -560,7 +564,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
 
 #if defined (DUILIB_BUILD_FOR_SDL)
     //默认开启支持透明度(SDL在Windows系统中，未使用分层窗口属性)
-    if (!createAttributes.m_bIsLayeredWindowDefined) {
+    if (!bIsLayeredWindowDefined) {
         createAttributes.m_bIsLayeredWindowDefined = true;
         createAttributes.m_bIsLayeredWindow = true;
     }
@@ -774,7 +778,12 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
 
     if (bHasShadowAttached) {
         //后设置，避免受到"shadow_type"的影响
-        pWindow->SetShadowAttached(bShadowAttached);
+        if (!bShadowAttached) {
+            pWindow->SetShadowAttached(bShadowAttached);
+        }
+        else if (!pWindow->IsUseSystemCaption()) {
+            pWindow->SetShadowAttached(bShadowAttached);
+        }
     }
 
     bool bScaledCX = false;

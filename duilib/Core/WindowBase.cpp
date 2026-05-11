@@ -1014,7 +1014,6 @@ UiRect WindowBase::OnNativeGetSizeBox() const
 
 void WindowBase::OnNativeUseSystemCaptionBarChanged()
 {
-    ProcessOnUseSystemCaptionBarChanged();
     OnUseSystemCaptionBarChanged();
 }
 

@@ -1346,33 +1346,20 @@ void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& 
     }
 
     //初始化层窗口属性
-    m_bIsLayeredWindow = false;
     if (createAttributes.m_bIsLayeredWindowDefined) {
         if (createAttributes.m_bIsLayeredWindow) {
             m_bIsLayeredWindow = true;
-            m_createParam.m_dwExStyle |= kWS_EX_LAYERED;
-        }
-        else {
-            m_createParam.m_dwExStyle &= ~kWS_EX_LAYERED;
         }
     }
     else if (m_createParam.m_dwExStyle & kWS_EX_LAYERED) {
         m_bIsLayeredWindow = true;
     }
 
-    //如果使用系统标题栏，关闭层窗口
-    if (IsUseSystemCaption()) {
-        m_bIsLayeredWindow = false;
-        m_createParam.m_dwExStyle &= ~kWS_EX_LAYERED;
-    }
-
     //如果设置了不透明度，则设置为层窗口
     if (createAttributes.m_bLayeredWindowOpacityDefined && (createAttributes.m_nLayeredWindowOpacity != 255)) {
-        m_createParam.m_dwExStyle |= kWS_EX_LAYERED;
         m_bIsLayeredWindow = true;
     }
     if (createAttributes.m_bLayeredWindowAlphaDefined && (createAttributes.m_nLayeredWindowAlpha != 255)) {
-        m_createParam.m_dwExStyle |= kWS_EX_LAYERED;
         m_bIsLayeredWindow = true;
     }
 
@@ -1388,6 +1375,11 @@ void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& 
     //Linux平台，仅部分Render支持透明窗口; Windows平台支持透明窗口
     if (!bSupportTransparent) {
         m_bIsLayeredWindow = false;
+    }
+    if (m_bIsLayeredWindow) {
+        m_createParam.m_dwExStyle |= kWS_EX_LAYERED;
+    }
+    else {
         m_createParam.m_dwExStyle &= ~kWS_EX_LAYERED;
     }
 }
@@ -1456,7 +1448,7 @@ void NativeWindow_SDL::SetCreateWindowProperties(SDL_PropertiesID props, NativeW
     //支持Hight DPI，参见SDL文档：docs/README-highdpi.md
     windowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
-    if (!IsUseSystemCaption() && IsLayeredWindow()) {
+    if (IsLayeredWindow()) {
         //设置透明属性，这个属性必须在创建窗口时传入，窗口创建完成后，不支持修改
         windowFlags |= SDL_WINDOW_TRANSPARENT;
     }
@@ -1955,6 +1947,9 @@ void NativeWindow_SDL::SetUseSystemCaption(bool bUseSystemCaption)
         return;
     }
     m_bUseSystemCaption = bUseSystemCaption;
+    if (!IsWindow()) {
+        return;
+    }
 
 #ifndef DUILIB_BUILD_FOR_WIN
     //目前Linux系统只有OpenGLES2这个Render支持窗口半透明，所以如果不支持时，强制使用系统标题栏
@@ -1969,14 +1964,8 @@ void NativeWindow_SDL::SetUseSystemCaption(bool bUseSystemCaption)
 
     if (IsUseSystemCaption()) {
         //使用系统默认标题栏, 需要增加标题栏风格
-        if (IsWindow()) {
-            bool nRet = SDL_SetWindowBordered(m_sdlWindow, true);
-            ASSERT_UNUSED_VARIABLE(nRet);
-        }
-        //请求应用层关闭层窗口
-        if (IsLayeredWindow()) {
-            m_pOwner->OnNativeRequestSetLayeredWindow(false, false);
-        }
+        bool nRet = SDL_SetWindowBordered(m_sdlWindow, true);
+        ASSERT_UNUSED_VARIABLE(nRet);
 
         //设置Hit Test函数为默认
         SDL_SetWindowHitTest(m_sdlWindow, nullptr, nullptr);

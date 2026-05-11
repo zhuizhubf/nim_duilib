@@ -718,8 +718,12 @@ void Window::ClearImageCache()
 void Window::OnUseSystemCaptionBarChanged()
 {
     if (IsUseSystemCaption()) {
-        //关闭阴影
+        //当开启系统标题栏时，需要关闭阴影
         SetShadowAttached(false);
+    }
+    else {
+        //当关闭系统标题栏时，需要开启阴影
+        SetShadowAttached(true);
     }
 }
 
@@ -814,6 +818,8 @@ void Window::UpdateLayeredWindowStyleEx(bool bRedraw)
     if (IsLayeredWindow() != bNeedLayeredWindow) {
         OnRequestSetLayeredWindow(bNeedLayeredWindow, bRedraw);
     }
+#else
+    (void)bRedraw;
 #endif
 }
 
@@ -2524,14 +2530,6 @@ bool Window::OnLanguageChanged()
 bool Window::OnThemeChanged()
 {
     return true;
-}
-
-void Window::ProcessOnUseSystemCaptionBarChanged()
-{
-    if (!IsUseSystemCaption()) {
-        //需要更新阴影显示逻辑
-        SetShadowAttached(IsShadowAttached());
-    }    
 }
 
 } // namespace ui

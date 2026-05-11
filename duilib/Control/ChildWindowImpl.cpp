@@ -474,8 +474,4 @@ void ChildWindowImpl::OnDwmCompositionChangedMsg(bool /*bDwmCompositionEnabled*/
     // 空实现
 }
 
-void ChildWindowImpl::ProcessOnUseSystemCaptionBarChanged()
-{
-    // 空实现
-}
 }//namespace ui

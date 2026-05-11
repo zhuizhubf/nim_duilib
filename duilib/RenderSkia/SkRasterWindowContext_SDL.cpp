@@ -53,7 +53,7 @@ void SkRasterWindowContext_SDL::resize(int nWidth, int nHeight)
     }
     if ((fWidth == nWidth) && (fHeight == nHeight)) {
         if ((fWidth > 0) && (fHeight > 0)) {
-            ASSERT(m_fSurfaceMemory != nullptr);
+            ASSERT(m_fSurfaceMemory.get() != nullptr);
             ASSERT(m_fBackbufferSurface != nullptr);
         }
         return;
