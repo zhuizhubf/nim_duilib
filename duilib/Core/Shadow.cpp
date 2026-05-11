@@ -332,7 +332,17 @@ void Shadow::OnShadowAttached(ShadowType nShadowType)
             }
         }
         else {
+#ifdef DUILIB_BUILD_FOR_MACOS
+            //MacOS系统中，如果使用系统标题栏，需要开启系统阴影，否则也不显示阴影
+            if (m_pWindow->IsUseSystemCaption()) {
+                m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDefault);
+            }
+            else {
+                m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDisabled);
+            }
+#else
             m_pWindow->NativeWnd()->SetSystemShadowType(NativeWindowShadowType::kShadowSystemDisabled);
+#endif
         }
     }
 }
