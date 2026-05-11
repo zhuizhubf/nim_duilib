@@ -766,6 +766,10 @@ private:
     //参考：https://learn.microsoft.com/zh-cn/windows/apps/desktop/modernize/apply-snap-layout-menu
     bool m_bSnapLayoutMenu;
 
+    /** m_bSnapLayoutMenu 属性是否被设置
+    */
+    bool m_bSnapLayoutMenuFlag;
+
     //在右键点击标题栏时，是否显示系统的窗口菜单（可进行调整窗口状态，关闭窗口等操作）
     bool m_bEnableSysMenu;
 

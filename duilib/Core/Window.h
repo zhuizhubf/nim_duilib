@@ -960,6 +960,10 @@ private:
     */
     virtual void NotifyWindowExitFullscreen() override final;
 
+    /** 切换系统标题栏与自绘标题栏后，需要处理内部逻辑同步
+    */
+    virtual void ProcessOnUseSystemCaptionBarChanged() override final;
+
 private:
     //鼠标等按下消息处理函数
     void OnButtonDown(EventType eventType, const UiPoint& pt, const NativeMsg& nativeMsg, uint32_t modifierKey);

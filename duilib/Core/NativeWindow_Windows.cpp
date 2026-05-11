@@ -41,6 +41,7 @@ NativeWindow_Windows::NativeWindow_Windows(INativeWindow* pOwner):
     m_bCloseByEsc(false),
     m_bCloseByEnter(false),
     m_bSnapLayoutMenu(false),
+    m_bSnapLayoutMenuFlag(false),
     m_bEnableSysMenu(true),
     m_bNCLButtonDownOnMaxButton(false),
     m_nSysMenuTimerId(0),
@@ -53,11 +54,6 @@ NativeWindow_Windows::NativeWindow_Windows(INativeWindow* pOwner):
 {
     ASSERT(m_pOwner != nullptr);
     m_rcLastWindowPlacement = { sizeof(WINDOWPLACEMENT), };
-
-    //Windows 11及新版本，支持显示贴靠布局菜单（默认关闭，最新版的Win11下，会触发NC绘制，显示出系统绘制的内容，效果不好）
-    /*if (UiIsWindows11OrGreater()) {
-        m_bSnapLayoutMenu = true;
-    }*/
 }
 
 NativeWindow_Windows::~NativeWindow_Windows()
@@ -682,7 +678,7 @@ bool NativeWindow_Windows::SetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
     bool bRet = SetLayeredWindowStyle(bIsLayeredWindow, bChanged);
     if (bRedraw && bChanged && IsWindow()) {
         // 强制窗口重绘
-        ::RedrawWindow(m_hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+        ::RedrawWindow(m_hWnd, NULL, NULL, RDW_FRAME | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         ::SetWindowPos(m_hWnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
     return bRet || !IsWindow();
@@ -810,37 +806,44 @@ void NativeWindow_Windows::SetUseSystemCaption(bool bUseSystemCaption)
         return;
     }
     m_bUseSystemCaption = bUseSystemCaption;
-    if (IsUseSystemCaption()) {
-        //使用系统默认标题栏, 需要增加标题栏风格
-        bool bChanged = false;
-        if (IsWindow()) {
-            UINT oldStyleValue = (UINT)::GetWindowLong(GetHWND(), GWL_STYLE);
+
+    //使用系统默认标题栏, 需要增加标题栏风格
+    if (IsWindow()) {
+        UINT oldStyleValue = (UINT)::GetWindowLong(GetHWND(), GWL_STYLE);
+        if (IsUseSystemCaption()) {
+            //开启系统标题栏
             UINT newStyleValue = oldStyleValue;
             if (oldStyleValue & WS_POPUP) {
                 //弹出式窗口
                 newStyleValue |= (WS_CAPTION | WS_SYSMENU);
             }
             else {
-                newStyleValue |= (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);                
+                newStyleValue |= (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
             }
             if (newStyleValue != oldStyleValue) {
                 ::SetWindowLong(GetHWND(), GWL_STYLE, newStyleValue);
-                bChanged = true; 
             }
         }
-        //请求应用层关闭层窗口
-        if (IsLayeredWindow()) {
-            bChanged = m_pOwner->OnNativeRequestSetLayeredWindow(false, false);
+        else {
+            //关闭系统标题栏
+            UpdateMinMaxBoxStyle();
         }
-        if (bChanged) {
-            // 强制窗口重绘
-            ::SetWindowPos(GetHWND(), nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
-            //重新激活窗口的非客户区绘制
-            if (IsWindowForeground()) {
-                KeepParentActive();
-            }            
-        }        
+        
     }
+    if (IsUseSystemCaption() && IsLayeredWindow()) {
+        //开启系统标题栏时，请求应用层关闭层窗口
+        m_pOwner->OnNativeRequestSetLayeredWindow(false, false);
+    }
+
+    // 强制窗口重绘
+    ::RedrawWindow(m_hWnd, NULL, NULL, RDW_FRAME | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+    ::SetWindowPos(m_hWnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+    //重新激活窗口的非客户区绘制
+    if (IsWindowForeground()) {
+        KeepParentActive();
+    }
+
     m_pOwner->OnNativeUseSystemCaptionBarChanged();
 }
 
@@ -3147,15 +3150,24 @@ HWND NativeWindow_Windows::GetWindowOwner() const
 
 void NativeWindow_Windows::SetEnableSnapLayoutMenu(bool bEnable)
 {
-    //仅Windows11才支持
-    if (UiIsWindows11OrGreater()) {
-        m_bSnapLayoutMenu = bEnable;
-    }
+    m_bSnapLayoutMenu = bEnable;
+    m_bSnapLayoutMenuFlag = true;    
 }
 
 bool NativeWindow_Windows::IsEnableSnapLayoutMenu() const
 {
-    return m_bSnapLayoutMenu;
+    //仅Windows11才支持
+    static bool bIsWindows11OrGreater = UiIsWindows11OrGreater();
+    if (bIsWindows11OrGreater) {
+        if (m_bSnapLayoutMenuFlag) {
+            //外部设置为准
+            return m_bSnapLayoutMenu;
+        }
+        else if (IsLayeredWindow() || IsSystemShadowEnabled()) {
+            return true; //Win11下，如果为分层窗口，或者使用系统阴影时默认开启
+        }
+    }
+    return false;
 }
 
 void NativeWindow_Windows::SetEnableSysMenu(bool bEnable)

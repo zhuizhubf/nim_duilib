@@ -30,38 +30,61 @@
                 <Label class="page_window_shadow_label" text_id="STRID_RENDER_SHADOW_MENU_ROUND"/>
             </VBox>
         </HBox>
-        <VBox>
-            <Label text_id="STRID_RENDER_SHADOW_TEST_TITLE" valign="center" margin="12,30,10,0"/>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_DEFAULT" selected="true" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={default}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_BIG" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={big}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_BIG_ROUND" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={big_round}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SMALL" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={small}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SMALL_ROUND" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={small_round}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_MENU" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={menu}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_MENU_ROUND" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={menu_round}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_NONE" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={none}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_NONE_ROUND" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_type={none_round}" />
-            </Option>
-            <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_CLOSE_FUNC" selected="false" valign="center" margin="30,4,0,2">
-                <Event type="select" receiver="#window#" apply_attribute="shadow_attached={false}" />
-            </Option>
-        </VBox>
+        <HBox>
+            <VBox>
+                <Label text_id="STRID_RENDER_SHADOW_TEST_TITLE" valign="center" margin="12,30,10,0"/>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_DEFAULT" selected="true" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={default}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_BIG" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={big}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_BIG_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={big_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SMALL" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={small}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SMALL_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={small_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_MENU" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={menu}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_MENU_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={menu_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_NONE" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={none}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_NONE_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={none_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SYSTEM_DEFAULT" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={system_default}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SYSTEM_NOT_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={system_not_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SYSTEM_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={system_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_TYPE_SYSTEM_SMALL_ROUND" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_type={system_small_round}" />
+                </Option>
+                <Option class="checkbox_2" group="shadow_type" text_id="STRID_RENDER_SHADOW_CLOSE_FUNC" selected="false" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="shadow_attached={false}" />
+                </Option>
+            </VBox>
+            <VBox>
+                <Label text_id="STRID_RENDER_SYSTEM_CAPTION_TEST_TITLE" valign="center" margin="12,30,10,0"/>
+                <Option class="checkbox_2" group="caption" text_id="STRID_RENDER_SYSTEM_CAPTION_ON" selected="false" valign="center" margin="30,14,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="use_system_caption={true}" />
+                </Option>
+                <Option class="checkbox_2" group="caption" text_id="STRID_RENDER_SYSTEM_CAPTION_OFF" selected="true" valign="center" margin="30,4,0,2">
+                    <Event type="select" receiver="#window#" apply_attribute="use_system_caption={false}" />
+                </Option>
+            </VBox>
+        </HBox>
     </VBox>
 </Window>

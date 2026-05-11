@@ -2526,4 +2526,12 @@ bool Window::OnThemeChanged()
     return true;
 }
 
+void Window::ProcessOnUseSystemCaptionBarChanged()
+{
+    if (!IsUseSystemCaption()) {
+        //需要更新阴影显示逻辑
+        SetShadowAttached(IsShadowAttached());
+    }    
+}
+
 } // namespace ui

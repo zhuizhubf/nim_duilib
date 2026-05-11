@@ -550,7 +550,14 @@ STRID_RENDER_SHADOW_TYPE_MENU = Shadow type: menu, Small shadow (right angle, su
 STRID_RENDER_SHADOW_TYPE_MENU_ROUND = Shadow type: menu_round, Small shadow (rounded corner, suitable for pop-up windows like menus)
 STRID_RENDER_SHADOW_TYPE_NONE = Shadow type: none, No shadow (with border, right angle)
 STRID_RENDER_SHADOW_TYPE_NONE_ROUND = Shadow type: none_round, No shadow (with border, rounded corner)
+STRID_RENDER_SHADOW_TYPE_SYSTEM_DEFAULT = Shadow type: system_default, use system default shadow
+STRID_RENDER_SHADOW_TYPE_SYSTEM_NOT_ROUND = Shadow type: system_not_round, system shadow, not round
+STRID_RENDER_SHADOW_TYPE_SYSTEM_ROUND = Shadow type: system_round, system shadow, round
+STRID_RENDER_SHADOW_TYPE_SYSTEM_SMALL_ROUND = Shadow type: system_small_round, system shadow, small round
 STRID_RENDER_SHADOW_CLOSE_FUNC = Turn off shadow function
+STRID_RENDER_SYSTEM_CAPTION_TEST_TITLE = Window System Title Bar Function Test:
+STRID_RENDER_SYSTEM_CAPTION_ON = Enable System Title Bar
+STRID_RENDER_SYSTEM_CAPTION_OFF = Disable System Title Bar
 
 STRID_RENDER_CTRL_TEST_MENUBAR_DESC =  MenuBar Example:
 STRID_RENDER_CTRL_TEST_MOVABLE_DESC = Draggable controls and containers

@@ -961,6 +961,10 @@ protected:
     */
     virtual bool OnRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw);
 
+    /** 切换系统标题栏与自绘标题栏后，需要处理内部逻辑同步
+    */
+    virtual void ProcessOnUseSystemCaptionBarChanged() = 0;
+
 protected:
     /** 是否自动设置窗口形状（Windows平台是指设置窗口的RGN）
     *   默认情况下，子窗口不自动设置，顶层窗口自动设置

@@ -481,6 +481,11 @@ protected:
     /** @}*/
 
 private:
+    /** 切换系统标题栏与自绘标题栏后，需要处理内部逻辑同步
+    */
+    virtual void ProcessOnUseSystemCaptionBarChanged() override final;
+
+private:
     //子窗口的外部消息回调接口
     ControlPtrT<ChildWindowEvents> m_pChildWindowEvents;
 };
