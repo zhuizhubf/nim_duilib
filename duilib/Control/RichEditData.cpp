@@ -1860,8 +1860,8 @@ int32_t RichEditData::GetPrevValidCharIndex(int32_t nCharIndex)
 
 bool RichEditData::IsSeperatorChar(DStringW::value_type ch) const
 {
-    static const DStringW sep = L"`~!@#$%^&*()-=+\t[]{}|\\;:'\"\r\n,<.>/?·！￥…、，。《》？“”；：‘’（）【】";
-    return sep.find(ch) != DStringW::npos;
+    // Unicode 标准：标点 + 空白 + 控制符
+    return iswpunct(ch) || iswspace(ch) || iswcntrl(ch);
 }
 
 int32_t RichEditData::GetNextValidWordIndex(int32_t nCharIndex)
