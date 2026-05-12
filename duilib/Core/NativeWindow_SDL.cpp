@@ -827,7 +827,7 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
     bool bOpenGL = false;
     bool bSupportTransparent = false;
 #ifndef DUILIB_BUILD_FOR_WIN
-    //Linux平台    
+    //macOS/Linux/FreeBSD平台
     bool bOpenGLES2 = false;    
     QueryRenderProperties(createAttributes.m_sdlRenderName, bOpenGL, bOpenGLES2, bSupportTransparent);
 #endif
@@ -1201,13 +1201,20 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
     }
 
     //优先级最低：默认的取值，按优先级顺序排列
-#ifdef DUILIB_BUILD_FOR_WIN
-    //备注：当前Windows平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）有："direct3d11", "opengl"，"vulkan"
+#if defined DUILIB_BUILD_FOR_WIN
+    //备注：当前平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）
     renderNames.push_back(_T("direct3d11"));
-    renderNames.push_back(_T("opengl"));
+    renderNames.push_back(_T("opengles2"));
     renderNames.push_back(_T("vulkan"));
+    renderNames.push_back(_T("opengl"));
+#elif defined (DUILIB_BUILD_FOR_MACOS)
+    //macOS平台：当前平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）
+    renderNames.push_back(_T("metal"));
+    renderNames.push_back(_T("opengles2"));
+    renderNames.push_back(_T("vulkan"));
+    renderNames.push_back(_T("opengl"));
 #else
-    //Linux平台：当前Windows平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）有："opengles2", "vulkan"
+    //Linux平台：当前平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）
     renderNames.push_back(_T("opengles2"));
     renderNames.push_back(_T("vulkan"));
     renderNames.push_back(_T("opengl"));
@@ -1304,6 +1311,9 @@ bool NativeWindow_SDL::IsRenderSupportTransparent(const DString& renderName) con
     else if (renderName == _T("vulkan")) {
         bSupportTransparent = true;
     }
+    else if (renderName == _T("opengles2")) {
+        bSupportTransparent = true;
+    }
 #else
     if (renderName == _T("opengles2")) {
         bSupportTransparent = true;
@@ -1312,6 +1322,9 @@ bool NativeWindow_SDL::IsRenderSupportTransparent(const DString& renderName) con
         bSupportTransparent = true;
     }
     else if (renderName == _T("vulkan")) {
+        bSupportTransparent = true;
+    }
+    else if (renderName == _T("metal")) {
         bSupportTransparent = true;
     }
 #endif
