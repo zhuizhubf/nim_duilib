@@ -205,12 +205,12 @@ UiRect RichEditData::EstimateTextDisplayBounds(const UiRect& rcAvailable)
     return rect;
 }
 
-void RichEditData::CalcCacheTextRects(UiRect& rcTextRect)
+void RichEditData::CalcCacheTextRects(UiRect& rcTextRect) const
 {
     rcTextRect.Clear();
     UiRectF rowRects;
     bool bFirst = true;
-    for (RichTextLineInfoPtr& pLineInfo : m_lineTextInfo) {
+    for (const RichTextLineInfoPtr& pLineInfo : m_lineTextInfo) {
         ASSERT(pLineInfo != nullptr);
         const size_t nRowCount = pLineInfo->m_rowInfo.size();
         for (size_t nRow = 0; nRow < nRowCount; ++nRow) {
@@ -749,7 +749,7 @@ bool RichEditData::SetText(const DStringW& text)
     return bTextChanged;
 }
 
-void RichEditData::SplitLines(const std::wstring_view& textView, std::vector<std::wstring_view>& lineTextViewList)
+void RichEditData::SplitLines(const std::wstring_view& textView, std::vector<std::wstring_view>& lineTextViewList) const
 {
     if (textView.empty()) {
         return;

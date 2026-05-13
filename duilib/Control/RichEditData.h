@@ -374,7 +374,7 @@ private:
 
     /** 将文本按照换行符（'\n'）切分为多行
     */
-    void SplitLines(const std::wstring_view& textView, std::vector<std::wstring_view>& lineTextViewList);
+    void SplitLines(const std::wstring_view& textView, std::vector<std::wstring_view>& lineTextViewList) const;
 
     /** 清空撤销列表
     */
@@ -386,7 +386,7 @@ private:
 
     /** 从缓存中计算文本所占的矩形区域
     */
-    void CalcCacheTextRects(UiRect& rcTextRect);
+    void CalcCacheTextRects(UiRect& rcTextRect) const;
 
     /** 按对齐方式，更新每行文本的纵坐标
     */
