@@ -3359,15 +3359,8 @@ bool RichEdit2::OnSetCursor(const EventArgs& msg)
 bool RichEdit2::OnSetFocus(const EventArgs& /*msg*/)
 {
     m_bActive = true;
-
-    UiPoint cursorPos;
-    Window* pWindow = GetWindow();
-    if (pWindow != nullptr) {
-        pWindow->GetCursorPos(cursorPos);
-        pWindow->ScreenToClient(cursorPos);
-    }
-
     //获得焦点时，打开输入法
+    Window* pWindow = GetWindow();
     if (pWindow != nullptr) {
         bool bEnableIME = IsVisible() && !IsReadOnly() && IsEnabled();
         pWindow->NativeWnd()->SetImeOpenStatus(bEnableIME);
@@ -3385,9 +3378,6 @@ bool RichEdit2::OnSetFocus(const EventArgs& /*msg*/)
     else {
         m_bTextInputMode = false;
     }
-
-    //更新光标位置
-    SetCaretPos(cursorPos);
 
     //设置是否显示光标
     ShowCaret(!HasSelText());
