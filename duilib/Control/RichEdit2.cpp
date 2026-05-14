@@ -522,6 +522,16 @@ int32_t RichEdit2::GetTextLimitLength() const
     return GetLimitText();
 }
 
+bool RichEdit2::IsTextReadOnlyMode() const
+{
+    return IsReadOnly();
+}
+
+bool RichEdit2::IsTextDisabledMode() const
+{
+    return !IsEnabled();
+}
+
 void RichEdit2::StopFlashPasswordChar()
 {
     if (m_bInputPasswordChar) {

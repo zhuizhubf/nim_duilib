@@ -918,6 +918,14 @@ protected:
     */
     virtual int32_t GetTextLimitLength() const override;
 
+    /** 文本是否为只读模式
+    */
+    virtual bool IsTextReadOnlyMode() const override;
+
+    /** 文本是否为禁用模式
+    */
+    virtual bool IsTextDisabledMode() const override;
+
     /** 设置可用状态事件
     * @param [in] bChanged true表示状态发生变化，false表示状态未发生变化
     */
