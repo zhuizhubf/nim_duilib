@@ -4104,7 +4104,12 @@ bool RichEdit2::ButtonUp(const EventArgs& msg)
         return false;
     }
     OnLButtonUp(msg.ptMouse, msg.GetSender());
-    m_bDraggingOutMouseDown = false;
+    if (m_bDraggingOutMouseDown) {
+        //调整光标位置到鼠标点击位置
+        int32_t nCharPosIndex = CharFromPos(msg.ptMouse);
+        InternalSetSel(nCharPosIndex, nCharPosIndex);
+        m_bDraggingOutMouseDown = false;
+    }    
     return bRet;
 }
 
