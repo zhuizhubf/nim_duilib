@@ -40,6 +40,11 @@ public:
     */
     virtual void OnLanguageChanged(bool bRedraw) override;
 
+    /** 主题发生变化，刷新界面颜色相关的内容
+    * @param [in] bRedraw true表示需要内部实现重绘，否则控件内部不需要重绘，由外部调用重绘
+    */
+    virtual void OnThemeChanged(bool bRedraw) override;
+
     /** 计算文本区域大小（宽和高）
      *  @param [in] szAvailable 可用大小，不包含内边距，不包含外边距
      *  @return 控件的文本估算大小，包含内边距(Box)，不包含外边距
@@ -245,6 +250,13 @@ template<typename T>
 void RichTextT<T>::OnLanguageChanged(bool bRedraw)
 {
     BaseClass::OnLanguageChanged(bRedraw);
+    m_impl->Redraw();
+}
+
+template<typename T>
+void RichTextT<T>::OnThemeChanged(bool bRedraw)
+{
+    BaseClass::OnThemeChanged(bRedraw);
     m_impl->Redraw();
 }
 
