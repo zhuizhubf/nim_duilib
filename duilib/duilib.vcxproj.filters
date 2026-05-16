@@ -909,6 +909,9 @@
     <ClCompile Include="RenderSkia\SkUTF.cpp">
       <Filter>RenderSkia</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ColorMap.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1894,6 +1897,9 @@
     </ClInclude>
     <ClInclude Include="RenderSkia\SkUTF.h">
       <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ColorMap.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

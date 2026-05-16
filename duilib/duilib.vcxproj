@@ -290,6 +290,7 @@
     <ClCompile Include="Core\BoxShadow.cpp" />
     <ClCompile Include="Core\ClickThrough_Windows.cpp" />
     <ClCompile Include="Core\ColorManager.cpp" />
+    <ClCompile Include="Core\ColorMap.cpp" />
     <ClCompile Include="Core\Control.cpp" />
     <ClCompile Include="Core\ControlDropTargetImpl_SDL.cpp" />
     <ClCompile Include="Core\ControlDropTargetImpl_Windows.cpp" />
@@ -657,6 +658,7 @@
     <ClInclude Include="Core\Callback.h" />
     <ClInclude Include="Core\ClickThrough.h" />
     <ClInclude Include="Core\ColorManager.h" />
+    <ClInclude Include="Core\ColorMap.h" />
     <ClInclude Include="Core\Control.h" />
     <ClInclude Include="Core\ControlDragable.h" />
     <ClInclude Include="Core\ControlDropTarget.h" />
