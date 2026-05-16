@@ -287,7 +287,7 @@ inline static SkScalar DrawSkGlyphChar(SkCanvas* skCanvas, const SkFont& font, c
                          SkSpan<SkScalar>(&fWidth, 1),
                          SkSpan<SkRect>(&bounds, 1),
                          &paint);
-    if (bounds.isEmpty() && !iswspace((wchar_t)ch) && !iswcntrl((wchar_t)ch)) {
+    if (bounds.isEmpty() && !iswspace((wchar_t)ch)) {
         //bounds是空的话，表示该字符无法显示，但此时fWidth却不是0，所以绘制一个方框，作为占位符
         glyphID = 0;
         skCanvas->drawSimpleText(&glyphID, sizeof(SkGlyphID), SkTextEncoding::kGlyphID, x, y, font, paint);
