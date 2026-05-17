@@ -294,6 +294,10 @@ public:
     virtual std::shared_ptr<IAnimationImage> GetImageAnimation() const { return nullptr; }
 };
 
+/** SVG格式替换颜色实现的回调函数
+*/
+typedef std::function<UiColor(const DString& strColor)> SvgReplaceColorCallbackFunction;
+
 /** 图片解码的输入参数
 */
 struct ImageDecodeParam
@@ -338,6 +342,9 @@ public:
 
     //SVG格式的颜色替换参数(支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，现在只要一个svg就够了)
     DString m_svgReplaceColors;
+
+    //用于替换SVG格式颜色值参数的回调函数
+    SvgReplaceColorCallbackFunction m_svgReplaceColorCallback;
 };
 
 /** 图片解码器接口

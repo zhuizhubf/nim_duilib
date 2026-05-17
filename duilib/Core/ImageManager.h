@@ -41,10 +41,13 @@ public:
 public:
     /** 加载图片 ImageInfo 对象
      * @param [in] loadParam 图片的加载属性，包含图片路径等信息
+     * @param [in] svgReplaceColorCallback 用于替换SVG格式颜色值参数的回调函数
      * @param [out] bImageDataFromCache 返回true表示从缓存获取的ImageData共享原图数据，否则表示重新加载的
      * @return 返回图片 ImageInfo 对象的智能指针
      */
-    std::shared_ptr<ImageInfo> GetImage(const ImageLoadParam& loadParam, bool& bImageDataFromCache);
+    std::shared_ptr<ImageInfo> GetImage(const ImageLoadParam& loadParam,
+                                        SvgReplaceColorCallbackFunction svgReplaceColorCallback,
+                                        bool& bImageDataFromCache);
 
     /** 从缓存中删除所有图片
      */

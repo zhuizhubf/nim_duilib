@@ -27,7 +27,9 @@ ImageManager::~ImageManager()
 {
 }
 
-std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadParam, bool& bImageDataFromCache)
+std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadParam,
+                                                  SvgReplaceColorCallbackFunction svgReplaceColorCallback,
+                                                  bool& bImageDataFromCache)
 {
     ASSERT(ui::GlobalManager::Instance().IsInUIThread());
     bImageDataFromCache = false;
@@ -166,7 +168,8 @@ std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadPara
         decodeParam.m_fPagMaxFrameRate = loadParam.GetPagMaxFrameRate();  //PAG格式相关参数
         decodeParam.m_bLoadAllFrames = true; //所有多帧图片相关参数
         decodeParam.m_bAssertEnabled = loadParam.IsAssertEnabled();       //加载图片失败时是否允许断言（一般只影响图片数据错误导致的问题）
-        decodeParam.m_svgReplaceColors = loadParam.GetSvgReplaceColors();   //SVG格式的颜色替换参数(支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，现在只要一个svg就够了)
+        decodeParam.m_svgReplaceColors = loadParam.GetSvgReplaceColors(); //SVG格式的颜色替换参数(支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，现在只要一个svg就够了)
+        decodeParam.m_svgReplaceColorCallback = svgReplaceColorCallback;  //用于替换SVG格式颜色值参数的回调函数
 
         //加载图片     
         std::unique_ptr<IImage> pImageData = ImageDecoders.LoadImageData(decodeParam);

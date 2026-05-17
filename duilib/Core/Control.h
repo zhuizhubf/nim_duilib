@@ -1583,10 +1583,6 @@ public:
     */
     IFont* GetIFontById(const DString& strFontId) const;
 
-    /** 获取颜色名称对应的颜色值
-    */
-    UiColor GetUiColorByName(const DString& colorName) const;
-
 protected:
     /** 设置可见状态事件
     * @param [in] bChanged true表示状态发生变化，false表示状态未发生变化

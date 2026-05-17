@@ -117,7 +117,7 @@ public:
 
         //检查颜色值是否变化，如果变化则需要重新生成图片
         if (!m_svgReplaceTextList.empty() && !m_svgText.empty()) {
-            if (CheckReplacedSvgColorChanged(m_svgReplaceTextList)) {
+            if (CheckReplacedSvgColorChanged(m_svgReplaceColorCallback, m_svgReplaceTextList)) {
                 DStringA svgText = SvgImageImpl::GetReplacedSvgText(m_svgText, m_svgReplaceTextList, nullptr);
                 std::unique_ptr<SkMemoryStream> spMemStream = SkMemoryStream::MakeCopy(svgText.data(), svgText.size());
                 uint32_t nLoadedImageWidth = 0;
@@ -196,10 +196,12 @@ public:
     };
 
     //生成替换文本的列表
-    static void CreateSvgReplaceTextList(const DString& strSvgReplaceColor, std::vector<SvgImageImpl::SvgReplaceText>& svgReplaceTextList)
+    static void CreateSvgReplaceTextList(SvgReplaceColorCallbackFunction svgReplaceColorCallback,
+                                         const DString& strSvgReplaceColor,
+                                         std::vector<SvgImageImpl::SvgReplaceText>& svgReplaceTextList)
     {
         svgReplaceTextList.clear();
-        if (strSvgReplaceColor.empty()) {
+        if (strSvgReplaceColor.empty() || (svgReplaceColorCallback == nullptr)) {
             return;
         }
         DStringA svgReplaceColor = StringConvert::TToUTF8(strSvgReplaceColor);
@@ -217,7 +219,7 @@ public:
                 ASSERT(!srcColor.empty() && !destColor.empty());
                 if (!srcColor.empty() && !destColor.empty()) {
                     DString colorName = StringConvert::UTF8ToT(destColor);
-                    UiColor colorValue = ColorManager::ConvertToUiColor(colorName);
+                    UiColor colorValue = svgReplaceColorCallback(colorName);
                     if (!colorValue.IsEmpty()) {
                         //颜色值
                         SvgImageImpl::SvgReplaceText replaceText;
@@ -275,13 +277,17 @@ public:
     /** 检测被替换的颜色值是否变化，如果变化则需要重新加载svg图片
     * @return 变化返回true，无变化返回false
     */
-    static bool CheckReplacedSvgColorChanged(std::vector<SvgReplaceText>& svgReplaceTextList)
+    static bool CheckReplacedSvgColorChanged(SvgReplaceColorCallbackFunction svgReplaceColorCallback,
+                                             std::vector<SvgReplaceText>& svgReplaceTextList)
     {
+        if (svgReplaceColorCallback == nullptr) {
+            return false;
+        }
         bool bColorChanged = false;
         for (SvgReplaceText& replaceText : svgReplaceTextList) {
             if (replaceText.bColor) {
                 DString colorName = StringConvert::UTF8ToT(replaceText.destText);
-                UiColor colorValue = ColorManager::ConvertToUiColor(colorName);
+                UiColor colorValue = svgReplaceColorCallback(colorName);
                 if (!colorValue.IsEmpty() && colorValue != replaceText.colorValue) {
                     //更新颜色值（一般是主题变化时，才会变化）
                     replaceText.colorValue = colorValue;
@@ -379,6 +385,9 @@ public:
     //SVG源码中需要替换的内容（颜色等）
     std::vector<SvgReplaceText> m_svgReplaceTextList;
 
+    //用于替换SVG格式颜色值参数的回调函数
+    SvgReplaceColorCallbackFunction m_svgReplaceColorCallback;
+
     //SVG DOM
     sk_sp<SkSVGDOM> m_svgDom;
 
@@ -446,7 +455,9 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
 
     //当有需要从SVG中替换的文本时，需要记录SVG源码及替换规则
     std::vector<SvgImageImpl::SvgReplaceText> svgReplaceTextList;
-    SvgImageImpl::CreateSvgReplaceTextList(decodeParam.m_svgReplaceColors, svgReplaceTextList);
+    SvgImageImpl::CreateSvgReplaceTextList(decodeParam.m_svgReplaceColorCallback,
+                                           decodeParam.m_svgReplaceColors,
+                                           svgReplaceTextList);
 
     std::unique_ptr<SkMemoryStream> spMemStream;
     if (svgReplaceTextList.empty()) {
@@ -485,6 +496,7 @@ std::unique_ptr<IImage> ImageDecoder_SVG::LoadImageData(const ImageDecodeParam& 
 
     //保存需要替换的源数据
     pSvgImageImpl->m_svgReplaceTextList.swap(svgReplaceTextList);
+    pSvgImageImpl->m_svgReplaceColorCallback = decodeParam.m_svgReplaceColorCallback;
     if (!pSvgImageImpl->m_svgReplaceTextList.empty()) {
         DStringA svgText((const DStringA::value_type*)fileData.data(), fileData.size());
         pSvgImageImpl->m_svgText.swap(svgText);

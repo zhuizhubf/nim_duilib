@@ -12,37 +12,24 @@ class DUILIB_API ColorManager
 public:
     ColorManager();
 
-    /** 将颜色数值字符串转换为ARGB颜色类
-     * @param[in] strColor 支持两种颜色值：
-                  (1) 颜色具体数值（如 #FFFFFFFF）
-                  (2) 内置的标准颜色值，比如"blue"，参见ui::UiColors::UiColorConsts函数中的定义
-     */
-    static UiColor ConvertToUiColor(const DString& strColor);
-
 public:
     /** 添加一个全局颜色值
-     * @param[in] strName 颜色名称（如 white）
-     * @param[in] strValue 颜色具体数值（如 #FFFFFFFF）
+     * @param [in] strName 颜色名称（如 white）
+     * @param [in] strValue 颜色具体数值（如 #FFFFFFFF）
      */
     void AddColor(const DString& strName, const DString& strValue);
 
     /** 添加一个全局颜色值
-     * @param[in] strName 颜色名称（如 white）
-     * @param[in] argb 颜色具体数值, 以ARGB格式表示
+     * @param [in] strName 颜色名称（如 white）
+     * @param [in] argb 颜色具体数值, 以ARGB格式表示
      */
     void AddColor(const DString& strName, UiColor argb);
 
     /** 根据名称获取一个颜色的具体数值
-     * @param[in] strName 要获取的颜色名称
+     * @param [in] strName 要获取的颜色名称（已通过AddColor添加到管理器的名称）
      * @return 返回 ARGB 格式的颜色描述值
      */
     UiColor GetColor(const DString& strName) const;
-
-    /** 根据名称获取一个标准颜色的具体数值
-     * @param[in] strName 要获取的颜色名称，比如"blue"，详细列表参见：ui::UiColors::UiColorConsts函数中的定义
-     * @return 返回 ARGB 格式的颜色描述值
-     */
-    UiColor GetStandardColor(const DString& strName) const;
 
     /** 删除所有颜色属性
      */
@@ -51,6 +38,16 @@ public:
     /** 删除所有颜色属性等缓存
      */
     void Clear();
+
+public:
+    /** 将颜色数值字符串转换为ARGB颜色类
+     * @param [in] strColor 支持以下几种颜色：
+     *  (1) 9个字符的颜色字符串，格式为#AARRGGBB
+     *  (2) 7个字符的颜色字符串，格式为#RRGGBB
+     *  (3) 内置的标准颜色值，比如"blue"，参见ui::UiColors::UiColorConsts函数中的定义
+     *  (4) 通过AddColor添加的颜色名称
+     */
+    UiColor ConvertToUiColor(const DString& strColor);
 
 public:
     /** 获取默认禁用状态下字体颜色
@@ -74,10 +71,6 @@ private:
     /** 颜色名称与颜色值的映射关系
     */
     ColorMap m_colorMap;
-
-    /** 标准颜色值映射表, 参见：UiColors::GetUiColorsString函数中的列表
-    */
-    ColorMap m_standardColorMap;
 
     /** 默认禁用状态下的字体颜色
     */

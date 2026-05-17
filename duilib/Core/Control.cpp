@@ -4715,8 +4715,17 @@ bool Control::LoadImageInfo(Image& duiImage, bool bPaintImage) const
             imageLoadParam.SetMaxDestRectSize(UiSize(GetRect().Width(), GetRect().Height()));
         }
 
+        std::weak_ptr<WeakFlag> colorCallbackFlag = pWindow->GetWeakFlag();
+        SvgReplaceColorCallbackFunction svgReplaceColorCallback = [colorCallbackFlag](const DString& strColor) {
+            UiColor color;
+            if (!colorCallbackFlag.expired()) {
+                color = GlobalManager::Instance().Color().ConvertToUiColor(strColor);
+            }
+            return color;
+            };
+
         bool bImageDataFromCache = false;
-        imageInfo = GlobalManager::Instance().Image().GetImage(imageLoadParam, bImageDataFromCache);
+        imageInfo = GlobalManager::Instance().Image().GetImage(imageLoadParam, svgReplaceColorCallback, bImageDataFromCache);
         duiImage.SetImageInfo(imageInfo);
         if (imageInfo != nullptr) {
             //检查并启动多线程解码，在子线程中解码图片数据
@@ -5235,22 +5244,15 @@ bool Control::HasUiColor(const DString& colorName) const
     if (colorName.empty()) {
         return false;
     }
-    UiColor color = GetUiColorByName(colorName);
-    return color.GetARGB() != 0;
+    return !GetUiColor(colorName).IsEmpty();
 }
 
-UiColor Control::GetUiColor(const DString& colorName) const
+UiColor Control::GetUiColor(const DString& colorName2) const
 {
-    if (colorName.empty()) {
+    if (colorName2.empty()) {
         return UiColor();
     }
-    UiColor color = GetUiColorByName(colorName);
-    ASSERT(!color.IsEmpty());
-    return color;
-}
 
-UiColor Control::GetUiColorByName(const DString& colorName2) const
-{
     //别名优先，由于需要保留历史兼容性问题(比如原代码中使用了"red"这种颜色值，需要被覆盖掉)
     DString colorName = GlobalManager::Instance().GetAliasValue(colorName2);
     if (colorName.empty()) {
@@ -5262,35 +5264,30 @@ UiColor Control::GetUiColorByName(const DString& colorName2) const
     }
     if (colorName.at(0) == _T('#')) {
         //优先级1：以'#'字符开头，直接指定颜色值，举例：#FFFFFFFF
-        color = ColorManager::ConvertToUiColor(colorName);
+        color = GlobalManager::Instance().Color().ConvertToUiColor(colorName);
     }
-    if (color.GetARGB() == 0) {
+    if (color.IsEmpty()) {
         Window* pWindow = GetWindow();
         if (pWindow != nullptr) {
             //优先级2：获取在配置XML中的<Window>节点中定义子节点<ThemeColor>指定的颜色
             color = pWindow->GetThemeColor(colorName);
         }
     }
-    if (color.GetARGB() == 0) {
+    if (color.IsEmpty()) {
         //优先级3：获取在global.xml中的<Global>节点中定义子节点<ThemeColor>指定的颜色
         color = GlobalManager::Instance().Color().GetColor(colorName);
     }
-    if (color.GetARGB() == 0) {
+    if (color.IsEmpty()) {
         //优先级4：直接指定预定义的颜色别名
-        color = GlobalManager::Instance().Color().GetStandardColor(colorName);
+        color = StandardColorMap::Instance().GetColor(colorName);
     }
-    ASSERT(color.GetARGB() != 0);
+    ASSERT(!color.IsEmpty());
     return color;
 }
 
 DString Control::GetColorString(const UiColor& color) const
 {
-    if (color.IsEmpty()) {
-        return DString();
-    }
-    else {
-        return StringUtil::Printf(_T("#%02X%02X%02X%02X"), color.GetA(), color.GetR(), color.GetG(), color.GetB());
-    }
+    return StandardColorMap::ColorToHex(color);
 }
 
 bool Control::HasBoxShadow() const
