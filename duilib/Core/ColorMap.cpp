@@ -126,7 +126,8 @@ DString StandardColorMap::ColorToHex(const UiColor& color)
 
 UiColor StandardColorMap::GetColor(const DString& strName) const
 {
-    return ColorMap::GetColor(strName);
+    DString lowerName = StringUtil::MakeLowerString(strName);
+    return ColorMap::GetColor(lowerName);
 }
 
 } // namespace ui
