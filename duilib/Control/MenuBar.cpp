@@ -367,6 +367,8 @@ void MenuBar::ShowPopupMenu(MenuBarButton* pButton)
     }
 
     UiPoint point(pButton->GetRect().left, pButton->GetRect().top);
+    UiPoint scrollOfset = pButton->GetScrollOffsetInScrollBox();
+    point.Offset(-scrollOfset.x, -scrollOfset.y);
     point.Offset(0, pButton->GetRect().Height());
     ClientToScreen(point);
 

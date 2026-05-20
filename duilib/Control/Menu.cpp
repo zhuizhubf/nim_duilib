@@ -22,6 +22,9 @@ public:
     explicit SubMenu(Window* pWindow):
         ListBoxItem(pWindow)
     {
+        //默认宽度和高度均设置为auto类型
+        SetFixedHeight(UiFixedInt::MakeAuto(), false, false);
+        SetFixedWidth(UiFixedInt::MakeAuto(), false, false);
     }
 };
 
@@ -1192,8 +1195,8 @@ bool MenuItem::CheckSubMenuItem()
 {
     bool hasSubMenu = false;
     for (auto item : m_items) {
-        MenuItem* subMenuItem = dynamic_cast<MenuItem*>(item);
-        if (subMenuItem != nullptr) {
+        if ((dynamic_cast<MenuItem*>(item) != nullptr) ||
+            (dynamic_cast<SubMenu*>(item) != nullptr)) {
             hasSubMenu = true;
             break;
         }
@@ -1236,8 +1239,22 @@ void MenuItem::CreateMenuWnd()
         FilePath xmlPath = pParentWindow->GetXmlPath();
         FilePath subXmlFile = FilePath(pParentWindow->m_submenuXml.c_str());
         //约定：子菜单的XML与父菜单的XML文件，在相同的目录中
+        bool bSubMenuXmlChecked = false;
         if (!xmlPath.IsEmpty()) {
-            subXmlFile = FilePathUtil::JoinFilePath(xmlPath, subXmlFile);
+            if (GlobalManager::Instance().Theme().IsResFileExists(FilePathUtil::JoinFilePath(xmlPath, subXmlFile), FilePath(skinFolder))) {
+                subXmlFile = FilePathUtil::JoinFilePath(xmlPath, subXmlFile);
+                bSubMenuXmlChecked = true;
+            }
+        }
+        if (!bSubMenuXmlChecked) {
+            if (!GlobalManager::Instance().Theme().IsResFileExists(subXmlFile, FilePath(skinFolder))) {
+                //在公共资源目录的public/menu目录中查找submenu.xml文件
+                const FilePath publicMenuPath(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu")); //"public/menu"
+                if (GlobalManager::Instance().Theme().IsResFileExists(FilePathUtil::JoinFilePath(publicMenuPath, subXmlFile), FilePath())) {
+                    subXmlFile = FilePathUtil::JoinFilePath(publicMenuPath, subXmlFile);
+                    bSubMenuXmlChecked = true;
+                }
+            }
         }
         m_pSubWindow->SetSubMenuXml(pParentWindow->m_submenuXml.c_str(), pParentWindow->m_submenuNodeName.c_str());
 

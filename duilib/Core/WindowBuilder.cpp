@@ -40,6 +40,7 @@
 #include "duilib/Control/IconControl.h"
 #include "duilib/Control/BitmapControl.h"
 #include "duilib/Control/AddressBar.h"
+#include "duilib/Control/MenuListBox.h"
 #include "duilib/Control/MenuBar.h"
 #include "duilib/Control/ChildWindow.h"
 
@@ -1222,6 +1223,38 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             }
             continue;
         }
+        else if (strClass == DUI_CTR_MENU_BAR_ITEM) {
+            MenuBar* pMenuBar = dynamic_cast<MenuBar*>(pParent);
+            ASSERT((pMenuBar != nullptr) && !node.attributes().empty());
+            if ((pMenuBar != nullptr) && !node.attributes().empty()) {
+                DString menuItemId =  node.attribute(_T("id")).as_string();
+                DString menuText = node.attribute(_T("text")).as_string();
+                DString menuTextId = node.attribute(_T("text_id")).as_string();
+                DString menuXmlPath = node.attribute(_T("xml_path")).as_string();
+                ASSERT(!menuText.empty() || !menuTextId.empty());
+                if (!menuText.empty() || !menuTextId.empty()) {
+                    if (menuXmlPath.empty()) {
+                        pugi::xml_node menuNode = node.child(_T("Menu"));
+                        if (!menuNode.empty()) {
+                            struct xml_string_writer : pugi::xml_writer {
+                                DString result;
+                                virtual void write(const void* data, size_t size) override {
+                                    std::string utf8(static_cast<const char*>(data), size);
+                                    result.append(StringConvert::UTF8ToT(utf8));
+                                }
+                            };
+                            xml_string_writer writer;
+                            menuNode.print(writer, _T("    "), pugi::format_default);
+                            menuXmlPath = _T("<Window shadow_type = \"menu_round\" shadow_border_size = \"1\" shadow_border_color = \"border_window\">");
+                            menuXmlPath += writer.result;
+                            menuXmlPath += _T("</Window>");
+                        }
+                    }
+                    pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
+                }
+            }
+            continue;
+        }
         else {
             pControl = CreateControlByClass(strClass, pWindow);
             if (pControl == nullptr) {
@@ -1246,6 +1279,11 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
                 if (pControl != nullptr) {
                     pControl->SetWindow(pWindow);
                 }
+            }
+
+            if ((pControl == nullptr) && (strClass == DUI_CTR_MENU)) {
+                //菜单容器
+                pControl = new MenuListBox(pWindow);
             }
         }
 
