@@ -1297,4 +1297,26 @@ void MenuItem::Activate(const EventArgs* pMsg)
     }
 }
 
+UiEstSize MenuItem::EstimateSize(UiSize szAvailable)
+{
+    //代码与Box::EstimateSize函数一致，但将m_items里面的SubMenu过滤掉
+    bool bRemoved = false;
+    std::vector<Control*> items = m_items;
+    auto iter = m_items.begin();
+    while (iter != m_items.end()) {
+        if (dynamic_cast<SubMenu*>(*iter) != nullptr) {
+            iter = m_items.erase(iter);
+            bRemoved = true;
+        }
+        else {
+            ++iter;
+        }
+    }
+    UiEstSize estSize = BaseClass::EstimateSize(szAvailable);
+    if (bRemoved) {
+        m_items.swap(items);
+    }
+    return estSize;
+}
+
 } // namespace ui
