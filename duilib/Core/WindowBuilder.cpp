@@ -1170,121 +1170,53 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
     for (pugi::xml_node node : xmlNode.children()) {
         DString strClass = node.name();
         if(IsIgnoreNodeName(strClass)) {
+            //需要忽略的节点名称（一些全局属性等）
             continue;
         }
-
-        Control* pControl = nullptr;
-        if (strClass == _T("Include")) {
-            if (node.attributes().empty()) {
-                continue;
-            }
-            pugi::xml_attribute countAttr = node.attribute(_T("count"));
-            int nCount = countAttr.as_int();
-            if (nCount <= 0) {
-                //默认值设置为1，count这个属性参数为可选
-                nCount = 1;
-            }
-            pugi::xml_attribute sourceAttr = node.attribute(_T("src"));
-            DString sourceValue = sourceAttr.as_string();
-            if (sourceValue.empty()) {
-                sourceAttr = node.attribute(_T("source"));
-                sourceValue = sourceAttr.as_string();                
-            }
-            const FilePath windowResPath = (pWindow != nullptr) ? pWindow->GetResourcePath() : FilePath();
-            FilePath sourceXmlFilePath(sourceValue);
-            if (!sourceValue.empty()) {
-                StringUtil::ReplaceAll(_T("/"), m_xmlFilePath.GetPathSeparatorStr(), sourceValue);
-                StringUtil::ReplaceAll(_T("\\"), m_xmlFilePath.GetPathSeparatorStr(), sourceValue);
-                if (!m_xmlFilePath.IsEmpty()) {
-                    //优先尝试在原XML文件相同目录加载
-                    DString xmlFilePath = m_xmlFilePath.ToString();
-                    size_t pos = xmlFilePath.find_last_of(_T("\\/"));
-                    if (pos != DString::npos) {
-                        FilePath srcFilePath(xmlFilePath.substr(0, pos));
-                        srcFilePath.JoinFilePath(FilePath(sourceValue));
-                        if (GlobalManager::Instance().Theme().IsResFileExists(srcFilePath, windowResPath)) {
-                            sourceXmlFilePath = srcFilePath;
-                        }
-                    }
-                }
-            }
-            ASSERT(!sourceXmlFilePath.IsEmpty());
-            if (sourceXmlFilePath.IsEmpty()) {
-                continue;
-            }
-            for ( int i = 0; i < nCount; i++ ) {
-                WindowBuilder builder;                
-                if (builder.ParseXmlFile(sourceXmlFilePath, windowResPath)) {
-                    pControl = builder.CreateControls(pWindow, m_createControlCallback, ToBox(pParent), nullptr);
-                }
-                else {
-                    pControl = nullptr;
-                }                
+        else if (strClass == _T("Include")) {
+            //Include节点
+            Control* pNewControl = ParseIncludeXmlNode(node, pParent, pWindow);
+            if ((pNewControl != nullptr) && (pReturn == nullptr)) {
+                pReturn = pNewControl;
             }
             continue;
         }
         else if (strClass == DUI_CTR_MENU_BAR_ITEM) {
-            MenuBar* pMenuBar = dynamic_cast<MenuBar*>(pParent);
-            ASSERT((pMenuBar != nullptr) && !node.attributes().empty());
-            if ((pMenuBar != nullptr) && !node.attributes().empty()) {
-                DString menuItemId =  node.attribute(_T("id")).as_string();
-                DString menuText = node.attribute(_T("text")).as_string();
-                DString menuTextId = node.attribute(_T("text_id")).as_string();
-                DString menuXmlPath = node.attribute(_T("xml_path")).as_string();
-                ASSERT(!menuText.empty() || !menuTextId.empty());
-                if (!menuText.empty() || !menuTextId.empty()) {
-                    if (menuXmlPath.empty()) {
-                        pugi::xml_node menuNode = node.child(_T("Menu"));
-                        if (!menuNode.empty()) {
-                            struct xml_string_writer : pugi::xml_writer {
-                                DString result;
-                                virtual void write(const void* data, size_t size) override {
-                                    std::string utf8(static_cast<const char*>(data), size);
-                                    result.append(StringConvert::UTF8ToT(utf8));
-                                }
-                            };
-                            xml_string_writer writer;
-                            menuNode.print(writer, _T("    "), pugi::format_default);
-                            menuXmlPath = _T("<Window shadow_type = \"menu_round\" shadow_border_size = \"1\" shadow_border_color = \"border_window\">");
-                            menuXmlPath += writer.result;
-                            menuXmlPath += _T("</Window>");
-                        }
-                    }
-                    pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
-                }
-            }
+            //MenuBarItem节点
+            ParseMenuBarItemXmlNode(node, pParent, pWindow);
             continue;
         }
-        else {
-            pControl = CreateControlByClass(strClass, pWindow);
-            if (pControl == nullptr) {
-                if ((strClass == _T("Event")) || 
-                    (strClass == _T("BubbledEvent"))) {
-                    bool bBubbled = (strClass == _T("BubbledEvent"));
-                    AttachXmlEvent(bBubbled, node, pParent);
-                    continue;
-                }
+ 
+        //根据Class名称直接窗口标准控件
+        Control* pControl = CreateControlByClass(strClass, pWindow);
+        if (pControl == nullptr) {
+            if ((strClass == _T("Event")) || 
+                (strClass == _T("BubbledEvent"))) {
+                //挂载XML事件
+                bool bBubbled = (strClass == _T("BubbledEvent"));
+                AttachXmlEvent(bBubbled, node, pParent);
+                continue;
             }
+        }
+        if( pControl == nullptr) {
+            //通过注册的控件函数来创建控件
+            pControl = GlobalManager::Instance().CreateControl(strClass);
+            if (pControl != nullptr) {
+                pControl->SetWindow(pWindow);
+            }
+        }
 
-            // User-supplied control factory
-            if( pControl == nullptr) {
-                pControl = GlobalManager::Instance().CreateControl(strClass);
-                if (pControl != nullptr) {
-                    pControl->SetWindow(pWindow);
-                }
+        if( pControl == nullptr && m_createControlCallback ) {
+            //通过外部回调函数创建控件
+            pControl = m_createControlCallback(strClass);
+            if (pControl != nullptr) {
+                pControl->SetWindow(pWindow);
             }
+        }
 
-            if( pControl == nullptr && m_createControlCallback ) {
-                pControl = m_createControlCallback(strClass);
-                if (pControl != nullptr) {
-                    pControl->SetWindow(pWindow);
-                }
-            }
-
-            if ((pControl == nullptr) && (strClass == DUI_CTR_MENU)) {
-                //菜单容器
-                pControl = new MenuListBox(pWindow);
-            }
+        if ((pControl == nullptr) && (strClass == DUI_CTR_MENU)) {
+            //菜单容器
+            pControl = new MenuListBox(pWindow);
         }
 
         if(pControl == nullptr) {
@@ -1328,7 +1260,7 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
         // Process attributes
         if(!node.attributes().empty()) {
             //读取节点的属性，设置控件的属性
-            int i = 0;
+            int32_t i = 0;
             for (pugi::xml_attribute attr : node.attributes()) {
                 ASSERT_UNUSED_VARIABLE(i == 0 || StringUtil::StringCompare(attr.name(), _T("class")) != 0);    //class必须是第一个属性
                 ++i;
@@ -1340,35 +1272,119 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             //节点为：<RichText></RichText>，解析其子节点为RichText内容
             ParseRichTextXmlNode(node, pControl);
         }
-        else {
-            // Add children
-            if (!node.children().empty()) {
-                //递归该节点的所有子节点，继续添加
-                ParseXmlNodeChildren(node, pControl, pWindow);
+        else if (!node.children().empty()) {
+            //递归该节点的所有子节点，继续添加
+            ParseXmlNodeChildren(node, pControl, pWindow);
+        }
+
+        // 因为某些属性和父窗口相关，比如selected，必须先Add到父窗口
+        if ((pParent != nullptr) && strClass != DUI_CTR_TREENODE) {
+            Box* pContainer = dynamic_cast<Box*>(pParent);
+            ASSERT(pContainer != nullptr);
+            if (pContainer != nullptr) {
+                if (!pContainer->AddItem(pControl)) {
+                    ASSERT(0);
+                    delete pControl;
+                    pControl = nullptr;
+                    continue;
+                }
             }
         }
 
-        // Attach to parent
-        // 因为某些属性和父窗口相关，比如selected，必须先Add到父窗口
-        if (pParent != nullptr && strClass != DUI_CTR_TREENODE) {
-            Box* pContainer = dynamic_cast<Box*>(pParent);
-            ASSERT(pContainer != nullptr);
-            if (pContainer == nullptr) {
-                return nullptr;
-            }
-            if( !pContainer->AddItem(pControl) ) {
-                ASSERT(0);
-                delete pControl;
-                continue;
-            }
-        }
-        
-        // Return first item
         if (pReturn == nullptr) {
             pReturn = pControl;
         }
     }
     return pReturn;
+}
+
+Control* WindowBuilder::ParseIncludeXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const
+{
+    if (node.attributes().empty()) {
+        return nullptr;
+    }
+    pugi::xml_attribute countAttr = node.attribute(_T("count"));
+    int32_t nCount = countAttr.as_int();
+    if (nCount <= 0) {
+        //默认值设置为1，count这个属性参数为可选
+        nCount = 1;
+    }
+    pugi::xml_attribute sourceAttr = node.attribute(_T("src"));
+    DString sourceValue = sourceAttr.as_string();
+    if (sourceValue.empty()) {
+        sourceAttr = node.attribute(_T("source"));
+        sourceValue = sourceAttr.as_string();
+    }
+    const FilePath windowResPath = (pWindow != nullptr) ? pWindow->GetResourcePath() : FilePath();
+    FilePath sourceXmlFilePath(sourceValue);
+    if (!sourceValue.empty()) {
+        StringUtil::ReplaceAll(_T("/"), m_xmlFilePath.GetPathSeparatorStr(), sourceValue);
+        StringUtil::ReplaceAll(_T("\\"), m_xmlFilePath.GetPathSeparatorStr(), sourceValue);
+        if (!m_xmlFilePath.IsEmpty()) {
+            //优先尝试在原XML文件相同目录加载
+            DString xmlFilePath = m_xmlFilePath.ToString();
+            size_t pos = xmlFilePath.find_last_of(_T("\\/"));
+            if (pos != DString::npos) {
+                FilePath srcFilePath(xmlFilePath.substr(0, pos));
+                srcFilePath.JoinFilePath(FilePath(sourceValue));
+                if (GlobalManager::Instance().Theme().IsResFileExists(srcFilePath, windowResPath)) {
+                    sourceXmlFilePath = srcFilePath;
+                }
+            }
+        }
+    }
+    ASSERT(!sourceXmlFilePath.IsEmpty());
+    if (sourceXmlFilePath.IsEmpty()) {
+        return nullptr;
+    }
+    Control* pReturn = nullptr;
+    Box* pParentBox = ToBox(pParent);
+    for (int32_t i = 0; i < nCount; i++) {
+        WindowBuilder builder;
+        if (builder.ParseXmlFile(sourceXmlFilePath, windowResPath)) {
+            Control* pControl = builder.CreateControls(pWindow, m_createControlCallback, pParentBox, nullptr);
+            if ((pParentBox != nullptr) && (pControl != nullptr)) {
+                ASSERT(pParentBox->GetItemIndex(pControl) != Box::InvalidIndex);
+            }
+            if (pReturn == nullptr) {
+                pReturn = pControl;
+            }
+        }
+    }
+    return pReturn;
+}
+
+void WindowBuilder::ParseMenuBarItemXmlNode(const pugi::xml_node& node, Control* pParent, Window* /*pWindow*/) const
+{
+    MenuBar* pMenuBar = dynamic_cast<MenuBar*>(pParent);
+    ASSERT((pMenuBar != nullptr) && !node.attributes().empty());
+    if ((pMenuBar != nullptr) && !node.attributes().empty()) {
+        DString menuItemId = node.attribute(_T("id")).as_string();
+        DString menuText = node.attribute(_T("text")).as_string();
+        DString menuTextId = node.attribute(_T("text_id")).as_string();
+        DString menuXmlPath = node.attribute(_T("xml_path")).as_string();
+        ASSERT(!menuText.empty() || !menuTextId.empty());
+        if (!menuText.empty() || !menuTextId.empty()) {
+            if (menuXmlPath.empty()) {
+                pugi::xml_node menuNode = node.child(_T("Menu"));
+                if (!menuNode.empty()) {
+                    struct xml_string_writer : pugi::xml_writer {
+                        DString result;
+                        virtual void write(const void* data, size_t size) override {
+                            std::string utf8(static_cast<const char*>(data), size);
+                            result.append(StringConvert::UTF8ToT(utf8));
+                        }
+                    };
+                    xml_string_writer writer;
+                    menuNode.print(writer, _T("    "), pugi::format_default);
+                    menuXmlPath = _T("<Window shadow_type = \"menu_round\" shadow_border_size = \"1\" shadow_border_color = \"border_window\">");
+                    menuXmlPath += writer.result;
+                    menuXmlPath += _T("</Window>");
+                }
+            }
+            pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
+        }
+    }
 }
 
 bool WindowBuilder::ParseRichTextXmlText(const DString& xmlText, Control* pControl)

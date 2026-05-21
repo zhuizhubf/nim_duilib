@@ -140,6 +140,21 @@ private:
     */
     static bool ParseRichTextXmlNode(const pugi::xml_node& xmlNode, RichTextImpl* pRichTextImpl, RichTextSlice* pTextSlice = nullptr);
 
+    /** 解析Include节点
+    * @param [in] xmlNode xml节点
+    * @param [in] pParent 父控件，可能是普通控件（参数只传入，未用到），也可能是容器（用时转换为容器）
+    * @param [in] pWindow 关联的窗口
+    * @return 返回第一个创建的节点，可能是普通控件，也可能是容器
+    */
+    Control* ParseIncludeXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const;
+
+    /** 解析MenuBarItem节点
+    * @param [in] xmlNode xml节点
+    * @param [in] pParent 父控件，可能是普通控件（参数只传入，未用到），也可能是容器（用时转换为容器）
+    * @param [in] pWindow 关联的窗口
+    */
+    void ParseMenuBarItemXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const;
+
 private:
     /** 解析窗口的属性(根XML节点名称："Window")
     */
@@ -156,6 +171,7 @@ private:
     /** 解析XML节点的子节点
     * @param [in] xmlNode xml节点
     * @param [in] pParent 父控件，可能是普通控件（参数只传入，未用到），也可能是容器（用时转换为容器）
+    * @param [in] pWindow 关联的窗口
     * @return 返回第一个创建的节点，可能是普通控件，也可能是容器
     */
     Control* ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Control* pParent = nullptr, Window* pWindow = nullptr);
