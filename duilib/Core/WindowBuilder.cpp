@@ -1186,6 +1186,11 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             ParseMenuBarItemXmlNode(node, pParent, pWindow);
             continue;
         }
+        else if (strClass == _T("PropertyGridGroup")) {
+            //PropertyGridGroup节点
+            ParsePropertyGridGroupXmlNode(node, pParent, pWindow);
+            continue;
+        }
  
         //根据Class名称直接窗口标准控件
         Control* pControl = CreateControlByClass(strClass, pWindow);
@@ -1225,36 +1230,45 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             continue;
         }
 
-        // TreeView相关必须先添加后解析
+        // TreeView相关必须先添加到容器，然后再解析子节点
+        bool bAddedToParentBox = false;
         if (strClass == DUI_CTR_TREENODE) {
-            bool bAdded = false;
             TreeNode* pNode = dynamic_cast<TreeNode*>(pControl);
             ASSERT(pNode != nullptr);
             TreeView* pTreeView = dynamic_cast<TreeView*>(pParent);
             if (pTreeView != nullptr) {
                 //一级子节点
                 pTreeView->GetRootNode()->AddChildNode(pNode);
-                bAdded = true;
+                bAddedToParentBox = true;
             }
             else {
                 //多级子节点
                 TreeNode* pTreeNode = dynamic_cast<TreeNode*>(pParent);
                 if (pTreeNode != nullptr) {
                     pTreeNode->AddChildNode(pNode);
-                    bAdded = true;
+                    bAddedToParentBox = true;
                 }
             }
-            if (!bAdded) {
+            if (!bAddedToParentBox) {
                 //尝试Combo控件
                 Combo* pCombo = dynamic_cast<Combo*>(pParent);
                 if (pCombo != nullptr) {
                     pCombo->GetTreeView()->GetRootNode()->AddChildNode(pNode);
-                    bAdded = true;
+                    bAddedToParentBox = true;
                 }
             }
-            ASSERT(bAdded);
+            ASSERT(bAddedToParentBox);
         }
-
+        else if (strClass == DUI_CTR_PROPERTY_GRID) {
+            //PropertyGrid控件必须先添加到容器，然后再解析子节点
+            if (pParent != nullptr) {
+                Box* pContainer = dynamic_cast<Box*>(pParent);
+                ASSERT(pContainer != nullptr);
+                if (pContainer != nullptr) {
+                    bAddedToParentBox = pContainer->AddItem(pControl);
+                }
+            }
+        }
         pControl->SetWindow(pWindow);
         
         // Process attributes
@@ -1267,7 +1281,6 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
                 pControl->SetAttribute(attr.name(), attr.value());
             }
         }
-
         if (strClass == DUI_CTR_RICHTEXT) {
             //节点为：<RichText></RichText>，解析其子节点为RichText内容
             ParseRichTextXmlNode(node, pControl);
@@ -1276,9 +1289,8 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             //递归该节点的所有子节点，继续添加
             ParseXmlNodeChildren(node, pControl, pWindow);
         }
-
-        // 因为某些属性和父窗口相关，比如selected，必须先Add到父窗口
-        if ((pParent != nullptr) && strClass != DUI_CTR_TREENODE) {
+        //普通的控件或者容器，需要再最后添加到容器（不可以先添加到容器，否则部分控件的实现逻辑会存在问题，比如TabBox等带select功能的容器）
+        if ((pParent != nullptr) && !bAddedToParentBox) {
             Box* pContainer = dynamic_cast<Box*>(pParent);
             ASSERT(pContainer != nullptr);
             if (pContainer != nullptr) {
@@ -1290,7 +1302,6 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
                 }
             }
         }
-
         if (pReturn == nullptr) {
             pReturn = pControl;
         }
@@ -1358,31 +1369,165 @@ void WindowBuilder::ParseMenuBarItemXmlNode(const pugi::xml_node& node, Control*
 {
     MenuBar* pMenuBar = dynamic_cast<MenuBar*>(pParent);
     ASSERT((pMenuBar != nullptr) && !node.attributes().empty());
-    if ((pMenuBar != nullptr) && !node.attributes().empty()) {
-        DString menuItemId = node.attribute(_T("id")).as_string();
-        DString menuText = node.attribute(_T("text")).as_string();
-        DString menuTextId = node.attribute(_T("text_id")).as_string();
-        DString menuXmlPath = node.attribute(_T("xml_path")).as_string();
-        ASSERT(!menuText.empty() || !menuTextId.empty());
-        if (!menuText.empty() || !menuTextId.empty()) {
-            if (menuXmlPath.empty()) {
-                pugi::xml_node menuNode = node.child(_T("Menu"));
-                if (!menuNode.empty()) {
-                    struct xml_string_writer : pugi::xml_writer {
-                        DString result;
-                        virtual void write(const void* data, size_t size) override {
-                            std::string utf8(static_cast<const char*>(data), size);
-                            result.append(StringConvert::UTF8ToT(utf8));
-                        }
-                    };
-                    xml_string_writer writer;
-                    menuNode.print(writer, _T("    "), pugi::format_default);
-                    menuXmlPath = _T("<Window shadow_type = \"menu_round\" shadow_border_size = \"1\" shadow_border_color = \"border_window\">");
-                    menuXmlPath += writer.result;
-                    menuXmlPath += _T("</Window>");
+    if ((pMenuBar == nullptr) || node.attributes().empty()) {
+        return;
+    }
+
+    DString menuItemId = node.attribute(_T("id")).as_string();
+    DString menuText = node.attribute(_T("text")).as_string();
+    DString menuTextId = node.attribute(_T("text_id")).as_string();
+    DString menuXmlPath = node.attribute(_T("xml_path")).as_string();
+    ASSERT(!menuText.empty() || !menuTextId.empty());
+    if (menuText.empty() && menuTextId.empty()) {
+        return;
+    }
+
+    if (menuXmlPath.empty()) {
+        pugi::xml_node menuNode = node.child(_T("Menu"));
+        if (!menuNode.empty()) {
+            struct xml_string_writer : pugi::xml_writer {
+                DString result;
+                virtual void write(const void* data, size_t size) override {
+                    std::string utf8(static_cast<const char*>(data), size);
+                    result.append(StringConvert::UTF8ToT(utf8));
                 }
+            };
+            xml_string_writer writer;
+            menuNode.print(writer, _T("    "), pugi::format_default);
+            menuXmlPath = _T("<Window shadow_type = \"menu_round\" shadow_border_size = \"1\" shadow_border_color = \"border_window\">");
+            menuXmlPath += writer.result;
+            menuXmlPath += _T("</Window>");
+        }
+    }
+    pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
+}
+
+void WindowBuilder::ParsePropertyGridGroupXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const
+{
+    PropertyGrid* pPropertyGrid = dynamic_cast<PropertyGrid*>(pParent);
+    ASSERT((pPropertyGrid != nullptr) && !node.attributes().empty());
+    if ((pPropertyGrid == nullptr) || node.attributes().empty()) {
+        return;
+    }
+    PropertyGridGroup* pPropertyGridGroup = nullptr;
+    DString name = node.attribute(_T("name")).as_string();
+    DString groupName = node.attribute(_T("group_name")).as_string();
+    DString groupNameId = node.attribute(_T("group_name_id")).as_string();
+    DString groupDescription = node.attribute(_T("description")).as_string();
+    if (!groupNameId.empty()) {
+        pPropertyGridGroup = pPropertyGrid->AddGroupById(groupNameId, groupDescription);
+    }
+    else {
+        pPropertyGridGroup = pPropertyGrid->AddGroup(groupName, groupDescription);
+    }
+    ASSERT(pPropertyGridGroup != nullptr);
+    if (pPropertyGridGroup == nullptr) {
+        return;
+    }
+    if (!name.empty()) {
+        pPropertyGridGroup->SetName(name);
+    }
+
+    for (pugi::xml_node childNode : node.children()) {
+        DString strClass = childNode.name();
+        DString propName = childNode.attribute(_T("name")).as_string();
+        DString propNameId = childNode.attribute(_T("name_id")).as_string();
+        DString propValue = childNode.attribute(_T("value")).as_string();
+        DString propValueId = childNode.attribute(_T("value_id")).as_string();
+        DString propDescription = childNode.attribute(_T("description")).as_string();
+        DString propMargin = childNode.attribute(_T("margin")).as_string();
+        DString propPadding = childNode.attribute(_T("padding")).as_string();
+        PropertyGridProperty* pProperty = nullptr;
+        if (strClass == _T("PropertyGridTextProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddTextPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
             }
-            pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
+            else {
+                pProperty = pPropertyGrid->AddTextProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridComboProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddComboPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddComboProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridFontProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddFontPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddFontProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridFontSizeProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddFontSizePropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddFontSizeProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridColorProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddColorPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddColorProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridDateTimeProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddDateTimePropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddDateTimeProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridIPAddressProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddIPAddressPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddIPAddressProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridHotKeyProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddHotKeyPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddHotKeyProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridFileProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddFilePropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddFileProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        else if (strClass == _T("PropertyGridDirectoryProperty")) {
+            if (!propNameId.empty()) {
+                pProperty = pPropertyGrid->AddDirectoryPropertyById(pPropertyGridGroup, propNameId, propValueId.empty() ? propValue : propValueId, propDescription, 0, !propValueId.empty());
+            }
+            else {
+                pProperty = pPropertyGrid->AddDirectoryProperty(pPropertyGridGroup, propName, propValue, propDescription);
+            }
+        }
+        if (pProperty != nullptr) {
+            if (!propName.empty()) {
+                pProperty->SetName(propName);
+            }
+            if (!propMargin.empty()) {
+                pProperty->SetAttribute(_T("margin"), propMargin);
+            }
+            if (!propPadding.empty()) {
+                pProperty->SetAttribute(_T("padding"), propPadding);
+            }
         }
     }
 }

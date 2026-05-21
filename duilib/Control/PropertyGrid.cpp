@@ -216,8 +216,6 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
     if ((fColumnLineWidth > 0.01) && !columnLineColor.IsEmpty()) {
         //绘制纵向网格线
         UiRect viewRect = m_pTreeView->GetRect();
-        UiPoint viewScrollPos = m_pTreeView->GetScrollOffsetInScrollBox();
-        viewRect.Offset(-viewScrollPos.x, -viewScrollPos.y);
         int32_t yTop = viewRect.top;
         std::vector<int32_t> xPosList;
         const size_t itemCount = m_pTreeView->GetItemCount();
@@ -228,8 +226,6 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
             }
             if (pItem->GetLabelBoxLeft() != nullptr) {
                 UiRect leftRect = pItem->GetLabelBoxLeft()->GetRect();
-                UiPoint scrollBoxOffset = pItem->GetLabelBoxLeft()->GetScrollOffsetInScrollBox();
-                leftRect.Offset(-scrollBoxOffset.x, -scrollBoxOffset.y);
                 xPosList.push_back(leftRect.right);
                 break;
             }
@@ -245,8 +241,6 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
     if ((fRowLineWidth > 0.01) && !rowLineColor.IsEmpty()) {
         //绘制横向网格线
         UiRect viewRect = m_pTreeView->GetRect();
-        UiPoint viewScrollPos = m_pTreeView->GetScrollOffsetInScrollBox();
-        viewRect.Offset(-viewScrollPos.x, -viewScrollPos.y);
         const size_t itemCount = m_pTreeView->GetItemCount();
         for (size_t index = 0; index < itemCount; ++index) {
             PropertyGridProperty* pItem = dynamic_cast<PropertyGridProperty*>(m_pTreeView->GetItemAt(index));
@@ -255,8 +249,6 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
             }
             //纵坐标位置放在每个子项控件的底部（Header控件的底部不画线）
             UiRect rcItemRect = pItem->GetRect();
-            UiPoint scrollBoxOffset = pItem->GetScrollOffsetInScrollBox();
-            rcItemRect.Offset(-scrollBoxOffset.x, -scrollBoxOffset.y);
             int32_t yPos = rcItemRect.bottom;
 
             int32_t nChildMarginY = 0;
@@ -277,15 +269,11 @@ void PropertyGrid::PaintGridLines(IRender* pRender)
             UiRect leftRect = viewRect;
             if (pItem->GetLabelBoxLeft() != nullptr) {
                 UiRect rcRect = pItem->GetLabelBoxLeft()->GetRect();
-                UiPoint scrollOffset = pItem->GetLabelBoxLeft()->GetScrollOffsetInScrollBox();
-                rcRect.Offset(-scrollOffset.x, -scrollOffset.y);
                 leftRect = rcRect;
             }
             UiRect rightRect = viewRect;
             if (pItem->GetLabelBoxRight() != nullptr) {
                 UiRect rcRect = pItem->GetLabelBoxRight()->GetRect();
-                UiPoint scrollOffset = pItem->GetLabelBoxRight()->GetScrollOffsetInScrollBox();
-                rcRect.Offset(-scrollOffset.x, -scrollOffset.y);
                 rightRect = rcRect;
 
                 //横向网格线的右侧：如果滚动条正在显示，则不覆盖滚动条
