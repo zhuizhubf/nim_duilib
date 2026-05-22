@@ -414,7 +414,7 @@ bool CheckCombo::AddTextItem(const DString& itemText)
         return false;
     }
     //避免重复名称
-    size_t itemCount = GetItemCount();
+    const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
         CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
         if (pCheckBox != nullptr) {
@@ -436,7 +436,7 @@ bool CheckCombo::AddTextIdItem(const DString& itemTextId)
         return false;
     }
     //避免重复名称
-    size_t itemCount = GetItemCount();
+    const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
         CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
         if (pCheckBox != nullptr) {
@@ -450,6 +450,42 @@ bool CheckCombo::AddTextIdItem(const DString& itemTextId)
     SetAttributeList(item, m_dropboxItemClass.c_str());
     item->SetTextId(itemTextId);
     return AddItem(item);
+}
+
+bool CheckCombo::SelectTextItem(const DString& itemText, bool bSelect)
+{
+    if (itemText.empty()) {
+        return false;
+    }
+    const size_t itemCount = GetItemCount();
+    for (size_t index = 0; index < itemCount; ++index) {
+        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        if (pCheckBox != nullptr) {
+            if (itemText == pCheckBox->GetText()) {
+                pCheckBox->Selected(bSelect, true);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CheckCombo::SelectTextIdItem(const DString& itemTextId, bool bSelect)
+{
+    if (itemTextId.empty()) {
+        return false;
+    }
+    const size_t itemCount = GetItemCount();
+    for (size_t index = 0; index < itemCount; ++index) {
+        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        if (pCheckBox != nullptr) {
+            if (itemTextId == pCheckBox->GetTextId()) {
+                pCheckBox->Selected(bSelect, true);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void CheckCombo::Activate(const EventArgs* /*pMsg*/)
@@ -502,6 +538,13 @@ void CheckCombo::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     }
 
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
+}
+
+void CheckCombo::SetPos(UiRect rc)
+{
+    BaseClass::SetPos(rc);
+    //更新选择列表的高度
+    UpdateSelectedListHeight();
 }
 
 void CheckCombo::SetDropBoxAttributeList(const DString& pstrList)

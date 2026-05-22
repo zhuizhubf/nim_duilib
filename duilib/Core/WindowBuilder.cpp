@@ -1191,6 +1191,11 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             ParsePropertyGridGroupXmlNode(node, pParent, pWindow);
             continue;
         }
+        else if (strClass == _T("CheckComboText")) {
+            //CheckComboText节点
+            ParseCheckComboTextXmlNode(node, pParent, pWindow);
+            continue;
+        }
  
         //根据Class名称直接窗口标准控件
         Control* pControl = CreateControlByClass(strClass, pWindow);
@@ -1402,7 +1407,7 @@ void WindowBuilder::ParseMenuBarItemXmlNode(const pugi::xml_node& node, Control*
     pMenuBar->AddTopMenu(menuItemId, menuText, menuTextId, menuXmlPath);
 }
 
-void WindowBuilder::ParsePropertyGridGroupXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const
+void WindowBuilder::ParsePropertyGridGroupXmlNode(const pugi::xml_node& node, Control* pParent, Window* /*pWindow*/) const
 {
     PropertyGrid* pPropertyGrid = dynamic_cast<PropertyGrid*>(pParent);
     ASSERT((pPropertyGrid != nullptr) && !node.attributes().empty());
@@ -1528,6 +1533,34 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(const pugi::xml_node& node, Co
             if (!propPadding.empty()) {
                 pProperty->SetAttribute(_T("padding"), propPadding);
             }
+        }
+    }
+}
+
+void WindowBuilder::ParseCheckComboTextXmlNode(const pugi::xml_node& node, Control* pParent, Window* /*pWindow*/) const
+{
+    CheckCombo* pCheckCombo = dynamic_cast<CheckCombo*>(pParent);
+    ASSERT((pCheckCombo != nullptr) && !node.attributes().empty());
+    if ((pCheckCombo == nullptr) || node.attributes().empty()) {
+        return;
+    }
+
+    DString text = node.attribute(_T("text")).as_string();
+    DString textId = node.attribute(_T("text_id")).as_string();
+    DString selected = node.attribute(_T("selected")).as_string();
+    if (text.empty() && textId.empty()) {
+        return;
+    }
+    if (!textId.empty()) {
+        pCheckCombo->AddTextIdItem(textId);
+        if (StringUtil::IsValueTrue(selected)) {
+            pCheckCombo->SelectTextIdItem(textId, true);
+        }
+    }
+    else {
+        pCheckCombo->AddTextItem(text);
+        if (StringUtil::IsValueTrue(selected)) {
+            pCheckCombo->SelectTextItem(text, true);
         }
     }
 }

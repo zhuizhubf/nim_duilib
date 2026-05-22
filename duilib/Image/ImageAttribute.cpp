@@ -312,7 +312,7 @@ void ImageAttribute::ModifyAttribute(const DString& strImageString, const DpiMan
                 imageAttribute.m_vAlign = value;
             }
         }
-        else if (name == _T("fade")) {
+        else if ((name == _T("fade")) || (name == _T("alpha"))) {
             //图片的透明度
             imageAttribute.m_bFade = (uint8_t)StringUtil::StringToInt32(value);
         }

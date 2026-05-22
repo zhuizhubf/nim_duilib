@@ -23,6 +23,7 @@ public:
     virtual DString GetType() const override;
     virtual void SetAttribute(const DString& strName, const DString& strValue) override;
     virtual void Activate(const EventArgs* pMsg) override;
+    virtual void SetPos(UiRect rc) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -51,6 +52,18 @@ public:
     * @param [in] itemTextId 文本内容ID（支持多语言版）
     */
     bool AddTextIdItem(const DString& itemTextId);
+
+    /** 选择列表项
+    * @param [in] itemText 文本内容
+    * @param [in] bSelect true表示选择，false表示取消选择
+    */
+    bool SelectTextItem(const DString& itemText, bool bSelect);
+
+    /** 选择列表项
+    * @param [in] itemTextId 文本内容ID（支持多语言版）
+    * @param [in] bSelect true表示选择，false表示取消选择
+    */
+    bool SelectTextIdItem(const DString& itemTextId, bool bSelect);
 
     /** 获取选择的文本列表
     */

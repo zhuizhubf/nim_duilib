@@ -162,6 +162,13 @@ private:
     */
     void ParsePropertyGridGroupXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const;
 
+    /** 解析CheckComboText节点
+    * @param [in] xmlNode xml节点
+    * @param [in] pParent 父控件，可能是普通控件（参数只传入，未用到），也可能是容器（用时转换为容器）
+    * @param [in] pWindow 关联的窗口
+    */
+    void ParseCheckComboTextXmlNode(const pugi::xml_node& node, Control* pParent, Window* pWindow) const;
+
 private:
     /** 解析窗口的属性(根XML节点名称："Window")
     */
