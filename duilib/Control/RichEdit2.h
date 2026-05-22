@@ -775,6 +775,16 @@ public:
     */
     void AdjustTextNumber(int32_t nDelta);
 
+    /** 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"，这样可以在XML中使用括号中这两个字符(\n)来当作换行符，从而支持多行文本)
+    * @param [in] bReplaceNewline true表示替换，false表示不替换
+    */
+    void SetReplaceNewline(bool bReplaceNewline);
+
+    /** 获取是否替换换行符(将字符串"\\n"替换为换行符"\n"，这样可以在XML中使用括号中这两个字符(\n)来当作换行符，从而支持多行文本)
+    * @return true表示替换，false表示不替换
+    */
+    bool IsReplaceNewline() const;
+
 public:
     /** 向上一行
      * @param[in] deltaValue 滚动距离，默认为 DUI_NOSET_VALUE
@@ -1262,6 +1272,9 @@ private:
     /** 是否禁止触发文本变化事件
     */
     bool m_bDisableTextChangeEvent;
+
+    //是否替换换行符(将字符串"\\n"替换为换行符"\n"，这样可以在XML中使用括号中这两个字符(\n)来当作换行符，从而支持多行文本)
+    bool m_bReplaceNewline;
 
     /** 设置允许的最大数字(仅当IsNumberOnly()为true的时候有效)
     */

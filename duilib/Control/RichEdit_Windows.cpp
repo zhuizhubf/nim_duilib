@@ -362,7 +362,8 @@ RichEdit::RichEdit(Window* pWindow) :
     m_pClearButton(nullptr),
     m_pShowPasswordButton(nullptr),
     m_nFocusBottomBorderSize(0),
-    m_fRowSpacingMul(1.0f)
+    m_fRowSpacingMul(1.0f),
+    m_bReplaceNewline(false)
 {
     //创建RichEditHost接口
     m_pRichHost = new RichEditHost(this);
@@ -523,10 +524,19 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
         SetFontId(strValue);
     }
     else if (strName == _T("text")) {
+        if (IsReplaceNewline()) {
+            //将反斜杠+n这两个字符替换成换行符
+            StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strValue);
+        }
         SetText(strValue);
     }
     else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
-        SetTextId(strValue);
+        DString strText = GlobalManager::Instance().Lang().GetStringByID(strValue);
+        if (IsReplaceNewline()) {
+            //将反斜杠+n这两个字符替换成换行符
+            StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strText);
+        }
+        SetText(strText);
     }
     else if ((strName == _T("want_tab")) || (strName == _T("wanttab"))) {
         SetWantTab(StringUtil::IsValueTrue(strValue));
@@ -594,6 +604,10 @@ void RichEdit::SetAttribute(const DString& strName, const DString& strValue2)
     }
     else if (strName == _T("enable_drag_out")) {
         //不支持该属性，忽略
+    }
+    else if (strName == _T("replace_newline")) {
+        // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
+        SetReplaceNewline(StringUtil::IsValueTrue(strValue));
     }
 
 #ifdef DUILIB_RICHEDIT_SUPPORT_RICHTEXT
@@ -3648,6 +3662,16 @@ void RichEdit::StartAutoAdjustTextNumber(int32_t nDelta)
 void RichEdit::StopAutoAdjustTextNumber()
 {
     m_flagAdjustTextNumber.Cancel();
+}
+
+void RichEdit::SetReplaceNewline(bool bReplaceNewline)
+{
+    m_bReplaceNewline = bReplaceNewline;
+}
+
+bool RichEdit::IsReplaceNewline() const
+{
+    return m_bReplaceNewline;
 }
 
 void RichEdit::SetClearBtnClass(const DString& btnClass)

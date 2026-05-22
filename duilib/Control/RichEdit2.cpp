@@ -112,7 +112,8 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_bEnableDragOut(true),
     m_bDraggingOut(false),
     m_bDraggingOutMouseDown(false),
-    m_nDropTextPos(-1)
+    m_nDropTextPos(-1),
+    m_bReplaceNewline(false)
 {
     m_pTextData = new RichEditData(this);
 }
@@ -239,10 +240,19 @@ void RichEdit2::SetAttribute(const DString& strName, const DString& strValue2)
         SetFontId(strValue);
     }
     else if (strName == _T("text")) {
+        if (IsReplaceNewline()) {
+            //将反斜杠+n这两个字符替换成换行符
+            StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strValue);
+        }
         SetText(strValue);
     }
     else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
-        SetTextId(strValue);
+        DString strText = GlobalManager::Instance().Lang().GetStringByID(strValue);
+        if (IsReplaceNewline()) {
+            //将反斜杠+n这两个字符替换成换行符
+            StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strText);
+        }
+        SetText(strText);
     }
     else if ((strName == _T("want_tab")) || (strName == _T("wanttab"))) {
         SetWantTab(StringUtil::IsValueTrue(strValue));
@@ -377,6 +387,10 @@ void RichEdit2::SetAttribute(const DString& strName, const DString& strValue2)
     else if (strName == _T("enable_drag_out")) {
         //是否允许拖出功能（作为拖放源）
         SetEnableDragOut(StringUtil::IsValueTrue(strValue));
+    }
+    else if (strName == _T("replace_newline")) {
+        // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
+        SetReplaceNewline(StringUtil::IsValueTrue(strValue));
     }
     else {
         ScrollBox::SetAttribute(strName, strValue);
@@ -2919,6 +2933,16 @@ void RichEdit2::StartAutoAdjustTextNumber(int32_t nDelta)
 void RichEdit2::StopAutoAdjustTextNumber()
 {
     m_flagAdjustTextNumber.Cancel();
+}
+
+void RichEdit2::SetReplaceNewline(bool bReplaceNewline)
+{
+    m_bReplaceNewline = bReplaceNewline;
+}
+
+bool RichEdit2::IsReplaceNewline() const
+{
+    return m_bReplaceNewline;
 }
 
 void RichEdit2::SetClearBtnClass(const DString& btnClass)

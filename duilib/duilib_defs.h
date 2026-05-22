@@ -78,6 +78,8 @@ namespace ui
     #define  DUI_CTR_VTILE_SCROLLBOX                 (_T("VTileScrollBox"))
 
     #define  DUI_CTR_LISTBOX_ITEM                    (_T("ListBoxItem"))
+    #define  DUI_CTR_LISTBOX_ITEM_HBOX               (_T("ListBoxItemH"))
+    #define  DUI_CTR_LISTBOX_ITEM_VBOX               (_T("ListBoxItemV"))
     #define  DUI_CTR_HLISTBOX                        (_T("HListBox"))
     #define  DUI_CTR_VLISTBOX                        (_T("VListBox"))
     #define  DUI_CTR_HTILE_LISTBOX                   (_T("HTileListBox"))

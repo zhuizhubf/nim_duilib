@@ -101,6 +101,8 @@ Control* WindowBuilder::CreateControlByClass(const DString& strControlClass, Win
         {DUI_CTR_VTILE_SCROLLBOX, [](Window* pWindow) { return new VTileScrollBox(pWindow); }},
 
         {DUI_CTR_LISTBOX_ITEM, [](Window* pWindow) { return new ListBoxItem(pWindow); }},
+        {DUI_CTR_LISTBOX_ITEM_HBOX, [](Window* pWindow) { return new ListBoxItemH(pWindow); }},
+        {DUI_CTR_LISTBOX_ITEM_VBOX, [](Window* pWindow) { return new ListBoxItemV(pWindow); }},
         {DUI_CTR_HLISTBOX, [](Window* pWindow) { return new HListBox(pWindow); }},
         {DUI_CTR_VLISTBOX, [](Window* pWindow) { return new VListBox(pWindow); }},
         {DUI_CTR_HTILE_LISTBOX, [](Window* pWindow) { return new HTileListBox(pWindow); }},
@@ -1196,6 +1198,11 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             ParseCheckComboTextXmlNode(node, pParent, pWindow);
             continue;
         }
+        else if ((strClass == _T("ListCtrlHeaderItem")) || (strClass == _T("ListCtrlItem")) || (strClass == _T("ListCtrlSubItem"))) {
+            //ListCtrlHeaderItem/ListCtrlItem/ListCtrlSubItem节点
+            ParseListCtrlXmlNode(node, pParent, pWindow);
+            continue;
+        }
  
         //根据Class名称直接窗口标准控件
         Control* pControl = CreateControlByClass(strClass, pWindow);
@@ -1264,8 +1271,8 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
             }
             ASSERT(bAddedToParentBox);
         }
-        else if (strClass == DUI_CTR_PROPERTY_GRID) {
-            //PropertyGrid控件必须先添加到容器，然后再解析子节点
+        else if ((strClass == DUI_CTR_PROPERTY_GRID) || (strClass == DUI_CTR_LISTCTRL)) {
+            //PropertyGrid/ListCtrl控件必须先添加到容器，然后再解析子节点
             if (pParent != nullptr) {
                 Box* pContainer = dynamic_cast<Box*>(pParent);
                 ASSERT(pContainer != nullptr);
@@ -1305,6 +1312,21 @@ Control* WindowBuilder::ParseXmlNodeChildren(const pugi::xml_node& xmlNode, Cont
                     pControl = nullptr;
                     continue;
                 }
+                else if ((strClass == DUI_CTR_LISTBOX_ITEM) ||
+                         (strClass == DUI_CTR_LISTBOX_ITEM_HBOX) ||
+                         (strClass == DUI_CTR_LISTBOX_ITEM_VBOX)) {
+                    //检查ListBoxItem
+                    if (!node.attributes().empty() && StringUtil::IsValueTrue(node.attribute(_T("selected")).as_string())) {
+                        //该列表项设置了选择selected属性
+                        ListBox* pListBox = dynamic_cast<ListBox*>(pContainer);
+                        if (pListBox != nullptr) {
+                            size_t nItemIndex = pListBox->GetItemIndex(pControl);
+                            if (nItemIndex != Box::InvalidIndex) {
+                                pListBox->SelectItem(nItemIndex, false, false);
+                            }
+                        }
+                    }
+                 }
             }
         }
         if (pReturn == nullptr) {
@@ -1562,6 +1584,42 @@ void WindowBuilder::ParseCheckComboTextXmlNode(const pugi::xml_node& node, Contr
         if (StringUtil::IsValueTrue(selected)) {
             pCheckCombo->SelectTextItem(text, true);
         }
+    }
+}
+
+void WindowBuilder::ParseListCtrlXmlNode(const pugi::xml_node& node, Control* pParent, Window* /*pWindow*/) const
+{
+    ListCtrl* pListCtrl = dynamic_cast<ListCtrl*>(pParent);
+    ASSERT((pListCtrl != nullptr) && !node.attributes().empty());
+    if ((pListCtrl == nullptr) || node.attributes().empty()) {
+        return;
+    }
+
+    DString strClass = node.name();
+    if (strClass == _T("ListCtrlHeaderItem"))  {
+        //ListCtrlHeaderItem节点
+        ListCtrlColumn column;
+        column.text = node.attribute(_T("text")).as_string();
+        column.textId = node.attribute(_T("text_id")).as_string();
+        column.nColumnWidth = node.attribute(_T("width")).as_int();
+        if (column.nColumnWidth <= 0) {
+            column.nColumnWidth = 100;
+        }
+        pListCtrl->InsertColumn(-1, column);
+    }
+    else if (strClass == _T("ListCtrlItem")) {
+        //ListCtrlItem节点: 添加一行
+        ListCtrlSubItemData dataItem;
+        dataItem.text = node.attribute(_T("text")).as_string();
+        pListCtrl->AddDataItem(dataItem);
+    }
+    else if (strClass == _T("ListCtrlSubItem")) {
+        //ListCtrlSubItem节点
+        int32_t nItemIndex = node.attribute(_T("item_index")).as_int();
+        int32_t nColumnIndex = node.attribute(_T("column_index")).as_int();
+        ListCtrlSubItemData subItem;
+        subItem.text = node.attribute(_T("text")).as_string();
+        pListCtrl->SetSubItemData((size_t)nItemIndex, (size_t)nColumnIndex, subItem);
     }
 }
 
