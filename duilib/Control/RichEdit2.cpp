@@ -45,7 +45,7 @@ RichEdit2::RichEdit2(Window* pWindow) :
     m_bNoSelOnKillFocus(true), 
     m_bSelAllOnFocus(false),    
     m_bNoCaretReadonly(false),
-    m_bIsCaretVisiable(false),
+    m_bIsCaretVisible(false),
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
     m_bIsComposition(false),    
     #ifdef DUILIB_UNICODE
@@ -2057,13 +2057,13 @@ void RichEdit2::GetCaretSize(int32_t& xWidth, int32_t& yHeight) const
 void RichEdit2::ShowCaret(bool fShow)
 {
     if (fShow) {
-        m_bIsCaretVisiable = true;
+        m_bIsCaretVisible = true;
         m_drawCaretFlag.Cancel();
-        std::function<void()> closure = UiBind(&RichEdit2::ChangeCaretVisiable, this);
+        std::function<void()> closure = UiBind(&RichEdit2::ChangeCaretVisible, this);
         GlobalManager::Instance().Timer().AddTimer(m_drawCaretFlag.GetWeakFlag(), closure, 500);
     }
     else {
-        m_bIsCaretVisiable = false;
+        m_bIsCaretVisible = false;
         m_drawCaretFlag.Cancel();
     }
 
@@ -2168,9 +2168,9 @@ void RichEdit2::GetCaretPos(int32_t& xPos, int32_t& yPos) const
     yPos -= szScrollOffset.cy;
 }
 
-void RichEdit2::ChangeCaretVisiable()
+void RichEdit2::ChangeCaretVisible()
 {
-    m_bIsCaretVisiable = !m_bIsCaretVisiable;
+    m_bIsCaretVisible = !m_bIsCaretVisible;
     Invalidate();
 }
 
@@ -2184,9 +2184,9 @@ void RichEdit2::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
         return;
     }
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    if (m_bIsCaretVisiable && !m_bIsComposition) {
+    if (m_bIsCaretVisible && !m_bIsComposition) {
 #else
-    if (m_bIsCaretVisiable) {
+    if (m_bIsCaretVisible) {
 #endif
         int32_t xPos = 0;
         int32_t yPos = 0;

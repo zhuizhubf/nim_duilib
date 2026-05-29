@@ -1057,7 +1057,7 @@ private:
 
     /** 切换光标是否显示
     */
-    void ChangeCaretVisiable();
+    void ChangeCaretVisible();
 
     /** 绘制提示文字
      * @param[in] pRender 绘制引擎
@@ -1150,7 +1150,7 @@ private:
 
 private:
     bool m_bNoCaretReadonly;    //只读模式下，不显示光标
-    bool m_bIsCaretVisiable;    //光标是否可见
+    bool m_bIsCaretVisible;     //光标是否可见
     int32_t m_iCaretPosX;       //光标X坐标
     int32_t m_iCaretPosY;       //光标Y坐标
     int32_t m_iCaretWidth;      //光标宽度

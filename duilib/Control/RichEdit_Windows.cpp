@@ -336,7 +336,7 @@ RichEdit::RichEdit(Window* pWindow) :
     m_bHideSelection(false),
     m_bContextMenuShown(false),
     m_bNoCaretReadonly(false),
-    m_bIsCaretVisiable(false),
+    m_bIsCaretVisible(false),
     m_bIsComposition(false),
     m_iCaretPosX(0),
     m_iCaretPosY(0),
@@ -2928,13 +2928,13 @@ void RichEdit::GetCaretSize(int32_t& xWidth, int32_t& yHeight) const
 void RichEdit::ShowCaret(bool fShow)
 {
     if (fShow) {
-        m_bIsCaretVisiable = true;
+        m_bIsCaretVisible = true;
         m_drawCaretFlag.Cancel();
-        std::function<void()> closure = UiBind(&RichEdit::ChangeCaretVisiable, this);
+        std::function<void()> closure = UiBind(&RichEdit::ChangeCaretVisible, this);
         GlobalManager::Instance().Timer().AddTimer(m_drawCaretFlag.GetWeakFlag(), closure, 500);
     }
     else {
-        m_bIsCaretVisiable = false;
+        m_bIsCaretVisible = false;
         m_drawCaretFlag.Cancel();
     }
 
@@ -2970,9 +2970,9 @@ void RichEdit::GetCaretPos(int32_t& xPos, int32_t& yPos) const
     yPos = m_iCaretPosY;
 }
 
-void RichEdit::ChangeCaretVisiable()
+void RichEdit::ChangeCaretVisible()
 {
-    m_bIsCaretVisiable = !m_bIsCaretVisiable;
+    m_bIsCaretVisible = !m_bIsCaretVisible;
     Invalidate();
 }
 
@@ -2986,7 +2986,7 @@ void RichEdit::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
         return;
     }
 
-    if (m_bIsCaretVisiable && !m_bIsComposition) {
+    if (m_bIsCaretVisible && !m_bIsComposition) {
         UiRect rect(m_iCaretPosX, m_iCaretPosY, m_iCaretPosX, m_iCaretPosY + m_iCaretHeight);
         UiColor dwClrColor;
         if (!m_sCaretColor.empty()) {
