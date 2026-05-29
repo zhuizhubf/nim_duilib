@@ -51,6 +51,13 @@ public:
     */
     UiSize GetScrollOffset() const;
 
+    /** 获取滚动条的真实偏移量, 以64位整型值标志偏移 (虚表会使用虚拟滚动条位置)
+    *   如果设置了ScrollVirtualOffset，那么这个函数会将滚动条的位置减去这个虚拟偏移；
+    *   如果没有设置ScrollVirtualOffset，那么这个函数返回与UiSize64 GetScrollPos()相同的结果，但会检查是否越界；
+    *   这个函数存在的意义是支持大数据量的虚表（VirtualScrollBox），避免UiRect越界。
+    */
+    UiSize64 GetScrollOffset64() const;
+
     /** ScrollOffset 值变化通知接口
     * @param [in] oldScrollOffset 旧值
     * @param [in] newScrollOffset 新值

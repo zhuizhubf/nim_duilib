@@ -752,6 +752,28 @@ UiPoint PlaceHolder::GetScrollOffsetInScrollBox() const
     return scrollPos;
 }
 
+UiSize64 PlaceHolder::GetScrollOffsetInScrollBox64() const
+{
+    UiSize64 scrollPos;
+    Control* parent = GetParent();
+    while (parent != nullptr) {
+        ScrollBox* pScrollBox = dynamic_cast<ScrollBox*>(parent);
+        if ((pScrollBox != nullptr) &&
+            (pScrollBox->IsVScrollBarValid() || pScrollBox->IsHScrollBarValid())) {
+            //此父控件是ScrollBox，并且父控件存在横向滚动条或者纵向滚动条
+            if (IsFloat() && (pScrollBox == GetParent())) {
+                //当前控件是浮动的，父控件是ScrollBox，不计入统计
+            }
+            else {
+                scrollPos.cx += pScrollBox->GetScrollOffset64().cx;
+                scrollPos.cy += pScrollBox->GetScrollOffset64().cy;
+            }
+        }
+        parent = parent->GetParent();
+    }
+    return scrollPos;
+}
+
 bool PlaceHolder::IsControlRelated(const PlaceHolder* pAncestor, const PlaceHolder* pChild)
 {
     while ((pChild != nullptr) && (pChild != pAncestor)) {

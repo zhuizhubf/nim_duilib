@@ -399,9 +399,10 @@ public:
     */
     bool IsClip() const { return m_bClip; }
 
-    /** 获取外层滚动偏移
+    /** 获取外层滚动偏移(X方向和Y方向)
      */
     UiPoint GetScrollOffsetInScrollBox() const;
+    UiSize64 GetScrollOffsetInScrollBox64() const;
 
     /** 判断两个控件是否相等，是否存在父子或者子孙关系
      * @param [in] pAncestor 父祖级别的控件

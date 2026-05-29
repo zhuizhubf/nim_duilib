@@ -1144,6 +1144,16 @@ UiSize ScrollBox::GetScrollOffset() const
     return realcrollPos;
 }
 
+UiSize64 ScrollBox::GetScrollOffset64() const
+{
+    //这种虚拟滚动条位置的引入，是为了解决UiRect用32位整型值不能支持超大虚表（千万数据量级别以上）的问题
+    UiSize64 scrollPos = GetScrollPos();
+    UiSize64 scrollVirtualOffset = GetScrollVirtualOffset();
+    scrollPos.cx -= scrollVirtualOffset.cx;
+    scrollPos.cy -= scrollVirtualOffset.cy;
+    return scrollPos;
+}
+
 const UiSize64& ScrollBox::GetScrollVirtualOffset() const
 {
     return m_scrollVirtualOffset;

@@ -93,6 +93,10 @@ private:
     */
     void OnCheckScrollView();
 
+    /** 获取滚动条偏移位置
+    */
+    UiSize64 GetListBoxScrollPos() const;
+
 private:
     /** 关联的ListBox控件
     */
