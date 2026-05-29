@@ -160,7 +160,7 @@ void CircleProgress::PaintStateImages(IRender* pRender)
         pRender->DrawArc(outer, 270, sweepAngle, false, fgPen);
     }
     else {
-        //不使用渐变色，直接用前景色铺满
+        //使用渐变色
         pRender->DrawArc(outer, 270, 360, false, bgPen);
 
         float sweepAngle = static_cast<float>(direction * 360 * (fValue - nMin) / (nMax - nMin));
@@ -171,7 +171,9 @@ void CircleProgress::PaintStateImages(IRender* pRender)
         std::unique_ptr<IMatrix> spMatrix(pRenderFactory->CreateMatrix());
         if ((spMatrix != nullptr) && ((nMax - nMin) != 0)){
             float angle = direction * 360 * ((float)fValue - nMin) / (nMax - nMin);
-            spMatrix->RotateAt(angle, (float)center.x, (float)center.y);
+
+            const UiPoint ptScrollOffset = GetScrollOffsetInScrollBox();
+            spMatrix->RotateAt(angle, (float)center.x - ptScrollOffset.x, (float)center.y - ptScrollOffset.y);
         }
 
         UiRect imageRect;
