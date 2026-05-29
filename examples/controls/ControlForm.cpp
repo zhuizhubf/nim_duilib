@@ -602,7 +602,6 @@ void ControlForm::OnResourceFileLoaded(const DString& xml)
             ui::RichEdit* pRichEdit = dynamic_cast<ui::RichEdit*>(pControl);
             if (pRichEdit) {
                 pRichEdit->SetText(xml);
-                pRichEdit->SetFocus();
                 pRichEdit->HomeUp();
             }
         }
