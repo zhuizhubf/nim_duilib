@@ -73,51 +73,61 @@ void Slider::HandleEvent(const EventArgs& msg)
     }
     if (msg.eventType == kEventMouseButtonUp) {
         UiSize szThumb = GetThumbSize();
-        double oldValue = GetValue();
+        const double oldValue = GetValue();
         if(IsMouseFocused()) {
             SetMouseFocused(false);
         }
         const int32_t nMin = GetMinValue();
         const int32_t nMax = GetMaxValue();
         if (IsHorizontal()) {
-            if (msg.ptMouse.x >= GetRect().right - szThumb.cx / 2) {
+            UiPoint ptMouse(msg.ptMouse);
+            ptMouse.Offset(GetScrollOffsetInScrollBox());
+            if (ptMouse.x >= GetRect().right - szThumb.cx / 2) {
                 SetValue(nMax);
             }
-            else if (msg.ptMouse.x <= GetRect().left + szThumb.cx / 2) {
+            else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
                 SetValue(nMin);
             }
             else {
-                double newValue = nMin + double((nMax - nMin) * (msg.ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
+                double newValue = nMin + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
                 SetValue(newValue);
             }
         }
         else {
-            if (msg.ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
+            UiPoint ptMouse(msg.ptMouse);
+            ptMouse.Offset(GetScrollOffsetInScrollBox());
+            if (ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
                 SetValue(nMin);
             }
-            else if (msg.ptMouse.y <= GetRect().top + szThumb.cy / 2) {
+            else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
                 SetValue(nMax);
             }
             else {
-                double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - msg.ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
+                double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
                 SetValue(newValue);
             }
         }
-        SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
-        Invalidate();
+        if (GetValue() != oldValue) {
+            SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            Invalidate();
+        }
         return;
     }
     if (msg.eventType == kEventMouseWheel) {
-        double oldValue = GetValue();
+        const double oldValue = GetValue();
         int32_t detaValue = msg.eventData;
         if (detaValue > 0) {
             SetValue(GetValue() + GetChangeStep());
-            SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            if (GetValue() != oldValue) {
+                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            }            
             return;
         }
         else {
             SetValue(GetValue() - GetChangeStep());
-            SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            if (GetValue() != oldValue) {
+                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            }
             return;
         }
     }
@@ -126,33 +136,37 @@ void Slider::HandleEvent(const EventArgs& msg)
         const int32_t nMin = GetMinValue();
         const int32_t nMax = GetMaxValue();
         if (IsMouseFocused()) {
-            double oldValue = GetValue();
+            UiPoint ptMouse(msg.ptMouse);
+            ptMouse.Offset(GetScrollOffsetInScrollBox());
+            const double oldValue = GetValue();
             if (IsHorizontal()) {
-                if (msg.ptMouse.x >= GetRect().right - szThumb.cx / 2) {
+                if (ptMouse.x >= GetRect().right - szThumb.cx / 2) {
                     SetValue(nMax);
                 }
-                else if (msg.ptMouse.x <= GetRect().left + szThumb.cx / 2) {
+                else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
                     SetValue(nMin);
                 }
                 else {
-                    double newValue = nMin + double((nMax - nMin) * (msg.ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
+                    double newValue = nMin + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
                     SetValue(newValue);
                 }
             }
             else {
-                if (msg.ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
+                if (ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
                     SetValue(nMin);
                 }
-                else if (msg.ptMouse.y <= GetRect().top + szThumb.cy / 2) {
+                else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
                     SetValue(nMax);
                 }
                 else {
-                    double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - msg.ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
+                    double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
                     SetValue(newValue);
                 }
             }
-            SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
-            Invalidate();
+            if (GetValue() != oldValue) {
+                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+                Invalidate();
+            }
         }
         return;
     }

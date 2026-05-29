@@ -354,24 +354,25 @@
                                    icon_image_right_space="4"/>
     
     <!-- 进度条 -->
-    <Class name="progress_horizontal_blue" valign="center" horizontal="true" height="3" width="stretch" value="0" max="100" min="0" 
+    <Class name="progress_horizontal_blue" valign="center" horizontal="true" height="4" width="stretch" value="0" max="100" min="0" 
                                            bkimage="${PATH_PROGRESS}/progress_blue_bg.png" 
                                            progress_image="${PATH_PROGRESS}/progress_blue_fg.png"/>
-    <Class name="progress_vertical_blue" valign="center" horizontal="false" width="3" height="stretch" value="0" max="100" min="0" 
+    <Class name="progress_vertical_blue" valign="center" horizontal="false" width="4" height="stretch" value="0" max="100" min="0" 
                                          bkimage="${PATH_PROGRESS}/progress_blue_bg_ver.png" 
                                          progress_image="${PATH_PROGRESS}/progress_blue_fg_ver.png"/>
     
     <!-- 滑块 -->
-    <Class name="slider_horizontal_green" width="stretch" height="14" margin="4,0,0,0" valign="center" 
+    <Class name="slider_horizontal_green" horizontal="true" width="stretch" height="14" margin="4,0,0,0" valign="center" 
                                           thumb_size="14,14" min="0" max="255" 
                                           progress_bar_padding="0,6,0,6" 
                                           progress_color="bg_progress" 
-                                          bkimage="file='${PATH_SLIDER}/slider_hor_bk.png' valign='center' height='3' width='1200'" 
+                                          bkimage="file='${PATH_SLIDER}/slider_hor_bk.png' valign='center' height='4' width='1200'" 
                                           thumb_normal_image="file='${PATH_SLIDER}/slider_thumb.svg' width='14' height='14'"/>
-    <Class name="slider_vertical_green"   width="stretch" height="14" margin="4,0,0,0" valign="center" thumb_size="14,14" min="0" max="255" 
-                                          progress_bar_padding="0,6,0,6" 
+    <Class name="slider_vertical_green"   horizontal="false" width="14" height="stretch" margin="0,4,0,0" halign="center" 
+                                          thumb_size="14,14" min="0" max="255" 
+                                          progress_bar_padding="6,0,6,0" 
                                           progress_color="bg_progress" 
-                                          bkimage="file='${PATH_SLIDER}/slider_ver_bk.png' halign='center' width='3' height='1200'" 
+                                          bkimage="file='${PATH_SLIDER}/slider_ver_bk.png' halign='center' width='4' height='1200'" 
                                           thumb_normal_image="file='${PATH_SLIDER}/slider_thumb.svg' width='14' height='14'"/>
     
     <!-- 菜单 -->
