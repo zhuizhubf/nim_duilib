@@ -200,7 +200,8 @@
     <ThemeColor name="border_address_bar" value="#FF393939" type="address_bar" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="地址栏默认边框" comment_en="AddressBar normal border"/>
 
     <!-- ===================== 进度条颜色 (type: progress) ===================== -->
-    <ThemeColor name="bg_progress" value="#FF1A1A1A" type="progress" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
+    <ThemeColor name="bg_progress" value="#FF0078D4" type="progress" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="进度条填充/滑块主色" comment_en="Progress bar fill/slider main color"/>
+    <ThemeColor name="bg_progress_track" value="#FF2C2C2C" type="progress" category="bg_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="进度条轨道/滑块轨道" comment_en="Progress bar track/slider track color"/>
 
     <!-- ===================== 分割线颜色 (type: split_line) ===================== -->
     <ThemeColor name="bg_split_disabled" value="#B3000000" type="split_line" category="bg_color" role="neutral" derived_from="bg_split_normal" adjust="lightness:-15,saturation:-50,alpha:=70" fixed="false" support_accent="false" contrast_bg="" comment_cn="分割线禁用状态" comment_en="Split line disabled state"/>

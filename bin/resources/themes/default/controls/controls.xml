@@ -112,7 +112,7 @@
                             </HBox>
                             <HBox margin="0,0,0,10" height="32">
                                 <Control width="24" height="24" bkimage="file='set_speaker.svg' width='20' height='20' valign='center' halign='center'" valign="center"/>
-                                <Slider class="slider_horizontal_green" value="70" margin="10" tooltip_text="ui::Slider"/>
+                                <Slider class="slider_horizontal_blue" value="70" margin="10" tooltip_text="ui::Slider"/>
                             </HBox>
                         </VBox>
                         <!-- CircleProgress -->
