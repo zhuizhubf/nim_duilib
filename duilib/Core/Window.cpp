@@ -336,14 +336,21 @@ void Window::PreInitWindow()
         //关联Root对象
         AttachBox(pRoot);
 
-        //初始化阴影
-        if (!m_bWindowShadowInited) {
-            m_bWindowShadowInited = true;
-            SetShadowAttached(IsShadowAttached());
-        }
+        //当前阴影状态
+        bool bShadowAttached = IsShadowAttached();
 
         //更新自绘制标题栏状态
         OnUseSystemCaptionBarChanged();
+
+        //初始化阴影        
+        if (!m_bWindowShadowInited) {
+            m_bWindowShadowInited = true;
+            SetShadowAttached(bShadowAttached);
+        }
+        else if (!IsUseSystemCaption()) {
+            //保持原有的阴影状态
+            SetShadowAttached(bShadowAttached);
+        }
     }
 }
 
