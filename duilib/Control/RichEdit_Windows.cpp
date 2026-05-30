@@ -1086,7 +1086,7 @@ void RichEdit::SetSelectionTextColor(const DString& textColor)
         cf.cbSize = sizeof(CHARFORMAT2W);
         m_richCtrl.GetSelectionCharFormat(cf);
         cf.dwMask = CFM_COLOR;
-        cf.crTextColor = dwTextColor.ToCOLORREF();
+        cf.crTextColor = dwTextColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
         cf.dwEffects &= ~CFE_AUTOCOLOR;
         BOOL bRet = m_richCtrl.SetSelectionCharFormat(cf);
         ASSERT_UNUSED_VARIABLE(bRet);
@@ -2317,6 +2317,14 @@ void RichEdit::OnMouseMessage(uint32_t uMsg, const EventArgs& msg)
 
 void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
 {
+    if (IsEnabled()) {
+        UiColor dwTextColor = GetUiColor(GetTextColor());
+        SetTextColorInternal(dwTextColor);
+    }
+    else {
+        UiColor dwTextColor = GetUiColor(GetDisabledTextColor());
+        SetTextColorInternal(dwTextColor);
+    }
     PerformanceStat statPerformance(_T("PaintWindow, RichEdit::Paint"));
     if (pRender == nullptr) {
         return;
@@ -3807,7 +3815,7 @@ void RichEdit::SetTextColorInternal(const UiColor& textColor)
         cf.cbSize = sizeof(CHARFORMAT2W);
         m_richCtrl.GetDefaultCharFormat(cf);
         cf.dwMask = CFM_COLOR;
-        cf.crTextColor = textColor.ToCOLORREF();
+        cf.crTextColor = textColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
         cf.dwEffects &= ~CFE_AUTOCOLOR;
         BOOL bRet = m_richCtrl.SetDefaultCharFormat(cf);
         ASSERT_UNUSED_VARIABLE(bRet);
@@ -3987,7 +3995,7 @@ void RichEdit::AddColorText(const DString& str, const DString& color)
     cf.cbSize = sizeof(CHARFORMAT2W);
     cf.dwMask = CFM_COLOR;
     cf.dwEffects = 0;
-    cf.crTextColor = dwColor.ToCOLORREF();
+    cf.crTextColor = dwColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
 
     ReplaceSel(str, FALSE);
     int len = GetTextLength();
