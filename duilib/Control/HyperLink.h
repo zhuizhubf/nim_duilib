@@ -12,7 +12,8 @@ class DUILIB_API HyperLink : public Label
     typedef Label BaseClass;
 public:
     explicit HyperLink(Window* pWindow):
-        Label(pWindow)
+        Label(pWindow),
+        m_bShowUrlTooltip(true)
     {
     }
     /// 重写父类方法，提供个性化功能，请参考父类声明
@@ -21,7 +22,10 @@ public:
     {
         DString strValue = GetExpandVarStrings(strValue2);
         if (strName == _T("url")) {
-            m_url = strValue;
+            SetUrl(strValue);
+        }
+        else if (strName == _T("show_url_tooltip")) {
+            SetShowUrlTooltip(StringUtil::IsValueTrue(strValue));
         }
         else {
             BaseClass::SetAttribute(strName, strValue);
@@ -38,6 +42,45 @@ public:
     }
 
 public:
+    /** 设置URL
+    */
+    void SetUrl(const DString& url)
+    {
+        m_url = url;
+        if (IsShowUrlTooltip()) {
+            //更新Tooltip
+            SetShowUrlTooltip(IsShowUrlTooltip());
+        }
+    }
+
+    /** 获取URL
+    */
+    DString GetUrl() const
+    {
+        return m_url.c_str();
+    }
+
+    /** 是否设置URL为tooltip
+    */
+    void SetShowUrlTooltip(bool bShowUrlTooltip)
+    {
+        m_bShowUrlTooltip = bShowUrlTooltip;
+        if (bShowUrlTooltip) {
+            SetToolTipText(GetUrl());
+        }
+        else {
+            SetToolTipText(_T(""));
+        }
+    }
+
+    /** 是否显示URL为tootip
+    */
+    bool IsShowUrlTooltip() const
+    {
+        return m_bShowUrlTooltip;
+    }
+
+public:
     /** 监听超级链接被点击事件
      * @param [in] callback 超级链接被点击后的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
@@ -48,6 +91,10 @@ private:
     /** URL
     */
     UiString m_url;
+
+    /** 是否设置URL为tooltip
+    */
+    bool m_bShowUrlTooltip;
 };
 
 }    // namespace ui
