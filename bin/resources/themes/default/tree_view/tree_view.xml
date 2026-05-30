@@ -90,7 +90,7 @@
                     <Control width="auto" bkimage="file='../tree_view/view-list-symbolic.svg' width='16' height='16' svg_replace_colors='#5d656b|border_svg_image'
                                                    valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>
                     <Label text_id="STRID_TREEVIEW_VIEW_MODE" width="auto" height="28" margin="4,0,4,0" font="system_regular_12" text_align="hcenter,vcenter" valign="center" mouse_enabled="false" keyboard_enabled="false"/>
-                    <Control width="auto" bkimage="file='../tree_view/chevron-bottom.svg' width='8' height='8' svg_replace_colors='#5d656b|border_svg_image'
+                    <Control width="auto" bkimage="file='../tree_view/chevron-bottom.svg' width='8' height='8' svg_replace_colors='#1E1E1E|border_svg_image'
                                                    valign='center' halign='center'" mouse_enabled="false" keyboard_enabled="false"/>
                 </ButtonHBox>
                 <Label text_id="STRID_TREEVIEW_VIEW_PATH" valign="center" margin="10,0,0,0"/>
