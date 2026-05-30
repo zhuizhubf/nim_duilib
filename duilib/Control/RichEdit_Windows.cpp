@@ -2317,14 +2317,6 @@ void RichEdit::OnMouseMessage(uint32_t uMsg, const EventArgs& msg)
 
 void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
 {
-    if (IsEnabled()) {
-        UiColor dwTextColor = GetUiColor(GetTextColor());
-        SetTextColorInternal(dwTextColor);
-    }
-    else {
-        UiColor dwTextColor = GetUiColor(GetDisabledTextColor());
-        SetTextColorInternal(dwTextColor);
-    }
     PerformanceStat statPerformance(_T("PaintWindow, RichEdit::Paint"));
     if (pRender == nullptr) {
         return;
