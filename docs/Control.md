@@ -813,6 +813,7 @@ BitmapControl 控件继承了 `Box` 属性，更多可用属性请参考`Box`的
 ## AddressBar 控件（继承 HBox 属性）
 | 属性名称 | 默认值 | 参数类型 | 用途 |
 | :--- | :--- | :--- | :--- |
+| address_path |  | string | 设置路径 |
 | path_tooltip | true | bool | 设置是否显示路径的tooltip |
 | return_update_ui | true | bool | 设置按回车时自动更新显示控件 |
 | esc_update_ui | true | bool | 设置按ESC时自动更新显示控件 |

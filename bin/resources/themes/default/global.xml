@@ -439,13 +439,14 @@
     <Class name="splitline_hor_level1" bkcolor="border_split_level1" height="1"/>
     <Class name="splitline_hor_level2" bkcolor="border_split_level2" height="1"/>
     <Class name="splitline_ver_level1" bkcolor="border_split_level1" width="1"/>
+    <Class name="splitline_ver_level2" bkcolor="border_split_level2" width="1"/>
     
     <!-- Split 分割线 -->
-    <Class name="split_vertical" width="5"  state_color_min_width="1"
-                                   normal_color_margin="2,0,2,0" normal_color="bg_split_normal" 
-                                   hovered_color_margin="1,0,1,0" hovered_color="bg_split_hovered" 
-                                   pressed_color_margin="1,0,1,0" pressed_color="bg_split_pressed" 
-                                   disabled_color_margin="2,0,2,0" disabled_color="bg_split_disabled" />
+    <Class name="split_vertical" width="5" state_color_min_width="1"
+                                 normal_color_margin="2,0,2,0" normal_color="bg_split_normal" 
+                                 hovered_color_margin="1,0,1,0" hovered_color="bg_split_hovered" 
+                                 pressed_color_margin="1,0,1,0" pressed_color="bg_split_pressed" 
+                                 disabled_color_margin="2,0,2,0" disabled_color="bg_split_disabled" />
     <Class name="split_horizontal" height="5" state_color_min_height="1"
                                    normal_color_margin="0,2,0,2" normal_color="bg_split_normal" 
                                    hovered_color_margin="0,1,0,1" hovered_color="bg_split_hovered" 
@@ -686,8 +687,8 @@
                                      halign="right" valign="center" mouse_enabled="false"/>
     
     <!-- AddressBar控件 -->
-    <Class name="address_bar" width="stretch" height="36" border_size="1" border_color="border_address_bar" border_round="4,4" 
-                              bkcolor="bg_address_bar"
+    <Class name="address_bar" width="stretch" height="36" border_size="1" border_color="border_address_bar" disabled_border_color="border_address_bar_disabled" border_round="4,4" 
+                              bkcolor="bg_address_bar" disabled_color="bg_address_bar_disabled"
                               path_tooltip="true" return_update_ui="true" esc_update_ui="true" kill_focus_update_ui="true"
                               rich_edit_class="address_bar_edit" 
                               rich_edit_clear_btn_class="rich_edit_clear_btn"
@@ -709,11 +710,15 @@
                                               hovered_color="bg_address_bar_btn_hovered" 
                                               pressed_color="bg_address_bar_btn_pressed"/>
     <Class name="address_bar_sub_path_root" padding="2,0,2,0" 
-                                            bkimage="file='${PATH_ADDRESS_BAR}/folder-root.svg' width='22' height='22' 
-                                            halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"/>
+                                            normal_image="file='${PATH_ADDRESS_BAR}/folder-root.svg' width='22' height='22' 
+                                                          halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"
+                                            disabled_image="file='${PATH_ADDRESS_BAR}/folder-root.svg' width='22' height='22' 
+                                                            halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image_disabled'"/>
     <Class name="address_bar_path_separator" width="auto" height="100%" margin="0,0,0,0"
-                                             bkimage="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' 
-                                             halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"/>
+                                             normal_image="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' 
+                                                           halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image'"
+                                             disabled_image="file='${PATH_ADDRESS_BAR}/filename-slash.svg' width='22' height='22' 
+                                                             halign='center' valign='center' svg_replace_colors='#5d656b|border_svg_image_disabled'"/>
 
     <!-- Property Grid控件，部分属性在default/public/property_grid/property_grid.xml中定义-->
     <Class name="property_grid" bkcolor="bg_property_grid" 

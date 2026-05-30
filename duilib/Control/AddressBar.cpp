@@ -34,7 +34,10 @@ DString AddressBar::GetType() const { return DUI_CTR_ADDRESS_BAR; }
 void AddressBar::SetAttribute(const DString& strName, const DString& strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("path_tooltip")) {
+    if (strName == _T("address_path")) {
+        SetAddressPath(strValue);
+    }
+    else if (strName == _T("path_tooltip")) {
         SetEnablePathTooltip(StringUtil::IsValueTrue(strValue));
     }
     else if (strName == _T("return_update_ui")) {
@@ -409,7 +412,9 @@ void AddressBar::SetAddressPath(const DString& addressPath)
     if (m_pRichEdit != nullptr) {
         m_pRichEdit->SetText(addressPath);
     }
-    UpdateAddressBarControls(addressPath);
+    if (m_pBarBox != nullptr) {
+        UpdateAddressBarControls(addressPath);
+    }
 }
 
 DString AddressBar::GetAddressPath() const

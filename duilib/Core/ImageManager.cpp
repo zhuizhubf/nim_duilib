@@ -80,7 +80,7 @@ std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadPara
 
     std::shared_ptr<IImage> spImageData;
     //查询缓存，如果缓存存在，则可共享图片资源，无需重复加载
-    const DString imageKey = imageFullPath;
+    const DString imageKey = CreateImageKey(imageFullPath, loadParam.GetSvgReplaceColors());
     auto iterImageData = m_imageDataMap.find(imageKey);
     if (iterImageData != m_imageDataMap.end()) {
         spImageData = iterImageData->second.m_pImage.lock();
@@ -198,7 +198,7 @@ std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadPara
             return nullptr;
         }
         //赋值, 添加到容器(替换删除函数)
-        ASSERT(imageKey == imageFullPath);
+        ASSERT(imageKey == CreateImageKey(imageFullPath, loadParam.GetSvgReplaceColors()));
         spImageData.reset(pImageData.release(), ImageManager::CallImageDataDestroy);//TODO：待验证，或许有平台兼容性问题
         OnImageDataCreate(imageKey, spImageData, fImageSizeScale);        
     }
@@ -219,6 +219,16 @@ std::shared_ptr<ImageInfo> ImageManager::GetImage(const ImageLoadParam& loadPara
         }
     }
     return nullptr;
+}
+
+DString ImageManager::CreateImageKey(const DString& imageFullPath, const DString& svgReplaceColors) const
+{
+    if (svgReplaceColors.empty()) {
+        return imageFullPath;
+    }
+    else {
+        return imageFullPath + _T("&") + svgReplaceColors;
+    }    
 }
 
 void ImageManager::CallImageInfoDestroy(ImageInfo* pImageInfo)

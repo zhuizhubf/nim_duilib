@@ -87,6 +87,10 @@ DString ImageLoadParam::GetLoadKey(uint32_t nLoadDpiScale) const
         fullPath += _T(":");
         fullPath += m_srcHeight.c_str();
     }
+    if (!m_svgReplaceColors.empty()) {
+        fullPath += _T("&");
+        fullPath += m_svgReplaceColors.c_str();
+    }
     return fullPath;
 }
 
@@ -239,4 +243,4 @@ UiSize ImageLoadParam::GetMaxDestRectSize() const
     return m_rcMaxDestRectSize;
 }
 
-}
+} //namespace ui

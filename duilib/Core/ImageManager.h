@@ -177,6 +177,12 @@ private:
     */
     DString GetDpiScaledPath(uint32_t dpiScale, const DString& imageFullPath) const;
 
+    /** 生成一个图片的KEY
+    * @param [in] imageFullPath 图片的完整路径
+    * @param [in] svgReplaceColors SVG 图片替换颜色的字符串
+    */
+    DString CreateImageKey(const DString& imageFullPath, const DString& svgReplaceColors) const;
+
 private:
     /** 是否智能匹配临近的缩放百分比图片
     */
