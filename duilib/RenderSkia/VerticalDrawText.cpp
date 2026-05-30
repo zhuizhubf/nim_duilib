@@ -125,11 +125,19 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF32String& textUTF32, con
                                                                 skPaint, pFont, true);
             if ((fTextWidth < fMinCharSize) || (verticalChar.bounds.width() < fMinCharSize) || (verticalChar.bounds.height() < fMinCharSize)) {
                 //空格或者不可见字符(按小写字母确定显示区域)
-                ch = DrawSkiaText::GetMeasureDefaultChar();
-                fTextWidth = DrawSkiaText::MeasureTextChar(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
-                                                           skPaint, pFont, true);
+                if (fTextWidth > fMinCharSize) {
+                    int32_t nTextWidth = (int32_t)(fTextWidth + 0.5f);
+                    verticalChar.bounds = SkRect::MakeIWH(nTextWidth, nTextWidth);
+                }
+                else {
+                    ch = DrawSkiaText::GetMeasureDefaultChar();
+                    fTextWidth = DrawSkiaText::MeasureTextChar(*pSkFont, ch, &verticalChar.bounds,//斜体字时，这个宽度包含了外延的宽度
+                                                                skPaint, pFont, true);
+                }
+                //用字体的实际高度，作为字的高度
+                verticalChar.size = SkSize::Make(std::max(fTextWidth, verticalChar.bounds.width()), verticalChar.bounds.height()); // 用实际高度
             }
-            if (bUseFontHeight) {
+            else if (bUseFontHeight) {
                 //用字体高度作为字的高度，所有字都等高
                 verticalChar.size = SkSize::Make(std::max(fTextWidth, verticalChar.bounds.width()), (SkScalar)fFontHeight);
             }
