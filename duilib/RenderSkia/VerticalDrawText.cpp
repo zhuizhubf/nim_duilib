@@ -126,7 +126,7 @@ bool VerticalDrawText::CalculateTextCharBounds(const UTF32String& textUTF32, con
             if ((fTextWidth < fMinCharSize) || (verticalChar.bounds.width() < fMinCharSize) || (verticalChar.bounds.height() < fMinCharSize)) {
                 //空格或者不可见字符(按小写字母确定显示区域)
                 if (fTextWidth > fMinCharSize) {
-                    int32_t nTextWidth = (int32_t)(fTextWidth + 0.5f);
+                    int32_t nTextWidth = (int32_t)(std::ceilf(fTextWidth) + 0.5f);
                     verticalChar.bounds = SkRect::MakeIWH(nTextWidth, nTextWidth);
                 }
                 else {
