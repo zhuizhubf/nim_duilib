@@ -966,9 +966,10 @@ std::shared_ptr<IBitmap> ControlDragableT<T>::CreateDragoutImage()
             destHeight = kDragImageHeight;
             destWidth = (int32_t)(kDragImageHeight * (float)rc.Width() / (float)rc.Height());
         }
+        UiPoint ptScrollOffset = this->GetScrollOffsetInScrollBox();
         render->AlphaBlend((kDragImageWidth - destWidth) / 2, 0, destWidth, destHeight,
             this->GetWindow()->GetRender(),
-            rc.left, rc.top, rc.Width(), rc.Height());
+            rc.left - ptScrollOffset.x, rc.top - ptScrollOffset.y, rc.Width(), rc.Height());
     }
     std::shared_ptr<IBitmap> pDragImage(render->MakeImageSnapshot());
     return pDragImage;

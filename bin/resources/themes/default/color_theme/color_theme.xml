@@ -220,6 +220,12 @@
                                 <CheckComboText text="Text 3" selected="true"></CheckComboText>
                             </CheckCombo>
                         </VBox>
+                        <VBox width="auto" height="auto">
+                            <Label text="ComboButton:" valign="center" height="auto"/>
+                            <ComboButton class="combo_button" name="check_combo" width="120" height="30"/>
+                            <Label text="ComboButton: Disabled" valign="center" margin="0,10,0,0" height="auto"/>
+                            <ComboButton class="combo_button" name="check_combo" width="120" height="30" enabled="false"/>
+                        </VBox>
                     </HBox>
                 </GroupVBox>
 
@@ -781,6 +787,24 @@
                     <HBox child_margin="10" height="auto">
                         <Label text="Hover over controls to see tooltips:" valign="center" height="auto"/>
                         <Button class="btn_global" text="Button with Tooltip" tooltip_text="This is a tooltip - hover over controls to preview color changes" padding="10,4,10,4"/>
+                    </HBox>
+                </GroupVBox>
+                
+                <!-- Section 17: TabCtrl -->
+                <GroupVBox class="group_box_round" text="TabCtrl - All States" height="auto" margin="0,4,0,0" padding="10,24,6,10" control_padding="false">
+                    <HBox child_margin="10" height="auto">
+                        <TabCtrl class="tab_ctrl" name="tab_list1" margin="10,10,10,10" drag_order="true" drag_out_id="1" drop_in_id="2">
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 1-1" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 1-2" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 1-3" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 1-4" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                        </TabCtrl>
+                        <TabCtrl class="tab_ctrl" margin="10,10,10,10" drag_order="true" drop_in_id="1" drag_out_id="2">
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 2-1" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 2-2" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 2-3" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                            <TabCtrlItem class="tab_ctrl_item" title="Item 2-4" icon="file='public/caption/logo.svg' valign='center' halign='center'"/>
+                        </TabCtrl>
                     </HBox>
                 </GroupVBox>
                 
