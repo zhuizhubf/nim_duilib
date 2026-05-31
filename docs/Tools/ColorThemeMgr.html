@@ -7051,7 +7051,7 @@
                         }
                     } 
                     else if (['disabled', 'disable'].includes(state)) {
-                        newAdjustFormula = isDarkTheme ? 'lightness:-15,saturation:-50,alpha:=70' : 'lightness:+15,saturation:-50,alpha:=70';
+                        newAdjustFormula = isDarkTheme ? 'lightness:-10,saturation:-30,alpha:=70' : 'lightness:+10,saturation:-30,alpha:=70';
                     } 
                     else if (['focused', 'focus'].includes(state)) {
                         newAdjustFormula = isDarkTheme ? 'lightness:+6' : 'lightness:-5';
@@ -7354,7 +7354,7 @@
                             break;
                         case 'bg_split_line':
                             // 分割线背景：通常接近背景色
-                            baseLuminance = isDarkBgTheme ? Math.max(0.12, baseHsl.l - 0.02) : Math.min(0.92, baseHsl.l + 0.02);
+                            baseLuminance = isDarkBgTheme ? Math.max(0.30, baseHsl.l - 0.12) : Math.min(0.85, baseHsl.l + 0.12);
                             break;
                         case 'bg_tooltip':
                             // 提示背景：更亮/暗以突出显示
