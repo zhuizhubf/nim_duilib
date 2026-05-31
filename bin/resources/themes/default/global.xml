@@ -44,10 +44,10 @@
     <!-- ===================== 字体配置 ===================== -->  
     <!-- 默认正文字体（纯文本）：列表形式，依次匹配，直到发现第一个有效字体作为默认字体名称，多个字体名称用逗号分隔 -->
     <DefaultFontFamilyNames
-        windows="Microsoft YaHei, SimSun, Segoe UI, Arial, sans-serif"
-        macos="PingFang SC, Helvetica Neue, Arial, sans-serif"
-        linux="Noto Sans CJK SC, Noto Sans, DejaVu Sans, sans-serif"
-        freebsd="Noto Sans CJK SC, Noto Sans, DejaVu Sans, sans-serif"
+        windows="Microsoft YaHei, SimSun"
+        macos="PingFang SC"
+        linux="Noto Sans CJK SC"
+        freebsd="Noto Sans CJK SC"
     />
 
     <!-- 回退字体列表（独立于默认正文字体），用于支持Emoji文字和扩展汉字(2个UTF16字符表示的汉字)等 -->
