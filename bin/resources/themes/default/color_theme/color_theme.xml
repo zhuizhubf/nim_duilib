@@ -785,8 +785,9 @@
                 <!-- Section 16: Tooltip -->
                 <GroupVBox class="group_box_round" text="Tooltips - All States" height="auto" margin="0,4,0,0" padding="10,24,6,10" control_padding="false">
                     <HBox child_margin="10" height="auto">
-                        <Label text="Hover over controls to see tooltips:" valign="center" height="auto"/>
-                        <Button class="btn_global" text="Button with Tooltip" tooltip_text="This is a tooltip - hover over controls to preview color changes" padding="10,4,10,4"/>
+                        <Label text="Hover over controls to see tooltips:" valign="center" height="auto" valign="center"/>
+                        <Button class="btn_global" text="Button with Tooltip" tooltip_text="This is a tooltip - hover over controls to preview color changes" padding="10,4,10,4" valign="center"/>
+                        <Label text="Tooltips Text color and background color" valign="center" height="auto" text_padding="10,10,10,10" bkcolor="bg_tooltip" normal_text_color="text_tooltip" valign="center"/>
                     </HBox>
                 </GroupVBox>
                 
