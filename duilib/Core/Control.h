@@ -1665,6 +1665,10 @@ private:
     struct TAsyncImageDecode;
     static void AsyncDecodeImageData(std::shared_ptr<TAsyncImageDecode> pAsyncDecoder);
 
+    /** 颜色转换函数的实现
+    */
+    static UiColor PrivateGetUiColor(const DString& colorName, Window* pWindow);
+
 private:
     //回调事件管理
     struct TEventMapData

@@ -19,7 +19,11 @@
                 <Button class="btn_wnd_close_11" height="stretch" width="40" name="btn_window_close" margin="0,0,0,2"/>
             </HBox>
         </HBox>
-
+        <HBox height="auto" child_margin="10" margin="30,10,10,10">
+            <Button class="btn_primary_global" name="open_theme_manager" text="打开主题配色管理器" height="32" width="200"/>
+            <Button class="btn_primary_global" name="open_new_window_as_dark" text="以深色主题打开新窗口" height="32" width="200"/>
+            <Button class="btn_primary_global" name="open_new_window_as_light" text="以浅色主题打开新窗口" height="32" width="200"/>
+        </HBox>
         <VScrollBox bkcolor="bg_container" vscrollbar="true" hscrollbar="true" padding="10,0,10,0">
             <VBox height="auto">
                 <Control height="0000"/>

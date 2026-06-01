@@ -342,16 +342,35 @@ public:
     */
     void AddThemeColor(const DString& strName, UiColor argb);
 
-    /** 根据名称获取一个颜色的具体数值(该颜色为固定值，不支持颜色主题切换)
-    * @param [in] strName 要获取的颜色名称
-    * @return 返回 DWORD 格式的颜色描述值
-    */
-    UiColor GetThemeColor(const DString& strName) const;
-
     /** 删除指定名称的颜色属性(该颜色为固定值，不支持颜色主题切换)
     * @param [in] strName 要删除的颜色名称
     */
     void RemoveThemeColor(const DString& strName);
+
+    /** 根据名称获取一个颜色的具体数值
+    * @param [in] strName 要获取的颜色名称
+    * @return 返回 ARGB 格式的颜色描述值
+    */
+    UiColor GetThemeColor(const DString& strName) const;
+
+public:
+    /** 打开一个颜色主题颜色配置，从而使得该窗口使用自己的颜色管理器（ColorManager），不跟随全局颜色管理器（GlobalManager::Instance().Color()）
+    * @param [in] themePath 主题资源所在的路径，比如"color_light"为默认浅色主题，"color_dark"为默认深色主题
+    */
+    bool OpenColorTheme(const FilePath& themePath);
+
+    /** 关闭一打开的颜色主题配置，使用全局颜色管理器（GlobalManager::Instance().Color()）
+    */
+    void CloseColorTheme();
+
+    /** 获取默认禁用状态下字体颜色
+     * @return 默认禁用状态颜色的字符串表示
+     */
+    const DString& GetDefaultDisabledTextColor();
+
+    /** 获取默认字体颜色
+     */
+    const DString& GetDefaultTextColor();
 
 public:
     /** 添加一个选项组
@@ -1115,6 +1134,10 @@ private:
     /** XML解析及控件创建
     */
     std::unique_ptr<WindowBuilder> m_windowBuilder;
+
+    /** 窗口自身的主题颜色管理器（不使用全局主题颜色管理器）
+    */
+    std::unique_ptr<ColorManager> m_pColorManager;
 
 private:
     /** 窗口配置中class名称与属性映射关系

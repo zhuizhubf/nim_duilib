@@ -860,10 +860,20 @@ DString LabelImpl::GetStateTextColor(ControlStateType stateType) const
         stateColor = m_pTextColorMap->GetStateColor(stateType);
     }
     if (stateColor.empty() && (stateType == kControlStateNormal)) {
-        stateColor = GlobalManager::Instance().Color().GetDefaultTextColor();
+        if (m_pOwner->GetWindow() != nullptr) {
+            stateColor = m_pOwner->GetWindow()->GetDefaultTextColor();
+        }
+        else {
+            stateColor = GlobalManager::Instance().Color().GetDefaultTextColor();
+        }
     }
     if (stateColor.empty() && (stateType == kControlStateDisabled)) {
-        stateColor = GlobalManager::Instance().Color().GetDefaultDisabledTextColor();
+        if (m_pOwner->GetWindow() != nullptr) {
+            stateColor = m_pOwner->GetWindow()->GetDefaultDisabledTextColor();
+        }
+        else {
+            stateColor = GlobalManager::Instance().Color().GetDefaultDisabledTextColor();
+        }
     }
     return stateColor;
 }

@@ -20,6 +20,7 @@ class Control;
 class RichTextSlice;
 class RichTextImpl;
 class WindowCreateAttributes;
+class ColorManager;
 
 /** 创建控件的回调函数
 */
@@ -100,6 +101,10 @@ public:
     * @param [out] themeStyle 主题风格
     */
     bool ParseThemeInfo(DString& themeName, DString& themeType, DString& themeStyle) const;
+
+    /** 从当前XML中解析出颜色主题相关数据，并添加到颜色管理器
+    */
+    bool ParseThemeColor(ColorManager& colorManager) const;
 
 public:
     /** 解析出窗口的属性(属性名称保存在Map的Key中，属性的值保存在属性的Value中)

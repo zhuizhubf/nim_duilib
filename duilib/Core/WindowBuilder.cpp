@@ -72,8 +72,8 @@ WindowBuilder::WindowBuilder()
 
 WindowBuilder::~WindowBuilder()
 {
+    m_xml.reset();
 }
-
 
 Control* WindowBuilder::CreateControlByClass(const DString& strControlClass, Window* pWindow)
 {
@@ -1106,6 +1106,38 @@ bool WindowBuilder::ParseThemeInfo(DString& themeName, DString& themeType, DStri
         }
     }
     return false;
+}
+
+bool WindowBuilder::ParseThemeColor(ColorManager& colorManager) const
+{
+    pugi::xml_node root = m_xml->root().first_child();
+    if (root.empty()) {
+        return false;
+    }
+    DString strClass = root.name();
+    if (strClass != _T("Global")) {
+        return false;
+    }
+    bool bRet = false;
+    for (pugi::xml_node node : root.children()) {
+        strClass = node.name();
+        if (strClass == _T("ThemeColor")) {
+            DString colorName = node.attribute(_T("name")).as_string();
+            DString colorValue = node.attribute(_T("value")).as_string();
+            if (!colorName.empty() && !colorValue.empty()) {
+                GlobalManager::Instance().ExpandVarStrings(colorValue);
+                colorManager.AddColor(colorName, colorValue);
+                if ((colorName == _T("text_default")) || (colorName == _T("default_font_color"))) {
+                    colorManager.SetDefaultTextColor(colorName);
+                }
+                else if ((colorName == _T("text_disabled")) || (colorName == _T("disabled_font_color"))) {
+                    colorManager.SetDefaultDisabledTextColor(colorName);
+                }
+                bRet = true;
+            }            
+        }
+    }
+    return bRet;
 }
 
 void WindowBuilder::ParseFontXmlNode(const pugi::xml_node& xmlNode)

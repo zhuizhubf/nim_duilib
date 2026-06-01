@@ -111,12 +111,12 @@ public:
                       std::vector<ThemeInfo>& themeInfoList) const;
 
     /** 切换颜色主题（立即生效），该主题的类型应该是Color或者Combined
-    * @param [in] themePath 主题资源所在的路径
+    * @param [in] themePath 主题资源所在的路径，比如"color_light"为默认浅色主题，"color_dark"为默认深色主题
     */
     bool SwitchColorTheme(const FilePath& themePath);
 
     /** 切换图标主题（立即生效），该主题的类型应该是Icon或者Combined
-    * @param [in] themePath 主题资源所在的路径
+    * @param [in] themePath 主题资源所在的路径，格式参考SwitchColorTheme函数的对应参数
     */
     bool SwitchIconTheme(const FilePath& themePath);
 
@@ -214,6 +214,15 @@ public:
      */
     void SetDarkColorPath(const DString& darkColorPath);
 
+public:
+    /** 将字符串转换为主题类型
+    */
+    ThemeType GetThemeTypeValue(DString themeType) const;
+
+    /** 将字符串转换为主题风格
+    */
+    ThemeStyle GetThemeStyleValue(DString themeStyle) const;
+
 private:
     /** 检查图片文件路径是否存在
     * @param [in,out] imageFullPath 如果不存在清空，如果存在保留
@@ -231,14 +240,6 @@ private:
                         const FilePath& windowResPath,
                         FilePath* pResFileFullPath,
                         std::vector<uint8_t>* pResFileData) const;
-
-    /** 将字符串转换为主题类型
-    */
-    ThemeType GetThemeTypeValue(DString themeType) const;
-
-    /** 将字符串转换为主题风格
-    */
-    ThemeStyle GetThemeStyleValue(DString themeStyle) const;
 
     /** 切换颜色主题或者图标主题（立即生效）
     * @param [in] themePath 主题资源所在的路径

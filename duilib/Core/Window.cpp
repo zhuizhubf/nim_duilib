@@ -41,6 +41,8 @@ Window::~Window()
     ASSERT(!IsWindow());
     ClearWindow();
     m_windowRoot.reset();
+    m_windowBuilder.reset();
+    m_pColorManager.reset();
 }
 
 void Window::SetAttribute(const DString& strName, const DString& strValue)
@@ -571,14 +573,85 @@ void Window::AddThemeColor(const DString& strName, UiColor argb)
     m_colorMap.AddColor(strName, argb);
 }
 
-UiColor Window::GetThemeColor(const DString& strName) const
-{
-    return m_colorMap.GetColor(strName);
-}
-
 void Window::RemoveThemeColor(const DString& strName)
 {
     m_colorMap.RemoveColor(strName);
+}
+
+UiColor Window::GetThemeColor(const DString& strName) const
+{
+    UiColor color = m_colorMap.GetColor(strName);
+    if (color.IsEmpty() && (m_pColorManager != nullptr)) {
+        //使用窗口自身的主题颜色管理器
+        color = m_pColorManager->GetColor(strName);
+    }
+    return color;
+}
+
+bool Window::OpenColorTheme(const FilePath& themePath)
+{
+    ASSERT(!themePath.IsEmpty());
+    if (themePath.IsEmpty()) {
+        return false;
+    }
+    FilePath globalXmlFileName = FilePath(GlobalManager::Instance().Theme().GetGlobalXmlFileName());
+    ASSERT(!globalXmlFileName.IsEmpty());
+    if (globalXmlFileName.IsEmpty()) {
+        return false;
+    }
+
+    FilePath themeFullPath = GlobalManager::Instance().Theme().GetThemeRootPath();
+    themeFullPath /= themePath;
+    themeFullPath /= globalXmlFileName;
+    WindowBuilder globalbuilder;    
+    if (!globalbuilder.ParseXmlFile(FilePath(themeFullPath))) {
+        ASSERT(!"ParseXmlFile failed!");
+        return false;
+    }
+
+    //初始化主题数据
+    DString themeName;
+    DString themeType;
+    DString themeStyle;
+    globalbuilder.ParseThemeInfo(themeName, themeType, themeStyle);
+    ASSERT(!themeName.empty() && !themeType.empty() && !themeStyle.empty());
+    if (themeName.empty() || themeType.empty() || themeStyle.empty()) {
+        return false;
+    }
+
+    //颜色主题
+    ThemeType readThemeType = GlobalManager::Instance().Theme().GetThemeTypeValue(themeType);
+    ASSERT((readThemeType == ThemeType::kColor) || (readThemeType == ThemeType::kCombined));
+    if ((readThemeType != ThemeType::kColor) &&
+        (readThemeType != ThemeType::kCombined)) {
+        return false;
+    }
+
+    m_pColorManager = std::make_unique<ColorManager>();
+    globalbuilder.ParseThemeColor(*m_pColorManager);
+
+    //主题变化后，重绘界面
+    InvalidateAll();
+    return true;
+}
+
+void Window::CloseColorTheme()
+{
+    m_pColorManager.reset();
+    //主题变化后，重绘界面
+    InvalidateAll();
+}
+
+const DString& Window::GetDefaultDisabledTextColor()
+{
+    ColorManager& colorManager = (m_pColorManager != nullptr) ? *m_pColorManager : GlobalManager::Instance().Color();
+    return colorManager.GetDefaultDisabledTextColor();
+}
+
+const DString& Window::GetDefaultTextColor()
+{
+    ColorManager& colorManager = (m_pColorManager != nullptr) ? *m_pColorManager : GlobalManager::Instance().Color();
+    return colorManager.GetDefaultTextColor();
 }
 
 bool Window::AddOptionGroup(const DString& strGroupName, Control* pControl)

@@ -876,7 +876,12 @@ DString RichEdit2::GetTextColor() const
         return m_sTextColor.c_str();
     }
     else {
-        return GlobalManager::Instance().Color().GetDefaultTextColor();
+        if (GetWindow() != nullptr) {
+            return GetWindow()->GetDefaultTextColor();
+        }
+        else {
+            return GlobalManager::Instance().Color().GetDefaultTextColor();
+        }
     }
 }
 
@@ -899,7 +904,12 @@ DString RichEdit2::GetDisabledTextColor() const
         return m_sTextColor.c_str();
     }
     else {
-        return GlobalManager::Instance().Color().GetDefaultDisabledTextColor();
+        if (GetWindow() != nullptr) {
+            return GetWindow()->GetDefaultDisabledTextColor();
+        }
+        else {
+            return GlobalManager::Instance().Color().GetDefaultDisabledTextColor();
+        }        
     }
 }
 

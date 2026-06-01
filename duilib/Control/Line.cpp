@@ -1,5 +1,6 @@
 #include "Line.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
 #include "duilib/Render/IRender.h"
 #include "duilib/Utils/StringUtil.h"
 
@@ -159,7 +160,12 @@ void Line::Paint(IRender* pRender, const UiRect& rcPaint)
 
     DString sLineColor = m_lineColor.c_str();
     if (sLineColor.empty()) {
-        sLineColor = GlobalManager::Instance().Color().GetDefaultTextColor();
+        if (GetWindow() != nullptr) {
+            sLineColor = GetWindow()->GetDefaultTextColor();
+        }
+        else {
+            sLineColor = GlobalManager::Instance().Color().GetDefaultTextColor();
+        }
     }
     UiColor lineColor = GetUiColor(sLineColor);
     float fLineWidth = GetLineWidth();

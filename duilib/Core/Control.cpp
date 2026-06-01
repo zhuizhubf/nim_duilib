@@ -4726,11 +4726,14 @@ bool Control::LoadImageInfo(Image& duiImage, bool bPaintImage) const
             imageLoadParam.SetMaxDestRectSize(UiSize(GetRect().Width(), GetRect().Height()));
         }
 
-        std::weak_ptr<WeakFlag> colorCallbackFlag = pWindow->GetWeakFlag();
-        SvgReplaceColorCallbackFunction svgReplaceColorCallback = [colorCallbackFlag](const DString& strColor) {
+        std::weak_ptr<WeakFlag> windowFlag = pWindow->GetWeakFlag();
+        SvgReplaceColorCallbackFunction svgReplaceColorCallback = [windowFlag, pWindow](const DString& strColor) {
             UiColor color;
-            if (!colorCallbackFlag.expired()) {
-                color = GlobalManager::Instance().Color().ConvertToUiColor(strColor);
+            if (!windowFlag.expired()) {
+                color = Control::PrivateGetUiColor(strColor, pWindow);
+            }
+            else {
+                color = Control::PrivateGetUiColor(strColor, nullptr);
             }
             return color;
             };
@@ -5258,7 +5261,12 @@ bool Control::HasUiColor(const DString& colorName) const
     return !GetUiColor(colorName).IsEmpty();
 }
 
-UiColor Control::GetUiColor(const DString& colorName2) const
+UiColor Control::GetUiColor(const DString& colorName) const
+{
+    return Control::PrivateGetUiColor(colorName, GetWindow());
+}
+
+UiColor Control::PrivateGetUiColor(const DString& colorName2, Window* pWindow)
 {
     if (colorName2.empty()) {
         return UiColor();
@@ -5278,7 +5286,6 @@ UiColor Control::GetUiColor(const DString& colorName2) const
         color = GlobalManager::Instance().Color().ConvertToUiColor(colorName);
     }
     if (color.IsEmpty()) {
-        Window* pWindow = GetWindow();
         if (pWindow != nullptr) {
             //优先级2：获取在配置XML中的<Window>节点中定义子节点<ThemeColor>指定的颜色
             color = pWindow->GetThemeColor(colorName);
