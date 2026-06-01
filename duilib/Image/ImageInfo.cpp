@@ -1,6 +1,7 @@
 #include "ImageInfo.h"
 #include "duilib/Image/ImageUtil.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Utils/PerformanceUtil.h"
 #include <cmath>
 
@@ -42,7 +43,7 @@ bool ImageInfo::IsSvgImage() const
     return (m_imageType == ImageType::kImageSvg);
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& rcSource)
+std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& rcSource, Control* pControl)
 {
     std::shared_ptr<IImage> pImageData = m_pImageData;
     ASSERT(pImageData != nullptr);
@@ -73,11 +74,11 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& r
     float fSizeScaleX = static_cast<float>(rcDest.Width()) / rcSource.Width();
     float fSizeScaleY = static_cast<float>(rcDest.Height()) / rcSource.Height();
     float fImageSizeScale = fSizeScaleX < fSizeScaleY ? fSizeScaleX  : fSizeScaleY ;
-    std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(fImageSizeScale);
+    std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(fImageSizeScale, pControl);
     return pBitmap;
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale)
+std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale, Control* pControl)
 {
     GlobalManager::Instance().AssertUIThread();
     //SVG图片，无缓存
@@ -100,12 +101,24 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale)
         }
         int32_t nWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)m_nImageInfoWidth, fImageSizeScale);
         int32_t nHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)m_nImageInfoHeight, fImageSizeScale);
-        pBitmap = pSvgImage->GetBitmap(UiSize(nWidth, nHeight));
+
+        SvgReplaceColorCallbackFunction svgReplaceColorCallback;
+        if (pControl != nullptr) {
+            std::weak_ptr<WeakFlag> controlFlag = pControl->GetWeakFlag();
+            svgReplaceColorCallback = [controlFlag, pControl](const DString& strColor) {
+                UiColor color;
+                if (!controlFlag.expired() && (pControl != nullptr)) {
+                    color = pControl->GetUiColor(strColor);
+                }
+                return color;
+                };
+        }
+        pBitmap = pSvgImage->GetBitmap(UiSize(nWidth, nHeight), svgReplaceColorCallback);
     }
     return pBitmap;
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError)
+std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pControl)
 {
     GlobalManager::Instance().AssertUIThread();
     if (m_imageType == ImageType::kImageBitmap) {
@@ -116,7 +129,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError)
     }
     else if (m_imageType == ImageType::kImageSvg) {
         //SVG图片
-        std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(IMAGE_SIZE_SCALE_NONE);
+        std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(IMAGE_SIZE_SCALE_NONE, pControl);
         if (pBitmap == nullptr) {
             if (bDecodeError != nullptr) {
                 *bDecodeError = true;

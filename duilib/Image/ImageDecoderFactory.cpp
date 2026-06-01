@@ -148,7 +148,7 @@ std::shared_ptr<IBitmap> ImageDecoderFactory::DecodeImageData(const ImageDecodeP
                     szImageSize.cx = (int32_t)std::round(szImageSize.cx * fRealScale);
                     szImageSize.cy = (int32_t)std::round(szImageSize.cy * fRealScale);
                 }
-                pBitmap = pSvgImage->GetBitmap(szImageSize);
+                pBitmap = pSvgImage->GetBitmap(szImageSize, decodeParam.m_svgReplaceColorCallback);
             }
         }
     }

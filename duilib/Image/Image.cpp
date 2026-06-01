@@ -210,7 +210,7 @@ std::shared_ptr<IBitmap> Image::GetBitmapData(UiRect& rcSource, UiRect& rcSource
         return nullptr;
     }
     //单帧图片
-    std::shared_ptr<IBitmap> pBitmap = m_imageInfo->GetBitmap(bDecodeError);
+    std::shared_ptr<IBitmap> pBitmap = m_imageInfo->GetBitmap(bDecodeError, m_pControl);
     AdjustImageSourceRect(pBitmap, rcSource, rcSourceCorners);
     return pBitmap;
 }
@@ -313,7 +313,7 @@ std::shared_ptr<IBitmap> Image::GetCurrentBitmap(bool bImageStretch,
     }
     else {
         //SVG图片：支持矢量缩放
-        std::shared_ptr<IBitmap> pBitmap = m_imageInfo->GetSvgBitmap(rcDest, rcSource);
+        std::shared_ptr<IBitmap> pBitmap = m_imageInfo->GetSvgBitmap(rcDest, rcSource, m_pControl);
         if (pBitmap == nullptr) {
             pBitmap = GetBitmapData(rcSource, rcSourceCorners, bDecodeError);
             if ((pBitmap == nullptr) && (bDecodeError != nullptr)) {

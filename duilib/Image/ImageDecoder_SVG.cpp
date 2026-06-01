@@ -105,8 +105,9 @@ public:
 
     /** 获取指定大小的位图，矢量缩放
     * @param [in] szImageSize 代表获取图片的宽度(cx)和高度(cy)
+    * @param [in] svgReplaceColorCallback SVG格式替换颜色实现的回调函数
     */
-    virtual std::shared_ptr<IBitmap> GetBitmap(const UiSize& szImageSize) override
+    virtual std::shared_ptr<IBitmap> GetBitmap(const UiSize& szImageSize, SvgReplaceColorCallbackFunction svgReplaceColorCallback) override
     {
         const uint32_t nImageWidth = szImageSize.cx > 0 ? (uint32_t)szImageSize.cx : m_nImageWidth;
         const uint32_t nImageHeight = szImageSize.cy > 0 ? (uint32_t)szImageSize.cy : m_nImageHeight;
@@ -117,7 +118,11 @@ public:
 
         //检查颜色值是否变化，如果变化则需要重新生成图片
         if (!m_svgReplaceTextList.empty() && !m_svgText.empty()) {
-            if (CheckReplacedSvgColorChanged(m_svgReplaceColorCallback, m_svgReplaceTextList)) {
+            SvgReplaceColorCallbackFunction replaceColorCallback = svgReplaceColorCallback;
+            if (replaceColorCallback == nullptr) {
+                replaceColorCallback = m_svgReplaceColorCallback;
+            }
+            if (CheckReplacedSvgColorChanged(replaceColorCallback, m_svgReplaceTextList)) {
                 DStringA svgText = SvgImageImpl::GetReplacedSvgText(m_svgText, m_svgReplaceTextList, nullptr);
                 std::unique_ptr<SkMemoryStream> spMemStream = SkMemoryStream::MakeCopy(svgText.data(), svgText.size());
                 uint32_t nLoadedImageWidth = 0;
