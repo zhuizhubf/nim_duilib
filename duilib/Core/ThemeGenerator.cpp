@@ -103,33 +103,81 @@ std::string ThemeGenerator::OKLCHToARGB(double L, double C, double H, uint8_t al
 
 std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool isDark)
 {
-    double b = isDark ? base : (1.0 - base);
-    return OKLCHToARGB(b, 0, hue);
+    // 增加baseChroma系数使背景色更明显地带有hue色彩
+    // baseChroma = base * 0.15 ~ 0.25，使base变化时背景色能明显反映色相
+    double baseChroma = base * 0.20;
+
+    // 浅色模式：bg-L = 0.97 - base * 0.95
+    // 深色模式：bg-L = 0.17 + base * 0.78
+    double bgL;
+    if (isDark) {
+        bgL = 0.17 + base * 0.78;
+    }
+    else {
+        bgL = 0.97 - base * 0.95;
+    }
+
+    return OKLCHToARGB(bgL, baseChroma, hue);
 }
 
 std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isDark)
 {
-    double b = isDark ? base : (1.0 - base);
-    double fgLuminance = 1.0 - b;
-    return OKLCHToARGB(fgLuminance, 0, hue);
+    // 使用与背景相同的色相和色度
+    double baseChroma = base * 0.20;
+
+    // 浅色模式：fg-L = 0.22 + base * 0.72
+    // 深色模式：fg-L = 0.92 - base * 0.75
+    double fgL;
+    if (isDark) {
+        fgL = 0.92 - base * 0.75;
+    }
+    else {
+        fgL = 0.22 + base * 0.72;
+    }
+
+    return OKLCHToARGB(fgL, baseChroma * 1.3, hue);
 }
 
 std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel)
 {
-    double b = isDark ? base : (1.0 - base);
-    double step = 0.06;
-    double stepDir = isDark ? -step : step;
-    double L = std::max(0.0, std::min(1.0, b - stepDir * surfaceLevel));
-    return OKLCHToARGB(L, 0, hue);
+    // sf-L = bg-L + offset
+    // 浅色模式 offset = +0.025
+    // 深色模式 offset = +0.07
+    double baseChroma = base * 0.20;
+
+    double bgL;
+    if (isDark) {
+        bgL = 0.17 + base * 0.78;
+    }
+    else {
+        bgL = 0.97 - base * 0.95;
+    }
+
+    double offset = isDark ? 0.07 : 0.025;
+    double sfL = bgL + offset * surfaceLevel;
+
+    return OKLCHToARGB(sfL, baseChroma, hue);
 }
 
 std::string ThemeGenerator::GetNeutralColor(double hue, double base, bool isDark, int level)
 {
-    double b = isDark ? base : (1.0 - base);
-    double step = 0.06;
-    double stepDir = isDark ? -step : step;
-    double L = std::max(0.0, std::min(1.0, b - stepDir * level / 100.0));
-    return OKLCHToARGB(L, 0, hue);
+    // 中性色使用与背景相同的色相
+    // level范围0-1500，映射到0-15
+    double baseChroma = base * 0.20;
+
+    double bgL;
+    if (isDark) {
+        bgL = 0.17 + base * 0.78;
+    }
+    else {
+        bgL = 0.97 - base * 0.95;
+    }
+
+    // 中性色的step与surface类似
+    double step = isDark ? 0.07 : 0.025;
+    double neutralL = bgL + step * (level / 100.0);
+
+    return OKLCHToARGB(neutralL, baseChroma, hue);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark)
@@ -355,18 +403,28 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string surface2 = GetSurfaceColor(hue, base, isDark, 2);
     std::string surface3 = GetSurfaceColor(hue, base, isDark, 3);
 
-    std::string accentColor = OKLCHToARGB(0.65, 0.22, hue);
-    std::string accentForeground = OKLCHToARGB(0.98, 0, 0);
+    // Accent固定参数
+    // 浅色模式：accent-L = 0.6204, C = 0.195
+    // 深色模式：accent-L = 0.68, C = 0.195
+    double accentL = isDark ? 0.68 : 0.6204;
+    double accentC = 0.195;
+    std::string accentColor = OKLCHToARGB(accentL, accentC, hue);
+
+    // accent-foreground：浅色模式接近白色，深色模式接近黑色
+    double accentFgL = isDark ? 0.14 : 0.99;
+    std::string accentForeground = OKLCHToARGB(accentFgL, 0, hue);
 
     std::string linkColor;
     std::string linkHoverColor;
+    // 链接颜色使用accent
     if (isDark) {
         linkColor = accentColor;
         linkHoverColor = GetStateColor(accentColor, "hovered", isDark);
     }
     else {
-        linkColor = OKLCHToARGB(0.15, 0.20, hue);
-        linkHoverColor = OKLCHToARGB(0.20, 0.20, hue);
+        // 浅色模式下使用accent
+        linkColor = accentColor;
+        linkHoverColor = GetStateColor(accentColor, "hovered", isDark);
     }
 
     std::string bgBtnNormal = surface1;

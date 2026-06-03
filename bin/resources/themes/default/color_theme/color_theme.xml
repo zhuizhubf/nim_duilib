@@ -28,22 +28,22 @@
                    margin="4,4,4,4" child_margin="10">
             <CheckBox class="checkbox_1" name="gen_color_checkbox" text_id="STRID_COLORTHEME_ENABLE_GEN_THEME"/>
             <HBox name="gen_color_box" height="auto" child_margin="10" enabled="false">
-                <Option class="option_1" group="radio_gen_color" text_id="STRID_COLORTHEME_LIGHT_THEME" selected="true"/>
-                <Option class="option_1" group="radio_gen_color" text_id="STRID_COLORTHEME_DARK_THEME"/>
+                <Option class="option_1" name="gen_color_radio_light" group="radio_gen_color" text_id="STRID_COLORTHEME_LIGHT_THEME" selected="true"/>
+                <Option class="option_1" name="gen_color_radio_dark" group="radio_gen_color" text_id="STRID_COLORTHEME_DARK_THEME"/>
                 <HBox height="auto" child_margin="10">
                     <VBox height="auto" width="360" child_margin="6">
                         <HBox height="auto" child_margin="2" margin="12,0,0,0">
                             <Label text_id="STRID_COLORTHEME_COLOR_HUE" valign="center" width="auto" height="auto"/>
                             <Label name="gen_color_label_hue" text="" valign="center" width="auto" height="auto"/>
                         </HBox>
-                        <Slider class="slider_horizontal_blue" name="gen_color_slider_hue" value="0" min="0" max="36000"/>
+                        <Slider class="slider_horizontal_blue" name="gen_color_slider_hue" value="0" min="0" max="3600"/>
                     </VBox>
                     <VBox height="auto" width="360" child_margin="6">
                         <HBox height="auto" child_margin="2" margin="12,0,0,0">
                             <Label text_id="STRID_COLORTHEME_COLOR_BASE_L" valign="center" width="auto" height="auto"/>
-                            <Label name="gen_color_label_base_luminance" text="" valign="center" width="auto" height="auto"/>
+                            <Label name="gen_color_label_base_chroma" text="" valign="center" width="auto" height="auto"/>
                         </HBox>
-                        <Slider class="slider_horizontal_blue" name="gen_color_slider_base_luminance" value="0" min="0" max="10000"/>
+                        <Slider class="slider_horizontal_blue" name="gen_color_slider_base_chroma" value="0" min="0" max="400"/>
                     </VBox>
                 </HBox>
             </HBox>

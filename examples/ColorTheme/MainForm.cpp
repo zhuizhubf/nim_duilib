@@ -72,11 +72,11 @@ void MainForm::OnInitWindow()
     ui::Slider* pSliderHue = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_hue")));
     ui::Label* pLabelHue = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_hue")));
 
-    ui::Slider* pSliderBaseLuminance = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_base_luminance")));
-    ui::Label* pLabelBaseLuminance = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_base_luminance")));
+    ui::Slider* pSliderBaseChroma = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_base_chroma")));
+    ui::Label* pLabelBaseChroma = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_base_chroma")));
     if ((pGenColorCheckBox == nullptr) || (pGenColorBox == nullptr) ||
         (pSliderHue == nullptr) || (pLabelHue == nullptr) ||
-        (pSliderBaseLuminance == nullptr) || (pLabelBaseLuminance == nullptr)) {
+        (pSliderBaseChroma == nullptr) || (pLabelBaseChroma == nullptr)) {
         return;
     }
 
@@ -84,10 +84,25 @@ void MainForm::OnInitWindow()
         OnGenColorParamChanged();
         return true;
         });
-    pSliderBaseLuminance->AttachValueChanged([this](const ui::EventArgs&) {
+    pSliderBaseChroma->AttachValueChanged([this](const ui::EventArgs&) {
         OnGenColorParamChanged();
         return true;
         });
+
+    ui::Option* pOptionColorType = dynamic_cast<ui::Option*>(FindControl(_T("gen_color_radio_light")));
+    if (pOptionColorType != nullptr) {
+        pOptionColorType->AttachSelect([this](const ui::EventArgs&) {
+            OnGenColorParamChanged();
+            return true;
+            });
+    }
+    pOptionColorType = dynamic_cast<ui::Option*>(FindControl(_T("gen_color_radio_dark")));
+    if (pOptionColorType != nullptr) {
+        pOptionColorType->AttachSelect([this](const ui::EventArgs&) {
+            OnGenColorParamChanged();
+            return true;
+            });
+    }
 
     //初始状态
     pGenColorBox->SetEnabled(pGenColorCheckBox->IsSelected());
@@ -124,21 +139,21 @@ void MainForm::OnGenColorParamChanged()
     ui::Slider* pSliderHue = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_hue")));
     ui::Label* pLabelHue = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_hue")));
 
-    ui::Slider* pSliderBaseLuminance = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_base_luminance")));
-    ui::Label* pLabelBaseLuminance = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_base_luminance")));
+    ui::Slider* pSliderBaseChroma = dynamic_cast<ui::Slider*>(FindControl(_T("gen_color_slider_base_chroma")));
+    ui::Label* pLabelBaseChroma = dynamic_cast<ui::Label*>(FindControl(_T("gen_color_label_base_chroma")));
     if ((pSliderHue == nullptr) || (pLabelHue == nullptr) ||
-        (pSliderBaseLuminance == nullptr) || (pLabelBaseLuminance == nullptr)) {
+        (pSliderBaseChroma == nullptr) || (pLabelBaseChroma == nullptr)) {
         return;
     }
 
-    double fHue = pSliderHue->GetValue() / 100.0; // [0 - 360]
+    double fHue = pSliderHue->GetValue() / 10.0; // [0 - 360]
     if (fHue < 0.0) {
         fHue = 0.0;
     }
     if (fHue > 360.0) {
         fHue = 360.0;
     }
-    double fBaseLuminance = pSliderBaseLuminance->GetValue() / 10000.0; // [0 - 1]
+    double fBaseLuminance = pSliderBaseChroma->GetValue() / 10000.0; // [0 - 0.03]
     if (fBaseLuminance < 0.0) {
         fBaseLuminance = 0.0;
     }
@@ -150,7 +165,7 @@ void MainForm::OnGenColorParamChanged()
     pLabelHue->SetText(hueString);
 
     DString baseLuminanceString = ui::StringUtil::Printf(_T("%.04f"), fBaseLuminance);
-    pLabelBaseLuminance->SetText(baseLuminanceString);
+    pLabelBaseChroma->SetText(baseLuminanceString);
 
     if (m_pThemeGenerator == nullptr) {
         //从当前主题加载默认的配置
@@ -179,7 +194,14 @@ void MainForm::OnGenColorParamChanged()
         }
     }
 
-    std::string colorThemeXmlData = m_pThemeGenerator->GenerateTheme(fHue, fBaseLuminance, IsColorThemeDarkMode());
+    bool bDarkMode = false;
+    ui::Option* pOptionColorType = dynamic_cast<ui::Option*>(FindControl(_T("gen_color_radio_dark")));
+    if ((pOptionColorType != nullptr) && (pOptionColorType->IsSelected())){
+        bDarkMode = true;
+    }
+
+    std::string colorThemeXmlData = m_pThemeGenerator->GenerateTheme(fHue, fBaseLuminance, bDarkMode);
+    DString testXml = ui::StringConvert::UTF8ToT(colorThemeXmlData);
     ASSERT(!colorThemeXmlData.empty());
     if (!colorThemeXmlData.empty()) {
         //加载新的主题颜色配置
