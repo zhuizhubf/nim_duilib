@@ -363,23 +363,6 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors.clear();
 
     std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
-
-    uint8_t dummyA, dummyR, dummyG, dummyB;
-    if (m_colorConverter.ParseHexColor(bgWindowMain, dummyA, dummyR, dummyG, dummyB)) {
-        double luminance = m_colorConverter.GetRelativeLuminance(dummyR, dummyG, dummyB);
-        if (isDark) {
-            if (luminance > 0.5) {
-                base = 1.0 - base;
-            }
-        }
-        else {
-            if (luminance < 0.5) {
-                base = 1.0 - base;
-            }
-        }
-    }
-
-    bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
     std::string fgWindowMain = GetForegroundColor(hue, base, isDark);
 
     std::string surface0 = GetSurfaceColor(hue, base, isDark, 0);
@@ -485,18 +468,20 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
 
     for (int i = 0; i < 16; i++) {
         std::ostringstream name;
-        name << "neutral_" << (i * 100);
+        name << "--neutral_" << (i * 100);
         m_generatedColors[name.str()] = GetNeutralColor(hue, base, isDark, i * 100);
     }
 
+    m_generatedColors["--background"] = bgWindowMain;
+    m_generatedColors["--foreground"] = fgWindowMain;
+    m_generatedColors["--surface_0"] = surface0;
+    m_generatedColors["--surface_1"] = surface1;
+    m_generatedColors["--surface_2"] = surface2;
+    m_generatedColors["--surface_3"] = surface3;
+    m_generatedColors["--accent"] = accentColor;
+    m_generatedColors["--accent_foreground"] = accentForeground;
+
     m_generatedColors["bg_window_main"] = bgWindowMain;
-    m_generatedColors["foreground"] = fgWindowMain;
-    m_generatedColors["surface_0"] = surface0;
-    m_generatedColors["surface_1"] = surface1;
-    m_generatedColors["surface_2"] = surface2;
-    m_generatedColors["surface_3"] = surface3;
-    m_generatedColors["accent"] = accentColor;
-    m_generatedColors["accent_foreground"] = accentForeground;
     m_generatedColors["color_blue"] = accentColor;
     m_generatedColors["color_blue_dark"] = GetStateColor(accentColor, "pressed", isDark);
     m_generatedColors["color_blue_light"] = GetStateColor(accentColor, "hovered", isDark);
@@ -749,7 +734,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                     if (lowerName.find("white") != std::string::npos || lowerName.find("black") != std::string::npos) {
                         if (!isDark) {
                             if (lowerName.find("white") != std::string::npos) {
-                                processedColors[colorName] = m_generatedColors["foreground"];
+                                processedColors[colorName] = m_generatedColors["--foreground"];
                             }
                             else {
                                 processedColors[colorName] = m_generatedColors["bg_window_main"];
@@ -760,7 +745,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                                 processedColors[colorName] = m_generatedColors["bg_window_main"];
                             }
                             else {
-                                processedColors[colorName] = m_generatedColors["foreground"];
+                                processedColors[colorName] = m_generatedColors["--foreground"];
                             }
                         }
                         continue;

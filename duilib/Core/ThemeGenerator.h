@@ -252,7 +252,7 @@ private:
     double m_bgLightLScale;     ///< 浅色模式背景明度随base变化系数 (范围: -2.0到0, 默认: -0.95)
     double m_bgDarkL;           ///< 深色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.17)
     double m_bgDarkLScale;      ///< 深色模式背景明度随base变化系数 (范围: 0到2.0, 默认: 0.78)
-    double m_bgBaseChroma;      ///< 背景色度系数 (范围: 0.0-3.0, 默认: 1.5)
+    double m_bgBaseChroma;      ///< 背景色度系数 (范围: 0.0-3.0, 默认: 1.0)
 
     // 前景色参数
     double m_fgLightL;          ///< 浅色模式前景明度基准值 (范围: 0.0-1.0, 默认: 0.22)
