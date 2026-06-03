@@ -207,4 +207,33 @@ void MainForm::OnGenColorParamChanged()
         //加载新的主题颜色配置
         OpenColorThemeData(colorThemeXmlData);
     }
+
+    //更新主色预览区(背景色和对应的前景色)
+    std::vector<std::pair<DString, DString>> previewColors;
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--background"), _T("--foreground")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--accent"), _T("--accent_foreground")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--success"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--warning"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--error"), _T("")));
+
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_0"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_1"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_2"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_3"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_4"), _T("")));
+
+    for (auto iter : previewColors) {
+        const DString& bg = iter.first;
+        const DString& fg = iter.second;
+        ui::Label* pLabel = dynamic_cast<ui::Label*>(FindControl(bg));
+        if (pLabel != nullptr) {
+            std::string bkColor = m_pThemeGenerator->GetGeneratedColor(ui::StringConvert::TToUTF8(bg));
+            pLabel->SetBkColor(ui::StringConvert::UTF8ToT(bkColor));
+            pLabel->SetToolTipText(ui::StringConvert::UTF8ToT(bkColor));
+            if (!fg.empty()) {
+                std::string fgColor = m_pThemeGenerator->GetGeneratedColor(ui::StringConvert::TToUTF8(fg));
+                pLabel->SetStateTextColor(ui::ControlStateType::kControlStateNormal, ui::StringConvert::UTF8ToT(fgColor));
+            }
+        }
+    }
 }

@@ -365,10 +365,11 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
     std::string fgWindowMain = GetForegroundColor(hue, base, isDark);
 
-    std::string surface0 = GetSurfaceColor(hue, base, isDark, 0);
-    std::string surface1 = GetSurfaceColor(hue, base, isDark, 1);
-    std::string surface2 = GetSurfaceColor(hue, base, isDark, 2);
-    std::string surface3 = GetSurfaceColor(hue, base, isDark, 3);
+    std::string surface0 = GetSurfaceColor(hue, base, isDark, 1);
+    std::string surface1 = GetSurfaceColor(hue, base, isDark, 2);
+    std::string surface2 = GetSurfaceColor(hue, base, isDark, 3);
+    std::string surface3 = GetSurfaceColor(hue, base, isDark, 4);
+    std::string surface4 = GetSurfaceColor(hue, base, isDark, 5);
 
     // 使用成员变量生成Accent颜色
     double accentL = isDark ? m_accentDarkL : m_accentLightL;
@@ -478,8 +479,13 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--surface_1"] = surface1;
     m_generatedColors["--surface_2"] = surface2;
     m_generatedColors["--surface_3"] = surface3;
+    m_generatedColors["--surface_4"] = surface4;
     m_generatedColors["--accent"] = accentColor;
     m_generatedColors["--accent_foreground"] = accentForeground;
+
+    m_generatedColors["--success"] = m_colorConverter.OKLCHToARGB(0.65, 0.16, 152, 255);; //成功色
+    m_generatedColors["--warning"] = m_colorConverter.OKLCHToARGB(0.68, 0.18, 80, 255);   //警告色
+    m_generatedColors["--error"] = m_colorConverter.OKLCHToARGB(0.65, 0.18, 25, 255);     //失败/错误/危险色
 
     m_generatedColors["bg_window_main"] = bgWindowMain;
     m_generatedColors["color_blue"] = accentColor;

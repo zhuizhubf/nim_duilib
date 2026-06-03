@@ -27,26 +27,46 @@
         <GroupHBox class="group_box_round" text="Color Generator" height="auto" padding="10,24,6,10" control_padding="false" 
                    margin="4,4,4,4" child_margin="10">
             <CheckBox class="checkbox_1" name="gen_color_checkbox" text_id="STRID_COLORTHEME_ENABLE_GEN_THEME"/>
-            <HBox name="gen_color_box" height="auto" child_margin="10" enabled="false">
-                <Option class="option_1" name="gen_color_radio_light" group="radio_gen_color" text_id="STRID_COLORTHEME_LIGHT_THEME" selected="true"/>
-                <Option class="option_1" name="gen_color_radio_dark" group="radio_gen_color" text_id="STRID_COLORTHEME_DARK_THEME"/>
+            <VBox name="gen_color_box" height="auto" child_margin="10" enabled="false">
                 <HBox height="auto" child_margin="10">
-                    <VBox height="auto" width="360" child_margin="6">
-                        <HBox height="auto" child_margin="2" margin="12,0,0,0">
-                            <Label text_id="STRID_COLORTHEME_COLOR_HUE" valign="center" width="auto" height="auto"/>
-                            <Label name="gen_color_label_hue" text="" valign="center" width="auto" height="auto"/>
+                    <Option class="option_1" name="gen_color_radio_light" group="radio_gen_color" text_id="STRID_COLORTHEME_LIGHT_THEME" selected="true"/>
+                    <Option class="option_1" name="gen_color_radio_dark" group="radio_gen_color" text_id="STRID_COLORTHEME_DARK_THEME"/>
+                    <VBox height="auto" child_margin="10" margin="10,0,0,0">
+                        <HBox height="auto" child_margin="10" margin="0,0,0,4">
+                            <VBox height="auto" width="360" child_margin="6">
+                                <HBox height="auto" child_margin="2" margin="12,0,0,0">
+                                    <Label text_id="STRID_COLORTHEME_COLOR_HUE" valign="center" width="auto" height="auto"/>
+                                    <Label name="gen_color_label_hue" text="" valign="center" width="auto" height="auto"/>
+                                </HBox>
+                                <Slider class="slider_horizontal_blue" name="gen_color_slider_hue" value="0" min="0" max="3600"/>
+                            </VBox>
+                            <VBox height="auto" width="360" child_margin="6">
+                                <HBox height="auto" child_margin="2" margin="12,0,0,0">
+                                    <Label text_id="STRID_COLORTHEME_COLOR_BASE_L" valign="center" width="auto" height="auto"/>
+                                    <Label name="gen_color_label_base_chroma" text="" valign="center" width="auto" height="auto"/>
+                                </HBox>
+                                <Slider class="slider_horizontal_blue" name="gen_color_slider_base_chroma" value="0" min="0" max="400"/>
+                            </VBox>
                         </HBox>
-                        <Slider class="slider_horizontal_blue" name="gen_color_slider_hue" value="0" min="0" max="3600"/>
-                    </VBox>
-                    <VBox height="auto" width="360" child_margin="6">
-                        <HBox height="auto" child_margin="2" margin="12,0,0,0">
-                            <Label text_id="STRID_COLORTHEME_COLOR_BASE_L" valign="center" width="auto" height="auto"/>
-                            <Label name="gen_color_label_base_chroma" text="" valign="center" width="auto" height="auto"/>
-                        </HBox>
-                        <Slider class="slider_horizontal_blue" name="gen_color_slider_base_chroma" value="0" min="0" max="400"/>
                     </VBox>
                 </HBox>
-            </HBox>
+                <GroupVBox class="group_box_round" text_id="STRID_COLORTHEME_COLOR_PREVIEW" height="auto" padding="10,30,6,10" control_padding="false">
+                    <HBox height="auto" child_margin="4">
+                        <Label name="--background" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_BACKGROUND" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--accent" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_ACCENT" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--success" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SUCCESS" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--warning" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_WARNING" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--error" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_ERROR" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                    </HBox>
+                    <HBox height="auto" child_margin="4" margin="0,4,0,0">
+                        <Label name="--surface_0" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_0" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_1" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_1" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_2" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_2" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_3" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_3" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_4" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_4" width="140" height="60" text_align="hcenter,vcenter" border_round="8,8"/>
+                    </HBox>
+                </GroupVBox>
+            </VBox>
         </GroupHBox>
         <VScrollBox bkcolor="bg_container" vscrollbar="true" hscrollbar="true" padding="10,0,10,0">
             <VBox height="auto">
