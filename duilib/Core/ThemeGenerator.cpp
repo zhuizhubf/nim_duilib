@@ -23,7 +23,7 @@ ThemeGenerator::ThemeGenerator()
     , m_bgLightLScale(-0.95)
     , m_bgDarkL(0.17)
     , m_bgDarkLScale(0.78)
-    , m_bgBaseChroma(1.5)
+    , m_bgBaseChroma(1.0)
     // 前景色参数
     , m_fgLightL(0.22)
     , m_fgLightLScale(0.72)
