@@ -1091,7 +1091,7 @@ void RichEdit::SetSelectionTextColor(const DString& textColor)
         cf.cbSize = sizeof(CHARFORMAT2W);
         m_richCtrl.GetSelectionCharFormat(cf);
         cf.dwMask = CFM_COLOR;
-        cf.crTextColor = dwTextColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
+        cf.crTextColor = dwTextColor.ToCOLORREF((GetWindow() != nullptr) && GetWindow()->IsColorThemeDarkMode());
         cf.dwEffects &= ~CFE_AUTOCOLOR;
         BOOL bRet = m_richCtrl.SetSelectionCharFormat(cf);
         ASSERT_UNUSED_VARIABLE(bRet);
@@ -3004,7 +3004,7 @@ void RichEdit::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
         }
         if (dwClrColor.IsEmpty()) {
             //默认光标颜色
-            if (GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark) {
+            if ((GetWindow() != nullptr) && GetWindow()->IsColorThemeDarkMode()) {
                 //深色主题
                 dwClrColor = UiColor(UiColors::White);
             }
@@ -3817,7 +3817,7 @@ void RichEdit::SetTextColorInternal(const UiColor& textColor)
         cf.cbSize = sizeof(CHARFORMAT2W);
         m_richCtrl.GetDefaultCharFormat(cf);
         cf.dwMask = CFM_COLOR;
-        cf.crTextColor = textColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
+        cf.crTextColor = textColor.ToCOLORREF((GetWindow() != nullptr) && GetWindow()->IsColorThemeDarkMode());
         cf.dwEffects &= ~CFE_AUTOCOLOR;
         BOOL bRet = m_richCtrl.SetDefaultCharFormat(cf);
         ASSERT_UNUSED_VARIABLE(bRet);
@@ -3997,7 +3997,7 @@ void RichEdit::AddColorText(const DString& str, const DString& color)
     cf.cbSize = sizeof(CHARFORMAT2W);
     cf.dwMask = CFM_COLOR;
     cf.dwEffects = 0;
-    cf.crTextColor = dwColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark);
+    cf.crTextColor = dwColor.ToCOLORREF((GetWindow() != nullptr) && GetWindow()->IsColorThemeDarkMode());
 
     ReplaceSel(str, FALSE);
     int len = GetTextLength();

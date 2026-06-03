@@ -359,9 +359,18 @@ public:
     */
     bool OpenColorTheme(const FilePath& themePath);
 
+    /** 打开一个颜色主题颜色配置，从而使得该窗口使用自己的颜色管理器（ColorManager），不跟随全局颜色管理器（GlobalManager::Instance().Color()）
+    * @param [in] themeXmlFileData 主题资源的XML文件数据
+    */
+    bool OpenColorThemeData(const std::string& themeXmlFileData);
+
     /** 关闭一打开的颜色主题配置，使用全局颜色管理器（GlobalManager::Instance().Color()）
     */
     void CloseColorTheme();
+
+    /** 判断当前主题是否为深色主题
+    */
+    bool IsColorThemeDarkMode() const;
 
     /** 获取默认禁用状态下字体颜色
      * @return 默认禁用状态颜色的字符串表示

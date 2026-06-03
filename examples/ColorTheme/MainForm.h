@@ -28,6 +28,20 @@ public:
     /** 当窗口创建完成以后调用此函数，供子类中做一些初始化的工作
     */
     virtual void OnInitWindow() override;
+
+private:
+    /** 生成主题颜色的功能开关
+    */
+    void OnGenColorEnableStateChanged(bool bEnabled);
+
+    /** 颜色配置参数变化，更新界面
+    */
+    void OnGenColorParamChanged();
+
+private:
+    /** 主题生成器
+    */
+    std::unique_ptr<ui::ThemeGenerator> m_pThemeGenerator;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

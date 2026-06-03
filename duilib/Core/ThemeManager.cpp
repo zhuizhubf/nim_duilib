@@ -187,6 +187,9 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
         }
         m_defaultThemeInfo.m_bSelectedTheme = false;
         themeInfo = m_colorThemeInfo;
+
+        //设置是否为深色主题
+        GlobalManager::Instance().Color().SetColorThemeDarkMode(m_colorThemeInfo.m_themeStyle == ThemeStyle::kDark);
     }
     else if (destThemeType == ThemeType::kIcon) {
         //图标主题

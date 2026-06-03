@@ -49,6 +49,14 @@ public:
      */
     UiColor ConvertToUiColor(const DString& strColor);
 
+    /** 设置当前主题是否为深色主题
+    */
+    void SetColorThemeDarkMode(bool bColorThemeDarkMode);
+
+    /** 判断当前主题是否为深色主题
+    */
+    bool IsColorThemeDarkMode() const;
+
 public:
     /** 获取默认禁用状态下字体颜色
      * @return 默认禁用状态颜色的字符串表示，对应 global.xml 中指定颜色值
@@ -79,6 +87,10 @@ private:
     /** 默认正常状态的字体颜色
     */
     DString m_defaultTextColor;
+
+    /** 主题风格类型是否为深色主题
+    */
+    bool m_bColorThemeDarkMode;
 };
 
 } // namespace ui

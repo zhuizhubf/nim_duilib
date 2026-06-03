@@ -603,8 +603,28 @@ bool Window::OpenColorTheme(const FilePath& themePath)
     FilePath themeFullPath = GlobalManager::Instance().Theme().GetThemeRootPath();
     themeFullPath /= themePath;
     themeFullPath /= globalXmlFileName;
-    WindowBuilder globalbuilder;    
-    if (!globalbuilder.ParseXmlFile(FilePath(themeFullPath))) {
+
+    WindowBuilder windowBuilder;
+    std::string xmlFileData = windowBuilder.ReadXmlFileData(themeFullPath);
+    ASSERT(!xmlFileData.empty());
+    if (xmlFileData.empty()) {
+        return false;
+    }
+    return OpenColorThemeData(xmlFileData);
+}
+
+bool Window::OpenColorThemeData(const std::string& themeXmlFileData)
+{
+    ASSERT(!themeXmlFileData.empty());
+    if (themeXmlFileData.empty()) {
+        return false;
+    }
+    std::vector<unsigned char> xmlFileData;
+    xmlFileData.resize(themeXmlFileData.size());
+    memcpy(xmlFileData.data(), themeXmlFileData.data(), xmlFileData.size());
+
+    WindowBuilder globalbuilder;
+    if (!globalbuilder.ParseXmlData(xmlFileData)) {
         ASSERT(!"ParseXmlFile failed!");
         return false;
     }
@@ -627,8 +647,10 @@ bool Window::OpenColorTheme(const FilePath& themePath)
         return false;
     }
 
+    ThemeStyle readThemeStyle = GlobalManager::Instance().Theme().GetThemeStyleValue(themeStyle);
     m_pColorManager = std::make_unique<ColorManager>();
     globalbuilder.ParseThemeColor(*m_pColorManager);
+    m_pColorManager->SetColorThemeDarkMode(readThemeStyle == ThemeStyle::kDark);
 
     //主题变化后，重绘界面
     InvalidateAll();
@@ -640,6 +662,16 @@ void Window::CloseColorTheme()
     m_pColorManager.reset();
     //主题变化后，重绘界面
     InvalidateAll();
+}
+
+bool Window::IsColorThemeDarkMode() const
+{
+    if (m_pColorManager != nullptr) {
+        return m_pColorManager->IsColorThemeDarkMode();
+    }
+    else {
+        return GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark;
+    }
 }
 
 const DString& Window::GetDefaultDisabledTextColor()

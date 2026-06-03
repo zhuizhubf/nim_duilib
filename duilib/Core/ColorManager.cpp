@@ -3,7 +3,8 @@
 
 namespace ui 
 {
-ColorManager::ColorManager()
+ColorManager::ColorManager():
+    m_bColorThemeDarkMode(false)
 {
 }
 
@@ -87,6 +88,16 @@ const DString& ColorManager::GetDefaultTextColor()
 void ColorManager::SetDefaultTextColor(const DString& strColor)
 {
     m_defaultTextColor = strColor;
+}
+
+void ColorManager::SetColorThemeDarkMode(bool bColorThemeDarkMode)
+{
+    m_bColorThemeDarkMode = bColorThemeDarkMode;
+}
+
+bool ColorManager::IsColorThemeDarkMode() const
+{
+    return m_bColorThemeDarkMode;
 }
 
 } // namespace ui

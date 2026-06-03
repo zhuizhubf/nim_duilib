@@ -325,6 +325,7 @@
     <ClCompile Include="Core\Shadow.cpp" />
     <ClCompile Include="Core\StateColorMap.cpp" />
     <ClCompile Include="Core\StateColorMap2.cpp" />
+    <ClCompile Include="Core\ThemeGenerator.cpp" />
     <ClCompile Include="Core\ThemeManager.cpp" />
     <ClCompile Include="Core\ThreadManager.cpp" />
     <ClCompile Include="Core\ThreadMessage_SDL.cpp" />
@@ -700,6 +701,7 @@
     <ClInclude Include="Core\SharePtr.h" />
     <ClInclude Include="Core\StateColorMap.h" />
     <ClInclude Include="Core\StateColorMap2.h" />
+    <ClInclude Include="Core\ThemeGenerator.h" />
     <ClInclude Include="Core\ThemeManager.h" />
     <ClInclude Include="Core\ThreadManager.h" />
     <ClInclude Include="Core\ThreadMessage.h" />

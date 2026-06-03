@@ -2216,7 +2216,7 @@ void RichEdit2::PaintCaret(IRender* pRender, const UiRect& /*rcPaint*/)
             }
             if (dwClrColor.IsEmpty()) {
                 //默认光标颜色
-                if (GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark) {
+                if ((GetWindow() != nullptr) && GetWindow()->IsColorThemeDarkMode()) {
                     //深色主题
                     dwClrColor = UiColor(UiColors::White);
                 }

@@ -49,6 +49,7 @@
 #include "Core/IconManager.h"
 #include "Core/WindowManager.h"
 #include "Core/ThemeManager.h"
+#include "Core/ThemeGenerator.h"
 #include "Core/Window.h"
 #include "Core/FrameworkThread.h"
 #include "Core/PlaceHolder.h"

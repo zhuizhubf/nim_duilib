@@ -746,3 +746,13 @@ STRID_LAYOUT_PAGE_27 = Container child_halign: Not supported, set on child
 STRID_LAYOUT_PAGE_28 = Child alignment: halign: Yes, valign: No
 STRID_LAYOUT_PAGE_29 = (Child width < display area width)
 STRID_LAYOUT_PAGE_30 = (Aligned in same column)
+
+# examples/ColorTheme
+STRID_COLORTHEME_BTN_OPEN_THEME_MGR    = Open Theme Color Manager
+STRID_COLORTHEME_BTN_OPEN_WND_AS_DARK  = Open New Window with Dark Theme
+STRID_COLORTHEME_BTN_OPEN_WND_AS_LIGHT = Open New Window with Light Theme
+STRID_COLORTHEME_ENABLE_GEN_THEME = Enable Theme Color Generation
+STRID_COLORTHEME_LIGHT_THEME = Light Theme
+STRID_COLORTHEME_DARK_THEME = Dark Theme
+STRID_COLORTHEME_COLOR_HUE = Hue:
+STRID_COLORTHEME_COLOR_BASE_L = Base Luminance:

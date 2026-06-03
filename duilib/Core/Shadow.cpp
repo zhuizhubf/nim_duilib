@@ -233,7 +233,7 @@ Shadow::Shadow(Window* pWindow, bool bShadowAttached):
     }
     if (m_shadowBorderColor.empty()) {
         //若无配置，则设置默认值
-        if (GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark) {
+        if ((m_pWindow != nullptr) && m_pWindow->IsColorThemeDarkMode()) {
             //深色主题
             m_shadowBorderColor = _T("#FF444444");
         }

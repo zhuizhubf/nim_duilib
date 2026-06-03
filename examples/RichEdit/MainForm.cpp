@@ -1407,7 +1407,7 @@ void MainForm::OnSetFont()
 
     cf.lStructSize = sizeof(cf);
     cf.hwndOwner = hWndParent;
-    cf.rgbColors = textColor.ToCOLORREF(ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ui::ThemeStyle::kDark);
+    cf.rgbColors = textColor.ToCOLORREF(IsColorThemeDarkMode());
     cf.lpszStyle = (LPWSTR)&szStyleName;
     cf.Flags = dwFlags;
 

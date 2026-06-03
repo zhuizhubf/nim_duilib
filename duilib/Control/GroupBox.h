@@ -252,8 +252,8 @@ void GroupBoxTemplate<InheritType>::PaintText(IRender* pRender)
     if (!m_lineColor.empty()) {
         lineColor = this->GetUiColor(m_lineColor.c_str());
     }
-    if (lineColor.GetARGB() == 0) {
-        if (GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ThemeStyle::kDark) {
+    if (lineColor.IsEmpty()) {
+        if ((this->GetWindow() != nullptr) && this->GetWindow()->IsColorThemeDarkMode()) {
             //深色主题
             lineColor = GetFadeColor(UiColor(UiColors::White), 96);
         }

@@ -58,6 +58,7 @@
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Utils/FileUtil.h"
 
 #include "duilib/third_party/xml/pugixml.hpp"
 #include <set>
@@ -277,6 +278,29 @@ bool WindowBuilder::ParseXmlFile(const FilePath& xmlFilePath, const FilePath& wi
     }
     m_xmlFilePath = xmlFilePath;
     return true;
+}
+
+std::string WindowBuilder::ReadXmlFileData(const FilePath& xmlFilePath, const FilePath& windowResPath) const
+{
+    ASSERT(!xmlFilePath.IsEmpty() && _T("xmlFilePath is empty!"));
+    if (xmlFilePath.IsEmpty()) {
+        return std::string();
+    }
+
+    std::string xmlFileString;
+    FilePath xmlFileFullPath;
+    std::vector<uint8_t> xmlFileData;
+    const ThemeManager& themeMgr = GlobalManager::Instance().Theme();
+    if (themeMgr.GetResFile(xmlFilePath, windowResPath, xmlFileFullPath, xmlFileData)) {
+        if (xmlFileData.empty() && !xmlFileFullPath.IsEmpty()) {
+            FileUtil::ReadFileData(xmlFileFullPath, xmlFileData);
+            
+        }
+        if (!xmlFileData.empty()) {
+            xmlFileString = std::string((const char*)xmlFileData.data(), xmlFileData.size());
+        }
+    }
+    return xmlFileString;
 }
 
 Control* WindowBuilder::CreateControls(Window* pWindow, CreateControlCallback pCallback, Box* pParent, Box* pUserDefinedBox)

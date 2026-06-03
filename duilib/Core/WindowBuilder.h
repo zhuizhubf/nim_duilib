@@ -106,6 +106,13 @@ public:
     */
     bool ParseThemeColor(ColorManager& colorManager) const;
 
+    /** 读取XML文件内容
+    * @param [in] xmlFilePath XML文件的路径
+    * @param [in] windowResPath 窗口资源子目录, 用于查找XML文件（当不指定文件路径时）
+    * @return 读取成功返回XML文件的内容（一般为UTF8格式）
+    */
+    std::string ReadXmlFileData(const FilePath& xmlFilePath, const FilePath& windowResPath = FilePath()) const;
+
 public:
     /** 解析出窗口的属性(属性名称保存在Map的Key中，属性的值保存在属性的Value中)
     */
