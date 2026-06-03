@@ -65,7 +65,7 @@ void MainForm::OnInitWindow()
             });
     }
 
-    //主题生成相关
+    //主题生成相关    
     ui::CheckBox* pGenColorCheckBox = dynamic_cast<ui::CheckBox*>(FindControl(_T("gen_color_checkbox")));
     ui::Box* pGenColorBox = dynamic_cast<ui::Box*>(FindControl(_T("gen_color_box")));
 
@@ -107,8 +107,24 @@ void MainForm::OnInitWindow()
     //初始状态
     pGenColorBox->SetEnabled(pGenColorCheckBox->IsSelected());
     OnGenColorEnableStateChanged(pGenColorCheckBox->IsSelected());
+    ui::Control* pGenColorGroupBox = FindControl(_T("gen_color_groupbox"));
+    if (pGenColorGroupBox != nullptr) {
+        pGenColorGroupBox->SetVisible(false);
+    }
+    ui::Control* pGenColorGroupBoxSplit = FindControl(_T("gen_color_groupbox_split"));
+    if (pGenColorGroupBoxSplit != nullptr) {
+        pGenColorGroupBoxSplit->SetVisible(false);
+    }
 
     pGenColorCheckBox->AttachSelect([this, pGenColorBox](const ui::EventArgs&) {
+        ui::Control* pGenColorGroupBox = FindControl(_T("gen_color_groupbox"));
+        if (pGenColorGroupBox != nullptr) {
+            pGenColorGroupBox->SetVisible(true);
+        }
+        ui::Control* pGenColorGroupBoxSplit = FindControl(_T("gen_color_groupbox_split"));
+        if (pGenColorGroupBoxSplit != nullptr) {
+            pGenColorGroupBoxSplit->SetVisible(true);
+        }
         pGenColorBox->SetEnabled(true);
         OnGenColorEnableStateChanged(true);
         return true;
@@ -117,6 +133,14 @@ void MainForm::OnInitWindow()
     pGenColorCheckBox->AttachUnSelect([this, pGenColorBox](const ui::EventArgs&) {
         pGenColorBox->SetEnabled(false);
         OnGenColorEnableStateChanged(false);
+        ui::Control* pGenColorGroupBox = FindControl(_T("gen_color_groupbox"));
+        if (pGenColorGroupBox != nullptr) {
+            pGenColorGroupBox->SetVisible(false);
+        }
+        ui::Control* pGenColorGroupBoxSplit = FindControl(_T("gen_color_groupbox_split"));
+        if (pGenColorGroupBoxSplit != nullptr) {
+            pGenColorGroupBoxSplit->SetVisible(false);
+        }
         return true;
         });
 }
