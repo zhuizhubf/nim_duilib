@@ -1,7 +1,7 @@
 #ifndef UI_CORE_THEME_GENERATOR_H_
 #define UI_CORE_THEME_GENERATOR_H_
 
-#include "duilib/Core/UiTypes.h"
+#include "duilib/Core/ColorConverter.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -128,61 +128,6 @@ public:
     void ResetParams();
 
 private:
-    /** @brief 解析十六进制颜色字符串
-     *  @param colorStr 颜色字符串，格式为"#AARRGGBB"
-     *  @param alpha 输出：透明度分量(0-255)
-     *  @param r 输出：红色分量(0-255)
-     *  @param g 输出：绿色分量(0-255)
-     *  @param b 输出：蓝色分量(0-255)
-     *  @return 解析成功返回true，否则返回false
-     */
-    bool ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b);
-
-    /** @brief 将RGBA分量转换为十六进制颜色字符串
-     *  @param alpha 透明度(0-255)
-     *  @param r 红色分量(0-255)
-     *  @param g 绿色分量(0-255)
-     *  @param b 蓝色分量(0-255)
-     *  @return 格式化的十六进制颜色字符串"#AARRGGBB"
-     */
-    std::string RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b);
-
-    /** @brief 计算RGB颜色的相对亮度
-     *  @param r 红色分量(0-255)
-     *  @param g 绿色分量(0-255)
-     *  @param b 蓝色分量(0-255)
-     *  @return 相对亮度值(0-1)
-     *  @details 使用ITU-R BT.709系数计算sRGB空间的相对亮度
-     */
-    double GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b);
-
-    /** @brief 计算两个颜色之间的对比度比率
-     *  @param color1 第一个颜色（ARGB格式）
-     *  @param color2 第二个颜色（ARGB格式）
-     *  @return 对比度比率值
-     *  @details 根据WCAG 2.1公式计算：(L1 + 0.05) / (L2 + 0.05)
-     */
-    double CalculateContrastRatio(const std::string& color1, const std::string& color2);
-
-    /** @brief 将RGB颜色转换为OKLCH色彩空间
-     *  @param r 红色分量(0-255)
-     *  @param g 绿色分量(0-255)
-     *  @param b 蓝色分量(0-255)
-     *  @param L 输出：亮度分量(0-1)
-     *  @param C 输出：色度分量(0-1)
-     *  @param H 输出：色相分量(0-360)
-     *  @return 转换成功返回true，否则返回false
-     */
-    bool RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H);
-
-    /** @brief 将OKLCH颜色转换为ARGB格式
-     *  @param L 亮度分量(0-1)
-     *  @param C 色度分量(0-1)
-     *  @param H 色相分量(0-360)
-     *  @param alpha 透明度(0-255)，默认为255
-     *  @return ARGB格式的颜色字符串
-     */
-    std::string OKLCHToARGB(double L, double C, double H, uint8_t alpha = 255);
 
     /** @brief 根据色相获取基础背景颜色
      *  @param hue 色调值(0-360)
@@ -278,41 +223,9 @@ private:
      */
     bool WriteOutputXml(const std::string& outputXml);
 
-    /** @brief OKLCH到RGB转换（双精度版本）
-     *  @param L 亮度分量(0-1)
-     *  @param C 色度分量(0-1)
-     *  @param H 色相分量(0-360)
-     *  @param red 输出：红色分量(0-1)
-     *  @param green 输出：绿色分量(0-1)
-     *  @param blue 输出：蓝色分量(0-1)
-     *  @return 转换成功返回0
-     */
-    static int OKLCH2RGB(double L, double C, double H, double* red, double* green, double* blue);
-
-    /** @brief OKLCH到RGB转换（字节版本）
-     *  @param L 亮度分量(0-1)
-     *  @param C 色度分量(0-1)
-     *  @param H 色相分量(0-360)
-     *  @param red 输出：红色分量(0-255)
-     *  @param green 输出：绿色分量(0-255)
-     *  @param blue 输出：蓝色分量(0-255)
-     *  @param alpha 透明度(0-255)
-     *  @return 转换成功返回0
-     */
-    static int OKLCH2RGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue, uint8_t alpha = 255);
-
-    /** @brief RGB到OKLCH转换
-     *  @param red 红色分量(0-1)
-     *  @param green 绿色分量(0-1)
-     *  @param blue 蓝色分量(0-1)
-     *  @param L 输出：亮度分量(0-1)
-     *  @param C 输出：色度分量(0-1)
-     *  @param H 输出：色相分量(0-360)
-     *  @return 转换成功返回0
-     */
-    static int RGB2OKLCH(double red, double green, double blue, double* L, double* C, double* H);
-
 private:
+    ColorConverter m_colorConverter;                          ///< 颜色转换工具类
+
     double m_hue;                                            ///< 当前色调值
     double m_base;                                           ///< 当前基础亮度值
     bool m_isDark;                                           ///< 当前是否为暗色主题

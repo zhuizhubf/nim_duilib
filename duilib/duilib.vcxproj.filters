@@ -915,6 +915,9 @@
     <ClCompile Include="Core\ThemeGenerator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ColorConverter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationManager.h">
@@ -1905,6 +1908,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\ThemeGenerator.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ColorConverter.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

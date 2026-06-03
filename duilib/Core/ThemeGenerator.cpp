@@ -94,82 +94,6 @@ void ThemeGenerator::ResetParams()
     SetAccentParams(0.6204, 0.68, 0.195);
 }
 
-bool ThemeGenerator::ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b)
-{
-    if (colorStr.empty() || colorStr.length() != 9 || colorStr[0] != '#') {
-        return false;
-    }
-
-    try {
-        alpha = static_cast<uint8_t>(std::stoul(colorStr.substr(1, 2), nullptr, 16));
-        r = static_cast<uint8_t>(std::stoul(colorStr.substr(3, 2), nullptr, 16));
-        g = static_cast<uint8_t>(std::stoul(colorStr.substr(5, 2), nullptr, 16));
-        b = static_cast<uint8_t>(std::stoul(colorStr.substr(7, 2), nullptr, 16));
-        return true;
-    }
-    catch (...) {
-        return false;
-    }
-}
-
-std::string ThemeGenerator::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b)
-{
-    std::ostringstream oss;
-    oss << "#" << std::uppercase << std::hex << std::setfill('0')
-        << std::setw(2) << static_cast<int>(alpha)
-        << std::setw(2) << static_cast<int>(r)
-        << std::setw(2) << static_cast<int>(g)
-        << std::setw(2) << static_cast<int>(b);
-    return oss.str();
-}
-
-double ThemeGenerator::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b)
-{
-    double rs = r / 255.0;
-    double gs = g / 255.0;
-    double bs = b / 255.0;
-
-    rs = (rs > 0.03928) ? rs : rs / 12.92;
-    gs = (gs > 0.03928) ? gs : gs / 12.92;
-    bs = (bs > 0.03928) ? bs : bs / 12.92;
-
-    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-}
-
-double ThemeGenerator::CalculateContrastRatio(const std::string& color1, const std::string& color2)
-{
-    uint8_t a1, r1, g1, b1;
-    uint8_t a2, r2, g2, b2;
-
-    if (!ParseHexColor(color1, a1, r1, g1, b1) || !ParseHexColor(color2, a2, r2, g2, b2)) {
-        return 0.0;
-    }
-
-    double l1 = GetRelativeLuminance(r1, g1, b1);
-    double l2 = GetRelativeLuminance(r2, g2, b2);
-
-    double lighter = std::max(l1, l2);
-    double darker = std::min(l1, l2);
-
-    return (lighter + 0.05) / (darker + 0.05);
-}
-
-bool ThemeGenerator::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H)
-{
-    double red = r / 255.0;
-    double green = g / 255.0;
-    double blue = b / 255.0;
-
-    return ThemeGenerator::RGB2OKLCH(red, green, blue, &L, &C, &H) == 0;
-}
-
-std::string ThemeGenerator::OKLCHToARGB(double L, double C, double H, uint8_t alpha)
-{
-    uint8_t r, g, b;
-    ThemeGenerator::OKLCH2RGB(L, C, H, r, g, b, alpha);
-    return RGBToHex(alpha, r, g, b);
-}
-
 std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool isDark)
 {
     // 使用成员变量计算背景色
@@ -183,7 +107,7 @@ std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool is
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    return OKLCHToARGB(bgL, baseChroma, hue);
+    return m_colorConverter.OKLCHToARGB(bgL, baseChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isDark)
@@ -199,7 +123,7 @@ std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isD
         fgL = m_fgLightL + base * m_fgLightLScale;
     }
 
-    return OKLCHToARGB(fgL, fgChroma, hue);
+    return m_colorConverter.OKLCHToARGB(fgL, fgChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel)
@@ -218,7 +142,7 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     double offset = isDark ? m_surfaceDarkOffset : m_surfaceLightOffset;
     double sfL = bgL + offset * surfaceLevel;
 
-    return OKLCHToARGB(sfL, surfaceChroma, hue);
+    return m_colorConverter.OKLCHToARGB(sfL, surfaceChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetNeutralColor(double hue, double base, bool isDark, int level)
@@ -237,7 +161,7 @@ std::string ThemeGenerator::GetNeutralColor(double hue, double base, bool isDark
     double step = isDark ? m_neutralDarkStep : m_neutralLightStep;
     double neutralL = bgL + step * (level / 100.0);
 
-    return OKLCHToARGB(neutralL, neutralChroma, hue);
+    return m_colorConverter.OKLCHToARGB(neutralL, neutralChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark)
@@ -247,12 +171,12 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
     }
 
     uint8_t alpha, r, g, b;
-    if (!ParseHexColor(baseColor, alpha, r, g, b)) {
+    if (!m_colorConverter.ParseHexColor(baseColor, alpha, r, g, b)) {
         return baseColor;
     }
 
     double L, C, H;
-    if (!RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
         return baseColor;
     }
 
@@ -293,7 +217,7 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
         }
     }
 
-    return OKLCHToARGB(L, C, H, alpha);
+    return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
 }
 
 std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr)
@@ -303,12 +227,12 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
     }
 
     uint8_t alpha, r, g, b;
-    if (!ParseHexColor(baseColor, alpha, r, g, b)) {
+    if (!m_colorConverter.ParseHexColor(baseColor, alpha, r, g, b)) {
         return baseColor;
     }
 
     double L, C, H;
-    if (!RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
         return baseColor;
     }
 
@@ -359,7 +283,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
         }
     }
 
-    return OKLCHToARGB(L, C, H, alpha);
+    return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
 }
 
 std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName)
@@ -379,23 +303,23 @@ std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::
 std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast)
 {
     uint8_t alpha, r, g, b;
-    if (!ParseHexColor(textColor, alpha, r, g, b)) {
+    if (!m_colorConverter.ParseHexColor(textColor, alpha, r, g, b)) {
         return textColor;
     }
 
     double L, C, H;
-    if (!RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
         return textColor;
     }
 
     uint8_t bgAlpha, bgR, bgG, bgB;
-    if (!ParseHexColor(bgColor, bgAlpha, bgR, bgG, bgB)) {
+    if (!m_colorConverter.ParseHexColor(bgColor, bgAlpha, bgR, bgG, bgB)) {
         return textColor;
     }
 
-    double bgLuminance = GetRelativeLuminance(bgR, bgG, bgB);
+    double bgLuminance = m_colorConverter.GetRelativeLuminance(bgR, bgG, bgB);
 
-    double contrast = CalculateContrastRatio(textColor, bgColor);
+    double contrast = m_colorConverter.CalculateContrastRatio(textColor, bgColor);
     if (contrast < 0.01) {
         return textColor;
     }
@@ -417,8 +341,8 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
 
         L = std::max(LTarget, std::min((bgLuminance > 0.5) ? 0.95 : 0.05, L + LStep));
 
-        std::string testColor = OKLCHToARGB(L, C, H, alpha);
-        contrast = CalculateContrastRatio(testColor, bgColor);
+        std::string testColor = m_colorConverter.OKLCHToARGB(L, C, H, alpha);
+        contrast = m_colorConverter.CalculateContrastRatio(testColor, bgColor);
 
         if (contrast >= minContrast) {
             return testColor;
@@ -427,7 +351,7 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
         iteration++;
     }
 
-    std::string finalColor = OKLCHToARGB(L, C, H, alpha);
+    std::string finalColor = m_colorConverter.OKLCHToARGB(L, C, H, alpha);
     return finalColor;
 }
 
@@ -441,8 +365,8 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
 
     uint8_t dummyA, dummyR, dummyG, dummyB;
-    if (ParseHexColor(bgWindowMain, dummyA, dummyR, dummyG, dummyB)) {
-        double luminance = GetRelativeLuminance(dummyR, dummyG, dummyB);
+    if (m_colorConverter.ParseHexColor(bgWindowMain, dummyA, dummyR, dummyG, dummyB)) {
+        double luminance = m_colorConverter.GetRelativeLuminance(dummyR, dummyG, dummyB);
         if (isDark) {
             if (luminance > 0.5) {
                 base = 1.0 - base;
@@ -466,11 +390,11 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // 使用成员变量生成Accent颜色
     double accentL = isDark ? m_accentDarkL : m_accentLightL;
     double accentC = m_accentC;
-    std::string accentColor = OKLCHToARGB(accentL, accentC, hue);
+    std::string accentColor = m_colorConverter.OKLCHToARGB(accentL, accentC, hue, 255);
 
     // accent-foreground：浅色模式接近白色，深色模式接近黑色
     double accentFgL = isDark ? 0.14 : 0.99;
-    std::string accentForeground = OKLCHToARGB(accentFgL, 0, hue);
+    std::string accentForeground = m_colorConverter.OKLCHToARGB(accentFgL, 0, hue, 255);
 
     std::string linkColor;
     std::string linkHoverColor;
@@ -814,7 +738,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
         std::string originalValue = attrs.value;
         if (!originalValue.empty()) {
             uint8_t a, r, g, b;
-            if (ParseHexColor(originalValue, a, r, g, b)) {
+            if (m_colorConverter.ParseHexColor(originalValue, a, r, g, b)) {
                 bool isSvgOrColor = (colorName.substr(0, 9) == "border_svg") || (colorName.substr(0, 6) == "color_");
 
                 if (isSvgOrColor) {
@@ -970,100 +894,6 @@ std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) cons
         return it->second;
     }
     return "";
-}
-
-
-static inline double srgb_transfer_function(double x) {
-    if (x <= 0.0031308) {
-        return 12.92 * x;
-    }
-    return 1.055 * pow(x, 1.0 / 2.4) - 0.055;
-}
-
-static inline double inverse_srgb_transfer_function(double x) {
-    if (x <= 0.04045) {
-        return x / 12.92;
-    }
-    return pow((x + 0.055) / 1.055, 2.4);
-}
-
-constexpr double PI = 3.141592653589793;
-
-int ThemeGenerator::OKLCH2RGB(double L, double C, double H, double* red, double* green, double* blue)
-{
-    if ((red == nullptr) || (green == nullptr) || (blue == nullptr)) {
-        return -1;
-    }
-    if (L < 0.0 || L > 1.0 || C < 0.0 || H < 0.0 || H > 360.0) {
-        return -1;
-    }
-
-    double a = C * cos(H * PI / 180.0);
-    double b = C * sin(H * PI / 180.0);
-
-    double l_ = L + 0.3963377774 * a + 0.2158037573 * b;
-    double m_ = L - 0.1055613458 * a - 0.0638541728 * b;
-    double s_ = L - 0.0894841775 * a - 1.2914855480 * b;
-
-    double l = l_ * l_ * l_;
-    double m = m_ * m_ * m_;
-    double s = s_ * s_ * s_;
-
-    *red = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-    *green = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-    *blue = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
-
-    *red = srgb_transfer_function(std::max(0.0, std::min(1.0, *red)));
-    *green = srgb_transfer_function(std::max(0.0, std::min(1.0, *green)));
-    *blue = srgb_transfer_function(std::max(0.0, std::min(1.0, *blue)));
-
-    return 0;
-}
-
-int ThemeGenerator::OKLCH2RGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue, uint8_t /*alpha*/)
-{
-    double r = 0, g = 0, b = 0;
-    if (OKLCH2RGB(L, C, H, &r, &g, &b) != 0) {
-        return -1;
-    }
-    red = static_cast<uint8_t>(255.0 * r);
-    green = static_cast<uint8_t>(255.0 * g);
-    blue = static_cast<uint8_t>(255.0 * b);
-    return 0;
-}
-
-int ThemeGenerator::RGB2OKLCH(double red, double green, double blue, double* L, double* C, double* H)
-{
-    if ((L == nullptr) || (C == nullptr) || (H == nullptr)) {
-        return -1;
-    }
-    if (red < 0.0 || red > 1.0 || green < 0.0 || green > 1.0 || blue < 0.0 || blue > 1.0) {
-        return -1;
-    }
-
-    double r_lin = inverse_srgb_transfer_function(red);
-    double g_lin = inverse_srgb_transfer_function(green);
-    double b_lin = inverse_srgb_transfer_function(blue);
-
-    double l_ = 0.4122214708 * r_lin + 0.5363325363 * g_lin + 0.0514459929 * b_lin;
-    double m_ = 0.2119034982 * r_lin + 0.6806995451 * g_lin + 0.1073969566 * b_lin;
-    double s_ = 0.0883024619 * r_lin + 0.2817188376 * g_lin + 0.6299787005 * b_lin;
-
-    double l = cbrt(l_);
-    double m = cbrt(m_);
-    double s = cbrt(s_);
-
-    *L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
-    double a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
-    double b_c = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
-
-    *C = sqrt(a * a + b_c * b_c);
-    *H = atan2(b_c, a) * 180.0 / PI;
-    if (*H < 0.0) {
-        *H += 360.0;
-    }
-
-    return 0;
 }
 
 }
