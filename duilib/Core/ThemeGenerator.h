@@ -48,6 +48,7 @@ struct ThemeMetaInfo
  *          - 支持Light/Dark两种模式
  *          - 自动处理颜色状态变体（hovered、pressed、selected、disabled）
  *          - 保持输出XML与输入XML的顺序和注释一致
+ *          - 可通过SetXXXParams系列函数自定义颜色算法参数
  */
 class DUILIB_API ThemeGenerator
 {
@@ -85,6 +86,46 @@ public:
      *  @return 颜色配置映射表
      */
     std::map<std::string, ThemeColorConfig> GetLoadedConfigs() const { return m_loadedConfigs; }
+
+    // ==================== 颜色算法参数设置函数 ====================
+
+    /** @brief 设置背景色参数
+     *  @param bgLightL 浅色模式下背景明度系数
+     *  @param bgDarkL 深色模式下背景明度系数
+     *  @param bgBaseChroma 背景色基础色度系数
+     */
+    void SetBgParams(double bgLightL, double bgDarkL, double bgBaseChroma);
+
+    /** @brief 设置前景色参数
+     *  @param fgLightL 浅色模式下前景明度系数
+     *  @param fgDarkL 深色模式下前景明度系数
+     *  @param fgBaseChroma 前景色基础色度系数
+     */
+    void SetFgParams(double fgLightL, double fgDarkL, double fgBaseChroma);
+
+    /** @brief 设置Surface层参数
+     *  @param surfaceLightOffset 浅色模式下Surface偏移量
+     *  @param surfaceDarkOffset 深色模式下Surface偏移量
+     *  @param surfaceBaseChroma Surface基础色度系数
+     */
+    void SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma);
+
+    /** @brief 设置中性色参数
+     *  @param neutralBaseChroma 中性色基础色度系数
+     *  @param neutralLightStep 浅色模式下中性色步长
+     *  @param neutralDarkStep 深色模式下中性色步长
+     */
+    void SetNeutralParams(double neutralBaseChroma, double neutralLightStep, double neutralDarkStep);
+
+    /** @brief 设置Accent颜色参数
+     *  @param accentLightL 浅色模式下Accent明度
+     *  @param accentDarkL 深色模式下Accent明度
+     *  @param accentC 色度值
+     */
+    void SetAccentParams(double accentLightL, double accentDarkL, double accentC);
+
+    /** @brief 重置所有参数为默认值 */
+    void ResetParams();
 
 private:
     /** @brief 解析十六进制颜色字符串
@@ -281,6 +322,36 @@ private:
     std::string m_originalXmlContent;                       ///< 原始XML完整内容
     ThemeMetaInfo m_themeMeta;                              ///< 主题元信息
     std::map<std::string, std::string> m_originalValues;    ///< 原始颜色值（用于对比）
+
+    // ==================== 颜色算法参数 ====================
+    // 背景色参数
+    double m_bgLightL;         ///< 浅色模式背景明度基准值（默认0.97）
+    double m_bgLightLScale;    ///< 浅色模式背景明度随base变化系数（默认-0.95）
+    double m_bgDarkL;           ///< 深色模式背景明度基准值（默认0.17）
+    double m_bgDarkLScale;      ///< 深色模式背景明度随base变化系数（默认0.78）
+    double m_bgBaseChroma;      ///< 背景色度系数（默认1.5）
+
+    // 前景色参数
+    double m_fgLightL;          ///< 浅色模式前景明度基准值（默认0.22）
+    double m_fgLightLScale;     ///< 浅色模式前景明度随base变化系数（默认0.72）
+    double m_fgDarkL;           ///< 深色模式前景明度基准值（默认0.92）
+    double m_fgDarkLScale;      ///< 深色模式前景明度随base变化系数（默认-0.75）
+    double m_fgBaseChroma;      ///< 前景色度系数（默认0.15）
+
+    // Surface层参数
+    double m_surfaceLightOffset; ///< 浅色模式Surface偏移量（默认0.025）
+    double m_surfaceDarkOffset;  ///< 深色模式Surface偏移量（默认0.07）
+    double m_surfaceBaseChroma;  ///< Surface色度系数（默认1.5）
+
+    // 中性色参数
+    double m_neutralBaseChroma; ///< 中性色色度系数（默认1.5）
+    double m_neutralLightStep;   ///< 浅色模式中性色步长（默认0.025）
+    double m_neutralDarkStep;    ///< 深色模式中性色步长（默认0.07）
+
+    // Accent参数
+    double m_accentLightL;       ///< 浅色模式Accent明度（默认0.6204）
+    double m_accentDarkL;        ///< 深色模式Accent明度（默认0.68）
+    double m_accentC;             ///< Accent色度（默认0.195）
 };
 
 }

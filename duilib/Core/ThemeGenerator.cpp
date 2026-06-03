@@ -18,11 +18,80 @@ ThemeGenerator::ThemeGenerator()
     : m_hue(143.24)
     , m_base(0.0143)
     , m_isDark(false)
+    // 背景色参数
+    , m_bgLightL(0.97)
+    , m_bgLightLScale(-0.95)
+    , m_bgDarkL(0.17)
+    , m_bgDarkLScale(0.78)
+    , m_bgBaseChroma(1.5)
+    // 前景色参数
+    , m_fgLightL(0.22)
+    , m_fgLightLScale(0.72)
+    , m_fgDarkL(0.92)
+    , m_fgDarkLScale(-0.75)
+    , m_fgBaseChroma(0.15)
+    // Surface层参数
+    , m_surfaceLightOffset(0.025)
+    , m_surfaceDarkOffset(0.07)
+    , m_surfaceBaseChroma(1.5)
+    // 中性色参数
+    , m_neutralBaseChroma(1.5)
+    , m_neutralLightStep(0.025)
+    , m_neutralDarkStep(0.07)
+    // Accent参数
+    , m_accentLightL(0.6204)
+    , m_accentDarkL(0.68)
+    , m_accentC(0.195)
 {
 }
 
 ThemeGenerator::~ThemeGenerator()
 {
+}
+
+void ThemeGenerator::SetBgParams(double bgLightL, double bgDarkL, double bgBaseChroma)
+{
+    m_bgLightL = bgLightL;
+    m_bgDarkL = bgDarkL;
+    m_bgBaseChroma = bgBaseChroma;
+}
+
+void ThemeGenerator::SetFgParams(double fgLightL, double fgDarkL, double fgBaseChroma)
+{
+    m_fgLightL = fgLightL;
+    m_fgDarkL = fgDarkL;
+    m_fgBaseChroma = fgBaseChroma;
+}
+
+void ThemeGenerator::SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma)
+{
+    m_surfaceLightOffset = surfaceLightOffset;
+    m_surfaceDarkOffset = surfaceDarkOffset;
+    m_surfaceBaseChroma = surfaceBaseChroma;
+}
+
+void ThemeGenerator::SetNeutralParams(double neutralBaseChroma, double neutralLightStep, double neutralDarkStep)
+{
+    m_neutralBaseChroma = neutralBaseChroma;
+    m_neutralLightStep = neutralLightStep;
+    m_neutralDarkStep = neutralDarkStep;
+}
+
+void ThemeGenerator::SetAccentParams(double accentLightL, double accentDarkL, double accentC)
+{
+    m_accentLightL = accentLightL;
+    m_accentDarkL = accentDarkL;
+    m_accentC = accentC;
+}
+
+void ThemeGenerator::ResetParams()
+{
+    // 重置所有参数为默认值
+    SetBgParams(0.97, 0.17, 1.5);
+    SetFgParams(0.22, 0.92, 0.15);
+    SetSurfaceParams(0.025, 0.07, 1.5);
+    SetNeutralParams(1.5, 0.025, 0.07);
+    SetAccentParams(0.6204, 0.68, 0.195);
 }
 
 bool ThemeGenerator::ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b)
@@ -103,18 +172,15 @@ std::string ThemeGenerator::OKLCHToARGB(double L, double C, double H, uint8_t al
 
 std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool isDark)
 {
-    // 增加baseChroma系数使背景色更明显地带有hue色彩
-    // baseChroma = base * 0.15 ~ 0.25，使base变化时背景色能明显反映色相
-    double baseChroma = base * 0.20;
+    // 使用成员变量计算背景色
+    double baseChroma = base * m_bgBaseChroma;
 
-    // 浅色模式：bg-L = 0.97 - base * 0.95
-    // 深色模式：bg-L = 0.17 + base * 0.78
     double bgL;
     if (isDark) {
-        bgL = 0.17 + base * 0.78;
+        bgL = m_bgDarkL + base * m_bgDarkLScale;
     }
     else {
-        bgL = 0.97 - base * 0.95;
+        bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
     return OKLCHToARGB(bgL, baseChroma, hue);
@@ -122,62 +188,56 @@ std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool is
 
 std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isDark)
 {
-    // 使用与背景相同的色相和色度
-    double baseChroma = base * 0.20;
+    // 使用成员变量计算前景色
+    double fgChroma = base * m_fgBaseChroma;
 
-    // 浅色模式：fg-L = 0.22 + base * 0.72
-    // 深色模式：fg-L = 0.92 - base * 0.75
     double fgL;
     if (isDark) {
-        fgL = 0.92 - base * 0.75;
+        fgL = m_fgDarkL + base * m_fgDarkLScale;
     }
     else {
-        fgL = 0.22 + base * 0.72;
+        fgL = m_fgLightL + base * m_fgLightLScale;
     }
 
-    return OKLCHToARGB(fgL, baseChroma * 1.3, hue);
+    return OKLCHToARGB(fgL, fgChroma, hue);
 }
 
 std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel)
 {
-    // sf-L = bg-L + offset
-    // 浅色模式 offset = +0.025
-    // 深色模式 offset = +0.07
-    double baseChroma = base * 0.20;
+    // 使用成员变量计算Surface颜色
+    double surfaceChroma = base * m_surfaceBaseChroma;
 
     double bgL;
     if (isDark) {
-        bgL = 0.17 + base * 0.78;
+        bgL = m_bgDarkL + base * m_bgDarkLScale;
     }
     else {
-        bgL = 0.97 - base * 0.95;
+        bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    double offset = isDark ? 0.07 : 0.025;
+    double offset = isDark ? m_surfaceDarkOffset : m_surfaceLightOffset;
     double sfL = bgL + offset * surfaceLevel;
 
-    return OKLCHToARGB(sfL, baseChroma, hue);
+    return OKLCHToARGB(sfL, surfaceChroma, hue);
 }
 
 std::string ThemeGenerator::GetNeutralColor(double hue, double base, bool isDark, int level)
 {
-    // 中性色使用与背景相同的色相
-    // level范围0-1500，映射到0-15
-    double baseChroma = base * 0.20;
+    // 使用成员变量计算中性色
+    double neutralChroma = base * m_neutralBaseChroma;
 
     double bgL;
     if (isDark) {
-        bgL = 0.17 + base * 0.78;
+        bgL = m_bgDarkL + base * m_bgDarkLScale;
     }
     else {
-        bgL = 0.97 - base * 0.95;
+        bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    // 中性色的step与surface类似
-    double step = isDark ? 0.07 : 0.025;
+    double step = isDark ? m_neutralDarkStep : m_neutralLightStep;
     double neutralL = bgL + step * (level / 100.0);
 
-    return OKLCHToARGB(neutralL, baseChroma, hue);
+    return OKLCHToARGB(neutralL, neutralChroma, hue);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark)
@@ -403,11 +463,9 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string surface2 = GetSurfaceColor(hue, base, isDark, 2);
     std::string surface3 = GetSurfaceColor(hue, base, isDark, 3);
 
-    // Accent固定参数
-    // 浅色模式：accent-L = 0.6204, C = 0.195
-    // 深色模式：accent-L = 0.68, C = 0.195
-    double accentL = isDark ? 0.68 : 0.6204;
-    double accentC = 0.195;
+    // 使用成员变量生成Accent颜色
+    double accentL = isDark ? m_accentDarkL : m_accentLightL;
+    double accentC = m_accentC;
     std::string accentColor = OKLCHToARGB(accentL, accentC, hue);
 
     // accent-foreground：浅色模式接近白色，深色模式接近黑色
