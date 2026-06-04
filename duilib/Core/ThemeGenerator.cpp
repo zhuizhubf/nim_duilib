@@ -334,15 +334,14 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors.clear();
 
     // =========================================================================
-    // 第一步：生成核心颜色（背景、前景、Surface层、Accent）
+    // 核心颜色计算
     // =========================================================================
 
     // 背景色和前景色
     std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
     std::string fgWindowMain = GetForegroundColor(hue, base, isDark);
 
-    // Surface层：用于卡片、按钮等元素的背景
-    // level为负数时比背景更亮(浅色模式)或更暗(深色模式)
+    // Surface层（用于卡片、按钮等元素的背景）
     std::string surface0 = GetSurfaceColor(hue, base, isDark, -1);
     std::string surface1 = GetSurfaceColor(hue, base, isDark, 1);
     std::string surface2 = GetSurfaceColor(hue, base, isDark, 3);
@@ -351,161 +350,17 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
 
     // Accent颜色（强调色）
     double accentL = isDark ? m_accentDarkL : m_accentLightL;
-    double accentC = m_accentC;
-    std::string accentColor = m_colorConverter.OKLCHToARGB(accentL, accentC, hue, 255);
+    std::string accentColor = m_colorConverter.OKLCHToARGB(accentL, m_accentC, hue, 255);
 
     // Accent前景色：浅色模式接近白色，深色模式接近黑色
     double accentFgL = isDark ? 0.14 : 0.99;
     std::string accentForeground = m_colorConverter.OKLCHToARGB(accentFgL, 0, hue, 255);
 
     // =========================================================================
-    // 第二步：派生核心颜色（链接色）
+    // 写入颜色到 m_generatedColors
     // =========================================================================
 
-    // 链接颜色使用accent色
-    std::string linkColor = accentColor;
-    std::string linkHoverColor = GetStateColor(accentColor, "hovered", isDark);
-
-    // =========================================================================
-    // 第三步：生成按钮相关颜色
-    // =========================================================================
-
-    // 普通按钮
-    std::string bgBtnNormal = surface1;
-    std::string bgBtnHovered = GetStateColor(bgBtnNormal, "hovered", isDark);
-    std::string bgBtnPressed = GetStateColor(bgBtnNormal, "pressed", isDark);
-    std::string bgBtnDisabled = GetStateColor(bgBtnNormal, "disabled", isDark);
-
-    // 窗口按钮
-    std::string bgBtnWindowNormal = surface1;
-    std::string bgBtnWindowHovered = GetStateColor(bgBtnWindowNormal, "hovered", isDark);
-    std::string bgBtnWindowPressed = GetStateColor(bgBtnWindowNormal, "pressed", isDark);
-
-    // =========================================================================
-    // 第四步：生成滚动条相关颜色
-    // =========================================================================
-
-    std::string bgScrollbarBtnNormal = surface2;
-    std::string bgScrollbarBtnHovered = GetStateColor(bgScrollbarBtnNormal, "hovered", isDark);
-    std::string bgScrollbarBtnPressed = GetStateColor(bgScrollbarBtnNormal, "pressed", isDark);
-    std::string bgSliderThumbNormal = accentColor;
-    std::string bgScrollbarBtnArrowNormal = GetStateColor(bgSliderThumbNormal, "pressed", isDark);
-
-    // =========================================================================
-    // 第五步：生成菜单相关颜色
-    // =========================================================================
-
-    // 菜单项
-    std::string bgMenuItemNormal = surface0;
-    std::string bgMenuItemHovered = GetStateColor(bgMenuItemNormal, "hovered", isDark);
-    std::string bgMenuItemPressed = GetStateColor(bgMenuItemNormal, "pressed", isDark);
-    std::string bgMenuItemSelected = GetStateColor(bgMenuItemNormal, "selected", isDark);
-
-    // 菜单栏
-    std::string bgMenuBarNormal = surface1;
-    std::string bgMenuBarHovered = GetStateColor(bgMenuBarNormal, "hovered", isDark);
-    std::string bgMenuBarPressed = GetStateColor(bgMenuBarNormal, "pressed", isDark);
-
-    // =========================================================================
-    // 第六步：生成列表项相关颜色
-    // =========================================================================
-
-    std::string bgListItemNormal = surface1;
-    std::string bgListItemHovered = GetStateColor(bgListItemNormal, "hovered", isDark);
-    std::string bgListItemPressed = GetStateColor(bgListItemNormal, "pressed", isDark);
-    std::string bgListItemSelected = GetStateColor(bgListItemNormal, "selected", isDark);
-    std::string bgListItemDisabled = GetStateColor(bgListItemNormal, "disabled", isDark);
-
-    // =========================================================================
-    // 第七步：生成树形控件相关颜色
-    // =========================================================================
-
-    std::string bgTreeViewNodeNormal = surface1;
-    std::string bgTreeViewNodeHovered = GetStateColor(bgTreeViewNodeNormal, "hovered", isDark);
-    std::string bgTreeViewNodePressed = GetStateColor(bgTreeViewNodeNormal, "pressed", isDark);
-    std::string bgTreeViewNodeSelected = GetStateColor(bgTreeViewNodeNormal, "selected", isDark);
-    std::string bgTreeViewNodeDisabled = GetStateColor(bgTreeViewNodeNormal, "disabled", isDark);
-
-    // =========================================================================
-    // 第八步：生成组合框相关颜色
-    // =========================================================================
-
-    std::string bgComboNormal = surface0;
-    std::string bgComboBtnNormal = surface1;
-    std::string bgComboBtnHovered = GetStateColor(bgComboBtnNormal, "hovered", isDark);
-    std::string bgComboBtnPressed = GetStateColor(bgComboBtnNormal, "pressed", isDark);
-    std::string bgComboBtnDisabled = GetStateColor(bgComboBtnNormal, "disabled", isDark);
-
-    // =========================================================================
-    // 第九步：生成富文本框相关颜色
-    // =========================================================================
-
-    std::string bgRichEditNormal = surface0;
-    std::string bgRichEditBtnNormal = surface1;
-    std::string bgRichEditBtnHovered = GetStateColor(bgRichEditBtnNormal, "hovered", isDark);
-    std::string bgRichEditBtnPressed = GetStateColor(bgRichEditBtnNormal, "pressed", isDark);
-    std::string bgRichEditBtnDisabled = GetStateColor(bgRichEditBtnNormal, "disabled", isDark);
-
-    // =========================================================================
-    // 第十步：生成Tab页相关颜色
-    // =========================================================================
-
-    // Tab关闭按钮
-    std::string bgTabCtrlItemCloseNormal = surface2;
-    std::string bgTabCtrlItemCloseHovered = GetStateColor(bgTabCtrlItemCloseNormal, "hovered", isDark);
-    std::string bgTabCtrlItemClosePressed = GetStateColor(bgTabCtrlItemCloseNormal, "pressed", isDark);
-
-    // Tab控件
-    std::string bgTabCtrlItemNormal = surface0;
-    std::string bgTabCtrlNormal = surface0;
-    std::string borderTabCtrlItemNormal = surface2;
-
-    // =========================================================================
-    // 第十一步：生成滑块相关颜色
-    // =========================================================================
-
-    std::string bgSliderNormal = surface2;
-
-    // =========================================================================
-    // 第十二步：生成边框相关颜色
-    // =========================================================================
-
-    std::string borderNormal = GetStateColor(surface2, "pressed", isDark);
-    std::string borderControlNormal = surface2;
-    std::string borderBtnNormal = surface2;
-
-    // =========================================================================
-    // 第十三步：生成其他控件颜色
-    // =========================================================================
-
-    // 列表控件
-    std::string bgListCtrlHeaderNormal = surface1;
-    std::string bgListCtrlItemNormal = surface1;
-
-    // 组合框和富文本框边框
-    std::string borderComboNormal = surface2;
-    std::string borderRicheditNormal = surface2;
-
-    // 地址栏
-    std::string bgAddressBarNormal = surface1;
-    std::string borderAddressBarNormal = surface2;
-    std::string bgAddressBarBtnNormal = surface1;
-
-    // 属性网格
-    std::string bgPropertyGridNormal = surface1;
-    std::string textPropertyGridHeaderNormal = fgWindowMain;
-
-    // 分隔条
-    std::string bgSplitNormal = surface2;
-
-    // 滚动条
-    std::string bgScrollbarNormal = surface2;
-    std::string bgScrollbarThumbNormal = surface2;
-
-    // =========================================================================
-    // 第十四步：写入CSS变量（--开头）
-    // =========================================================================
-
+    // CSS变量（--开头）
     m_generatedColors["--background"] = bgWindowMain;
     m_generatedColors["--foreground"] = fgWindowMain;
     m_generatedColors["--surface_0"] = surface0;
@@ -519,15 +374,10 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--warning"] = m_colorConverter.OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
     m_generatedColors["--error"] = m_colorConverter.OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
 
-    // =========================================================================
-    // 第十五步：写入窗口和文本颜色
-    // =========================================================================
-
+    // 窗口和基础文本颜色
     m_generatedColors["bg_window_main"] = bgWindowMain;
     m_generatedColors["text_default"] = fgWindowMain;
     m_generatedColors["text_muted"] = GetStateColor(fgWindowMain, "disabled", isDark);
-
-    // 按钮文本
     m_generatedColors["text_btn_normal"] = fgWindowMain;
     m_generatedColors["text_btn_disabled"] = GetStateColor(fgWindowMain, "disabled", isDark);
 
@@ -536,27 +386,24 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["text_primary_btn_disabled"] = GetStateColor(accentForeground, "disabled", isDark);
 
     // 链接文本
-    m_generatedColors["text_link_normal"] = linkColor;
-    m_generatedColors["text_link_hovered"] = linkHoverColor;
-    m_generatedColors["text_link_pressed"] = GetStateColor(linkColor, "pressed", isDark);
+    m_generatedColors["text_link_normal"] = accentColor;
+    m_generatedColors["text_link_hovered"] = GetStateColor(accentColor, "hovered", isDark);
+    m_generatedColors["text_link_pressed"] = GetStateColor(accentColor, "pressed", isDark);
 
     // 富文本框提示文本
     m_generatedColors["text_richedit_prompt"] = GetStateColor(fgWindowMain, "disabled", isDark);
-    m_generatedColors["text_property_grid_header"] = textPropertyGridHeaderNormal;
 
-    // =========================================================================
-    // 第十六步：写入主按钮颜色
-    // =========================================================================
+    // 属性网格文本
+    m_generatedColors["text_property_grid_header"] = fgWindowMain;
 
+    // 主按钮（蓝色按钮）
     m_generatedColors["color_blue"] = accentColor;
     m_generatedColors["color_blue_dark"] = GetStateColor(accentColor, "pressed", isDark);
     m_generatedColors["color_blue_light"] = GetStateColor(accentColor, "hovered", isDark);
-
     m_generatedColors["bg_primary_btn_normal"] = accentColor;
     m_generatedColors["bg_primary_btn_hovered"] = GetStateColor(accentColor, "hovered", isDark);
     m_generatedColors["bg_primary_btn_pressed"] = GetStateColor(accentColor, "pressed", isDark);
     m_generatedColors["bg_primary_btn_disabled"] = GetStateColor(accentColor, "disabled", isDark);
-
     m_generatedColors["border_primary_btn_normal"] = GetStateColor(accentColor, "pressed", isDark);
     m_generatedColors["border_primary_btn_hovered"] = GetStateColor(accentColor, "hovered", isDark);
     m_generatedColors["border_primary_btn_pressed"] = GetStateColor(accentColor, "pressed", isDark);
@@ -569,125 +416,89 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["border_list_ctrl_frame_selected"] = accentColor;
     m_generatedColors["bg_list_ctrl_frame_selected"] = GetStateColor(accentColor, "hovered", isDark);
 
-    // =========================================================================
-    // 第十七步：写入普通按钮颜色
-    // =========================================================================
+    // 普通按钮
+    m_generatedColors["bg_btn_normal"] = surface1;
+    m_generatedColors["bg_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
+    m_generatedColors["bg_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
 
-    m_generatedColors["bg_btn_normal"] = bgBtnNormal;
-    m_generatedColors["bg_btn_hovered"] = bgBtnHovered;
-    m_generatedColors["bg_btn_pressed"] = bgBtnPressed;
-    m_generatedColors["bg_btn_disabled"] = bgBtnDisabled;
+    // 窗口按钮
+    m_generatedColors["bg_btn_window_normal"] = surface1;
+    m_generatedColors["bg_btn_window_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_btn_window_pressed"] = GetStateColor(surface1, "pressed", isDark);
 
-    // =========================================================================
-    // 第十八步：写入窗口按钮颜色
-    // =========================================================================
+    // 滚动条按钮
+    m_generatedColors["bg_scrollbar_btn_normal"] = surface2;
+    m_generatedColors["bg_scrollbar_btn_hovered"] = GetStateColor(surface2, "hovered", isDark);
+    m_generatedColors["bg_scrollbar_btn_pressed"] = GetStateColor(surface2, "pressed", isDark);
+    m_generatedColors["bg_scrollbar_btn_arrow_normal"] = GetStateColor(accentColor, "pressed", isDark);
+    m_generatedColors["bg_slider"] = surface2;
+    m_generatedColors["bg_slider_thumb"] = accentColor;
+    m_generatedColors["bg_scrollbar_normal"] = surface2;
+    m_generatedColors["bg_scrollbar_thumb_normal"] = surface2;
 
-    m_generatedColors["bg_btn_window_normal"] = bgBtnWindowNormal;
-    m_generatedColors["bg_btn_window_hovered"] = bgBtnWindowHovered;
-    m_generatedColors["bg_btn_window_pressed"] = bgBtnWindowPressed;
+    // 菜单
+    m_generatedColors["bg_menu_item_normal"] = surface0;
+    m_generatedColors["bg_menu_item_hovered"] = GetStateColor(surface0, "hovered", isDark);
+    m_generatedColors["bg_menu_item_pressed"] = GetStateColor(surface0, "pressed", isDark);
+    m_generatedColors["bg_menu_item_selected"] = GetStateColor(surface0, "selected", isDark);
+    m_generatedColors["bg_menu_bar"] = surface1;
+    m_generatedColors["bg_menu_bar_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_menu_bar_pressed"] = GetStateColor(surface1, "pressed", isDark);
 
-    // =========================================================================
-    // 第十九步：写入滚动条按钮颜色
-    // =========================================================================
+    // 列表项
+    m_generatedColors["bg_list_item_normal"] = surface1;
+    m_generatedColors["bg_list_item_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_list_item_pressed"] = GetStateColor(surface1, "pressed", isDark);
+    m_generatedColors["bg_list_item_selected"] = GetStateColor(surface1, "selected", isDark);
+    m_generatedColors["bg_list_item_disabled"] = GetStateColor(surface1, "disabled", isDark);
+    m_generatedColors["bg_list_ctrl_header"] = surface1;
+    m_generatedColors["bg_list_ctrl_item_normal"] = surface1;
 
-    m_generatedColors["bg_scrollbar_btn_normal"] = bgScrollbarBtnNormal;
-    m_generatedColors["bg_scrollbar_btn_hovered"] = bgScrollbarBtnHovered;
-    m_generatedColors["bg_scrollbar_btn_pressed"] = bgScrollbarBtnPressed;
-    m_generatedColors["bg_scrollbar_btn_arrow_normal"] = bgScrollbarBtnArrowNormal;
-    m_generatedColors["bg_slider"] = bgSliderNormal;
-    m_generatedColors["bg_slider_thumb"] = bgSliderThumbNormal;
-    m_generatedColors["bg_scrollbar_normal"] = bgScrollbarNormal;
-    m_generatedColors["bg_scrollbar_thumb_normal"] = bgScrollbarThumbNormal;
+    // 树形控件
+    m_generatedColors["bg_tree_view_node_normal"] = surface1;
+    m_generatedColors["bg_tree_view_node_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_tree_view_node_pressed"] = GetStateColor(surface1, "pressed", isDark);
+    m_generatedColors["bg_tree_view_node_selected"] = GetStateColor(surface1, "selected", isDark);
+    m_generatedColors["bg_tree_view_node_disabled"] = GetStateColor(surface1, "disabled", isDark);
 
-    // =========================================================================
-    // 第二十步：写入菜单颜色
-    // =========================================================================
+    // 组合框
+    m_generatedColors["bg_combo"] = surface0;
+    m_generatedColors["bg_combo_btn_normal"] = surface1;
+    m_generatedColors["bg_combo_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_combo_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
+    m_generatedColors["bg_combo_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
+    m_generatedColors["border_combo_normal"] = surface2;
 
-    m_generatedColors["bg_menu_item_normal"] = bgMenuItemNormal;
-    m_generatedColors["bg_menu_item_hovered"] = bgMenuItemHovered;
-    m_generatedColors["bg_menu_item_pressed"] = bgMenuItemPressed;
-    m_generatedColors["bg_menu_item_selected"] = bgMenuItemSelected;
-    m_generatedColors["bg_menu_bar"] = bgMenuBarNormal;
-    m_generatedColors["bg_menu_bar_hovered"] = bgMenuBarHovered;
-    m_generatedColors["bg_menu_bar_pressed"] = bgMenuBarPressed;
+    // 富文本框
+    m_generatedColors["bg_richedit"] = surface0;
+    m_generatedColors["bg_richedit_btn_normal"] = surface1;
+    m_generatedColors["bg_richedit_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
+    m_generatedColors["bg_richedit_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
+    m_generatedColors["bg_richedit_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
+    m_generatedColors["border_richedit_normal"] = surface2;
 
-    // =========================================================================
-    // 第二十一步：写入列表项颜色
-    // =========================================================================
+    // Tab页
+    m_generatedColors["bg_tab_ctrl_item_close_normal"] = surface2;
+    m_generatedColors["bg_tab_ctrl_item_close_hovered"] = GetStateColor(surface2, "hovered", isDark);
+    m_generatedColors["bg_tab_ctrl_item_close_pressed"] = GetStateColor(surface2, "pressed", isDark);
+    m_generatedColors["bg_tab_ctrl_item_normal"] = surface0;
+    m_generatedColors["bg_tab_ctrl"] = surface0;
+    m_generatedColors["border_tab_ctrl_item"] = surface2;
 
-    m_generatedColors["bg_list_item_normal"] = bgListItemNormal;
-    m_generatedColors["bg_list_item_hovered"] = bgListItemHovered;
-    m_generatedColors["bg_list_item_pressed"] = bgListItemPressed;
-    m_generatedColors["bg_list_item_selected"] = bgListItemSelected;
-    m_generatedColors["bg_list_item_disabled"] = bgListItemDisabled;
-    m_generatedColors["bg_list_ctrl_header"] = bgListCtrlHeaderNormal;
-    m_generatedColors["bg_list_ctrl_item_normal"] = bgListCtrlItemNormal;
+    // 地址栏
+    m_generatedColors["bg_address_bar"] = surface1;
+    m_generatedColors["border_address_bar"] = surface2;
+    m_generatedColors["bg_address_bar_btn_normal"] = surface1;
 
-    // =========================================================================
-    // 第二十二步：写入树形控件颜色
-    // =========================================================================
+    // 属性网格和分隔条
+    m_generatedColors["bg_property_grid"] = surface1;
+    m_generatedColors["bg_split_normal"] = surface2;
 
-    m_generatedColors["bg_tree_view_node_normal"] = bgTreeViewNodeNormal;
-    m_generatedColors["bg_tree_view_node_hovered"] = bgTreeViewNodeHovered;
-    m_generatedColors["bg_tree_view_node_pressed"] = bgTreeViewNodePressed;
-    m_generatedColors["bg_tree_view_node_selected"] = bgTreeViewNodeSelected;
-    m_generatedColors["bg_tree_view_node_disabled"] = bgTreeViewNodeDisabled;
-
-    // =========================================================================
-    // 第二十三步：写入组合框颜色
-    // =========================================================================
-
-    m_generatedColors["bg_combo"] = bgComboNormal;
-    m_generatedColors["bg_combo_btn_normal"] = bgComboBtnNormal;
-    m_generatedColors["bg_combo_btn_hovered"] = bgComboBtnHovered;
-    m_generatedColors["bg_combo_btn_pressed"] = bgComboBtnPressed;
-    m_generatedColors["bg_combo_btn_disabled"] = bgComboBtnDisabled;
-    m_generatedColors["border_combo_normal"] = borderComboNormal;
-
-    // =========================================================================
-    // 第二十四步：写入富文本框颜色
-    // =========================================================================
-
-    m_generatedColors["bg_richedit"] = bgRichEditNormal;
-    m_generatedColors["bg_richedit_btn_normal"] = bgRichEditBtnNormal;
-    m_generatedColors["bg_richedit_btn_hovered"] = bgRichEditBtnHovered;
-    m_generatedColors["bg_richedit_btn_pressed"] = bgRichEditBtnPressed;
-    m_generatedColors["bg_richedit_btn_disabled"] = bgRichEditBtnDisabled;
-    m_generatedColors["border_richedit_normal"] = borderRicheditNormal;
-
-    // =========================================================================
-    // 第二十五步：写入Tab控件颜色
-    // =========================================================================
-
-    m_generatedColors["bg_tab_ctrl_item_close_normal"] = bgTabCtrlItemCloseNormal;
-    m_generatedColors["bg_tab_ctrl_item_close_hovered"] = bgTabCtrlItemCloseHovered;
-    m_generatedColors["bg_tab_ctrl_item_close_pressed"] = bgTabCtrlItemClosePressed;
-    m_generatedColors["bg_tab_ctrl_item_normal"] = bgTabCtrlItemNormal;
-    m_generatedColors["bg_tab_ctrl"] = bgTabCtrlNormal;
-    m_generatedColors["border_tab_ctrl_item"] = borderTabCtrlItemNormal;
-
-    // =========================================================================
-    // 第二十六步：写入地址栏颜色
-    // =========================================================================
-
-    m_generatedColors["bg_address_bar"] = bgAddressBarNormal;
-    m_generatedColors["border_address_bar"] = borderAddressBarNormal;
-    m_generatedColors["bg_address_bar_btn_normal"] = bgAddressBarBtnNormal;
-
-    // =========================================================================
-    // 第二十七步：写入属性网格和分隔条颜色
-    // =========================================================================
-
-    m_generatedColors["bg_property_grid"] = bgPropertyGridNormal;
-    m_generatedColors["bg_split_normal"] = bgSplitNormal;
-
-    // =========================================================================
-    // 第二十八步：写入边框颜色
-    // =========================================================================
-
-    m_generatedColors["border_normal"] = borderNormal;
-    m_generatedColors["border_control_normal"] = borderControlNormal;
-    m_generatedColors["border_btn_normal"] = borderBtnNormal;
+    // 边框颜色
+    m_generatedColors["border_normal"] = GetStateColor(surface2, "pressed", isDark);
+    m_generatedColors["border_control_normal"] = surface2;
+    m_generatedColors["border_btn_normal"] = surface2;
 }
 
 bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
