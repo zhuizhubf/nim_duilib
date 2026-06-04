@@ -166,7 +166,7 @@ private:
      *          - selected: 浅色变暗(+0.09L)，深色变亮(-0.09L)
      *          - disabled: 降低饱和度并设置半透明
      */
-    std::string GetStateColor(const std::string& baseColor, const std::string& state, bool isDark);
+    std::string GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const;
 
     /** @brief 应用颜色调整参数
      *  @param baseColor 基础颜色
@@ -178,14 +178,14 @@ private:
      *          - hue: 色相调整（度数）
      *          - alpha: 透明度调整（绝对值或相对值）
      */
-    std::string ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr);
+    std::string ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const;
 
     /** @brief 检测颜色名称中的状态标识
      *  @param colorName 颜色名称
      *  @return pair<状态, 基础名称>
      *  @details 从颜色名称中提取状态后缀，如"bg_btn_hovered"返回("hovered", "bg_btn")
      */
-    std::pair<std::string, std::string> DetectColorState(const std::string& colorName);
+    std::pair<std::string, std::string> DetectColorState(const std::string& colorName) const;
 
     /** @brief 生成主题核心颜色集
      *  @param hue 色调值(0-360)
@@ -206,33 +206,33 @@ private:
      *  @return 调整后的文本颜色
      *  @details 如果对比度不足，通过迭代调整亮度分量直到达到目标对比度
      */
-    std::string EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast = 4.5);
+    std::string EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast = 4.5) const;
 
-    /** @brief 写入输出XML文件（保留中）
-     *  @param outputXml 输出文件路径
-     *  @return 写入成功返回true
+    /** @brief 生成主题颜色
+     *  @param isDark 是否为暗色主题
+     *  @return 生成的主题XML字符串
+     *  @details 根据指定的色相和亮度生成完整的主题颜色配置，
+     *          只修改颜色值，保留原始XML的格式、顺序和注释
      */
-    bool WriteOutputXml(const std::string& outputXml);
+    std::string GenerateThemeXml(bool isDark) const;
 
 private:
-    ColorConverter m_colorConverter;                          ///< 颜色转换工具类
+    ColorConverter m_colorConverter;                         ///< 颜色转换工具类
 
     double m_hue;                                            ///< 当前色调值 (0-360)
     double m_base;                                           ///< 当前基础亮度值 (0.0-1.0，控制颜色鲜艳程度)
     bool m_isDark;                                           ///< 当前是否为暗色主题
-    std::map<std::string, std::string> m_generatedColors;   ///< 生成的核心颜色集
+    std::map<std::string, std::string> m_generatedColors;    ///< 生成的核心颜色集
     std::map<std::string, ThemeColorConfig> m_loadedConfigs; ///< 从XML加载的颜色配置
-    std::vector<std::string> m_colorOrder;                  ///< 颜色节点原始顺序
-    std::string m_originalXmlContent;                       ///< 原始XML完整内容
-    ThemeMetaInfo m_themeMeta;                              ///< 主题元信息
-    std::map<std::string, std::string> m_originalValues;    ///< 原始颜色值（用于对比）
+    std::string m_originalXmlContent;                        ///< 原始XML完整内容
+    ThemeMetaInfo m_themeMeta;                               ///< 主题元信息
 
     // ============================================================================
     // 颜色算法参数 (所有L值范围0.0-1.0, 所有Offset/C系数范围根据具体参数确定)
     // ============================================================================
 
     // 背景色参数
-    double m_bgLightL;           ///< 浅色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.97)
+    double m_bgLightL;          ///< 浅色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.97)
     double m_bgLightLScale;     ///< 浅色模式背景明度随base变化系数 (范围: -2.0到0, 默认: -0.95)
     double m_bgDarkL;           ///< 深色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.17)
     double m_bgDarkLScale;      ///< 深色模式背景明度随base变化系数 (范围: 0到2.0, 默认: 0.78)
@@ -247,13 +247,13 @@ private:
 
     // Surface层参数
     double m_surfaceLightOffset; ///< 浅色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.025, 使表面变暗)
-    double m_surfaceDarkOffset;   ///< 深色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.07, 使表面变亮)
+    double m_surfaceDarkOffset;  ///< 深色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.07, 使表面变亮)
     double m_surfaceBaseChroma;  ///< Surface色度系数 (范围: 0.0-3.0, 默认: 1.5)
 
     // Accent参数
     double m_accentLightL;      ///< 浅色模式Accent明度 (范围: 0.0-1.0, 默认: 0.6204)
     double m_accentDarkL;       ///< 深色模式Accent明度 (范围: 0.0-1.0, 默认: 0.68)
-    double m_accentC;            ///< Accent色度 (范围: 0.0-0.4, 默认: 0.195)
+    double m_accentC;           ///< Accent色度 (范围: 0.0-0.4, 默认: 0.195)
 };
 
 }

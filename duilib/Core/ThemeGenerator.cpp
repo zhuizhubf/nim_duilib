@@ -3,13 +3,9 @@
 
 #include "duilib/third_party/xml/pugixml.hpp"
 
-#include <algorithm>
-#include <cmath>
 #include <sstream>
 #include <iomanip>
 #include <fstream>
-#include <cstdlib>
-#include <set>
 
 namespace ui
 {
@@ -135,7 +131,7 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     return m_colorConverter.OKLCHToARGB(sfL, surfaceChroma, hue, 255);
 }
 
-std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark)
+std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const
 {
     if (baseColor.empty()) {
         return baseColor;
@@ -191,7 +187,7 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
     return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
 }
 
-std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr)
+std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const
 {
     if (baseColor.empty() || adjustStr.empty()) {
         return baseColor;
@@ -257,7 +253,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
     return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
 }
 
-std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName)
+std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const
 {
     std::vector<std::string> states = {"_disabled", "_pressed", "_hovered", "_selected"};
     for (const auto& state : states) {
@@ -271,7 +267,7 @@ std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::
     return std::make_pair("", colorName);
 }
 
-std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast)
+std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast) const
 {
     uint8_t alpha, r, g, b;
     if (!m_colorConverter.ParseHexColor(textColor, alpha, r, g, b)) {
@@ -501,6 +497,15 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["border_btn_normal"] = surface2;
 }
 
+std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) const
+{
+    auto iter = m_generatedColors.find(colorName);
+    if (iter != m_generatedColors.end()) {
+        return iter->second;
+    }
+    return std::string();
+}
+
 bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
 {
     ASSERT(!inputXml.empty());
@@ -538,8 +543,6 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
 
     m_loadedConfigs.clear();
     m_themeMeta.properties.clear();
-    m_originalValues.clear();
-    m_colorOrder.clear();
 
     pugi::xml_node root = doc.root().first_child();
     if (DString(root.name()) != _T("Global")) {
@@ -582,12 +585,9 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
 
             if (!config.name.empty()) {
                 m_loadedConfigs[config.name] = config;
-                m_originalValues[config.name] = config.value;
-                m_colorOrder.push_back(config.name);
             }
         }
     }
-
     return true;
 }
 
@@ -596,9 +596,12 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
     if (m_loadedConfigs.empty()) {
         return std::string();
     }
-
     GenerateThemeColors(hue, base, isDark);
+    return GenerateThemeXml(isDark);
+}
 
+std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
+{
     std::map<std::string, std::string> processedColors;
 
     // 第一步：处理所有颜色配置
@@ -607,8 +610,9 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
         const ThemeColorConfig& attrs = pair.second;
 
         // 优先使用生成的核心颜色
-        if (m_generatedColors.find(colorName) != m_generatedColors.end()) {
-            processedColors[colorName] = m_generatedColors[colorName];
+        auto iter = m_generatedColors.find(colorName);
+        if (iter != m_generatedColors.end()) {
+            processedColors[colorName] = iter->second;
             continue;
         }
 
@@ -622,7 +626,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                 baseColor = processedColors[baseName];
             }
             else if (m_generatedColors.find(baseName) != m_generatedColors.end()) {
-                baseColor = m_generatedColors[baseName];
+                baseColor = m_generatedColors.find(baseName)->second;
             }
             else {
                 std::string derivedFrom = attrs.derived_from;
@@ -631,7 +635,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                         baseColor = processedColors[derivedFrom];
                     }
                     else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
-                        baseColor = m_generatedColors[derivedFrom];
+                        baseColor = m_generatedColors.find(derivedFrom)->second;
                     }
                 }
             }
@@ -663,18 +667,18 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                     if (lowerName.find("white") != std::string::npos || lowerName.find("black") != std::string::npos) {
                         if (!isDark) {
                             if (lowerName.find("white") != std::string::npos) {
-                                processedColors[colorName] = m_generatedColors["--foreground"];
+                                processedColors[colorName] = GetGeneratedColor("--foreground");
                             }
                             else {
-                                processedColors[colorName] = m_generatedColors["bg_window_main"];
+                                processedColors[colorName] = GetGeneratedColor("bg_window_main");
                             }
                         }
                         else {
                             if (lowerName.find("white") != std::string::npos) {
-                                processedColors[colorName] = m_generatedColors["bg_window_main"];
+                                processedColors[colorName] = GetGeneratedColor("bg_window_main");
                             }
                             else {
-                                processedColors[colorName] = m_generatedColors["--foreground"];
+                                processedColors[colorName] = GetGeneratedColor("--foreground");
                             }
                         }
                         continue;
@@ -689,7 +693,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
                         baseColor = processedColors[derivedFrom];
                     }
                     else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
-                        baseColor = m_generatedColors[derivedFrom];
+                        baseColor = GetGeneratedColor(derivedFrom);
                     }
 
                     if (!baseColor.empty()) {
@@ -764,7 +768,7 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
     for (const auto& pair : m_loadedConfigs) {
         const std::string& colorName = pair.first;
         if (processedColors.find(colorName) == processedColors.end()) {
-            processedColors[colorName] = m_loadedConfigs[colorName].value;
+            processedColors[colorName] = pair.second.value;
         }
     }
 
@@ -799,15 +803,6 @@ std::string ThemeGenerator::GenerateTheme(double hue, double base, bool isDark)
     }
 
     return result;
-}
-
-std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) const
-{
-    auto it = m_generatedColors.find(colorName);
-    if (it != m_generatedColors.end()) {
-        return it->second;
-    }
-    return "";
 }
 
 }
