@@ -15,20 +15,22 @@ namespace ui
  */
 struct ThemeColorConfig
 {
-    std::string name;            ///< 颜色名称，如"bg_window_main"
-    std::string value;           ///< 颜色值，格式为"#AARRGGBB"
-    std::string type;            ///< 颜色类型，如"bg_color"、"border_color"等
-    std::string category;        ///< 颜色分类，如"bg_color"、"text_color"等
+    std::string name;           ///< 颜色名称，如"bg_window_main"
+    std::string value;          ///< 颜色值，格式为"#AARRGGBB"
+    std::string type;           ///< 颜色类型，如"bg_color"、"border_color"等
+    std::string category;       ///< 颜色分类，如"bg_color"、"text_color"等
     std::string role;           ///< 颜色角色描述
-    std::string derived_from;    ///< 派生来源，指定基于哪个颜色派生
+    std::string derived_from;   ///< 派生来源，指定基于哪个颜色派生
     std::string adjust;         ///< 调整参数，如"lightness:-10,saturation:20"
     bool fixed;                 ///< 是否为固定颜色，固定颜色不会被主题生成器修改
     bool support_accent;        ///< 是否支持强调色
     std::string contrast_bg;    ///< 对比度检查的背景色名称
     std::string comment_cn;     ///< 中文注释
     std::string comment_en;     ///< 英文注释
-    std::string original_xml;   ///< 原始XML片段（保留原始格式）
     int node_order;             ///< 节点顺序索引（用于保持输出顺序与输入一致）
+
+    std::string m_baseName;     ///< 颜色名称的基础名称，如"bg_btn_disabled"的基础名称为"bg_btn"
+    std::string m_state;        ///< 颜色名称的状态名称，如"bg_btn_disabled"的状态名称为"disabled"
 };
 
 /** @struct ThemeMetaInfo
@@ -135,7 +137,7 @@ private:
      *  @param isDark 是否为暗色主题
      *  @return 基础背景颜色的ARGB字符串
      */
-    std::string GetBaseColorFromHue(double hue, double base, bool isDark);
+    std::string GetBackgroundColor(double hue, double base, bool isDark);
 
     /** @brief 获取前景色（与背景色互补）
      *  @param hue 色调值(0-360)

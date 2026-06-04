@@ -78,7 +78,7 @@ void ThemeGenerator::ResetParams()
     SetAccentParams(0.6204, 0.68, 0.195);
 }
 
-std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool isDark)
+std::string ThemeGenerator::GetBackgroundColor(double hue, double base, bool isDark)
 {
     // 使用成员变量计算背景色
     double baseChroma = base * m_bgBaseChroma;
@@ -171,7 +171,7 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
             L = std::max(0.0, std::min(1.0, L + 0.09));
         }
     }
-    else if (state == "disabled") {
+    else if ((state == "disabled") || (state == "prompt")) {
         if (!isDark) {
             L = std::max(0.0, std::min(1.0, L + 0.08));
             C = std::max(0.0, C - 0.4);
@@ -182,6 +182,13 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
             C = std::max(0.0, C - 0.2);
             alpha = 153;
         }
+    }
+    else if (state == "focused") {
+        //强调色
+        return GetGeneratedColor("--accent");
+    }
+    else {
+        return baseColor;
     }
 
     return ColorConverter::OKLCHToARGB(L, C, H, alpha);
@@ -255,7 +262,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
 
 std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const
 {
-    std::vector<std::string> states = {"_disabled", "_pressed", "_hovered", "_selected"};
+    std::vector<std::string> states = {"_normal", "_disabled", "_pressed", "_hovered", "_selected", "_prompt" , "_focused" };
     for (const auto& state : states) {
         size_t pos = colorName.rfind(state);
         if (pos != std::string::npos) {
@@ -334,8 +341,8 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // =========================================================================
 
     // 背景色和前景色
-    std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
-    std::string fgWindowMain = GetForegroundColor(hue, base, isDark);
+    std::string backgroundColor = GetBackgroundColor(hue, base, isDark);
+    std::string foregroundColor = GetForegroundColor(hue, base, isDark);
 
     // Surface层（用于卡片、按钮等元素的背景）
     std::string surface0 = GetSurfaceColor(hue, base, isDark, -1);
@@ -357,8 +364,8 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // =========================================================================
 
     // CSS变量（--开头）
-    m_generatedColors["--background"] = bgWindowMain;
-    m_generatedColors["--foreground"] = fgWindowMain;
+    m_generatedColors["--background"] = backgroundColor;
+    m_generatedColors["--foreground"] = foregroundColor;
     m_generatedColors["--surface_0"] = surface0;
     m_generatedColors["--surface_1"] = surface1;
     m_generatedColors["--surface_2"] = surface2;
@@ -371,11 +378,11 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--error"] = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
 
     // 窗口和基础文本颜色
-    m_generatedColors["bg_window_main"] = bgWindowMain;
-    m_generatedColors["text_default"] = fgWindowMain;
-    m_generatedColors["text_muted"] = GetStateColor(fgWindowMain, "disabled", isDark);
-    m_generatedColors["text_btn_normal"] = fgWindowMain;
-    m_generatedColors["text_btn_disabled"] = GetStateColor(fgWindowMain, "disabled", isDark);
+    m_generatedColors["bg_window_main"] = backgroundColor;
+    m_generatedColors["text_default"] = foregroundColor;
+    m_generatedColors["text_muted"] = GetStateColor(foregroundColor, "disabled", isDark);
+    m_generatedColors["text_btn_normal"] = foregroundColor;
+    m_generatedColors["text_btn_disabled"] = GetStateColor(foregroundColor, "disabled", isDark);
 
     // 主按钮文本
     m_generatedColors["text_primary_btn_normal"] = accentForeground;
@@ -387,10 +394,10 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["text_link_pressed"] = GetStateColor(accentColor, "pressed", isDark);
 
     // 富文本框提示文本
-    m_generatedColors["text_richedit_prompt"] = GetStateColor(fgWindowMain, "disabled", isDark);
+    m_generatedColors["text_richedit_prompt"] = GetStateColor(foregroundColor, "disabled", isDark);
 
     // 属性网格文本
-    m_generatedColors["text_property_grid_header"] = fgWindowMain;
+    m_generatedColors["text_property_grid_header"] = foregroundColor;
 
     // 主按钮（蓝色按钮）
     m_generatedColors["color_blue"] = accentColor;
@@ -582,6 +589,12 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
             config.comment_cn = StringConvert::TToUTF8(child.attribute(_T("comment_cn")).as_string());
             config.comment_en = StringConvert::TToUTF8(child.attribute(_T("comment_en")).as_string());
             config.node_order = orderIndex++;
+
+            std::pair<std::string, std::string> statePair = DetectColorState(config.name);
+            if (!statePair.first.empty()) {
+                config.m_state = statePair.first;
+                config.m_baseName = statePair.second;
+            }
 
             if (!config.name.empty()) {
                 m_loadedConfigs[config.name] = config;
