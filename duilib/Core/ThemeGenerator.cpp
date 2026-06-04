@@ -91,7 +91,7 @@ std::string ThemeGenerator::GetBaseColorFromHue(double hue, double base, bool is
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    return m_colorConverter.OKLCHToARGB(bgL, baseChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(bgL, baseChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isDark)
@@ -107,7 +107,7 @@ std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isD
         fgL = m_fgLightL + base * m_fgLightLScale;
     }
 
-    return m_colorConverter.OKLCHToARGB(fgL, fgChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(fgL, fgChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel)
@@ -128,7 +128,7 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     double offset = isDark ? m_surfaceDarkOffset : -m_surfaceLightOffset;
     double sfL = bgL + offset * surfaceLevel;
 
-    return m_colorConverter.OKLCHToARGB(sfL, surfaceChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(sfL, surfaceChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const
@@ -138,12 +138,12 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
     }
 
     uint8_t alpha, r, g, b;
-    if (!m_colorConverter.ParseHexColor(baseColor, alpha, r, g, b)) {
+    if (!ColorConverter::ParseHexColor(baseColor, alpha, r, g, b)) {
         return baseColor;
     }
 
     double L, C, H;
-    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!ColorConverter::RGBToOKLCH(r, g, b, L, C, H)) {
         return baseColor;
     }
 
@@ -184,7 +184,7 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
         }
     }
 
-    return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
+    return ColorConverter::OKLCHToARGB(L, C, H, alpha);
 }
 
 std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const
@@ -194,12 +194,12 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
     }
 
     uint8_t alpha, r, g, b;
-    if (!m_colorConverter.ParseHexColor(baseColor, alpha, r, g, b)) {
+    if (!ColorConverter::ParseHexColor(baseColor, alpha, r, g, b)) {
         return baseColor;
     }
 
     double L, C, H;
-    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!ColorConverter::RGBToOKLCH(r, g, b, L, C, H)) {
         return baseColor;
     }
 
@@ -250,7 +250,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
         }
     }
 
-    return m_colorConverter.OKLCHToARGB(L, C, H, alpha);
+    return ColorConverter::OKLCHToARGB(L, C, H, alpha);
 }
 
 std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const
@@ -270,23 +270,23 @@ std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::
 std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast) const
 {
     uint8_t alpha, r, g, b;
-    if (!m_colorConverter.ParseHexColor(textColor, alpha, r, g, b)) {
+    if (!ColorConverter::ParseHexColor(textColor, alpha, r, g, b)) {
         return textColor;
     }
 
     double L, C, H;
-    if (!m_colorConverter.RGBToOKLCH(r, g, b, L, C, H)) {
+    if (!ColorConverter::RGBToOKLCH(r, g, b, L, C, H)) {
         return textColor;
     }
 
     uint8_t bgAlpha, bgR, bgG, bgB;
-    if (!m_colorConverter.ParseHexColor(bgColor, bgAlpha, bgR, bgG, bgB)) {
+    if (!ColorConverter::ParseHexColor(bgColor, bgAlpha, bgR, bgG, bgB)) {
         return textColor;
     }
 
-    double bgLuminance = m_colorConverter.GetRelativeLuminance(bgR, bgG, bgB);
+    double bgLuminance = ColorConverter::GetRelativeLuminance(bgR, bgG, bgB);
 
-    double contrast = m_colorConverter.CalculateContrastRatio(textColor, bgColor);
+    double contrast = ColorConverter::CalculateContrastRatio(textColor, bgColor);
     if (contrast < 0.01) {
         return textColor;
     }
@@ -308,8 +308,8 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
 
         L = std::max(LTarget, std::min((bgLuminance > 0.5) ? 0.95 : 0.05, L + LStep));
 
-        std::string testColor = m_colorConverter.OKLCHToARGB(L, C, H, alpha);
-        contrast = m_colorConverter.CalculateContrastRatio(testColor, bgColor);
+        std::string testColor = ColorConverter::OKLCHToARGB(L, C, H, alpha);
+        contrast = ColorConverter::CalculateContrastRatio(testColor, bgColor);
 
         if (contrast >= minContrast) {
             return testColor;
@@ -318,7 +318,7 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
         iteration++;
     }
 
-    std::string finalColor = m_colorConverter.OKLCHToARGB(L, C, H, alpha);
+    std::string finalColor = ColorConverter::OKLCHToARGB(L, C, H, alpha);
     return finalColor;
 }
 
@@ -346,11 +346,11 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
 
     // Accent颜色（强调色）
     double accentL = isDark ? m_accentDarkL : m_accentLightL;
-    std::string accentColor = m_colorConverter.OKLCHToARGB(accentL, m_accentC, hue, 255);
+    std::string accentColor = ColorConverter::OKLCHToARGB(accentL, m_accentC, hue, 255);
 
     // Accent前景色：浅色模式接近白色，深色模式接近黑色
     double accentFgL = isDark ? 0.14 : 0.99;
-    std::string accentForeground = m_colorConverter.OKLCHToARGB(accentFgL, 0, hue, 255);
+    std::string accentForeground = ColorConverter::OKLCHToARGB(accentFgL, 0, hue, 255);
 
     // =========================================================================
     // 写入颜色到 m_generatedColors
@@ -366,9 +366,9 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--surface_4"] = surface4;
     m_generatedColors["--accent"] = accentColor;
     m_generatedColors["--accent_foreground"] = accentForeground;
-    m_generatedColors["--success"] = m_colorConverter.OKLCHToARGB(0.65, 0.16, 152, 255);  // 成功色
-    m_generatedColors["--warning"] = m_colorConverter.OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
-    m_generatedColors["--error"] = m_colorConverter.OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
+    m_generatedColors["--success"] = ColorConverter::OKLCHToARGB(0.65, 0.16, 152, 255);  // 成功色
+    m_generatedColors["--warning"] = ColorConverter::OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
+    m_generatedColors["--error"] = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
 
     // 窗口和基础文本颜色
     m_generatedColors["bg_window_main"] = bgWindowMain;
@@ -656,7 +656,7 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         std::string originalValue = attrs.value;
         if (!originalValue.empty()) {
             uint8_t a, r, g, b;
-            if (m_colorConverter.ParseHexColor(originalValue, a, r, g, b)) {
+            if (ColorConverter::ParseHexColor(originalValue, a, r, g, b)) {
                 bool isSvgOrColor = (colorName.substr(0, 9) == "border_svg") || (colorName.substr(0, 6) == "color_");
 
                 if (isSvgOrColor) {

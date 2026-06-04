@@ -217,8 +217,6 @@ private:
     std::string GenerateThemeXml(bool isDark) const;
 
 private:
-    ColorConverter m_colorConverter;                         ///< 颜色转换工具类
-
     double m_hue;                                            ///< 当前色调值 (0-360)
     double m_base;                                           ///< 当前基础亮度值 (0.0-1.0，控制颜色鲜艳程度)
     bool m_isDark;                                           ///< 当前是否为暗色主题

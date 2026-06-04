@@ -8,15 +8,7 @@
 namespace ui
 {
 
-ColorConverter::ColorConverter()
-{
-}
-
-ColorConverter::~ColorConverter()
-{
-}
-
-bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b) const
+bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b)
 {
     if (colorStr.empty() || colorStr.length() != 9 || colorStr[0] != '#') {
         return false;
@@ -34,7 +26,7 @@ bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, 
     }
 }
 
-std::string ColorConverter::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b) const
+std::string ColorConverter::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b)
 {
     std::ostringstream oss;
     oss << "#" << std::uppercase << std::hex << std::setfill('0')
@@ -45,7 +37,7 @@ std::string ColorConverter::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_
     return oss.str();
 }
 
-double ColorConverter::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b) const
+double ColorConverter::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b)
 {
     double rs = r / 255.0;
     double gs = g / 255.0;
@@ -58,7 +50,7 @@ double ColorConverter::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b) con
     return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-double ColorConverter::CalculateContrastRatio(const std::string& color1, const std::string& color2) const
+double ColorConverter::CalculateContrastRatio(const std::string& color1, const std::string& color2)
 {
     uint8_t a1, r1, g1, b1;
     uint8_t a2, r2, g2, b2;
@@ -76,7 +68,7 @@ double ColorConverter::CalculateContrastRatio(const std::string& color1, const s
     return (lighter + 0.05) / (darker + 0.05);
 }
 
-bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H) const
+bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H)
 {
     double red = r / 255.0;
     double green = g / 255.0;
@@ -85,7 +77,7 @@ bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, doub
     return RGBToOKLCH(red, green, blue, &L, &C, &H) == 0;
 }
 
-int ColorConverter::RGBToOKLCH(double red, double green, double blue, double* L, double* C, double* H) const
+int ColorConverter::RGBToOKLCH(double red, double green, double blue, double* L, double* C, double* H)
 {
     if ((L == nullptr) || (C == nullptr) || (H == nullptr)) {
         return -1;
@@ -119,14 +111,14 @@ int ColorConverter::RGBToOKLCH(double red, double green, double blue, double* L,
     return 0;
 }
 
-std::string ColorConverter::OKLCHToARGB(double L, double C, double H, uint8_t alpha) const
+std::string ColorConverter::OKLCHToARGB(double L, double C, double H, uint8_t alpha)
 {
     uint8_t r, g, b;
     OKLCHToRGB(L, C, H, r, g, b);
     return RGBToHex(alpha, r, g, b);
 }
 
-int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double* green, double* blue) const
+int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double* green, double* blue)
 {
     if ((red == nullptr) || (green == nullptr) || (blue == nullptr)) {
         return -1;
@@ -162,7 +154,7 @@ int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double
     return 0;
 }
 
-int ColorConverter::OKLCHToRGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue) const
+int ColorConverter::OKLCHToRGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue)
 {
     double r = 0, g = 0, b = 0;
     if (OKLCHToRGB(L, C, H, &r, &g, &b) != 0) {
@@ -174,7 +166,7 @@ int ColorConverter::OKLCHToRGB(double L, double C, double H, uint8_t& red, uint8
     return 0;
 }
 
-double ColorConverter::sRGBTransferFunction(double x) const
+double ColorConverter::sRGBTransferFunction(double x)
 {
     if (x <= 0.0031308) {
         return 12.92 * x;
@@ -182,7 +174,7 @@ double ColorConverter::sRGBTransferFunction(double x) const
     return 1.055 * std::pow(x, 1.0 / 2.4) - 0.055;
 }
 
-double ColorConverter::InverseSRGBTransferFunction(double x) const
+double ColorConverter::InverseSRGBTransferFunction(double x)
 {
     if (x <= 0.04045) {
         return x / 12.92;
@@ -190,7 +182,7 @@ double ColorConverter::InverseSRGBTransferFunction(double x) const
     return std::pow((x + 0.055) / 1.055, 2.4);
 }
 
-double ColorConverter::Cbrt(double x) const
+double ColorConverter::Cbrt(double x)
 {
     return std::pow(x, 1.0 / 3.0);
 }
