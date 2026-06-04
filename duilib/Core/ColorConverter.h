@@ -150,18 +150,18 @@ public:
     int RGBToOKLCH(double red, double green, double blue, double* L, double* C, double* H);
 
     /** @brief 将OKLCH转换为ARGB十六进制字符串
-     *  @param L 明度值(0-1)
-     *  @param C 色度值
-     *  @param H 色相值(0-360)
+     *  @param L 明度值(0-1，超出范围会被自动钳制)
+     *  @param C 色度值(负值会被自动钳制为0)
+     *  @param H 色相值(0-360，超出范围会自动归一化)
      *  @param alpha Alpha值(0-255)
      *  @return ARGB十六进制字符串，如"#FFAABBCC"
      */
     std::string OKLCHToARGB(double L, double C, double H, uint8_t alpha);
 
     /** @brief 将OKLCH转换为RGB
-     *  @param L 明度值(0-1)
-     *  @param C 色度值
-     *  @param H 色相值(0-360)
+     *  @param L 明度值(0-1，超出范围会被自动钳制)
+     *  @param C 色度值(负值会被自动钳制为0)
+     *  @param H 色相值(0-360，超出范围会自动归一化)
      *  @param red 输出红色值(0.0-1.0)
      *  @param green 输出绿色值(0.0-1.0)
      *  @param blue 输出蓝色值(0.0-1.0)

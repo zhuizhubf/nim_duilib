@@ -127,7 +127,9 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    double offset = isDark ? m_surfaceDarkOffset : m_surfaceLightOffset;
+    // 浅色模式: offset为负，表面色随层级增加而变暗
+    // 深色模式: offset为正，表面色随层级增加而变亮
+    double offset = isDark ? m_surfaceDarkOffset : -m_surfaceLightOffset;
     double sfL = bgL + offset * surfaceLevel;
 
     return m_colorConverter.OKLCHToARGB(sfL, surfaceChroma, hue, 255);
@@ -334,11 +336,11 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string bgWindowMain = GetBaseColorFromHue(hue, base, isDark);
     std::string fgWindowMain = GetForegroundColor(hue, base, isDark);
 
-    std::string surface0 = GetSurfaceColor(hue, base, isDark, 1);
-    std::string surface1 = GetSurfaceColor(hue, base, isDark, 2);
+    std::string surface0 = GetSurfaceColor(hue, base, isDark, -1);
+    std::string surface1 = GetSurfaceColor(hue, base, isDark, 1);
     std::string surface2 = GetSurfaceColor(hue, base, isDark, 3);
-    std::string surface3 = GetSurfaceColor(hue, base, isDark, 4);
-    std::string surface4 = GetSurfaceColor(hue, base, isDark, 5);
+    std::string surface3 = GetSurfaceColor(hue, base, isDark, 5);
+    std::string surface4 = GetSurfaceColor(hue, base, isDark, 7);
 
     // 使用成员变量生成Accent颜色
     double accentL = isDark ? m_accentDarkL : m_accentLightL;

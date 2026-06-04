@@ -131,9 +131,14 @@ int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double
     if ((red == nullptr) || (green == nullptr) || (blue == nullptr)) {
         return -1;
     }
-    if (L < 0.0 || L > 1.0 || C < 0.0 || H < 0.0 || H > 360.0) {
-        return -1;
-    }
+    // Clamp L to valid range [0, 1]
+    if (L < 0.0) L = 0.0;
+    if (L > 1.0) L = 1.0;
+    // C should be non-negative, use absolute value if negative
+    if (C < 0.0) C = 0.0;
+    // Normalize H to [0, 360)
+    while (H < 0.0) H += 360.0;
+    while (H >= 360.0) H -= 360.0;
 
     double a = C * std::cos(H * PI / 180.0);
     double b = C * std::sin(H * PI / 180.0);

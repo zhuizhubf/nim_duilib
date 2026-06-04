@@ -108,10 +108,11 @@ public:
     void SetFgParams(double fgLightL, double fgDarkL, double fgBaseChroma);
 
     /** @brief 设置Surface层参数
-     *  @param surfaceLightOffset 浅色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.025)
-     *  @param surfaceDarkOffset 深色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.07)
+     *  @param surfaceLightOffset 浅色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.025, 用于使表面变暗)
+     *  @param surfaceDarkOffset 深色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.07, 用于使表面变亮)
      *  @param surfaceBaseChroma Surface基础色度系数 (范围: 0.0-2.0, 典型值: 1.5)
-     *  @note Surface用于卡片、按钮等元素的背景，offset控制层级间的明暗差异
+     *  @note Surface用于卡片、按钮等元素的背景。浅色模式下offset使表面变暗(L减少)，
+     *       深色模式下offset使表面变亮(L增加)，从而形成视觉层次感
      */
     void SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma);
 
@@ -245,8 +246,8 @@ private:
     double m_fgBaseChroma;      ///< 前景色度系数 (范围: 0.0-1.0, 默认: 0.15)
 
     // Surface层参数
-    double m_surfaceLightOffset; ///< 浅色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.025)
-    double m_surfaceDarkOffset;   ///< 深色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.07)
+    double m_surfaceLightOffset; ///< 浅色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.025, 使表面变暗)
+    double m_surfaceDarkOffset;   ///< 深色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.07, 使表面变亮)
     double m_surfaceBaseChroma;  ///< Surface色度系数 (范围: 0.0-3.0, 默认: 1.5)
 
     // Accent参数
