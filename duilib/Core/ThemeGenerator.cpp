@@ -34,10 +34,6 @@ ThemeGenerator::ThemeGenerator()
     , m_surfaceLightOffset(0.025)
     , m_surfaceDarkOffset(0.07)
     , m_surfaceBaseChroma(1.5)
-    // 中性色参数
-    , m_neutralBaseChroma(1.5)
-    , m_neutralLightStep(0.025)
-    , m_neutralDarkStep(0.07)
     // Accent参数
     , m_accentLightL(0.6204)
     , m_accentDarkL(0.68)
@@ -70,13 +66,6 @@ void ThemeGenerator::SetSurfaceParams(double surfaceLightOffset, double surfaceD
     m_surfaceBaseChroma = surfaceBaseChroma;
 }
 
-void ThemeGenerator::SetNeutralParams(double neutralBaseChroma, double neutralLightStep, double neutralDarkStep)
-{
-    m_neutralBaseChroma = neutralBaseChroma;
-    m_neutralLightStep = neutralLightStep;
-    m_neutralDarkStep = neutralDarkStep;
-}
-
 void ThemeGenerator::SetAccentParams(double accentLightL, double accentDarkL, double accentC)
 {
     m_accentLightL = accentLightL;
@@ -90,7 +79,6 @@ void ThemeGenerator::ResetParams()
     SetBgParams(0.97, 0.17, 1.5);
     SetFgParams(0.22, 0.92, 0.15);
     SetSurfaceParams(0.025, 0.07, 1.5);
-    SetNeutralParams(1.5, 0.025, 0.07);
     SetAccentParams(0.6204, 0.68, 0.195);
 }
 
@@ -143,25 +131,6 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     double sfL = bgL + offset * surfaceLevel;
 
     return m_colorConverter.OKLCHToARGB(sfL, surfaceChroma, hue, 255);
-}
-
-std::string ThemeGenerator::GetNeutralColor(double hue, double base, bool isDark, int level)
-{
-    // 使用成员变量计算中性色
-    double neutralChroma = base * m_neutralBaseChroma;
-
-    double bgL;
-    if (isDark) {
-        bgL = m_bgDarkL + base * m_bgDarkLScale;
-    }
-    else {
-        bgL = m_bgLightL + base * m_bgLightLScale;
-    }
-
-    double step = isDark ? m_neutralDarkStep : m_neutralLightStep;
-    double neutralL = bgL + step * (level / 100.0);
-
-    return m_colorConverter.OKLCHToARGB(neutralL, neutralChroma, hue, 255);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark)
@@ -466,12 +435,6 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     std::string bgAddressBarBtnNormal = surface1;
     std::string bgSplitNormal = surface2;
     std::string bgScrollbarBtnArrowNormal = GetStateColor(bgSliderThumbNormal, "pressed", isDark);
-
-    for (int i = 0; i < 16; i++) {
-        std::ostringstream name;
-        name << "--neutral_" << (i * 100);
-        m_generatedColors[name.str()] = GetNeutralColor(hue, base, isDark, i * 100);
-    }
 
     m_generatedColors["--background"] = bgWindowMain;
     m_generatedColors["--foreground"] = fgWindowMain;

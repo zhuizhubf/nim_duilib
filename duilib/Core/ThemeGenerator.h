@@ -115,14 +115,6 @@ public:
      */
     void SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma);
 
-    /** @brief 设置中性色参数
-     *  @param neutralBaseChroma 中性色基础色度系数 (范围: 0.0-2.0, 典型值: 1.5)
-     *  @param neutralLightStep 浅色模式下中性色步长 (范围: 0.0-0.2, 典型值: 0.025)
-     *  @param neutralDarkStep 深色模式下中性色步长 (范围: 0.0-0.2, 典型值: 0.07)
-     *  @note 中性色用于分隔线、边框等，step控制中性色渐变的步进大小
-     */
-    void SetNeutralParams(double neutralBaseChroma, double neutralLightStep, double neutralDarkStep);
-
     /** @brief 设置Accent颜色参数
      *  @param accentLightL 浅色模式下Accent明度 (范围: 0.0-1.0, 典型值: 0.6204)
      *  @param accentDarkL 深色模式下Accent明度 (范围: 0.0-1.0, 典型值: 0.68)
@@ -161,15 +153,6 @@ private:
      *  @details 根据层级递推颜色明暗，浅色主题逐层变暗，深色主题逐层变亮
      */
     std::string GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel);
-
-    /** @brief 获取中性色
-     *  @param hue 色调值(0-360)
-     *  @param base 基础亮度值(0-1)
-     *  @param isDark 是否为暗色主题
-     *  @param level 层级(0-1500)
-     *  @return 中性色的ARGB字符串
-     */
-    std::string GetNeutralColor(double hue, double base, bool isDark, int level);
 
     /** @brief 获取状态变体颜色
      *  @param baseColor 基础颜色
@@ -265,11 +248,6 @@ private:
     double m_surfaceLightOffset; ///< 浅色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.025)
     double m_surfaceDarkOffset;   ///< 深色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.07)
     double m_surfaceBaseChroma;  ///< Surface色度系数 (范围: 0.0-3.0, 默认: 1.5)
-
-    // 中性色参数
-    double m_neutralBaseChroma; ///< 中性色色度系数 (范围: 0.0-3.0, 默认: 1.5)
-    double m_neutralLightStep;   ///< 浅色模式中性色步长 (范围: 0.0-0.2, 默认: 0.025)
-    double m_neutralDarkStep;    ///< 深色模式中性色步长 (范围: 0.0-0.2, 默认: 0.07)
 
     // Accent参数
     double m_accentLightL;      ///< 浅色模式Accent明度 (范围: 0.0-1.0, 默认: 0.6204)
