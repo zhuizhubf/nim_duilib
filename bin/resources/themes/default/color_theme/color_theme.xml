@@ -20,9 +20,9 @@
             </HBox>
         </HBox>
         <GroupHBox class="group_box_round" text="Color Theme Test" height="auto" padding="10,20,6,10" control_padding="false" margin="4,4,4,4">
-            <Button class="btn_primary_global" name="open_theme_manager" text_id="STRID_COLORTHEME_BTN_OPEN_THEME_MGR" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0"/>
-            <Button class="btn_primary_global" name="open_new_window_as_dark" text_id="STRID_COLORTHEME_BTN_OPEN_WND_AS_DARK" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0"/>
-            <Button class="btn_primary_global" name="open_new_window_as_light" text_id="STRID_COLORTHEME_BTN_OPEN_WND_AS_LIGHT" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0"/>
+            <Button class="btn_primary_global" name="open_theme_manager" text_id="STRID_COLORTHEME_BTN_OPEN_THEME_MGR" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0" border_round="4,4"/>
+            <Button class="btn_primary_global" name="open_new_window_as_dark" text_id="STRID_COLORTHEME_BTN_OPEN_WND_AS_DARK" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0" border_round="4,4"/>
+            <Button class="btn_primary_global" name="open_new_window_as_light" text_id="STRID_COLORTHEME_BTN_OPEN_WND_AS_LIGHT" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0" border_round="4,4"/>
             <CheckBox class="checkbox_1" name="gen_color_checkbox" text_id="STRID_COLORTHEME_ENABLE_GEN_THEME" margin="20,0,0,0"/>
         </GroupHBox>
         <GroupHBox class="group_box_round" name="gen_color_groupbox" text="Color Generator" height="auto" padding="10,24,6,10" control_padding="false" 
@@ -49,6 +49,7 @@
                             </VBox>
                         </HBox>
                     </VBox>
+                    <Button class="btn_primary_global" name="btn_copty_xml_data" text_id="STRID_COLORTHEME_COPY_XML" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0" border_round="4,4"/>
                 </HBox>
                 <GroupVBox class="group_box_round" text_id="STRID_COLORTHEME_COLOR_PREVIEW" height="auto" padding="10,30,6,10" control_padding="false">
                     <HBox height="auto" child_margin="4">

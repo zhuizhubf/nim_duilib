@@ -42,6 +42,10 @@ private:
     /** 主题生成器
     */
     std::unique_ptr<ui::ThemeGenerator> m_pThemeGenerator;
+
+    /** 当前预览主题的XML文件数据
+    */
+    std::string m_colorThemeXmlData;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

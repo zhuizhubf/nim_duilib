@@ -26,17 +26,9 @@ void MainForm::OnInitWindow()
     if (pOpenThemeMgrBtn != nullptr) {
         pOpenThemeMgrBtn->AttachClick([](const ui::EventArgs&) {
             //打开主题配色管理器
-            //ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
-            //resourcePath /= ui::FilePath(_T("../../docs/Tools/ColorThemeMgr.html"));
-            //ui::SystemUtil::OpenUrl(resourcePath.NativePath());
-
             ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
-            resourcePath /= ui::FilePath(_T("themes/color_light/global.xml"));
-            ui::ThemeGenerator themeGenerator;
-            bool bRet = themeGenerator.LoadConfigFromXml(resourcePath.NativePathA());
-
-            std::string xmlText = themeGenerator.GenerateTheme(210.0f, 0.01f, false);
-            DString xmlTextW = ui::StringConvert::UTF8ToT(xmlText);
+            resourcePath /= ui::FilePath(_T("../../docs/Tools/ColorThemeMgr.html"));
+            ui::SystemUtil::OpenUrl(resourcePath.NativePath());
             return true;
             });
     }
@@ -143,6 +135,17 @@ void MainForm::OnInitWindow()
         }
         return true;
         });
+
+    //复制XML文件数据
+    ui::Button* pCopyXmlBtn = dynamic_cast<ui::Button*>(FindControl(_T("btn_copty_xml_data")));
+    if (pCopyXmlBtn != nullptr) {
+        pCopyXmlBtn->AttachClick([this](const ui::EventArgs&) {
+            if (!m_colorThemeXmlData.empty()) {
+                ui::Clipboard::SetClipboardText(m_colorThemeXmlData);
+            }
+            return true;
+            });
+    }
 }
 
 void MainForm::OnGenColorEnableStateChanged(bool bEnabled)
@@ -177,19 +180,19 @@ void MainForm::OnGenColorParamChanged()
     if (fHue > 360.0) {
         fHue = 360.0;
     }
-    double fBaseLuminance = pSliderBaseChroma->GetValue() / 10000.0; // [0 - 0.03]
-    if (fBaseLuminance < 0.0) {
-        fBaseLuminance = 0.0;
+    double fBaseChroma = pSliderBaseChroma->GetValue() / 10000.0; // [0 - 0.03]
+    if (fBaseChroma < 0.0) {
+        fBaseChroma = 0.0;
     }
-    if (fBaseLuminance > 1.0) {
-        fBaseLuminance = 1.0;
+    if (fBaseChroma > 1.0) {
+        fBaseChroma = 1.0;
     }
 
     DString hueString = ui::StringUtil::Printf(_T("%.02f"), fHue);
     pLabelHue->SetText(hueString);
 
-    DString baseLuminanceString = ui::StringUtil::Printf(_T("%.04f"), fBaseLuminance);
-    pLabelBaseChroma->SetText(baseLuminanceString);
+    DString baseChromaString = ui::StringUtil::Printf(_T("%.04f"), fBaseChroma);
+    pLabelBaseChroma->SetText(baseChromaString);
 
     if (m_pThemeGenerator == nullptr) {
         //从当前主题加载默认的配置
@@ -224,13 +227,15 @@ void MainForm::OnGenColorParamChanged()
         bDarkMode = true;
     }
 
-    std::string colorThemeXmlData = m_pThemeGenerator->GenerateTheme(fHue, fBaseLuminance, bDarkMode);
+    std::string colorThemeXmlData = m_pThemeGenerator->GenerateTheme(fHue, fBaseChroma, bDarkMode);
     DString testXml = ui::StringConvert::UTF8ToT(colorThemeXmlData);
     ASSERT(!colorThemeXmlData.empty());
+    UNUSED_VARIABLE(testXml);
     if (!colorThemeXmlData.empty()) {
         //加载新的主题颜色配置
         OpenColorThemeData(colorThemeXmlData);
     }
+    m_colorThemeXmlData.swap(colorThemeXmlData);
 
     //更新主色预览区(背景色和对应的前景色)
     std::vector<std::pair<DString, DString>> previewColors;
