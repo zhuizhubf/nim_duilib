@@ -97,7 +97,7 @@ public:
      *  @param bgLightL 浅色模式背景明度基准值 (范围: 0.0-1.0, 典型值: 0.97)
      *  @param bgDarkL 深色模式背景明度基准值 (范围: 0.0-1.0, 典型值: 0.17)
      *  @param bgBaseChroma 背景色基础色度系数 (范围: 0.0-2.0, 典型值: 1.5)
-     *  @note baseChroma越大，背景色越鲜艳，base=0.02时建议用1.5，base=1.0时建议用3.0
+     *  @note baseChroma越大，背景色越鲜艳，base=0.02时建议用1.0，base=1.0时建议用3.0
      */
     void SetBgParams(double bgLightL, double bgDarkL, double bgBaseChroma);
 
@@ -112,7 +112,7 @@ public:
     /** @brief 设置Surface层参数
      *  @param surfaceLightOffset 浅色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.025, 用于使表面变暗)
      *  @param surfaceDarkOffset 深色模式下Surface偏移量 (范围: 0.0-0.2, 典型值: 0.07, 用于使表面变亮)
-     *  @param surfaceBaseChroma Surface基础色度系数 (范围: 0.0-2.0, 典型值: 1.5)
+     *  @param surfaceBaseChroma Surface基础色度系数 (范围: 0.0-2.0, 典型值: 1.0)
      *  @note Surface用于卡片、按钮等元素的背景。浅色模式下offset使表面变暗(L减少)，
      *       深色模式下offset使表面变亮(L增加)，从而形成视觉层次感
      */

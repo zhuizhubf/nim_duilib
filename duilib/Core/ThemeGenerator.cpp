@@ -29,7 +29,7 @@ ThemeGenerator::ThemeGenerator()
     // Surface层参数
     , m_surfaceLightOffset(0.025)
     , m_surfaceDarkOffset(0.07)
-    , m_surfaceBaseChroma(1.5)
+    , m_surfaceBaseChroma(1.0)
     // Accent参数
     , m_accentLightL(0.6204)
     , m_accentDarkL(0.68)
@@ -302,24 +302,37 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
         return textColor;
     }
 
-    double LStep = (bgLuminance > 0.5) ? 0.05 : -0.05;
-    double LTarget = (bgLuminance > 0.5) ? 0.05 : 0.95;
+    // 根据背景明度确定调整方向：
+    // 浅色背景(bgLuminance > 0.5)：需要让文字更暗(L减小)
+    // 深色背景(bgLuminance <= 0.5)：需要让文字更亮(L增大)
+    const bool bgIsLight = (bgLuminance > 0.5);
+    const double LStep = bgIsLight ? -0.05 : 0.05;
 
     const int maxIterations = 50;
     int iteration = 0;
 
     while (iteration < maxIterations) {
-        if ((bgLuminance > 0.5 && L <= LTarget) || (bgLuminance <= 0.5 && L >= LTarget)) {
-            break;
-        }
+        // 调整L值
+        L = L + LStep;
 
-        L = std::max(LTarget, std::min((bgLuminance > 0.5) ? 0.95 : 0.05, L + LStep));
+        // 钳制到 [0, 1] 范围
+        if (L < 0.0) L = 0.0;
+        if (L > 1.0) L = 1.0;
+
+        // 如果已经达到目标方向极端值，停止迭代
+        if (bgIsLight && L <= 0.0) break;
+        if (!bgIsLight && L >= 1.0) break;
 
         std::string testColor = ColorConverter::OKLCHToARGB(L, C, H, alpha);
         contrast = ColorConverter::CalculateContrastRatio(testColor, bgColor);
 
         if (contrast >= minContrast) {
             return testColor;
+        }
+
+        // 如果已无法再继续调整（到达极限），停止
+        if ((bgIsLight && L <= 0.0) || (!bgIsLight && L >= 1.0)) {
+            break;
         }
 
         iteration++;
