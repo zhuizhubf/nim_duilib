@@ -64,7 +64,6 @@
 
 #include "Core/Keycode.h"
 #include "Core/Keyboard.h"
-#include "Core/CursorManager.h"
 #include "Core/DragWindow.h"
 
 #include "Box/VBox.h"
@@ -111,6 +110,7 @@
 #include "Control/BitmapControl.h"
 #include "Control/AddressBar.h"
 #include "Control/ChildWindow.h"
+#include "Control/GroupBox.h"
 
 #include "Control/ListCtrl.h"
 #include "Control/ListCtrlReportView.h"

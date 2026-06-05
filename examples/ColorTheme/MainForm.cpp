@@ -22,6 +22,9 @@ void MainForm::OnInitWindow()
 {
     BaseClass::OnInitWindow();
 
+    //显示所有颜色
+    ShowAllColors();    
+
     ui::Button* pOpenThemeMgrBtn = dynamic_cast<ui::Button*>(FindControl(_T("open_theme_manager")));
     if (pOpenThemeMgrBtn != nullptr) {
         pOpenThemeMgrBtn->AttachClick([](const ui::EventArgs&) {
@@ -266,3 +269,76 @@ void MainForm::OnGenColorParamChanged()
         }
     }
 }
+
+void MainForm::ShowAllColors()
+{
+    ui::Box* pAllColorsBox = dynamic_cast<ui::Box*>(FindControl(_T("all_colors")));
+    if (pAllColorsBox == nullptr) {
+        return;
+    }
+
+    //从当前主题加载默认的配置
+    ui::FilePath globalXmlFileName = ui::FilePath(ui::GlobalManager::Instance().Theme().GetGlobalXmlFileName());
+    ASSERT(!globalXmlFileName.IsEmpty());
+    if (globalXmlFileName.IsEmpty()) {
+        return;
+    }
+
+    ui::FilePath themeFullPath = ui::GlobalManager::Instance().Theme().GetThemeRootPath();
+    themeFullPath /= ui::GlobalManager::Instance().Theme().GetCurrentColorThemeInfo().m_themePath;
+    themeFullPath /= globalXmlFileName;
+
+    ui::WindowBuilder windowBuilder;
+    std::string xmlFileData = windowBuilder.ReadXmlFileData(themeFullPath);
+    ASSERT(!xmlFileData.empty());
+    if (xmlFileData.empty()) {
+        return;
+    }
+
+    ui::ThemeGenerator themeGenerator;
+    if (!themeGenerator.LoadConfigFromXml(xmlFileData)) {
+        return;
+    }
+    //所有颜色
+    std::map<std::string, ui::ThemeColorConfig> themeColorConfigs = themeGenerator.GetLoadedConfigs();
+
+    //按type分组
+    std::map<std::string, ui::GridBox*> themeTypeGroupBoxs;
+    for (const auto& pair : themeColorConfigs) {
+        const std::string& colorName = pair.first;
+        const ui::ThemeColorConfig& colorConfig = pair.second;
+
+        ui::GridBox* pBox = nullptr;
+        auto iter = themeTypeGroupBoxs.find(colorConfig.type);
+        if (iter != themeTypeGroupBoxs.end()) {
+            pBox = iter->second;
+        }
+        else {
+            ui::GroupVBox* pGroupVBox = new ui::GroupVBox(this);
+            pAllColorsBox->AddItem(pGroupVBox);
+            pGroupVBox->SetClass(_T("group_box_round"));
+            pGroupVBox->SetAttribute(_T("height"), _T("auto"));
+            pGroupVBox->SetAttribute(_T("padding"), _T("10,20,10,10"));
+            pGroupVBox->SetAttribute(_T("control_padding"), _T("false"));
+            pGroupVBox->SetText(ui::StringConvert::UTF8ToT(colorConfig.type));
+
+            pBox = new ui::GridBox(this);
+            themeTypeGroupBoxs[colorConfig.type] = pBox;
+            pGroupVBox->AddItem(pBox);
+
+            pBox->SetGridHeight(40, true);
+            pBox->SetGridWidth(300, true);
+            pBox->SetAttribute(_T("width"), _T("auto"));
+            pBox->SetAttribute(_T("height"), _T("auto"));
+            pBox->SetAttribute(_T("child_margin"), _T("8"));
+            pBox->SetAttribute(_T("margin"), _T("10,10,10,10"));
+        }
+
+        ui::Label* pColorLabel = new ui::Label(this);
+        pBox->AddItem(pColorLabel);
+        pColorLabel->SetBkColor(ui::StringConvert::UTF8ToT(colorName));
+        pColorLabel->SetText(ui::StringConvert::UTF8ToT(colorName));
+        pColorLabel->SetToolTipText(ui::StringConvert::UTF8ToT(colorName));
+    }
+}
+

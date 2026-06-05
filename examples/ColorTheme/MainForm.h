@@ -38,6 +38,10 @@ private:
     */
     void OnGenColorParamChanged();
 
+    /** 显示所有颜色
+    */
+    void ShowAllColors();
+
 private:
     /** 主题生成器
     */
