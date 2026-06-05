@@ -26,6 +26,10 @@
     <ThemeColor name="color_red" value="#FFA32929" type="common" category="basic_color" role="semantic_error" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="错误/警告/关闭按钮" comment_en="Error/warning/close button"/>
     <ThemeColor name="color_red_dark" value="#FF521414" type="common" category="basic_color" role="semantic_error_dark" derived_from="color_red" adjust="lightness:-20" fixed="false" support_accent="false" contrast_bg="" comment_cn="红色系pressed" comment_en="Red pressed state"/>
     <ThemeColor name="color_red_light" value="#FFD65C5C" type="common" category="basic_color" role="semantic_error_light" derived_from="color_red" adjust="lightness:+20" fixed="false" support_accent="false" contrast_bg="" comment_cn="红色系hovered" comment_en="Red hovered state"/>
+    <ThemeColor name="color_success" value="#FF22A95B" type="common" category="basic_color" role="semantic_success" derived_from="" adjust="" false="true" support_accent="false" contrast_bg="" comment_cn="成功色" comment_en="Success Color"/>
+    <ThemeColor name="color_warning" value="#FFD08700" type="common" category="basic_color" role="semantic_warning" derived_from="" adjust="" false="true" support_accent="false" contrast_bg="" comment_cn="警告色" comment_en="Warning Color"/>
+    <ThemeColor name="color_error" value="#FFE85854" type="common" category="basic_color" role="semantic_error" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="失败/错误/危险色" comment_en="Error Color"/>
+    <ThemeColor name="color_accent" value="#FF0078D4" type="common" category="basic_color" role="semantic_accent" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="强调色" comment_en="Accent Color"/>
 
     <!-- ===================== 窗口相关颜色 (type: window) ===================== -->
     <ThemeColor name="bg_window_main" value="#FFF4F4F4" type="window" category="bg_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="主窗口/面板背景" comment_en="Main window/panel background"/>
