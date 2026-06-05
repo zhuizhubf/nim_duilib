@@ -78,17 +78,7 @@ public:
      */
     std::string GenerateTheme(double hue, double base, bool isDark);
 
-    /** @brief 获取生成的指定颜色
-     *  @param colorName 颜色名称
-     *  @return 颜色的ARGB字符串，如"#FF123456"
-     */
-    std::string GetGeneratedColor(const std::string& colorName) const;
-
-    /** @brief 获取已加载的颜色配置
-     *  @return 颜色配置映射表
-     */
-    std::map<std::string, ThemeColorConfig> GetLoadedConfigs() const { return m_loadedConfigs; }
-
+public:
     // ==================== 颜色算法参数设置函数 ====================
     // 注意: 所有L值(明度)范围为0.0-1.0, C值(色度)范围为0.0-0.4+
     //       base参数范围为0.0-1.0，控制颜色的鲜艳程度
@@ -187,6 +177,18 @@ public:
 
     /** @brief 重置所有参数为默认值 */
     void ResetParams();
+
+public:
+    /** @brief 获取生成的指定颜色
+     *  @param colorName 颜色名称
+     *  @return 颜色的ARGB字符串，如"#FF123456"
+     */
+    std::string GetGeneratedColor(const std::string& colorName) const;
+
+    /** @brief 获取已加载的颜色配置
+     *  @return 颜色配置映射表
+     */
+    std::map<std::string, ThemeColorConfig> GetLoadedConfigs() const { return m_loadedConfigs; }
 
 private:
 
