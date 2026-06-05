@@ -34,6 +34,10 @@ ThemeGenerator::ThemeGenerator()
     , m_accentLightL(0.6204)
     , m_accentDarkL(0.68)
     , m_accentC(0.195)
+    // 带彩色选项（默认全部为true）
+    , m_bgColored(true)
+    , m_fgColored(true)
+    , m_surfaceColored(true)
 {
 }
 
@@ -69,19 +73,83 @@ void ThemeGenerator::SetAccentParams(double accentLightL, double accentDarkL, do
     m_accentC = accentC;
 }
 
+void ThemeGenerator::GetBgParams(double& bgLightL, double& bgDarkL, double& bgBaseChroma) const
+{
+    bgLightL = m_bgLightL;
+    bgDarkL = m_bgDarkL;
+    bgBaseChroma = m_bgBaseChroma;
+}
+
+void ThemeGenerator::GetFgParams(double& fgLightL, double& fgDarkL, double& fgBaseChroma) const
+{
+    fgLightL = m_fgLightL;
+    fgDarkL = m_fgDarkL;
+    fgBaseChroma = m_fgBaseChroma;
+}
+
+void ThemeGenerator::GetSurfaceParams(double& surfaceLightOffset, double& surfaceDarkOffset, double& surfaceBaseChroma) const
+{
+    surfaceLightOffset = m_surfaceLightOffset;
+    surfaceDarkOffset = m_surfaceDarkOffset;
+    surfaceBaseChroma = m_surfaceBaseChroma;
+}
+
+void ThemeGenerator::GetAccentParams(double& accentLightL, double& accentDarkL, double& accentC) const
+{
+    accentLightL = m_accentLightL;
+    accentDarkL = m_accentDarkL;
+    accentC = m_accentC;
+}
+
+void ThemeGenerator::SetBgColored(bool colored)
+{
+    m_bgColored = colored;
+}
+
+bool ThemeGenerator::IsBgColored() const
+{
+    return m_bgColored;
+}
+
+void ThemeGenerator::SetFgColored(bool colored)
+{
+    m_fgColored = colored;
+}
+
+bool ThemeGenerator::IsFgColored() const
+{
+    return m_fgColored;
+}
+
+void ThemeGenerator::SetSurfaceColored(bool colored)
+{
+    m_surfaceColored = colored;
+}
+
+bool ThemeGenerator::IsSurfaceColored() const
+{
+    return m_surfaceColored;
+}
+
 void ThemeGenerator::ResetParams()
 {
     // 重置所有参数为默认值
-    SetBgParams(0.97, 0.17, 1.5);
+    SetBgParams(0.97, 0.17, 1.0);
     SetFgParams(0.22, 0.92, 0.15);
-    SetSurfaceParams(0.025, 0.07, 1.5);
+    SetSurfaceParams(0.025, 0.07, 1.0);
     SetAccentParams(0.6204, 0.68, 0.195);
+    // 重置带彩色选项为默认值
+    m_bgColored = true;
+    m_fgColored = true;
+    m_surfaceColored = true;
 }
 
 std::string ThemeGenerator::GetBackgroundColor(double hue, double base, bool isDark)
 {
     // 使用成员变量计算背景色
-    double baseChroma = base * m_bgBaseChroma;
+    double baseChroma = m_bgColored ? (base * m_bgBaseChroma) : 0.0;
+    // 实际使用的色相值，无彩色时色相不影响结果
+    double effectiveHue = m_bgColored ? hue : 0.0;
 
     double bgL;
     if (isDark) {
@@ -91,13 +159,14 @@ std::string ThemeGenerator::GetBackgroundColor(double hue, double base, bool isD
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
-    return ColorConverter::OKLCHToARGB(bgL, baseChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(bgL, baseChroma, effectiveHue, 255);
 }
 
 std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isDark)
 {
     // 使用成员变量计算前景色
-    double fgChroma = base * m_fgBaseChroma;
+    double fgChroma = m_fgColored ? (base * m_fgBaseChroma) : 0.0;
+    double effectiveHue = m_fgColored ? hue : 0.0;
 
     double fgL;
     if (isDark) {
@@ -107,13 +176,14 @@ std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isD
         fgL = m_fgLightL + base * m_fgLightLScale;
     }
 
-    return ColorConverter::OKLCHToARGB(fgL, fgChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(fgL, fgChroma, effectiveHue, 255);
 }
 
 std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark, int surfaceLevel)
 {
     // 使用成员变量计算Surface颜色
-    double surfaceChroma = base * m_surfaceBaseChroma;
+    double surfaceChroma = m_surfaceColored ? (base * m_surfaceBaseChroma) : 0.0;
+    double effectiveHue = m_surfaceColored ? hue : 0.0;
 
     double bgL;
     if (isDark) {
@@ -128,7 +198,7 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     double offset = isDark ? m_surfaceDarkOffset : -m_surfaceLightOffset;
     double sfL = bgL + offset * surfaceLevel;
 
-    return ColorConverter::OKLCHToARGB(sfL, surfaceChroma, hue, 255);
+    return ColorConverter::OKLCHToARGB(sfL, surfaceChroma, effectiveHue, 255);
 }
 
 std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const

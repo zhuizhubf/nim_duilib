@@ -93,7 +93,7 @@ public:
     // 注意: 所有L值(明度)范围为0.0-1.0, C值(色度)范围为0.0-0.4+
     //       base参数范围为0.0-1.0，控制颜色的鲜艳程度
 
-    /** @brief 设置背景色参数
+    /** @brief 设置背景色参数（带彩色）
      *  @param bgLightL 浅色模式背景明度基准值 (范围: 0.0-1.0, 典型值: 0.97)
      *  @param bgDarkL 深色模式背景明度基准值 (范围: 0.0-1.0, 典型值: 0.17)
      *  @param bgBaseChroma 背景色基础色度系数 (范围: 0.0-2.0, 典型值: 1.5)
@@ -125,6 +125,65 @@ public:
      *  @note Accent是主题的强调色，用于按钮、链接等关键元素
      */
     void SetAccentParams(double accentLightL, double accentDarkL, double accentC);
+
+    // ==================== 颜色算法参数获取函数 ====================
+
+    /** @brief 获取背景色参数
+     *  @param bgLightL 输出浅色模式背景明度基准值
+     *  @param bgDarkL 输出深色模式背景明度基准值
+     *  @param bgBaseChroma 输出背景色基础色度系数
+     */
+    void GetBgParams(double& bgLightL, double& bgDarkL, double& bgBaseChroma) const;
+
+    /** @brief 获取前景色参数
+     *  @param fgLightL 输出浅色模式前景明度基准值
+     *  @param fgDarkL 输出深色模式前景明度基准值
+     *  @param fgBaseChroma 输出前景色基础色度系数
+     */
+    void GetFgParams(double& fgLightL, double& fgDarkL, double& fgBaseChroma) const;
+
+    /** @brief 获取Surface层参数
+     *  @param surfaceLightOffset 输出浅色模式Surface偏移量
+     *  @param surfaceDarkOffset 输出深色模式Surface偏移量
+     *  @param surfaceBaseChroma 输出Surface基础色度系数
+     */
+    void GetSurfaceParams(double& surfaceLightOffset, double& surfaceDarkOffset, double& surfaceBaseChroma) const;
+
+    /** @brief 获取Accent颜色参数
+     *  @param accentLightL 输出浅色模式Accent明度
+     *  @param accentDarkL 输出深色模式Accent明度
+     *  @param accentC 输出Accent色度值
+     */
+    void GetAccentParams(double& accentLightL, double& accentDarkL, double& accentC) const;
+
+    // ==================== 颜色带彩色/不带彩色选项 ====================
+
+    /** @brief 设置背景色是否带彩色
+     *  @param colored true=带彩色（应用色相），false=无彩色（灰度）
+     *  @note 默认值为true。设为false后，背景色将退化为灰度色
+     */
+    void SetBgColored(bool colored);
+
+    /** @brief 获取背景色是否带彩色 */
+    bool IsBgColored() const;
+
+    /** @brief 设置前景色是否带彩色
+     *  @param colored true=带彩色（应用色相），false=无彩色（灰度）
+     *  @note 默认值为true。前景通常建议保持带彩色以增强可读性
+     */
+    void SetFgColored(bool colored);
+
+    /** @brief 获取前景色是否带彩色 */
+    bool IsFgColored() const;
+
+    /** @brief 设置Surface层是否带彩色
+     *  @param colored true=带彩色（应用色相），false=无彩色（灰度）
+     *  @note 默认值为true
+     */
+    void SetSurfaceColored(bool colored);
+
+    /** @brief 获取Surface层是否带彩色 */
+    bool IsSurfaceColored() const;
 
     /** @brief 重置所有参数为默认值 */
     void ResetParams();
@@ -254,6 +313,11 @@ private:
     double m_accentLightL;      ///< 浅色模式Accent明度 (范围: 0.0-1.0, 默认: 0.6204)
     double m_accentDarkL;       ///< 深色模式Accent明度 (范围: 0.0-1.0, 默认: 0.68)
     double m_accentC;           ///< Accent色度 (范围: 0.0-0.4, 默认: 0.195)
+
+    // 带彩色/无彩色选项 (默认全部为true，即带彩色)
+    bool m_bgColored;           ///< 背景色是否带彩色 (true=带彩色, false=无彩色)
+    bool m_fgColored;           ///< 前景色是否带彩色 (true=带彩色, false=无彩色)
+    bool m_surfaceColored;      ///< Surface层是否带彩色 (true=带彩色, false=无彩色)
 };
 
 }

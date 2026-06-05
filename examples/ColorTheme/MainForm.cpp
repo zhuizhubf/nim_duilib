@@ -139,6 +139,29 @@ void MainForm::OnInitWindow()
         return true;
         });
 
+    //仅使用中性色
+    ui::CheckBox* pGenNeutralColorCheckBox = dynamic_cast<ui::CheckBox*>(FindControl(_T("gen_color_neutral_mode")));
+    if (pGenNeutralColorCheckBox != nullptr) {
+        pGenNeutralColorCheckBox->AttachSelect([this](const ui::EventArgs&) {
+            if (m_pThemeGenerator != nullptr) {
+                m_pThemeGenerator->SetBgColored(false);
+                m_pThemeGenerator->SetFgColored(false);
+                m_pThemeGenerator->SetSurfaceColored(false);
+                OnGenColorEnableStateChanged(true);
+            }            
+            return true;
+            });
+        pGenNeutralColorCheckBox->AttachUnSelect([this](const ui::EventArgs&) {
+            if (m_pThemeGenerator != nullptr) {
+                m_pThemeGenerator->SetBgColored(true);
+                m_pThemeGenerator->SetFgColored(true);
+                m_pThemeGenerator->SetSurfaceColored(true);
+                OnGenColorEnableStateChanged(true);
+            }
+            return true;
+            });
+    }
+
     //复制XML文件数据
     ui::Button* pCopyXmlBtn = dynamic_cast<ui::Button*>(FindControl(_T("btn_copty_xml_data")));
     if (pCopyXmlBtn != nullptr) {

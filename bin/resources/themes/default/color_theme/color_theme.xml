@@ -53,6 +53,7 @@
                             </VBox>
                         </HBox>
                     </VBox>
+                    <CheckBox class="checkbox_1" name="gen_color_neutral_mode" text_id="STRID_COLORTHEME_GEN_NEUTRAL_MODE" margin="10,0,0,0" valign="center"/>
                     <Button class="btn_primary_global" name="btn_copty_xml_data" text_id="STRID_COLORTHEME_COPY_XML" height="32" width="auto" margin="4,0,4,0" text_padding="10,0,10,0" border_round="4,4"/>
                 </HBox>
                 <GroupVBox class="group_box_round" text_id="STRID_COLORTHEME_COLOR_PREVIEW" height="auto" padding="10,30,6,10" control_padding="false">
