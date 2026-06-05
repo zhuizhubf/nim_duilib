@@ -262,7 +262,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
 
 std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const
 {
-    std::vector<std::string> states = {"_normal", "_disabled", "_pressed", "_hovered", "_selected", "_prompt" , "_focused" };
+    std::vector<std::string> states = {"_default", "_normal", "_disabled", "_pressed", "_hovered", "_selected", "_prompt" , "_focused" };
     for (const auto& state : states) {
         size_t pos = colorName.rfind(state);
         if (pos != std::string::npos) {
@@ -377,131 +377,97 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--warning"] = ColorConverter::OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
     m_generatedColors["--error"] = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
 
-    // 窗口和基础文本颜色
-    m_generatedColors["bg_window_main"] = backgroundColor;
-    m_generatedColors["text_default"] = foregroundColor;
-    m_generatedColors["text_muted"] = GetStateColor(foregroundColor, "disabled", isDark);
-    m_generatedColors["text_btn_normal"] = foregroundColor;
-    m_generatedColors["text_btn_disabled"] = GetStateColor(foregroundColor, "disabled", isDark);
+    //筛选出需要处理的颜色
+    std::map<std::string, ThemeColorConfig> generatedConfigs;
+    for (const auto& pair : m_loadedConfigs) {
+        const std::string& colorName = pair.first;
+        const ThemeColorConfig& attrs = pair.second;
+        if (attrs.fixed) {
+            //固定属性，不需要生成颜色
+            //continue;
+        }
+        if (attrs.category == "basic_color") {
+            //基础色，不需要生成颜色
+            continue;
+        }
+        if (!attrs.derived_from.empty()) {
+            //继承自其他颜色的颜色，不需要生成颜色
+            continue;
+        }
+        if (!attrs.m_state.empty()) {
+            //有状态的颜色，按BaseName生成
+            generatedConfigs[attrs.m_baseName] = attrs;
+            if ((attrs.m_state == "normal") || (attrs.m_state == "default")) {                       
+                generatedConfigs[colorName] = attrs; //仅保留正常状态的颜色值
+            }
+        }
+        else {
+            generatedConfigs[colorName] = attrs;
+        }
+    }
 
-    // 主按钮文本
-    m_generatedColors["text_primary_btn_normal"] = accentForeground;
-    m_generatedColors["text_primary_btn_disabled"] = GetStateColor(accentForeground, "disabled", isDark);
+    //根据规则生成颜色
+    for (const auto& pair : generatedConfigs) {
+        const std::string& colorName = pair.first;
+        const ThemeColorConfig& attrs = pair.second;
+        std::string colorValue;
+        if (attrs.support_accent) {
+            //支持强调色的，使用强调色
+            colorValue = accentColor;            
+        }
+        else if (attrs.category == "bg_color") {
+            //背景色
+            colorValue = backgroundColor;
+        }
+        else if (attrs.category == "border_color") {
+            //边框色
+            colorValue = surface1;
+        }
+        else if (attrs.category == "text_color") {
+            //文本颜色
+            colorValue = foregroundColor;
+        }
+        if (!colorValue.empty()) {
+            if (!attrs.m_state.empty()) {
+                m_generatedColors[attrs.m_baseName] = colorValue;
+            }
+            m_generatedColors[colorName] = colorValue;
+        }
+    }
 
-    // 链接文本
-    m_generatedColors["text_link_normal"] = accentColor;
-    m_generatedColors["text_link_hovered"] = GetStateColor(accentColor, "hovered", isDark);
-    m_generatedColors["text_link_pressed"] = GetStateColor(accentColor, "pressed", isDark);
+    //固定色设置
+    //
+    //窗口关闭按钮
+    m_generatedColors["bg_btn_window_close"] = m_generatedColors["--error"];
 
-    // 富文本框提示文本
-    m_generatedColors["text_richedit_prompt"] = GetStateColor(foregroundColor, "disabled", isDark);
+    //常用背景和边框
+    m_generatedColors["bg_titlebar"] = surface2;
+    m_generatedColors["bg_window_card"] = surface0;
+    m_generatedColors["bg_container"] = surface0;
+    m_generatedColors["bg_content"] = surface0;
+    m_generatedColors["bg_overlay"] = surface0;
+    m_generatedColors["bg_header"] = surface2;
 
-    // 属性网格文本
-    m_generatedColors["text_property_grid_header"] = foregroundColor;
+    m_generatedColors["border_window"] = surface3;
 
-    // 主按钮（蓝色按钮）
-    m_generatedColors["color_blue"] = accentColor;
-    m_generatedColors["color_blue_dark"] = GetStateColor(accentColor, "pressed", isDark);
-    m_generatedColors["color_blue_light"] = GetStateColor(accentColor, "hovered", isDark);
-    m_generatedColors["bg_primary_btn_normal"] = accentColor;
-    m_generatedColors["bg_primary_btn_hovered"] = GetStateColor(accentColor, "hovered", isDark);
-    m_generatedColors["bg_primary_btn_pressed"] = GetStateColor(accentColor, "pressed", isDark);
-    m_generatedColors["bg_primary_btn_disabled"] = GetStateColor(accentColor, "disabled", isDark);
-    m_generatedColors["border_primary_btn_normal"] = GetStateColor(accentColor, "pressed", isDark);
-    m_generatedColors["border_primary_btn_hovered"] = GetStateColor(accentColor, "hovered", isDark);
-    m_generatedColors["border_primary_btn_pressed"] = GetStateColor(accentColor, "pressed", isDark);
-    m_generatedColors["border_primary_btn_disabled"] = GetStateColor(accentColor, "disabled", isDark);
-
-    // 聚焦边框
-    m_generatedColors["border_control_focused"] = accentColor;
-    m_generatedColors["border_richedit_focused"] = accentColor;
-    m_generatedColors["border_richedit_bottom_focused"] = accentColor;
-    m_generatedColors["border_list_ctrl_frame_selected"] = accentColor;
-    m_generatedColors["bg_list_ctrl_frame_selected"] = GetStateColor(accentColor, "hovered", isDark);
-
-    // 普通按钮
-    m_generatedColors["bg_btn_normal"] = surface1;
-    m_generatedColors["bg_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
-    m_generatedColors["bg_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
-
-    // 窗口按钮
-    m_generatedColors["bg_btn_window_normal"] = surface1;
-    m_generatedColors["bg_btn_window_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_btn_window_pressed"] = GetStateColor(surface1, "pressed", isDark);
-
-    // 滚动条按钮
-    m_generatedColors["bg_scrollbar_btn_normal"] = surface2;
-    m_generatedColors["bg_scrollbar_btn_hovered"] = GetStateColor(surface2, "hovered", isDark);
-    m_generatedColors["bg_scrollbar_btn_pressed"] = GetStateColor(surface2, "pressed", isDark);
-    m_generatedColors["bg_scrollbar_btn_arrow_normal"] = GetStateColor(accentColor, "pressed", isDark);
-    m_generatedColors["bg_slider"] = surface2;
-    m_generatedColors["bg_slider_thumb"] = accentColor;
-    m_generatedColors["bg_scrollbar_normal"] = surface2;
-    m_generatedColors["bg_scrollbar_thumb_normal"] = surface2;
-
-    // 菜单
-    m_generatedColors["bg_menu_item_normal"] = surface0;
-    m_generatedColors["bg_menu_item_hovered"] = GetStateColor(surface0, "hovered", isDark);
-    m_generatedColors["bg_menu_item_pressed"] = GetStateColor(surface0, "pressed", isDark);
-    m_generatedColors["bg_menu_item_selected"] = GetStateColor(surface0, "selected", isDark);
-    m_generatedColors["bg_menu_bar"] = surface1;
-    m_generatedColors["bg_menu_bar_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_menu_bar_pressed"] = GetStateColor(surface1, "pressed", isDark);
-
-    // 列表项
-    m_generatedColors["bg_list_item_normal"] = surface1;
-    m_generatedColors["bg_list_item_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_list_item_pressed"] = GetStateColor(surface1, "pressed", isDark);
-    m_generatedColors["bg_list_item_selected"] = GetStateColor(surface1, "selected", isDark);
-    m_generatedColors["bg_list_item_disabled"] = GetStateColor(surface1, "disabled", isDark);
-    m_generatedColors["bg_list_ctrl_header"] = surface1;
-    m_generatedColors["bg_list_ctrl_item_normal"] = surface1;
-
-    // 树形控件
-    m_generatedColors["bg_tree_view_node_normal"] = surface1;
-    m_generatedColors["bg_tree_view_node_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_tree_view_node_pressed"] = GetStateColor(surface1, "pressed", isDark);
-    m_generatedColors["bg_tree_view_node_selected"] = GetStateColor(surface1, "selected", isDark);
-    m_generatedColors["bg_tree_view_node_disabled"] = GetStateColor(surface1, "disabled", isDark);
-
-    // 组合框
-    m_generatedColors["bg_combo"] = surface0;
-    m_generatedColors["bg_combo_btn_normal"] = surface1;
-    m_generatedColors["bg_combo_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_combo_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
-    m_generatedColors["bg_combo_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
-    m_generatedColors["border_combo_normal"] = surface2;
-
-    // 富文本框
+    //编辑框背景
     m_generatedColors["bg_richedit"] = surface0;
-    m_generatedColors["bg_richedit_btn_normal"] = surface1;
-    m_generatedColors["bg_richedit_btn_hovered"] = GetStateColor(surface1, "hovered", isDark);
-    m_generatedColors["bg_richedit_btn_pressed"] = GetStateColor(surface1, "pressed", isDark);
-    m_generatedColors["bg_richedit_btn_disabled"] = GetStateColor(surface1, "disabled", isDark);
-    m_generatedColors["border_richedit_normal"] = surface2;
+    //地址栏背景
+    m_generatedColors["bg_address_bar"] = surface0;
+    //列表容器
+    m_generatedColors["bg_list"] = surface0;
 
-    // Tab页
-    m_generatedColors["bg_tab_ctrl_item_close_normal"] = surface2;
-    m_generatedColors["bg_tab_ctrl_item_close_hovered"] = GetStateColor(surface2, "hovered", isDark);
-    m_generatedColors["bg_tab_ctrl_item_close_pressed"] = GetStateColor(surface2, "pressed", isDark);
-    m_generatedColors["bg_tab_ctrl_item_normal"] = surface0;
-    m_generatedColors["bg_tab_ctrl"] = surface0;
-    m_generatedColors["border_tab_ctrl_item"] = surface2;
+    m_generatedColors["bg_list_ctrl"] = surface0;
+    m_generatedColors["bg_list_ctrl_view"] = surface0;
 
-    // 地址栏
-    m_generatedColors["bg_address_bar"] = surface1;
-    m_generatedColors["border_address_bar"] = surface2;
-    m_generatedColors["bg_address_bar_btn_normal"] = surface1;
+    m_generatedColors["bg_tree_view"] = surface0;
 
-    // 属性网格和分隔条
-    m_generatedColors["bg_property_grid"] = surface1;
+    //进度条背景
+    m_generatedColors["bg_progress_track"] = surface2;
+
+    //分割线颜色
     m_generatedColors["bg_split_normal"] = surface2;
-
-    // 边框颜色
-    m_generatedColors["border_normal"] = GetStateColor(surface2, "pressed", isDark);
-    m_generatedColors["border_control_normal"] = surface2;
-    m_generatedColors["border_btn_normal"] = surface2;
+    m_generatedColors["border_split_level2"] = surface2;
 }
 
 std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) const
@@ -617,126 +583,84 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
 {
     std::map<std::string, std::string> processedColors;
 
-    // 第一步：处理所有颜色配置
+    // 优先使用生成的核心颜色
     for (const auto& pair : m_loadedConfigs) {
         const std::string& colorName = pair.first;
-        const ThemeColorConfig& attrs = pair.second;
-
-        // 优先使用生成的核心颜色
         auto iter = m_generatedColors.find(colorName);
         if (iter != m_generatedColors.end()) {
             processedColors[colorName] = iter->second;
+        }
+    }
+
+    // 第1步：处理所有颜色配置的变体颜色
+    for (const auto& pair : m_loadedConfigs) {
+        const std::string& colorName = pair.first;
+
+        //已经生成的，不重复计算
+        auto iter = processedColors.find(colorName);
+        if (iter != processedColors.end()) {
             continue;
         }
 
-        // 检测状态变体颜色
+        //处理状态变体颜色
         auto [state, baseName] = DetectColorState(colorName);
-        std::string adjust = attrs.adjust;
-
         if (!state.empty()) {
-            std::string baseColor;
+            std::string baseColor;//基准色（用于计算状态变体颜色）
             if (processedColors.find(baseName) != processedColors.end()) {
                 baseColor = processedColors[baseName];
             }
             else if (m_generatedColors.find(baseName) != m_generatedColors.end()) {
                 baseColor = m_generatedColors.find(baseName)->second;
             }
-            else {
-                std::string derivedFrom = attrs.derived_from;
-                if (!derivedFrom.empty()) {
-                    if (processedColors.find(derivedFrom) != processedColors.end()) {
-                        baseColor = processedColors[derivedFrom];
-                    }
-                    else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
-                        baseColor = m_generatedColors.find(derivedFrom)->second;
-                    }
-                }
-            }
-
             if (!baseColor.empty()) {
-                if (!adjust.empty()) {
-                    std::string adjusted = ApplyAdjustments(baseColor, adjust);
-                    processedColors[colorName] = GetStateColor(adjusted, state, isDark);
-                }
-                else {
-                    processedColors[colorName] = GetStateColor(baseColor, state, isDark);
-                }
-                continue;
+                processedColors[colorName] = GetStateColor(baseColor, state, isDark);
             }
-        }
-
-        // 处理派生颜色和调整
-        std::string originalValue = attrs.value;
-        if (!originalValue.empty()) {
-            uint8_t a, r, g, b;
-            if (ColorConverter::ParseHexColor(originalValue, a, r, g, b)) {
-                bool isSvgOrColor = (colorName.substr(0, 9) == "border_svg") || (colorName.substr(0, 6) == "color_");
-
-                if (isSvgOrColor) {
-                    std::string lowerName = colorName;
-                    std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-                        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-
-                    if (lowerName.find("white") != std::string::npos || lowerName.find("black") != std::string::npos) {
-                        if (!isDark) {
-                            if (lowerName.find("white") != std::string::npos) {
-                                processedColors[colorName] = GetGeneratedColor("--foreground");
-                            }
-                            else {
-                                processedColors[colorName] = GetGeneratedColor("bg_window_main");
-                            }
-                        }
-                        else {
-                            if (lowerName.find("white") != std::string::npos) {
-                                processedColors[colorName] = GetGeneratedColor("bg_window_main");
-                            }
-                            else {
-                                processedColors[colorName] = GetGeneratedColor("--foreground");
-                            }
-                        }
-                        continue;
-                    }
-                }
-
-                std::string derivedFrom = attrs.derived_from;
-
-                if (!derivedFrom.empty()) {
-                    std::string baseColor;
-                    if (processedColors.find(derivedFrom) != processedColors.end()) {
-                        baseColor = processedColors[derivedFrom];
-                    }
-                    else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
-                        baseColor = GetGeneratedColor(derivedFrom);
-                    }
-
-                    if (!baseColor.empty()) {
-                        if (!adjust.empty()) {
-                            processedColors[colorName] = ApplyAdjustments(baseColor, adjust);
-                        }
-                        else {
-                            processedColors[colorName] = baseColor;
-                        }
-                        continue;
-                    }
-                }
-
-                if (!adjust.empty()) {
-                    processedColors[colorName] = ApplyAdjustments(originalValue, adjust);
-                }
-                else {
-                    processedColors[colorName] = originalValue;
-                }
-            }
-            else {
-                processedColors[colorName] = originalValue;
-            }
-        }
-        else {
-            processedColors[colorName] = originalValue;
         }
     }
 
-    // 第二步：对比度检查和修正
+    //第2步：处理派生颜色
+    for (const auto& pair : m_loadedConfigs) {
+        const std::string& colorName = pair.first;
+        const ThemeColorConfig& attrs = pair.second;
+
+        std::string derivedFrom = attrs.derived_from;
+        if (derivedFrom.empty()) {
+            //非派生颜色
+            continue;
+        }
+
+        //处理派生颜色
+        std::string baseColor;//基准色（用于计算派生颜色）
+        if (processedColors.find(derivedFrom) != processedColors.end()) {
+            baseColor = processedColors[derivedFrom];
+        }
+        else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
+            baseColor = m_generatedColors.find(derivedFrom)->second;
+        }
+        if (baseColor.empty()) {
+            auto [derivedFromState, derivedFromBaseName] = DetectColorState(derivedFrom);
+            if (!derivedFromState.empty()) {
+                if (processedColors.find(derivedFromBaseName) != processedColors.end()) {
+                    baseColor = processedColors[derivedFromBaseName];
+                }
+                else if (m_generatedColors.find(derivedFromBaseName) != m_generatedColors.end()) {
+                    baseColor = m_generatedColors.find(derivedFromBaseName)->second;
+                }
+            }
+        }
+
+        if (!baseColor.empty()) {
+            std::string adjust = attrs.adjust;
+            if (!adjust.empty()) {
+                processedColors[colorName] = ApplyAdjustments(baseColor, adjust);
+            }
+            else {
+                processedColors[colorName] = baseColor;
+            }
+        }
+    }
+
+    // 第3步：对比度检查和修正
     // 对所有processedColors中的颜色进行检查（只要在loadedConfigs中配置了contrast_bg）
     for (const auto& pair : processedColors) {
         const std::string& colorName = pair.first;
@@ -751,33 +675,46 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
             continue;
         }
 
-        std::string contrastBgStr = attrs.contrast_bg;
-        size_t commaPos = contrastBgStr.find(',');
-        if (commaPos != std::string::npos) {
-            contrastBgStr = contrastBgStr.substr(0, commaPos);
-        }
-
-        while (!contrastBgStr.empty() && (contrastBgStr[0] == ' ' || contrastBgStr[0] == '\t')) {
-            contrastBgStr = contrastBgStr.substr(1);
-        }
-        while (!contrastBgStr.empty() && (contrastBgStr.back() == ' ' || contrastBgStr.back() == '\t')) {
-            contrastBgStr.pop_back();
-        }
-
-        auto itBg = processedColors.find(contrastBgStr);
-        auto itColor = processedColors.find(colorName);
-
-        if (itBg != processedColors.end() && itColor != processedColors.end()) {
-            std::string textColor = itColor->second;
-            std::string bgColor = itBg->second;
-            std::string corrected = EnsureContrast(textColor, bgColor, 4.5);
-            if (!corrected.empty()) {
-                processedColors[colorName] = corrected;
+        std::list<std::string> contrastBgList = StringUtil::Split(attrs.contrast_bg, ",");
+        for (std::string& contrastBg : contrastBgList) {
+            StringUtil::Trim(contrastBg);
+            if (!contrastBg.empty()) {
+                auto itBg = processedColors.find(contrastBg);
+                auto itColor = processedColors.find(colorName);
+                if (itBg != processedColors.end() && itColor != processedColors.end()) {
+                    std::string textColor = itColor->second;
+                    std::string bgColor = itBg->second;
+                    std::string corrected = EnsureContrast(textColor, bgColor, 4.5);
+                    if (!corrected.empty()) {
+                        processedColors[colorName] = corrected;
+                    }
+                }
             }
         }
     }
 
-    // 第三步：补充缺失的颜色
+    // 第4步：保留原颜色的透明度
+    for (const auto& pair : m_loadedConfigs) {
+        const std::string& colorName = pair.first;
+        auto iter = processedColors.find(colorName);
+        if (iter != processedColors.end()) {
+            std::string oldColor = pair.second.value;
+            std::string newColor = iter->second;
+            uint8_t alpha, r, g, b;
+            if (ColorConverter::ParseHexColor(newColor, alpha, r, g, b)) {
+                if (alpha == 255) {
+                    uint8_t alpha0, r0, g0, b0;
+                    if (ColorConverter::ParseHexColor(oldColor, alpha0, r0, g0, b0)) {
+                        if (alpha0 != alpha) {
+                            iter->second = ColorConverter::RGBToHex(alpha0, r, g, b);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 第5步：补充缺失的颜色
     for (const auto& pair : m_loadedConfigs) {
         const std::string& colorName = pair.first;
         if (processedColors.find(colorName) == processedColors.end()) {
@@ -785,7 +722,7 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         }
     }
 
-    // 第四步：精确替换原始XML中的value值（保持原始格式和顺序）
+    // 第6步：精确替换原始XML中的value值（保持原始格式和顺序）
     std::string result = m_originalXmlContent;
 
     for (const auto& pair : processedColors) {

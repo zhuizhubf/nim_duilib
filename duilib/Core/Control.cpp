@@ -4030,18 +4030,22 @@ void Control::DoPaintFocusRect(IRender* pRender)
     if (pRenderFactory == nullptr) {
         return;
     }
-    float fWidth =  Dpi().GetScaleFloat(1.0f); //画笔宽度
+    float fWidth =  Dpi().GetScaleFloat(1.5f); //画笔宽度
     UiColor dwBorderColor;//画笔颜色
     DString focusRectColor = GetFocusedRectColor();
     if (!focusRectColor.empty()) {
         dwBorderColor = GetUiColor(focusRectColor);
     }
+    if (dwBorderColor.IsEmpty()) {
+        //默认聚焦状态的矩形边框颜色
+        dwBorderColor = GetUiColor(_T("border_focus_ring"));
+    }
     if(dwBorderColor.IsEmpty()) {
         dwBorderColor = UiColor(UiColors::Gray);
     }
-    UiRect rcBorderSize(1, 1, 1, 1);
+    UiRect rcBorderSize(1, 1, 1, 1); //功能开关
     UiRect rcFocusRect = GetRect();
-    int32_t nFocusWidth = Dpi().GetScaleInt(2); //矩形间隙
+    int32_t nFocusWidth = Dpi().GetScaleInt(3); //矩形间隙
     rcFocusRect.Deflate(nFocusWidth, nFocusWidth);
     if (rcFocusRect.IsEmpty()) {
         return;

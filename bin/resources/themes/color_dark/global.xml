@@ -50,7 +50,7 @@
     <ThemeColor name="border_control_pressed" value="#FF676767" type="control" category="border_color" role="primary" derived_from="border_control_normal" adjust="lightness:+18" fixed="false" support_accent="true" contrast_bg="" comment_cn="通用控件点击边框" comment_en="General control pressed border"/>
     <ThemeColor name="border_control_hovered" value="#FF585858" type="control" category="border_color" role="neutral" derived_from="border_control_normal" adjust="lightness:+12" fixed="false" support_accent="false" contrast_bg="" comment_cn="通用控件悬浮边框" comment_en="General control hovered border"/>
     <ThemeColor name="border_control_normal" value="#FF393939" type="control" category="border_color" role="neutral" derived_from="" adjust="" fixed="false" support_accent="false" contrast_bg="" comment_cn="通用控件默认边框" comment_en="General control normal border"/>
-    <ThemeColor name="border_focus_ring" value="#4D676767" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
+    <ThemeColor name="border_focus_ring" value="#FF676767" type="control" category="border_color" role="primary" derived_from="" adjust="" fixed="false" support_accent="true" contrast_bg="" comment_cn="焦点环/光晕" comment_en="Focus ring/halo"/>
 
     <!-- ===================== SVG图片颜色 (type: image) ===================== -->
     <ThemeColor name="border_svg_image_light2" value="#D9FFFFFF" type="image" category="border_color" role="neutral" derived_from="border_svg_image_light" adjust="lightness:+15" fixed="false" support_accent="false" contrast_bg="bg_window_main, bg_window_card, bg_titlebar" comment_cn="SVG图片浅色2" comment_en="SVG image light color 2"/>

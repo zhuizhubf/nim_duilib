@@ -339,6 +339,7 @@ void MainForm::ShowAllColors()
         pColorLabel->SetBkColor(ui::StringConvert::UTF8ToT(colorName));
         pColorLabel->SetText(ui::StringConvert::UTF8ToT(colorName));
         pColorLabel->SetToolTipText(ui::StringConvert::UTF8ToT(colorName));
+        pColorLabel->SetAttribute(_T("text_align"), _T("hcenter,vcenter"));
     }
 }
 
