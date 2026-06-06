@@ -520,6 +520,9 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
 
     //固定色设置
     //
+    //强调色
+    m_generatedColors["color_accent"] = accentColor;
+
     //窗口关闭按钮
     m_generatedColors["bg_btn_window_close"] = m_generatedColors["--error"];
 

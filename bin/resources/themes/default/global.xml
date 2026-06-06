@@ -260,12 +260,12 @@
                            selected_normal_image="file='${PATH_OPTION}/radio-checked.svg' width='16' height='16' valign='center'"/>
     
     <!-- 复选框 -->
-    <Class name="checkbox_toggle_1" height="28" width="38" valign="center"
-                                    normal_image="file='${PATH_CHECKBOX}/checkbox-toggle-off.svg' width='26' height='26' valign='center'" 
-                                    selected_normal_image="file='${PATH_CHECKBOX}/checkbox-toggle-on.svg' width='26' height='26' valign='center'"/>
-    <Class name="checkbox_toggle_2" height="18" width="38" valign="center"
-                                    normal_image="file='${PATH_CHECKBOX}/checkbox-toggle.svg' width='64' height='64' src='0,0,64,30'" 
-                                    selected_normal_image="file='${PATH_CHECKBOX}/checkbox-toggle.svg' width='64' height='64' src='0,34,64,64'"/>
+    <Class name="checkbox_toggle_1" height="22" width="44" valign="center"
+                                    normal_image="file='${PATH_CHECKBOX}/checkbox-toggle-off.svg' height='18' valign='center' halign='center'" 
+                                    selected_normal_image="file='${PATH_CHECKBOX}/checkbox-toggle-on.svg' height='18' valign='center' halign='center' svg_replace_colors='#34C759|color_accent'"/>
+    <Class name="checkbox_toggle_2" height="22" width="44" valign="center"
+                                    normal_image="file='${PATH_CHECKBOX}/checkbox-toggle2-off.svg' height='20' valign='center' halign='center'" 
+                                    selected_normal_image="file='${PATH_CHECKBOX}/checkbox-toggle2-on.svg' height='20' valign='center' halign='center' svg_replace_colors='#0078D4|color_accent'"/>
     <Class name="checkbox_1" height="20" text_padding="20,0,0,0" text_align="vcenter" valign="center"
                              normal_image="file='${PATH_CHECKBOX}/checkbox-fill-unchecked.svg' width='16' height='16' valign='center'" 
                              disabled_image="file='${PATH_CHECKBOX}/checkbox-fill-unchecked.svg' width='16' height='16' valign='center' fade='80'" 
