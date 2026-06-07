@@ -264,68 +264,169 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
 
 std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const
 {
+    // 非法颜色或公式为空时直接返回原颜色
     if (baseColor.empty() || adjustStr.empty()) {
         return baseColor;
     }
 
+    // 解析 ARGB 格式
     uint8_t alpha, r, g, b;
     if (!ColorConverter::ParseHexColor(baseColor, alpha, r, g, b)) {
         return baseColor;
     }
 
-    double L, C, H;
-    if (!ColorConverter::RGBToOKLCH(r, g, b, L, C, H)) {
-        return baseColor;
-    }
+    // 解析 alpha 为 0~1 范围
+    double currentAlpha = alpha / 255.0;
 
+    // RGB 转 HSL（注意：使用 HSL 而不是 OKLCH，与 JS 算法保持一致）
+    double h, s, l;
+    ColorConverter::RGBToHSL(r, g, b, h, s, l);
+
+    // 当前 RGB 值（用于 invert 操作）
+    uint8_t currentR = r, currentG = g, currentB = b;
+
+    // 解析公式，按逗号分隔得到多个操作
     std::istringstream adjustStream(adjustStr);
     std::string adjustment;
     while (std::getline(adjustStream, adjustment, ',')) {
-        std::string type;
+        // 去除首尾空白
+        size_t start = adjustment.find_first_not_of(" \t");
+        if (start == std::string::npos) continue;
+        size_t end = adjustment.find_last_not_of(" \t");
+        adjustment = adjustment.substr(start, end - start + 1);
+
+        if (adjustment.empty()) continue;
+
+        // 解析属性名（lightness / saturation / hue / alpha / invert）
+        // 和运算符（+ / - / * / =）以及百分比数值
+        char op = '+';
+        std::string property;
         std::string valueStr;
 
         size_t colonPos = adjustment.find(':');
         if (colonPos != std::string::npos) {
-            type = adjustment.substr(0, colonPos);
+            // 格式: "property:opvalue" 或 "property: value"
+            property = adjustment.substr(0, colonPos);
             valueStr = adjustment.substr(colonPos + 1);
+
+            // 去除属性名前后空白
+            size_t pStart = property.find_first_not_of(" \t");
+            size_t pEnd = property.find_last_not_of(" \t");
+            if (pStart != std::string::npos) {
+                property = property.substr(pStart, pEnd - pStart + 1);
+            }
+
+            // 去除数值前后空白
+            size_t vStart = valueStr.find_first_not_of(" \t");
+            size_t vEnd = valueStr.find_last_not_of(" \t");
+            if (vStart != std::string::npos) {
+                valueStr = valueStr.substr(vStart, vEnd - vStart + 1);
+            }
+
+            // 提取运算符
+            if (!valueStr.empty()) {
+                op = valueStr[0];
+                if (op == '+' || op == '-' || op == '*' || op == '=') {
+                    valueStr = valueStr.substr(1);
+                    // 去除数值前空白
+                    size_t vvStart = valueStr.find_first_not_of(" \t");
+                    if (vvStart != std::string::npos) {
+                        valueStr = valueStr.substr(vvStart);
+                    }
+                }
+            }
         }
         else {
-            type = adjustment;
-            valueStr = "";
+            // 没有冒号，可能是 "invert" 这样的无值属性
+            property = adjustment;
         }
 
-        type.erase(0, type.find_first_not_of(" \t"));
-        type.erase(type.find_last_not_of(" \t") + 1);
-        valueStr.erase(0, valueStr.find_first_not_of(" \t"));
-        valueStr.erase(valueStr.find_last_not_of(" \t") + 1);
+        if (property.empty()) continue;
 
-        if (type == "invert") {
-            L = 1.0 - L;
+        // invert 是无参数操作，直接反转 RGB 三通道
+        if (property == "invert") {
+            currentR = 255 - currentR;
+            currentG = 255 - currentG;
+            currentB = 255 - currentB;
+            // 重新计算 HSL
+            ColorConverter::RGBToHSL(currentR, currentG, currentB, h, s, l);
+            continue;
         }
-        else if (type == "lightness") {
-            double delta = std::stod(valueStr);
-            L = std::max(0.0, std::min(1.0, L + delta / 100.0));
-        }
-        else if (type == "saturation") {
-            double delta = std::stod(valueStr);
-            C = std::max(0.0, C + delta / 100.0);
-        }
-        else if (type == "hue") {
-            double delta = std::stod(valueStr);
-            H = fmod(H + delta + 360.0, 360.0);
-        }
-        else if (type == "alpha") {
-            if (valueStr[0] == '=') {
-                alpha = static_cast<uint8_t>(std::stoul(valueStr.substr(1), nullptr, 10));
+
+        // 其他属性需要数值
+        double percent = 0.0;
+        if (!valueStr.empty()) {
+            try {
+                percent = std::stod(valueStr);
             }
-            else {
-                double delta = std::stod(valueStr);
-                alpha = static_cast<uint8_t>(std::max(0, std::min(255, static_cast<int>(alpha + delta * 2.55))));
+            catch (...) {
+                continue;
             }
+        }
+
+        // 归一化为 0~1 范围
+        double delta = percent / 100.0;
+
+        // 应用操作（+ - * =）
+        if (property == "lightness") {
+            // 亮度：0~100% → 内部 0~1
+            double newValue = l;
+            switch (op) {
+                case '+': newValue = l + delta; break;
+                case '-': newValue = l - delta; break;
+                case '*': newValue = l * delta; break;
+                case '=': newValue = delta; break;
+            }
+            l = std::max(0.0, std::min(1.0, newValue));
+        }
+        else if (property == "saturation") {
+            // 饱和度：0~100% → 内部 0~1
+            double newValue = s;
+            switch (op) {
+                case '+': newValue = s + delta; break;
+                case '-': newValue = s - delta; break;
+                case '*': newValue = s * delta; break;
+                case '=': newValue = delta; break;
+            }
+            s = std::max(0.0, std::min(1.0, newValue));
+        }
+        else if (property == "alpha") {
+            // 透明度：0~100% → 内部 0~1
+            double newValue = currentAlpha;
+            switch (op) {
+                case '+': newValue = currentAlpha + delta; break;
+                case '-': newValue = currentAlpha - delta; break;
+                case '*': newValue = currentAlpha * delta; break;
+                case '=': newValue = delta; break;
+            }
+            currentAlpha = std::max(0.0, std::min(1.0, newValue));
+        }
+        else if (property == "hue") {
+            // 色相：0~100% → 内部 0~360
+            // 公式 0~100% → 内部映射为 0~360°
+            double hueNormalized = h / 360.0;
+            double newValue = hueNormalized;
+            switch (op) {
+                case '+': newValue = hueNormalized + delta; break;
+                case '-': newValue = hueNormalized - delta; break;
+                case '*': newValue = hueNormalized * delta; break;
+                case '=': newValue = delta; break;
+            }
+            // 强制夹紧到 [0, 1)
+            newValue = std::max(0.0, std::min(0.999999, newValue));
+            h = newValue * 360.0;
         }
     }
 
-    return ColorConverter::OKLCHToARGB(L, C, H, alpha);
+    // 转换回 RGB
+    uint8_t finalR, finalG, finalB;
+    ColorConverter::HSLToRGB(h, s, l, finalR, finalG, finalB);
+
+    // Alpha 限制在 0~1（对应 0~255）
+    currentAlpha = std::max(0.0, std::min(1.0, currentAlpha));
+    uint8_t finalAlpha = static_cast<uint8_t>(std::round(currentAlpha * 255.0));
+
+    return ColorConverter::RGBToHex(finalAlpha, finalR, finalG, finalB);
 }
 
 std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const

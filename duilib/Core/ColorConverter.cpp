@@ -37,6 +37,93 @@ std::string ColorConverter::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_
     return oss.str();
 }
 
+void ColorConverter::RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double& s, double& l)
+{
+    // 归一化到 0~1
+    double rf = r / 255.0;
+    double gf = g / 255.0;
+    double bf = b / 255.0;
+
+    double maxVal = std::max({rf, gf, bf});
+    double minVal = std::min({rf, gf, bf});
+    double delta = maxVal - minVal;
+
+    // 明度
+    l = (maxVal + minVal) / 2.0;
+
+    // 饱和度
+    if (delta < 1e-10) {
+        s = 0.0;
+        h = 0.0;
+        return;
+    }
+
+    s = (l <= 0.5) ? (delta / (maxVal + minVal)) : (delta / (2.0 - maxVal - minVal));
+
+    // 色相
+    if (maxVal == rf) {
+        h = 60.0 * (fmod(((gf - bf) / delta), 6.0));
+    }
+    else if (maxVal == gf) {
+        h = 60.0 * (((bf - rf) / delta) + 2.0);
+    }
+    else {
+        h = 60.0 * (((rf - gf) / delta) + 4.0);
+    }
+
+    if (h < 0.0) {
+        h += 360.0;
+    }
+}
+
+void ColorConverter::HSLToRGB(double h, double s, double l, uint8_t& r, uint8_t& g, uint8_t& b)
+{
+    // 饱和度和明度限制在 [0, 1]
+    s = std::max(0.0, std::min(1.0, s));
+    l = std::max(0.0, std::min(1.0, l));
+
+    // 色相归一化到 [0, 360)
+    h = fmod(h, 360.0);
+    if (h < 0.0) {
+        h += 360.0;
+    }
+
+    if (s < 1e-10) {
+        // 灰度
+        uint8_t gray = static_cast<uint8_t>(std::round(l * 255.0));
+        r = g = b = gray;
+        return;
+    }
+
+    double c = (1.0 - std::abs(2.0 * l - 1.0)) * s;
+    double x = c * (1.0 - std::abs(fmod(h / 60.0, 2.0) - 1.0));
+    double m = l - c / 2.0;
+
+    double r1, g1, b1;
+    if (h < 60.0) {
+        r1 = c; g1 = x; b1 = 0;
+    }
+    else if (h < 120.0) {
+        r1 = x; g1 = c; b1 = 0;
+    }
+    else if (h < 180.0) {
+        r1 = 0; g1 = c; b1 = x;
+    }
+    else if (h < 240.0) {
+        r1 = 0; g1 = x; b1 = c;
+    }
+    else if (h < 300.0) {
+        r1 = x; g1 = 0; b1 = c;
+    }
+    else {
+        r1 = c; g1 = 0; b1 = x;
+    }
+
+    r = static_cast<uint8_t>(std::round((r1 + m) * 255.0));
+    g = static_cast<uint8_t>(std::round((g1 + m) * 255.0));
+    b = static_cast<uint8_t>(std::round((b1 + m) * 255.0));
+}
+
 double ColorConverter::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b)
 {
     double rs = r / 255.0;

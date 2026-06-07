@@ -32,6 +32,24 @@
  * 【RGB色彩空间】
  * - 各分量: 0 - 255 (字节) 或 0.0 - 1.0 (双精度)
  *
+ * 【HSL色彩空间】
+ * - H (Hue/色相): 0 - 360
+ *   * 0/360 = 红色 (Red)
+ *   * 60 = 黄色 (Yellow)
+ *   * 120 = 绿色 (Green)
+ *   * 180 = 青色 (Cyan)
+ *   * 240 = 蓝色 (Blue)
+ *   * 300 = 品红色 (Magenta)
+ *
+ * - S (Saturation/饱和度): 0.0 - 1.0
+ *   * 0.0 = 灰度（无彩色）
+ *   * 1.0 = 最高饱和度
+ *
+ * - L (Lightness/明度): 0.0 - 1.0
+ *   * 0.0 = 黑色
+ *   * 1.0 = 白色
+ *   * 0.5 = 颜色最鲜艳
+ *
  * 【Hex格式】
  * - 格式: "#AARRGGBB" 或 "#RRGGBB"
  *   * AA = Alpha (00-FF, 透明-不透明)
@@ -101,6 +119,27 @@ public:
      *  @return Hex颜色字符串，如"#FFAABBCC"
      */
     static std::string RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b);
+
+    /** @brief 将RGB转换为HSL色彩空间
+     *  @param r 红色值(0-255)
+     *  @param g 绿色值(0-255)
+     *  @param b 蓝色值(0-255)
+     *  @param h 输出色相(0-360)
+     *  @param s 输出饱和度(0.0-1.0)
+     *  @param l 输出明度(0.0-1.0)
+     *  @note HSL是更直观的颜色表示，便于按比例调整
+     */
+    static void RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double& s, double& l);
+
+    /** @brief 将HSL色彩空间转换为RGB
+     *  @param h 色相(0-360)
+     *  @param s 饱和度(0.0-1.0)
+     *  @param l 明度(0.0-1.0)
+     *  @param r 输出红色值(0-255)
+     *  @param g 输出绿色值(0-255)
+     *  @param b 输出蓝色值(0-255)
+     */
+    static void HSLToRGB(double h, double s, double l, uint8_t& r, uint8_t& g, uint8_t& b);
 
     // ==================== 相对亮度 ====================
 
