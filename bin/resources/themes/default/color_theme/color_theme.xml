@@ -58,18 +58,22 @@
                 </HBox>
                 <GroupVBox class="group_box_round" text_id="STRID_COLORTHEME_COLOR_PREVIEW" height="auto" padding="10,30,6,10" control_padding="false">
                     <HBox height="auto" child_margin="4">
-                        <Label name="--background" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_BACKGROUND" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--background2" bkcolor="bg_window_main" text_id="STRID_COLORTHEME_COLOR_BACKGROUND" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--background1" bkcolor="bg_window_main" text_id="STRID_COLORTHEME_COLOR_BACKGROUND" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--background" bkcolor="bg_window_main" text_id="STRID_COLORTHEME_COLOR_BACKGROUND" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--accent" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_ACCENT" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--success" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SUCCESS" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--warning" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_WARNING" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--error" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_ERROR" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                     </HBox>
                     <HBox height="auto" child_margin="4" margin="0,4,0,0">
-                        <Label name="--surface_0" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_0" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--surface_1" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_1" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--surface_2" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_2" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--surface_3" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_3" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                         <Label name="--surface_4" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_4" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_5" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_5" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_6" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_6" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
+                        <Label name="--surface_7" bkcolor="bg_window_card" text_id="STRID_COLORTHEME_COLOR_SURFACE_7" width="160" height="40" text_align="hcenter,vcenter" border_round="8,8"/>
                     </HBox>
                 </GroupVBox>
             </VBox>

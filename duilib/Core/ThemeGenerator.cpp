@@ -243,14 +243,12 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
     }
     else if ((state == "disabled") || (state == "prompt")) {
         if (!isDark) {
-            L = std::max(0.0, std::min(1.0, L + 0.08));
+            L = std::max(0.0, std::min(1.0, L + 0.05));
             C = std::max(0.0, C - 0.4);
-            alpha = 153;
         }
         else {
             L = std::max(0.0, std::min(1.0, L - 0.05));
             C = std::max(0.0, C - 0.2);
-            alpha = 153;
         }
     }
     else if (state == "focused") {
@@ -422,19 +420,31 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // =========================================================================
     // 核心颜色计算
     // =========================================================================
+    // 遵循《UI主题颜色生成规范》：
+    //   1) 主题采用7级背景色等级，浅色主题从最浅(#FFFFFF)到最深(#D6D9DD)【深色主题则相反】
+    //   2) 数字越小颜色越浅，数字越大颜色越深
+    //   3) 同一等级内所有控件/区域使用完全相同的背景色
+    //   4) 编辑框最浅，标题栏最深
+    //   5) 深色主题沿用相同等级，颜色深度方向相反（数字越大颜色越浅）
+    // =========================================================================
 
-    // 背景色和前景色
-    std::string backgroundColor = GetBackgroundColor(hue, base, isDark);
+    // Surface层（7级背景色等级）
+    // 浅色模式：level越大颜色越深；深色模式：level越大颜色越浅
+    std::string surface1 = GetSurfaceColor(hue, base, isDark, -3); //比窗口颜色浅的更多
+    std::string surface2 = GetSurfaceColor(hue, base, isDark, -1); //比窗口颜色浅
+    std::string surface3 = GetBackgroundColor(hue, base, isDark);  //窗口背景，为标准色
+    std::string surface4 = GetSurfaceColor(hue, base, isDark, 1);
+    std::string surface5 = GetSurfaceColor(hue, base, isDark, 2);
+    std::string surface6 = GetSurfaceColor(hue, base, isDark, 3);
+    std::string surface7 = GetSurfaceColor(hue, base, isDark, 4);
+
+    // 等级3（主窗口/对话框客户区背景、Tab页面内容区域）
+    std::string windowBg = surface3;
+
+    // 前景色：与最深背景色形成对比的文字颜色
     std::string foregroundColor = GetForegroundColor(hue, base, isDark);
 
-    // Surface层（用于卡片、按钮等元素的背景）
-    std::string surface0 = GetSurfaceColor(hue, base, isDark, -1);
-    std::string surface1 = GetSurfaceColor(hue, base, isDark, 1);
-    std::string surface2 = GetSurfaceColor(hue, base, isDark, 3);
-    std::string surface3 = GetSurfaceColor(hue, base, isDark, 5);
-    std::string surface4 = GetSurfaceColor(hue, base, isDark, 7);
-
-    // Accent颜色（强调色）
+    // Accent颜色（强调色）：用于按钮、链接等关键元素
     double accentL = isDark ? m_accentDarkL : m_accentLightL;
     std::string accentColor = ColorConverter::OKLCHToARGB(accentL, m_accentC, hue, 255);
 
@@ -446,21 +456,25 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // 写入颜色到 m_generatedColors
     // =========================================================================
 
-    // CSS变量（--开头）
-    m_generatedColors["--background"] = backgroundColor;
-    m_generatedColors["--foreground"] = foregroundColor;
-    m_generatedColors["--surface_0"] = surface0;
+    // 7级背景色
     m_generatedColors["--surface_1"] = surface1;
     m_generatedColors["--surface_2"] = surface2;
     m_generatedColors["--surface_3"] = surface3;
     m_generatedColors["--surface_4"] = surface4;
-    m_generatedColors["--accent"] = accentColor;
-    m_generatedColors["--accent_foreground"] = accentForeground;
+    m_generatedColors["--surface_5"] = surface5;
+    m_generatedColors["--surface_6"] = surface6;
+    m_generatedColors["--surface_7"] = surface7;
+    m_generatedColors["--background"] = windowBg;                //窗口的被景色
+    m_generatedColors["--foreground"] = foregroundColor;         //窗口的前景色
+    m_generatedColors["--accent"] = accentColor;                 //强调色
+    m_generatedColors["--accent_foreground"] = accentForeground; //强调色的前景色
     m_generatedColors["--success"] = ColorConverter::OKLCHToARGB(0.65, 0.16, 152, 255);  // 成功色
     m_generatedColors["--warning"] = ColorConverter::OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
     m_generatedColors["--error"] = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
 
-    //筛选出需要处理的颜色
+    // =========================================================================
+    // 筛选出需要处理的颜色（去除基础色/派生色/固定色）
+    // =========================================================================
     std::map<std::string, ThemeColorConfig> generatedConfigs;
     for (const auto& pair : m_loadedConfigs) {
         const std::string& colorName = pair.first;
@@ -480,7 +494,7 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
         if (!attrs.m_state.empty()) {
             //有状态的颜色，按BaseName生成
             generatedConfigs[attrs.m_baseName] = attrs;
-            if ((attrs.m_state == "normal") || (attrs.m_state == "default")) {                       
+            if ((attrs.m_state == "normal") || (attrs.m_state == "default")) {
                 generatedConfigs[colorName] = attrs; //仅保留正常状态的颜色值
             }
         }
@@ -489,71 +503,110 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
         }
     }
 
-    //根据规则生成颜色
+    // 根据规则生成颜色(对于含有状态的颜色，只生成BaseName的颜色值)
     for (const auto& pair : generatedConfigs) {
         const std::string& colorName = pair.first;
         const ThemeColorConfig& attrs = pair.second;
         std::string colorValue;
         if (attrs.support_accent) {
             //支持强调色的，使用强调色
-            colorValue = accentColor;            
+            colorValue = accentColor;
         }
         else if (attrs.category == "bg_color") {
-            //背景色
-            colorValue = backgroundColor;
+            //未明确分类的背景色，默认使用主窗口背景
+            colorValue = windowBg;
         }
         else if (attrs.category == "border_color") {
-            //边框色
-            colorValue = surface1;
+            //未明确分类的边框色，使用等级4
+            colorValue = surface4;
         }
         else if (attrs.category == "text_color") {
-            //文本颜色
+            //文本颜色使用前景色
             colorValue = foregroundColor;
         }
         if (!colorValue.empty()) {
             if (!attrs.m_state.empty()) {
                 m_generatedColors[attrs.m_baseName] = colorValue;
             }
-            m_generatedColors[colorName] = colorValue;
+            else {
+                m_generatedColors[colorName] = colorValue;
+            }            
         }
     }
 
-    //固定色设置
-    //
-    //强调色
-    m_generatedColors["color_accent"] = accentColor;
+    // =========================================================================
+    // 根据7级规范分配背景色到具体控件(对于含有状态的颜色，只生成BaseName的颜色值)
+    // =========================================================================
+    // 规范等级    颜色变量     典型色值     控件/区域
+    // ----------------------------------------------------------------
+    // 等级1(最浅) surface0    #FFFFFF     编辑框 Edit/LineEdit, RichEdit, ComboBox编辑区, CheckBox方框, RadioButton圆圈
+    // 等级2       surface1    #F8F9FA     列表 ListCtrl/ListView, 树 TreeView, 列表框 ListBox, 数据表格 Grid/DataGrid
+    // 等级3       surface2    #F0F0F0     主窗口/对话框客户区背景, Tab页面内容区域
+    // 等级4       surface3    #EDEFF2     通用容器面板 Panel/Widget, GroupBox内部区域
+    // 等级5       surface4    #E5E7EB     Button默认态, Switch, Progress背景, Slider槽, ComboBox整体背景, StatusBar
+    // 等级6       surface5    #DFE1E5     MenuBar, ToolBar, Tab标签条背景
+    // 等级7(最深)  surface6    #D6D9DD     窗口标题栏 TitleBar/Caption
+    // ----------------------------------------------------------------
 
-    //窗口关闭按钮
+    const size_t nGeneratedColorsCount = m_generatedColors.size();
+
+    // 等级1：编辑框区域（最浅，#FFFFFF）
+    m_generatedColors["bg_richedit"] = surface1;
+
+    // 等级2：列表/树/表格
+    m_generatedColors["bg_list"] = surface2;
+    m_generatedColors["bg_list_item"] = surface2;
+
+    m_generatedColors["bg_list_ctrl"] = surface2;
+    m_generatedColors["bg_list_ctrl_view"] = surface2;
+    m_generatedColors["bg_list_ctrl_item"] = surface2;
+
+    m_generatedColors["bg_tree_view"] = surface2;
+    m_generatedColors["bg_tree_view_node"] = surface2;
+
+    // 等级3：主窗口/对话框客户区背景、Tab页面内容区域
+    m_generatedColors["bg_window_main"] = windowBg;
+    m_generatedColors["bg_window_card"] = surface2; //比标准窗口的颜色浅
+
+    m_generatedColors["bg_container"] = surface3;
+    m_generatedColors["bg_content"] = surface3;
+    m_generatedColors["bg_overlay"] = surface3;
+    m_generatedColors["bg_address_bar"] = surface3;
+
+    // 等级4：通用容器面板 Panel/Widget, GroupBox内部区域
+    m_generatedColors["bg_header"] = surface4;
+
+
+    // 等级5：按钮、Switch、Progress、Slider、ComboBox整体、StatusBar
+    m_generatedColors["bg_btn_window"] = surface5;
+    m_generatedColors["bg_btn"] = surface5;
+    m_generatedColors["border_btn"] = surface7; //按钮边框色
+    m_generatedColors["bg_combo"] = surface5;
+    m_generatedColors["bg_progress_track"] = surface5;
+
+    // 等级6：MenuBar、ToolBar、Tab标签条背景
+    m_generatedColors["bg_menu_bar"] = surface6;
+    m_generatedColors["bg_tab_ctrl"] = surface6;
+    m_generatedColors["bg_property_grid"] = surface6;
+
+    // 等级7（最深）：窗口标题栏 / 窗口边框
+    m_generatedColors["bg_titlebar"] = surface7;
+    m_generatedColors["border_window"] = surface7;
+
+    // 边框色：通常使用比背景色深一级的颜色
+    m_generatedColors["border_control"] = surface4;
+    m_generatedColors["border_group_box"] = surface4;
+
+    // 分割线：颜色比边框线更深一些
+    m_generatedColors["bg_split"] = surface6;
+    m_generatedColors["border_split_level1"] = surface6;
+    m_generatedColors["border_split_level2"] = surface7;
+
+    // 窗口关闭按钮 - 使用错误色
     m_generatedColors["bg_btn_window_close"] = m_generatedColors["--error"];
 
-    //常用背景和边框
-    m_generatedColors["bg_titlebar"] = surface2;
-    m_generatedColors["bg_window_card"] = surface0;
-    m_generatedColors["bg_container"] = surface0;
-    m_generatedColors["bg_content"] = surface0;
-    m_generatedColors["bg_overlay"] = surface0;
-    m_generatedColors["bg_header"] = surface2;
-
-    m_generatedColors["border_window"] = surface3;
-
-    //编辑框背景
-    m_generatedColors["bg_richedit"] = surface0;
-    //地址栏背景
-    m_generatedColors["bg_address_bar"] = surface0;
-    //列表容器
-    m_generatedColors["bg_list"] = surface0;
-
-    m_generatedColors["bg_list_ctrl"] = surface0;
-    m_generatedColors["bg_list_ctrl_view"] = surface0;
-
-    m_generatedColors["bg_tree_view"] = surface0;
-
-    //进度条背景
-    m_generatedColors["bg_progress_track"] = surface2;
-
-    //分割线颜色
-    m_generatedColors["bg_split_normal"] = surface2;
-    m_generatedColors["border_split_level2"] = surface2;
+    //确保颜色值正确(生成的颜色个数不应增加，因为新增加的是无法识别的)
+    ASSERT_UNUSED_VARIABLE(nGeneratedColorsCount == m_generatedColors.size());
 }
 
 std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) const
@@ -746,7 +799,28 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         }
     }
 
-    // 第3步：对比度检查和修正
+    // 第3步：保留原颜色的透明度
+    for (const auto& pair : m_loadedConfigs) {
+        const std::string& colorName = pair.first;
+        auto iter = processedColors.find(colorName);
+        if (iter != processedColors.end()) {
+            std::string oldColor = pair.second.value;
+            std::string newColor = iter->second;
+            uint8_t alpha, r, g, b;
+            if (ColorConverter::ParseHexColor(newColor, alpha, r, g, b)) {
+                if (alpha == 255) {
+                    uint8_t alpha0, r0, g0, b0;
+                    if (ColorConverter::ParseHexColor(oldColor, alpha0, r0, g0, b0)) {
+                        if (alpha0 != alpha) {
+                            iter->second = ColorConverter::RGBToHex(alpha0, r, g, b);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 第4步：对比度检查和修正
     // 对所有processedColors中的颜色进行检查（只要在loadedConfigs中配置了contrast_bg）
     for (const auto& pair : processedColors) {
         const std::string& colorName = pair.first;
@@ -779,26 +853,8 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         }
     }
 
-    // 第4步：保留原颜色的透明度
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
-        auto iter = processedColors.find(colorName);
-        if (iter != processedColors.end()) {
-            std::string oldColor = pair.second.value;
-            std::string newColor = iter->second;
-            uint8_t alpha, r, g, b;
-            if (ColorConverter::ParseHexColor(newColor, alpha, r, g, b)) {
-                if (alpha == 255) {
-                    uint8_t alpha0, r0, g0, b0;
-                    if (ColorConverter::ParseHexColor(oldColor, alpha0, r0, g0, b0)) {
-                        if (alpha0 != alpha) {
-                            iter->second = ColorConverter::RGBToHex(alpha0, r, g, b);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //颜色修正
+    processedColors["bg_split_disabled"] = GetGeneratedColor("--surface_4");
 
     // 第5步：补充缺失的颜色
     for (const auto& pair : m_loadedConfigs) {

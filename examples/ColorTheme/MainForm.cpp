@@ -271,11 +271,13 @@ void MainForm::OnGenColorParamChanged()
     previewColors.push_back(std::make_pair<DString, DString>(_T("--warning"), _T("")));
     previewColors.push_back(std::make_pair<DString, DString>(_T("--error"), _T("")));
 
-    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_0"), _T("")));
     previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_1"), _T("")));
     previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_2"), _T("")));
     previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_3"), _T("")));
     previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_4"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_5"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_6"), _T("")));
+    previewColors.push_back(std::make_pair<DString, DString>(_T("--surface_7"), _T("")));
 
     for (auto iter : previewColors) {
         const DString& bg = iter.first;
