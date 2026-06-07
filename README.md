@@ -14,11 +14,12 @@
  - 支持动画格式：支持GIF、APNG、WEBP、Lottie JSON、PAG动画文件格式。
  - 多语言与国际化：支持动态多种语言切换，便于开发全球化的应用程序。
  - 支持动态换肤：通过XML文件定义皮肤结构，可以轻松改变界面风格，支持动态换肤。
- - 支持窗口阴影：支持窗口的圆角阴影、直角阴影，并可选择阴影大小，可实时更新。
+ - 支持窗口阴影：支持窗口的圆角阴影、直角阴影，并可选择阴影大小，可实时更新；在Windows和macOS系统中，支持使用系统阴影。
  - 支持DPI感知：有Unaware、SystemAware、PerMonitorAware、PerMonitorAware_V2四种模式，支持独立设置DPI，支持高清DPI的适配（仅限Windows平台）。
  - 支持CEF控件：支持libcef 109 版本，以兼容Windows 7系统；支持libcef 142 版本，支持Windows 10及以上操作系统，支持Linux和MacOS平台。
  - 支持WebView2控件：支持使用WebView2控件用于显示网页，其接口封装简单，更易于使用（仅支持Windows平台）。
  - 支持SDL3：可使用SDL3作为窗口管理和输入输出等基本功能提供者，从而支持跨平台（目前已经适配了Windows/Linux/MacOS/FreeBSD平台）。
+ - 支持主题切换，默认支持浅色主题和深色主题，支持设置强调色，并提供设计主题的辅助工具。
 
 ## 目录结构
 | 目录          | 说明 |
@@ -40,7 +41,7 @@
         <th>修改内容</th>
     </tr>
     <tr>
-        <td rowspan="11">整体改进</td>
+        <td rowspan="12">整体改进</td>
         <td align="left">1. 调整了代码的组织结构，按照功能模块划分，大文件按类拆分为多个小文件，有利于理解整个库的体系结构</td>
     </tr>
     <tr><td align="left">2. 梳理了代码的接口文件，补充各个接口的注释和功能注释，有利于阅读和理解代码</td></tr>
@@ -53,6 +54,7 @@
     <tr><td align="left">9. 支持SDL3，支持跨平台（已经适配了Windows平台、Linux平台、MacOS平台、FreeBSD平台）</td></tr>
     <tr><td align="left">10. CEF组件放到duilib工程，并对CEF的版本进行了升级（支持libcef 109 版本，以兼容Win7系统；支持libcef 142 版本，支持Win10及以上操作系统）</td></tr>
     <tr><td align="left">11. 重新设计图片管理的接口和加载流程（Image目录），支持多线程加载图片，以更好的扩展其他图片格式支持</td></tr>
+    <tr><td align="left">12. 重新设计全局资源管理器的XML文件结构（global.xml），改进字体管理功能，支持字体回退功能，从而支持Emoji字体显示；支持浅色主题和深色主题，支持强调色</td></tr>
     <tr>
         <td rowspan="22">功能完善</td>
         <td align="left">1. 对窗口类（Window）增加了新的属性：的功能进行了完善，提高对DPI自适应、窗口消息的代码容错，代码结构做了调整</td>
@@ -72,7 +74,7 @@
     <tr><td align="left">14. 完善了多国语言的功能，能够更好的支持多语言动态切换，并提供示例程序examples/MultiLang</td></tr>
     <tr><td align="left">15. 完善了DPI感知功能，支持Unaware、SystemAware、PerMonitorAware、PerMonitorAware_V2四种模式，支持独立设置DPI，支持高清DPI的适配，提供了示例程序examples/DpiAware</td></tr>
     <tr><td align="left">16. 移除了ui_components工程，CEF组件代码重新梳理，继承到duilib工程中，其他内容删除</td></tr>
-    <tr><td align="left">17. 优化窗口的阴影功能，窗口的阴影使用svg图片，增加了阴影类型属性（shadow_type），可选值为：<br> "default", 默认阴影 <br> "big", 大阴影，直角（适合普通窗口）<br> "big_round", 大阴影，圆角（适合普通窗口）<br> "small", 小阴影，直角（适合普通窗口）<br> "small_round", 小阴影，圆角（适合普通窗口）<br> "menu", 小阴影，直角（适合弹出式窗口，比如菜单等）<br> "menu_round", 小阴影，圆角（适合弹出式窗口，比如菜单等）<br> "none", 无阴影</td></tr>
+    <tr><td align="left">17. 优化窗口的阴影功能，窗口的阴影使用svg图片，增加了阴影类型属性（shadow_type），支持自绘阴影和系统阴影，详见`docs/Window.md`文档</td></tr>
     <tr><td align="left">18. 新增对APNG/SVG/WEBP/ICO/LOTTIE/PAG图片格式的支持</td></tr>
     <tr><td align="left">19. 重新设计控件的loading功能，使用Box容器展示loading功能，通过xml文件配置loading界面（包括动画图片），并支持与动画图片交互</td></tr>
     <tr><td align="left">20. Label文本显示控件的功能加强：对文本齐方式新增加"两端对齐"，新增对竖排文本的支持（文本绘制方向从上到下，从右到左），新增支持设置行间距和设置字间距</td></tr>
