@@ -254,6 +254,7 @@
 | CursorManager | [duilib/Core/CursorManager.h](../duilib/Core/CursorManager.h) | 光标管理器 |
 | ThreadManager | [duilib/Core/ThreadManager.h](../duilib/Core/ThreadManager.h) | 线程管理器 |
 | ColorManager | [duilib/Core/ColorManager.h](../duilib/Core/ColorManager.h) | 颜色管理器 |
+| ThemeManager | [duilib/Core/ColorManager.h](../duilib/Core/ThemeManager.h) | 主题管理器 |
 | WindowManager | [duilib/Core/WindowManager.h](../duilib/Core/WindowManager.h) | 窗口管理器 |
 | ImageDecoderFactory | [duilib/Image/ImageDecoderFactory.h](../duilib/Image/ImageDecoderFactory.h) | 图片解码器的管理 |
 
