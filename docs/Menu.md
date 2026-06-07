@@ -7,7 +7,7 @@
 3. `settings_menu.xml`中的主要内容：
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<Window shadow_type="menu_round" shadow_attached="true" layered_window="true" >
+<Window shadow_type="menu_round">
     <MenuListBox class="menu" name="main_menu">
         <!-- 一级菜单 -->
         <MenuItem class="menu_element" name="first" width="180">
@@ -99,7 +99,7 @@
 4. `submenu.xml`中的主要内容：
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<Window shadow_type="menu_round" shadow_attached="true" layered_window="true">
+<Window shadow_type="menu_round">
   <MenuListBox class="menu" name="submenu">
    
   </MenuListBox>

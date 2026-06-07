@@ -6,15 +6,7 @@
 
 namespace ui
 {
-/** 实现一个带有标题栏的窗体，带有最大化、最小化、还原按钮的支持
-* 该实现支持窗口阴影，单仅提供带有 WS_EX_LAYERED 属性窗口阴影。
-* 该类实现，封装了2种窗口模式：
-* （1）正常模式，不附加阴影的窗口：可以通过XML配置文件<Window>如下配置（举例）：
-*              shadow_attached="false" layered_window="false" ，不需要配置alpha属性，不支持alpha属性;
-*              上述配置等同于：layered_window="false"，不设置shadow_attached属性
-* （2）附加阴影窗口模式，需要使用层窗口(带有WS_EX_LAYERED属性)，可以通过XML配置文件<Window>如下配置（举例）：
-*              shadow_attached="true" layered_window="true" ，alpha为可选，设置窗口透明度，如果不设置默认为255；
-*              上述配置等同于：layered_window="true"，不设置shadow_attached属性
+/** 实现一个带有自绘标题栏的窗口，支持窗口最小化、还原/最大化、关闭按钮，支持窗口全屏、界面切换语言、切换主题按钮
 */
 class DUILIB_API WindowImplBase : public Window
 {

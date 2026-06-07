@@ -244,7 +244,7 @@ void MainForm::OnInitWindow()
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="75%,75%" min_size="240,100"
         caption="0,0,0,36" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
-        shadow_type="default" shadow_attached="true" shadow_snap="true"
+        shadow_type="default" shadow_snap="true"
         size_box="4,4,4,4" icon="public/caption/logo.ico">
     <!-- 整个窗口中，所有控件都放在这个VBox容器中 -->
     <VBox bkcolor="bg_window_main">
