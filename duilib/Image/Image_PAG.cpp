@@ -304,16 +304,31 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         pAnimationFrame->m_bDataError = true;
         return false;
     }
+    //RAII 风格的像素位解锁包装
+    struct TAutoUnlockPixels
+    {
+        std::shared_ptr<IBitmap>& bitmap;
+        bool locked;
+        ~TAutoUnlockPixels()
+        {
+            if (locked && bitmap) {
+                bitmap->UnLockPixelBits();
+            }
+        }
+    };
+    TAutoUnlockPixels autoUnlock{ pBitmap, true };
+
     size_t rowBytes = (size_t)pBitmap->GetWidth() * 4;
 #ifdef DUILIB_BUILD_FOR_WIN
     pag::ColorType colorType = pag::ColorType::BGRA_8888;
 #else
     pag::ColorType colorType = pag::ColorType::RGBA_8888;
-#endif    
+#endif
     pag::AlphaType alphaType = pag::AlphaType::Premultiplied;
     bool bRet = pagDecoder.readFrame(index, pixels, rowBytes, colorType, alphaType);
     if (bRet) {
         pBitmap->UnLockPixelBits();
+        autoUnlock.locked = false;  // 已解锁，防止析构中重复解锁
         pAnimationFrame->m_pBitmap = pBitmap;
         pAnimationFrame->m_nOffsetX = 0;
         pAnimationFrame->m_nOffsetY = 0;
@@ -326,6 +341,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         m_impl->m_bDecodeError = true;
         pAnimationFrame->m_bDataError = true;
         pAnimationFrame->m_pBitmap.reset();
+        // autoUnlock 析构时会自动 UnLockPixelBits
     }
     return bRet;
 }

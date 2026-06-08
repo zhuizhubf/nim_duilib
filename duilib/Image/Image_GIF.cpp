@@ -5,6 +5,7 @@
 
 #include "duilib/third_party/giflib/gif_lib.h"
 #include <atomic>
+#include <climits>
 
 namespace ui
 {
@@ -419,7 +420,11 @@ bool Image_GIF::IsDelayDecodeFinished() const
     if (m_impl->m_bDecodeError || (m_impl->m_gifDecoder == nullptr)) {
         return true;
     }
-    return (int32_t)(m_impl->m_frames.size() + m_impl->m_delayFrames.size()) == m_impl->m_nFrameCount;
+    size_t totalSize = m_impl->m_frames.size() + m_impl->m_delayFrames.size();
+    if (totalSize > (size_t)INT32_MAX) {
+        return true;
+    }
+    return (int32_t)totalSize == m_impl->m_nFrameCount;
 }
 
 uint32_t Image_GIF::GetDecodedFrameIndex() const

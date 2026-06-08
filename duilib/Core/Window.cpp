@@ -152,12 +152,12 @@ bool Window::SetRenderBackendType(RenderBackendType backendType)
         ASSERT(pRenderFactory != nullptr);
         if (pRenderFactory != nullptr) {
             m_render.reset(pRenderFactory->CreateRender(GetRenderDpi(), GetWindowHandle(), m_renderBackendType));
-            bRet = (m_render != nullptr) ? true : false;
+            bRet = (m_render != nullptr);
         }
     }
     else {
         ASSERT(m_render->GetRenderBackendType() == backendType);
-        bRet = (m_render->GetRenderBackendType() == backendType) ? true : false;
+        bRet = (m_render->GetRenderBackendType() == backendType);
     }
     ASSERT(bRet);
     return bRet;
