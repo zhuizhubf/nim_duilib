@@ -244,8 +244,8 @@
     <ClCompile Include="Control\ColorPicker.cpp" />
     <ClCompile Include="Control\ColorPickerCustom.cpp" />
     <ClCompile Include="Control\ColorPickerRegular.cpp" />
-    <ClCompile Include="Control\ColorPickerStatard.cpp" />
-    <ClCompile Include="Control\ColorPickerStatardGray.cpp" />
+    <ClCompile Include="Control\ColorPickerStandard.cpp" />
+    <ClCompile Include="Control\ColorPickerStandardGray.cpp" />
     <ClCompile Include="Control\ColorSlider.cpp" />
     <ClCompile Include="Control\ComboButton.cpp" />
     <ClCompile Include="Control\DateTime.cpp" />
@@ -603,8 +603,8 @@
     <ClInclude Include="Control\ColorPicker.h" />
     <ClInclude Include="Control\ColorPickerCustom.h" />
     <ClInclude Include="Control\ColorPickerRegular.h" />
-    <ClInclude Include="Control\ColorPickerStatard.h" />
-    <ClInclude Include="Control\ColorPickerStatardGray.h" />
+    <ClInclude Include="Control\ColorPickerStandard.h" />
+    <ClInclude Include="Control\ColorPickerStandardGray.h" />
     <ClInclude Include="Control\ColorSlider.h" />
     <ClInclude Include="Control\ComboButton.h" />
     <ClInclude Include="Control\DateTime.h" />

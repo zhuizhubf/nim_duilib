@@ -76,10 +76,10 @@ void PropertyGrid::SetAttribute(const DString& strName, const DString& strValue2
         SetLeftColumnWidth(StringUtil::StringToInt32(strValue), true);
     }
     else if (strName == _T("property_font_normal")) {
-        SetProptertyNormalFontId(strValue);
+        SetPropertyNormalFontId(strValue);
     }
     else if (strName == _T("property_font_modified")) {
-        SetProptertyModifiedFontId(strValue);
+        SetPropertyModifiedFontId(strValue);
     }
     else {
         BaseClass::SetAttribute(strName, strValue);
@@ -1190,7 +1190,7 @@ int32_t PropertyGrid::GetLeftColumnWidthValue() const
     return m_nLeftColumnWidth;
 }
 
-void PropertyGrid::SetProptertyNormalFontId(const DString& fontId)
+void PropertyGrid::SetPropertyNormalFontId(const DString& fontId)
 {
     m_propertyNormalFontId = fontId;
 }
@@ -1200,7 +1200,7 @@ DString PropertyGrid::GetProptertyNormalFontId() const
     return m_propertyNormalFontId.c_str();
 }
 
-void PropertyGrid::SetProptertyModifiedFontId(const DString& fontId)
+void PropertyGrid::SetPropertyModifiedFontId(const DString& fontId)
 {
     m_propertyModifiedFontId = fontId;
 }

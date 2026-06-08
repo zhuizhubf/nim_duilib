@@ -228,8 +228,8 @@
 | 拾色器实现类 | | [duilib/Control/ColorConvert.h](../duilib/Control/ColorConvert.h) | ColorPicker的实现类，颜色类型（RGB/HSV/HSL）转换类 |
 | 拾色器实现类 | | [duilib/Control/ColorPickerCustom.h](../duilib/Control/ColorPickerCustom.h) | ColorPicker的实现类，自定义颜色 |
 | 拾色器实现类 | | [duilib/Control/ColorPickerRegular.h](../duilib/Control/ColorPickerRegular.h) | ColorPicker的实现类，常用颜色 |
-| 拾色器实现类 | | [duilib/Control/ColorPickerStatard.h](../duilib/Control/ColorPickerStatard.h) | ColorPicker的实现类，标准颜色 |
-| 拾色器实现类 | | [duilib/Control/ColorPickerStatardGray.h](../duilib/Control/ColorPickerStatardGray.h) | ColorPicker的实现类，标准颜色，灰色 |
+| 拾色器实现类 | | [duilib/Control/ColorPickerStandard.h](../duilib/Control/ColorPickerStandard.h) | ColorPicker的实现类，标准颜色 |
+| 拾色器实现类 | | [duilib/Control/ColorPickerStandardGray.h](../duilib/Control/ColorPickerStandardGray.h) | ColorPicker的实现类，标准颜色，灰色 |
 | 拾色器实现类 | | [duilib/Control/ColorSlider.h](../duilib/Control/ColorSlider.h) | ColorPicker的实现类 |
 | ControlDragable | Control | [duilib/Control/ControlDragable.h](../duilib/Control/ControlDragable.h) | 支持相同Box内的子控件通过拖动来调整顺序 |
 | BoxDragable | Box | [duilib/Control/ControlDragable.h](../duilib/Control/ControlDragable.h) | 支持相同Box内的子控件通过拖动来调整顺序 |

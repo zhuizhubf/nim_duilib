@@ -64,13 +64,16 @@ void APngDecoder::PngWarningCallback(png_structp /*png_ptr*/, png_const_charp me
 }
 
 // PNG错误回调
-void APngDecoder::PngErrorCallback(png_structp /*png_ptr*/, png_const_charp message)
+void APngDecoder::PngErrorCallback(png_structp png_ptr, png_const_charp message)
 {
     std::string errMsg;
     if (message != nullptr) {
         errMsg = StringUtil::Printf("PNG decoding error: %s", message);
     }
     DEBUG_OUTPUT(errMsg.c_str());
+
+    //最终必须使用png_error终止
+    png_error(png_ptr, "PNG decoding error");
 }
 
 // libpng读取回调

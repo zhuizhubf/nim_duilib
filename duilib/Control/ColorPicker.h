@@ -12,8 +12,8 @@ namespace ui
 */
 class Control;
 class ColorPickerRegular;
-class ColorPickerStatard;
-class ColorPickerStatardGray;
+class ColorPickerStandard;
+class ColorPickerStandardGray;
 class ColorPickerCustom;
 class DUILIB_API ColorPicker : public WindowImplBase
 {
@@ -98,11 +98,11 @@ private:
 
     /** 标准颜色控件接口
     */
-    ColorPickerStatard* m_pStatardPicker;
+    ColorPickerStandard* m_pStandardPicker;
 
     /** 标准颜色控件接口(灰色)
     */
-    ColorPickerStatardGray* m_pStatardGrayPicker;
+    ColorPickerStandardGray* m_pStandardGrayPicker;
 
     /** 自定义颜色控件接口
     */

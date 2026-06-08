@@ -71,7 +71,7 @@ void ListBox::SetAttribute(const DString& strName, const DString& strValue2)
         SetFrameSelectionColor(strValue);
     }
     else if (strName == _T("frame_selection_alpha")) {
-        SetframeSelectionAlpha((uint8_t)StringUtil::StringToInt32(strValue));
+        SetFrameSelectionAlpha((uint8_t)StringUtil::StringToInt32(strValue));
     }
     else if (strName == _T("frame_selection_border_size")) {
         SetFrameSelectionBorderSize(StringUtil::StringToInt32(strValue));
@@ -122,12 +122,12 @@ DString ListBox::GetFrameSelectionColor() const
     return DString();
 }
 
-void ListBox::SetframeSelectionAlpha(uint8_t frameSelectionAlpha)
+void ListBox::SetFrameSelectionAlpha(uint8_t frameSelectionAlpha)
 {
     if (m_pHelper == nullptr) {
         m_pHelper = std::make_unique<ListBoxHelper>(this);
     }
-    m_pHelper->SetframeSelectionAlpha(frameSelectionAlpha);
+    m_pHelper->SetFrameSelectionAlpha(frameSelectionAlpha);
 }
 
 uint8_t ListBox::GetFrameSelectionAlpha() const

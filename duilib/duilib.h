@@ -128,8 +128,8 @@
 #include "Control/ColorControl.h"
 #include "Control/ColorSlider.h"
 #include "Control/ColorPickerRegular.h"
-#include "Control/ColorPickerStatard.h"
-#include "Control/ColorPickerStatardGray.h"
+#include "Control/ColorPickerStandard.h"
+#include "Control/ColorPickerStandardGray.h"
 #include "Control/ColorPickerCustom.h"
 
 #endif //DUILIB_HEADERS_H_

@@ -45,7 +45,7 @@ DString ListBoxHelper::GetFrameSelectionColor() const
     return m_frameSelectionColor.c_str();
 }
 
-void ListBoxHelper::SetframeSelectionAlpha(uint8_t frameSelectionAlpha)
+void ListBoxHelper::SetFrameSelectionAlpha(uint8_t frameSelectionAlpha)
 {
     m_frameSelectionAlpha = frameSelectionAlpha;
 }

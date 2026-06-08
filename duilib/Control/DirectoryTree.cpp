@@ -29,13 +29,13 @@ DirectoryTree::DirectoryTree(Window* pWindow):
 
 DirectoryTree::~DirectoryTree()
 {
+    //移除所有的树节点，避免产生Destroy事件
+    RemoveAllNodes();
+
     for (auto iter : m_folderMap) {
         DeleteFolderStatus(iter.second);
     }
     m_folderMap.clear();
-
-    //移除所有的树节点，避免产生Destroy事件
-    RemoveAllNodes();
 
     if (m_impl != nullptr) {
         delete m_impl;

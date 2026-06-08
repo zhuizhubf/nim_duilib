@@ -535,7 +535,7 @@ public:
 
     /** 设置属性值的字体Id（正常状态）
     */
-    void SetProptertyNormalFontId(const DString& fontId);
+    void SetPropertyNormalFontId(const DString& fontId);
 
     /** 获取属性值的字体ID（正常状态）
     */
@@ -543,7 +543,7 @@ public:
 
     /** 设置属性值的字体Id（已修改状态）
     */
-    void SetProptertyModifiedFontId(const DString& fontId);
+    void SetPropertyModifiedFontId(const DString& fontId);
 
     /** 获取属性值的字体ID（已修改状态）
     */

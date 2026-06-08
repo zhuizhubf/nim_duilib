@@ -1,26 +1,26 @@
-#include "ColorPickerStatard.h"
+#include "ColorPickerStandard.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Core/GlobalManager.h"
 
 namespace ui
 {
 
-ColorPickerStatard::ColorPickerStatard(Window* pWindow):
+ColorPickerStandard::ColorPickerStandard(Window* pWindow):
     Control(pWindow),
     m_radius(0)
 {
     InitColorMap();
 }
 
-DString ColorPickerStatard::GetType() const { return DUI_CTR_COLOR_PICKER_STANDARD; }
+DString ColorPickerStandard::GetType() const { return DUI_CTR_COLOR_PICKER_STANDARD; }
 
-void ColorPickerStatard::SelectColor(const UiColor& color)
+void ColorPickerStandard::SelectColor(const UiColor& color)
 {
     m_selectedColor = color;
     Invalidate();
 }
 
-void ColorPickerStatard::Paint(IRender* pRender, const UiRect& rcPaint)
+void ColorPickerStandard::Paint(IRender* pRender, const UiRect& rcPaint)
 {
     BaseClass::Paint(pRender, rcPaint);
     ASSERT(pRender != nullptr);
@@ -39,7 +39,7 @@ void ColorPickerStatard::Paint(IRender* pRender, const UiRect& rcPaint)
     DrawColorMap(pRender, rect);
 }
 
-void ColorPickerStatard::DrawColorMap(IRender* pRender, const UiRect& rect)
+void ColorPickerStandard::DrawColorMap(IRender* pRender, const UiRect& rect)
 {
     int32_t rectSize = std::min(rect.Width(), rect.Height());
     const int32_t radius = static_cast<int32_t>(rectSize / 13 / 2 / std::cos(30 / 57.2957795f)); //半径
@@ -100,7 +100,7 @@ void ColorPickerStatard::DrawColorMap(IRender* pRender, const UiRect& rect)
     }
 }
 
-bool ColorPickerStatard::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt, int32_t radius,
+bool ColorPickerStandard::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt, int32_t radius,
                                             const UiColor& penColor, float penWidth, const UiColor& brushColor)
 {
     ASSERT(pRender != nullptr);
@@ -146,7 +146,7 @@ bool ColorPickerStatard::DrawRegularHexagon(IRender* pRender, const UiPointF& ce
     return bRet;
 }
 
-bool ColorPickerStatard::MouseMove(const EventArgs& msg)
+bool ColorPickerStandard::MouseMove(const EventArgs& msg)
 {
     //更新ToolTip信息
     if (GetRect().ContainsPt(msg.ptMouse)) {
@@ -166,7 +166,7 @@ bool ColorPickerStatard::MouseMove(const EventArgs& msg)
     return BaseClass::MouseMove(msg);
 }
 
-bool ColorPickerStatard::ButtonDown(const EventArgs& msg)
+bool ColorPickerStandard::ButtonDown(const EventArgs& msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -188,7 +188,7 @@ bool ColorPickerStatard::ButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool ColorPickerStatard::GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const
+bool ColorPickerStandard::GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const
 {
     struct ColorPt
     {
@@ -228,7 +228,7 @@ bool ColorPickerStatard::GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, 
     }        
 }
 
-float ColorPickerStatard::GetPointsDistance(const UiPointF& pt1, const UiPointF& pt2) const
+float ColorPickerStandard::GetPointsDistance(const UiPointF& pt1, const UiPointF& pt2) const
 {
     float a = std::abs(pt1.x - pt2.x);
     float b = std::abs(pt1.y - pt2.y);
@@ -236,7 +236,7 @@ float ColorPickerStatard::GetPointsDistance(const UiPointF& pt1, const UiPointF&
     return c;
 }
 
-void ColorPickerStatard::InitColorMap()
+void ColorPickerStandard::InitColorMap()
 {
     m_colorMap = {
         {UiColor(0xFF003366), _T("STRID_PUBLIC_COLORPICKER_TIP3_DARK_BLUE_1"), UiPointF()},          // 深蓝1

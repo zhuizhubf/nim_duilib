@@ -65,7 +65,6 @@ Control::~Control()
 
     m_pAnimationData.reset();
     m_pBkImage.reset();
-    m_pImageMap.reset();
     m_pDragDropData.reset();
     m_pOtherData.reset();
     m_pEventMapData.reset();

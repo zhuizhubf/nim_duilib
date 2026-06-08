@@ -1,8 +1,8 @@
 #include "ColorPicker.h"
 #include "duilib/Box/TabBox.h"
 #include "duilib/Control/ColorPickerRegular.h"
-#include "duilib/Control/ColorPickerStatard.h"
-#include "duilib/Control/ColorPickerStatardGray.h"
+#include "duilib/Control/ColorPickerStandard.h"
+#include "duilib/Control/ColorPickerStandardGray.h"
 #include "duilib/Control/ColorPickerCustom.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/WindowCreateParam.h"
@@ -59,8 +59,8 @@ ColorPicker::ColorPicker():
     m_pNewColor(nullptr),
     m_pOldColor(nullptr),
     m_pRegularPicker(nullptr),
-    m_pStatardPicker(nullptr),
-    m_pStatardGrayPicker(nullptr),
+    m_pStandardPicker(nullptr),
+    m_pStandardGrayPicker(nullptr),
     m_pCustomPicker(nullptr)
 {
 }
@@ -122,8 +122,8 @@ void ColorPicker::OnInitWindow()
     ASSERT(m_pOldColor != nullptr);
 
     m_pRegularPicker = dynamic_cast<ColorPickerRegular*>(FindControl(_T("color_picker_regular")));
-    m_pStatardPicker = dynamic_cast<ColorPickerStatard*>(FindControl(_T("color_picker_standard")));
-    m_pStatardGrayPicker = dynamic_cast<ColorPickerStatardGray*>(FindControl(_T("color_picker_standard_gray")));
+    m_pStandardPicker = dynamic_cast<ColorPickerStandard*>(FindControl(_T("color_picker_standard")));
+    m_pStandardGrayPicker = dynamic_cast<ColorPickerStandardGray*>(FindControl(_T("color_picker_standard_gray")));
     m_pCustomPicker = dynamic_cast<ColorPickerCustom*>(FindControl(_T("color_picker_custom")));
 
     if (m_pRegularPicker != nullptr) {
@@ -133,22 +133,22 @@ void ColorPicker::OnInitWindow()
             return true;
             });
     }
-    if (m_pStatardPicker != nullptr) {
-        m_pStatardPicker->AttachSelectColor([this](const ui::EventArgs& args) {
+    if (m_pStandardPicker != nullptr) {
+        m_pStandardPicker->AttachSelectColor([this](const ui::EventArgs& args) {
             UiColor newColor((uint32_t)args.wParam);
             OnSelectColor(newColor);
-            if (m_pStatardGrayPicker != nullptr) {
-                m_pStatardGrayPicker->SelectColor(UiColor());
+            if (m_pStandardGrayPicker != nullptr) {
+                m_pStandardGrayPicker->SelectColor(UiColor());
             }
             return true;
             });
     }
-    if (m_pStatardGrayPicker != nullptr) {
-        m_pStatardGrayPicker->AttachSelectColor([this](const ui::EventArgs& args) {
+    if (m_pStandardGrayPicker != nullptr) {
+        m_pStandardGrayPicker->AttachSelectColor([this](const ui::EventArgs& args) {
             UiColor newColor((uint32_t)args.wParam);
             OnSelectColor(newColor);
-            if (m_pStatardPicker != nullptr) {
-                m_pStatardPicker->SelectColor(UiColor());
+            if (m_pStandardPicker != nullptr) {
+                m_pStandardPicker->SelectColor(UiColor());
             }
             return true;
             });
@@ -179,11 +179,11 @@ void ColorPicker::OnInitWindow()
             }
             else if (args.wParam == 1) {
                 //标准颜色
-                if (m_pStatardPicker != nullptr) {
-                    m_pStatardPicker->SelectColor(selectedColor);
+                if (m_pStandardPicker != nullptr) {
+                    m_pStandardPicker->SelectColor(selectedColor);
                 }
-                if (m_pStatardGrayPicker != nullptr) {
-                    m_pStatardGrayPicker->SelectColor(selectedColor);
+                if (m_pStandardGrayPicker != nullptr) {
+                    m_pStandardGrayPicker->SelectColor(selectedColor);
                 }
             }
             else if (args.wParam == 2) {
@@ -285,11 +285,11 @@ void ColorPicker::SetSelectedColor(const UiColor& color)
     if (m_pRegularPicker != nullptr) {
         m_pRegularPicker->SelectColor(color);
     }
-    if (m_pStatardPicker != nullptr) {
-        m_pStatardPicker->SelectColor(color);
+    if (m_pStandardPicker != nullptr) {
+        m_pStandardPicker->SelectColor(color);
     }
-    if (m_pStatardGrayPicker != nullptr) {
-        m_pStatardGrayPicker->SelectColor(color);
+    if (m_pStandardGrayPicker != nullptr) {
+        m_pStandardGrayPicker->SelectColor(color);
     }
 }
 
@@ -816,11 +816,11 @@ void ColorPicker::OnPickColorFromScreen()
                 m_pRegularPicker->SelectColor(selectedColor);
             }
             //更新标准颜色
-            if (m_pStatardPicker != nullptr) {
-                m_pStatardPicker->SelectColor(selectedColor);
+            if (m_pStandardPicker != nullptr) {
+                m_pStandardPicker->SelectColor(selectedColor);
             }
-            if (m_pStatardGrayPicker != nullptr) {
-                m_pStatardGrayPicker->SelectColor(selectedColor);
+            if (m_pStandardGrayPicker != nullptr) {
+                m_pStandardGrayPicker->SelectColor(selectedColor);
             }
             //更新自定义颜色
             if (m_pCustomPicker != nullptr) {

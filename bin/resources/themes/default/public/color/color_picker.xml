@@ -50,8 +50,8 @@
                             </VBox>
                             <VBox name="color_picker_tab_page_2">
                                 <!-- 标准颜色 -->
-                                <ColorPickerStatard name="color_picker_standard" />
-                                <ColorPickerStatardGray name="color_picker_standard_gray" height="auto" max_height="160" padding="10,10,10,10"/>
+                                <ColorPickerStandard name="color_picker_standard" />
+                                <ColorPickerStandardGray name="color_picker_standard_gray" height="auto" max_height="160" padding="10,10,10,10"/>
                             </VBox>
                             <VBox name="color_picker_tab_page_3">
                                 <!-- 自定义颜色 -->

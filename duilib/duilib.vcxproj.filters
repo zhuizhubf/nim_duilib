@@ -822,12 +822,6 @@
     <ClCompile Include="Control\ColorPickerRegular.cpp">
       <Filter>Control\ColorPicker</Filter>
     </ClCompile>
-    <ClCompile Include="Control\ColorPickerStatard.cpp">
-      <Filter>Control\ColorPicker</Filter>
-    </ClCompile>
-    <ClCompile Include="Control\ColorPickerStatardGray.cpp">
-      <Filter>Control\ColorPicker</Filter>
-    </ClCompile>
     <ClCompile Include="Control\ColorSlider.cpp">
       <Filter>Control\ColorPicker</Filter>
     </ClCompile>
@@ -917,6 +911,12 @@
     </ClCompile>
     <ClCompile Include="Core\ColorConverter.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerStandard.cpp">
+      <Filter>Control\ColorPicker</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerStandardGray.cpp">
+      <Filter>Control\ColorPicker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1799,12 +1799,6 @@
     <ClInclude Include="Control\ColorPickerRegular.h">
       <Filter>Control\ColorPicker</Filter>
     </ClInclude>
-    <ClInclude Include="Control\ColorPickerStatard.h">
-      <Filter>Control\ColorPicker</Filter>
-    </ClInclude>
-    <ClInclude Include="Control\ColorPickerStatardGray.h">
-      <Filter>Control\ColorPicker</Filter>
-    </ClInclude>
     <ClInclude Include="Control\ColorSlider.h">
       <Filter>Control\ColorPicker</Filter>
     </ClInclude>
@@ -1912,6 +1906,12 @@
     </ClInclude>
     <ClInclude Include="Core\ColorConverter.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerStandard.h">
+      <Filter>Control\ColorPicker</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerStandardGray.h">
+      <Filter>Control\ColorPicker</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

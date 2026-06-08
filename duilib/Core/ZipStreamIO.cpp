@@ -37,7 +37,6 @@ voidpf ZCALLBACK ZipStreamIO::fopen_file_func(voidpf opaque, const char* /*filen
 uLong ZCALLBACK ZipStreamIO::fread_file_func(voidpf opaque, voidpf stream, void* buf, uLong size)
 {
     ASSERT_UNUSED_VARIABLE(opaque == stream);
-    ASSERT_UNUSED_VARIABLE(opaque == stream);
     ASSERT(stream != nullptr);
     if (stream == nullptr) {
         return 0;

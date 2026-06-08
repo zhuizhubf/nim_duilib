@@ -127,8 +127,8 @@ namespace ui
     #define  DUI_CTR_COLOR_CONTROL                   (_T("ColorControl"))
     #define  DUI_CTR_COLOR_SLIDER                    (_T("ColorSlider"))
     #define  DUI_CTR_COLOR_PICKER_REGULAR            (_T("ColorPickerRegular"))
-    #define  DUI_CTR_COLOR_PICKER_STANDARD           (_T("ColorPickerStatard"))
-    #define  DUI_CTR_COLOR_PICKER_STANDARD_GRAY      (_T("ColorPickerStatardGray"))
+    #define  DUI_CTR_COLOR_PICKER_STANDARD           (_T("ColorPickerStandard"))
+    #define  DUI_CTR_COLOR_PICKER_STANDARD_GRAY      (_T("ColorPickerStandardGray"))
     #define  DUI_CTR_COLOR_PICKER_CUSTOM             (_T("ColorPickerCustom"))
 
     #define  DUI_CTR_LINE                            (_T("Line"))

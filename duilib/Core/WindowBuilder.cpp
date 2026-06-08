@@ -27,8 +27,8 @@
 #include "duilib/Control/ColorControl.h"
 #include "duilib/Control/ColorSlider.h"
 #include "duilib/Control/ColorPickerRegular.h"
-#include "duilib/Control/ColorPickerStatard.h"
-#include "duilib/Control/ColorPickerStatardGray.h"
+#include "duilib/Control/ColorPickerStandard.h"
+#include "duilib/Control/ColorPickerStandardGray.h"
 #include "duilib/Control/ColorPickerCustom.h"
 #include "duilib/Control/Line.h"
 #include "duilib/Control/IPAddress.h"
@@ -155,8 +155,8 @@ Control* WindowBuilder::CreateControlByClass(const DString& strControlClass, Win
         {DUI_CTR_COLOR_CONTROL, [](Window* pWindow) { return new ColorControl(pWindow); }},
         {DUI_CTR_COLOR_SLIDER, [](Window* pWindow) { return new ColorSlider(pWindow); }},
         {DUI_CTR_COLOR_PICKER_REGULAR, [](Window* pWindow) { return new ColorPickerRegular(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_STANDARD, [](Window* pWindow) { return new ColorPickerStatard(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_STANDARD_GRAY, [](Window* pWindow) { return new ColorPickerStatardGray(pWindow); }},
+        {DUI_CTR_COLOR_PICKER_STANDARD, [](Window* pWindow) { return new ColorPickerStandard(pWindow); }},
+        {DUI_CTR_COLOR_PICKER_STANDARD_GRAY, [](Window* pWindow) { return new ColorPickerStandardGray(pWindow); }},
         {DUI_CTR_COLOR_PICKER_CUSTOM, [](Window* pWindow) { return new ColorPickerCustom(pWindow); }},
         {DUI_CTR_LINE, [](Window* pWindow) { return new Line(pWindow); }},
         {DUI_CTR_IPADDRESS, [](Window* pWindow) { return new IPAddress(pWindow); }},
