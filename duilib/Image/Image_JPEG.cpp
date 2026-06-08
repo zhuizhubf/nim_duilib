@@ -252,6 +252,7 @@ bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
                                   &jpegSubsamp,
                                   &jpegColorspace);
     if (ret != 0) {
+        m_impl->m_bDecodeError = true;
         return false;
     }
     //解析Header成功
@@ -302,7 +303,7 @@ bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
     m_impl->m_nWidth = TJSCALED(width, selectedScalingfactor);
     m_impl->m_nHeight = TJSCALED(height, selectedScalingfactor);
     ASSERT((m_impl->m_nWidth > 0) && (m_impl->m_nHeight > 0));
-    if ((m_impl->m_nHeight <= 0) || (m_impl->m_nHeight <= 0)) {
+    if ((m_impl->m_nWidth <= 0) || (m_impl->m_nHeight <= 0)) {
         m_impl->m_bDecodeError = true;
         return false;
     }

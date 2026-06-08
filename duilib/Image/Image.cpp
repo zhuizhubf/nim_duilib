@@ -221,7 +221,7 @@ void Image::AdjustImageSourceRect(const std::shared_ptr<IBitmap>& pBitmap, UiRec
         return;
     }
     ASSERT((pBitmap->GetWidth() > 0) && (pBitmap->GetHeight() > 0));
-    if ((pBitmap->GetWidth() <= 0) || (pBitmap->GetHeight() <= 0)) {
+    if ((pBitmap->GetWidth() == 0) || (pBitmap->GetHeight() == 0)) {
         return;
     }
     ASSERT((m_imageInfo->GetWidth() > 0) && (m_imageInfo->GetHeight() > 0));

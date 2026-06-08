@@ -304,7 +304,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         pAnimationFrame->m_bDataError = true;
         return false;
     }
-    size_t rowBytes = pBitmap->GetWidth() * 4;
+    size_t rowBytes = (size_t)pBitmap->GetWidth() * 4;
 #ifdef DUILIB_BUILD_FOR_WIN
     pag::ColorType colorType = pag::ColorType::BGRA_8888;
 #else

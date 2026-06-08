@@ -32,15 +32,15 @@ DirectoryTree::~DirectoryTree()
     //移除所有的树节点，避免产生Destroy事件
     RemoveAllNodes();
 
+    if (m_impl != nullptr) {
+        delete m_impl;
+        m_impl = nullptr;
+    }
+
     for (auto iter : m_folderMap) {
         DeleteFolderStatus(iter.second);
     }
     m_folderMap.clear();
-
-    if (m_impl != nullptr) {
-        delete m_impl;
-        m_impl = nullptr;
-    }    
 }
 
 void DirectoryTree::DeleteFolderStatus(FolderStatus* pFolderStatus)

@@ -62,7 +62,7 @@ bool FileUtil::ReadFileHeaderData(const FilePath& filePath, uint32_t nReadSize, 
     if (f != nullptr) {
         isReadOk = true;
         ::fseek(f, 0, SEEK_END);
-        int fileSize = ::ftell(f);
+        long fileSize = ::ftell(f);
         ::fseek(f, 0, SEEK_SET);
         if (fileSize > 0) {
             if (nReadSize > (uint32_t)fileSize) {

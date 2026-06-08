@@ -151,11 +151,11 @@ namespace ReadPngHeader
         png_destroy_read_struct(&png, &info, nullptr);
 
         ASSERT((pngImageInfo.width > 0) && (pngImageInfo.height > 0));
-        if ((pngImageInfo.width <= 0) || (pngImageInfo.height <= 0)) {
+        if ((pngImageInfo.width == 0) || (pngImageInfo.height == 0)) {
             return false;
         }
         ASSERT(pngImageInfo.frame_count > 0);
-        if (pngImageInfo.frame_count <= 0) {
+        if (pngImageInfo.frame_count == 0) {
             return false;
         }
         if (pngImageInfo.frame_count > 1) {
@@ -260,11 +260,11 @@ namespace ReadPngHeader
         png_destroy_read_struct(&png, &info, nullptr);
 
         ASSERT((pngImageInfo.width > 0) && (pngImageInfo.height > 0));
-        if ((pngImageInfo.width <= 0) || (pngImageInfo.height <= 0)) {
+        if ((pngImageInfo.width == 0) || (pngImageInfo.height == 0)) {
             return false;
         }
         ASSERT(pngImageInfo.frame_count > 0);
-        if (pngImageInfo.frame_count <= 0) {
+        if (pngImageInfo.frame_count == 0) {
             return false;
         }
         if (pngImageInfo.frame_count > 1) {
@@ -371,7 +371,7 @@ public:
         }
 
         bool bLoaded = true;
-        if ((m_nFrameCount <= 0) || ((int32_t)m_nWidth <= 0) || ((int32_t)m_nHeight <= 0)) {
+        if ((m_nFrameCount <= 0) || (m_nWidth == 0) || (m_nHeight == 0)) {
             bLoaded = false;
         }
         else if (bLoadAllFrames) {

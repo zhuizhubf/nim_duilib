@@ -188,10 +188,10 @@ bool APngDecoder::LoadPng(IPngReader* reader, bool bLoadAllFrames)
     png_read_update_info(m_pngPtr, m_infoPtr);
 
     // 初始化图像参数
-    m_width = png_get_image_width(m_pngPtr, m_infoPtr);
-    m_height = png_get_image_height(m_pngPtr, m_infoPtr);
-    m_bytesPerRow = m_width * 4;
-    m_frameSize = m_bytesPerRow * m_height;
+    m_width = (int32_t)png_get_image_width(m_pngPtr, m_infoPtr);
+    m_height = (int32_t)png_get_image_height(m_pngPtr, m_infoPtr);
+    m_bytesPerRow = (size_t)m_width * 4;
+    m_frameSize = m_bytesPerRow * (size_t)m_height;
 
     // 初始化帧缓存
     m_frameBuffer = std::make_unique<uint8_t[]>(m_frameSize);

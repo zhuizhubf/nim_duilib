@@ -96,10 +96,12 @@ bool Image_ICO::LoadImageFromMemory(const std::vector<UiImageData>& imageData,
         pFrameData->m_pBitmap.reset(pRenderFactory->CreateBitmap());
         ASSERT(pFrameData->m_pBitmap != nullptr);
         if (pFrameData->m_pBitmap == nullptr) {
+            m_impl->m_frames.clear();
             return false;
         }
         ASSERT((icoData.m_imageWidth != 0) && (icoData.m_imageHeight != 0));
         if ((icoData.m_imageWidth == 0) || (icoData.m_imageHeight == 0)) {
+            m_impl->m_frames.clear();
             return false;
         }
 

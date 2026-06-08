@@ -63,7 +63,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& r
         return nullptr;
     }
     ASSERT((pSvgImage->GetWidth() > 0) && (pSvgImage->GetHeight() > 0));
-    if ((pSvgImage->GetWidth() <= 0) && (pSvgImage->GetHeight() <= 0)) {
+    if ((pSvgImage->GetWidth() == 0) && (pSvgImage->GetHeight() == 0)) {
         return nullptr;
     }
     ASSERT((m_nImageInfoWidth > 0) && (m_nImageInfoHeight > 0));
