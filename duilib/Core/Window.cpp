@@ -1630,6 +1630,7 @@ LRESULT Window::OnHotKeyMsg(int32_t /*hotkeyId*/, VirtualKeyCode /*vkCode*/, uin
         ASSERT(Keyboard::IsKeyDown(kVK_LWIN) || Keyboard::IsKeyDown(kVK_RWIN));
     }
 #endif
+    (void)modifierKey;
     bHandled = false;
     return 0;
 }
