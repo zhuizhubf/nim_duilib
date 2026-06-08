@@ -56,6 +56,14 @@ void ColorPickerStandard::DrawColorMap(IRender* pRender, const UiRect& rect)
     UiPointF selectCenterPt;
     UiColor selectBrushColor;
 
+    // 总共 13 行六边形，最大颜色数 = 7+8+9+10+11+12+13+12+11+10+9+8+7 = 127
+    // m_colorMap 应与实际六边形数一致
+    const size_t totalHexagons = 127;
+    if (m_colorMap.size() != totalHexagons) {
+        // 颜色表大小不对，重新初始化
+        InitColorMap();
+    }
+
     size_t colorIndex = 0;
     for (int32_t y = 0; y < 13; ++y) { //共计13行
         int32_t count = 0;
@@ -79,6 +87,9 @@ void ColorPickerStandard::DrawColorMap(IRender* pRender, const UiRect& rect)
             UiColor brushColor = UiColor(UiColors::Salmon);
             if (colorIndex < m_colorMap.size()) {
                 brushColor = m_colorMap[colorIndex].color;
+            }
+            // 始终更新 centerPt（无论 m_colorMap 是否有对应项）
+            if (colorIndex < m_colorMap.size()) {
                 m_colorMap[colorIndex].centerPt = centerPt;
                 if (m_selectedColor == brushColor) {
                     //当前选择的颜色，边框加粗显示

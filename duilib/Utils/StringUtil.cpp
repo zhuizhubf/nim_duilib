@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <vector>
+#include <climits>
 
 namespace ui
 {
@@ -170,6 +171,11 @@ void StringAppendVT(const CharType *format, va_list ap, std::basic_string<CharTy
         {
             ASSERT(0);
             return; /* not expected, result should be -1 here */
+        }
+        // 检查 buffer_size 翻倍是否溢出（防御性）
+        if (buffer_size > (INT_MAX / 2)) {
+            ASSERT(0);
+            return;    /* too long, would overflow */
         }
         buffer_size <<= 1; /* try doubling the buffer size */
         if (buffer_size > 32 * 1024 * 1024)

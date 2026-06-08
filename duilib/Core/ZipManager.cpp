@@ -120,6 +120,7 @@ bool ZipManager::GetZipData(const FilePath& path, std::vector<unsigned char>& fi
         nRet = ::unzOpenCurrentFile(m_hzip);
     }
     if (nRet != UNZ_OK) {
+        ASSERT(!"ZipManager: unzOpenCurrentFile failed");
         return false;
     }
 
