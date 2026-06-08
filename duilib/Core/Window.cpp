@@ -925,6 +925,9 @@ void Window::UpdateLayeredWindowStyleEx(bool bRedraw)
     bool bNeedLayeredWindow = false;
     if (IsShadowAttached()) {
         ShadowType shadowType = GetShadowType();
+        if (shadowType == ShadowType::kShadowDefault) {
+            shadowType = Shadow::GetDefaultShadowType(this);
+        }
         bNeedLayeredWindow = Shadow::IsShadowTypeNeedLayeredWindow(shadowType);
     }
     if (IsLayeredWindow() != bNeedLayeredWindow) {
@@ -2612,6 +2615,9 @@ void Window::OnDwmCompositionChangedMsg(bool bDwmCompositionEnabled)
     if (!bDwmCompositionEnabled && IsShadowAttached()) {
         //关闭DWM后（仅Window 7能关闭，Win 8 开始已经无法关闭DWM服务）
         ShadowType shadowType = GetShadowType();
+        if (shadowType == ShadowType::kShadowDefault) {
+            shadowType = Shadow::GetDefaultShadowType(this);
+        }
         if (Shadow::IsSystemShadowType(shadowType)) {
             //自动切换到可用的阴影类型
             SetShadowType(ShadowType::kShadowNone);

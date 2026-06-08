@@ -189,7 +189,7 @@ bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRende
 
 bool SkRasterWindowContext_Windows::SwapPaintBuffers(HDC hPaintDC, const UiRect& rcPaint, IRender* pRender, uint8_t nLayeredWindowAlpha) const
 {
-    PerformanceStat statPerformance(_T("SkRasterWindowContext_Windows::SwapPaintBuffers"));
+    PerformanceStat statPerformance(_T("PaintWindow, SkRasterWindowContext_Windows::SwapPaintBuffers"));
     ASSERT(hPaintDC != nullptr);
     if (hPaintDC == nullptr) {
         return false;

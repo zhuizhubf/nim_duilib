@@ -6,6 +6,10 @@
 #include "duilib/Render/IRender.h"
 #include "duilib/Render/AutoClip.h"
 
+#ifdef DUILIB_BUILD_FOR_WIN
+    #include <VersionHelpers.h>
+#endif
+
 namespace ui 
 {
 
@@ -208,9 +212,6 @@ private:
     Shadow* m_pShadow;
 };
 
-//默认阴影类型
-ShadowType Shadow::m_nShadowTypeDefault = ShadowType::kShadowBigRound;
-
 Shadow::Shadow(Window* pWindow, bool bShadowAttached):
     m_bShadowAttached(bShadowAttached),
     m_bWindowMaximized(false),
@@ -244,7 +245,7 @@ Shadow::Shadow(Window* pWindow, bool bShadowAttached):
     }
 
     //设置默认的阴影类型
-    m_nShadowType = m_nShadowTypeDefault;
+    m_nShadowType = ShadowType::kShadowDefault;
 }
 
 void Shadow::SetShadowAttached(bool bShadowAttached)
@@ -252,6 +253,9 @@ void Shadow::SetShadowAttached(bool bShadowAttached)
     ASSERT(m_pWindow->GetFullscreenControl() == nullptr);
     if (m_pWindow->GetFullscreenControl() != nullptr) {
         return;
+    }
+    if (m_nShadowType == ShadowType::kShadowDefault) {
+        m_nShadowType = GetDefaultShadowType(m_pWindow);
     }
     m_bShadowAttached = bShadowAttached;
     OnShadowAttached(GetShadowType());
@@ -513,7 +517,7 @@ bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
         nShadowType = ShadowType::kShadowCustom;
     }
     else if (typeString == _T("default")) {
-        nShadowType = m_nShadowTypeDefault;
+        nShadowType = ShadowType::kShadowDefault;
     }
     else if (typeString == _T("system_default")) {
         nShadowType = ShadowType::kShadowSystemDefault;
@@ -534,14 +538,40 @@ bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
     return true;
 }
 
+ShadowType Shadow::GetDefaultShadowType(const Window* pWindow)
+{
+    if ((pWindow != nullptr) && pWindow->NativeWnd()->IsSystemShadowSupported()) {
+        //该窗口支持系统阴影
+        return ShadowType::kShadowSystemDefault;
+    }
+    //未关联窗口的情况
+#if defined (DUILIB_BUILD_FOR_WIN)
+    //Windows系统
+    if (::IsWindows10OrGreater()) {
+        //Windows 10 或者更新的系统，默认使用系统阴影，体验较好
+        return ShadowType::kShadowSystemDefault;
+    }
+    else {
+        //低于Windows 10的系统，默认使用自绘阴影，因为系统阴影的体验不好
+        return ShadowType::kShadowBigRound;
+    }
+#elif defined (DUILIB_BUILD_FOR_MACOS)
+    //macOS：支持系统阴影
+    return ShadowType::kShadowSystemDefault;
+#else
+    //其他平台：默认为自绘阴影，圆角
+    return ShadowType::kShadowBigRound;
+#endif
+}
+
 ShadowType Shadow::GetSupportedShadowType(const Window* pWindow, ShadowType nShadowType)
 {
+    if (nShadowType == ShadowType::kShadowDefault) {
+        nShadowType = GetDefaultShadowType(pWindow);
+    }
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return nShadowType;
-    }
-    if (nShadowType == ShadowType::kShadowDefault) {
-        nShadowType = m_nShadowTypeDefault;
     }
     if (!pWindow->NativeWnd()->IsSystemShadowSupported()) {
         //当不支持系统阴影时，自动选择自绘阴影
@@ -552,7 +582,7 @@ ShadowType Shadow::GetSupportedShadowType(const Window* pWindow, ShadowType nSha
         }
 #else
         if (nShadowType == ShadowType::kShadowSystemDefault) {
-            nShadowType = m_nShadowTypeDefault;
+            nShadowType = ShadowType::kShadowBigRound;
         }
         else if (nShadowType == ShadowType::kShadowSystemDoNotRound) {
             nShadowType = ShadowType::kShadowNone;
@@ -620,7 +650,7 @@ bool Shadow::GetShadowParam(const Window* pWindow,
 {
     nShadowType = GetSupportedShadowType(pWindow, nShadowType);
     if (nShadowType == ShadowType::kShadowDefault) {
-        nShadowType = m_nShadowTypeDefault;
+        nShadowType = GetDefaultShadowType(pWindow);
     }
     bool bRet = false;
     //阴影边缘的颜色，与窗口边框的颜色保持一致

@@ -44,6 +44,12 @@ public:
     */
     static bool GetShadowType(const DString& typeString, ShadowType& nShadowType);
 
+    /** 获取默认的阴影类型
+    * @param [in] pWindow 关联的窗口，用于判断是否支持系统阴影，可以为nullptr
+    * @return 返回默认的阴影类型（返回除了ShadowType::kShadowDefault外的阴影类型）
+    */
+    static ShadowType GetDefaultShadowType(const Window* pWindow);
+
     /** 根据窗口属性获取支持的阴影类型
     */
     static ShadowType GetSupportedShadowType(const Window* pWindow, ShadowType nShadowType);
@@ -61,6 +67,7 @@ public:
     static bool IsShadowTypeNeedWindowRGN(ShadowType nShadowType);
 
     /** 获取默认的阴影类型对应的参数
+    * @param [in] pWindow 关联的窗口
     * @param [in,out] nShadowType 阴影类型
     * @param [out] szBorderRound 返回圆角大小，未经DPI缩放
     * @param [out] rcShadowCorner 返回阴影素材的九宫格属性，未经DPI缩放
@@ -237,11 +244,6 @@ private:
     /** 更新窗口的贴边属性
     */
     void UpdateWindowPosSnap();
-
-private:
-    /** 默认的阴影类型
-    */
-    static ShadowType m_nShadowTypeDefault;
 
 private:
     //是否支持阴影效果
