@@ -125,7 +125,15 @@ public:
         }
 
         //每帧的播放时间
-        m_frameDelayMs = (int32_t)(1000 / pagDecoder.frameRate());    
+        //注意：frameRate 为 0 时，1000 / 0.0f 得到 +inf，(int32_t)+inf 是 UB（未定义行为）；
+        //这里先检查 frameRate > 0 才计算，否则使用默认帧延迟，避免 UB
+        const float frameRate = pagDecoder.frameRate();
+        if (frameRate > 0.0f) {
+            m_frameDelayMs = (int32_t)(1000.0f / frameRate);
+        }
+        else {
+            m_frameDelayMs = IMAGE_ANIMATION_DELAY_MS;
+        }
         return true;
     }
 };

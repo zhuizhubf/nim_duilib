@@ -72,7 +72,8 @@ void SkRasterWindowContext_SDL::resize(int nWidth, int nHeight)
         return;
     }
 
-    m_fSurfaceMemory.reset(nWidth * nHeight * sizeof(uint32_t));
+    //注意：nWidth * nHeight * sizeof(uint32_t) 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
+    m_fSurfaceMemory.reset((size_t)nWidth * nHeight * sizeof(uint32_t));
     void* pixels = m_fSurfaceMemory.get();
     ASSERT(pixels != nullptr);
     if (pixels == nullptr) {
@@ -83,7 +84,7 @@ void SkRasterWindowContext_SDL::resize(int nWidth, int nHeight)
     }
 
     SkImageInfo info = SkImageInfo::Make(nWidth, nHeight, pDisplayParams->colorType(), SkAlphaType::kPremul_SkAlphaType, pDisplayParams->colorSpace());
-    m_fBackbufferSurface = SkSurfaces::WrapPixels(info, pixels, sizeof(uint32_t) * nWidth);
+    m_fBackbufferSurface = SkSurfaces::WrapPixels(info, pixels, (size_t)sizeof(uint32_t) * nWidth);
     if (m_fBackbufferSurface == nullptr) {
         m_fSurfaceMemory.reset();
         fWidth = 0;
@@ -319,9 +320,11 @@ bool SkRasterWindowContext_SDL::SwapPaintBuffersFast(const UiRect& rcPaint, uint
         const int32_t nMaxRow = rcPaint.top + rcPaint.Height();
         const int32_t nWidth = rcPaint.Width();
         for (int32_t nRow = rcPaint.top; nRow < nMaxRow; ++nRow) {
-            ::memcpy((uint32_t*)sdlSurface->pixels + nRow * sdlSurface->w + rcPaint.left,
-                     (uint32_t*)m_fSurfaceMemory.get() + nRow * sdlSurface->w + rcPaint.left,
-                     nWidth * sizeof(uint32_t));
+            //注意：nRow * sdlSurface->w 是 int * int，溢出后转 size_t 错误；必须先转为 size_t
+            const size_t nRowOffset = (size_t)nRow * sdlSurface->w;
+            ::memcpy((uint32_t*)sdlSurface->pixels + nRowOffset + rcPaint.left,
+                     (uint32_t*)m_fSurfaceMemory.get() + nRowOffset + rcPaint.left,
+                     (size_t)nWidth * sizeof(uint32_t));
         }
 
         //处理颜色顺序
@@ -425,7 +428,8 @@ void SkRasterWindowContext_SDL::UpdateColorByteOrder(void* surfacePixels, int32_
     const int32_t nWidth = rcPaint.Width();
     for (int32_t nRow = rcPaint.top; nRow < nMaxRow; ++nRow) {
         for (int32_t nCol = 0; nCol < nWidth; ++nCol) {
-            uint32_t* pColorValue = (uint32_t*)surfacePixels + nRow * nSurfaceWidth + rcPaint.left + nCol;
+            //注意：nRow * nSurfaceWidth 是 int * int，溢出后转 size_t 错误；必须先转为 size_t
+            uint32_t* pColorValue = (uint32_t*)surfacePixels + (size_t)nRow * nSurfaceWidth + rcPaint.left + nCol;
             colorValue = *pColorValue;
             if (bDiffR) {
                 ((uint8_t*)pColorValue)[sdlR] = ((uint8_t*)&colorValue)[backR];
@@ -453,7 +457,8 @@ void SkRasterWindowContext_SDL::UpdateColorAlpha(void* surfacePixels, int32_t nS
     const int32_t nWidth = rcPaint.Width();
     for (int32_t nRow = rcPaint.top; nRow < nMaxRow; ++nRow) {
         for (int32_t nCol = 0; nCol < nWidth; ++nCol) {
-            uint32_t* pColorValue = (uint32_t*)surfacePixels + nRow * nSurfaceWidth + rcPaint.left + nCol;
+            //注意：nRow * nSurfaceWidth 是 int * int，溢出后转 size_t 错误；必须先转为 size_t
+            uint32_t* pColorValue = (uint32_t*)surfacePixels + (size_t)nRow * nSurfaceWidth + rcPaint.left + nCol;
             uint8_t& r = ((uint8_t*)pColorValue)[sdlR];
             uint8_t& g = ((uint8_t*)pColorValue)[sdlG];
             uint8_t& b = ((uint8_t*)pColorValue)[sdlB];

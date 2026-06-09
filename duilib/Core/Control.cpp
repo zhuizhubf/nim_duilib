@@ -850,7 +850,9 @@ bool Control::OnApplyAttributeList(const DString& strReceiver, const DString& st
     bool isFindSubControl = false;
     DString receiverName = strReceiver;
     if (receiverName.size() >= 2) {
-        if (receiverName.substr(0, 2) == _T(".\\") || receiverName.substr(0, 2) == _T("./")) {
+        //注意：substr(0, 2) 提取到局部变量，避免重复创建临时 DString 对象（4 次 → 1 次）
+        const DString prefix = receiverName.substr(0, 2);
+        if ((prefix == _T(".\\")) || (prefix == _T("./"))) {
             receiverName = receiverName.substr(2);
             isFindSubControl = true;
         }

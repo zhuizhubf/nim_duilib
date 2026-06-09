@@ -135,15 +135,19 @@ void ListCtrl::SetAttribute(const DString& strName, const DString& strValue2)
         SetDataSubItemClass(strValue);
     }
     else if (strName == _T("row_grid_line_width")) {
-        ASSERT(StringUtil::StringToFloat(strValue.c_str(), nullptr) >= 0);
-        SetRowGridLineWidth(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
+        //注意：StringToFloat 调用 1 次，提取到局部变量避免重复计算且防止结果不一致
+        float fValue = StringUtil::StringToFloat(strValue.c_str(), nullptr);
+        ASSERT(fValue >= 0);
+        SetRowGridLineWidth(fValue, true);
     }
     else if (strName == _T("row_grid_line_color")) {
         SetRowGridLineColor(strValue);
     }
     else if (strName == _T("column_grid_line_width")) {
-        ASSERT(StringUtil::StringToFloat(strValue.c_str(), nullptr) >= 0);
-        SetColumnGridLineWidth(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
+        //注意：StringToFloat 调用 1 次，提取到局部变量避免重复计算且防止结果不一致
+        float fValue = StringUtil::StringToFloat(strValue.c_str(), nullptr);
+        ASSERT(fValue >= 0);
+        SetColumnGridLineWidth(fValue, true);
     }
     else if (strName == _T("column_grid_line_color")) {
         SetColumnGridLineColor(strValue);
@@ -1291,6 +1295,11 @@ void ListCtrl::SetHeaderHeight(int32_t nHeaderHeight, bool bNeedDpiScale)
     if (nHeaderHeight < 0) {
         nHeaderHeight = 0;
     }
+    //注意：增加上限检查，防止 XML 中传入超大值（>10000）导致 DPI 缩放后整数溢出及显示异常
+    if (nHeaderHeight > 10000) {
+        ASSERT(!"ListCtrl::SetHeaderHeight: nHeaderHeight too large, clamp to 10000");
+        nHeaderHeight = 10000;
+    }
     if (bNeedDpiScale) {
         Dpi().ScaleInt(nHeaderHeight);
     }
@@ -1322,6 +1331,11 @@ void ListCtrl::SetDataItemHeight(int32_t nItemHeight, bool bNeedDpiScale)
     ASSERT(nItemHeight > 0);
     if (nItemHeight <= 0) {
         return;
+    }
+    //注意：增加上限检查，防止 XML 中传入超大值（>10000）导致 DPI 缩放后整数溢出及显示异常
+    if (nItemHeight > 10000) {
+        ASSERT(!"ListCtrl::SetDataItemHeight: nItemHeight too large, clamp to 10000");
+        nItemHeight = 10000;
     }
     if (bNeedDpiScale) {
         Dpi().ScaleInt(nItemHeight);

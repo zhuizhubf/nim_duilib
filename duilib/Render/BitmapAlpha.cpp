@@ -28,7 +28,8 @@ void BitmapAlpha::ClearAlpha(const UiRect& rcDirty, uint8_t alpha) const
     }
     if ((rcDirty.left == 0) && (rcDirty.top == 0) && (rcDirty.Width() == m_nWidth) && (rcDirty.Height() == m_nHeight)) {
         //全部清除
-        ::memset(m_pPiexl, alpha, m_nHeight * m_nWidth * m_nChannels);
+        //注意：m_nHeight * m_nWidth * m_nChannels 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
+        ::memset(m_pPiexl, alpha, (size_t)m_nHeight * m_nWidth * m_nChannels);
         return;
     }
 

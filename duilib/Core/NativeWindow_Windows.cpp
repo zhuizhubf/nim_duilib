@@ -3289,6 +3289,12 @@ HRESULT NativeWindow_Windows::OnDragEnter(IDataObject* pDataObj, DWORD grfKeySta
 
     m_textList.clear();
     m_fileList.clear();
+    //COM 引用计数：保存 IDataObject 指针前必须 AddRef，否则外部释放后会 use-after-free
+    if (m_pDataObj != nullptr) {
+        m_pDataObj->Release();
+        m_pDataObj = nullptr;
+    }
+    pDataObj->AddRef();
     m_pDataObj = pDataObj;
 
     ControlDropTargetImpl_Windows::ParseWindowsDataObject(pDataObj, m_textList, m_fileList);
@@ -3333,7 +3339,11 @@ HRESULT NativeWindow_Windows::OnDragOver(IDataObject* pDataObj, DWORD grfKeyStat
 
 HRESULT NativeWindow_Windows::OnDragLeave()
 {
-    m_pDataObj = nullptr;
+    //COM 引用计数：清理保存的 IDataObject 指针前必须 Release
+    if (m_pDataObj != nullptr) {
+        m_pDataObj->Release();
+        m_pDataObj = nullptr;
+    }
     m_textList.clear();
     m_fileList.clear();
     m_pOwner->OnNativeDropLeaveMsg();
@@ -3365,6 +3375,14 @@ HRESULT NativeWindow_Windows::OnDrop(IDataObject* pDataObj, DWORD grfKeyState, P
     if (pdwEffect != nullptr) {
         *pdwEffect = data.m_dwEffect;
     }
+
+    //COM 引用计数：Drop 完成后不再有 DragLeave 消息，需要在此处释放 IDataObject 引用
+    if (m_pDataObj != nullptr) {
+        m_pDataObj->Release();
+        m_pDataObj = nullptr;
+    }
+    m_textList.clear();
+    m_fileList.clear();
     return data.m_hResult;
 }
 
