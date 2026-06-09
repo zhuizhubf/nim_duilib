@@ -18,8 +18,6 @@ TreeNode::TreeNode(Window* pWindow) :
     m_checkBoxIconPadding(0),
     m_checkBoxTextPadding(0),
     m_iconTextPadding(0),
-    m_pExpandImageRect(nullptr),
-    m_pCollapseImageRect(nullptr),
     m_expandIndent(0),
     m_checkBoxIndent(0),
     m_iconIndent(0)
@@ -31,14 +29,6 @@ TreeNode::TreeNode(Window* pWindow) :
 
 TreeNode::~TreeNode()
 {
-    if (m_pExpandImageRect != nullptr) {
-        delete m_pExpandImageRect;
-        m_pExpandImageRect = nullptr;
-    }
-    if (m_pCollapseImageRect != nullptr) {
-        delete m_pCollapseImageRect;
-        m_pCollapseImageRect = nullptr;
-    }
 }
 
 DString TreeNode::GetType() const { return DUI_CTR_TREENODE; }
@@ -222,19 +212,19 @@ void TreeNode::PaintStateImages(IRender* pRender)
     if (IsExpand()) {
         //绘制展开状态图标，如果没有子节点，不会只这个图标
         if ((m_expandImage != nullptr) && !m_aTreeNodes.empty()){
-            if (m_pExpandImageRect == nullptr) {
-                m_pExpandImageRect = new UiRect;
+            if (!m_pExpandImageRect) {
+                m_pExpandImageRect = std::make_unique<UiRect>();
             }
-            m_expandImage->PaintStateImage(pRender, GetState(), _T(""), m_pExpandImageRect);
+            m_expandImage->PaintStateImage(pRender, GetState(), _T(""), m_pExpandImageRect.get());
         }
     }
     else {
         //绘制未展开状态图标
         if (m_collapseImage != nullptr) {
-            if (m_pCollapseImageRect == nullptr) {
-                m_pCollapseImageRect = new UiRect;
+            if (!m_pCollapseImageRect) {
+                m_pCollapseImageRect = std::make_unique<UiRect>();
             }
-            m_collapseImage->PaintStateImage(pRender, GetState(), _T(""), m_pCollapseImageRect);
+            m_collapseImage->PaintStateImage(pRender, GetState(), _T(""), m_pCollapseImageRect.get());
         }
     }
 }
@@ -565,14 +555,8 @@ void TreeNode::SetExpandImageClass(const DString& expandClass)
         //关闭展开标志功能
         m_expandImage.reset();
         m_collapseImage.reset();
-        if (m_pExpandImageRect != nullptr) {
-            delete m_pExpandImageRect;
-            m_pExpandImageRect = nullptr;
-        }
-        if (m_pCollapseImageRect != nullptr) {
-            delete m_pCollapseImageRect;
-            m_pCollapseImageRect = nullptr;
-        }
+        m_pExpandImageRect.reset();
+        m_pCollapseImageRect.reset();
     }
     AdjustExpandImagePadding();
 }
