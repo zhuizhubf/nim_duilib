@@ -4,6 +4,7 @@
 #include "duilib/Render/IRender.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include <memory>
 
 namespace ui 
 {
@@ -77,6 +78,8 @@ public:
             if (pFallbackFont == nullptr) {
                 continue;
             }
+            // RAII 包装：异常路径下也能正确释放
+            std::unique_ptr<IFont> pFallbackFontHolder(pFallbackFont);
             UiFont fontInfo;
             fontInfo.m_fontSize = pFont->FontSize();
             fontInfo.m_bUnderline = pFont->IsUnderline();
@@ -94,13 +97,13 @@ public:
                 }
             }
             if (!isInitOk) {
-                delete pFallbackFont;
-                pFallbackFont = nullptr;
+                // RAII 自动释放 pFallbackFont
                 continue;
             }
 
             //找到第一个匹配的，停止
-            pRetFallbackFont = pFallbackFont;
+            //转移所有权到 pRetFallbackFont，RAII 释放器置空
+            pRetFallbackFont = pFallbackFontHolder.release();
             break;
         }
         if (pRetFallbackFont != nullptr) {
