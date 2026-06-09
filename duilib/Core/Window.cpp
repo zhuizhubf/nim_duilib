@@ -1258,8 +1258,8 @@ bool Window::Paint(const UiRect& rcPaint)
         return false;
     }
 
-    //开始绘制前，去掉alpha通道
-    if (IsLayeredWindow()) {
+    //开始绘制前，去掉alpha通道，将颜色值全部置零
+    if (!rcPaint.IsEmpty()) {
         PerformanceStat statPerformance(_T("PaintWindow, Window::Paint ClearAlpha"));
         pRender->ClearAlpha(rcPaint);
     }
@@ -1286,10 +1286,10 @@ bool Window::Paint(const UiRect& rcPaint)
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_RICH_EDIT_DRAW_OPT)
     //开始绘制前，进行alpha通道修复
-    if (IsLayeredWindow()) {
+    if (!rcPaint.IsEmpty()) {
         PerformanceStat statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
         Shadow* pShadow = m_windowRoot->GetShadow();
-        if ((pShadow != nullptr) && IsShadowAttached() &&
+        if ((pShadow != nullptr) && IsShadowAttached() && !Shadow::IsSystemShadowType(GetShadowType()) &&
             (m_renderOffset.x == 0) && (m_renderOffset.y == 0)) {
             //补救由于Gdi绘制造成的alpha通道为0
             UiRect rcNewPaint = rcPaint;
@@ -1301,14 +1301,14 @@ bool Window::Paint(const UiRect& rcPaint)
             rcRootPadding.top += 1;
             rcRootPadding.right += 1;
             rcRootPadding.bottom += 1;
-            pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要回复
+            pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要恢复
         }
         else {
             UiRect rcNewPaint = rcPaint;
             UiRect rcRootPaddingPos = pRoot->GetPosWithoutPadding();
             rcNewPaint.Intersect(rcRootPaddingPos);
             UiPadding rcRootPadding;
-            pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要回复
+            pRender->RestoreAlpha(rcNewPaint, rcRootPadding);//目前只有Windows的RichEdit绘制导致窗体透明，所以才需要恢复
         }
     }
 #endif

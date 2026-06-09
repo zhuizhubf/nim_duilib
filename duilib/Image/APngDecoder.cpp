@@ -65,7 +65,7 @@ void APngDecoder::PngWarningCallback(png_structp /*png_ptr*/, png_const_charp me
 }
 
 // PNG错误回调
-void APngDecoder::PngErrorCallback(png_structp png_ptr, png_const_charp message)
+void APngDecoder::PngErrorCallback(png_structp /*png_ptr*/, png_const_charp message)
 {
     std::string errMsg;
     if (message != nullptr) {
