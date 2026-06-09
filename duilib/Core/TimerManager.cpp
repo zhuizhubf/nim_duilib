@@ -82,8 +82,9 @@ void TimerManager::Clear()
         m_aTimers.pop();
     }
     m_removedTimerIds.clear();
-    m_bRunning = false;
+    m_bRunning.store(false, std::memory_order_release);
     if (m_pWorkerThread != nullptr) {
+        //持有 m_taskMutex 期间通知：worker 的 wait 谓词一定会看到 m_bRunning=false
         m_cv.notify_one();
         guard.unlock();
         m_pWorkerThread->join();
@@ -116,10 +117,10 @@ size_t TimerManager::AddTimer(const std::weak_ptr<WeakFlag>& weakFlag, const Tim
     m_aTimers.push(pTimer);
     if (m_pWorkerThread == nullptr) {
         //启动线程
-        m_bRunning = true;
+        m_bRunning.store(true, std::memory_order_release);
         m_pWorkerThread = std::make_unique<std::thread>(&TimerManager::WorkerThreadProc, this);
     }
-    ASSERT(m_bRunning);
+    ASSERT(m_bRunning.load(std::memory_order_acquire));
     //唤醒工作线程，检查任务状态
     m_cv.notify_one();
     return nTimerId;
@@ -203,20 +204,20 @@ void TimerManager::Poll()
     }
     //唤醒工作线程，检查任务状态
     m_cv.notify_one();
-    m_bHasPenddingPoll = false;
+    m_bHasPenddingPoll.store(false, std::memory_order_release);
 }
 
 void TimerManager::WorkerThreadProc()
 {
-    while (m_bRunning) {
+    while (m_bRunning.load(std::memory_order_acquire)) {
         std::unique_lock taskGuard(m_taskMutex);
-        if (!m_bRunning) {
+        if (!m_bRunning.load(std::memory_order_acquire)) {
             break;
         }
         if (m_aTimers.empty()) {
             //为空，等待任务；使用谓词避免虚假唤醒
-            m_cv.wait(taskGuard, [this] { return !m_bRunning || !m_aTimers.empty(); });
-            if (!m_bRunning) {
+            m_cv.wait(taskGuard, [this] { return !m_bRunning.load(std::memory_order_acquire) || !m_aTimers.empty(); });
+            if (!m_bRunning.load(std::memory_order_acquire)) {
                 break;
             }
         }
@@ -240,13 +241,17 @@ void TimerManager::WorkerThreadProc()
 
             if (nDetaTimeMs > 0) {
                 //延迟等待超时
-                //LogUtil::OutputLine(StringUtil::Printf(_T("condition_variable: wait_for timer event(%u ms)"), nDetaTimeMs));
                 //该函数精确度10ms左右
                 //注意事项：发现gcc版本和glibc版本对wait_for都有问题（使用的时系统时间），gcc >=10 且 glibc >= 2.30 才会对程序行为没有影响。
-                m_cv.wait_for(taskGuard, std::chrono::milliseconds(nDetaTimeMs));
+                //使用谓词版本 wait_until：能精确到停止时间点，且能正确响应 m_bRunning 变化和 spurious wakeup
+                //(wait_for 是相对时间，spurious wakeup 后会重新倒计时 nDetaTimeMs，可能延迟多倍)
+                auto deadline = currentTime + std::chrono::milliseconds(nDetaTimeMs);
+                m_cv.wait_until(taskGuard, deadline, [this] {
+                    return !m_bRunning.load(std::memory_order_acquire) || m_aTimers.empty();
+                    });
             }
             //通知处理(发送到主线程执行, 此时不能加锁，避免出现死锁问题)
-            m_bHasPenddingPoll = true;
+            m_bHasPenddingPoll.store(true, std::memory_order_release);
             taskGuard.unlock();
 
             uint32_t nErrorCode = 0;
@@ -257,7 +262,7 @@ void TimerManager::WorkerThreadProc()
                     //在程序启动时，如果在子线程向主线程Post消息，会遇到此错误
                     for (int32_t i = 0; i < 200; ++i) {
                         ::Sleep(50);
-                        if (!m_bRunning) {
+                        if (!m_bRunning.load(std::memory_order_acquire)) {
                             break;
                         }
                         bRet = m_threadMsg.PostMsg(WM_USER_DEFINED_TIMER, 0, 0, &nErrorCode);
@@ -266,28 +271,29 @@ void TimerManager::WorkerThreadProc()
                         }
                     }
                 }
-                if (m_bRunning) {
+                if (m_bRunning.load(std::memory_order_acquire)) {
                     ASSERT_UNUSED_VARIABLE(bRet);
-                }                
+                }
             }
 #else
-            if (m_bRunning) {
+            if (m_bRunning.load(std::memory_order_acquire)) {
                 ASSERT_UNUSED_VARIABLE(bRet);
             }
 #endif
             taskGuard.lock();
-            if (m_bRunning) {
+            if (m_bRunning.load(std::memory_order_acquire)) {
                 ASSERT_UNUSED_VARIABLE(bRet);
-            }            
-            //LogUtil::OutputLine(StringUtil::Printf(_T("PostMessage: send timer event")));
-
-            if (m_bRunning && m_bHasPenddingPoll) {
-                //使用谓词等待，避免虚假唤醒
-                m_cv.wait(taskGuard, [this] { return !m_bRunning || !m_bHasPenddingPoll; });
             }
-        }        
+
+            if (m_bRunning.load(std::memory_order_acquire) && m_bHasPenddingPoll.load(std::memory_order_acquire)) {
+                //使用谓词等待，避免虚假唤醒
+                m_cv.wait(taskGuard, [this] {
+                    return !m_bRunning.load(std::memory_order_acquire) || !m_bHasPenddingPoll.load(std::memory_order_acquire);
+                    });
+            }
+        }
     }
-    m_bRunning = false;
+    m_bRunning.store(false, std::memory_order_release);
 }
 
 }

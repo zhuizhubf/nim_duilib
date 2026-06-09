@@ -50,8 +50,8 @@ FrameworkThread::~FrameworkThread()
         GlobalManager::Instance().Thread().UnregisterThread(m_nThreadIdentifier);
     }
     m_threadMsg.Clear();
-    ASSERT(!m_bRunning);
-    if (m_bRunning) {
+    ASSERT(!m_bRunning.load(std::memory_order_acquire));
+    if (m_bRunning.load(std::memory_order_acquire)) {
         Stop();
     }
 }
@@ -59,15 +59,15 @@ FrameworkThread::~FrameworkThread()
 bool FrameworkThread::RunMessageLoop(bool bSupportIdle)
 {
     ASSERT(m_nThreadIdentifier == kThreadUI);
-    ASSERT(!m_bRunning);
-    if (m_bRunning) {
+    ASSERT(!m_bRunning.load(std::memory_order_acquire));
+    if (m_bRunning.load(std::memory_order_acquire)) {
         return false;
     }
-    m_bRunning = true;
+    m_bRunning.store(true, std::memory_order_release);
     m_bSupportIdle = bSupportIdle;
     if (!OnInit()) {
         //初始化失败，直接返回
-        m_bRunning = false;
+        m_bRunning.store(false, std::memory_order_release);
         return false;
     }
     OnRunMessageLoop();
@@ -78,7 +78,7 @@ bool FrameworkThread::RunMessageLoop(bool bSupportIdle)
     }
     m_bThreadUI = false;
     m_threadMsg.Clear();
-    m_bRunning = false;
+    m_bRunning.store(false, std::memory_order_release);
     return true;
 }
 
@@ -93,14 +93,14 @@ void FrameworkThread::OnMainThreadExit()
 
 bool FrameworkThread::Start()
 {
-    ASSERT(!m_bRunning);
-    if (m_bRunning) {
+    ASSERT(!m_bRunning.load(std::memory_order_acquire));
+    if (m_bRunning.load(std::memory_order_acquire)) {
         return false;
     }
     if (m_nThreadIdentifier != kThreadNone) {
         GlobalManager::Instance().Thread().RegisterThread(m_nThreadIdentifier, this);
     }
-    m_bRunning = true;
+    m_bRunning.store(true, std::memory_order_release);
     m_bThreadUI = false;
     m_pWorkerThread = std::make_unique<std::thread>(&FrameworkThread::WorkerThreadProc, this);
     m_nThisThreadId = m_pWorkerThread->get_id();
@@ -115,20 +115,28 @@ bool FrameworkThread::Stop()
     ASSERT(!IsUIThread());
     if (m_pWorkerThread != nullptr) {
         //停止线程
-        m_bRunning = false;
+        // 关键修复：
+        // 1) 必须在 m_penddingTaskMutex 锁内将 m_bRunning 置为 false，
+        //    保证 worker 线程在 wait 唤醒后通过谓词检查能立即看到新的状态；
+        // 2) m_cv.notify_all() 必须在锁释放之后调用，避免"未到达等待态的 notify"信号丢失问题；
+        // 3) 使用 std::atomic 的 release 内存序与 worker 的 acquire load 配对，确保 happens-before。
+        {
+            std::lock_guard<std::mutex> lk(m_penddingTaskMutex);
+            m_bRunning.store(false, std::memory_order_release);
+        }
         m_cv.notify_all();
         m_pWorkerThread->join();
         m_pWorkerThread.reset();
     }
     else {
-        m_bRunning = false;
+        m_bRunning.store(false, std::memory_order_release);
     }
     return true;
 }
 
 bool FrameworkThread::IsRunning() const
 {
-    return m_bRunning;
+    return m_bRunning.load(std::memory_order_acquire);
 }
 
 bool FrameworkThread::IsUIThread() const
@@ -411,29 +419,41 @@ void FrameworkThread::WorkerThreadProc()
     m_nThisThreadId = std::this_thread::get_id();
     if (!OnInit()) {
         //初始化失败，退出线程
-        m_bRunning = false;
+        m_bRunning.store(false, std::memory_order_release);
         OnCleanup();
         return;
     }
-    while (m_bRunning) {        
+    // 关键修复：使用带谓词的 wait，处理 spurious wakeup 和 Stop() 期间的"信号丢失"竞态
+    // 谓词条件：有任务 OR 线程应停止
+    // 同时将 penddingTaskIds 提取到循环外，避免每轮重新分配 vector
+    std::vector<size_t> penddingTaskIds;
+    while (m_bRunning.load(std::memory_order_acquire)) {
         std::unique_lock lk(m_penddingTaskMutex);
-        std::vector<size_t> penddingTaskIds;
-        if (m_penddingTaskIds.empty()) {
-            m_cv.wait(lk);
-        }              
+        // wait(lk, pred) 等价于:
+        //   while (!pred()) {
+        //       lk.unlock();
+        //       block_on(m_cv);
+        //       lk.lock();
+        //   }
+        // 即谓词会在每次唤醒（包括 spurious wakeup）后重新检查，
+        // 保证即使 Stop() 中的 notify_all 因竞态丢失，worker 也能在重新获取锁后看到 m_bRunning=false
+        m_cv.wait(lk, [this] {
+            return !m_penddingTaskIds.empty() || !m_bRunning.load(std::memory_order_acquire);
+            });
         if (!m_penddingTaskIds.empty()) {
             penddingTaskIds.swap(m_penddingTaskIds);
         }
         lk.unlock();
 
         for (size_t nTaskId : penddingTaskIds) {
-            if (!m_bRunning) {
+            if (!m_bRunning.load(std::memory_order_acquire)) {
                 break;
             }
             ExecTask(nTaskId);
         }
+        penddingTaskIds.clear();
     }
-    m_bRunning = false;
+    m_bRunning.store(false, std::memory_order_release);
     OnCleanup();
 }
 

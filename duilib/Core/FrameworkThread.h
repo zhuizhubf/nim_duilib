@@ -216,8 +216,10 @@ private:
     bool m_bThreadUI;
 
     /** 是否正在运行中
+    *   注意：必须使用 std::atomic 以保证多线程间的内存可见性，
+    *   单纯 volatile 在 C++ 标准下不保证多线程可见性。
     */
-    volatile bool m_bRunning;
+    std::atomic<bool> m_bRunning;
 
     /** true表示支持Idle功能，当消息队列为空时，会调用OnMessageLoopIdle虚函数，供应用层处理业务
     */
