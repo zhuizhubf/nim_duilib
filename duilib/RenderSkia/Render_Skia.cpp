@@ -1044,6 +1044,10 @@ void Render_Skia::DrawLine(const UiPointF& pt1, const UiPointF& pt2, IPen* pen)
 void Render_Skia::DrawRect(const UiRectF& rc, UiColor penColor, float fWidth, bool bLineInRect)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    // 空矩形跳过：bLineInRect 模式还会再减去半线宽，可能让 fRight < fLeft
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(penColor.GetA(), penColor.GetR(), penColor.GetG(), penColor.GetB());
     skPaint.setStrokeWidth(SkIntToScalar(fWidth));
@@ -1074,6 +1078,9 @@ void Render_Skia::DrawRect(const UiRectF& rc, IPen* pen, bool bLineInRect)
         return;
     }
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     SetPaintByPen(skPaint, pen);
 
@@ -1098,6 +1105,9 @@ void Render_Skia::DrawRect(const UiRectF& rc, IPen* pen, bool bLineInRect)
 void Render_Skia::DrawRoundRect(const UiRectF& rc, float rx, float ry, UiColor penColor, float fWidth)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(penColor.GetA(), penColor.GetR(), penColor.GetG(), penColor.GetB());
     skPaint.setStrokeWidth(SkIntToScalar(fWidth));
@@ -1120,6 +1130,9 @@ void Render_Skia::DrawRoundRect(const UiRectF& rc, float rx, float ry, IPen* pen
         return;
     }
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     SetPaintByPen(skPaint, pen);
 
@@ -1136,6 +1149,9 @@ void Render_Skia::DrawRoundRect(const UiRectF& rc, float rx, float ry, IPen* pen
 void Render_Skia::FillRoundRect(const UiRectF& rc, float rx, float ry, UiColor dwColor, uint8_t uFade)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(dwColor.GetA(), dwColor.GetR(), dwColor.GetG(), dwColor.GetB());
     skPaint.setStyle(SkPaint::kFill_Style);
@@ -1159,6 +1175,9 @@ void Render_Skia::FillRoundRect(const UiRectF& rc, float rx, float ry, UiColor d
     if (dwColor2.IsEmpty()) {
         return FillRoundRect(rc, rx, ry, dwColor, uFade);
     }
+    if (rc.IsEmpty()) {
+        return;
+    }
 
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setStyle(SkPaint::kFill_Style);
@@ -1181,6 +1200,10 @@ void Render_Skia::FillRoundRect(const UiRectF& rc, float rx, float ry, UiColor d
 void Render_Skia::DrawCircle(const UiPointF& centerPt, float radius, UiColor penColor, float fWidth)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    // 退化检查：半径 <= 0 或 NaN 时跳过；使用 !(radius > 0) 同时排除负数和 NaN
+    if (!(radius > 0.0f)) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(penColor.GetA(), penColor.GetR(), penColor.GetG(), penColor.GetB());
     skPaint.setStrokeWidth(fWidth);
@@ -1203,6 +1226,9 @@ void Render_Skia::DrawCircle(const UiPointF& centerPt, float radius, IPen* pen)
         return;
     }
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (!(radius > 0.0f)) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     SetPaintByPen(skPaint, pen);
 
@@ -1219,6 +1245,9 @@ void Render_Skia::DrawCircle(const UiPointF& centerPt, float radius, IPen* pen)
 void Render_Skia::FillCircle(const UiPointF& centerPt, float radius, UiColor dwColor, uint8_t uFade)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    if (!(radius > 0.0f)) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(dwColor.GetA(), dwColor.GetR(), dwColor.GetG(), dwColor.GetB());
     skPaint.setStyle(SkPaint::kFill_Style);
@@ -1450,6 +1479,9 @@ void Render_Skia::FillPath(const IPath* path, const UiRectF& rc, UiColor dwColor
     const Path_Skia* pSkiaPath = dynamic_cast<const Path_Skia*>(path);
     ASSERT(pSkiaPath != nullptr);
     if (pSkiaPath == nullptr) {
+        return;
+    }
+    if (rc.IsEmpty()) {
         return;
     }
 
