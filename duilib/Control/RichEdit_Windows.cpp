@@ -2556,6 +2556,25 @@ public:
         }
     }
 
+    //直接返回内部缓冲区指针（最快访问方式，无任何检查）
+    inline uint8_t* data() noexcept
+    {
+        return m_data;
+    }
+
+    //直接返回内部缓冲区指针（const 版本）
+    inline const uint8_t* data() const noexcept
+    {
+        return m_data;
+    }
+
+    //直接设置元素数量（用于批量写入后的快速更新，无任何检查）
+    //调用方需保证 new_size <= m_capacity
+    inline void set_size(size_t new_size) noexcept
+    {
+        m_size = new_size;
+    }
+
 private:
     uint8_t* m_data;    // 原生数据指针（无封装，最快访问）
     size_t   m_size;    // 当前元素个数
@@ -2663,8 +2682,6 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
     const int32_t nWidth = rc.Width();
 
     constexpr const int32_t nColorBits = sizeof(uint32_t); //每个颜色点所占字节数
-    uint8_t* pRowStart = nullptr; //每行Alpha通道值起始的位置
-    uint8_t* pRowEnd = nullptr;   //每行Alpha通道值结束的位置
 
     if (m_pAlphaValues == nullptr) {
         m_pAlphaValues = std::make_unique<FastBytes>();
@@ -2678,18 +2695,33 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
         }
         alphaValues.reserve(nEstSize);
     }
+    //重置大小，保留已分配的容量（避免残留旧数据影响后续恢复）
+    alphaValues.clear();
+
     bool bHasBkClolor = false; //标记是否设置了背景色
-    for (int32_t i = nTop; i < nBottom; ++i) {
-        pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
-        pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
-        while (pRowStart < pRowEnd) {            
-            alphaValues.push_back(*pRowStart);
-            if (!bHasBkClolor && (*pRowStart != 0)) {
-                bHasBkClolor = true;
+    bool bUseBkColorAlpha = false; //标记第二阶段恢复Alpha时是否使用bkColor的Alpha常量
+    uint8_t bkColorAlphaValue = 0; //bkColor的Alpha值（仅在 bUseBkColorAlpha=true 时使用）
+
+    //第一遍：保存原始Alpha值并清零Alpha通道
+    //优化：使用裸指针直接写入，避免 push_back 的函数调用与分支开销
+    if (nEstSize > 0) {
+        uint8_t* pDst = alphaValues.data();
+        uint8_t* pBits = (uint8_t*)pBitmapBits;
+        const int32_t nRowStride = nWidth * nColorBits;
+        for (int32_t i = nTop; i < nBottom; ++i) {
+            uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
+            uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+            while (pRow < pEnd) {
+                const uint8_t alpha = *pRow;
+                *pDst++ = alpha;
+                if (!bHasBkClolor && alpha != 0) {
+                    bHasBkClolor = true;
+                }
+                *pRow = 0;
+                pRow += 4;
             }
-            *pRowStart = 0;
-            pRowStart += 4;
         }
+        alphaValues.set_size((size_t)nEstSize);
     }
     if (!bHasBkClolor && IsAlpha()) {
         //如果控件设置了透明度，并且未设置背景，直接绘制文字会无法正常显示，自动处理背景色问题
@@ -2706,17 +2738,23 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
             bkColorValue = GetUiColor(bkColor);
         }
         if (!bkColorValue.IsEmpty()) {
-            alphaValues.clear();
+            //使用bkColor的Alpha常量作为恢复值，避免对 alphaValues 做无效的逐像素填充
+            bUseBkColorAlpha = true;
+            bkColorAlphaValue = bkColorValue.GetA();
+            const uint8_t b = bkColorValue.GetB();
+            const uint8_t g = bkColorValue.GetG();
+            const uint8_t r = bkColorValue.GetR();
+            uint8_t* pBits = (uint8_t*)pBitmapBits;
+            const int32_t nRowStride = nWidth * nColorBits;
             for (int32_t i = nTop; i < nBottom; ++i) {
-                pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
-                pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
-                while (pRowStart < pRowEnd) {
-                    alphaValues.push_back(bkColorValue.GetA());
-                    *pRowStart = 0;
-                    *(pRowStart + 1) = bkColorValue.GetB();
-                    *(pRowStart + 2) = bkColorValue.GetG();
-                    *(pRowStart + 3) = bkColorValue.GetR();
-                    pRowStart += 4;
+                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
+                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                while (pRow < pEnd) {
+                    *pRow = 0;
+                    *(pRow + 1) = b;
+                    *(pRow + 2) = g;
+                    *(pRow + 3) = r;
+                    pRow += 4;
                 }
             }
         }
@@ -2785,23 +2823,44 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
                             0);                 // What view of the object
 
     //恢复Alpha(绘制过程中，会导致绘制区域部分的Alpha通道出现异常)
-    size_t nAlpaIndex = 0;
-    for (int32_t i = nTop; i < nBottom; ++i) {
-        pRowStart = (uint8_t*)pBitmapBits + (i * nWidth + nLeft) * nColorBits + 3;
-        pRowEnd = (uint8_t*)pBitmapBits + (i * nWidth + nRight) * nColorBits;
-        while (pRowStart < pRowEnd) {
-            if (*pRowStart == 0) {
-                //Alpha值为0，绘制穿透背景了，需要恢复原Alpha值
-                ASSERT(nAlpaIndex < alphaValues.size());
-                if (nAlpaIndex < alphaValues.size()) {
-                    *pRowStart = alphaValues[nAlpaIndex]; //优先使用原Alpha值
-                }
-                else {
-                    *pRowStart = 255; //容错
+    //优化：使用裸指针直接访问，避免 operator[] 的函数调用与索引计算开销
+    {
+        uint8_t* pBits = (uint8_t*)pBitmapBits;
+        const int32_t nRowStride = nWidth * nColorBits;
+        if (bUseBkColorAlpha) {
+            //使用bkColor的Alpha常量恢复，无需逐像素读取 alphaValues
+            for (int32_t i = nTop; i < nBottom; ++i) {
+                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
+                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                while (pRow < pEnd) {
+                    if (*pRow == 0) {
+                        *pRow = bkColorAlphaValue;
+                    }
+                    pRow += 4;
                 }
             }
-            pRowStart += 4;
-            ++nAlpaIndex;
+        }
+        else {
+            //使用第一遍保存的原始Alpha值恢复
+            const uint8_t* pSrc = alphaValues.data();
+            const size_t nAlphaCount = alphaValues.size();
+            for (int32_t i = nTop; i < nBottom; ++i) {
+                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
+                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                while (pRow < pEnd) {
+                    if (*pRow == 0) {
+                        //Alpha值为0，绘制穿透背景了，需要恢复原Alpha值
+                        if (pSrc < (alphaValues.data() + nAlphaCount)) {
+                            *pRow = *pSrc; //优先使用原Alpha值
+                        }
+                        else {
+                            *pRow = 255; //容错
+                        }
+                    }
+                    ++pSrc;
+                    pRow += 4;
+                }
+            }
         }
     }
 
