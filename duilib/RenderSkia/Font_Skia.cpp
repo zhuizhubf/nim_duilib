@@ -39,6 +39,8 @@ bool Font_Skia::InitFont(const UiFont& fontInfo)
     if (fontInfo.m_fontName.empty()) {
         return false;
     }
+    // 仅更新字体信息并清理旧的 SkFont 实例
+    // 实际的 SkFont 创建会延迟到首次调用 GetFontHandle() 时（懒加载模式）
     m_uiFont = fontInfo;
     ClearSkFont();
     return true;

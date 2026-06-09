@@ -86,19 +86,21 @@ IPath::FillType Path_Skia::GetFillType()
 
 void Path_Skia::MoveToPoint(int32_t x1, int32_t y1)
 {
+    // 仅在 lastPt 与目标点不同时才调用 moveTo，避免连续 moveTo 破坏路径闭合逻辑
+    const SkPoint newPt = SkPoint::Make(static_cast<float>(x1), static_cast<float>(y1));
     std::optional<SkPoint> lastPt = m_skPathBuilder->getLastPt();
-    if (lastPt != SkPoint::Make(static_cast<float>(x1), static_cast<float>(y1))) {
-        //如果不相等才调用moveTo函数，否则影响路径的闭合逻辑
-        m_skPathBuilder->moveTo(SkPoint::Make(static_cast<float>(x1), static_cast<float>(y1)));
+    if (!lastPt.has_value() || *lastPt != newPt) {
+        m_skPathBuilder->moveTo(newPt);
     }
 }
 
 void Path_Skia::MoveToPoint(float x1, float y1)
 {
+    // 仅在 lastPt 与目标点不同时才调用 moveTo，避免连续 moveTo 破坏路径闭合逻辑
+    const SkPoint newPt = SkPoint::Make(x1, y1);
     std::optional<SkPoint> lastPt = m_skPathBuilder->getLastPt();
-    if (lastPt != SkPoint::Make(x1, y1)) {
-        //如果不相等才调用moveTo函数，否则影响路径的闭合逻辑
-        m_skPathBuilder->moveTo(SkPoint::Make(x1, y1));
+    if (!lastPt.has_value() || *lastPt != newPt) {
+        m_skPathBuilder->moveTo(newPt);
     }
 }
 

@@ -19,7 +19,8 @@ public:
     Font_Skia& operator=(const Font_Skia&) = delete;
     virtual ~Font_Skia() override;
 
-    /** 初始化字体(内部未对字体大小做DPI自适应)
+    /** 设置字体信息(内部未对字体大小做DPI自适应)
+    * @note 该方法只保存 UiFont 并清理旧的 SkFont，实际 SkFont 的创建延迟到首次调用 GetFontHandle()
     */
     virtual bool InitFont(const UiFont& fontInfo) override;
 
