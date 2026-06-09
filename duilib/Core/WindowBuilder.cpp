@@ -994,8 +994,8 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
                 strName = attr.name();
                 strValue = attr.value();
                 if (strName == fontPropName) {
-                    GlobalManager::Instance().ExpandVarStrings(strValue);
-                    defaultFontFamilyNames = strValue;
+                    // 显式接收 ExpandVarStrings 的返回值，表达"使用展开后的字符串"的意图
+                    defaultFontFamilyNames = GlobalManager::Instance().ExpandVarStrings(strValue);
                     break;
                 }
             }
@@ -1009,8 +1009,7 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
                 strName = attr.name();
                 strValue = attr.value();
                 if (strName == fontPropName) {
-                    GlobalManager::Instance().ExpandVarStrings(strValue);
-                    fallbackFontFamilyNames = strValue;
+                    fallbackFontFamilyNames = GlobalManager::Instance().ExpandVarStrings(strValue);
                     break;
                 }
             }
@@ -1033,7 +1032,7 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node& root)
                 }
             }
             if (!strFontFile.empty()) {
-                GlobalManager::Instance().ExpandVarStrings(strFontFile);
+                strFontFile = GlobalManager::Instance().ExpandVarStrings(strFontFile);
                 GlobalManager::Instance().Font().AddFontFile(strFontFile, strFontDesc);
             }
         }

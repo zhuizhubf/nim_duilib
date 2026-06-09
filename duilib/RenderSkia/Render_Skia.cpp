@@ -910,6 +910,10 @@ void Render_Skia::DrawImageRect(const UiRect& rcPaint, IBitmap* pBitmap,
 void Render_Skia::FillRect(const UiRectF& rc, UiColor dwColor, uint8_t uFade)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    // 空矩形跳过：避免无效的 Skia drawRect 调用（含 NaN/Inf 退化为空矩形）
+    if (rc.IsEmpty()) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(dwColor.GetA(), dwColor.GetR(), dwColor.GetG(), dwColor.GetB());
     if (uFade != 0xFF) {
@@ -968,6 +972,9 @@ void Render_Skia::FillRect(const UiRectF& rc, UiColor dwColor, UiColor dwColor2,
     if (dwColor2.IsEmpty()) {
         return FillRect(rc, dwColor, uFade);
     }
+    if (rc.IsEmpty()) {
+        return;
+    }
 
     SkPaint skPaint = *m_pSkPaint;
     if (uFade != 0xFF) {
@@ -989,6 +996,10 @@ void Render_Skia::FillRect(const UiRectF& rc, UiColor dwColor, UiColor dwColor2,
 void Render_Skia::DrawLine(const UiPointF& pt1, const UiPointF& pt2, UiColor penColor, float fWidth)
 {
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
+    // 退化检查：端点重合（pt1==pt2）跳过 drawLine 调用
+    if (pt1.Equals(pt2)) {
+        return;
+    }
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setARGB(penColor.GetA(), penColor.GetR(), penColor.GetG(), penColor.GetB());
     skPaint.setStyle(SkPaint::kStroke_Style);
