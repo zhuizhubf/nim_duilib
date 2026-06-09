@@ -37,11 +37,16 @@ UiRect Slider::GetProgressPos()
     UiSize szThumb = GetThumbSize();
     UiRect rc;
     if (IsHorizontal()) {
-        rc.right = int((fValue - nMin) * (GetRect().right - GetRect().left - szThumb.cx) / (nMax - nMin) + szThumb.cx / 2 + 0.5);
+        // 使用 double 计算避免 int32 溢出，再通过 TruncateToInt32 安全转为 int32_t
+        const double fValueScale = (GetRect().right - GetRect().left - szThumb.cx) / static_cast<double>(nMax - nMin);
+        const int64_t nRight64 = static_cast<int64_t>((fValue - nMin) * fValueScale + szThumb.cx / 2.0 + 0.5);
+        rc.right = TruncateToInt32(nRight64);
         rc.bottom = GetRect().bottom - GetRect().top;
     }
     else {
-        rc.top = int((nMax - fValue) * (GetRect().bottom - GetRect().top - szThumb.cy) / (nMax - nMin) + szThumb.cy / 2 + 0.5);
+        const double fValueScale = (GetRect().bottom - GetRect().top - szThumb.cy) / static_cast<double>(nMax - nMin);
+        const int64_t nTop64 = static_cast<int64_t>((nMax - fValue) * fValueScale + szThumb.cy / 2.0 + 0.5);
+        rc.top = TruncateToInt32(nTop64);
         rc.right = GetRect().right - GetRect().left;
         rc.bottom = GetRect().bottom - GetRect().top;
     }

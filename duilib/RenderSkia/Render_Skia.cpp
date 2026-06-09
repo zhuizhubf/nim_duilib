@@ -244,6 +244,10 @@ void Render_Skia::RestoreClip(int32_t nState)
 
 void Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
 {
+    // 空矩形（rc.right <= rc.left）跳过：避免无意义的 save+clip 调用
+    if (rc.right <= rc.left || rc.bottom <= rc.top) {
+        return;
+    }
     SkIRect rcSkI = { rc.left, rc.top, rc.right, rc.bottom };
     SkRect rcSk = SkRect::Make(rcSkI);
     rcSk.offset(*m_pSkPointOrg);
@@ -251,7 +255,8 @@ void Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
     SkCanvas* skCanvas = GetSkCanvas();
     ASSERT(skCanvas != nullptr);
     if (skCanvas != nullptr) {
-        skCanvas->save();
+        // 同步更新 m_saveCount，使其与 Skia 内部 save 栈保持一致
+        m_saveCount = skCanvas->save();
         if (bIntersect) {
             skCanvas->clipRect(rcSk, SkClipOp::kIntersect, true);
         }
@@ -263,6 +268,9 @@ void Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
 
 void Render_Skia::SetRoundClip(const UiRect& rc, float rx, float ry, bool bIntersect)
 {
+    if (rc.right <= rc.left || rc.bottom <= rc.top) {
+        return;
+    }
     SkIRect rcSkI = { rc.left, rc.top, rc.right, rc.bottom };
     SkRect rcSk = SkRect::Make(rcSkI);
 
@@ -276,7 +284,8 @@ void Render_Skia::SetRoundClip(const UiRect& rc, float rx, float ry, bool bInter
     SkCanvas* skCanvas = GetSkCanvas();
     ASSERT(skCanvas != nullptr);
     if (skCanvas != nullptr) {
-        skCanvas->save();
+        // 同步更新 m_saveCount，使其与 Skia 内部 save 栈保持一致
+        m_saveCount = skCanvas->save();
         if (bIntersect) {
             skCanvas->clipRegion(rgn, SkClipOp::kIntersect);
         }
@@ -291,7 +300,11 @@ void Render_Skia::ClearClip()
     SkCanvas* skCanvas = GetSkCanvas();
     ASSERT(skCanvas != nullptr);
     if (skCanvas != nullptr) {
-        skCanvas->restore();
+        // 主动恢复一次 save 状态，使 m_saveCount 与 Skia 内部状态保持一致
+        if (m_saveCount > 0) {
+            skCanvas->restoreToCount(m_saveCount - 1);
+            m_saveCount = m_saveCount - 1;
+        }
     }
 }
 
@@ -312,6 +325,10 @@ bool Render_Skia::BitBlt(int32_t x, int32_t y, int32_t cx, int32_t cy, IRender* 
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
     ASSERT(pSrcRender != nullptr);
     if (pSrcRender == nullptr) {
+        return false;
+    }
+    // 防止负值或零尺寸导致 Skia::drawImageRect 内部 UB
+    if (cx <= 0 || cy <= 0 || xSrc < 0 || ySrc < 0) {
         return false;
     }
 
@@ -356,6 +373,10 @@ bool Render_Skia::StretchBlt(int32_t xDest, int32_t yDest, int32_t widthDest, in
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
     ASSERT(pSrcRender != nullptr);
     if (pSrcRender == nullptr) {
+        return false;
+    }
+    // 防止负值或零尺寸导致 Skia::drawImageRect 内部 UB
+    if (widthDest <= 0 || heightDest <= 0 || widthSrc <= 0 || heightSrc <= 0 || xSrc < 0 || ySrc < 0) {
         return false;
     }
 

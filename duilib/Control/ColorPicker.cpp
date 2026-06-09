@@ -126,70 +126,83 @@ void ColorPicker::OnInitWindow()
     m_pStandardGrayPicker = dynamic_cast<ColorPickerStandardGray*>(FindControl(_T("color_picker_standard_gray")));
     m_pCustomPicker = dynamic_cast<ColorPickerCustom*>(FindControl(_T("color_picker_custom")));
 
+    // 使用 ControlPtrT 包装 this 指针，避免窗口析构后回调悬空
+    ControlPtrT<ColorPicker> pThis(this);
     if (m_pRegularPicker != nullptr) {
-        m_pRegularPicker->AttachSelectColor([this](const ui::EventArgs& args) {
-            UiColor newColor((uint32_t)args.wParam);
-            OnSelectColor(newColor);
+        m_pRegularPicker->AttachSelectColor([pThis](const ui::EventArgs& args) {
+            if (pThis != nullptr) {
+                UiColor newColor((uint32_t)args.wParam);
+                pThis->OnSelectColor(newColor);
+            }
             return true;
             });
     }
     if (m_pStandardPicker != nullptr) {
-        m_pStandardPicker->AttachSelectColor([this](const ui::EventArgs& args) {
-            UiColor newColor((uint32_t)args.wParam);
-            OnSelectColor(newColor);
-            if (m_pStandardGrayPicker != nullptr) {
-                m_pStandardGrayPicker->SelectColor(UiColor());
+        m_pStandardPicker->AttachSelectColor([pThis](const ui::EventArgs& args) {
+            if (pThis != nullptr) {
+                UiColor newColor((uint32_t)args.wParam);
+                pThis->OnSelectColor(newColor);
+                if (pThis->m_pStandardGrayPicker != nullptr) {
+                    pThis->m_pStandardGrayPicker->SelectColor(UiColor());
+                }
             }
             return true;
             });
     }
     if (m_pStandardGrayPicker != nullptr) {
-        m_pStandardGrayPicker->AttachSelectColor([this](const ui::EventArgs& args) {
-            UiColor newColor((uint32_t)args.wParam);
-            OnSelectColor(newColor);
-            if (m_pStandardPicker != nullptr) {
-                m_pStandardPicker->SelectColor(UiColor());
+        m_pStandardGrayPicker->AttachSelectColor([pThis](const ui::EventArgs& args) {
+            if (pThis != nullptr) {
+                UiColor newColor((uint32_t)args.wParam);
+                pThis->OnSelectColor(newColor);
+                if (pThis->m_pStandardPicker != nullptr) {
+                    pThis->m_pStandardPicker->SelectColor(UiColor());
+                }
             }
             return true;
             });
     }
     if (m_pCustomPicker != nullptr) {
-        m_pCustomPicker->AttachSelectColor([this](const ui::EventArgs& args) {
-            UiColor newColor((uint32_t)args.wParam);
-            OnSelectColor(newColor);
+        m_pCustomPicker->AttachSelectColor([pThis](const ui::EventArgs& args) {
+            if (pThis != nullptr) {
+                UiColor newColor((uint32_t)args.wParam);
+                pThis->OnSelectColor(newColor);
+            }
             return true;
             });
     }
 
     TabBox* pTabBox = dynamic_cast<TabBox*>(FindControl(_T("color_picker_tab")));
     if (pTabBox != nullptr) {
-        pTabBox->AttachTabSelect([this](const ui::EventArgs& args) {
+        pTabBox->AttachTabSelect([pThis](const ui::EventArgs& args) {
+            if (pThis == nullptr) {
+                return true;
+            }
             UiColor selectedColor;
-            if (m_pNewColor != nullptr) {
-                DString bkColor = m_pNewColor->GetBkColor();
+            if (pThis->m_pNewColor != nullptr) {
+                DString bkColor = pThis->m_pNewColor->GetBkColor();
                 if (!bkColor.empty()) {
-                    selectedColor = m_pNewColor->GetUiColor(bkColor);
+                    selectedColor = pThis->m_pNewColor->GetUiColor(bkColor);
                 }                
             }
             if (args.wParam == 0) {
                 //常用颜色
-                if (m_pRegularPicker != nullptr) {
-                    m_pRegularPicker->SelectColor(selectedColor);
+                if (pThis->m_pRegularPicker != nullptr) {
+                    pThis->m_pRegularPicker->SelectColor(selectedColor);
                 }                
             }
             else if (args.wParam == 1) {
                 //标准颜色
-                if (m_pStandardPicker != nullptr) {
-                    m_pStandardPicker->SelectColor(selectedColor);
+                if (pThis->m_pStandardPicker != nullptr) {
+                    pThis->m_pStandardPicker->SelectColor(selectedColor);
                 }
-                if (m_pStandardGrayPicker != nullptr) {
-                    m_pStandardGrayPicker->SelectColor(selectedColor);
+                if (pThis->m_pStandardGrayPicker != nullptr) {
+                    pThis->m_pStandardGrayPicker->SelectColor(selectedColor);
                 }
             }
             else if (args.wParam == 2) {
                 //自定义颜色
-                if (m_pCustomPicker != nullptr) {
-                    m_pCustomPicker->SelectColor(selectedColor);
+                if (pThis->m_pCustomPicker != nullptr) {
+                    pThis->m_pCustomPicker->SelectColor(selectedColor);
                 }
             }
             return true;
@@ -199,16 +212,20 @@ void ColorPicker::OnInitWindow()
     //确定按钮
     Button* pButton = dynamic_cast<Button*>(FindControl(_T("color_picker_ok")));
     if (pButton != nullptr) {
-        pButton->AttachClick([this](const ui::EventArgs& /*args*/) {
-            this->CloseWnd(kWindowCloseOK);
+        pButton->AttachClick([pThis](const ui::EventArgs& /*args*/) {
+            if (pThis != nullptr) {
+                pThis->CloseWnd(kWindowCloseOK);
+            }
             return true;
             });
     }
     //取消按钮
     pButton = dynamic_cast<Button*>(FindControl(_T("color_picker_cancel")));
     if (pButton != nullptr) {
-        pButton->AttachClick([this](const ui::EventArgs& /*args*/) {
-            this->CloseWnd(kWindowCloseCancel);
+        pButton->AttachClick([pThis](const ui::EventArgs& /*args*/) {
+            if (pThis != nullptr) {
+                pThis->CloseWnd(kWindowCloseCancel);
+            }
             return true;
             });
     }
@@ -216,8 +233,10 @@ void ColorPicker::OnInitWindow()
     //选择：屏幕取色
     pButton = dynamic_cast<Button*>(FindControl(_T("color_picker_choose")));
     if (pButton != nullptr) {
-        pButton->AttachClick([this](const ui::EventArgs& /*args*/) {
-            OnPickColorFromScreen();
+        pButton->AttachClick([pThis](const ui::EventArgs& /*args*/) {
+            if (pThis != nullptr) {
+                pThis->OnPickColorFromScreen();
+            }
             return true;
             });
     }
@@ -249,8 +268,8 @@ void ColorPicker::OnSelectColor(const UiColor& newColor)
         m_pNewColor->SetBkColor(newColor);
         m_pNewColor->SetText(m_pNewColor->GetBkColor());
 
-        //文本颜色，使用反色
-        UiColor textColor = UiColor(255 - newColor.GetR(), 255 - newColor.GetG(), 255 - newColor.GetB());
+        // 使用 YIQ 公式选择黑/白文本，得到更好的可读性对比度
+        UiColor textColor = GetContrastTextColor(newColor);
         m_pNewColor->SetStateTextColor(kControlStateNormal, m_pNewColor->GetColorString(textColor));
     }
     if (m_colorCallback != nullptr) {
@@ -267,16 +286,16 @@ void ColorPicker::SetSelectedColor(const UiColor& color)
         m_pNewColor->SetBkColor(color);
         m_pNewColor->SetText(m_pNewColor->GetBkColor());
 
-        //文本颜色，使用反色
-        UiColor textColor = UiColor(255 - color.GetR(), 255 - color.GetG(), 255 - color.GetB());
+        // 使用 YIQ 公式选择黑/白文本，得到更好的可读性对比度
+        UiColor textColor = GetContrastTextColor(color);
         m_pNewColor->SetStateTextColor(kControlStateNormal, m_pNewColor->GetColorString(textColor));
     }
     if (m_pOldColor != nullptr) {
         m_pOldColor->SetBkColor(color);
         m_pOldColor->SetText(m_pOldColor->GetBkColor());
 
-        //文本颜色，使用反色
-        UiColor textColor = UiColor(255 - color.GetR(), 255 - color.GetG(), 255 - color.GetB());
+        // 使用 YIQ 公式选择黑/白文本，得到更好的可读性对比度
+        UiColor textColor = GetContrastTextColor(color);
         m_pOldColor->SetStateTextColor(kControlStateNormal, m_pOldColor->GetColorString(textColor));
     }
     if (m_pCustomPicker != nullptr) {
@@ -296,6 +315,20 @@ void ColorPicker::SetSelectedColor(const UiColor& color)
 UiColor ColorPicker::GetSelectedColor() const
 {
     return m_selectedColor;
+}
+
+UiColor ColorPicker::GetContrastTextColor(const UiColor& bkColor)
+{
+    // YIQ 公式：人眼对绿色最敏感，红色次之，蓝色最不敏感
+    // Y = 0.299R + 0.587G + 0.114B，范围 0-255
+    // Y >= 128 时背景偏亮，选择黑色文本；否则选择白色文本
+    const double y = 0.299 * bkColor.GetR() + 0.587 * bkColor.GetG() + 0.114 * bkColor.GetB();
+    if (y >= 128.0) {
+        return UiColor(0, 0, 0);     // 黑色
+    }
+    else {
+        return UiColor(255, 255, 255); // 白色
+    }
 }
 
 /** 屏幕取色预览控件
