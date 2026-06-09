@@ -19,6 +19,8 @@ enum ePaintSelectedColors
 ListBox::ListBox(Window* pWindow, Layout* pLayout) :
     ScrollBox(pWindow, pLayout),
     m_iCurSel(Box::InvalidIndex),
+    // m_nLastNoShiftItem：没按Shift键时的最后一次选中项的索引（用于Shift多选范围的起点），
+    // 默认为0，使用时通过 nLastNoShiftItem >= nItemCount 兜底修正
     m_nLastNoShiftItem(0),
     m_pCompareFunc(nullptr),
     m_pCompareContext(nullptr),

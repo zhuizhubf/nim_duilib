@@ -123,6 +123,21 @@ void ScrollBox::SetPos(UiRect rc)
 
 void ScrollBox::DoSetPos(UiRect rc, bool bScrollProcess)
 {
+    // 防止复杂布局下反复触发滚动条状态变化导致递归过深
+    // 实际正常流程最多 1 次递归（内部 SetPosInternally 在 bScrollProcess==true 时不再递归），
+    // 此处作为安全网，超过深度限制时主动中断以避免栈溢出
+    constexpr int32_t kMaxDoSetPosDepth = 8;
+    thread_local int32_t s_recursionDepth = 0;
+    if (++s_recursionDepth > kMaxDoSetPosDepth) {
+        ASSERT(!"ScrollBox::DoSetPos recursion depth exceeded, possible layout loop");
+        --s_recursionDepth;
+        return;
+    }
+    struct DepthGuard {
+        int32_t& m_depth;
+        ~DepthGuard() { --m_depth; }
+    } guard(s_recursionDepth);
+
     UiSize oldScrollOffset = GetScrollOffset();
     bool bEndDown = false;
     if (IsHoldEnd() && IsVScrollBarValid() && GetScrollRange().cy - GetScrollPos().cy == 0) {

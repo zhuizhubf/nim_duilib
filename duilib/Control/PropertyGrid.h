@@ -573,8 +573,13 @@ public:
     RichText* GetDescriptionArea() const { return m_pDescriptionArea; }
 
     /** 描述控件的分割条接口
+    *   @return 返回描述区域下方的分割条指针，若 XML 中未声明 `duilib_property_grid_description_area_split` 子控件则返回 nullptr
     */
     Split* GetDescriptionAreaSplit() const { return m_pDescriptionAreaSplit; }
+
+    /** 描述区是否可用（XML 中声明了 duilib_property_grid_description_area 子控件）
+    */
+    bool IsDescriptionArea() const { return m_bDescriptionArea; }
 
 public:
     /** 获取属性表的树控件接口（用于管理数据）
