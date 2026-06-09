@@ -131,6 +131,8 @@ void TimerManager::RemoveTimer(size_t nTimerId)
     m_removedTimerIds.insert(nTimerId);
 }
 
+// IsTimerRemoved / ClearRemovedTimerId 内部不获取锁，调用方必须持有 m_taskMutex
+// （约定：与 AddTimer / RemoveTimer / Poll 共享锁；外部不要直接调用）
 bool TimerManager::IsTimerRemoved(size_t nTimerId) const
 {
     if (!m_removedTimerIds.empty()) {
@@ -212,8 +214,8 @@ void TimerManager::WorkerThreadProc()
             break;
         }
         if (m_aTimers.empty()) {
-            //为空，等待任务
-            m_cv.wait(taskGuard);
+            //为空，等待任务；使用谓词避免虚假唤醒
+            m_cv.wait(taskGuard, [this] { return !m_bRunning || !m_aTimers.empty(); });
             if (!m_bRunning) {
                 break;
             }
@@ -280,7 +282,8 @@ void TimerManager::WorkerThreadProc()
             //LogUtil::OutputLine(StringUtil::Printf(_T("PostMessage: send timer event")));
 
             if (m_bRunning && m_bHasPenddingPoll) {
-                m_cv.wait(taskGuard);
+                //使用谓词等待，避免虚假唤醒
+                m_cv.wait(taskGuard, [this] { return !m_bRunning || !m_bHasPenddingPoll; });
             }
         }        
     }

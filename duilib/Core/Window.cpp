@@ -322,8 +322,18 @@ void Window::PreInitWindow()
     if (m_windowBuilder != nullptr) {
         auto callback = UiBind(&Window::CreateControl, this, std::placeholders::_1);
         Control* pControl = m_windowBuilder->CreateControls(this, callback);
+        if (pControl == nullptr) {
+            // XML 解析或控件创建失败，记录并中止初始化
+            ASSERT(!"Window::PreInitWindow: failed to create controls from XML");
+            return;
+        }
         pRoot = m_windowBuilder->ToBox(pControl);
         ASSERT(pRoot != nullptr);
+        if (pRoot == nullptr) {
+            // 根控件不是 Box 类型（XML 顶层必须为 Box）
+            ASSERT(!"Window::PreInitWindow: root control is not a Box type");
+            return;
+        }
     }
 
     if (pRoot != nullptr) {

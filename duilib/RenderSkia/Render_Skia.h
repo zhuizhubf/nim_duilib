@@ -3,6 +3,7 @@
 
 #include "duilib/Render/IRender.h"
 #include "duilib/Core/Callback.h"
+#include <memory>
 
 //Skia相关类的前置声明
 class SkSurface;
@@ -216,11 +217,11 @@ private:
 
     /** 绘制属性
     */
-    SkPaint* m_pSkPaint;
+    std::unique_ptr<SkPaint> m_pSkPaint;
 
     /** 视图的原点坐标
     */
-    SkPoint* m_pSkPointOrg;
+    std::unique_ptr<SkPoint> m_pSkPointOrg;
 
     /** DPI转换辅助接口
     */
