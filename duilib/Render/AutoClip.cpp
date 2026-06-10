@@ -28,6 +28,7 @@ AutoClip::AutoClip(IRender* pRender, const UiRect& rc, bool bClip)
     // 先将成员初始化为安全状态，防止对象在 bClip=false 路径下被错误使用
     m_pRender = nullptr;
     m_bClip = false;
+    m_nClipState = -1;
 
     if (bClip) {
         // 记录"本次构造确实设置了裁剪区域"，析构时据此决定是否需要 ClearClip
@@ -41,7 +42,7 @@ AutoClip::AutoClip(IRender* pRender, const UiRect& rc, bool bClip)
         // 二次判空：在 Release 编译下避免对空指针解引用
         if (m_pRender != nullptr) {
             // 设置矩形裁剪区域，内部会与当前裁剪区取交集并保存旧状态
-            m_pRender->SetClip(rc);
+            m_nClipState = m_pRender->SetClip(rc);
         }
     }
 }
@@ -54,6 +55,7 @@ AutoClip::AutoClip(IRender* pRender, const UiRect& rcRound,
     // 同样先将成员重置为安全状态
     m_pRender = nullptr;
     m_bClip = false;
+    m_nClipState = -1;
 
     if (bClip) {
         m_bClip = bClip;
@@ -63,7 +65,7 @@ AutoClip::AutoClip(IRender* pRender, const UiRect& rcRound,
 
         if (m_pRender != nullptr) {
             // 设置圆角矩形裁剪区域，内部会与当前裁剪区取交集并保存旧状态
-            m_pRender->SetRoundClip(rcRound, fRoundWidth, fRoundHeight);
+            m_nClipState = m_pRender->SetRoundClip(rcRound, fRoundWidth, fRoundHeight);
         }
     }
 }
@@ -78,7 +80,7 @@ AutoClip::~AutoClip()
 {
     if (m_bClip && (m_pRender != nullptr)) {
         // 清除当前裁剪区域，并恢复至最近一次保存的状态
-        m_pRender->ClearClip();
+        m_pRender->ClearClip(m_nClipState);
     }
 }
 

@@ -222,7 +222,7 @@ void GroupBoxTemplate<InheritType>::PaintText(IRender* pRender)
     UiPadding rcPadding = this->GetControlPadding();
     DString textValue = this->GetText();//文本内容
     UiRect drawTextRect;//文本的绘制区域
-    bool hasClip = false;
+    int32_t nClipState = -1;
     if (!textValue.empty()) {
         MeasureStringParam measureParam;
         measureParam.pFont = this->GetIFontById(this->GetFontId());
@@ -238,8 +238,7 @@ void GroupBoxTemplate<InheritType>::PaintText(IRender* pRender)
         drawTextRect.bottom = std::min(drawTextRect.bottom, nTextBottom);
 
         //设置剪辑区域，避免绘制文字区域
-        pRender->SetClip(drawTextRect, false);
-        hasClip = true;
+        nClipState = pRender->SetClip(drawTextRect, false);
     }
 
     //在文字底部绘制边框
@@ -298,9 +297,9 @@ void GroupBoxTemplate<InheritType>::PaintText(IRender* pRender)
         pRender->DrawRect(UiRectF::MakeFromRect(rc), lineColor, fLineWidth);
     }
 
-    if (hasClip) {
+    if (nClipState >= 0) {
         //恢复剪辑区域
-        pRender->ClearClip();
+        pRender->ClearClip(nClipState);
     }    
 }
 

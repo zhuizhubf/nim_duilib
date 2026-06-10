@@ -624,15 +624,14 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
         rcNewPaint.Offset(scrollPos.cx, scrollPos.cy);
         rcNewPaint.Offset(GetRenderOffset().x, GetRenderOffset().y);
 
-        bool bHasClip = false;
+        int32_t nClipState = -1;
         if (!atTopItems.empty() &&
             (std::find(atTopItems.begin(), atTopItems.end(), pControl) == atTopItems.end())) {            
             UiRect rcControlRect = pControl->GetRect();
             UiRect rUnion;
             if (UiRect::Intersect(rUnion, rcTopControls, rcControlRect)) {
                 //有交集，需要设置裁剪，避免绘制置顶元素与其他元素重叠的区域
-                pRender->SetClip(rUnion, false);
-                bHasClip = true;
+                nClipState = pRender->SetClip(rUnion, false);
             }
         }
 
@@ -640,8 +639,8 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
         UiPoint ptOldOrg = pRender->OffsetWindowOrg(ptOffset);
         pControl->AlphaPaint(pRender, rcNewPaint);
         pRender->SetWindowOrg(ptOldOrg);
-        if (bHasClip) {
-            pRender->ClearClip();
+        if (nClipState >= 0) {
+            pRender->ClearClip(nClipState);
         }
     }
 

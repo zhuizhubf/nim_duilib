@@ -242,11 +242,11 @@ void Render_Skia::RestoreClip(int32_t nState)
     }
 }
 
-void Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
+int32_t Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
 {
     // 空矩形（rc.right <= rc.left）跳过：避免无意义的 save+clip 调用
     if (rc.right <= rc.left || rc.bottom <= rc.top) {
-        return;
+        return -1;
     }
     SkIRect rcSkI = { rc.left, rc.top, rc.right, rc.bottom };
     SkRect rcSk = SkRect::Make(rcSkI);
@@ -263,13 +263,15 @@ void Render_Skia::SetClip(const UiRect& rc, bool bIntersect)
         else {
             skCanvas->clipRect(rcSk, SkClipOp::kDifference, true);
         }
+        return m_saveCount;
     }
+    return -1;
 }
 
-void Render_Skia::SetRoundClip(const UiRect& rc, float rx, float ry, bool bIntersect)
+int32_t Render_Skia::SetRoundClip(const UiRect& rc, float rx, float ry, bool bIntersect)
 {
     if (rc.right <= rc.left || rc.bottom <= rc.top) {
-        return;
+        return -1;
     }
     SkIRect rcSkI = { rc.left, rc.top, rc.right, rc.bottom };
     SkRect rcSk = SkRect::Make(rcSkI);
@@ -292,18 +294,28 @@ void Render_Skia::SetRoundClip(const UiRect& rc, float rx, float ry, bool bInter
         else {
             skCanvas->clipRegion(rgn, SkClipOp::kDifference);
         }
+        return m_saveCount;
     }
+    return -1;
 }
 
-void Render_Skia::ClearClip()
+void Render_Skia::ClearClip(int32_t nState)
 {
+    ASSERT(nState >= 0);
+    if (nState < 0) {
+        return;
+    }
     SkCanvas* skCanvas = GetSkCanvas();
     ASSERT(skCanvas != nullptr);
     if (skCanvas != nullptr) {
         // 主动恢复一次 save 状态，使 m_saveCount 与 Skia 内部状态保持一致
+        ASSERT(m_saveCount == nState);
+        if (m_saveCount != nState) {
+            return;
+        }
         if (m_saveCount > 0) {
-            skCanvas->restoreToCount(m_saveCount - 1);
-            m_saveCount = m_saveCount - 1;
+            skCanvas->restoreToCount(m_saveCount);
+            m_saveCount = skCanvas->getSaveCount() - 1;
         }
     }
 }

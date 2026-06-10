@@ -85,6 +85,10 @@ private:
       */
     IRender* m_pRender;
 
+    /** 裁剪区域的设备上下文标志
+    */
+    int32_t m_nClipState;
+
     /** @brief 标记本次构造是否真的设置了裁剪区域。
       *  - true  ：构造时调用了 SetClip/SetRoundClip，析构时需要 ClearClip；
       *  - false ：构造时未设置裁剪（用户传入 bClip=false 或 pRender 非法），
