@@ -4,14 +4,65 @@
 
 namespace ui 
 {
+PerformanceUtil::PerformanceUtil(const DString& statName) :
+    m_statName(statName),
+    m_nameHash(0)
+{
+    if (!m_statName.empty()) {
+        PerformanceUtilHelper::Instance().AddStat(m_statName);
+        m_nameHash = std::hash<DString>{}(m_statName);
+        PerformanceUtilHelper::Instance().BeginStat(m_nameHash);
+    }
+}
+PerformanceUtil::~PerformanceUtil()
+{
+    if (m_nameHash != 0) {
+        PerformanceUtilHelper::Instance().EndStat(m_nameHash);
+    }
+}
 
-PerformanceUtil::PerformanceUtil():
+void PerformanceUtil::EndStat()
+{
+    if (m_nameHash != 0) {
+        PerformanceUtilHelper::Instance().EndStat(m_nameHash);
+        m_nameHash = 0;
+    }
+}
+
+////////////////////////////////////////////////////////////////////
+
+PerformanceUtilFast::PerformanceUtilFast(size_t nameHash) :
+    m_nameHash(nameHash)
+{
+    if (m_nameHash != 0) {
+        PerformanceUtilHelper::Instance().BeginStat(m_nameHash);
+    }
+}
+PerformanceUtilFast::~PerformanceUtilFast()
+{
+    if (m_nameHash != 0) {
+        PerformanceUtilHelper::Instance().EndStat(m_nameHash);
+    }
+}
+
+void PerformanceUtilFast::EndStat()
+{
+    if (m_nameHash != 0) {
+        PerformanceUtilHelper::Instance().EndStat(m_nameHash);
+        m_nameHash = 0;
+    }
+}
+
+////////////////////////////////////////////////////////////////////
+
+PerformanceUtilHelper::PerformanceUtilHelper():
     m_nStatIndex(0)
 {
 }
 
-PerformanceUtil::~PerformanceUtil()
+PerformanceUtilHelper::~PerformanceUtilHelper()
 {
+#if DUILIB_PERFORMANCE_STAT_ENABLED
     std::vector<TStat> statList;
     for (const auto& iter : m_stat) {
         if (iter.second.totalCount == 0) {
@@ -38,15 +89,16 @@ PerformanceUtil::~PerformanceUtil()
                                         );
         LogUtil::OutputLine(log);
     }
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 }
 
-PerformanceUtil& PerformanceUtil::Instance()
+PerformanceUtilHelper& PerformanceUtilHelper::Instance()
 {
-    static PerformanceUtil self;
+    static PerformanceUtilHelper self;
     return self;
 }
 
-void PerformanceUtil::BeginStat(const DString& name)
+void PerformanceUtilHelper::BeginStat(const DString& name)
 {
     ASSERT(!name.empty());
     size_t nameHash = std::hash<DString>{}(name);
@@ -55,14 +107,14 @@ void PerformanceUtil::BeginStat(const DString& name)
     BeginStat(nameHash);
 }
 
-void PerformanceUtil::EndStat(const DString& name)
+void PerformanceUtilHelper::EndStat(const DString& name)
 {
     ASSERT(!name.empty());
     size_t nameHash = std::hash<DString>{}(name);
     EndStat(nameHash);
 }
 
-void PerformanceUtil::AddStat(const DString& name)
+void PerformanceUtilHelper::AddStat(const DString& name)
 {
     ASSERT(!name.empty());
     size_t nameHash = std::hash<DString>{}(name);
@@ -71,7 +123,7 @@ void PerformanceUtil::AddStat(const DString& name)
     stat.nStatIndex = ++m_nStatIndex;
 }
 
-void PerformanceUtil::BeginStat(size_t nameHash)
+void PerformanceUtilHelper::BeginStat(size_t nameHash)
 {
     TStat& stat = m_stat[nameHash];
     stat.startTime = std::chrono::steady_clock::now();
@@ -79,7 +131,7 @@ void PerformanceUtil::BeginStat(size_t nameHash)
     stat.nStartRefCount++;
 }
 
-void PerformanceUtil::EndStat(size_t nameHash)
+void PerformanceUtilHelper::EndStat(size_t nameHash)
 {
     std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();;
     TStat& stat = m_stat[nameHash];

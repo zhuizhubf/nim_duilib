@@ -15,7 +15,6 @@
 #include "SkiaHeaderEnd.h"
 
 #include "duilib/RenderSkia/DrawSkiaText.h"
-#include "duilib/Utils/PerformanceUtil.h"
 
 //该文件原始文件的出处：skia/chrome_67/src/utils/SkTextBox.cpp
 //基于原始文件，有修改，以兼容最新版本的skia代码（2023-06-25）
@@ -573,7 +572,6 @@ void SkTextBox::Draw(SkCanvas* pSkCanvas,
 
 void SkTextBox::Draw(SkCanvas* pSkCanvas)
 {
-    PerformanceStat stat(_T("SkTextBox::Draw"));
     ASSERT(pSkCanvas != nullptr);
     if (pSkCanvas == nullptr) {
         return;

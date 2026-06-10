@@ -585,7 +585,7 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
     CheckLoadBitmapFile();
 
     //统计绘制图片的性能
-    PerformanceStat statPerformance(_T("BitmapControl::Paint"));
+    PerformanceUtil statPerformance(_T("BitmapControl::Paint"));
 
     //支持多线程时，对m_pBitmap操作前先加锁
     std::unique_ptr<std::unique_lock<std::mutex>> spMutexLock;

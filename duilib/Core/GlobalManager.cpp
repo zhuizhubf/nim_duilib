@@ -132,7 +132,7 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
                             DpiInitParam dpiInitParam,
                             const CreateControlCallback& callback)
 {
-    PerformanceUtil::Instance().BeginStat(_T("Startup"));//程序启动时间统计
+    PerformanceUtilHelper::Instance().BeginStat(_T("Startup"));//程序启动时间统计
     ASSERT(!m_bStartup);
     if (m_bStartup) {
         return false;//禁止重复初始化
@@ -574,7 +574,7 @@ bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
     if (languageFileName.empty()) {
         return false;
     }
-    PerformanceStat perfStat(_T("GlobalManager::ReloadLanguage"));
+    PerformanceUtil perfStat(_T("GlobalManager::ReloadLanguage"));
     FilePath newLanguagePath = GetLanguagePath();
     if (!languagePath.IsEmpty()) {
         newLanguagePath = languagePath;

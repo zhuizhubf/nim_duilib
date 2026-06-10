@@ -179,7 +179,7 @@ bool Image::IsMultiFrameImage() const
 
 AnimationFramePtr Image::GetCurrentFrame(const UiRect& rcDest, UiRect& rcSource, UiRect& rcSourceCorners) const
 {
-    PerformanceStat statPerformance(_T("Image::GetCurrentFrame"));
+    PerformanceUtil statPerformance(_T("Image::GetCurrentFrame"));
     ASSERT((m_imageInfo != nullptr) && m_imageInfo->IsMultiFrameImage());
     if (!m_imageInfo || !m_imageInfo->IsMultiFrameImage()) {
         return nullptr;
@@ -204,7 +204,7 @@ AnimationFramePtr Image::GetCurrentFrame(const UiRect& rcDest, UiRect& rcSource,
 
 std::shared_ptr<IBitmap> Image::GetBitmapData(UiRect& rcSource, UiRect& rcSourceCorners, bool* bDecodeError) const
 {
-    PerformanceStat statPerformance(_T("Image::GetBitmapData"));
+    PerformanceUtil statPerformance(_T("Image::GetBitmapData"));
     ASSERT((m_imageInfo != nullptr) && !m_imageInfo->IsMultiFrameImage());
     if (!m_imageInfo || m_imageInfo->IsMultiFrameImage()) {
         return nullptr;

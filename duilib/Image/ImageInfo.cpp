@@ -229,7 +229,7 @@ std::shared_ptr<IAnimationImage> ImageInfo::GetAnimationImage(uint32_t nFrameInd
 
 AnimationFramePtr ImageInfo::GetFrame(uint32_t nFrameIndex, const UiSize& szDestRectSize)
 {
-    PerformanceStat statPerformance(_T("ImageInfo::GetFrame"));
+    PerformanceUtil statPerformance(_T("ImageInfo::GetFrame"));
     GlobalManager::Instance().AssertUIThread();
     std::shared_ptr<IAnimationImage> pAnimationImage = GetAnimationImage(nFrameIndex);
     ASSERT(pAnimationImage != nullptr);

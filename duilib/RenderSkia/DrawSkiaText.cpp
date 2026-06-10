@@ -168,7 +168,7 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
                                    FallbackFontCreator fallbackFontCreator,
                                    MeasureTextTempData& tempData)
 {
-    PerformanceStat statPerformance(_T("DrawSkiaText::MeasureText"));
+    PerformanceUtil statPerformance(_T("DrawSkiaText::MeasureText"));
     if ((text == nullptr) || (byteLength == 0)) {
         return 0.0f;
     }    
@@ -368,7 +368,7 @@ void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t b
                                   const SkFont& font, const SkPaint& paint,
                                   FallbackFontCreator fallbackFontCreator)
 {
-    PerformanceStat statPerformance(_T("DrawSkiaText::DrawSimpleText"));
+    PerformanceUtil statPerformance(_T("DrawSkiaText::DrawSimpleText"));
     if ((skCanvas == nullptr) || (text == nullptr) || (byteLength == 0)) {
         return;
     }
@@ -401,7 +401,7 @@ size_t DrawSkiaText::BreakText(const void* text, size_t byteLength, SkTextEncodi
                                MeasureTextTempData& tempData,
                                BreakTextTempData* breakTextData)
 {
-    //PerformanceStat statPerformance(_T("DrawSkiaText::BreakText"));
+    //PerformanceUtil statPerformance(_T("DrawSkiaText::BreakText"));
     if (measuredWidth != nullptr) {
         *measuredWidth = 0;
     }

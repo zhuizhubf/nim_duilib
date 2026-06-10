@@ -1,26 +1,60 @@
 #ifndef UI_UTILS_PERFORMANCE_UTIL_H_
 #define UI_UTILS_PERFORMANCE_UTIL_H_
 
-#include "duilib/duilib_defs.h"
+#include "duilib/duilib_config.h"
 #include <string>
 #include <unordered_map>
 #include <chrono>
 #include <algorithm>
 
+/** 功能开关（给调用方使用）: 1表示开启性能统计日志，0表示关闭性能统计日志
+*/
+#define DUILIB_PERFORMANCE_STAT_ENABLED 1
+
 namespace ui 
 {
-
 /** 代码执行性能分析工具
 */
 class DUILIB_API PerformanceUtil
 {
 public:
-    PerformanceUtil();
+    explicit PerformanceUtil(const DString& statName);
     ~PerformanceUtil();
+
+    //主动结束统计
+    void EndStat();
+
+private:
+    DString m_statName; //统计项的显示名称
+    size_t m_nameHash;  //统计项的显示名称的Hash值
+};
+
+/** 代码执行性能分析工具（快速版，避免使用字符串的hash函数）
+*/
+class DUILIB_API PerformanceUtilFast
+{
+public:
+    explicit PerformanceUtilFast(size_t nameHash);
+    ~PerformanceUtilFast();
+
+    //主动结束统计
+    void EndStat();
+
+private:
+    size_t m_nameHash;  //统计项的显示名称的Hash值
+};
+
+/** 代码执行性能分析工具（实现）
+*/
+class DUILIB_API PerformanceUtilHelper
+{
+public:
+    PerformanceUtilHelper();
+    ~PerformanceUtilHelper();
 
     /** 单例对象
     */
-    static PerformanceUtil& Instance();
+    static PerformanceUtilHelper& Instance();
 
     /** 代码开始执行，开始计时
     * @param [in] name 统计项的名称
@@ -81,70 +115,6 @@ private:
 
     std::unordered_map<size_t, TStat> m_stat;
     size_t m_nStatIndex; //添加的顺序号
-};
-
-class PerformanceStat
-{
-public:
-    explicit PerformanceStat(const DString& statName):
-        m_statName(statName),
-        m_nameHash(0)
-    {
-        if (!m_statName.empty()) {
-            PerformanceUtil::Instance().AddStat(m_statName);
-            m_nameHash = std::hash<DString>{}(m_statName);
-            PerformanceUtil::Instance().BeginStat(m_nameHash);
-        }        
-    }
-    ~PerformanceStat()
-    {
-        if (m_nameHash != 0) {
-            PerformanceUtil::Instance().EndStat(m_nameHash);
-        }
-    }
-
-    //主动结束统计
-    void EndStat()
-    {
-        if (m_nameHash != 0) {
-            PerformanceUtil::Instance().EndStat(m_nameHash);
-            m_nameHash = 0;
-        }
-    }
-
-private:
-    DString m_statName; //统计项的显示名称
-    size_t m_nameHash;  //统计项的显示名称的Hash值
-};
-
-class PerformanceStatFast
-{
-public:
-    explicit PerformanceStatFast(size_t nameHash):
-        m_nameHash(nameHash)
-    {
-        if (m_nameHash != 0) {
-            PerformanceUtil::Instance().BeginStat(m_nameHash);
-        }
-    }
-    ~PerformanceStatFast()
-    {
-        if (m_nameHash != 0) {
-            PerformanceUtil::Instance().EndStat(m_nameHash);
-        }
-    }
-
-    //主动结束统计
-    void EndStat()
-    {
-        if (m_nameHash != 0) {
-            PerformanceUtil::Instance().EndStat(m_nameHash);
-            m_nameHash = 0;
-        }
-    }
-
-private:
-    size_t m_nameHash;  //统计项的显示名称的Hash值
 };
 
 }

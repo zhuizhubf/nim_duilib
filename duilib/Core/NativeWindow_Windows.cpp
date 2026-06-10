@@ -1535,7 +1535,7 @@ LRESULT NativeWindow_Windows::OnPaintMsg(UINT uMsg, WPARAM wParam, LPARAM lParam
         bPaint = false;
     }
     if (bPaint) {
-        PerformanceStat statPerformance(_T("PaintWindow, NativeWindow_Windows::OnPaintMsg(Total)"));
+        PerformanceUtil statPerformance(_T("PaintWindow, NativeWindow_Windows::OnPaintMsg(Total)"));
         if (IsChildWindow()) {
             //子窗口模式，完全由应用层负责绘制
             if (m_pOwner != nullptr) {

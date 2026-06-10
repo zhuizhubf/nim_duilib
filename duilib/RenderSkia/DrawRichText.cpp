@@ -100,7 +100,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                                         std::shared_ptr<DrawRichTextCache>* pDrawRichTextCache,
                                         std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceStat statPerformance(_T("DrawRichText::InternalDrawRichText"));
+    PerformanceUtil statPerformance(_T("DrawRichText::InternalDrawRichText"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;
@@ -777,7 +777,7 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
                                            size_t nDeletedRows,
                                            const std::vector<int32_t>& rowRectTopList)
 {
-    PerformanceStat statPerformance(_T("DrawRichText::UpdateDrawRichTextCache"));
+    PerformanceUtil statPerformance(_T("DrawRichText::UpdateDrawRichTextCache"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return false;
@@ -1055,7 +1055,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
                                          uint8_t uFade,
                                          std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceStat statPerformance(_T("DrawRichText::DrawRichTextCacheData"));
+    PerformanceUtil statPerformance(_T("DrawRichText::DrawRichTextCacheData"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;

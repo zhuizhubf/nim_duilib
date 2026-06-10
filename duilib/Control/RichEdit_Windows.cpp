@@ -2327,7 +2327,7 @@ void RichEdit::OnMouseMessage(uint32_t uMsg, const EventArgs& msg)
 
 void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
 {
-    PerformanceStat statPerformance(_T("PaintWindow, RichEdit::Paint"));
+    PerformanceUtil statPerformance(_T("PaintWindow, RichEdit::Paint"));
     if (pRender == nullptr) {
         return;
     }
@@ -2583,7 +2583,7 @@ private:
 
 void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
 {
-    PerformanceStat statPerformance(_T("PaintWindow, RichEdit::PaintRichEdit"));
+    PerformanceUtil statPerformance(_T("PaintWindow, RichEdit::PaintRichEdit"));
     if (pRender == nullptr) {
         return;
     }

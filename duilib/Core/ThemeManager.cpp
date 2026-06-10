@@ -89,7 +89,7 @@ bool ThemeManager::InitTheme(const FilePath& themeRootFullPath,
     globalXmlFileNameFullPath.NormalizeFilePath();             //默认取值示例：resources/themes/default/global.xml
 
     //解析全局资源信息(默认是"global.xml"文件)
-    PerformanceStat statPerformance(_T("ParseXml, ThemeManager::InitTheme load global.xml"));
+    PerformanceUtil statPerformance(_T("ParseXml, ThemeManager::InitTheme load global.xml"));
     WindowBuilder globalbuilder;
     Window tempWnd;
     if (globalbuilder.ParseXmlFile(FilePath(globalXmlFileName))) {

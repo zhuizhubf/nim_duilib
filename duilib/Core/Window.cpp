@@ -1228,7 +1228,7 @@ bool Window::OnPreparePaint()
 
 LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/, bool& bHandled)
 {
-    PerformanceStat statPerformance(_T("PaintWindow, Window::OnPaintMsg"));
+    PerformanceUtil statPerformance(_T("PaintWindow, Window::OnPaintMsg"));
     bHandled = false;
     if (!IsWindowFirstShown()) {
         //首次绘制的时候，需要完整绘制（避免初始窗口部分在屏幕外时，然后拖动窗口到屏幕中间时，界面显示不完整的问题）
@@ -1245,7 +1245,7 @@ LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/
     static bool bStartupEnd = false;
     if (!bStartupEnd) {
         bStartupEnd = true;
-        PerformanceUtil::Instance().EndStat(_T("Startup"));
+        PerformanceUtilHelper::Instance().EndStat(_T("Startup"));
     }
     return 0;
 }
@@ -1260,7 +1260,7 @@ bool Window::Paint(const UiRect& rcPaint)
 
     //开始绘制前，去掉alpha通道，将颜色值全部置零
     if (!rcPaint.IsEmpty()) {
-        PerformanceStat statPerformance(_T("PaintWindow, Window::Paint ClearAlpha"));
+        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint ClearAlpha"));
         pRender->ClearAlpha(rcPaint);
     }
 
@@ -1270,7 +1270,7 @@ bool Window::Paint(const UiRect& rcPaint)
         return false;
     }
     if (pRoot->IsVisible()) {
-        PerformanceStat statPerformance(_T("PaintWindow, Window::Paint Paint/PaintChild"));
+        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint Paint/PaintChild"));
         AutoClip rectClip(pRender, rcPaint, true);
         UiPoint ptOldWindOrg = pRender->OffsetWindowOrg(m_renderOffset);
         pRoot->AlphaPaint(pRender, rcPaint);
@@ -1287,7 +1287,7 @@ bool Window::Paint(const UiRect& rcPaint)
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_RICH_EDIT_DRAW_OPT)
     //开始绘制前，进行alpha通道修复
     if (!rcPaint.IsEmpty()) {
-        PerformanceStat statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
+        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
         Shadow* pShadow = m_windowRoot->GetShadow();
         if ((pShadow != nullptr) && IsShadowAttached() && !Shadow::IsSystemShadowType(GetShadowType()) &&
             (m_renderOffset.x == 0) && (m_renderOffset.y == 0)) {

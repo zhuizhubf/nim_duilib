@@ -174,7 +174,7 @@ bool SkRasterWindowContext_SDL::PaintAndSwapBuffers(IRender* pRender, IRenderPai
 
 bool SkRasterWindowContext_SDL::SwapPaintBuffers(const UiRect& rcPaint, uint8_t nLayeredWindowAlpha)
 {
-    PerformanceStat statPerformance(_T("PaintWindow, SkRasterWindowContext_SDL::SwapPaintBuffers"));
+    PerformanceUtil statPerformance(_T("PaintWindow, SkRasterWindowContext_SDL::SwapPaintBuffers"));
     ASSERT(!rcPaint.IsEmpty());
     if (rcPaint.IsEmpty()) {
         return false;
@@ -306,7 +306,7 @@ bool SkRasterWindowContext_SDL::SwapPaintBuffersFast(const UiRect& rcPaint, uint
     }
 
     //统计性能
-    PerformanceStat statPerformance(_T("PaintWindow, SkRasterWindowContext_SDL::SwapPaintBuffersFast"));
+    PerformanceUtil statPerformance(_T("PaintWindow, SkRasterWindowContext_SDL::SwapPaintBuffersFast"));
 
     bool bDrawOk = false;
     if ((rcPaint.Width() != width()) || (rcPaint.Height() != height())) {

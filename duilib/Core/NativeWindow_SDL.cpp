@@ -2710,7 +2710,7 @@ void NativeWindow_SDL::Invalidate(const UiRect& rcItem)
 
 void NativeWindow_SDL::PaintWindow(bool bPaintAll)
 {
-    PerformanceStat statPerformance(_T("PaintWindow, NativeWindow_SDL::PaintWindow(Total)"));
+    PerformanceUtil statPerformance(_T("PaintWindow, NativeWindow_SDL::PaintWindow(Total)"));
     if (bPaintAll) {
         //绘制全部
         m_rcUpdateRect.Clear();

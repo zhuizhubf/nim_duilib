@@ -17,7 +17,7 @@ LangManager::~LangManager()
 
 bool LangManager::LoadStringTable(const FilePath& strFilePath)
 {
-    PerformanceStat perfStat(_T("LangManager::LoadStringTable"));
+    PerformanceUtil perfStat(_T("LangManager::LoadStringTable"));
     std::vector<uint8_t> fileData;
     FileUtil::ReadFileData(strFilePath, fileData);
     ASSERT(!fileData.empty());

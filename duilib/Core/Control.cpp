@@ -3199,7 +3199,7 @@ bool Control::PaintImage(IRender* pRender,
                          const UiRect* pDestRect,
                          UiRect* pPaintedRect) const
 {
-    PerformanceStat statPerformance(_T("Control::PaintImage"));
+    PerformanceUtil statPerformance(_T("Control::PaintImage"));
     //注解：strModify参数，目前外部传入的主要是："destscale='false' dest='%d,%d,%d,%d'"
     //                   也有一个类传入了：_T(" corner='%d,%d,%d,%d'")。
     if (pImage == nullptr) {

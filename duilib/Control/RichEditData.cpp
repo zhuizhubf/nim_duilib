@@ -349,7 +349,7 @@ void RichEditData::CheckCalcTextRects()
 
 void RichEditData::CalcTextRectsFull()
 {
-    PerformanceStat statPerformance(_T("RichEditData::CalcTextRectsFull"));
+    PerformanceUtil statPerformance(_T("RichEditData::CalcTextRectsFull"));
     //清空所有行的缓存数据
     RemoveEmptyLine(m_lineTextInfo);
     for (RichTextLineInfoPtr& pLineInfo : m_lineTextInfo) {
@@ -547,7 +547,7 @@ void RichEditData::CalcTextRectsPart(size_t nStartLine,
                                      const std::vector<size_t>& deletedLines,
                                      size_t nDeletedRows)
 {
-    PerformanceStat statPerformance(_T("RichEditData::CalcTextRectsPart"));
+    PerformanceUtil statPerformance(_T("RichEditData::CalcTextRectsPart"));
     ASSERT(!m_pRichText->IsTextPasswordMode());//密码模式下，不应使用该函数
     if (nStartLine != (size_t)-1) {
         ASSERT(!modifiedLines.empty() || !deletedLines.empty());
@@ -779,7 +779,7 @@ void RichEditData::CalcTextRectsPart(size_t nStartLine,
 
 bool RichEditData::SetText(const DStringW& text)
 {
-    PerformanceStat statPerformance(_T("RichEditData::SetText"));
+    PerformanceUtil statPerformance(_T("RichEditData::SetText"));
     if (text.empty()) {
         Clear();
         return true;
@@ -1053,7 +1053,7 @@ bool RichEditData::FindLineTextPos(int32_t nStartChar, int32_t nEndChar,
 
 bool RichEditData::ReplaceText(int32_t nStartChar, int32_t nEndChar, const DStringW& text, bool bCanUndo, bool bClearRedo)
 {
-    PerformanceStat statPerformance(_T("RichEditData::ReplaceText"));
+    PerformanceUtil statPerformance(_T("RichEditData::ReplaceText"));
     ASSERT((nStartChar >= 0) && (nEndChar >= 0) && (nEndChar >= nStartChar));
     if ((nStartChar < 0) || (nEndChar < 0) || (nStartChar > nEndChar)) {
         return false;
