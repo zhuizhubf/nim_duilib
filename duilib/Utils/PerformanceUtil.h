@@ -7,6 +7,11 @@
 #include <chrono>
 #include <algorithm>
 
+#if defined DUILIB_BUILD_FOR_WIN
+    //Windows平台使用 std::vector 作为嵌套调用的 tick 栈, 支持 BeginStat/EndStat 嵌套
+    #include <vector>
+#endif
+
 /** 功能开关（给调用方使用）: 1表示开启性能统计日志，0表示关闭性能统计日志
 */
 #define DUILIB_PERFORMANCE_STAT_ENABLED 1
@@ -92,6 +97,17 @@ private:
         //是否有开始数据
         int32_t nStartRefCount = 0;
 
+#if defined DUILIB_BUILD_FOR_WIN
+        //Windows平台: 使用 QueryPerformanceCounter 原始 tick 值计时, 精度远高于微秒
+        //累积时按 tick 值进行累加, 避免每次测量都做整数截断造成累积误差, 仅在最后输出时转换为微秒
+        //关键改进: 使用 tickStack 栈来支持 BeginStat/EndStat 嵌套调用(例如递归或回调),
+        //          避免嵌套场景下 startTick 被覆盖导致外层时间被算小的问题
+        int64_t startTick = 0;     //最近一次(非嵌套)开始时间, 保留用于调试
+        int64_t endTick = 0;       //最近一次结束时间, 保留用于调试
+        int64_t totalTicks = 0;    //代码执行总时间(单位: QPC tick, 精度最高)
+        int64_t maxTicks = 0;      //单次最大执行时间(单位: QPC tick)
+        std::vector<int64_t> tickStack; //嵌套调用的 startTick 栈, 每次 BeginStat 压栈, 每次 EndStat 弹栈
+#else
         //开始时间
         std::chrono::steady_clock::time_point startTime;
 
@@ -101,12 +117,13 @@ private:
         //代码执行总时间：微秒(千分之一毫秒)
         std::chrono::microseconds totalTimes = std::chrono::microseconds::zero();
 
-        //统计总次数
-        uint32_t totalCount = 0;
-
         /** 单次最大：：微秒(千分之一毫秒)
         */
         std::chrono::microseconds maxTime = std::chrono::microseconds::zero();
+#endif
+
+        //统计总次数
+        uint32_t totalCount = 0;
 
         /** 名称
         */
