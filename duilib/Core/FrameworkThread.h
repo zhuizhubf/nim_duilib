@@ -187,6 +187,11 @@ private:
         std::chrono::steady_clock::time_point m_startTime;     //开始时间（任务放入队列的时间）
         std::chrono::steady_clock::time_point m_lastExecTime;  //任务上次执行的时间
         int32_t m_nTotalExecTimes = 0;          //任务总计执行的次数
+
+        // 底层定时器 ID（用于 PostDelayedTask / PostRepeatedTask 触发的任务）。
+        // 0 表示没有关联的定时器（如 PostTask 的立即任务）。
+        // 在 CancelTask 时同步通过 TimerManager::RemoveTimer 取消，避免定时器空转触发空回调。
+        size_t m_nTimerId = 0;
     };
 
     /** 任务信息映射表
