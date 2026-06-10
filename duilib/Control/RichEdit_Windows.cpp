@@ -2681,7 +2681,8 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
     const int32_t nRight = std::min(rcUpdate.right, rc.Width());
     const int32_t nWidth = rc.Width();
 
-    constexpr const int32_t nColorBits = sizeof(uint32_t); //每个颜色点所占字节数
+    const uint32_t alphaMask = 0xFF000000u; //Alpha通道掩码
+    const uint32_t alphaClear = ~alphaMask; //清除Alpha后的像素掩码
 
     if (m_pAlphaValues == nullptr) {
         m_pAlphaValues = std::make_unique<FastBytes>();
@@ -2703,24 +2704,25 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
     uint8_t bkColorAlphaValue = 0; //bkColor的Alpha值（仅在 bUseBkColorAlpha=true 时使用）
 
     //第一遍：保存原始Alpha值并清零Alpha通道
-    //优化：使用裸指针直接写入，避免 push_back 的函数调用与分支开销
+    //优化：使用 uint32_t 像素操作 + __restrict，让编译器自动向量化（SSE2 一次处理 4 像素，AVX2 处理 8 像素）
     if (nEstSize > 0) {
-        uint8_t* pDst = alphaValues.data();
-        uint8_t* pBits = (uint8_t*)pBitmapBits;
-        const int32_t nRowStride = nWidth * nColorBits;
+        uint8_t* __restrict pDst = alphaValues.data();
+        uint32_t* __restrict pBits32 = (uint32_t*)pBitmapBits;
+        uint32_t alphaOr = 0; //用位或累积任一像素的 Alpha 通道，避免逐像素分支破坏向量化
         for (int32_t i = nTop; i < nBottom; ++i) {
-            uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
-            uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+            uint32_t* pRow = pBits32 + (size_t)i * nWidth + nLeft;
+            uint32_t* pEnd = pBits32 + (size_t)i * nWidth + nRight;
             while (pRow < pEnd) {
-                const uint8_t alpha = *pRow;
-                *pDst++ = alpha;
-                if (!bHasBkClolor && alpha != 0) {
-                    bHasBkClolor = true;
-                }
-                *pRow = 0;
-                pRow += 4;
+                const uint32_t pixel = *pRow;
+                *pDst++ = (uint8_t)(pixel >> 24); //保存原始Alpha字节
+                alphaOr |= pixel; //累积（任何像素Alpha非0都会反映到 alphaOr 的高字节）
+                *pRow = pixel & alphaClear; //清零Alpha通道
+                ++pRow;
             }
         }
+        //循环结束后统一判断是否有非零Alpha（避免循环内分支破坏自动向量化）
+        bHasBkClolor = ((alphaOr & alphaMask) != 0);
+        //同步 size 维护不变量（实际第二阶段使用 data() + 已知 nEstSize，不依赖 size()）
         alphaValues.set_size((size_t)nEstSize);
     }
     if (!bHasBkClolor && IsAlpha()) {
@@ -2741,20 +2743,18 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
             //使用bkColor的Alpha常量作为恢复值，避免对 alphaValues 做无效的逐像素填充
             bUseBkColorAlpha = true;
             bkColorAlphaValue = bkColorValue.GetA();
-            const uint8_t b = bkColorValue.GetB();
-            const uint8_t g = bkColorValue.GetG();
-            const uint8_t r = bkColorValue.GetR();
-            uint8_t* pBits = (uint8_t*)pBitmapBits;
-            const int32_t nRowStride = nWidth * nColorBits;
+            //优化：把 BGR 预拼成单个 uint32_t 字面量（alpha=0），整像素一次写
+            //     内层循环只剩 1 次 store + 1 次指针递增，热循环可被完全向量化
+            const uint32_t bkColorPixel = ((uint32_t)bkColorValue.GetR() << 16) |
+                                          ((uint32_t)bkColorValue.GetG() << 8) |
+                                          (uint32_t)bkColorValue.GetB();
+            uint32_t* __restrict pBits32 = (uint32_t*)pBitmapBits;
             for (int32_t i = nTop; i < nBottom; ++i) {
-                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
-                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                uint32_t* pRow = pBits32 + (size_t)i * nWidth + nLeft;
+                uint32_t* pEnd = pBits32 + (size_t)i * nWidth + nRight;
                 while (pRow < pEnd) {
-                    *pRow = 0;
-                    *(pRow + 1) = b;
-                    *(pRow + 2) = g;
-                    *(pRow + 3) = r;
-                    pRow += 4;
+                    *pRow = bkColorPixel;
+                    ++pRow;
                 }
             }
         }
@@ -2823,42 +2823,45 @@ void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
                             0);                 // What view of the object
 
     //恢复Alpha(绘制过程中，会导致绘制区域部分的Alpha通道出现异常)
-    //优化：使用裸指针直接访问，避免 operator[] 的函数调用与索引计算开销
-    {
-        uint8_t* pBits = (uint8_t*)pBitmapBits;
-        const int32_t nRowStride = nWidth * nColorBits;
+    //优化：使用 uint32_t 像素操作 + 位运算无分支混合，编译器自动向量化
+    //      关键技巧：mask = (pixel & alphaMask) == 0 ? alphaMask : 0 用 CMOV 实现，无分支
+    //      仅在 bHasBkClolor 或 bUseBkColorAlpha 为真时才执行（避免无意义的全位图扫描）：
+    //        - bHasBkClolor==true：第一遍保存了原始Alpha，需要用 alphaValues 恢复
+    //        - bUseBkColorAlpha==true：bkColor路径填充了位图，需要用 bkColorAlpha 恢复
+    //        - 两者都==false：位图本来就是全透明的（从渲染器读出来就是 alpha=0），
+    //                        TxDraw 后文字部分 alpha>0，背景部分 alpha=0，正好就是想要的最终状态，
+    //                        完全跳过第二阶段（省掉一次完整的位图扫描）
+    if (bHasBkClolor || bUseBkColorAlpha) {
+        uint32_t* __restrict pBits32 = (uint32_t*)pBitmapBits;
         if (bUseBkColorAlpha) {
             //使用bkColor的Alpha常量恢复，无需逐像素读取 alphaValues
+            const uint32_t bkAlphaShifted = (uint32_t)bkColorAlphaValue << 24;
             for (int32_t i = nTop; i < nBottom; ++i) {
-                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
-                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                uint32_t* pRow = pBits32 + (size_t)i * nWidth + nLeft;
+                uint32_t* pEnd = pBits32 + (size_t)i * nWidth + nRight;
                 while (pRow < pEnd) {
-                    if (*pRow == 0) {
-                        *pRow = bkColorAlphaValue;
-                    }
-                    pRow += 4;
+                    const uint32_t pixel = *pRow;
+                    //无分支：若当前Alpha为0则使用 bkAlphaShifted，否则保持原值
+                    const uint32_t mask = ((pixel & alphaMask) == 0) ? alphaMask : 0;
+                    *pRow = (pixel & alphaClear) | (bkAlphaShifted & mask);
+                    ++pRow;
                 }
             }
         }
         else {
             //使用第一遍保存的原始Alpha值恢复
-            const uint8_t* pSrc = alphaValues.data();
-            const size_t nAlphaCount = alphaValues.size();
+            const uint8_t* __restrict pSrc = alphaValues.data();
             for (int32_t i = nTop; i < nBottom; ++i) {
-                uint8_t* pRow = pBits + i * nRowStride + nLeft * nColorBits + 3;
-                uint8_t* pEnd = pBits + i * nRowStride + nRight * nColorBits;
+                uint32_t* pRow = pBits32 + (size_t)i * nWidth + nLeft;
+                uint32_t* pEnd = pBits32 + (size_t)i * nWidth + nRight;
                 while (pRow < pEnd) {
-                    if (*pRow == 0) {
-                        //Alpha值为0，绘制穿透背景了，需要恢复原Alpha值
-                        if (pSrc < (alphaValues.data() + nAlphaCount)) {
-                            *pRow = *pSrc; //优先使用原Alpha值
-                        }
-                        else {
-                            *pRow = 255; //容错
-                        }
-                    }
+                    const uint32_t pixel = *pRow;
+                    const uint32_t savedShifted = (uint32_t)(*pSrc) << 24;
+                    //无分支：若当前Alpha为0则使用 savedShifted，否则保持原值
+                    const uint32_t mask = ((pixel & alphaMask) == 0) ? alphaMask : 0;
+                    *pRow = (pixel & alphaClear) | (savedShifted & mask);
                     ++pSrc;
-                    pRow += 4;
+                    ++pRow;
                 }
             }
         }
