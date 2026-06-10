@@ -3199,7 +3199,17 @@ bool Control::PaintImage(IRender* pRender,
                          const UiRect* pDestRect,
                          UiRect* pPaintedRect) const
 {
-    PerformanceUtil statPerformance(_T("Control::PaintImage"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("Control::PaintImage");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     //注解：strModify参数，目前外部传入的主要是："destscale='false' dest='%d,%d,%d,%d'"
     //                   也有一个类传入了：_T(" corner='%d,%d,%d,%d'")。
     if (pImage == nullptr) {
@@ -3523,6 +3533,17 @@ std::unique_ptr<IRender> Control::CreateTempRender() const
 
 void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
 {
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("PaintWindow, Control::AlphaPaint");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return;

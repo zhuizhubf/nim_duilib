@@ -168,7 +168,17 @@ SkScalar DrawSkiaText::MeasureText(const SkFont& font, const void* text, size_t 
                                    FallbackFontCreator fallbackFontCreator,
                                    MeasureTextTempData& tempData)
 {
-    PerformanceUtil statPerformance(_T("DrawSkiaText::MeasureText"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("DrawSkiaText::MeasureText");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     if ((text == nullptr) || (byteLength == 0)) {
         return 0.0f;
     }    
@@ -368,7 +378,16 @@ void DrawSkiaText::DrawSimpleText(SkCanvas* skCanvas, const void* text, size_t b
                                   const SkFont& font, const SkPaint& paint,
                                   FallbackFontCreator fallbackFontCreator)
 {
-    PerformanceUtil statPerformance(_T("DrawSkiaText::DrawSimpleText"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("DrawSkiaText::DrawSimpleText");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
     if ((skCanvas == nullptr) || (text == nullptr) || (byteLength == 0)) {
         return;
     }

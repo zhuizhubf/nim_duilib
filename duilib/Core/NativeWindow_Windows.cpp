@@ -1535,7 +1535,16 @@ LRESULT NativeWindow_Windows::OnPaintMsg(UINT uMsg, WPARAM wParam, LPARAM lParam
         bPaint = false;
     }
     if (bPaint) {
-        PerformanceUtil statPerformance(_T("PaintWindow, NativeWindow_Windows::OnPaintMsg(Total)"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+        //性能统计
+        static size_t statNameHash = 0;
+        if (statNameHash == 0) {
+            DString statName = _T("PaintWindow, NativeWindow_Windows::OnPaintMsg(Total)");
+            statNameHash = std::hash<DString>{}(statName);
+            PerformanceUtilHelper::Instance().AddStat(statName);
+        }
+        PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
         if (IsChildWindow()) {
             //子窗口模式，完全由应用层负责绘制
             if (m_pOwner != nullptr) {

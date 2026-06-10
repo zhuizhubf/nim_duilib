@@ -1228,7 +1228,17 @@ bool Window::OnPreparePaint()
 
 LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/, bool& bHandled)
 {
-    PerformanceUtil statPerformance(_T("PaintWindow, Window::OnPaintMsg"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("PaintWindow, Window::OnPaintMsg");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     bHandled = false;
     if (!IsWindowFirstShown()) {
         //首次绘制的时候，需要完整绘制（避免初始窗口部分在屏幕外时，然后拖动窗口到屏幕中间时，界面显示不完整的问题）
@@ -1260,7 +1270,16 @@ bool Window::Paint(const UiRect& rcPaint)
 
     //开始绘制前，去掉alpha通道，将颜色值全部置零
     if (!rcPaint.IsEmpty()) {
-        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint ClearAlpha"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+        //性能统计
+        static size_t statNameHash = 0;
+        if (statNameHash == 0) {
+            DString statName = _T("PaintWindow, Window::Paint ClearAlpha");
+            statNameHash = std::hash<DString>{}(statName);
+            PerformanceUtilHelper::Instance().AddStat(statName);
+        }
+        PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
         pRender->ClearAlpha(rcPaint);
     }
 
@@ -1270,7 +1289,17 @@ bool Window::Paint(const UiRect& rcPaint)
         return false;
     }
     if (pRoot->IsVisible()) {
-        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint Paint/PaintChild"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+        //性能统计
+        static size_t statNameHash = 0;
+        if (statNameHash == 0) {
+            DString statName = _T("PaintWindow, Window::Paint AlphaPaint(Root Box)");
+            statNameHash = std::hash<DString>{}(statName);
+            PerformanceUtilHelper::Instance().AddStat(statName);
+        }
+        PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
         AutoClip rectClip(pRender, rcPaint, true);
         UiPoint ptOldWindOrg = pRender->OffsetWindowOrg(m_renderOffset);
         pRoot->AlphaPaint(pRender, rcPaint);

@@ -1,6 +1,5 @@
 #include "FontMgr_Skia.h"
 #include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/PerformanceUtil.h"
 
 #include "SkiaHeaderBegin.h"
 #include "include/core/SkFontMgr.h"
@@ -387,7 +386,6 @@ void FontMgr_Skia::ClearFontCache()
 
 SkFont* FontMgr_Skia::CreateSkFont(const UiFont& fontInfo)
 {
-    PerformanceUtil statPerformance(_T("FontMgr_Skia::CreateSkFont"));
     ASSERT(!fontInfo.m_fontName.empty());
     if (fontInfo.m_fontName.empty()) {
         return nullptr;

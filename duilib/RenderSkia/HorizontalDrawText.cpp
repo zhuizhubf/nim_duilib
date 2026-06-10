@@ -4,7 +4,6 @@
 
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/PerformanceUtil.h"
 
 #include "SkiaHeaderBegin.h"
 #include "include/core/SkCanvas.h"
@@ -304,7 +303,6 @@ float HorizontalDrawText::CalculateDefaultCharWidth(const IFont* pFont, const Sk
 
 UiRect HorizontalDrawText::MeasureString(const DString& strText, const MeasureStringParam& measureParam)
 {
-    PerformanceUtil statPerformance(_T("HorizontalDrawText::MeasureString"));
     ASSERT((m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return UiRect();
@@ -378,7 +376,6 @@ void HorizontalDrawText::DrawString(const DString& strText, const DrawStringPara
 {
     // 备注：横向文本绘制不支持以下功能
     // 1. 文本风格：DrawStringFormat::TEXT_PATH_ELLIPSIS 不支持，按DrawStringFormat::TEXT_END_ELLIPSIS处理
-    PerformanceUtil statPerformance(_T("HorizontalDrawText::DrawString"));
     ASSERT((m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;

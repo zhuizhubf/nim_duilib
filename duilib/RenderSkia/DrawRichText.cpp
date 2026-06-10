@@ -100,7 +100,6 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                                         std::shared_ptr<DrawRichTextCache>* pDrawRichTextCache,
                                         std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceUtil statPerformance(_T("DrawRichText::InternalDrawRichText"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;
@@ -114,6 +113,17 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     if (pRenderFactory == nullptr) {
         return;
     }
+
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("DrawRichText::InternalDrawRichText");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 
     //绘制区域：绘制区域的坐标以 (rcTextRect.left,rcTextRect.top)作为(0,0)点
     UiRect rcDrawRect = rcTextRect;
@@ -777,7 +787,6 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
                                            size_t nDeletedRows,
                                            const std::vector<int32_t>& rowRectTopList)
 {
-    PerformanceUtil statPerformance(_T("DrawRichText::UpdateDrawRichTextCache"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return false;
@@ -788,6 +797,17 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     }
 
     ASSERT(!modifiedLines.empty() || !deletedLines.empty());
+
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("DrawRichText::UpdateDrawRichTextCache");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 
     if (!modifiedLines.empty()) {
         if (nStartLine != modifiedLines[0]) {
@@ -1055,7 +1075,6 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
                                          uint8_t uFade,
                                          std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    PerformanceUtil statPerformance(_T("DrawRichText::DrawRichTextCacheData"));
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;
@@ -1065,6 +1084,17 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     if (spDrawRichTextCache == nullptr) {
         return;
     }
+
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("DrawRichText::DrawRichTextCacheData");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 
     const SkTextEncoding textEncoding = spDrawRichTextCache->m_textEncoding;
     const size_t textCharSize = spDrawRichTextCache->m_textCharSize;

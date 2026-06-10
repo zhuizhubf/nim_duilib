@@ -4,7 +4,6 @@
 
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/PerformanceUtil.h"
 
 #include "SkiaHeaderBegin.h"
 
@@ -367,7 +366,6 @@ float VerticalDrawText::CalculateDefaultCharWidth(const IFont* pFont, const SkFo
 
 UiRect VerticalDrawText::MeasureString(const DString& strText, const MeasureStringParam& measureParam)
 {
-    PerformanceUtil statPerformance(_T("VerticalDrawText::MeasureString"));
     ASSERT((m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return UiRect();
@@ -442,7 +440,6 @@ void VerticalDrawText::DrawString(const DString& strText, const DrawStringParam&
 {
     // 备注：纵向文本绘制不支持以下功能
     // 1. 文本风格：DrawStringFormat::TEXT_PATH_ELLIPSIS 不支持，按DrawStringFormat::TEXT_END_ELLIPSIS处理
-    PerformanceUtil statPerformance(_T("VerticalDrawText::DrawString"));
     ASSERT((m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return;

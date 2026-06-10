@@ -584,8 +584,16 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
     //按需加载指定的图片
     CheckLoadBitmapFile();
 
+#if DUILIB_PERFORMANCE_STAT_ENABLED
     //统计绘制图片的性能
-    PerformanceUtil statPerformance(_T("BitmapControl::Paint"));
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("BitmapControl::Paint");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 
     //支持多线程时，对m_pBitmap操作前先加锁
     std::unique_ptr<std::unique_lock<std::mutex>> spMutexLock;
