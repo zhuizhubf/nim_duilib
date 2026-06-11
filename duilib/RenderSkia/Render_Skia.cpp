@@ -429,6 +429,11 @@ bool Render_Skia::StretchBlt(int32_t xDest, int32_t yDest, int32_t widthDest, in
 
 bool Render_Skia::AlphaBlend(int32_t xDest, int32_t yDest, int32_t widthDest, int32_t heightDest, IRender* pSrcRender, int32_t xSrc, int32_t ySrc, int32_t widthSrc, int32_t heightSrc, uint8_t alpha)
 {
+    // 1. 参数验证: 与 StretchBlt/BitBlt 保持一致, 提前过滤无效调用, 避免 Skia 内部 UB
+    //    (xSrc/ySrc 不能为负; width*/height* 必须为正)
+    if (widthDest <= 0 || heightDest <= 0 || widthSrc <= 0 || heightSrc <= 0 || xSrc < 0 || ySrc < 0) {
+        return false;
+    }
     ASSERT((GetWidth() > 0) && (GetHeight() > 0));
     ASSERT(pSrcRender != nullptr);
     if (pSrcRender == nullptr) {
@@ -445,32 +450,45 @@ bool Render_Skia::AlphaBlend(int32_t xDest, int32_t yDest, int32_t widthDest, in
     if (skSurface == nullptr) {
         return false;
     }
+
+    // 2. 早期获取目标画布: GetSkCanvas() 是虚函数, 在 makeImageSnapshot() 之前调用,
+    //    一旦画布无效可以快速失败, 避免后续相对昂贵的快照操作(GPU 同步或像素拷贝)
+    SkCanvas* skCanvas = GetSkCanvas();
+    ASSERT(skCanvas != nullptr);
+    if (skCanvas == nullptr) {
+        return false;
+    }
+
+    // 3. 源图像快照: 该操作是函数中相对昂贵的部分(可能涉及 GPU 同步或像素拷贝)
     sk_sp<SkImage> skSrcImage = skSurface->makeImageSnapshot();
     ASSERT(skSrcImage != nullptr);
     if (skSrcImage == nullptr) {
         return false;
     }
 
+    // 4. 构造 SkPaint: 继承 m_pSkPaint 的属性(颜色/滤镜等), 仅修改 Style 和 Alpha
     SkPaint skPaint = *m_pSkPaint;
     skPaint.setStyle(SkPaint::kFill_Style);
     if (alpha != 0xFF) {
         skPaint.setAlpha(alpha);
     }
 
-    SkIRect rcSkDestI = SkIRect::MakeXYWH(xDest, yDest, widthDest, heightDest);
-    SkRect rcSkDest = SkRect::Make(rcSkDestI);
-    rcSkDest.offset(*m_pSkPointOrg);
+    // 5. 直接构造 SkRect: 消除 SkIRect 中间对象和 SkRect::Make/offset 多次调用,
+    //    减少内存访问与函数调用开销
+    const SkScalar orgX = m_pSkPointOrg->fX;
+    const SkScalar orgY = m_pSkPointOrg->fY;
+    SkRect rcSkDest = SkRect::MakeXYWH((SkScalar)xDest + orgX,
+                                       (SkScalar)yDest + orgY,
+                                       (SkScalar)widthDest,
+                                       (SkScalar)heightDest);
+    SkRect rcSkSrc = SkRect::MakeXYWH((SkScalar)xSrc,
+                                      (SkScalar)ySrc,
+                                      (SkScalar)widthSrc,
+                                      (SkScalar)heightSrc);
 
-    SkIRect rcSkSrcI = SkIRect::MakeXYWH(xSrc, ySrc, widthSrc, heightSrc);
-    SkRect rcSkSrc = SkRect::Make(rcSkSrcI);
-
-    SkCanvas* skCanvas = GetSkCanvas();
-    ASSERT(skCanvas != nullptr);
-    if (skCanvas != nullptr) {
-        skCanvas->drawImageRect(skSrcImage, rcSkSrc, rcSkDest, SkSamplingOptions(), &skPaint, SkCanvas::kFast_SrcRectConstraint);
-        return true;
-    }
-    return false;
+    // 6. 执行绘制: 使用 kFast_SrcRectConstraint 走 Skia 快速路径(本函数已校验源矩形合法性)
+    skCanvas->drawImageRect(skSrcImage, rcSkSrc, rcSkDest, SkSamplingOptions(), &skPaint, SkCanvas::kFast_SrcRectConstraint);
+    return true;
 }
 
 /** 计算平铺绘制图片时，应该循环绘制多少次（横向或者纵向绘制）

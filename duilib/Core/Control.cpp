@@ -3533,17 +3533,6 @@ std::unique_ptr<IRender> Control::CreateTempRender() const
 
 void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
 {
-#if DUILIB_PERFORMANCE_STAT_ENABLED
-    //性能统计
-    static size_t statNameHash = 0;
-    if (statNameHash == 0) {
-        DString statName = _T("PaintWindow, Control::AlphaPaint");
-        statNameHash = std::hash<DString>{}(statName);
-        PerformanceUtilHelper::Instance().AddStat(statName);
-    }
-    PerformanceUtilFast statPerformance(statNameHash);
-#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
-
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return;
