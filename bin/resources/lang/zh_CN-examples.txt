@@ -47,7 +47,7 @@ MULTI_LANG_RICH_TEXT                =    <font color="#8B0000">这是</font>一�
 STRID_CHAT_SIGN_UP  = 注册
 STRID_CHAT_SIGN_IN  = 登录
 STRID_CHAT_ACCOUNT  = 帐号
-STRID_CHAT_PASSORD  = 密码
+STRID_CHAT_PASSWORD = 密码
 
 # examples/ChildWindow
 STRID_CHILDWINDOW_TITLE  = 子窗口控件(ChildWindow)测试程序

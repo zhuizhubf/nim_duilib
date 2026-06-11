@@ -1,4 +1,4 @@
-﻿<Window size="90%,80%" size_box="4,4,4,4" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" shadow_attached="true" text_id="STRID_RICHEDIT_TEST_TITLE">
+<Window size="90%,80%" size_box="4,4,4,4" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" caption="0,0,0,36" shadow_attached="true" text_id="STRID_RICHEDIT_TEST_TITLE">
     <!-- 该窗口下的Class定义 -->
     <Font id="btn_font_bold_14" name="Elephant" size="14" bold="true"/>
     <Font id="btn_font_italic_14" name="Elephant" size="14" bold="true" italic="true"/>
@@ -151,30 +151,30 @@
                 <VBox bkcolor="bg_window_main" height="auto" minheight="40" >
                     <HBox height="auto" margin="0,2,2,0">
                         <Label text_id="STRID_RICHEDIT_FILE" valign="center" margin="8,0,8,0"/>
-                        <Button class="btn_global" name="open_file" width="100" height="28" text_id="STRID_RICHEDIT_OPEN_FILE" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="save_file" width="100" height="28" text_id="STRID_RICHEDIT_SAVE_FILE" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="save_as_file" width="160" height="28" text_id="STRID_RICHEDIT_SAVE_AS_FILE" borderround="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="open_file" width="100" height="28" text_id="STRID_RICHEDIT_OPEN_FILE" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="save_file" width="100" height="28" text_id="STRID_RICHEDIT_SAVE_FILE" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="save_as_file" width="160" height="28" text_id="STRID_RICHEDIT_SAVE_AS_FILE" border_round="2,2" valign="center" margin="4,0,4,0"/>
                     </HBox>
                     <HBox height="auto" margin="0,2,2,0">
                         <Label text_id="STRID_RICHEDIT_EDIT" valign="center" margin="8,0,8,0"/>
-                        <Button class="btn_global" name="btn_copy" width="100" height="28" text_id="STRID_RICHEDIT_COPY" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_cut" width="100" height="28" text_id="STRID_RICHEDIT_CUT" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_paste" width="100" height="28" text_id="STRID_RICHEDIT_PASTE" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_delete" width="100" height="28" text_id="STRID_RICHEDIT_DELETE" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_sel_all" width="100" height="28" text_id="STRID_RICHEDIT_SELECT_ALL" borderround="2,2" valign="center" margin="4,0,8,0"/>
-                        <Button class="btn_global" name="btn_sel_none" width="100" height="28" text_id="STRID_RICHEDIT_DESELECT" borderround="2,2" valign="center" margin="4,0,8,0"/>
-                        <Button class="btn_global" name="btn_undo" width="100" height="28" text_id="STRID_RICHEDIT_UNDO" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_redo" width="100" height="28" text_id="STRID_RICHEDIT_REDO" borderround="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_copy" width="100" height="28" text_id="STRID_RICHEDIT_COPY" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_cut" width="100" height="28" text_id="STRID_RICHEDIT_CUT" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_paste" width="100" height="28" text_id="STRID_RICHEDIT_PASTE" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_delete" width="100" height="28" text_id="STRID_RICHEDIT_DELETE" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_sel_all" width="100" height="28" text_id="STRID_RICHEDIT_SELECT_ALL" border_round="2,2" valign="center" margin="4,0,8,0"/>
+                        <Button class="btn_global" name="btn_sel_none" width="100" height="28" text_id="STRID_RICHEDIT_DESELECT" border_round="2,2" valign="center" margin="4,0,8,0"/>
+                        <Button class="btn_global" name="btn_undo" width="100" height="28" text_id="STRID_RICHEDIT_UNDO" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_redo" width="100" height="28" text_id="STRID_RICHEDIT_REDO" border_round="2,2" valign="center" margin="4,0,4,0"/>
                     </HBox>
                     <HBox height="auto" margin="0,2,2,0">
                         <Label text_id="STRID_RICHEDIT_FIND" valign="center" margin="8,0,8,0"/>
-                        <Button class="btn_global" name="btn_find_text" width="100" height="28" text_id="STRID_RICHEDIT_FIND_TEXT" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_find_next" width="100" height="28" text_id="STRID_RICHEDIT_FIND_NEXT_TEXT" borderround="2,2" valign="center" margin="4,0,4,0"/>
-                        <Button class="btn_global" name="btn_replace_text" width="100" height="28" text_id="STRID_RICHEDIT_REPLACE_TEXT" borderround="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_find_text" width="100" height="28" text_id="STRID_RICHEDIT_FIND_TEXT" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_find_next" width="100" height="28" text_id="STRID_RICHEDIT_FIND_NEXT_TEXT" border_round="2,2" valign="center" margin="4,0,4,0"/>
+                        <Button class="btn_global" name="btn_replace_text" width="100" height="28" text_id="STRID_RICHEDIT_REPLACE_TEXT" border_round="2,2" valign="center" margin="4,0,4,0"/>
                     </HBox>
                     <HBox height="auto" margin="0,2,2,0">
                         <Label text_id="STRID_RICHEDIT_FONT" valign="center" margin="8,0,8,0"/>
-                        <Button class="btn_global" name="set_font" width="100" height="28" text_id="STRID_RICHEDIT_SET_FONT" borderround="2,2" valign="center" margin="4,0,4,2"/>
+                        <Button class="btn_global" name="set_font" width="100" height="28" text_id="STRID_RICHEDIT_SET_FONT" border_round="2,2" valign="center" margin="4,0,4,2"/>
                         <Combo class="combo" name="combo_font_name" combo_icon_class="" combo_type="drop_down" dropbox_size="0,300" height="28" width="160" tooltip_text_id="STRID_RICHEDIT_SELECT_FONT" margin="2,0,2,2"/>
                         <Combo class="combo" name="combo_font_size" combo_icon_class="" combo_type="drop_down" dropbox_size="0,300" height="28" width="60" margin="2,0,2,0" tooltip_text_id="STRID_RICHEDIT_SELECT_FONT"/>
                         <CheckBox class="checkbox_font_class" name="btn_font_bold" width="28" height="26" text="B" font="btn_font_bold_14" valign="center" margin="2,1,1,3" tooltip_text_id="STRID_RICHEDIT_FONT_BOLD"/>

@@ -5,7 +5,7 @@
             <Control width="auto" height="auto" halign="center" valign="center" bkimage="head_shadow.png" mouse_enabled="false"/>
         </Box>
         <Box height="auto" margin="0,50,0,0" padding="14,14,14,14" bkimage="file='bk_shadow.png' corner='30,30,30,30'">
-            <VBox height="auto" bkcolor="bg_container" borderround="3,3,3,3">
+            <VBox height="auto" bkcolor="bg_container" border_round="3,3,3,3">
                 <VBox height="auto">
                     <HBox height="40" margin="0,6,5,40">
                         <Control />
@@ -14,7 +14,7 @@
                     </HBox>
                     <HBox height="auto">
                         <Control />
-                        <Button name="register_account" margin="0,5,15,10" halign="right" text_id="STRID_CHAT_SIGN_UP" cursortype="hand" font="system_underline_12" normal_text_color="light_green"/>
+                        <Button name="register_account" margin="0,5,15,10" halign="right" text_id="STRID_CHAT_SIGN_UP" cursor_type="hand" font="system_underline_12" normal_text_color="light_green"/>
                     </HBox>
                     <!--帐号和密码-->
                     <VBox name="enter_panel" width="240" height="auto" margin="20,0,20,0" bkimage="">
@@ -24,7 +24,7 @@
                         </HBox>
                         <HBox height="41" padding="14,0,10,1" margin="0,2,0,0">
                             <Control name="passwordicon" width="16" height="16" valign="center" normal_image="password_1.png"/>
-                            <RichEdit class="simple simple_border prompt" name="password" width="stretch" height="auto" margin="10,0,10,0" valign="center" font="system_regular_14" password="true" prompt_text_id="STRID_CHAT_PASSORD"/>
+                            <RichEdit class="simple simple_border prompt" name="password" width="stretch" height="auto" margin="10,0,10,0" valign="center" font="system_regular_14" password="true" prompt_text_id="STRID_CHAT_PASSWORD"/>
                         </HBox>
                     </VBox>
                 </VBox>

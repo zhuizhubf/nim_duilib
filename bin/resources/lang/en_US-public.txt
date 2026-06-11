@@ -1,4 +1,4 @@
-﻿# String resources in English 
+# String resources in English 
 # comment symbol："#"
 
 # Title Bar Buttons
@@ -386,5 +386,5 @@ STRID_PUBLIC_DIRECTORY_TREE_VIDEOS = Videos
 STRID_PUBLIC_DIRECTORY_TREE_MUSIC = Music
 
 # 字体大小列表
-STRID_PUBLIC_FONT_SIZE_LIST = 
+STRID_PUBLIC_FONT_SIZE_LIST = 95.6,95.6;83.7,83.7;71.7,71.7;56.0,56.0;48.0,48.0;34.7,34.7;32.0,32.0;29.3,29.3;24.0,24.0;21.3,21.3;20.0,20.0;18.7,18.7;16.0,16.0;14.0,14.0;12.0,12.0;10.0,10.0;8.7,8.7;7.3,7.3;6.7,6.7
 

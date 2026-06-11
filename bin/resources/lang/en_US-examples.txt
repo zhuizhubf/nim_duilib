@@ -1,4 +1,4 @@
-﻿# String resources in English 
+# String resources in English 
 # comment symbol："#"
 
 # The following are the texts used by each example program
@@ -46,7 +46,7 @@ MULTI_LANG_RICH_TEXT                 =   <font color="#8B0000">This is</font> a 
 STRID_CHAT_SIGN_UP  = Sign Up
 STRID_CHAT_SIGN_IN  = Sign In
 STRID_CHAT_ACCOUNT  = Account
-STRID_CHAT_PASSORD  = Passorw
+STRID_CHAT_PASSWORD = Password
 
 # examples/ChildWindow
 STRID_CHILDWINDOW_TITLE  = ChildWindow Test Program
