@@ -1284,6 +1284,8 @@ bool Window::Paint(const UiRect& rcPaint)
         }
         PerformanceUtilFast statPerformance(statNameHash);
 #endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
+        //背景清零
         pRender->ClearAlpha(rcPaint);
     }
 

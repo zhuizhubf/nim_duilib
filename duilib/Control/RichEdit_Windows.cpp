@@ -2327,7 +2327,17 @@ void RichEdit::OnMouseMessage(uint32_t uMsg, const EventArgs& msg)
 
 void RichEdit::Paint(IRender* pRender, const UiRect& rcPaint)
 {
-    PerformanceUtil statPerformance(_T("PaintWindow, RichEdit::Paint"));
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("PaintWindow, RichEdit::Paint");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     if (pRender == nullptr) {
         return;
     }
@@ -2583,7 +2593,6 @@ private:
 
 void RichEdit::PaintRichEdit(IRender* pRender, const UiRect& rcPaint)
 {
-    PerformanceUtil statPerformance(_T("PaintWindow, RichEdit::PaintRichEdit"));
     if (pRender == nullptr) {
         return;
     }

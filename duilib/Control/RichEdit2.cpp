@@ -1825,6 +1825,17 @@ bool RichEdit2::IsPasteLimited() const
 
 void RichEdit2::Paint(IRender* pRender, const UiRect& rcPaint)
 {
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+    //性能统计
+    static size_t statNameHash = 0;
+    if (statNameHash == 0) {
+        DString statName = _T("PaintWindow, RichEdit2::Paint");
+        statNameHash = std::hash<DString>{}(statName);
+        PerformanceUtilHelper::Instance().AddStat(statName);
+    }
+    PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
     if (pRender == nullptr) {
         return;
     }
