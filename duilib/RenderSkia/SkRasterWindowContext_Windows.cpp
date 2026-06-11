@@ -193,7 +193,7 @@ bool SkRasterWindowContext_Windows::SwapPaintBuffers(HDC hPaintDC, const UiRect&
     //性能统计
     static size_t statNameHash = 0;
     if (statNameHash == 0) {
-        DString statName = _T("PaintWindow, SkRasterWindowContext_Windows::SwapPaintBuffers");
+        DString statName = _T("PaintWindow 9, SkRasterWindowContext_Windows::SwapPaintBuffers");
         statNameHash = std::hash<DString>{}(statName);
         PerformanceUtilHelper::Instance().AddStat(statName);
     }

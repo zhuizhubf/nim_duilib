@@ -3204,7 +3204,7 @@ bool Control::PaintImage(IRender* pRender,
     //性能统计
     static size_t statNameHash = 0;
     if (statNameHash == 0) {
-        DString statName = _T("Control::PaintImage");
+        DString statName = _T("PaintWindow, Control::PaintImage");
         statNameHash = std::hash<DString>{}(statName);
         PerformanceUtilHelper::Instance().AddStat(statName);
     }

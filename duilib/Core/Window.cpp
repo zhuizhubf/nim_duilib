@@ -1232,7 +1232,7 @@ LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/
     //性能统计
     static size_t statNameHash = 0;
     if (statNameHash == 0) {
-        DString statName = _T("PaintWindow, Window::OnPaintMsg");
+        DString statName = _T("PaintWindow 1, Window::OnPaintMsg");
         statNameHash = std::hash<DString>{}(statName);
         PerformanceUtilHelper::Instance().AddStat(statName);
     }
@@ -1255,7 +1255,7 @@ LRESULT Window::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& /*nativeMsg*/
     static bool bStartupEnd = false;
     if (!bStartupEnd) {
         bStartupEnd = true;
-        PerformanceUtilHelper::Instance().EndStat(_T("Startup"));
+        PerformanceUtilHelper::Instance().EndStat(_T("Application Startup")); //程序启动时间统计
     }
     return 0;
 }
@@ -1274,7 +1274,7 @@ bool Window::Paint(const UiRect& rcPaint)
         //性能统计
         static size_t statNameHash = 0;
         if (statNameHash == 0) {
-            DString statName = _T("PaintWindow, Window::Paint ClearAlpha");
+            DString statName = _T("PaintWindow 2, Window::Paint ClearAlpha");
             statNameHash = std::hash<DString>{}(statName);
             PerformanceUtilHelper::Instance().AddStat(statName);
         }
@@ -1293,7 +1293,7 @@ bool Window::Paint(const UiRect& rcPaint)
         //性能统计
         static size_t statNameHash = 0;
         if (statNameHash == 0) {
-            DString statName = _T("PaintWindow, Window::Paint AlphaPaint(Root Box)");
+            DString statName = _T("PaintWindow 3, Window::Paint AlphaPaint(Root Box)");
             statNameHash = std::hash<DString>{}(statName);
             PerformanceUtilHelper::Instance().AddStat(statName);
         }
@@ -1316,7 +1316,7 @@ bool Window::Paint(const UiRect& rcPaint)
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_RICH_EDIT_DRAW_OPT)
     //开始绘制前，进行alpha通道修复
     if (!rcPaint.IsEmpty()) {
-        PerformanceUtil statPerformance(_T("PaintWindow, Window::Paint RestoreAlpha"));
+        PerformanceUtil statPerformance(_T("PaintWindow 4, Window::Paint RestoreAlpha"));
         Shadow* pShadow = m_windowRoot->GetShadow();
         if ((pShadow != nullptr) && IsShadowAttached() && !Shadow::IsSystemShadowType(GetShadowType()) &&
             (m_renderOffset.x == 0) && (m_renderOffset.y == 0)) {

@@ -132,7 +132,7 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
                             DpiInitParam dpiInitParam,
                             const CreateControlCallback& callback)
 {
-    PerformanceUtilHelper::Instance().BeginStat(_T("Startup"));//程序启动时间统计
+    PerformanceUtilHelper::Instance().BeginStat(_T("Application Startup"));//程序启动时间统计
     ASSERT(!m_bStartup);
     if (m_bStartup) {
         return false;//禁止重复初始化

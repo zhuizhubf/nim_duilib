@@ -588,7 +588,7 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
     //统计绘制图片的性能
     static size_t statNameHash = 0;
     if (statNameHash == 0) {
-        DString statName = _T("BitmapControl::Paint");
+        DString statName = _T("PaintWindow, BitmapControl::Paint");
         statNameHash = std::hash<DString>{}(statName);
         PerformanceUtilHelper::Instance().AddStat(statName);
     }

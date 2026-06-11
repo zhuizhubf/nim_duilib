@@ -1539,7 +1539,7 @@ LRESULT NativeWindow_Windows::OnPaintMsg(UINT uMsg, WPARAM wParam, LPARAM lParam
         //性能统计
         static size_t statNameHash = 0;
         if (statNameHash == 0) {
-            DString statName = _T("PaintWindow, NativeWindow_Windows::OnPaintMsg(Total)");
+            DString statName = _T("PaintWindow 0, NativeWindow_Windows::OnPaintMsg(Total)");
             statNameHash = std::hash<DString>{}(statName);
             PerformanceUtilHelper::Instance().AddStat(statName);
         }
