@@ -1,4 +1,4 @@
-﻿# 快速上手（Windows系统，以VS 2022为例）
+# 快速上手（Windows系统，以VS 2022为例）
 
 此示例将引导你快速部署一个基于 nim_duilib 的基本应用，此示例与 `examples` 中的 `basic` 项目相似，如果你更喜欢查看代码，可以打开`examples.sln`工程，参考示例代码而无需多花费时间。
 
@@ -279,15 +279,14 @@ void MainForm::OnInitWindow()
 
 ## 显示窗口
 
-在主线程的 MainThread::Init 方法中，创建窗口并居中显示，创建窗口前先引入窗口的头文件，修改后的代码如下：    
+在主线程的 `MainThread::OnInit` 方法中，创建窗口并居中显示，创建窗口前先引入窗口的头文件，修改后的代码如下：    
 （首先在文件中包含头文件：`#include "MainForm.h"`）
 
 ```cpp
-void MainThread::OnInit()
+bool MainThread::OnInit()
 {
     //初始化全局资源, 使用本地文件夹作为资源
-    ui::FilePath resourcePath = ui::FilePathUtil::GetCurrentModuleDirectory();
-    resourcePath += _T("resources\\");
+    ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
     ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
 
     //在下面加入启动窗口代码
@@ -297,6 +296,7 @@ void MainThread::OnInit()
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("MyDuilibApp"), true));
     window->PostQuitMsgWhenClosed(true);
     window->ShowWindow(ui::kSW_SHOW_NORMAL);
+    return true;
 }
 ```
 

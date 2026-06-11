@@ -31,7 +31,7 @@
 | cmake         | cmake编译时依赖的公共设置|
 | build         | 各个平台的编译脚本和编译工程（包括VC编译工程）|
 | msvc          | Windows平台的应用程序清单文件和VC工程公共配置|
-| examples      | 项目的示例程序源代码，涵盖所有控件的基本用法示例|
+| examples      | 项目的示例程序源代码，涵盖所有控件的基本用法示例（示例程序，详见 [docs/Examples.md](docs/Examples.md)）|
 | duilib/third_party| 项目代码依赖的第三方库，详细内容见后续文档|
 
 ## 基于NIM_Duilib_Framework源码做的主要修改

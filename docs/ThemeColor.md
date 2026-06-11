@@ -362,6 +362,42 @@ void applyCustomAccentColor(Color32 newAccentColor) {
 
 ---
 
+## 6. 主题的加载与使用
+
+### 6.1 主题文件的存放位置
+
+主题文件（`*.xml`）应放在资源根目录的 `themes/<theme_name>/` 子目录下，例如：
+
+```
+bin/resources/themes/
+├── default/
+│   ├── global.xml             # 全局资源（字体、颜色定义）
+│   ├── light.xml              # 浅色主题（Theme 节点 + ThemeColor 节点集合）
+│   ├── dark.xml               # 深色主题
+│   ├── public/                # 共享图片资源
+│   └── <your_app>/            # 应用专属 XML 与图片
+```
+
+### 6.2 加载流程
+
+1. 应用程序调用 `ui::GlobalManager::Instance().Startup(...)` 启动全局资源管理器；
+2. 框架按主题文件中的 `Theme` 节点属性加载对应主题；
+3. 控件通过 `color="<ThemeColor.name>"` 或 `bkcolor="<ThemeColor.name>"` 引用颜色。
+
+### 6.3 主题切换
+
+可通过 `ui::ThemeManager` 在运行时切换主题。切换后，所有未设置 `fixed="true"` 的派生颜色会按强调色派生链重新计算。
+
+### 6.4 主题扩展方式
+
+如需新增自定义主题：
+1. 复制现有主题文件（如 `light.xml`）为基础；
+2. 修改 `Theme` 节点的 `name`、`style` 等属性；
+3. 调整 `ThemeColor` 的 `value`，或调整 `derived_from`/`adjust` 派生关系；
+4. 在 `global.xml` 中将新主题的 `Class` 样式指向新主题文件。
+
+---
+
 ## 7. 现有颜色覆盖分析与补充建议
 
 ### 7.1 已覆盖的颜色分类 ✅
