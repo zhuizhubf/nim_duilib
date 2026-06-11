@@ -431,11 +431,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
         }
         else if (strName == _T("shadow_type")) {
             //设置阴影类型
-            if (Shadow::GetShadowType(strValue, nShadowType)) {
-                UiSize szBorderRound;
-                DString shadowImage;
-                Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
-            }
+            Shadow::GetShadowType(strValue, nShadowType);
         }
         else if ((strName == _T("shadow_corner")) || (strName == _T("shadowcorner"))) {
             //设置窗口阴影的九宫格属性            
@@ -484,15 +480,83 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
         }
     }
 
-    //评估阴影的九宫格属性
+    //设置分层窗口的默认值
+    const bool bUseSystemCaption = createAttributes.m_bUseSystemCaptionDefined && createAttributes.m_bUseSystemCaption;
+    const bool bShadowAttached = !createAttributes.m_bShadowAttachedDefined || (createAttributes.m_bShadowAttachedDefined && createAttributes.m_bShadowAttached);
+    if (!createAttributes.m_bIsLayeredWindowDefined &&
+        !bUseSystemCaption &&
+        createAttributes.m_bLayeredWindowOpacityDefined) {
+        //使用Opacity属性，默认需要开启分层窗口
+        createAttributes.m_bIsLayeredWindowDefined = true;
+        createAttributes.m_bIsLayeredWindow = true;
+    }
+    else if (!createAttributes.m_bIsLayeredWindowDefined && bUseSystemCaption) {
+        //使用系统标题栏属性，默认不开启分层窗口
+        createAttributes.m_bIsLayeredWindowDefined = true;
+        createAttributes.m_bIsLayeredWindow = false;
+    }
+    if (!createAttributes.m_bIsLayeredWindowDefined) {
+        if (bShadowAttached) {
+            //阴影启用
+            if (!bUseSystemCaption && Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
+                //使用自绘阴影，默认需要开启分层窗口
+                createAttributes.m_bIsLayeredWindowDefined = true;
+                createAttributes.m_bIsLayeredWindow = true;
+            }
+        }
+    }
+
+    //校验
+#ifdef _DEBUG
+    //使用系统标题栏时，不应该开启分层窗口属性
+    if (bUseSystemCaption) {
+        ASSERT(!createAttributes.m_bIsLayeredWindow);
+    }    
+    //使用Opacity属性时，应该开启分层窗口属性
+    if (createAttributes.m_bLayeredWindowOpacityDefined) {
+        ASSERT(createAttributes.m_bIsLayeredWindow);
+    }
+#endif
+
+#if defined (DUILIB_BUILD_FOR_SDL)
+    //默认开启支持透明度(SDL在Windows系统中，未使用分层窗口属性)
+    if (!bIsLayeredWindowDefined) {
+        createAttributes.m_bIsLayeredWindowDefined = true;
+        createAttributes.m_bIsLayeredWindow = true;
+    }
+#endif
+
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    if (backendType == RenderBackendType::kNativeGL_BackendType) {
+        //使用OpenGL时，不能使用层窗口
+        if (!createAttributes.m_bLayeredWindowOpacityDefined &&
+            createAttributes.m_bIsLayeredWindowDefined && createAttributes.m_bIsLayeredWindow) {
+            ASSERT(!createAttributes.m_bIsLayeredWindow);
+            createAttributes.m_bIsLayeredWindow = false;
+        }
+    }
+#else
+    UNUSED_VARIABLE(backendType);
+#endif
+
+    //评估阴影的九宫格属性, 用于确定最终的窗口大小
     if (createAttributes.m_bShadowAttachedDefined && !createAttributes.m_bShadowAttached) {
         //阴影被禁用
         rcShadowCorner.Clear();
     }
-    else if (rcShadowCorner.IsEmpty()){
+    else if (rcShadowCorner.IsEmpty()) {
         UiSize szBorderRound;
         DString shadowImage;
-        Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
+        if (pWindow != nullptr) {
+            bool bLayeredWindow = createAttributes.m_bIsLayeredWindowDefined && createAttributes.m_bIsLayeredWindow;
+            bool bOldLayeredWindow = pWindow->IsLayeredWindow();
+            pWindow->SetLayeredWindow(bLayeredWindow, false);
+            Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
+            pWindow->SetLayeredWindow(bOldLayeredWindow, false);
+        }
+        else {
+            Shadow::GetShadowParam(pWindow, nShadowType, szBorderRound, rcShadowCorner, shadowImage);
+        }
     }
     createAttributes.m_rcShadowCorner = rcShadowCorner;
 
@@ -544,71 +608,6 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
         createAttributes.m_szInitSize.cy = cy;
     }
 
-    //设置分层窗口的默认值
-    const bool bUseSystemCaption = createAttributes.m_bUseSystemCaptionDefined && createAttributes.m_bUseSystemCaption;
-    const bool bShadowAttached = !createAttributes.m_bShadowAttachedDefined || (createAttributes.m_bShadowAttachedDefined && createAttributes.m_bShadowAttached);
-    if (!createAttributes.m_bIsLayeredWindowDefined &&
-        !bUseSystemCaption &&
-        createAttributes.m_bLayeredWindowOpacityDefined) {
-        //使用Opacity属性，默认需要开启分层窗口
-        createAttributes.m_bIsLayeredWindowDefined = true;
-        createAttributes.m_bIsLayeredWindow = true;
-    }
-    else if (!createAttributes.m_bIsLayeredWindowDefined && bUseSystemCaption) {
-        //使用系统标题栏属性，默认不开启分层窗口
-        createAttributes.m_bIsLayeredWindowDefined = true;
-        createAttributes.m_bIsLayeredWindow = false;
-    }
-    if (!createAttributes.m_bIsLayeredWindowDefined) {
-        if (bShadowAttached) {
-            //阴影启用
-            if (!bUseSystemCaption && Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
-                //使用自绘阴影，默认需要开启分层窗口
-                createAttributes.m_bIsLayeredWindowDefined = true;
-                createAttributes.m_bIsLayeredWindow = true;
-            }
-        }
-    }
-
-    //校验
-#ifdef _DEBUG
-    //使用系统标题栏时，不应该开启分层窗口属性
-    if (bUseSystemCaption) {
-        ASSERT(!createAttributes.m_bIsLayeredWindow);
-    }    
-    //使用Opacity属性时，应该开启分层窗口属性
-    if (createAttributes.m_bLayeredWindowOpacityDefined) {
-        ASSERT(createAttributes.m_bIsLayeredWindow);
-    }    
-    if (bShadowAttached && !bUseSystemCaption) {
-        //阴影启用
-        if (Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
-            //使用自绘阴影，需要启用分层窗口属性，否则绘制会有异常
-            ASSERT(createAttributes.m_bIsLayeredWindow);
-        }
-    }
-#endif
-
-#if defined (DUILIB_BUILD_FOR_SDL)
-    //默认开启支持透明度(SDL在Windows系统中，未使用分层窗口属性)
-    if (!bIsLayeredWindowDefined) {
-        createAttributes.m_bIsLayeredWindowDefined = true;
-        createAttributes.m_bIsLayeredWindow = true;
-    }
-#endif
-
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    if (backendType == RenderBackendType::kNativeGL_BackendType) {
-        //使用OpenGL时，不能使用层窗口
-        if (!createAttributes.m_bLayeredWindowOpacityDefined &&
-            createAttributes.m_bIsLayeredWindowDefined && createAttributes.m_bIsLayeredWindow) {
-            ASSERT(!createAttributes.m_bIsLayeredWindow);
-            createAttributes.m_bIsLayeredWindow = false;
-        }
-    }
-#else
-    UNUSED_VARIABLE(backendType);
-#endif
     return true;
 }
 
@@ -785,7 +784,6 @@ void WindowBuilder::ParseWindowAttributes(Window* pWindow, const pugi::xml_node&
         else if ((strName == _T("layered_window")) || (strName == _T("layeredwindow"))) {
             knownNames.insert(strName);
             //设置是否设置分层窗口属性（分层窗口还是普通窗口）
-            ASSERT(!pWindow->IsUseSystemCaption());
             pWindow->SetLayeredWindow(StringUtil::IsValueTrue(strValue), false);
         }
         else if (strName == _T("alpha")) {

@@ -1454,6 +1454,9 @@ void NativeWindow_Windows::ClearWindowRgn(bool bRedraw)
 
 void NativeWindow_Windows::Invalidate(const UiRect& rcItem)
 {
+    if (m_hWnd == nullptr) {
+        return;
+    }
     RECT rc = { rcItem.left, rcItem.top, rcItem.right, rcItem.bottom };
     ::InvalidateRect(m_hWnd, &rc, FALSE);
     // Invalidating a layered window will not trigger a WM_PAINT message,

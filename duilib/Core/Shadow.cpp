@@ -540,9 +540,15 @@ bool Shadow::GetShadowType(const DString& typeString, ShadowType& nShadowType)
 
 ShadowType Shadow::GetDefaultShadowType(const Window* pWindow)
 {
-    if ((pWindow != nullptr) && pWindow->NativeWnd()->IsSystemShadowSupported()) {
-        //该窗口支持系统阴影
-        return ShadowType::kShadowSystemDefault;
+    if (pWindow != nullptr) {
+        if (pWindow->IsLayeredWindow()) {
+            //分层窗口，默认为自绘阴影，圆角
+            return ShadowType::kShadowBigRound;
+        }
+        else if (pWindow->NativeWnd()->IsSystemShadowSupported()) {
+            //该窗口支持系统阴影
+            return ShadowType::kShadowSystemDefault;
+        }        
     }
     //未关联窗口的情况
 #if defined (DUILIB_BUILD_FOR_WIN)

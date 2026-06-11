@@ -857,9 +857,13 @@ void Window::OnLayeredWindowChanged()
 
 void Window::InvalidateAll()
 {
-    UiRect rcClient;
-    GetClientRect(rcClient);
-    Invalidate(rcClient);
+    if (IsWindow()) {
+        UiRect rcClient;
+        GetClientRect(rcClient);
+        if (!rcClient.IsEmpty()) {
+            Invalidate(rcClient);
+        }
+    }
 }
 
 void Window::OnWindowAlphaChanged()
