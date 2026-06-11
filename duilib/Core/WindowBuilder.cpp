@@ -495,14 +495,16 @@ bool WindowBuilder::ParseWindowCreateAttributes(Window* pWindow, WindowCreateAtt
         createAttributes.m_bIsLayeredWindowDefined = true;
         createAttributes.m_bIsLayeredWindow = false;
     }
-    if (!createAttributes.m_bIsLayeredWindowDefined) {
-        if (bShadowAttached) {
-            //阴影启用
-            if (!bUseSystemCaption && Shadow::IsShadowTypeNeedLayeredWindow(nShadowType)) {
-                //使用自绘阴影，默认需要开启分层窗口
-                createAttributes.m_bIsLayeredWindowDefined = true;
-                createAttributes.m_bIsLayeredWindow = true;
-            }
+    if (!createAttributes.m_bIsLayeredWindowDefined && bShadowAttached && !bUseSystemCaption) {
+        //阴影启用
+        ShadowType shadowType = nShadowType;
+        if (shadowType == ShadowType::kShadowDefault) {
+            shadowType = Shadow::GetDefaultShadowType(pWindow);
+        }
+        if (Shadow::IsShadowTypeNeedLayeredWindow(shadowType)) {
+            //使用自绘阴影，默认需要开启分层窗口
+            createAttributes.m_bIsLayeredWindowDefined = true;
+            createAttributes.m_bIsLayeredWindow = true;
         }
     }
 
