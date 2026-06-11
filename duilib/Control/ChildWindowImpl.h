@@ -13,7 +13,7 @@ namespace ui
 class ChildWindowImpl: public WindowBase
 {
 public:
-    explict ChildWindowImpl(ChildWindowEvents* pChildWindowEvents);
+    explicit ChildWindowImpl(ChildWindowEvents* pChildWindowEvents);
     virtual ~ChildWindowImpl() override;
     ChildWindowImpl(const ChildWindowImpl&) = delete;
     ChildWindowImpl& operator=(const ChildWindowImpl&) = delete;
