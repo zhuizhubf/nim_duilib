@@ -1272,13 +1272,35 @@ bool Window::Paint(const UiRect& rcPaint)
         return false;
     }
 
-    //开始绘制前，去掉alpha通道，将颜色值全部置零
-    if (!rcPaint.IsEmpty()) {
+#if defined (DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_RICH_EDIT_DRAW_OPT)
+    bool bNeedClearAlpha = true;  //Windows，使用系统RichEdit自身的绘制时，必须执行背景清零，否则文字显示会出现异常
+#else
+    bool bNeedClearAlpha = false; //默认不需要清零，窗口阴影自己负责清零
+#endif
+    if (!bNeedClearAlpha) {
+        //动态检测是否需要做背景清零（按根容器的背景色是否设置了Alpha值，按跟容器是否设置了Alpha值）
+        Box* pXmlRoot = GetXmlRoot();
+        if (pXmlRoot->IsAlpha()) {
+            bNeedClearAlpha = true;
+        }
+        else {
+            UiColor bkColorValue;
+            DString bkColor = pXmlRoot->GetBkColor();
+            if (!bkColor.empty()) {
+                bkColorValue = pXmlRoot->GetUiColor(bkColor);
+            }
+            if (bkColorValue.GetAlpha() != 255) {
+                bNeedClearAlpha = true;
+            }
+        }
+    }
+
+    if (!rcPaint.IsEmpty() && bNeedClearAlpha) {
 #if DUILIB_PERFORMANCE_STAT_ENABLED
         //性能统计
         static size_t statNameHash = 0;
         if (statNameHash == 0) {
-            DString statName = _T("PaintWindow 2, Window::Paint ClearAlpha");
+            DString statName = _T("PaintWindow 2, Window::Paint ClearAlpha(Full)");
             statNameHash = std::hash<DString>{}(statName);
             PerformanceUtilHelper::Instance().AddStat(statName);
         }
@@ -1287,6 +1309,55 @@ bool Window::Paint(const UiRect& rcPaint)
 
         //背景清零
         pRender->ClearAlpha(rcPaint);
+    }
+    else if (IsShadowAttached()) {
+        //仅对阴影部分清零，其他区域不清零
+        const UiPadding rcShadowCorner = GetCurrentShadowCorner();        
+        if (!rcShadowCorner.IsEmpty()) {
+#if DUILIB_PERFORMANCE_STAT_ENABLED
+            //性能统计
+            static size_t statNameHash = 0;
+            if (statNameHash == 0) {
+                DString statName = _T("PaintWindow 2, Window::Paint ClearAlpha(Shadow)");
+                statNameHash = std::hash<DString>{}(statName);
+                PerformanceUtilHelper::Instance().AddStat(statName);
+            }
+            PerformanceUtilFast statPerformance(statNameHash);
+#endif //  DUILIB_PERFORMANCE_STAT_ENABLED
+
+            const UiSize szShadowBorderRound = GetShadowBorderRound();
+            UiRect rcClient;
+            GetClientRect(rcClient);
+            if (!rcClient.IsEmpty()) {
+                UiRect rcShadow;
+
+                //上方阴影区域
+                rcShadow = rcClient;
+                rcShadow.bottom = rcClient.top + rcShadowCorner.top + szShadowBorderRound.cy;
+                UiRect rcClearRect;
+                if (UiRect::Intersect(rcClearRect, rcShadow, rcPaint)) {
+                    pRender->ClearAlpha(rcClearRect);
+                }
+                //下方阴影区域
+                rcShadow = rcClient;
+                rcShadow.top = rcClient.bottom - rcShadowCorner.bottom - szShadowBorderRound.cy;
+                if (UiRect::Intersect(rcClearRect, rcShadow, rcPaint)) {
+                    pRender->ClearAlpha(rcClearRect);
+                }
+                //左侧阴影区域
+                rcShadow = rcClient;
+                rcShadow.right = rcClient.left + rcShadowCorner.left + szShadowBorderRound.cx;
+                if (UiRect::Intersect(rcClearRect, rcShadow, rcPaint)) {
+                    pRender->ClearAlpha(rcClearRect);
+                }
+                //右侧阴影区域
+                rcShadow = rcClient;
+                rcShadow.left = rcShadow.right - rcShadowCorner.right - szShadowBorderRound.cx;
+                if (UiRect::Intersect(rcClearRect, rcShadow, rcPaint)) {
+                    pRender->ClearAlpha(rcClearRect);
+                }
+            }
+        }
     }
 
     // 绘制
