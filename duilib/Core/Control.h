@@ -1583,6 +1583,15 @@ public:
     */
     IFont* GetIFontById(const DString& strFontId) const;
 
+    /** 设置为动画模式(该模式下，可减少不必要的绘制)
+    * @param [in] 
+    */
+    void SetAnimationMode(bool bAnimationMode);
+
+    /** 获取当前是否为动画模式
+    */
+    bool IsAnimationMode() const;
+
 protected:
     /** 设置可见状态事件
     * @param [in] bChanged true表示状态发生变化，false表示状态未发生变化
@@ -1903,6 +1912,10 @@ private:
 
     //绘制顺序: 0 表示常规绘制，非0表示指定绘制顺序，值越大表示绘制越晚绘制
     uint8_t m_nPaintOrder;
+
+    /** 是否为动画模式(该模式下，可减少不必要的绘制)
+    */
+    bool m_bAnimationMode;
 
     //边框是否在顶层（即先绘制子控件，后绘制边框，避免边框被子控件覆盖）
     bool m_bBordersOnTop;

@@ -538,6 +538,9 @@ bool TabBox::StartSwitchItemAnimationFadeInOut(Control* pNewItemControl, Control
     //新选中的标签页，最后绘制，避免被旧页面覆盖
     pNewItem->SetPaintOrder(1);
 
+    pOldItem->SetAnimationMode(true);
+    pNewItem->SetAnimationMode(true);
+
     AnimationPlayCallback playCallback = [pTabBox, pNewItem, pOldItem, nMaxValue, nNewItemAlpha, nOldItemAlpha](int32_t nNewValue) {
             if ((pTabBox == nullptr) || (pNewItem == nullptr) || (pOldItem == nullptr)) {
                 return;
@@ -570,6 +573,7 @@ bool TabBox::StartSwitchItemAnimationFadeInOut(Control* pNewItemControl, Control
             if ((pTabBox != nullptr) && (pOldItem != nullptr)) {
                 size_t itemIndex = pTabBox->GetItemIndex(pOldItem.get());
                 if (itemIndex < pTabBox->GetItemCount()) {
+                    pOldItem->SetAnimationMode(false);
                     pOldItem->SetRenderOffsetX(0);
                     pOldItem->SetRenderOffsetY(0);
                     pOldItem->SetAlpha(nOldItemAlpha);
@@ -581,6 +585,7 @@ bool TabBox::StartSwitchItemAnimationFadeInOut(Control* pNewItemControl, Control
             if ((pTabBox != nullptr) && (pNewItem != nullptr)) {
                 size_t itemIndex = pTabBox->GetItemIndex(pNewItem.get());
                 if (itemIndex < pTabBox->GetItemCount()) {
+                    pNewItem->SetAnimationMode(false);
                     pNewItem->SetRenderOffsetX(0);
                     pNewItem->SetRenderOffsetY(0);
                     pNewItem->SetAlpha(nNewItemAlpha);

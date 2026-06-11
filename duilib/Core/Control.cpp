@@ -40,6 +40,7 @@ Control::Control(Window* pWindow) :
     m_uUserDataID((size_t)-1),
     m_bShowFocusedRect(false),
     m_nPaintOrder(0),
+    m_bAnimationMode(false),
     m_bBordersOnTop(true),
     m_bMouseEnter(false)
 {
@@ -3567,6 +3568,9 @@ void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
     const UiPoint renderOffset = GetRenderOffset();
 
     if (bAlpha) {
+        //是否需要重绘（动画模式下，不需要重绘）
+        bool bNeedRepaint = !IsAnimationMode();
+
         //当设置了透明度时，该控件（若为容器则包含子控件）需要完整绘制
         UiRect rcPaintRect = GetRect();
         SetPaintRect(rcPaintRect);
@@ -3579,6 +3583,7 @@ void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
             return;
         }
         if ((pTempRender->GetWidth() != GetRect().Width()) || (pTempRender->GetHeight() != GetRect().Height())) {
+            bNeedRepaint = true;
             if (!pTempRender->Resize(GetRect().Width(), GetRect().Height())) {
                 //存在错误，绘制失败
                 ASSERT(!"pTempRender->Resize failed!");
@@ -3586,7 +3591,7 @@ void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
             }
         }
         
-        if ((pTempRender->GetWidth() > 0) && (pTempRender->GetHeight() > 0)) {
+        if ((pTempRender->GetWidth() > 0) && (pTempRender->GetHeight() > 0) && bNeedRepaint)  {
             // 将控件（如果是容器，则包含子控件），完整绘制到缓存新的render中
             // 绘制前，首先清除原内容
             pTempRender->Clear(UiColor());
@@ -3612,7 +3617,7 @@ void Control::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
         }
 
         //如果配置了box-shadow，先绘制，因为box-shadow会超出rect边界绘制(如果使用剪辑区域，会显示不全)        
-        if (bPaintBoxShadow) {
+        if (bPaintBoxShadow && bNeedRepaint) {
             m_bBoxShadowPainted = false;
             PaintShadow(pRender);
             m_bBoxShadowPainted = true;
@@ -5442,6 +5447,16 @@ uint8_t Control::GetPaintOrder() const
 IFont* Control::GetIFontById(const DString& strFontId) const
 {
     return GlobalManager::Instance().Font().GetIFont(strFontId, this->Dpi());
+}
+
+void Control::SetAnimationMode(bool bAnimationMode)
+{
+    m_bAnimationMode = bAnimationMode;
+}
+
+bool Control::IsAnimationMode() const
+{
+    return m_bAnimationMode;
 }
 
 bool Control::HasDestroyEventCallback() const
