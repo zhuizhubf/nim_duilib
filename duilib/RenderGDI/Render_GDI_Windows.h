@@ -182,6 +182,10 @@ private:
     void DrawBitmapRect(IBitmap* pBitmap, const UiRect& rcDest, const UiRect& rcSource, uint8_t uFade);
     void DrawRoundRectImpl(const UiRectF& rc, float rx, float ry, const IPen* pen, const IBrush* brush, bool bFill);
 
+    /** 获取绘制字形时复用的GDI+画刷（避免每个字符都重复创建，开销很大）
+    */
+    Gdiplus::SolidBrush* GetGlyphBrush(UiColor textColor, uint8_t uFade);
+
 private:
     HWND m_hWnd = nullptr;
     HDC m_hMemDC = nullptr;
@@ -193,6 +197,12 @@ private:
     UiPoint m_ptOrg = { 0, 0 };
     IRenderDpiPtr m_spRenderDpi;
     std::vector<std::pair<UiFont, std::unique_ptr<IFont>>> m_fontCache;
+
+    //绘制字形时复用的GDI+对象
+    std::unique_ptr<Gdiplus::StringFormat> m_pGlyphStringFormat;
+    std::unique_ptr<Gdiplus::SolidBrush> m_pGlyphBrush;
+    UiColor m_glyphBrushColor;
+    uint8_t m_glyphBrushFade = 0;
 };
 
 } // namespace ui

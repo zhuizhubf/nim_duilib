@@ -469,16 +469,25 @@ void BuildRichLayout(ITextShaper& textShaper,
         result.m_fLineHeight = (float)std::max(1, textRect.Height());
     }
     result.m_lines = WrapLines(result.m_glyphs, textRect.Width(), false, result.m_fLineHeight, 0.0f);
+
+    //按行计算每个文本片段的矩形范围：
+    //这里的top/bottom使用"行"的真实范围，不能直接使用textRect的top/bottom。
+    //因为调用方在估算文本大小时，传入的textRect.bottom可能是INT_MAX（表示高度不限），
+    //如果直接使用，会导致估算出的文本高度为INT_MAX，进而引起滚动条和布局反复变化。
+    float fLineTop = (float)textRect.top;
     for (const LayoutLine& line : result.m_lines) {
+        const float fLineBottom = fLineTop + result.m_fLineHeight;
         for (const LayoutGlyph& glyph : line.m_glyphs) {
             if (glyph.m_nRunIndex < result.m_runRects.size()) {
-                result.m_runRects[glyph.m_nRunIndex].push_back(UiRect(
-                    textRect.left + (int32_t)glyph.m_x,
-                    textRect.top,
-                    textRect.left + (int32_t)(glyph.m_x + glyph.m_glyph.m_fAdvance),
-                    textRect.bottom));
+                const float fLeft = (float)textRect.left + glyph.m_x;
+                const float fRight = fLeft + glyph.m_glyph.m_fAdvance;
+                result.m_runRects[glyph.m_nRunIndex].push_back(UiRect((int32_t)fLeft,
+                                                                      (int32_t)fLineTop,
+                                                                      (int32_t)fRight,
+                                                                      (int32_t)fLineBottom));
             }
         }
+        fLineTop = fLineBottom;
     }
 }
 }

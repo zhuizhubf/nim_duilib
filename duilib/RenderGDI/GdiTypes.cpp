@@ -16,6 +16,42 @@ namespace ui
 
 namespace
 {
+/** 线程内复用的测量用DC
+*   文本布局时会按字符查询字形（IsUnicodeCharSupported），如果每次调用都
+*   创建并销毁一个兼容DC，开销极大（实测会导致界面卡顿数秒）。
+*   这里按线程复用一个DC，线程之间互不影响，线程退出时自动释放。
+*/
+class ThreadMeasureDC
+{
+public:
+    ThreadMeasureDC():
+        m_hDC(::CreateCompatibleDC(nullptr))
+    {
+    }
+    ~ThreadMeasureDC()
+    {
+        if (m_hDC != nullptr) {
+            ::DeleteDC(m_hDC);
+            m_hDC = nullptr;
+        }
+    }
+    ThreadMeasureDC(const ThreadMeasureDC&) = delete;
+    ThreadMeasureDC& operator=(const ThreadMeasureDC&) = delete;
+
+    HDC GetDC() const { return m_hDC; }
+
+private:
+    HDC m_hDC = nullptr;
+};
+
+/** 获取当前线程复用的测量用DC
+*/
+HDC GetThreadMeasureDC()
+{
+    thread_local ThreadMeasureDC s_measureDC;
+    return s_measureDC.GetDC();
+}
+
 Gdiplus::Color ToGdiplusColor(UiColor color, uint8_t alpha = 255)
 {
     const uint8_t a = (uint8_t)((uint32_t)color.GetAlpha() * alpha / 255);
@@ -635,26 +671,132 @@ bool Font_GDI::IsStrikeOut() const
 
 bool Font_GDI::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId)
 {
+    uint16_t nGlyphId = 0;
+    float fAdvance = 0.0f;
+    if (!GetGlyphInfo(unicodeChar, nGlyphId, fAdvance)) {
+        return false;
+    }
+    if (glyphId != nullptr) {
+        *glyphId = nGlyphId;
+    }
+    return true;
+}
+
+bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdvance)
+{
+    glyphId = 0;
+    fAdvance = 0.0f;
     if ((m_hFont == nullptr) || (unicodeChar > 0xFFFF)) {
         return false;
     }
-    HDC hdc = ::CreateCompatibleDC(nullptr);
+
+    //先查询缓存
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        auto iter = m_glyphCache.find(unicodeChar);
+        if (iter != m_glyphCache.end()) {
+            if (!iter->second.m_bSupported) {
+                return false;
+            }
+            glyphId = iter->second.m_glyphId;
+            fAdvance = iter->second.m_fAdvance;
+            return true;
+        }
+    }
+
+    //缓存中没有，调用GDI接口查询
+    GlyphCacheItem item;
+    HDC hdc = GetThreadMeasureDC();
+    if (hdc != nullptr) {
+        HGDIOBJ hOldFont = ::SelectObject(hdc, m_hFont);
+        const wchar_t ch = (wchar_t)unicodeChar;
+        WORD glyph = 0;
+        const DWORD ret = ::GetGlyphIndicesW(hdc, &ch, 1, &glyph, GGI_MARK_NONEXISTING_GLYPHS);
+        if ((ret != GDI_ERROR) && (glyph != 0xFFFF)) {
+            item.m_bSupported = true;
+            item.m_glyphId = glyph;
+            SIZE size = {};
+            if (::GetTextExtentPoint32W(hdc, &ch, 1, &size)) {
+                item.m_fAdvance = (float)size.cx;
+            }
+        }
+        ::SelectObject(hdc, hOldFont);
+    }
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        m_glyphCache[unicodeChar] = item;
+    }
+
+    if (!item.m_bSupported) {
+        return false;
+    }
+    glyphId = item.m_glyphId;
+    fAdvance = item.m_fAdvance;
+    return true;
+}
+
+bool Font_GDI::GetFontMetrics(TextFontMetrics& metrics)
+{
+    if (m_hFont == nullptr) {
+        return false;
+    }
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        if (m_bFontMetricsValid) {
+            metrics = m_fontMetrics;
+            return true;
+        }
+    }
+
+    HDC hdc = GetThreadMeasureDC();
     if (hdc == nullptr) {
         return false;
     }
     HGDIOBJ hOldFont = ::SelectObject(hdc, m_hFont);
-    const wchar_t ch = (wchar_t)unicodeChar;
-    WORD glyph = 0;
-    const DWORD ret = ::GetGlyphIndicesW(hdc, &ch, 1, &glyph, GGI_MARK_NONEXISTING_GLYPHS);
+    TEXTMETRICW tm = {};
+    const BOOL bRet = ::GetTextMetricsW(hdc, &tm);
     ::SelectObject(hdc, hOldFont);
-    ::DeleteDC(hdc);
-    if ((ret != GDI_ERROR) && (glyph != 0xFFFF)) {
-        if (glyphId != nullptr) {
-            *glyphId = glyph;
-        }
-        return true;
+    if (!bRet) {
+        return false;
     }
-    return false;
+    metrics.m_fAscent = (float)tm.tmAscent;
+    metrics.m_fDescent = (float)tm.tmDescent;
+    metrics.m_fHeight = (float)tm.tmHeight;
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        m_fontMetrics = metrics;
+        m_bFontMetricsValid = true;
+    }
+    return true;
+}
+
+Gdiplus::Font* Font_GDI::GetGdiplusFont()
+{
+    if (m_hFont == nullptr) {
+        return nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        if (m_pGdiplusFont != nullptr) {
+            return m_pGdiplusFont.get();
+        }
+    }
+
+    std::unique_ptr<Gdiplus::Font> pGdiplusFont;
+    HDC hdc = GetThreadMeasureDC();
+    if (hdc != nullptr) {
+        pGdiplusFont = std::make_unique<Gdiplus::Font>(hdc, m_hFont);
+        if ((pGdiplusFont != nullptr) && (pGdiplusFont->GetLastStatus() != Gdiplus::Ok)) {
+            pGdiplusFont.reset();
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
+        if (m_pGdiplusFont == nullptr) {
+            m_pGdiplusFont = std::move(pGdiplusFont);
+        }
+        return m_pGdiplusFont.get();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

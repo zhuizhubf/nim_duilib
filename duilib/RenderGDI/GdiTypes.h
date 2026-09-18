@@ -2,6 +2,7 @@
 #define UI_RENDER_GDI_TYPES_H_
 
 #include "duilib/Render/IRender.h"
+#include "duilib/Text/ITextShaper.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
@@ -12,7 +13,9 @@
 
 #include <array>
 #include <memory>
+#include <mutex>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 namespace ui
@@ -205,6 +208,23 @@ public:
     virtual bool IsStrikeOut() const override;
     virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId) override;
 
+    /** 获取字符的字形ID与宽度（带缓存）
+    *   文本布局时会按字符反复查询，这里缓存查询结果，避免重复调用GDI接口(开销很大)
+    * @param [in] unicodeChar UTF32字符
+    * @param [out] glyphId 返回字形ID
+    * @param [out] fAdvance 返回字符宽度
+    * @return 当前字体是否包含该字符
+    */
+    bool GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdvance);
+
+    /** 获取字体度量信息（带缓存）
+    */
+    bool GetFontMetrics(TextFontMetrics& metrics);
+
+    /** 获取GDI+字体对象（带缓存，供绘制使用，避免每个字符都重复创建）
+    */
+    Gdiplus::Font* GetGdiplusFont();
+
 public:
     HFONT GetFontHandle() const { return m_hFont; }
     const LOGFONTW& GetLogFont() const { return m_logFont; }
@@ -214,11 +234,29 @@ private:
     void DeleteFont();
 
 private:
+    /** 字符的字形缓存数据
+    */
+    struct GlyphCacheItem
+    {
+        uint16_t m_glyphId = 0;   //字形ID
+        float m_fAdvance = 0.0f;  //字符宽度
+        bool m_bSupported = false;//当前字体是否包含该字符
+    };
+
     GdiFontMgr* m_pFontMgr = nullptr;
     HFONT m_hFont = nullptr;
     LOGFONTW m_logFont = {};
     DString m_fontName;
     int32_t m_fontSize = 0;
+
+    //字形信息缓存（多线程访问时需要加锁）
+    mutable std::mutex m_glyphCacheMutex;
+    std::unordered_map<uint32_t, GlyphCacheItem> m_glyphCache;
+    //字体度量缓存
+    bool m_bFontMetricsValid = false;
+    TextFontMetrics m_fontMetrics;
+    //GDI+字体缓存（延迟创建）
+    std::unique_ptr<Gdiplus::Font> m_pGdiplusFont;
 };
 
 /** GDI 字体管理器实现

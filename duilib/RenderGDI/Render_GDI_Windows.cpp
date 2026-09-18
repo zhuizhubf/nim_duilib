@@ -1175,20 +1175,11 @@ IFont* Render_GDI_Windows::CreateFont(const UiFont& fontInfo)
 bool Render_GDI_Windows::GetFontMetrics(const IFont* pFont, TextFontMetrics& metrics)
 {
     Font_GDI* pGdiFont = dynamic_cast<Font_GDI*>(const_cast<IFont*>(pFont));
-    if ((pGdiFont == nullptr) || (pGdiFont->GetFontHandle() == nullptr) || (m_hMemDC == nullptr)) {
+    if ((pGdiFont == nullptr) || (pGdiFont->GetFontHandle() == nullptr)) {
         return false;
     }
-    HGDIOBJ hOldFont = ::SelectObject(m_hMemDC, pGdiFont->GetFontHandle());
-    TEXTMETRICW tm = {};
-    const BOOL bRet = ::GetTextMetricsW(m_hMemDC, &tm);
-    ::SelectObject(m_hMemDC, hOldFont);
-    if (!bRet) {
-        return false;
-    }
-    metrics.m_fAscent = (float)tm.tmAscent;
-    metrics.m_fDescent = (float)tm.tmDescent;
-    metrics.m_fHeight = (float)tm.tmHeight;
-    return true;
+    //使用字体对象内的缓存，避免反复调用GDI接口
+    return pGdiFont->GetFontMetrics(metrics);
 }
 
 bool Render_GDI_Windows::ResolveGlyph(const IFont* pFont, uint32_t unicodeChar, TextGlyphInfo& glyph, bool bUseDefaultCharWhenFailed)
@@ -1197,45 +1188,45 @@ bool Render_GDI_Windows::ResolveGlyph(const IFont* pFont, uint32_t unicodeChar, 
         return false;
     }
     IFont* pResolvedFont = const_cast<IFont*>(pFont);
+    Font_GDI* pGdiFont = dynamic_cast<Font_GDI*>(pResolvedFont);
+    if ((pGdiFont == nullptr) || (pGdiFont->GetFontHandle() == nullptr)) {
+        return false;
+    }
     uint16_t glyphId = 0;
-    bool bSupported = pResolvedFont->IsUnicodeCharSupported(unicodeChar, &glyphId);
+    float fAdvance = 0.0f;
+    //字形信息在字体对象内做了缓存，避免同一个字符被反复查询(开销很大)
+    bool bSupported = pGdiFont->GetGlyphInfo(unicodeChar, glyphId, fAdvance);
     if (!bSupported) {
-        Font_GDI* pGdiFont = dynamic_cast<Font_GDI*>(pResolvedFont);
+        //当前字体不支持该字符，查询回退字体
         IFallbackFontMgr* pFallbackFontMgr = nullptr;
-        if ((pGdiFont != nullptr) && (pGdiFont->GetFontMgr() != nullptr)) {
+        if (pGdiFont->GetFontMgr() != nullptr) {
             pFallbackFontMgr = pGdiFont->GetFontMgr()->GetFallbackFontMgr();
         }
         if (pFallbackFontMgr != nullptr) {
             uint16_t nFallbackGlyphId = 0;
             IFont* pFallbackFont = pFallbackFontMgr->CreateFallbackFont(pFont, unicodeChar, &nFallbackGlyphId);
-            if ((pFallbackFont != nullptr) && (nFallbackGlyphId != 0)) {
+            Font_GDI* pFallbackGdiFont = dynamic_cast<Font_GDI*>(pFallbackFont);
+            if ((pFallbackGdiFont != nullptr) && (nFallbackGlyphId != 0) &&
+                pFallbackGdiFont->GetGlyphInfo(unicodeChar, glyphId, fAdvance)) {
                 pResolvedFont = pFallbackFont;
-                glyphId = nFallbackGlyphId;
                 bSupported = true;
             }
         }
     }
     if (!bSupported && bUseDefaultCharWhenFailed) {
-        bSupported = pResolvedFont->IsUnicodeCharSupported((uint32_t)'A', &glyphId);
-        unicodeChar = (uint32_t)'A';
+        if (pGdiFont->GetGlyphInfo((uint32_t)'A', glyphId, fAdvance)) {
+            bSupported = true;
+            unicodeChar = (uint32_t)'A';
+        }
     }
     if (!bSupported) {
         glyph.m_bMissing = true;
         return false;
     }
-    TextFontMetrics metrics;
-    if (!GetFontMetrics(pResolvedFont, metrics)) {
-        return false;
-    }
-    float fAdvance = 0.0f;
     Font_GDI* pResolvedGdiFont = dynamic_cast<Font_GDI*>(pResolvedFont);
-    if ((pResolvedGdiFont != nullptr) && (pResolvedGdiFont->GetFontHandle() != nullptr)) {
-        HGDIOBJ hOldFont = ::SelectObject(m_hMemDC, pResolvedGdiFont->GetFontHandle());
-        SIZE size = {};
-        const wchar_t ch = (unicodeChar <= 0xFFFF) ? (wchar_t)unicodeChar : L'A';
-        ::GetTextExtentPoint32W(m_hMemDC, &ch, 1, &size);
-        ::SelectObject(m_hMemDC, hOldFont);
-        fAdvance = (float)size.cx;
+    TextFontMetrics metrics;
+    if ((pResolvedGdiFont == nullptr) || !pResolvedGdiFont->GetFontMetrics(metrics)) {
+        return false;
     }
     glyph.m_pFont = pResolvedFont;
     glyph.m_glyphId = glyphId;
@@ -1259,18 +1250,40 @@ void Render_GDI_Windows::DrawGlyph(const TextGlyphInfo& glyph, float x, float y,
     if (!GetFontMetrics(pFont, fontMetrics)) {
         return;
     }
+    //复用字体对象内缓存的GDI+字体，避免每个字符都重复创建(开销很大)
+    Gdiplus::Font* pGdiplusFont = pFont->GetGdiplusFont();
+    if (pGdiplusFont == nullptr) {
+        return;
+    }
     std::unique_ptr<Gdiplus::Graphics> graphics = CreateGdiplusGraphics(m_hMemDC, m_ptOrg);
     if (graphics == nullptr) {
         return;
     }
-    Gdiplus::Font gdiplusFont(m_hMemDC, pFont->GetFontHandle());
-    Gdiplus::SolidBrush brush(ToGdiplusColor(textColor, uFade));
-    Gdiplus::StringFormat stringFormat;
-    stringFormat.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
+    //复用画刷和字符串格式对象，避免每个字符都重复创建(开销很大)
+    Gdiplus::SolidBrush* pBrush = GetGlyphBrush(textColor, uFade);
+    if ((pBrush == nullptr) || (m_pGlyphStringFormat == nullptr)) {
+        return;
+    }
     wchar_t ch = (glyph.m_unicodeChar <= 0xFFFF) ? (wchar_t)glyph.m_unicodeChar : L'A';
     // TextLayout 传入的是基线坐标，GDI+ DrawString 使用 top 坐标
     const Gdiplus::PointF position(x, y - fontMetrics.m_fAscent);
-    graphics->DrawString(&ch, 1, &gdiplusFont, position, &stringFormat, &brush);
+    graphics->DrawString(&ch, 1, pGdiplusFont, position, m_pGlyphStringFormat.get(), pBrush);
+}
+
+Gdiplus::SolidBrush* Render_GDI_Windows::GetGlyphBrush(UiColor textColor, uint8_t uFade)
+{
+    if (m_pGlyphStringFormat == nullptr) {
+        m_pGlyphStringFormat = std::make_unique<Gdiplus::StringFormat>();
+        if (m_pGlyphStringFormat != nullptr) {
+            m_pGlyphStringFormat->SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
+        }
+    }
+    if ((m_pGlyphBrush == nullptr) || (m_glyphBrushColor != textColor) || (m_glyphBrushFade != uFade)) {
+        m_pGlyphBrush = std::make_unique<Gdiplus::SolidBrush>(ToGdiplusColor(textColor, uFade));
+        m_glyphBrushColor = textColor;
+        m_glyphBrushFade = uFade;
+    }
+    return m_pGlyphBrush.get();
 }
 
 } // namespace ui
