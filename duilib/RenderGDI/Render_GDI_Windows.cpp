@@ -1255,15 +1255,22 @@ void Render_GDI_Windows::DrawGlyph(const TextGlyphInfo& glyph, float x, float y,
     if ((pFont == nullptr) || (pFont->GetFontHandle() == nullptr)) {
         return;
     }
+    TextFontMetrics fontMetrics;
+    if (!GetFontMetrics(pFont, fontMetrics)) {
+        return;
+    }
     std::unique_ptr<Gdiplus::Graphics> graphics = CreateGdiplusGraphics(m_hMemDC, m_ptOrg);
     if (graphics == nullptr) {
         return;
     }
     Gdiplus::Font gdiplusFont(m_hMemDC, pFont->GetFontHandle());
     Gdiplus::SolidBrush brush(ToGdiplusColor(textColor, uFade));
-    const Gdiplus::PointF position(x, y);
-    graphics->DrawDriverString(&glyph.m_glyphId, 1, &gdiplusFont, &brush, &position,
-                               Gdiplus::DriverStringOptionsCmapLookup, nullptr);
+    Gdiplus::StringFormat stringFormat;
+    stringFormat.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
+    wchar_t ch = (glyph.m_unicodeChar <= 0xFFFF) ? (wchar_t)glyph.m_unicodeChar : L'A';
+    // TextLayout 传入的是基线坐标，GDI+ DrawString 使用 top 坐标
+    const Gdiplus::PointF position(x, y - fontMetrics.m_fAscent);
+    graphics->DrawString(&ch, 1, &gdiplusFont, position, &stringFormat, &brush);
 }
 
 } // namespace ui
