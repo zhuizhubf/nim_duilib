@@ -4,7 +4,7 @@
 
 #include "SkRasterWindowContext_Windows.h"
 #include "SkGLWindowContext_Windows.h"
-#include "WindowRgn_Windows.h"
+#include "duilib/Render/WindowRgn_Windows.h"
 
 #include "SkiaHeaderBegin.h"
 
