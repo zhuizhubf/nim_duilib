@@ -18,6 +18,7 @@ namespace ui
 
 class Render_Skia : public IRender
 {
+    friend class SkiaTextShaper;
 public:
     Render_Skia();
     Render_Skia(const Render_Skia& r) = delete;
