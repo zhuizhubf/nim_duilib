@@ -275,6 +275,7 @@ RenderCapabilities Render_GDI_Windows::GetCapabilities() const
     capabilities.Add(RenderCapabilities::kLayeredWindow);
     capabilities.Add(RenderCapabilities::kImageTransform);
     capabilities.Add(RenderCapabilities::kRichText);
+    capabilities.Add(RenderCapabilities::kVerticalText);
     capabilities.Add(RenderCapabilities::kFontFallback);
     capabilities.Add(RenderCapabilities::kBoxShadow);
     capabilities.Add(RenderCapabilities::kAntiAlias);

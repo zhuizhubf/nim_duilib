@@ -185,6 +185,42 @@ std::vector<LayoutLine> WrapLines(const std::vector<LayoutGlyph>& glyphs,
     return lines;
 }
 
+std::vector<LayoutLine> WrapVerticalLines(const std::vector<LayoutGlyph>& glyphs,
+                                          int32_t nMaxHeight,
+                                          float fColumnWidth)
+{
+    std::vector<LayoutLine> lines;
+    LayoutLine currentLine;
+    currentLine.m_fWidth = fColumnWidth;
+    float y = 0.0f;
+    for (const LayoutGlyph& glyph : glyphs) {
+        if (glyph.m_bNewLine) {
+            lines.push_back(currentLine);
+            currentLine = LayoutLine();
+            currentLine.m_fWidth = fColumnWidth;
+            y = 0.0f;
+            continue;
+        }
+        const float fAdvance = glyph.m_glyph.m_fAdvance;
+        if ((nMaxHeight > 0) && (y > 0.0f) && ((y + fAdvance) > (float)nMaxHeight)) {
+            lines.push_back(currentLine);
+            currentLine = LayoutLine();
+            currentLine.m_fWidth = fColumnWidth;
+            y = 0.0f;
+        }
+        LayoutGlyph item = glyph;
+        item.m_x = 0.0f;
+        item.m_y = y;
+        currentLine.m_glyphs.push_back(item);
+        y += fAdvance;
+        currentLine.m_fHeight = y;
+    }
+    if (!currentLine.m_glyphs.empty() || lines.empty()) {
+        lines.push_back(currentLine);
+    }
+    return lines;
+}
+
 float CalculateTotalHeight(const std::vector<LayoutLine>& lines, float fLineHeight)
 {
     if (lines.empty()) {
@@ -358,12 +394,23 @@ UiRect TextLayout::MeasureString(ITextShaper& textShaper,
     ResolveLineHeight(textShaper, drawParam, fLineHeight, fFontHeight);
     const bool bSingleLine = ((measureParam.uFormat & DrawStringFormat::TEXT_SINGLELINE) != 0) ||
                              ((measureParam.uFormat & DrawStringFormat::TEXT_VERTICAL) == 0 && measureParam.rectSize <= 0);
-    const std::vector<LayoutLine> lines = WrapLines(glyphs, measureParam.rectSize, bSingleLine, fLineHeight, measureParam.fWordSpacing);
+    const bool bVertical = (measureParam.uFormat & DrawStringFormat::TEXT_VERTICAL) != 0;
+    const std::vector<LayoutLine> lines = bVertical ?
+        WrapVerticalLines(glyphs, measureParam.rectSize, fLineHeight) :
+        WrapLines(glyphs, measureParam.rectSize, bSingleLine, fLineHeight, measureParam.fWordSpacing);
     float fWidth = 0.0f;
     for (const LayoutLine& line : lines) {
         fWidth = std::max(fWidth, line.m_fWidth);
     }
-    const float fHeight = CalculateTotalHeight(lines, fLineHeight);
+    float fHeight = 0.0f;
+    if (bVertical) {
+        for (const LayoutLine& line : lines) {
+            fHeight = std::max(fHeight, line.m_fHeight);
+        }
+    }
+    else {
+        fHeight = CalculateTotalHeight(lines, fLineHeight);
+    }
     return UiRect(0, 0, (int32_t)std::ceil(fWidth), (int32_t)std::ceil(fHeight));
 }
 
@@ -379,34 +426,66 @@ void TextLayout::DrawString(ITextShaper& textShaper,
     float fLineHeight = 0.0f;
     float fFontHeight = 0.0f;
     ResolveLineHeight(textShaper, drawParam, fLineHeight, fFontHeight);
+    const bool bVertical = (drawParam.uFormat & DrawStringFormat::TEXT_VERTICAL) != 0;
     const bool bSingleLine = (drawParam.uFormat & DrawStringFormat::TEXT_SINGLELINE) != 0;
-    std::vector<LayoutLine> lines = WrapLines(glyphs, drawParam.textRect.Width(), bSingleLine, fLineHeight, drawParam.fWordSpacing);
+    std::vector<LayoutLine> lines = bVertical ?
+        WrapVerticalLines(glyphs, drawParam.textRect.Height(), fLineHeight) :
+        WrapLines(glyphs, drawParam.textRect.Width(), bSingleLine, fLineHeight, drawParam.fWordSpacing);
     if (!bSingleLine && ((drawParam.uFormat & DrawStringFormat::TEXT_END_ELLIPSIS) != 0) && (lines.size() == 1) &&
         (lines[0].m_fWidth > (float)drawParam.textRect.Width())) {
         AppendEllipsis(textShaper, lines[0].m_glyphs, drawParam.pFont, drawParam.dwTextColor, (float)drawParam.textRect.Width());
         lines[0].m_fWidth = (float)drawParam.textRect.Width();
     }
-    const float fTotalHeight = CalculateTotalHeight(lines, fLineHeight);
-    float fStartY = (float)drawParam.textRect.top;
-    if ((drawParam.uFormat & DrawStringFormat::TEXT_VCENTER) != 0) {
-        fStartY += ((float)drawParam.textRect.Height() - fTotalHeight) / 2.0f;
-    }
-    else if ((drawParam.uFormat & DrawStringFormat::TEXT_BOTTOM) != 0) {
-        fStartY += (float)drawParam.textRect.Height() - fTotalHeight;
-    }
     const int32_t nClipState = ((drawParam.uFormat & DrawStringFormat::TEXT_NOCLIP) != 0) ? -1 : pRender->SetClip(drawParam.textRect, true);
-    for (size_t i = 0; i < lines.size(); ++i) {
-        const LayoutLine& line = lines[i];
-        float fStartX = (float)drawParam.textRect.left;
-        if ((drawParam.uFormat & DrawStringFormat::TEXT_HCENTER) != 0) {
-            fStartX += ((float)drawParam.textRect.Width() - line.m_fWidth) / 2.0f;
+    if (bVertical) {
+        const float fTotalWidth = fLineHeight * (float)lines.size();
+        float fStartX = (float)drawParam.textRect.right - fLineHeight;
+        if ((drawParam.uFormat & DrawStringFormat::TEXT_LEFT) != 0) {
+            fStartX = (float)drawParam.textRect.left;
         }
-        else if ((drawParam.uFormat & DrawStringFormat::TEXT_RIGHT) != 0) {
-            fStartX += (float)drawParam.textRect.Width() - line.m_fWidth;
+        else if ((drawParam.uFormat & DrawStringFormat::TEXT_HCENTER) != 0) {
+            fStartX = (float)drawParam.textRect.left + ((float)drawParam.textRect.Width() - fTotalWidth) / 2.0f;
         }
-        const float fY = fStartY + fLineHeight * (float)i + fFontHeight * 0.8f;
-        for (const LayoutGlyph& glyph : line.m_glyphs) {
-            textShaper.DrawGlyph(glyph.m_glyph, fStartX + glyph.m_x, fY, drawParam.dwTextColor, drawParam.uFade);
+        for (size_t i = 0; i < lines.size(); ++i) {
+            const LayoutLine& line = lines[i];
+            const float fColumnX = ((drawParam.uFormat & DrawStringFormat::TEXT_LEFT) != 0) ?
+                (fStartX + fLineHeight * (float)i) : (fStartX - fLineHeight * (float)i);
+            float fStartY = (float)drawParam.textRect.top;
+            if ((drawParam.uFormat & DrawStringFormat::TEXT_VCENTER) != 0) {
+                fStartY += ((float)drawParam.textRect.Height() - line.m_fHeight) / 2.0f;
+            }
+            else if ((drawParam.uFormat & DrawStringFormat::TEXT_BOTTOM) != 0) {
+                fStartY += (float)drawParam.textRect.Height() - line.m_fHeight;
+            }
+            for (const LayoutGlyph& glyph : line.m_glyphs) {
+                textShaper.DrawGlyph(glyph.m_glyph, fColumnX + fLineHeight * 0.2f,
+                                     fStartY + glyph.m_y + fFontHeight * 0.8f,
+                                     drawParam.dwTextColor, drawParam.uFade);
+            }
+        }
+    }
+    else {
+        const float fTotalHeight = CalculateTotalHeight(lines, fLineHeight);
+        float fStartY = (float)drawParam.textRect.top;
+        if ((drawParam.uFormat & DrawStringFormat::TEXT_VCENTER) != 0) {
+            fStartY += ((float)drawParam.textRect.Height() - fTotalHeight) / 2.0f;
+        }
+        else if ((drawParam.uFormat & DrawStringFormat::TEXT_BOTTOM) != 0) {
+            fStartY += (float)drawParam.textRect.Height() - fTotalHeight;
+        }
+        for (size_t i = 0; i < lines.size(); ++i) {
+            const LayoutLine& line = lines[i];
+            float fStartX = (float)drawParam.textRect.left;
+            if ((drawParam.uFormat & DrawStringFormat::TEXT_HCENTER) != 0) {
+                fStartX += ((float)drawParam.textRect.Width() - line.m_fWidth) / 2.0f;
+            }
+            else if ((drawParam.uFormat & DrawStringFormat::TEXT_RIGHT) != 0) {
+                fStartX += (float)drawParam.textRect.Width() - line.m_fWidth;
+            }
+            const float fY = fStartY + fLineHeight * (float)i + fFontHeight * 0.8f;
+            for (const LayoutGlyph& glyph : line.m_glyphs) {
+                textShaper.DrawGlyph(glyph.m_glyph, fStartX + glyph.m_x, fY, drawParam.dwTextColor, drawParam.uFade);
+            }
         }
     }
     if (nClipState >= 0) {
