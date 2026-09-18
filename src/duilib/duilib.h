@@ -24,8 +24,8 @@
 #include "Animation/AnimationPlayer.h"
 #include "Animation/AnimationManager.h"
 
-#include "Render/IRender.h"
-#include "Render/AutoClip.h"
+#include "render/IRender.h"
+#include "render/AutoClip.h"
 
 #include "Core/EventArgs.h"
 #include "Core/UiTypes.h"
