@@ -2,11 +2,11 @@
 #define UI_IMAGE_APNG_DECODER_H_
 
 #include "duilib/Core/UiTypes.h"
-#include "duilib/third_party/zlib/zlib.h"
-#include "duilib/third_party/libpng/pngpriv.h"
-#include "duilib/third_party/libpng/pngstruct.h"
-#include "duilib/third_party/libpng/pnginfo.h"
-#include "duilib/third_party/libpng/png.h"
+#include "third_party/zlib/zlib.h"
+#include "third_party/libpng/pngpriv.h"
+#include "third_party/libpng/pngstruct.h"
+#include "third_party/libpng/pnginfo.h"
+#include "third_party/libpng/png.h"
 
 #include <cstddef>
 #include <cstdint>

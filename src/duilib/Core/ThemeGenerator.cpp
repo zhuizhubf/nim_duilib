@@ -1,7 +1,7 @@
 #include "ThemeGenerator.h"
 #include "duilib/Utils/StringConvert.h"
 
-#include "duilib/third_party/xml/pugixml.hpp"
+#include "third_party/xml/pugixml.hpp"
 
 #include <sstream>
 #include <iomanip>

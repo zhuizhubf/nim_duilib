@@ -62,7 +62,7 @@
  #define PI 3.141592653589793f
 #endif
 
-#include "../../duilib_config.h"
+#include "duilib/duilib_config.h"
 
 #include <stdio.h>
 #include <math.h>

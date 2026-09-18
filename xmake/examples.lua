@@ -67,7 +67,7 @@ for _, name in ipairs(examples) do
 
         if is_cef_example and get_config("cef") then
             add_deps(duilib_cef_wrapper_name())
-            add_includedirs(path.join(DUILIB_THIRD_DIR, "libcef", duilib_cef_src_dir()))
+            add_includedirs(path.join(DUILIB_THIRD_DIR, "prebuilt/libcef", duilib_cef_src_dir()))
         end
 
         if duilib_is_windows() then

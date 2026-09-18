@@ -60,7 +60,7 @@
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/FileUtil.h"
 
-#include "duilib/third_party/xml/pugixml.hpp"
+#include "third_party/xml/pugixml.hpp"
 #include <set>
 
 namespace ui 

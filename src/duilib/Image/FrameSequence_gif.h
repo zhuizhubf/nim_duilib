@@ -17,7 +17,7 @@
 #ifndef UI_IMAGE_FRAMESQUENCE_GIF_H
 #define UI_IMAGE_FRAMESQUENCE_GIF_H
 
-#include "duilib/third_party/giflib/gif_lib.h"
+#include "third_party/giflib/gif_lib.h"
 #include <cstdint>
 
 namespace ui

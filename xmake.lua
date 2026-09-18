@@ -49,8 +49,8 @@ DUILIB_ROOT      = os.projectdir()
 DUILIB_SRC_DIR   = path.join(DUILIB_ROOT, "src")
 -- 核心库源码目录（保持 duilib/ 名称，公开包含路径不变）
 DUILIB_CORE_DIR  = path.join(DUILIB_SRC_DIR, "duilib")
--- 第三方依赖目录（Task 4 会改为 path.join(DUILIB_ROOT, "third_party")）
-DUILIB_THIRD_DIR = path.join(DUILIB_CORE_DIR, "third_party")
+-- 第三方依赖目录（含 prebuilt/ 预编译 SDK）
+DUILIB_THIRD_DIR = path.join(DUILIB_ROOT, "third_party")
 DUILIB_LIB_DIR   = path.join(DUILIB_ROOT, "lib")
 DUILIB_BIN_DIR   = path.join(DUILIB_ROOT, "bin")
 DUILIB_SKIA_LIBS = {"svg", "skshaper", "skottie", "sksg", "jsonreader", "skia"}

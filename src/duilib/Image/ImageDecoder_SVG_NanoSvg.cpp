@@ -19,9 +19,9 @@
 #pragma warning (disable: 4456 4244 4702)
     #define NANOSVG_IMPLEMENTATION
     #define NANOSVG_ALL_COLOR_KEYWORDS
-    #include "duilib/third_party/svg/nanosvg.h"
+    #include "third_party/svg/nanosvg.h"
     #define NANOSVGRAST_IMPLEMENTATION
-    #include "duilib/third_party/svg/nanosvgrast.h"
+    #include "third_party/svg/nanosvgrast.h"
 #pragma warning (pop)
 
 namespace ui

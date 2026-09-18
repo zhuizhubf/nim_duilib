@@ -142,25 +142,25 @@
 ## 使用的第三方库说明
 | 名称     |代码子目录                 | 用途                                 | license文件        | 协议分类          |
 | :---     | :---                      |:---                                  |:---               |:---               |
-|apng      |duilib/third_party/libpng  | 支持APNG图片格式                     |zlib/libpng License|zlib/libpng 许可协议，宽松型开源协议|
-|libpng    |duilib/third_party/libpng  | 支持PNG图片格式                      |[libpng.LICENSE.txt](licenses/libpng.LICENSE.txt)|自定义的 BSD 风格宽松协议|
-|zlib      |duilib/third_party/zlib    | 支持PNG/APNG图片格式<br>Zip文件解压  |[zlib.LICENSE.txt](licenses/zlib.LICENSE.txt)|zlib许可协议，宽松型开源协议|
-|cximage   |duilib/third_party/cximage | 支持ICO图片格式                      |[cximage.LICENSE.txt](licenses/cximage.LICENSE.txt)|MIT 风格协议（非标准 MIT 协议）|
-|giflib    |duilib/third_party/giflib  | 支持GIF图片格式                      |[giflib.LICENSE.txt](licenses/giflib.LICENSE.txt)|MIT 许可协议|
-|libwebp   |duilib/third_party/libwebp | 支持WebP图片格式                     |[libWebP.LICENSE.txt](licenses/libwebp.LICENSE.txt)|BSD 3条款许可协议|
-|stb_image |duilib/third_party/stb_image| 支持BMP图片格式<br>调整图片大小     |[stb_image.LICENSE.txt](licenses/stb_image.LICENSE.txt)|MIT 许可协议/公有领域协议|
-|libjpeg-turbo|duilib/third_party/libjpeg-turbo| 支持JPEG图片格式             |[libjpeg-turbo.LICENSE.md](licenses/libjpeg-turbo.LICENSE.md)|IJG 许可证和修改后的BSD 3条款许可协议|
-|nanosvg   |duilib/third_party/svg      | 支持SVG图片格式                     |[nanosvg.LICENSE.txt](licenses/nanosvg.LICENSE.txt)|zlib 许可协议|
-|pugixml   |duilib/third_party/xml      | 支持资源描述XML的解析               |[pugixml.LICENSE.txt](licenses/pugixml.LICENSE.txt)|MIT 许可协议|
-|ConvertUTF|duilib/third_party/convert_utf| 用于UTF-8/UTF-16编码转换         |[llvm.LICENSE.txt](licenses/llvm.LICENSE.txt)|Apache License Version 2.0 为主，<br>LLVM 例外条款补充，<br>历史版本兼容 legacy 协议|
+|apng      |third_party/libpng  | 支持APNG图片格式                     |zlib/libpng License|zlib/libpng 许可协议，宽松型开源协议|
+|libpng    |third_party/libpng  | 支持PNG图片格式                      |[libpng.LICENSE.txt](licenses/libpng.LICENSE.txt)|自定义的 BSD 风格宽松协议|
+|zlib      |third_party/zlib    | 支持PNG/APNG图片格式<br>Zip文件解压  |[zlib.LICENSE.txt](licenses/zlib.LICENSE.txt)|zlib许可协议，宽松型开源协议|
+|cximage   |third_party/cximage | 支持ICO图片格式                      |[cximage.LICENSE.txt](licenses/cximage.LICENSE.txt)|MIT 风格协议（非标准 MIT 协议）|
+|giflib    |third_party/giflib  | 支持GIF图片格式                      |[giflib.LICENSE.txt](licenses/giflib.LICENSE.txt)|MIT 许可协议|
+|libwebp   |third_party/libwebp | 支持WebP图片格式                     |[libWebP.LICENSE.txt](licenses/libwebp.LICENSE.txt)|BSD 3条款许可协议|
+|stb_image |third_party/stb_image| 支持BMP图片格式<br>调整图片大小     |[stb_image.LICENSE.txt](licenses/stb_image.LICENSE.txt)|MIT 许可协议/公有领域协议|
+|libjpeg-turbo|third_party/prebuilt/libjpeg-turbo| 支持JPEG图片格式             |[libjpeg-turbo.LICENSE.md](licenses/libjpeg-turbo.LICENSE.md)|IJG 许可证和修改后的BSD 3条款许可协议|
+|nanosvg   |third_party/svg      | 支持SVG图片格式                     |[nanosvg.LICENSE.txt](licenses/nanosvg.LICENSE.txt)|zlib 许可协议|
+|pugixml   |third_party/xml      | 支持资源描述XML的解析               |[pugixml.LICENSE.txt](licenses/pugixml.LICENSE.txt)|MIT 许可协议|
+|ConvertUTF|third_party/convert_utf| 用于UTF-8/UTF-16编码转换         |[llvm.LICENSE.txt](licenses/llvm.LICENSE.txt)|Apache License Version 2.0 为主，<br>LLVM 例外条款补充，<br>历史版本兼容 legacy 协议|
 |skia      |项目未包含skia源码          | 界面库渲染引擎<br>支持SVG图片格式<br>支持Lottie JSON动画|[skia.LICENSE.txt](licenses/skia.LICENSE.txt)|BSD 3条款许可协议|
 |SDL       |项目未包含SDL源码           | 跨平台窗口管理                     |[SDL.LICENSE.txt](licenses/SDL.LICENSE.txt)|zlib 许可协议|
 |duilib    |                            | NIM_Duilib_Framework<br>是基于duilib开发  |[duilib.LICENSE.txt](licenses/duilib.LICENSE.txt)|BSD 2条款许可协议|
 |NIM_Duilib<br>Framework|               | 本项目是基于<br>NIM_Duilib_Framework开发   |[NIM_Duilib_Framework.LICENSE.txt](licenses/NIM_Duilib_Framework.LICENSE.txt)|MIT 许可协议|
-|libcef    |duilib/third_party/libcef   | 用于加载CEF模块|[libcef.LICENSE.txt](licenses/libcef.LICENSE.txt)|BSD 3条款许可协议|
-|udis86    |duilib/third_party/libudis86| 反汇编计算完整性指令最短长度         |[udis86.LICENSE.txt](licenses/udis86.LICENSE.txt)|BSD 2条款许可协议|
-|WebView2  |duilib/third_party/<br>Microsoft.Web.WebView2| 支持WebView2控件 |[Microsoft.Web.WebView2.LICENSE.txt](licenses/Microsoft.Web.WebView2.LICENSE.txt)|BSD 3条款许可协议|
-|libpag    |duilib/third_party/libpag   | 支持PAG动画文件<br>（该功能默认未启用，详见后续文档） |[libpag.LICENSE.txt](licenses/libpag.LICENSE.txt)|Apache License Version 2.0(主体)<br>libpag依赖的第三方组件的<br>授权协议很多，详见目录:<br>`duilib/third_party/libpag/licenses`<br>中的文件。如果介意libpag的授权协议<br>（包括主体协议/第三方组件协议），<br>可以不启用libpag。|
+|libcef    |third_party/prebuilt/libcef   | 用于加载CEF模块|[libcef.LICENSE.txt](licenses/libcef.LICENSE.txt)|BSD 3条款许可协议|
+|udis86    |third_party/libudis86| 反汇编计算完整性指令最短长度         |[udis86.LICENSE.txt](licenses/udis86.LICENSE.txt)|BSD 2条款许可协议|
+|WebView2  |third_party/<br>Microsoft.Web.WebView2| 支持WebView2控件 |[Microsoft.Web.WebView2.LICENSE.txt](licenses/Microsoft.Web.WebView2.LICENSE.txt)|BSD 3条款许可协议|
+|libpag    |third_party/prebuilt/libpag   | 支持PAG动画文件<br>（该功能默认未启用，详见后续文档） |[libpag.LICENSE.txt](licenses/libpag.LICENSE.txt)|Apache License Version 2.0(主体)<br>libpag依赖的第三方组件的<br>授权协议很多，详见目录:<br>`third_party/prebuilt/libpag/licenses`<br>中的文件。如果介意libpag的授权协议<br>（包括主体协议/第三方组件协议），<br>可以不启用libpag。|
 
 ## 界面效果预览
 使用该界面库编写的示例程序，该文档可以见到各个控件的展示效果：[docs/Examples.md](docs/Examples.md) 
@@ -170,9 +170,9 @@
 * 支持PAG动画文件格式功能默认关闭（因为需要自己编译libpag.lib和libpag.dll，放进项目才能正常编译运行）
 * 支持PAG动画格式的开启方法：    
 （1）编译前使用配置项开启：`xmake f --pag=y`（默认关闭）    
-（2）参照以下文档编译libpag库：[`duilib/third_party/libpag/windows/libpag-build.md`](duilib/third_party/libpag/windows/libpag-build.md)     
+（2）参照以下文档编译libpag库：[`third_party/prebuilt/libpag/windows/libpag-build.md`](third_party/prebuilt/libpag/windows/libpag-build.md)     
 * 编译nim_duilib的时候，直接使用xmake编译即可（`xmake`），编译产物在 bin 目录中。
-* libpag库的主体授权协议为Apache License Version 2.0，其依赖的第三方组件的授权协议很多，<br>详见目录:`duilib/third_party/libpag/licenses`中的文件。<br>如果介意libpag的授权协议（包括主体协议/第三方组件协议），可以不启用libpag。
+* libpag库的主体授权协议为Apache License Version 2.0，其依赖的第三方组件的授权协议很多，<br>详见目录:`third_party/prebuilt/libpag/licenses`中的文件。<br>如果介意libpag的授权协议（包括主体协议/第三方组件协议），可以不启用libpag。
 
 ## 编程语言
 - C/C++: 编译器需要支持C++20（`main`分支）
@@ -240,7 +240,7 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | libjpeg-turbo | 使用仓库内预编译库（Windows），其他平台使用 xmake 包 |
 | CEF | 可选：需要自行下载 CEF 运行库，详见 [docs/CEF.md](docs/CEF.md) |
 | WebView2 | 可选：使用仓库内的 WebView2 SDK（Windows 默认开启）|
-| libpag | 可选：需要自行编译 libpag.lib/libpag.dll，详见 [duilib/third_party/libpag/windows/libpag-build.md](duilib/third_party/libpag/windows/libpag-build.md) |
+| libpag | 可选：需要自行编译 libpag.lib/libpag.dll，详见 [third_party/prebuilt/libpag/windows/libpag-build.md](third_party/prebuilt/libpag/windows/libpag-build.md) |
 
 ### 六、平台说明
 - Windows：使用 MSVC 编译；`--cef=y` 可启用 CEF（需自行准备 CEF 运行库）；WebView2 默认开启

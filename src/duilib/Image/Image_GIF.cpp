@@ -3,7 +3,7 @@
 #include "duilib/Core/GlobalManager.h"
 #include "render/IRender.h"
 
-#include "duilib/third_party/giflib/gif_lib.h"
+#include "third_party/giflib/gif_lib.h"
 #include <atomic>
 #include <climits>
 #include <cstdint>

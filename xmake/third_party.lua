@@ -45,7 +45,7 @@ target("duilib-cximage")
     duilib_target_settings()
     set_languages("c++17")
     add_deps("duilib-png", "duilib-zlib")
-    add_includedirs(path.join(thirdroot, "cximage"), path.join(thirdroot, "libpng"), path.join(thirdroot, "zlib"))
+    add_includedirs(path.join(thirdroot, "cximage"), path.join(thirdroot, "libpng"), path.join(thirdroot, "zlib"), DUILIB_SRC_DIR)
     add_files(
         path.join(thirdroot, "cximage", "ximaenc.cpp"),
         path.join(thirdroot, "cximage", "ximage.cpp"),
@@ -81,7 +81,7 @@ target_end()
 -- CEF 封装库（libcef_dll_wrapper，仅 Windows + --cef=y 时编译）
 -- -----------------------------------------------------------------------------
 if get_config("cef") then
-    local cefroot = path.join(thirdroot, "libcef", duilib_cef_src_dir())
+    local cefroot = path.join(thirdroot, "prebuilt/libcef", duilib_cef_src_dir())
     local wraproot = path.join(cefroot, "libcef_dll")
     local cefarch = (duilib_arch_name() == "x86") and "Win32" or "x64"
 

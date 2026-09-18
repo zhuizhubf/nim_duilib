@@ -3,8 +3,8 @@
 #include "render/IRender.h"
 #include "duilib/Utils/FileUtil.h"
 
-#include "duilib/third_party/libwebp/src/webp/decode.h"
-#include "duilib/third_party/libwebp/src/webp/demux.h"
+#include "third_party/libwebp/src/webp/decode.h"
+#include "third_party/libwebp/src/webp/demux.h"
 #include <atomic>
 
 namespace ui

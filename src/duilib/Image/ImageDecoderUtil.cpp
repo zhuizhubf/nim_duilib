@@ -18,17 +18,17 @@
 #if DUILIB_IMAGE_SUPPORT_JPEG_TURBO
     #define STBI_NO_JPEG
 #endif
-#include "duilib/third_party/stb_image/stb_image.h"
+#include "third_party/stb_image/stb_image.h"
 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #define STBIR_DEFAULT_FILTER_UPSAMPLE STBIR_FILTER_TRIANGLE
 #pragma warning (disable: 4505)
-    #include "duilib/third_party/stb_image/stb_image_resize2.h"
+    #include "third_party/stb_image/stb_image_resize2.h"
 #pragma warning (pop)
 
 #pragma warning (push)
 #pragma warning (disable: 4996)
-    #include "duilib/third_party/cximage/ximage.h"
+    #include "third_party/cximage/ximage.h"
 #pragma warning (pop)
 
 #include <set>

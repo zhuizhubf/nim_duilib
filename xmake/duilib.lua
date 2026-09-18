@@ -64,24 +64,24 @@ target("duilib")
     end
 
     -- 内置的第三方源码
-    add_files(path.join(droot, "third_party/giflib", "*.c"))
-    add_files(path.join(droot, "third_party/zlib/contrib/minizip", "ioapi.c"))
-    add_files(path.join(droot, "third_party/zlib/contrib/minizip", "unzip.c"))
-    add_files(path.join(droot, "third_party/convert_utf", "*.cpp"))
-    add_files(path.join(droot, "third_party/xml", "pugixml.cpp"))
+    add_files(path.join(DUILIB_THIRD_DIR, "giflib", "*.c"))
+    add_files(path.join(DUILIB_THIRD_DIR, "zlib/contrib/minizip", "ioapi.c"))
+    add_files(path.join(DUILIB_THIRD_DIR, "zlib/contrib/minizip", "unzip.c"))
+    add_files(path.join(DUILIB_THIRD_DIR, "convert_utf", "*.cpp"))
+    add_files(path.join(DUILIB_THIRD_DIR, "xml", "pugixml.cpp"))
     if duilib_is_windows() then
-        add_files(path.join(droot, "third_party/libudis86", "*.c"))
+        add_files(path.join(DUILIB_THIRD_DIR, "libudis86", "*.c"))
     end
 
     -- 头文件目录
     add_includedirs(
         DUILIB_SRC_DIR,
         DUILIB_ROOT,
-        path.join(droot, "third_party/zlib"),
-        path.join(droot, "third_party/giflib"),
-        path.join(droot, "third_party/libpng"),
-        path.join(droot, "third_party/convert_utf"),
-        path.join(droot, "third_party/xml")
+        path.join(DUILIB_THIRD_DIR, "zlib"),
+        path.join(DUILIB_THIRD_DIR, "giflib"),
+        path.join(DUILIB_THIRD_DIR, "libpng"),
+        path.join(DUILIB_THIRD_DIR, "convert_utf"),
+        path.join(DUILIB_THIRD_DIR, "xml")
     )
 
     -- 第三方静态库
@@ -95,7 +95,7 @@ target("duilib")
     -- libjpeg-turbo（可选项）
     if get_config("jpeg_turbo") then
         if duilib_is_windows() then
-            local jpegdir = path.join(droot, "third_party/libjpeg-turbo",
+            local jpegdir = path.join(DUILIB_THIRD_DIR, "prebuilt/libjpeg-turbo",
                                       duilib_arch_name() == "x86" and "libjpeg-turbo6-win-vc-x86" or "libjpeg-turbo6-win-vc-x64")
             add_includedirs(path.join(jpegdir, "include"))
             add_linkdirs(path.join(jpegdir, "lib"))
@@ -107,7 +107,7 @@ target("duilib")
 
     -- libpag（可选项：需要自己编译 libpag.lib 和 libpag.dll）
     if get_config("pag") then
-        local pagroot = path.join(droot, "third_party/libpag/windows")
+        local pagroot = path.join(DUILIB_THIRD_DIR, "prebuilt/libpag/windows")
         local pagdir = path.join(pagroot, duilib_arch_name() == "x86" and "lib-vc-x86" or "lib-vc-x64")
         add_includedirs(pagroot)
         add_linkdirs(pagdir)
@@ -227,7 +227,7 @@ if get_config("cef") and not duilib_is_freebsd() then
             add_files(path.join(DUILIB_SRC_DIR, "cef", "*.mm"))
         end
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
-                        path.join(DUILIB_THIRD_DIR, "libcef", duilib_cef_src_dir()))
+                        path.join(DUILIB_THIRD_DIR, "prebuilt/libcef", duilib_cef_src_dir()))
     target_end()
 end
 
@@ -243,8 +243,8 @@ if duilib_webview2_enabled() then
         add_deps("duilib")
         add_files(path.join(DUILIB_SRC_DIR, "webview2", "*.cpp"))
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
-                        path.join(DUILIB_THIRD_DIR, "Microsoft.Web.WebView2/build/native/include"))
-        add_linkdirs(path.join(DUILIB_THIRD_DIR, "Microsoft.Web.WebView2/build/native", duilib_arch_name()))
+                        path.join(DUILIB_THIRD_DIR, "prebuilt/Microsoft.Web.WebView2/build/native/include"))
+        add_linkdirs(path.join(DUILIB_THIRD_DIR, "prebuilt/Microsoft.Web.WebView2/build/native", duilib_arch_name()))
         add_links("WebView2LoaderStatic")
         add_syslinks("advapi32", "ole32", "shell32", "version", "wininet")
     target_end()
@@ -261,7 +261,7 @@ if duilib_svg_nanosvg_enabled() then
         duilib_common_defines()
         add_deps("duilib")
         add_files(path.join(droot, "Image", "ImageDecoder_SVG_NanoSvg.cpp"))
-        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT, path.join(droot, "third_party/svg"))
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT, path.join(DUILIB_THIRD_DIR, "svg"))
     target_end()
 end
 
