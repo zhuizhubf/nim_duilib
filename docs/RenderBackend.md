@@ -52,10 +52,11 @@ xmake f -c --render=both
 Skia 文本迁移过渡选项：
 
 ```sh
---common_text_layout=y   # Skia 的普通横排/竖排字符串改走 duilib-text 公共布局
+--common_text_layout=y   # 默认开启：Skia 文本走 duilib-text 公共布局
+--common_text_layout=n   # 回退到 RenderSkia 旧的文本布局实现
 ```
 
-该选项目前为实验性，默认关闭；Skia 的 RichText 仍使用原有布局实现，待公共布局算法完全对齐后再切换默认值。
+公共文本布局覆盖普通横排/竖排字符串和 RichText 绘制/测量/缓存接口。若遇到视觉回归，可通过 `--common_text_layout=n` 暂时回退。
 
 `--render=gdi` 和 `--render=both` 仅支持 Windows。
 

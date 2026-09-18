@@ -126,9 +126,9 @@ option("lottie")
 option_end()
 
 option("common_text_layout")
-    set_default(false)
+    set_default(true)
     set_showmenu(true)
-    set_description("Skia 后端使用 duilib-text 的公共文本布局（实验性）")
+    set_description("Skia 后端使用 duilib-text 的公共文本布局（默认开启）")
 option_end()
 
 option("skia_dir")
