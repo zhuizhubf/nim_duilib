@@ -355,5 +355,10 @@ healthchecksdb
 /duilib/third_party/libpag/windows/lib-vc-x86
 /bin/libpag.dll
 /.temp
-/msvc/PropertySheets/duilib_dll.flag
 /bin/*.dll
+# xmake
+/.xmake
+/xmake/.xmake
+# 保留 xmake 本地包仓库（上面 VS 模板中的 **/[Pp]ackages/* 是用于忽略 NuGet 包目录的）
+!xmake/repos/packages/*/
+!xmake/repos/packages/**/*

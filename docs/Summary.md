@@ -14,7 +14,7 @@
 * [XML文件中直接响应控件的事件](XmlEvents.md)
 * [主题参考文档](Theme.md)
 * [CEF控件](CEF.md)
-* [项目编译相关文档和脚本](../build/build.md)
+* [编译方式（xmake）](../README.md#编译xmake)
 
 ## 项目中主要类的简表
 各个类的详细接口说明请参考关联头文件，有较详细的注释。    

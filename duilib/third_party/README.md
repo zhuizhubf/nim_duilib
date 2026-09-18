@@ -59,4 +59,4 @@
 2. 项目中其他需要修改的内容
  - `README.md` CEF版本号需要修改    
  - `docs\CEF.md`    
- - `build\build_duilib_all_in_one.sh`    
+ - `xmake.lua` 与 `xmake\` 目录（CEF 相关的编译配置）    

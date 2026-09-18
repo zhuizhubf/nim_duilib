@@ -4,7 +4,7 @@
 nim_duilib 是基于 Skia 渲染引擎的跨平台 C++ UI 框架，采用 XML 描述界面布局 + C++ 控制逻辑的开发模式。
 - **支持平台**: Windows (7/10/11+), Linux, macOS (12+), FreeBSD
 - **渲染引擎**: Skia (CPU/OpenGL)
-- **构建工具**: CMake + Visual Studio / GCC / Clang
+- **构建工具**: xmake（Skia 由项目内置本地包自动下载并编译）
 - **C++ 标准**: C++17+
 
 ## 项目结构
@@ -25,8 +25,8 @@ nim_duilib/
 ├── examples/            # 示例程序
 ├── docs/                # 完整文档
 ├── bin/resources/       # 主题资源（XML布局、图片、字体）
-├── build/               # 构建脚本和解决方案
-└── cmake/               # CMake配置
+├── xmake/               # xmake构建脚本（第三方库、duilib、示例、Skia本地包）
+└── build/               # 编译临时目录（build/build_temp，可清理）
 ```
 
 ## 开发模式（XML + C++）
@@ -92,6 +92,7 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - 窗口析构由框架管理，使用 `new` 创建，不需要手动 `delete`
 
 ## 构建
-- Windows: 打开 `build/examples.sln`，选择 Debug|x64 或 Release|x64
-- 跨平台: `build/build_duilib_all_in_one.sh` 或 `build/build_duilib_all_in_one.bat`
-- 依赖: 需要先编译 Skia（参考 `build/build.md`）
+- 配置: `xmake f -o build/build_temp/xmake -c`（首次会自动下载并编译 Skia，默认用 MSVC，无需 LLVM）
+- 编译: `xmake`（库 + 全部示例）；只编库用 `xmake f --examples=n` 后再 `xmake`
+- 运行: `xmake run basic`，或直接运行 `bin` 目录下的示例程序
+- 可选: `--cef=y`、`--pag=y`、`--jpeg_turbo=y`、`--sdl=y`(Windows)、`--skia_clang=y` 等

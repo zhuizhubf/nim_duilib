@@ -1,4 +1,4 @@
-﻿# CEF控件（CefControl）    
+# CEF控件（CefControl）    
 nim_duilib的CEF控件（CefControl）是对libcef的集成封装，将CEF组件相关的功能封装成为duilib的一个控件，使得网页浏览功能能够与界面库整合在一起使用。libcef（Chromium Embedded Framework，简称CEF）‌是一个开源框架，允许开发者在其应用程序中嵌入Chromium（Google Chrome浏览器的开源基础）浏览器功能。通过libcef，开发者可以将网页渲染、JavaScript执行及HTML5支持等功能集成到自己的应用中，而无需用户单独安装浏览器‌。  
 
 ## 一、libcef的核心功能与架构
@@ -75,15 +75,17 @@ resources.pak
 locales（目录，里面包含zh-CN.pak、en-US.pak等语言包）
 ```
 
-### 4. 使用libcef 109版本（适用于使用`CEFSettings.props`属性文件的VC工程)
-使用VS打开`${NIM_DUILIB_ROOT}\msvc\PropertySheets\CEFSettings.props`文件，将LibCefVersion109属性值改为`true`，重新编译代码即可。    
-通过`${NIM_DUILIB_ROOT}\examples\cef`和`${NIM_DUILIB_ROOT}\examples\CefBrowser`工程可以看到效果（访问一下可以查看UA的网站，显示一下UA可确认）。
+### 4. 使用libcef 109版本
+配置 `xmake f --cef=y --cef109=y` 后重新编译（`xmake`），即可使用 109 版本（兼容 Win7）。
+通过 `examples/cef` 和 `examples/CefBrowser` 示例可以看到效果（访问一下可以查看UA的网站，显示一下UA可确认）。
 
-### 5. 使用libcef 最新版本（适用于使用`CEFSettings.props`属性文件的VC工程)
-使用VS打开`${NIM_DUILIB_ROOT}\msvc\PropertySheets\CEFSettings.props`文件，将LibCefVersion109属性值改为`false`，重新编译代码即可。    
-通过`${NIM_DUILIB_ROOT}\examples\cef`和`${NIM_DUILIB_ROOT}\examples\CefBrowser`工程可以看到效果（访问一下可以查看UA的网站，显示一下UA可确认）。
+### 5. 使用libcef 最新版本（默认）
+配置 `xmake f --cef=y` 后重新编译（`xmake`），默认使用最新版本的 CEF。
+通过 `examples/cef` 和 `examples/CefBrowser` 示例可以看到效果（访问一下可以查看UA的网站，显示一下UA可确认）。
 
-### 6. 如何在自己项目的工程中手工设置libcef相关的属性（未使用`CEFSettings.props`属性文件的VC工程）
+### 6. 在自己项目的工程中手工设置libcef相关的属性
+
+> 提示：使用本项目的 xmake 脚本编译时，CEF 的相关配置（头文件路径、链接库、延迟加载 libcef.dll 等）已由脚本自动处理（`xmake f --cef=y`）；以下步骤适用于把自己的工程接入 CEF 的场景。
 #### （1）libcef 新版的支持
 libcef 的较新的版本（高于109版本），功能更完善。支持Win10及以上版本的操作系统（Win10/Win11等），不支持Win7等低于Win10的操作系统。    
 使用的基本步骤如下（所有目录只写了相对nim_duilib根目录的子目录，实际设置根据自己的项目组织结构可灵活调整）：    

@@ -1,6 +1,6 @@
 # 快速上手（Windows系统，以VS 2022为例）
 
-此示例将引导你快速部署一个基于 nim_duilib 的基本应用，此示例与 `examples` 中的 `basic` 项目相似，如果你更喜欢查看代码，可以打开`examples.sln`工程，参考示例代码而无需多花费时间。
+此示例将引导你快速部署一个基于 nim_duilib 的基本应用，此示例与 `examples` 中的 `basic` 项目相似，可以直接参考 `examples/basic` 的代码（构建方式见 [README](../README.md) 中的“编译（xmake）”章节）。
 
 ## 获取项目代码并编译
 
@@ -10,32 +10,22 @@
 git clone https://github.com/rhett-lee/nim_duilib
 ```
 
-2. 获取skia代码的编译方法和修改的代码（nim_duilib使用skia作为绘制引擎，所以先要编译skia）
+2. 编译 nim_duilib：进入 `nim_duilib` 目录，执行以下命令（首次配置会自动下载并编译 Skia：默认使用 MSVC，**不需要安装 LLVM**）：
 
 ```bash
-git clone https://github.com/rhett-lee/skia_compile
+xmake f -o build/build_temp/xmake -c     # 配置（首次会自动下载并编译 Skia，约 5 分钟）
+xmake                                    # 编译：第三方库 + duilib + 全部示例程序
 ```
 
-3. 编译skia源码：按照skia_compile项目文档[Windows下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Windows%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)中的方法，编译出skia相关的lib文件    
-   注意事项：skia源码应该与nim_duilib源码位于相同的目录下。    
-   注意事项：skia源码编译的时候，应使用LLVM编译，程序运行比较流畅；如果使用VS编译，运行速度很慢，界面比较卡。    
-   检查方法：编译成功以后，在skia/out的子目录下，有生成skia.lib等lib文件。
-4. 在工作目录内，几个项目的源码目录的基本结构如下    
-
-<img src="./Images/vs00.png"/>
-
-5. 编译nim_duilib：进入 `nim_duilib` 目录，使用 Visual Studio 打开 `examples.sln`，选择编译选项为Debug|x64或者Release|x64，按下 F7 即可编译所有示例程序（编译完成的示例程序位于bin目录中）。
+3. 编译完成后，示例程序生成在 `bin` 目录中，可直接运行 `bin\basic.exe` 查看效果（也可以执行 `xmake run basic`）。
 
 ## 创建基础工程
 
-使用 Visual Studio 打开项目目录中 `examples.sln` 解决方案，新建一个 Windows 桌面应用，来一步一步完成第一个基于 duilib 界面库的程序。
+本项目使用 xmake 构建，新增一个示例程序的步骤如下（可参考 `examples/basic`）：
 
-1. 在`examples.sln` 解决方案中新建一个 Windows 桌面程序（VS2022，程序类型为：Windows Desktop Application）。
-假定程序名为：`MyDuilibApp`，源码放在`examples`子目录中。    
+1. 在 `examples` 目录下新建一个子目录（例如 `examples/MyDuilibApp`），放入程序源码：Windows 入口文件（参考 `examples/basic/main_windows.cpp`）、`MainThread.h/.cpp`、`MainForm.h/.cpp`、`.rc` 资源文件等；
 
-<img src="./Images/vs01.png"/>
-
-2. 将生成的代码清理一下，只保留关键的 wWinMain 函数：
+入口函数的形式如下：
 ```cpp
 #include "MainThread.h"
 
@@ -47,32 +37,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-
-    //正常退出程序
+    MainThread thread;
+    thread.Start();
     return 0;
 }
 ```
 
-## 配置项目属性
-- 使用nim_duilib提供的通用配置（`msvc\PropertySheets\BinCommonSettings.props`）    
-（1）用文本编辑器打开刚刚创建的工程文件（`examples\MyDuilibApp\MyDuilibApp.vcxproj`）    
-（2）找到`<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />`这一行的位置，在这行的后面插入一行，添加一下内容：    
-         `<Import Project="..\..\msvc\PropertySheets\BinCommonSettings.props" />`    
-（3）保存该工程文件的修改，如果已经在VS中打开，需要重新加载。    
+2. 在 [xmake/examples.lua](../xmake/examples.lua) 的 `common_examples` 列表中登记新的示例名称；
+3. 重新配置并编译：
 
-<img src="./Images/vs02.png"/>
+```bash
+xmake f -o build/build_temp/xmake -c
+xmake build MyDuilibApp
+xmake run MyDuilibApp
+```
 
-- 项目右键->添加->引用，将 duilib作为引用项目，这样就不需要手动引入库文件了。
-
-<img src="./Images/vs03.png"/>
-
-添加成功后，可以看到引用成功的项目：    
-<img src="./Images/vs04.png"/>  
+示例程序的工程配置（头文件路径、系统库、manifest、资源文件、duilib 依赖等）由 [xmake/examples.lua](../xmake/examples.lua) 统一设置，不需要手工配置工程。
 
 ## 引入线程库
 
 在创建的项目中增加自定义的线程类MainThread（主线程和一个工作线程）    
-创建两个文件（`MainThread.h` 和 `MainThread.cpp`），并添加到VS工程中，两个文件的内容分别如下：
+创建两个文件（`MainThread.h` 和 `MainThread.cpp`），放在示例的源码目录中（xmake 会自动收录目录下的源码文件），两个文件的内容分别如下：
 
 MainThread.h    
 ```cpp
@@ -305,8 +290,8 @@ bool MainThread::OnInit()
 ## 在程序中使用libCEF
 可以参考相关的文档[CEF.md](CEF.md)
 
-## 关于Visual Studio的工程配置
-项目中关于Visual Studio的工程配置是使用属性文件，保存在以下目录：`nim_duilib\msvc\PropertySheets`
+## 关于工程配置（xmake）
+项目的编译配置位于仓库根目录的 `xmake.lua` 和 `xmake` 目录：`xmake/duilib.lua`（duilib 主库）、`xmake/third_party.lua`（第三方库）、`xmake/examples.lua`（示例程序）、`xmake/common.lua`（公共设置）；Skia 由 `xmake/repos` 中的本地包自动下载并编译。
     
 ## 如何设置项目中使用的源代码文件编码为UTF-8格式
 1. 在项目根目录创建一个格式配置文件，文件名为：.editorconfig

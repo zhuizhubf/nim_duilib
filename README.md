@@ -28,9 +28,8 @@
 | docs          | 项目的说明文档，包括各个控件的功能介绍与属性列表说明文档|
 | bin           | 各个示例程序输出目录，包含预设的皮肤和语言文件以及 CEF 依赖|
 | licenses      | 引用的其他开源代码对应的licenses文件|
-| cmake         | cmake编译时依赖的公共设置|
-| build         | 各个平台的编译脚本和编译工程（包括VC编译工程）|
-| msvc          | Windows平台的应用程序清单文件和VC工程公共配置|
+| xmake         | xmake编译脚本（第三方库、duilib主库、示例程序以及Skia的本地包定义）|
+| build         | 编译的临时目录（build/build_temp，可清理）|
 | examples      | 项目的示例程序源代码，涵盖所有控件的基本用法示例（示例程序，详见 [docs/Examples.md](docs/Examples.md)）|
 | duilib/third_party| 项目代码依赖的第三方库，详细内容见后续文档|
 
@@ -170,9 +169,9 @@
 * 目前PAG动画文件格式仅在Window平台支持，其他平台暂未支持
 * 支持PAG动画文件格式功能默认关闭（因为需要自己编译libpag.lib和libpag.dll，放进项目才能正常编译运行）
 * 支持PAG动画格式的开启方法：    
-（1）使用文本编译器打开[`msvc/PropertySheets/LibPagSettings.props`](msvc/PropertySheets/LibPagSettings.props)文件，将`LibPagEnabled`变量的支持修改为`1`    
+（1）编译前使用配置项开启：`xmake f --pag=y`（默认关闭）    
 （2）参照以下文档编译libpag库：[`duilib/third_party/libpag/windows/libpag-build.md`](duilib/third_party/libpag/windows/libpag-build.md)     
-* 编译nim_duilib的时候，需要使用`build/duilib.sln`或者`build/examples.sln`编译，其他方式编译不支持。
+* 编译nim_duilib的时候，直接使用xmake编译即可（`xmake`），编译产物在 bin 目录中。
 * libpag库的主体授权协议为Apache License Version 2.0，其依赖的第三方组件的授权协议很多，<br>详见目录:`duilib/third_party/libpag/licenses`中的文件。<br>如果介意libpag的授权协议（包括主体协议/第三方组件协议），可以不启用libpag。
 
 ## 编程语言
@@ -186,389 +185,68 @@
 - FreeBSD
 
 ## 支持的编译器
-- Visual Studio 2022/2026（Windows）
-- Visual Studio 2017/2019（Windows，这两个版本的编译器仅在`develop-cpp17`分支代码支持，其他分支代码均不支持；使用VS2017时，不支持CEF模块）
-- LLVM（Windows）
-- MinGW-W64：gcc/g++、clang/clang++（Windows）
-- gcc/g++（Linux）
-- clang/clang++（Linux）
-- clang/clang++（macOS）
-- clang/clang++（FreeBSD）
+- Visual Studio 2022/2026（Windows，MSVC，默认用它编译Skia，无需安装LLVM）
+- LLVM/Clang（Windows，可选：`xmake f --skia_clang=y` 时使用）
+- gcc/g++（Linux、FreeBSD）
+- clang/clang++（Linux、macOS、FreeBSD）
 
-## A. 编译过程（Windows平台）
-### 一、准备工作：安装必备的软件
-1. 安装python3（python的主版本需要是3，需要添加到Path环境变量）    
-（1）首先安装python3    
-（2）到`python.exe`所在目录中，复制一份`python.exe`，改名为`python3.exe`: 确保命令行参数中可以访问到`python3.exe`   
-（3）在命令行验证：`> python3.exe --version` 可以查看python的版本号     
-2. 安装Git For Windows: 2.44版本（其他版本也可以），git需要添加到Path环境变量，确保命令行参数中可以访问到`git.exe`    
-3. 安装Visual Studio，安装过程中注意同时选择安装正确的Windows SDK版本    
-   推荐安装Windows 11 SDK，因为CEF模块需要依赖Windows 11 SDK，Windows 10 SDK会导致CEF相关模块编译不过；    
-   如果不使用CEF功能，使用Windows 10 SDK也可以
-4. 安装LLVM：21.1.4 Win64 版本（其他版本也可以）    
-（1）安装目录：`C:\LLVM`    
-（2）注意事项：如果安装在其他目录，安装目录中不能有空格，否则编译会遇到问题。
+## 编译（xmake）
+本项目使用 [xmake](https://xmake.io/) 构建：Skia 由项目内置的本地包自动下载并编译（默认使用 MSVC，**不需要安装 LLVM**），SDL3 等依赖由 xmake 包仓库自动获取，其余第三方库使用仓库内的源码或预编译库。
 
-### 二、使用脚本自动编译（推荐）
-该脚本自动完成相关源码下载和编译工作。    
-选定一个工作目录（注意事项：路径中不能包含空格，否则编译脚本会出错），创建一个脚本`build.bat`，将下面已经整理好脚本复制进去，保存文件。    
-* 对于Visual Studio 2022/2026，脚本文件内容如下：    
+### 一、准备工作
+1. 安装 [xmake](https://xmake.io/#/guide/installation)（v2.9 及以上版本）
+2. Windows：安装 Visual Studio 2022/2026（勾选“使用 C++ 的桌面开发”工作负载）
+3. Linux/macOS/FreeBSD：安装 gcc 或 clang，以及系统依赖（X11、freetype、fontconfig 等）
+4. 可选：安装 LLVM/Clang（仅当需要改用 clang 编译 Skia 时使用，配置 `--skia_clang=y`）
+
+> 编译 Skia 需要 Python：xmake 会自动获取并使用自带的 Python 包，无需手工安装或配置。
+
+### 二、编译（Windows/Linux/macOS/FreeBSD 通用）
 ```
-REM For Visual Studio 2022/2026
-echo OFF
-set retry_delay=10
-
-:retry_clone_duilib
-if not exist ".\nim_duilib\.git" (
-    git clone https://github.com/rhett-lee/nim_duilib
-) else (  
-    git -C ./nim_duilib pull
-)
-if %errorlevel% neq 0 (
-    timeout /t %retry_delay% >nul
-    goto retry_clone_duilib
-)
-if not exist ".\nim_duilib\.git" (
-    echo clone duilib failed!
-    exit /b 1
-)
-.\nim_duilib\build\build_duilib_all_in_one.bat
-```
-上述脚本默认编译使用的是静态运行库(MT和MTd)，如果需要使用动态运行库（MD和MDd），需要将上述脚本的最后一行追加`/MD`参数，改为：    
-`.\nim_duilib\build\build_duilib_all_in_one.bat /MD`    
-备注1：如果nim_duilib最终编译为DLL库，那么就必须使用动态运行库。    
-备注2：如果nim_duilib使用动态运行库，那么Skia库也必须使用动态运行库，编译方法可参考skia_compile库的文档。    
-    
-* 对于Visual Studio 2017/2019（需要使用develop-cpp17分支代码），脚本文件内容如下：    
-```
-REM For Visual Studio 2017/2019
-echo OFF
-set retry_delay=10
-
-:retry_clone_duilib
-if not exist ".\nim_duilib\.git" (
-    git clone https://github.com/rhett-lee/nim_duilib
-) else (  
-    git -C ./nim_duilib pull
-)
-if %errorlevel% neq 0 (
-    timeout /t %retry_delay% >nul
-    goto retry_clone_duilib
-)
-if not exist ".\nim_duilib\.git" (
-    echo clone duilib failed!
-    exit /b 1
-)
-
-:retry_pull_duilib
-git -C ./nim_duilib checkout develop-cpp17
-git -C ./nim_duilib pull
-if %errorlevel% neq 0 (
-    timeout /t %retry_delay% >nul
-    goto retry_pull_duilib
-)
-.\nim_duilib\build\build_duilib_all_in_one.bat
-```
-上述脚本默认编译使用的是静态运行库(MT和MTd)，如果需要使用动态运行库（MD和MDd），需要将上述脚本的最后一行追加`/MD`参数，改为：    
-`.\nim_duilib\build\build_duilib_all_in_one.bat /MD`    
-备注1：如果nim_duilib最终编译为DLL库，那么就必须使用动态运行库。    
-备注2：如果nim_duilib使用动态运行库，那么Skia库也必须使用动态运行库，编译方法可参考skia_compile库的文档。    
-    
-* 脚本文件准备好以后，进入命令行控制台，运行该脚本： 
-```
-.\build.bat
-```
-编译完成的示例程序位于bin目录中。
-
-### 三、手动编译过程（Windows平台）
-1. 设置工作目录：`D:\develop`    
-2. 获取相关代码    
-（1）`git clone https://github.com/rhett-lee/nim_duilib`      
-（2）`git clone https://github.com/rhett-lee/skia_compile`    
-（3）`git clone https://github.com/google/skia.git`  
-3. 编译Skia源码    
-（1）nim_duilib内部使用Skia作为界面绘制引擎，所以先要编译skia，优先用LLVM编译，运行流畅    
-（2）按照skia_compile目录中的[Windows下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Windows%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)文档中的方法，编译出skia相关的.lib文件      
-4. 如果使用的是Visual Studio 2017/2019，需要使用develop-cpp17分支代码，需要在命令运行以下命令：    
-   `git -C ./nim_duilib checkout develop-cpp17`
-5. 编译nim_duilib：进入 `build` 目录，打开 `examples.sln`（如果使用的是Visual Studio 2017，需要打开`examples_vs2017.sln`），可执行编译，编译完成的示例程序位于bin目录中。
-6. CEF模块的备注：    
-（1）CEF模块依赖Windows 11 SDK，如果是低版本SDK，会有编译错误。    
-（2）CEF模块仅支持Visual Studio 2019/2022/2026，不支持Visual Studio 2017。    
-（3）CEF模块如果不需要可关闭，编辑`msvc\PropertySheets\CEFSettings.props`文件，将`LibCefEnabled`的值改为`0`即可。    
-（4）关闭CEF模块后，可使用`duilib_no_cef.sln`或者`examples_no_cef.sln`工程来编译，从而减少libCEF代码的编译。    
-7. WebView2模块的备注：    
-（1）WebView2模块如果不需要可关闭，编辑`msvc\PropertySheets\WebView2Settings.props`文件，将`WebView2Enabled`的值改为`0`即可。    
-8. nim_duilib库默认使用静态运行库（/MT和/MTd），同时也支持动态运行库（/MD和/MDd），切换方法如下：    
-（1）Skia库编译时使用的运行库，与nim_duilib库使用的运行库必须相同。Skia库的编译方法可参考skia_compile库的文档。    
-（2）nim_duilib库切换为使用动态运行库，可运行以下脚本：    
-    `.\nim_duilib\msvc\PropertySheets\DuilibUseDynamicRuntime.bat`    
-（3）nim_duilib库切换为使用静态运行库，可运行以下脚本：    
-    `.\nim_duilib\msvc\PropertySheets\DuilibUseStaticRuntime.bat`    
-
-## B. 编译过程（Linux平台）
-### 一、准备工作：安装必备的软件
-不同的操作系统平台，可以按照以下列表安装必备的软件。
-| 操作系统平台            |桌面类型        |需要安装的模块及安装命令（必选） | 
-| :---                    | :---           | :---                    |
-|OpenEuler                |UKUI/DDE（X11） |`sudo dnf install -y gcc g++ gdb make git ninja-build gn python cmake llvm clang unzip fontconfig-devel mesa-libGL-devel mesa-libGLU-devel mesa-libGLES-devel mesa-libEGL-devel vulkan-devel libXext-devel libXcursor-devel libXi-devel libXrandr-devel dbus-devel ibus-devel`| 
-|OpenKylin（开放麒麟）    | Wayland        |`sudo apt install -y gcc g++ gdb make git ninja-build generate-ninja python3 cmake llvm clang unzip libfontconfig-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev libwayland-dev libxkbcommon-dev`| 
-|UbuntuKylin（优麒麟）    | X11            |`sudo apt install -y gcc g++ gdb make git ninja-build generate-ninja python3 cmake llvm clang unzip libfontconfig-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-devlibxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev`| 
-|中科方德                 | X11            |`sudo apt install -y gcc g++ gdb make git ninja-build generate-ninja python3 cmake llvm clang unzip libfontconfig-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev`| 
-|统信UOS                  | X11            |`sudo apt install -y gcc g++ gdb make git cmake python3 ninja-build wget unzip libfontconfig1-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev`| 
-|Ubuntu                   |GNOME（Wayland）|`sudo apt install -y gcc g++ gdb make git ninja-build generate-ninja python3 cmake llvm clang unzip bzip2 libfontconfig-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev libwayland-dev libxkbcommon-dev`| 
-|Debian                   |GNOME（Wayland）|`sudo apt install -y gcc g++ gdb make git ninja-build generate-ninja python3 cmake llvm clang unzip libfontconfig-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libvulkan-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libdbus-1-dev libibus-1.0-dev libwayland-dev libxkbcommon-dev`| 
-|Fedora                   |GNOME（Wayland）|`sudo dnf install -y gcc g++ gdb make git ninja-build gn python cmake llvm clang unzip fontconfig-devel mesa-libGL-devel mesa-libGLU-devel mesa-libGLES-devel mesa-libEGL-devel vulkan-devel libXext-devel libXcursor-devel libXi-devel libXrandr-devel dbus-devel ibus-devel wayland-devel libxkbcommon-devel`|
-|OpenSuse                 |KDE（X11）      |`sudo zypper install -y gcc gcc-c++ gdb make git ninja gn python cmake llvm clang unzip fontconfig-devel Mesa-libGL-devel Mesa-libEGL-devel Mesa-libGLESv3-devel glu-devel vulkan-devel libXext-devel libXcursor-devel libXi-devel libXrandr-devel dbus-1-devel ibus-devel`|
-
-### 二、使用脚本自动编译（推荐）
-该脚本自动完成相关源码下载和编译工作。    
-选定一个工作目录（注意事项：路径中不能包含空格，否则编译脚本会出错），创建一个脚本`build.sh`，将下面已经整理好脚本复制进去，保存文件。    
-然后在控制台，为脚本文件添加可执行权限，最后运行该脚本： 
-```
-chmod +x build.sh
-./build.sh
+xmake f -o build/build_temp/xmake -c     # 配置（Release；首次配置会自动下载并编译 Skia，约 5 分钟）
+xmake                                    # 编译：第三方库 + duilib + 全部示例程序
+xmake run basic                          # 运行示例程序（可执行文件输出到 bin 目录）
 ```
 
-脚本文件内容如下：    
-```
-#!/bin/bash
+### 三、常用配置项
+| 配置项 | 说明 |
+| :--- | :--- |
+| `-m debug` / `-m release` | Debug/Release 编译（默认 Release）|
+| `-a x86` / `-a x64` | 32 位/64 位（Windows 支持；Linux/macOS/FreeBSD 只支持 64 位）|
+| `--examples=n` | 只编译库，不编译示例程序 |
+| `--sdl=y` | 启用 SDL3（Windows 默认关闭，Linux/macOS/FreeBSD 始终启用）|
+| `--cef=y` | 启用 CEF：编译 libcef_dll_wrapper 及 cef/CefBrowser 示例 |
+| `--cef109=y` | 使用 CEF 109 版本（兼容 Win7）|
+| `--webview2=n` | 关闭 WebView2 控件（Windows，默认开启）|
+| `--pag=y` | 启用 libpag（需要先自行编译 libpag.lib 和 libpag.dll）|
+| `--jpeg_turbo=y` | 启用 libjpeg-turbo 解码 JPEG 图片 |
+| `--md=y` | MSVC 运行库使用 /MD（默认 /MT）|
+| `--log=y` | 输出详细的编译配置信息 |
+| `--skia_clang=y` | Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC）|
+| `--skia_clang_dir=D:/LLVM` | 使用 clang 编译 Skia 时的 clang 目录（默认 `C:/LLVM`）|
+| `--skia_dir=../skia` | 直接使用已有的 Skia 源码树，跳过自动下载编译 |
 
-# Retry clone nim_duilib
-while true; do
-    if [ ! -d "./nim_duilib/.git" ]; then
-        git clone https://github.com/rhett-lee/nim_duilib
-    else
-        git -C ./nim_duilib pull
-    fi
-    if [ $? -ne 0 ]; then
-        sleep 10
-        continue
-    fi
-    break
-done
+### 四、编译产物
+- `lib` 目录：duilib 主库与第三方静态库（duilib-zlib、duilib-png、duilib-webp、duilib-cximage）
+- `bin` 目录：各个示例程序的可执行文件（依赖 bin/resources 目录中的皮肤、语言文件等资源）
+- `build/build_temp`：编译的临时目录，可随时清理；清理后首次编译会重新编译 Skia
 
-chmod +x ./nim_duilib/build/build_duilib_all_in_one.sh
-./nim_duilib/build/build_duilib_all_in_one.sh
-```
-编译完成的示例程序位于bin目录中。    
-备注：UOS系统，需要先安装所需的开发环境，然后再安装，可参考文档：[统信UOS下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/%E7%BB%9F%E4%BF%A1UOS%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)。
+### 五、依赖的获取方式
+| 依赖 | 获取方式 |
+| :--- | :--- |
+| Skia | 项目内置的本地包（`xmake/repos`）：自动下载指定快照 + 补丁并编译，仅编译当前配置；也可用 `--skia_dir` 复用已有的 Skia |
+| SDL3 | xmake 官方包仓库自动获取 |
+| zlib、libpng(含APNG)、giflib、libwebp、cximage | 使用仓库内源码编译 |
+| libjpeg-turbo | 使用仓库内预编译库（Windows），其他平台使用 xmake 包 |
+| CEF | 可选：需要自行下载 CEF 运行库，详见 [docs/CEF.md](docs/CEF.md) |
+| WebView2 | 可选：使用仓库内的 WebView2 SDK（Windows 默认开启）|
+| libpag | 可选：需要自行编译 libpag.lib/libpag.dll，详见 [duilib/third_party/libpag/windows/libpag-build.md](duilib/third_party/libpag/windows/libpag-build.md) |
 
-### 三、手动编译过程（Linux平台）
-1. 设置工作目录：`~/develop`    
-2. 获取相关代码    
-（1）`git clone https://github.com/rhett-lee/nim_duilib`      
-（2）`git clone https://github.com/rhett-lee/skia_compile`    
-（3）`git clone https://github.com/google/skia.git`  
-（4）`git clone https://github.com/libsdl-org/SDL.git`    
-3. 编译Skia库    
+### 六、平台说明
+- Windows：使用 MSVC 编译；`--cef=y` 可启用 CEF（需自行准备 CEF 运行库）；WebView2 默认开启
+- Linux/macOS/FreeBSD：SDL3 自动启用（窗口系统基于 SDL3）；CEF 暂不支持，配置 `--cef=y` 会给出明确错误提示
+- 重新配置与重编：`xmake f -c` 清除配置重新配置；`xmake -r` 重新编译全部目标
 
-| 操作系统平台            |参考文档（网络链接）    |  参考文档（本地文件） |
-| :---                    | :---       |:---   |
-|OpenEuler                |[OpenEuler下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/OpenEuler%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|[OpenEuler下编译skia.md](../skia_compile/OpenEuler%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|
-|OpenKylin（开放麒麟）    |[OpenKylin下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/OpenKylin%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|[OpenKylin下编译skia.md](../skia_compile/OpenKylin%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|
-|UbuntuKylin（优麒麟）    |[UbuntuKylin下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/UbuntuKylin%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)  |[UbuntuKylin下编译skia.md](../skia_compile/UbuntuKylin%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|
-|中科方德                 |[中科方德下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/%E4%B8%AD%E7%A7%91%E6%96%B9%E5%BE%B7%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)  |[中科方德下编译skia.md](../skia_compile/%E4%B8%AD%E7%A7%91%E6%96%B9%E5%BE%B7%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) |
-|统信UOS                  |[统信UOS下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/%E7%BB%9F%E4%BF%A1UOS%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|[统信UOS下编译skia.md](../skia_compile/%E7%BB%9F%E4%BF%A1UOS%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|
-|Ubuntu                   |[Ubuntu下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Ubuntu%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) | [Ubuntu下编译skia.md](../skia_compile/Ubuntu%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) |
-|Debian                   |[Debian下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Debian%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)  |[Debian下编译skia.md](../skia_compile/Debian%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) |
-|Fedora                   |[Fedora下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/Fedora%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)  |[Fedora下编译skia.md](../skia_compile/Fedora%E4%B8%8B%E7%BC%96%E8%AF%91skia.md)|
-|OpenSuse                 |[OpenSuse下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/OpenSuse%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) | [OpenSuse下编译skia.md](../skia_compile/OpenSuse%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) |
-
-    注意事项：skia源码编译的时候，应使用LLVM编译，程序运行比较流畅。
-4. 编译SDL库 
-```
-#!/bin/bash
-cd ~/develop
-cmake -S "./SDL/" -B "./SDL.build" -DCMAKE_INSTALL_PREFIX="./SDL3/" -DSDL_SHARED=ON -DSDL_STATIC=OFF -DSDL_TEST_LIBRARY=OFF -DSDL_X11_XSCRNSAVER=OFF -DSDL_X11_XTEST=OFF -DCMAKE_BUILD_TYPE=Release
-cmake --build ./SDL.build
-cmake --install ./SDL.build
-```
-5. 编译nim_duilib
-```
-#!/bin/bash
-cd ~/develop/nim_duilib/
-chmod +x linux_build.sh
-./linux_build.sh
-```
-编译完成后，在bin目录中生成了可执行文件。    
-如果希望支持CEF，可以参考相关文档[docs/CEF.md](docs/CEF.md)。
-
-## C. 编译过程（macOS平台）
-### 一、准备工作：安装必备的软件
-安装完成系统后，需要做的工作：    
-#### 安装Xcode命令行工具
-```
-xcode-select --install
-```
-验证安装：
-```
-clang++ --version
-```
-#### 安装Homebrew
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-如果失败，可以查找其他源来安装。    
-更新Homebrew：    
-```
-brew update
-```
-#### 系统已经自带，无需安装的软件
-`git make unzip python3`
-
-#### 安装cmake
-```
-brew install cmake
-```
-#### 安装ninja
-```
-brew install ninja
-```
-#### 安装gn（需要从源码编译gn）
-```
-mkdir ~/develop
-cd ~/develop
-git clone https://github.com/timniederhausen/gn
-cd gn
-python3 build/gen.py
-ninja -C out
-sudo cp out/gn /usr/local/bin/
-gn --version
-```
-
-### 二、使用脚本自动编译（推荐）
-该脚本自动完成相关源码下载和编译工作。    
-选定一个工作目录（注意事项：路径中不能包含空格，否则编译脚本会出错），创建一个脚本`build.sh`，将下面已经整理好脚本复制进去，保存文件。    
-然后在控制台，为脚本文件添加可执行权限，最后运行该脚本： 
-```
-chmod +x build.sh
-./build.sh
-```
-
-脚本文件内容如下：    
-```
-#!/bin/bash
-
-# Retry clone nim_duilib
-while true; do
-    if [ ! -d "./nim_duilib/.git" ]; then
-        git clone https://github.com/rhett-lee/nim_duilib
-    else
-        git -C ./nim_duilib pull
-    fi
-    if [ $? -ne 0 ]; then
-        sleep 10
-        continue
-    fi
-    break
-done
-
-chmod +x ./nim_duilib/build/build_duilib_all_in_one.sh
-./nim_duilib/build/build_duilib_all_in_one.sh
-```
-编译完成的示例程序位于bin目录中。    
-
-### 三、手动编译过程（macOS平台）
-1. 设置工作目录：`~/develop`    
-2. 获取相关代码    
-（1）`git clone https://github.com/rhett-lee/nim_duilib`      
-（2）`git clone https://github.com/rhett-lee/skia_compile`    
-（3）`git clone https://github.com/google/skia.git`  
-（4）`git clone https://github.com/libsdl-org/SDL.git`  
-3. 编译Skia库    
-
-| 操作系统平台 |参考文档（网络链接） |  参考文档（本地文件） |
-| :---         | :---                |:---                   |
-|macOS         |[macOS下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/macOS%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) | [macOS下编译skia.md](../skia_compile/macOS%E4%B8%8B%E7%BC%96%E8%AF%91skia.md) |
-
-    注意事项：skia源码编译的时候，应使用LLVM编译，程序运行比较流畅。
-4. 编译SDL库 
-```
-#!/bin/bash
-cd ~/develop
-cmake -S "./SDL/" -B "./SDL.build" -DCMAKE_INSTALL_PREFIX="./SDL3/" -DSDL_SHARED=ON -DSDL_STATIC=OFF -DSDL_TEST_LIBRARY=OFF -DSDL_X11_XSCRNSAVER=OFF -DSDL_X11_XTEST=OFF -DCMAKE_BUILD_TYPE=Release
-cmake --build ./SDL.build
-cmake --install ./SDL.build
-```
-5. 编译nim_duilib
-```
-#!/bin/bash
-cd ~/develop/nim_duilib/
-chmod +x macos_build.sh
-./macos_build.sh
-```
-编译完成后，在bin目录中生成了可执行文件。    
-如果希望支持CEF，可以参考相关文档[docs/CEF.md](docs/CEF.md)。
-
-## D. 编译过程（FreeBSD平台）
-### 一、准备工作：安装必备的软件
-```
-sudo pkg install git unzip python3 cmake ninja gn llvm fontconfig freetype2
-```
-### 二、使用脚本自动编译（推荐）
-该脚本自动完成相关源码下载和编译工作。    
-选定一个工作目录（注意事项：路径中不能包含空格，否则编译脚本会出错），创建一个脚本`build.sh`，将下面已经整理好脚本复制进去，保存文件。    
-然后在控制台，为脚本文件添加可执行权限，最后运行该脚本： 
-```
-chmod +x build.sh
-./build.sh
-```
-
-脚本文件内容如下：    
-```
-#!/usr/bin/env bash
-
-# Retry clone nim_duilib
-while true; do
-    if [ ! -d "./nim_duilib/.git" ]; then
-        git clone https://github.com/rhett-lee/nim_duilib
-    else
-        git -C ./nim_duilib pull
-    fi
-    if [ $? -ne 0 ]; then
-        sleep 10
-        continue
-    fi
-    break
-done
-
-chmod +x ./nim_duilib/build/build_duilib_all_in_one.sh
-./nim_duilib/build/build_duilib_all_in_one.sh
-```
-编译完成的示例程序位于bin目录中。
-
-​​注意：FreeBSD 平台不支持 CEF（Chromium Embedded Framework）。
-### 三、手动编译过程（FreeBSD平台）
-1. 设置工作目录：`~/develop`    
-2. 获取相关代码    
-（1）`git clone https://github.com/rhett-lee/nim_duilib`      
-（2）`git clone https://github.com/rhett-lee/skia_compile`    
-（3）`git clone https://github.com/google/skia.git`  
-（4）`git clone https://github.com/libsdl-org/SDL.git`  
-3. 编译Skia库    
-
-| 操作系统平台 |参考文档（网络链接） |  参考文档（本地文件） |
-| :---         | :---                |:---                   |
-|FreeBSD         |[FreeBSD下编译skia.md](https://github.com/rhett-lee/skia_compile/blob/main/FreeBSD下编译skia.md) | [FreeBSD下编译skia.md](../skia_compile/FreeBSD下编译skia.md) |
-
-    注意事项：skia源码编译的时候，只支持使用LLVM编译。
-4. 编译SDL库 
-```
-#!/usr/bin/env bash
-cd ~/develop
-cmake -S "./SDL/" -B "./SDL.build" -DCMAKE_INSTALL_PREFIX="./SDL3/" -DSDL_SHARED=ON -DSDL_STATIC=OFF -DSDL_TEST_LIBRARY=OFF -DSDL_X11_XSCRNSAVER=OFF -DSDL_X11_XTEST=OFF -DCMAKE_BUILD_TYPE=Release
-cmake --build ./SDL.build
-cmake --install ./SDL.build
-```
-5. 编译nim_duilib
-```
-#!/usr/bin/env bash
-cd ~/develop/nim_duilib/
-chmod +x ./build/freebsd_build.sh
-./build/freebsd_build.sh
-```
-编译完成后，在bin目录中生成了可执行文件。    
 
 ## 开发计划
  - 继续丰富界面库的控件，完善界面库的功能
@@ -663,7 +341,7 @@ nim_duilib/.claude/
  - [XML文件中各控件的节点名称](docs/XmlNode.md)
  - [XML文件中直接响应控件的事件](docs/XmlEvents.md)
  - [CEF控件](docs/CEF.md)
- - [项目编译相关文档和脚本](build/build.md)
+ - [编译方式（xmake）](#编译xmake)
  - [参考文档](docs/Summary.md)
 
 ## 相关链接

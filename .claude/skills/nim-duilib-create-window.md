@@ -115,7 +115,7 @@ window->ShowWindow(ui::kSW_SHOW_NORMAL);
 ```
 
 ### 6. 检查清单
-- [ ] .h 和 .cpp 文件已添加到 VS 工程或 CMakeLists.txt
+- [ ] .h 和 .cpp 文件已放在对应的源码目录中（xmake 自动收录目录下的源码文件）
 - [ ] XML 文件编码为 UTF-8
 - [ ] XML 文件路径与 GetSkinFolder()/GetSkinFile() 返回值一致
-- [ ] 如果是示例工程，需要在 vcxproj 中添加引用
+- [ ] 如果是新增示例，需要在 `xmake/examples.lua` 的示例列表中登记

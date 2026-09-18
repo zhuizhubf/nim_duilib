@@ -111,13 +111,7 @@ void MainThread::OnInit()
 ```
 
 ### 步骤 5：添加 .rc 到工程
-- Visual Studio：右键项目 → 添加 → 现有项 → 选择 .rc 文件
-- CMakeLists.txt：
-```cmake
-# Windows 平台添加资源文件
-if(WIN32)
-    target_sources(MyApp PRIVATE MyApp.rc)
-endif()
+- 使用 xmake 编译时，示例程序目录下的 `.rc` 文件会被自动加入（见 `xmake/examples.lua`），无需手工配置。
 ```
 
 ## 打包清单：应该包含什么

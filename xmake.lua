@@ -1,0 +1,148 @@
+--[[
+
+    nim_duilib 的 xmake 构建脚本
+    ---------------------------------------------------------------------------
+    本文件是项目唯一的构建入口（原 CMake 工程、VS 解决方案和 bat/sh 脚本已移除）。
+
+    快速开始（Windows + MSVC x64）：
+        xmake f -o build/build_temp/xmake -c         # 配置（Release，当前平台/架构）
+        xmake                                        # 编译全部（第三方库 + duilib + 全部示例）
+        xmake build basic                            # 只编译 basic 示例
+        xmake run basic                              # 运行 basic 示例
+
+    常用配置（执行 xmake f 配置后生效）：
+        xmake f -m debug                             # Debug 编译
+        xmake f -a x86                               # 32 位编译
+        xmake f --examples=n                         # 只编译库，不编译示例
+        xmake f --sdl=y                              # 启用 SDL3（Windows 默认关闭，其他平台默认开启）
+        xmake f --cef=y                              # 启用 CEF（编译 cef / CefBrowser 示例）
+        xmake f --cef109=y                           # 使用 CEF 109 版本（兼容 Win7）
+        xmake f --webview2=n                         # 关闭 WebView2 控件（Windows，默认开启）
+        xmake f --pag=y                              # 启用 libpag（需按文档自行编译 libpag.lib/libpag.dll）
+        xmake f --jpeg_turbo=y                       # 启用 libjpeg-turbo 解码
+        xmake f --md=y                               # MSVC 运行库使用 /MD（默认 /MT）
+        xmake f --log=y                              # 输出详细的编译配置信息
+        xmake f --skia_clang=y                       # Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC，无需安装 LLVM）
+        xmake f --skia_clang_dir=D:/LLVM             # 使用 clang 编译 Skia 时的 clang 目录（默认 C:/LLVM）
+        xmake f --skia_dir=../skia                   # 直接使用已有的 Skia 源码树（跳过自动下载编译）
+
+    说明：
+        1. Skia 由项目内的本地包（xmake/repos 下的 duilib-skia）自动下载并编译，只编译当前配置；
+           Windows 下默认使用 MSVC（cl.exe）编译，不需要安装 LLVM；如需改用 clang，配置 --skia_clang=y；
+        2. SDL3 由 xmake 官方包仓库自动获取；
+        3. 其他第三方库使用仓库内的源码/预编译库，编译方式与原构建方式保持一致；
+        4. 库文件输出到 lib/，可执行文件输出到 bin/，与现有脚本一致。
+
+]]
+
+set_project("nim_duilib")
+set_version("1.0.0")
+set_xmakever("2.9.0")
+set_languages("c++20")
+
+-- 项目内的本地包仓库（Skia 自动下载并编译）
+add_repositories("duilib-repo xmake/repos")
+
+-- 公共变量（xmake/ 目录下的脚本可以直接使用）
+DUILIB_ROOT      = os.projectdir()
+DUILIB_LIB_DIR   = path.join(DUILIB_ROOT, "lib")
+DUILIB_BIN_DIR   = path.join(DUILIB_ROOT, "bin")
+DUILIB_SKIA_LIBS = {"svg", "skshaper", "skottie", "sksg", "jsonreader", "skia"}
+
+-- 公共选项
+option("sdl")
+    set_default(false)
+    set_showmenu(true)
+    set_description("启用 SDL3 支持（非 Windows 平台始终启用）")
+option_end()
+
+option("cef")
+    set_default(false)
+    set_showmenu(true)
+    set_description("启用 CEF：编译 libcef_dll_wrapper，并编译 cef/CefBrowser 示例")
+option_end()
+
+option("cef109")
+    set_default(false)
+    set_showmenu(true)
+    set_description("使用 CEF 109 版本（兼容 Win7）")
+option_end()
+
+option("webview2")
+    set_default(true)
+    set_showmenu(true)
+    set_description("启用 WebView2 控件（仅 Windows 有效，默认开启）")
+option_end()
+
+option("pag")
+    set_default(false)
+    set_showmenu(true)
+    set_description("启用 libpag（需要先编译好 libpag.lib 和 libpag.dll）")
+option_end()
+
+option("jpeg_turbo")
+    set_default(false)
+    set_showmenu(true)
+    set_description("启用 libjpeg-turbo 解码 JPEG 图片")
+option_end()
+
+option("md")
+    set_default(false)
+    set_showmenu(true)
+    set_description("MSVC 运行库使用 /MD（默认使用 /MT）")
+option_end()
+
+option("log")
+    set_default(false)
+    set_showmenu(true)
+    set_description("输出详细的编译配置信息")
+option_end()
+
+option("examples")
+    set_default(true)
+    set_showmenu(true)
+    set_description("编译 examples 目录下的示例程序")
+option_end()
+
+option("skia_dir")
+    set_default("")
+    set_showmenu(true)
+    set_description("已有的 Skia 源码树目录（设置后不再自动下载/编译 Skia）")
+option_end()
+
+option("skia_clang_dir")
+    set_default("")
+    set_showmenu(true)
+    set_description("使用 clang 编译 Skia 时的 clang 目录（默认 C:/LLVM）")
+option_end()
+
+option("skia_clang")
+    set_default(false)
+    set_showmenu(true)
+    set_description("Windows 下使用 LLVM/Clang 编译 Skia（默认使用 MSVC，无需安装 LLVM）")
+option_end()
+
+-- 构建脚本
+includes("xmake/common.lua")
+
+-- 依赖包（xmake 要求在根作用域声明，target 中只使用 add_packages 引用）
+if duilib_sdl_enabled() then
+    add_requires("libsdl3", {configs = {shared = false}})
+end
+if not duilib_skia_dir() then
+    add_requires("duilib-skia", {configs = {
+        clang = (get_config("skia_clang") == true),
+        clang_dir = duilib_skia_clang_dir(),
+        runtime = (get_config("md") and "MD" or "MT")
+    }})
+end
+if get_config("jpeg_turbo") and duilib_plat() ~= "windows" then
+    add_requires("libjpeg-turbo")
+end
+
+includes("xmake/third_party.lua")
+includes("xmake/duilib.lua")
+
+if get_config("examples") then
+    includes("xmake/examples.lua")
+end

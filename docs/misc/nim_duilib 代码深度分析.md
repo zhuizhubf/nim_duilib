@@ -1,4 +1,4 @@
-﻿# nim_duilib 代码深度分析
+# nim_duilib 代码深度分析
 nim_duilib是基于经典duilib深度优化的**跨平台C++界面库**，核心融合DirectUI理念，通过XML驱动布局实现视觉与逻辑分离，适配Windows/Linux/macOS/FreeBSD多平台，底层依托Skia渲染、SDL3做跨平台窗口管理，是一款面向桌面应用高效开发的开源库，整体代码设计兼具**扩展性、跨平台性和高性能**，以下从**代码架构、核心模块、关键优化、第三方依赖、编译体系**五个维度展开分析。
 
 ## 一、代码整体架构与目录设计
@@ -11,8 +11,8 @@ nim_duilib是基于经典duilib深度优化的**跨平台C++界面库**，核心
 | docs         | 开发文档，含控件属性、布局说明、编译指南、示例效果等                       |
 | bin          | 示例程序编译输出目录，包含预设皮肤、语言文件、CEF依赖等运行时资源         |
 | licenses     | 统一管理自身及第三方依赖的开源协议文件，规避授权风险                       |
-| cmake/msvc   | 编译配置，cmake为跨平台编译公共设置，msvc为Windows平台VC工程专属配置      |
-| build        | 各平台编译脚本（bat/sh）和工程文件（sln/cmakelists），提供一键编译能力    |
+| xmake        | 编译脚本，包含第三方库、duilib主库、示例程序以及Skia的本地包定义（自动下载并编译Skia） |
+| build        | 编译的临时目录（build/build_temp），可清理                              |
 | examples     | 全功能示例程序源码，覆盖所有控件、布局、跨平台特性，可直接作为开发参考    |
 
 ### 2. 代码组织原则
@@ -97,25 +97,22 @@ nim_duilib的第三方依赖均放在`duilib/third_party`目录（部分核心�
 
 ### 2. 依赖管理亮点
 1. **协议统一管理**：所有依赖的开源协议文件放在licenses目录，便于开发者查阅和合规使用；
-2. **可选功能解耦**：如PAG动画支持默认关闭，需修改`msvc/PropertySheets/LibPagSettings.props`手动开启，避免无用依赖增加库体积；
+2. **可选功能解耦**：如PAG动画支持默认关闭，通过`xmake f --pag=y`手动开启，避免无用依赖增加库体积；
 3. **版本适配**：对CEF/WebView2等依赖做了多版本适配，兼顾兼容性（Win7）和新特性（Win10+）；
 4. **轻量级封装**：对所有第三方依赖做了轻量级封装，暴露统一的上层接口，开发者无需关注底层依赖的实现细节。
 
 ## 五、编译体系代码分析
-nim_duilib提供**跨平台一键编译+手动编译**双方案，编译脚本位于build目录，支持Windows（bat）、Linux/macOS/FreeBSD（sh），编译体系代码设计兼具**便捷性和灵活性**，核心特点：
+nim_duilib使用xmake作为唯一的构建方式，构建脚本位于仓库根目录的`xmake.lua`和`xmake`目录，核心特点：
 
 ### 1. 编译环境要求
 - 编程语言：C++20，编译器需支持C++20标准；
-- 各平台编译器：Windows（VS2022/LLVM/MinGW-W64）、Linux（gcc/clang）、macOS/FreeBSD（clang）；
-- 必备工具：Python3（编译Skia）、Git（拉取源码）、CMake/Ninja（跨平台编译）。
+- 各平台编译器：Windows（VS2022/2026，可选LLVM/Clang编译Skia）、Linux（gcc/clang）、macOS/FreeBSD（clang）；
+- 必备工具：xmake（构建工具）、Git（拉取源码）；Python由xmake自动获取（编译Skia时使用），无需手工安装。
 
 ### 2. 编译脚本设计
-- **一键编译**：提供build.bat（Windows）/build.sh（类Unix）脚本，自动拉取源码、编译Skia/SDL3、编译nim_duilib及示例，无需手动配置环境，路径无空格即可运行；
-- **手动编译**：分步骤提供Skia/SDL3/nim_duilib的编译脚本，便于开发者自定义编译配置（如开启/关闭PAG/CEF）；
-- **平台专属优化**：
-  - Windows：基于VS2022工程（sln）编译，提供msvc专属属性表配置；
-  - Linux：针对不同发行版（OpenEuler/Ubuntu/统信UOS）提供专属依赖安装命令，适配国产系统；
-  - FreeBSD：仅支持LLVM编译，暂不支持CEF，编译脚本做了针对性屏蔽。
+- **一键编译**：`xmake f -o build/build_temp/xmake -c` 配置后执行 `xmake`，自动下载并编译Skia（默认使用MSVC，无需LLVM）、获取SDL3等依赖，并编译duilib库与全部示例程序；
+- **可配置裁剪**：通过 `xmake f --cef=y --pag=y --jpeg_turbo=y --sdl=y` 等开关控制功能，`--examples=n` 可只编译库；
+- **平台适配**：Windows使用MSVC（可选LLVM/Clang编译Skia）；Linux/macOS/FreeBSD使用gcc/clang，窗口系统基于SDL3；FreeBSD暂不支持CEF。
 
 ### 3. 编译产物
 编译完成后，示例程序及库文件输出到**bin目录**，包含运行时所需的所有资源（皮肤、语言文件、第三方依赖库），可直接运行，便于开发者快速验证功能。
