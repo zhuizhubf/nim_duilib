@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cwctype>
+#include <limits>
 #include <vector>
 
 namespace ui
@@ -90,6 +91,14 @@ bool IsWhiteSpace(uint32_t ch)
     return (ch <= 32) || std::iswspace((wint_t)ch);
 }
 
+bool IsWordBreakChar(uint32_t ch)
+{
+    if (ch <= 255) {
+        return !std::iswalnum((wint_t)ch);
+    }
+    return IsWhiteSpace(ch);
+}
+
 void ResolveLineHeight(ITextShaper& textShaper,
                        const DrawStringParam& drawParam,
                        float& fLineHeight,
@@ -154,12 +163,14 @@ std::vector<LayoutLine> WrapLines(const std::vector<LayoutGlyph>& glyphs,
     LayoutLine currentLine;
     currentLine.m_fHeight = fLineHeight;
     float x = 0.0f;
+    size_t nLastBreakIndex = (std::numeric_limits<size_t>::max)();
     for (const LayoutGlyph& glyph : glyphs) {
         if (glyph.m_bNewLine) {
             lines.push_back(currentLine);
             currentLine = LayoutLine();
             currentLine.m_fHeight = fLineHeight;
             x = 0.0f;
+            nLastBreakIndex = (std::numeric_limits<size_t>::max)();
             if (bSingleLine) {
                 break;
             }
@@ -167,10 +178,32 @@ std::vector<LayoutLine> WrapLines(const std::vector<LayoutGlyph>& glyphs,
         }
         const float fAdvance = glyph.m_glyph.m_fAdvance + fWordSpacing;
         if (!bSingleLine && (nMaxWidth > 0) && (x > 0.0f) && ((x + fAdvance) > (float)nMaxWidth)) {
-            lines.push_back(currentLine);
-            currentLine = LayoutLine();
-            currentLine.m_fHeight = fLineHeight;
-            x = 0.0f;
+            if ((nLastBreakIndex != (std::numeric_limits<size_t>::max)()) &&
+                (nLastBreakIndex + 1 < currentLine.m_glyphs.size())) {
+                //优先按单词边界换行，将断点后的字符移到下一行
+                std::vector<LayoutGlyph> carryGlyphs(currentLine.m_glyphs.begin() + nLastBreakIndex + 1,
+                                                     currentLine.m_glyphs.end());
+                currentLine.m_glyphs.resize(nLastBreakIndex + 1);
+                currentLine.m_fWidth = x; // 当前行宽度稍后重算
+                lines.push_back(currentLine);
+
+                currentLine = LayoutLine();
+                currentLine.m_fHeight = fLineHeight;
+                x = 0.0f;
+                for (LayoutGlyph carryGlyph : carryGlyphs) {
+                    carryGlyph.m_x = x;
+                    x += carryGlyph.m_glyph.m_fAdvance + fWordSpacing;
+                    currentLine.m_glyphs.push_back(carryGlyph);
+                }
+                currentLine.m_fWidth = x;
+            }
+            else {
+                lines.push_back(currentLine);
+                currentLine = LayoutLine();
+                currentLine.m_fHeight = fLineHeight;
+                x = 0.0f;
+            }
+            nLastBreakIndex = (std::numeric_limits<size_t>::max)();
         }
         LayoutGlyph item = glyph;
         item.m_x = x;
@@ -178,6 +211,9 @@ std::vector<LayoutLine> WrapLines(const std::vector<LayoutGlyph>& glyphs,
         currentLine.m_glyphs.push_back(item);
         x += fAdvance;
         currentLine.m_fWidth = x;
+        if (IsWordBreakChar(glyph.m_unicodeChar)) {
+            nLastBreakIndex = currentLine.m_glyphs.size() - 1;
+        }
     }
     if (!currentLine.m_glyphs.empty() || lines.empty()) {
         lines.push_back(currentLine);
