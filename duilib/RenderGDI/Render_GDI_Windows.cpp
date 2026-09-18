@@ -322,6 +322,7 @@ RenderCapabilities Render_GDI_Windows::GetCapabilities() const
     capabilities.Add(RenderCapabilities::kVerticalText);
     capabilities.Add(RenderCapabilities::kFontFallback);
     capabilities.Add(RenderCapabilities::kBoxShadow);
+    capabilities.Add(RenderCapabilities::kTextPathEllipsis);
     capabilities.Add(RenderCapabilities::kAntiAlias);
     return capabilities;
 }

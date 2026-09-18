@@ -304,6 +304,78 @@ void AppendEllipsis(ITextShaper& textShaper,
     }
 }
 
+void AppendPathEllipsis(ITextShaper& textShaper,
+                        std::vector<LayoutGlyph>& glyphs,
+                        IFont* pFont,
+                        UiColor textColor,
+                        float fWidth)
+{
+    float fTextWidth = 0.0f;
+    for (const LayoutGlyph& glyph : glyphs) {
+        fTextWidth += glyph.m_glyph.m_fAdvance;
+    }
+    if (fTextWidth <= fWidth) {
+        return;
+    }
+
+    std::vector<LayoutGlyph> ellipsis;
+    const uint32_t dots[] = { '.', '.', '.' };
+    float fDotsWidth = 0.0f;
+    for (uint32_t ch : dots) {
+        TextGlyphInfo glyphInfo;
+        if (textShaper.ResolveGlyph(pFont, ch, glyphInfo, true)) {
+            LayoutGlyph glyph;
+            glyph.m_pFont = glyphInfo.m_pFont;
+            glyph.m_textColor = textColor;
+            glyph.m_glyph = glyphInfo;
+            glyph.m_unicodeChar = ch;
+            ellipsis.push_back(glyph);
+            fDotsWidth += glyphInfo.m_fAdvance;
+        }
+    }
+    const float fRemainWidth = std::max(0.0f, fWidth - fDotsWidth);
+    const float fHeadWidth = fRemainWidth / 2.0f;
+    const float fTailWidth = fRemainWidth - fHeadWidth;
+
+    size_t nHeadCount = 0;
+    float fHeadActual = 0.0f;
+    while ((nHeadCount < glyphs.size()) && ((fHeadActual + glyphs[nHeadCount].m_glyph.m_fAdvance) <= fHeadWidth)) {
+        fHeadActual += glyphs[nHeadCount].m_glyph.m_fAdvance;
+        ++nHeadCount;
+    }
+
+    size_t nTailCount = 0;
+    float fTailActual = 0.0f;
+    while ((nTailCount < (glyphs.size() - nHeadCount)) &&
+           ((fTailActual + glyphs[glyphs.size() - 1 - nTailCount].m_glyph.m_fAdvance) <= fTailWidth)) {
+        fTailActual += glyphs[glyphs.size() - 1 - nTailCount].m_glyph.m_fAdvance;
+        ++nTailCount;
+    }
+
+    std::vector<LayoutGlyph> newGlyphs;
+    newGlyphs.reserve(nHeadCount + ellipsis.size() + nTailCount);
+    float x = 0.0f;
+    for (size_t i = 0; i < nHeadCount; ++i) {
+        LayoutGlyph glyph = glyphs[i];
+        glyph.m_x = x;
+        x += glyph.m_glyph.m_fAdvance;
+        newGlyphs.push_back(glyph);
+    }
+    for (LayoutGlyph glyph : ellipsis) {
+        glyph.m_x = x;
+        x += glyph.m_glyph.m_fAdvance;
+        newGlyphs.push_back(glyph);
+    }
+    const size_t nTailStart = glyphs.size() - nTailCount;
+    for (size_t i = nTailStart; i < glyphs.size(); ++i) {
+        LayoutGlyph glyph = glyphs[i];
+        glyph.m_x = x;
+        x += glyph.m_glyph.m_fAdvance;
+        newGlyphs.push_back(glyph);
+    }
+    glyphs.swap(newGlyphs);
+}
+
 void FillLineInfo(const std::vector<LayoutLine>& lines,
                   const UiRect& textRect,
                   float fLineHeight,
@@ -467,9 +539,16 @@ void TextLayout::DrawString(ITextShaper& textShaper,
     std::vector<LayoutLine> lines = bVertical ?
         WrapVerticalLines(glyphs, drawParam.textRect.Height(), fLineHeight) :
         WrapLines(glyphs, drawParam.textRect.Width(), bSingleLine, fLineHeight, drawParam.fWordSpacing);
-    if (!bSingleLine && ((drawParam.uFormat & DrawStringFormat::TEXT_END_ELLIPSIS) != 0) && (lines.size() == 1) &&
+    const bool bEndEllipsis = (drawParam.uFormat & DrawStringFormat::TEXT_END_ELLIPSIS) != 0;
+    const bool bPathEllipsis = (drawParam.uFormat & DrawStringFormat::TEXT_PATH_ELLIPSIS) != 0;
+    if ((bEndEllipsis || bPathEllipsis) && (lines.size() == 1) &&
         (lines[0].m_fWidth > (float)drawParam.textRect.Width())) {
-        AppendEllipsis(textShaper, lines[0].m_glyphs, drawParam.pFont, drawParam.dwTextColor, (float)drawParam.textRect.Width());
+        if (bPathEllipsis) {
+            AppendPathEllipsis(textShaper, lines[0].m_glyphs, drawParam.pFont, drawParam.dwTextColor, (float)drawParam.textRect.Width());
+        }
+        else {
+            AppendEllipsis(textShaper, lines[0].m_glyphs, drawParam.pFont, drawParam.dwTextColor, (float)drawParam.textRect.Width());
+        }
         lines[0].m_fWidth = (float)drawParam.textRect.Width();
     }
     const int32_t nClipState = ((drawParam.uFormat & DrawStringFormat::TEXT_NOCLIP) != 0) ? -1 : pRender->SetClip(drawParam.textRect, true);
