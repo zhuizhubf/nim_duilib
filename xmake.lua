@@ -125,6 +125,12 @@ option("lottie")
     set_description("Lottie 解码模块：auto、off 或 skia")
 option_end()
 
+option("common_text_layout")
+    set_default(false)
+    set_showmenu(true)
+    set_description("Skia 后端使用 duilib-text 的公共文本布局（实验性）")
+option_end()
+
 option("skia_dir")
     set_default("")
     set_showmenu(true)

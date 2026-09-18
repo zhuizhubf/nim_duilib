@@ -49,6 +49,14 @@ xmake f -c --render=both
 --lottie=skia    # 链接 Skia Lottie 解码模块（可配合 GDI 渲染使用）
 ```
 
+Skia 文本迁移过渡选项：
+
+```sh
+--common_text_layout=y   # Skia 的普通横排/竖排字符串改走 duilib-text 公共布局
+```
+
+该选项目前为实验性，默认关闭；Skia 的 RichText 仍使用原有布局实现，待公共布局算法完全对齐后再切换默认值。
+
 `--render=gdi` 和 `--render=both` 仅支持 Windows。
 
 ## 运行期选择

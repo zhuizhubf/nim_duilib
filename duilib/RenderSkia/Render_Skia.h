@@ -16,6 +16,8 @@ enum class SkTextEncoding;
 namespace ui 
 {
 
+class SkiaTextShaper;
+
 class Render_Skia : public IRender
 {
     friend class SkiaTextShaper;
@@ -227,6 +229,10 @@ private:
     /** 视图的原点坐标
     */
     std::unique_ptr<SkPoint> m_pSkPointOrg;
+
+    /** 公共文本层适配器
+    */
+    std::unique_ptr<SkiaTextShaper> m_textShaper;
 
     /** DPI转换辅助接口
     */

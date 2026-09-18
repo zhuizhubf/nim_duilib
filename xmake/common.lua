@@ -224,6 +224,7 @@ function duilib_common_defines()
     add_defines("DUILIB_IMAGE_SVG_NANOSVG=" .. (duilib_svg_nanosvg_enabled() and "1" or "0"))
     add_defines("DUILIB_IMAGE_SVG_SKIA=" .. (duilib_svg_skia_enabled() and "1" or "0"))
     add_defines("DUILIB_IMAGE_LOTTIE_SKIA=" .. (duilib_lottie_skia_enabled() and "1" or "0"))
+    add_defines("DUILIB_COMMON_TEXT_LAYOUT=" .. (get_config("common_text_layout") and "1" or "0"))
     if duilib_is_windows() then
         add_defines("DUILIB_WEBVIEW2=" .. (duilib_webview2_enabled() and "1" or "0"))
     end

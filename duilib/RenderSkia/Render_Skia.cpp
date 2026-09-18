@@ -9,7 +9,9 @@
 #include "duilib/RenderSkia/Font_Skia.h"
 #include "duilib/RenderSkia/SkTextBox.h"
 #include "duilib/RenderSkia/DrawSkiaImage.h"
+#include "duilib/RenderSkia/SkiaTextShaper.h"
 #include "duilib/Render/BitmapAlpha.h"
+#include "duilib/Text/TextLayout.h"
 
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Core/SharePtr.h"
@@ -51,6 +53,9 @@ Render_Skia::Render_Skia():
     m_pSkPaint = std::make_unique<SkPaint>();
     m_pSkPaint->setAntiAlias(true);
     m_pSkPaint->setDither(true);
+#if DUILIB_COMMON_TEXT_LAYOUT
+    m_textShaper = std::make_unique<SkiaTextShaper>(this);
+#endif
 }
 
 Render_Skia::~Render_Skia()
@@ -1566,6 +1571,12 @@ void Render_Skia::DrawString(const DString& strText, const DrawStringParam& draw
         //这种情况是窗口大小为0的情况，返回，不加断言
         return;
     }
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        TextLayout::DrawString(*m_textShaper, this, strText, drawParam);
+        return;
+    }
+#endif
     if (drawParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
         VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
@@ -1710,6 +1721,11 @@ UiRect Render_Skia::MeasureString(const DString& strText, const MeasureStringPar
         //这种情况是窗口大小为0的情况，返回空，不加断言
         return UiRect();
     }
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        return TextLayout::MeasureString(*m_textShaper, strText, measureParam);
+    }
+#endif
     if (measureParam.uFormat & TEXT_VERTICAL) {
         //纵向绘制文本
         VerticalDrawText drawTextUtil(GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
