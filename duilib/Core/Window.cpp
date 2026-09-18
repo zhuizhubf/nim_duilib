@@ -136,6 +136,10 @@ Window* Window::GetParentWindow() const
 bool Window::SetRenderBackendType(RenderBackendType backendType)
 {
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+    if (GlobalManager::Instance().GetRenderType() == RenderType::kRenderType_GDI) {
+        //GDI 后端仅支持 CPU 绘制
+        backendType = RenderBackendType::kRaster_BackendType;
+    }
     m_renderBackendType = backendType;
 #else
     backendType = RenderBackendType::kRaster_BackendType;
