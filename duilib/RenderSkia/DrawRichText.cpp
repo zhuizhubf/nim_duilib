@@ -1,4 +1,5 @@
 #include "DrawRichText.h"
+#include "duilib/Text/DrawRichTextCache.h"
 #include "duilib/RenderSkia/Font_Skia.h"
 #include "duilib/RenderSkia/SkTextBox.h"
 #include "duilib/RenderSkia/DrawSkiaText.h"
@@ -55,9 +56,9 @@ struct TPendingDrawRichText
     uint16_t m_textStyle = 0;
 };
 
-/** 绘制缓存
+/** Skia 绘制缓存
 */
-class DrawRichTextCache
+class SkiaDrawRichTextCache: public DrawRichTextCache
 {
 public:
     /** 原始参数
@@ -72,6 +73,16 @@ public:
     */
     std::vector<TPendingDrawRichText> m_pendingTextData;
 };
+
+inline static SkiaDrawRichTextCache* GetSkiaDrawRichTextCache(DrawRichTextCache* pCache)
+{
+    return dynamic_cast<SkiaDrawRichTextCache*>(pCache);
+}
+
+inline static const SkiaDrawRichTextCache* GetSkiaDrawRichTextCache(const DrawRichTextCache* pCache)
+{
+    return dynamic_cast<const SkiaDrawRichTextCache*>(pCache);
+}
 
 DrawRichText::DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg) :
     m_pRender(pRender),
@@ -521,15 +532,16 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
 
     if (pDrawRichTextCache != nullptr) {
         //生成绘制缓存，但不执行绘制
-        std::shared_ptr<DrawRichTextCache> spDrawRichTextCache = std::make_shared<DrawRichTextCache>();
+        std::shared_ptr<DrawRichTextCache> spDrawRichTextCache = std::make_shared<SkiaDrawRichTextCache>();
+        SkiaDrawRichTextCache* pSkiaCache = static_cast<SkiaDrawRichTextCache*>(spDrawRichTextCache.get());
         *pDrawRichTextCache = spDrawRichTextCache;
-        spDrawRichTextCache->m_richTextData = richTextData;
-        spDrawRichTextCache->m_textRect = rcTextRect;
+        pSkiaCache->m_richTextData = richTextData;
+        pSkiaCache->m_textRect = rcTextRect;
 
-        spDrawRichTextCache->m_textEncoding = textEncoding;
-        spDrawRichTextCache->m_textCharSize = textCharSize;
+        pSkiaCache->m_textEncoding = textEncoding;
+        pSkiaCache->m_textCharSize = textCharSize;
 
-        spDrawRichTextCache->m_pendingTextData.swap(pendingTextData);
+        pSkiaCache->m_pendingTextData.swap(pendingTextData);
     }
     else if (!bMeasureOnly) {
         UiRect rcTemp;
@@ -727,19 +739,24 @@ bool DrawRichText::IsValidDrawRichTextCache(const UiRect& textRect,
     if (spDrawRichTextCache == nullptr) {
         return false;
     }
-    if ((spDrawRichTextCache->m_textRect.Width() != textRect.Width()) ||
-        (spDrawRichTextCache->m_textRect.Height() != textRect.Height())) {
+    const SkiaDrawRichTextCache* pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
+    ASSERT(pSkiaCache != nullptr);
+    if (pSkiaCache == nullptr) {
+        return false;
+    }
+    if ((pSkiaCache->m_textRect.Width() != textRect.Width()) ||
+        (pSkiaCache->m_textRect.Height() != textRect.Height())) {
         //矩形大小发生变化，不能使用缓存(位置变化时，可以使用缓存)
         return false;
     }
-    if (spDrawRichTextCache->m_richTextData.size() != richTextData.size()) {
+    if (pSkiaCache->m_richTextData.size() != richTextData.size()) {
         return false;
     }
     bool bValid = true;
     const size_t nCount = richTextData.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
         const RichTextData& textData = richTextData[nIndex];
-        const RichTextData& textDataCache = spDrawRichTextCache->m_richTextData[nIndex];
+        const RichTextData& textDataCache = pSkiaCache->m_richTextData[nIndex];
         if (textData.m_textView.data() != textDataCache.m_textView.data()) {
             bValid = false;
         }
@@ -823,7 +840,12 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     }
 
     //删除的行数据，对应移除
-    DrawRichTextCache& oldData = *spOldDrawRichTextCache;
+    SkiaDrawRichTextCache* pOldData = GetSkiaDrawRichTextCache(spOldDrawRichTextCache.get());
+    ASSERT(pOldData != nullptr);
+    if (pOldData == nullptr) {
+        return false;
+    }
+    SkiaDrawRichTextCache& oldData = *pOldData;
     oldData.m_richTextData.swap(richTextDataNew);
 
     if (!deletedLines.empty()) {
@@ -845,7 +867,12 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     //是否将修改的内容追加到最后了
     bool bAppendUpdateAtEnd = false;
     if (spUpdateDrawRichTextCache != nullptr) {
-        DrawRichTextCache& updateData = *spUpdateDrawRichTextCache;
+        SkiaDrawRichTextCache* pUpdateData = GetSkiaDrawRichTextCache(spUpdateDrawRichTextCache.get());
+        ASSERT(pUpdateData != nullptr);
+        if (pUpdateData == nullptr) {
+            return false;
+        }
+        SkiaDrawRichTextCache& updateData = *pUpdateData;
         if (!updateData.m_pendingTextData.empty()) {//容器可能为空（当本行为空行时为空）
             ASSERT(updateData.m_textRect == oldData.m_textRect);
             if (updateData.m_textRect != oldData.m_textRect) {
@@ -931,12 +958,20 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     return true;
 }
 
-bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& first, const DrawRichTextCache& second) const
+bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache, const DrawRichTextCache& secondCache) const
 {
     ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
     if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
         return false;
     }
+    const SkiaDrawRichTextCache* pFirst = GetSkiaDrawRichTextCache(&firstCache);
+    const SkiaDrawRichTextCache* pSecond = GetSkiaDrawRichTextCache(&secondCache);
+    ASSERT((pFirst != nullptr) && (pSecond != nullptr));
+    if ((pFirst == nullptr) || (pSecond == nullptr)) {
+        return false;
+    }
+    const SkiaDrawRichTextCache& first = *pFirst;
+    const SkiaDrawRichTextCache& second = *pSecond;
 
     ASSERT(first.m_textRect == second.m_textRect);
     if (first.m_textRect != second.m_textRect) {
@@ -1084,6 +1119,11 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     if (spDrawRichTextCache == nullptr) {
         return;
     }
+    const SkiaDrawRichTextCache* pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
+    ASSERT(pSkiaCache != nullptr);
+    if (pSkiaCache == nullptr) {
+        return;
+    }
 
 #if DUILIB_PERFORMANCE_STAT_ENABLED
     //性能统计
@@ -1096,10 +1136,10 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     PerformanceUtilFast statPerformance(statNameHash);
 #endif //  DUILIB_PERFORMANCE_STAT_ENABLED
 
-    const SkTextEncoding textEncoding = spDrawRichTextCache->m_textEncoding;
-    const size_t textCharSize = spDrawRichTextCache->m_textCharSize;
+    const SkTextEncoding textEncoding = pSkiaCache->m_textEncoding;
+    const size_t textCharSize = pSkiaCache->m_textCharSize;
 
-    const std::vector<TPendingDrawRichText>& pendingTextData = spDrawRichTextCache->m_pendingTextData;
+    const std::vector<TPendingDrawRichText>& pendingTextData = pSkiaCache->m_pendingTextData;
 
     UiRect rcTemp;
     UiRect rcDestRect;
@@ -1112,7 +1152,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
 
     if (pRichTextRects != nullptr) {
         pRichTextRects->clear();
-        pRichTextRects->resize(spDrawRichTextCache->m_richTextData.size());
+        pRichTextRects->resize(pSkiaCache->m_richTextData.size());
     }
 
     UiColor textColor;

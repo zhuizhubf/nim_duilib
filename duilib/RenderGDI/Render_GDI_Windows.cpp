@@ -4,6 +4,7 @@
 
 #include "duilib/Render/BitmapAlpha.h"
 #include "duilib/RenderGDI/GdiTypes.h"
+#include "duilib/Text/DrawRichTextCache.h"
 #include "duilib/Text/TextLayout.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
@@ -26,6 +27,49 @@ Gdiplus::Color ToGdiplusColor(UiColor color, uint8_t alpha = 255)
 {
     const uint8_t a = (uint8_t)((uint32_t)color.GetAlpha() * alpha / 255);
     return Gdiplus::Color(a, color.GetRed(), color.GetGreen(), color.GetBlue());
+}
+
+class GdiDrawRichTextCache: public DrawRichTextCache
+{
+public:
+    UiRect m_textRect;
+    std::vector<RichTextData> m_richTextData;
+};
+
+bool IsRichTextDataEqual(const RichTextData& first, const RichTextData& second)
+{
+    if ((first.m_textView.data() != second.m_textView.data()) ||
+        (first.m_textView.size() != second.m_textView.size())) {
+        return false;
+    }
+    if ((first.m_textColor != second.m_textColor) || (first.m_bgColor != second.m_bgColor)) {
+        return false;
+    }
+    if ((first.m_pFontInfo == nullptr) || (second.m_pFontInfo == nullptr)) {
+        if (first.m_pFontInfo != second.m_pFontInfo) {
+            return false;
+        }
+    }
+    else if (*first.m_pFontInfo != *second.m_pFontInfo) {
+        return false;
+    }
+    return (first.m_fRowSpacingMul == second.m_fRowSpacingMul) &&
+           (first.m_fRowSpacingAdd == second.m_fRowSpacingAdd) &&
+           (first.m_textStyle == second.m_textStyle);
+}
+
+bool IsRichTextCacheDataEqual(const std::vector<RichTextData>& first,
+                              const std::vector<RichTextData>& second)
+{
+    if (first.size() != second.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < first.size(); ++i) {
+        if (!IsRichTextDataEqual(first[i], second[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::unique_ptr<Gdiplus::Graphics> CreateGdiplusGraphics(HDC hdc, UiPoint ptOrg)
@@ -802,8 +846,8 @@ void Render_GDI_Windows::MeasureRichText3(const UiRect& textRect,
                                           std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
                                           std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    spDrawRichTextCache.reset();
     TextLayout::MeasureRichText2(*this, textRect, szScrollOffset, richTextData, pLineInfoParam, pRichTextRects);
+    CreateDrawRichTextCache(textRect, szScrollOffset, pRenderFactory, richTextData, spDrawRichTextCache);
 }
 
 void Render_GDI_Windows::DrawRichText(const UiRect& textRect,
@@ -817,26 +861,35 @@ void Render_GDI_Windows::DrawRichText(const UiRect& textRect,
     TextLayout::DrawRichText(*this, this, textRect, szScrollOffset, richTextData, uFade, pRichTextRects);
 }
 
-bool Render_GDI_Windows::CreateDrawRichTextCache(const UiRect& /*textRect*/,
+bool Render_GDI_Windows::CreateDrawRichTextCache(const UiRect& textRect,
                                                  const UiSize& /*szScrollOffset*/,
                                                  IRenderFactory* /*pRenderFactory*/,
-                                                 const std::vector<RichTextData>& /*richTextData*/,
+                                                 const std::vector<RichTextData>& richTextData,
                                                  std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache)
 {
-    spDrawRichTextCache.reset();
-    return false;
+    std::shared_ptr<GdiDrawRichTextCache> spCache = std::make_shared<GdiDrawRichTextCache>();
+    spCache->m_textRect = textRect;
+    spCache->m_richTextData = richTextData;
+    spDrawRichTextCache = spCache;
+    return true;
 }
 
-bool Render_GDI_Windows::IsValidDrawRichTextCache(const UiRect& /*textRect*/,
-                                                  const std::vector<RichTextData>& /*richTextData*/,
-                                                  const std::shared_ptr<DrawRichTextCache>& /*spDrawRichTextCache*/)
+bool Render_GDI_Windows::IsValidDrawRichTextCache(const UiRect& textRect,
+                                                  const std::vector<RichTextData>& richTextData,
+                                                  const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache)
 {
-    return false;
+    GdiDrawRichTextCache* pCache = dynamic_cast<GdiDrawRichTextCache*>(spDrawRichTextCache.get());
+    if (pCache == nullptr) {
+        return false;
+    }
+    return (pCache->m_textRect.Width() == textRect.Width()) &&
+           (pCache->m_textRect.Height() == textRect.Height()) &&
+           IsRichTextCacheDataEqual(pCache->m_richTextData, richTextData);
 }
 
-bool Render_GDI_Windows::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& /*spOldDrawRichTextCache*/,
+bool Render_GDI_Windows::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& spOldDrawRichTextCache,
                                                  const std::shared_ptr<DrawRichTextCache>& /*spUpdateDrawRichTextCache*/,
-                                                 std::vector<RichTextData>& /*richTextDataNew*/,
+                                                 std::vector<RichTextData>& richTextDataNew,
                                                  size_t /*nStartLine*/,
                                                  const std::vector<size_t>& /*modifiedLines*/,
                                                  size_t /*nModifiedRows*/,
@@ -844,21 +897,37 @@ bool Render_GDI_Windows::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCac
                                                  size_t /*nDeletedRows*/,
                                                  const std::vector<int32_t>& /*rowRectTopList*/)
 {
-    return false;
+    GdiDrawRichTextCache* pOldCache = dynamic_cast<GdiDrawRichTextCache*>(spOldDrawRichTextCache.get());
+    if (pOldCache == nullptr) {
+        return false;
+    }
+    pOldCache->m_richTextData = richTextDataNew;
+    return true;
 }
 
-bool Render_GDI_Windows::IsDrawRichTextCacheEqual(const DrawRichTextCache& /*first*/, const DrawRichTextCache& /*second*/) const
+bool Render_GDI_Windows::IsDrawRichTextCacheEqual(const DrawRichTextCache& first, const DrawRichTextCache& second) const
 {
-    return false;
+    const GdiDrawRichTextCache* pFirst = dynamic_cast<const GdiDrawRichTextCache*>(&first);
+    const GdiDrawRichTextCache* pSecond = dynamic_cast<const GdiDrawRichTextCache*>(&second);
+    if ((pFirst == nullptr) || (pSecond == nullptr)) {
+        return false;
+    }
+    return (pFirst->m_textRect == pSecond->m_textRect) &&
+           IsRichTextCacheDataEqual(pFirst->m_richTextData, pSecond->m_richTextData);
 }
 
-void Render_GDI_Windows::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& /*spDrawRichTextCache*/,
-                                               const UiRect& /*rcNewTextRect*/,
-                                               const UiSize& /*szNewScrollOffset*/,
+void Render_GDI_Windows::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
+                                               const UiRect& rcNewTextRect,
+                                               const UiSize& szNewScrollOffset,
                                                const std::vector<int32_t>& /*rowXOffset*/,
-                                               uint8_t /*uFade*/,
-                                               std::vector<std::vector<UiRect>>* /*pRichTextRects*/)
+                                               uint8_t uFade,
+                                               std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+    GdiDrawRichTextCache* pCache = dynamic_cast<GdiDrawRichTextCache*>(spDrawRichTextCache.get());
+    if (pCache == nullptr) {
+        return;
+    }
+    TextLayout::DrawRichText(*this, this, rcNewTextRect, szNewScrollOffset, pCache->m_richTextData, uFade, pRichTextRects);
 }
 
 void Render_GDI_Windows::DrawBoxShadow(const UiRect& rc, const UiSize& /*roundSize*/, const UiPoint& cpOffset,
