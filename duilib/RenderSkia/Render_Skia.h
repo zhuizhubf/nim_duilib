@@ -28,6 +28,10 @@ public:
     */
     virtual RenderType GetRenderType() const override;
 
+    /** 获取当前渲染目标的能力集
+    */
+    virtual RenderCapabilities GetCapabilities() const override;
+
     virtual void Clear(const UiColor& uiColor) override;
     virtual void ClearRect(const UiRect& rcDirty, const UiColor& uiColor) override;
 

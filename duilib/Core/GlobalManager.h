@@ -28,6 +28,10 @@ namespace ui
 */
 class IRenderFactory;
 
+/** 渲染引擎类型
+*/
+enum class RenderType;
+
 /** 全局属性管理工具类
 *   用于管理一些全局属性的工具类，包含全局样式（global.xml）和语言设置等
 */
@@ -173,6 +177,21 @@ public:
     /** 获取绘制接口类对象
     */
     IRenderFactory* GetRenderFactory();
+
+    /** 设置渲染后端类型
+    *   只能在 Startup 之前，或者 Shutdown 之后调用
+    * @param [in] renderType 需要使用的渲染后端
+    * @return 成功返回true，失败返回false
+    */
+    bool SetRenderType(RenderType renderType);
+
+    /** 获取当前选择的渲染后端类型
+    */
+    RenderType GetRenderType() const;
+
+    /** 判断指定的渲染后端是否已经链接并可用
+    */
+    bool IsRenderTypeAvailable(RenderType renderType) const;
 
     /** 获取颜色管理器
     */
@@ -486,6 +505,10 @@ private:
     /** 渲染引擎管理接口
     */
     std::unique_ptr<IRenderFactory> m_renderFactory;
+
+    /** 当前选择的渲染引擎类型
+    */
+    RenderType m_renderType;
 
     /** 平台相关数据（可选参数，如不填写则使用默认值：nullptr）
     *   Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）

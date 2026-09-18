@@ -7,8 +7,8 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Core/Box.h"
 
-//渲染引擎
-#include "duilib/RenderSkia/RenderFactory_Skia.h"
+//渲染引擎接口
+#include "duilib/Render/IRenderBackend.h"
 
 //图片解码接口
 #include "duilib/Image/ImageDecoder_ICO.h"
@@ -16,10 +16,8 @@
 #include "duilib/Image/ImageDecoder_GIF.h"
 #include "duilib/Image/ImageDecoder_PNG.h"
 #include "duilib/Image/ImageDecoder_PAG.h"
-#include "duilib/Image/ImageDecoder_SVG.h"
 #include "duilib/Image/ImageDecoder_WEBP.h"
 #include "duilib/Image/ImageDecoder_JPEG.h"
-#include "duilib/Image/ImageDecoder_LOTTIE.h"
 #include "duilib/Image/ImageDecoder_Common.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN)
@@ -73,6 +71,11 @@ private:
 };
 
 GlobalManager::GlobalManager():
+#if defined (DUILIB_RENDER_DEFAULT_GDI) && (DUILIB_RENDER_DEFAULT_GDI != 0)
+    m_renderType(RenderType::kRenderType_GDI),
+#else
+    m_renderType(RenderType::kRenderType_Skia),
+#endif
     m_platformData(nullptr),
     m_bAnimationEnabled(true),
     m_bStartup(false)
@@ -128,6 +131,79 @@ DString GlobalManager::GetTextById(const DString& textId)
     return Instance().Lang().GetStringByID(textId);
 }
 
+namespace
+{
+bool IsRenderTypeCompiled(RenderType renderType)
+{
+#if defined (DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
+    if (renderType == RenderType::kRenderType_Skia) {
+        return true;
+    }
+#endif
+#if defined (DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
+    if (renderType == RenderType::kRenderType_GDI) {
+        return true;
+    }
+#endif
+    return false;
+}
+
+IRenderFactory* CreateRenderFactoryByType(RenderType renderType)
+{
+#if defined (DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
+    if (renderType == RenderType::kRenderType_Skia) {
+        const IRenderBackend* pRenderBackend = GetRenderBackend_Skia();
+        ASSERT(pRenderBackend != nullptr);
+        if (pRenderBackend != nullptr) {
+            return pRenderBackend->CreateRenderFactory();
+        }
+    }
+#endif
+#if defined (DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
+    if (renderType == RenderType::kRenderType_GDI) {
+        const IRenderBackend* pRenderBackend = GetRenderBackend_GDI();
+        ASSERT(pRenderBackend != nullptr);
+        if (pRenderBackend != nullptr) {
+            return pRenderBackend->CreateRenderFactory();
+        }
+    }
+#endif
+    ASSERT(!"Unsupported render type!");
+    return nullptr;
+}
+
+void RegisterImageDecoderModules(ImageDecoderFactory& imageDecoderFactory)
+{
+#if defined (DUILIB_IMAGE_SVG_NANOSVG) && (DUILIB_IMAGE_SVG_NANOSVG != 0)
+    {
+        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_SvgNanoSvg();
+        ASSERT(pImageDecoderModule != nullptr);
+        if (pImageDecoderModule != nullptr) {
+            pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
+        }
+    }
+#endif
+#if defined (DUILIB_IMAGE_SVG_SKIA) && (DUILIB_IMAGE_SVG_SKIA != 0)
+    {
+        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_SvgSkia();
+        ASSERT(pImageDecoderModule != nullptr);
+        if (pImageDecoderModule != nullptr) {
+            pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
+        }
+    }
+#endif
+#if defined (DUILIB_IMAGE_LOTTIE_SKIA) && (DUILIB_IMAGE_LOTTIE_SKIA != 0)
+    {
+        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_LottieSkia();
+        ASSERT(pImageDecoderModule != nullptr);
+        if (pImageDecoderModule != nullptr) {
+            pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
+        }
+    }
+#endif
+}
+}
+
 bool GlobalManager::Startup(const ResourceParam& resParam,
                             DpiInitParam dpiInitParam,
                             const CreateControlCallback& callback)
@@ -161,7 +237,6 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
     dpiManager.InitDpiAwareness(dpiInitParam);
 
     //初始化图片格式解码器
-    m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_SVG>());
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_PNG>());
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_GIF>());
 
@@ -172,11 +247,13 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_WEBP>());
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_ICO>());
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_Icon>());
-    m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_LOTTIE>());
 
 #ifdef DUILIB_IMAGE_SUPPORT_LIB_PAG
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_PAG>());
 #endif
+
+    //注册可选图片解码模块（SVG/Lottie等）
+    RegisterImageDecoderModules(m_imageDecoderFactory);
 
     //通用解码器，放在最后
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_Common>());
@@ -185,8 +262,8 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
     //初始化定时器
     m_timerManager.Initialize(m_platformData);
 
-    //Skia渲染引擎实现
-    m_renderFactory = std::make_unique<RenderFactory_Skia>();    
+    //创建渲染引擎实现
+    m_renderFactory.reset(CreateRenderFactoryByType(m_renderType));
 
     ASSERT(m_renderFactory != nullptr);
     if (m_renderFactory == nullptr) {
@@ -954,6 +1031,30 @@ void GlobalManager::RemoveAllImages()
 IRenderFactory* GlobalManager::GetRenderFactory()
 {
     return m_renderFactory.get();
+}
+
+bool GlobalManager::SetRenderType(RenderType renderType)
+{
+    if (m_bStartup || (m_renderFactory != nullptr)) {
+        ASSERT(!"GlobalManager::SetRenderType must be called before Startup or after Shutdown!");
+        return false;
+    }
+    if (!IsRenderTypeAvailable(renderType)) {
+        ASSERT(!"The requested render backend is not linked!");
+        return false;
+    }
+    m_renderType = renderType;
+    return true;
+}
+
+RenderType GlobalManager::GetRenderType() const
+{
+    return m_renderType;
+}
+
+bool GlobalManager::IsRenderTypeAvailable(RenderType renderType) const
+{
+    return IsRenderTypeCompiled(renderType);
 }
 
 void GlobalManager::AddClass(const DString& strClassName, const DString& strControlAttrList)

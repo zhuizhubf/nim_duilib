@@ -62,6 +62,27 @@ RenderType Render_Skia::GetRenderType() const
     return RenderType::kRenderType_Skia;
 }
 
+RenderCapabilities Render_Skia::GetCapabilities() const
+{
+    RenderCapabilities capabilities;
+    capabilities.Add(RenderCapabilities::kPath);
+    capabilities.Add(RenderCapabilities::kGradientFill);
+    capabilities.Add(RenderCapabilities::kAlphaBlend);
+    capabilities.Add(RenderCapabilities::kImageTransform);
+    capabilities.Add(RenderCapabilities::kRichText);
+    capabilities.Add(RenderCapabilities::kVerticalText);
+    capabilities.Add(RenderCapabilities::kFontFallback);
+    capabilities.Add(RenderCapabilities::kColorEmoji);
+    capabilities.Add(RenderCapabilities::kBoxShadow);
+    capabilities.Add(RenderCapabilities::kBoxShadowBlur);
+    capabilities.Add(RenderCapabilities::kTextPathEllipsis);
+    capabilities.Add(RenderCapabilities::kAntiAlias);
+    if (GetRenderBackendType() == RenderBackendType::kRaster_BackendType) {
+        capabilities.Add(RenderCapabilities::kLayeredWindow);
+    }
+    return capabilities;
+}
+
 SkPoint& Render_Skia::GetPointOrg() const
 {
     return *m_pSkPointOrg;

@@ -547,7 +547,47 @@ enum DUILIB_API DrawStringFormat
 */
 enum class RenderType
 {
-    kRenderType_Skia = 0
+    kRenderType_Skia = 0,
+
+    /** GDI/GDI+ 渲染后端（Windows）
+    */
+    kRenderType_GDI = 1
+};
+
+/** 渲染能力标志
+*/
+struct DUILIB_API RenderCapabilities
+{
+    /** 能力标志位
+    */
+    enum Flags: uint64_t
+    {
+        kNone              = 0,             //!< 无特殊能力
+        kPath              = 1ull << 0,     //!< 支持路径
+        kGradientFill      = 1ull << 1,     //!< 支持渐变填充
+        kAlphaBlend        = 1ull << 2,     //!< 支持半透明合成
+        kLayeredWindow     = 1ull << 3,     //!< 支持分层窗口
+        kImageTransform    = 1ull << 4,     //!< 支持图片变换
+        kRichText          = 1ull << 5,     //!< 支持富文本
+        kVerticalText      = 1ull << 6,     //!< 支持竖排文本
+        kFontFallback      = 1ull << 7,     //!< 支持字体回退
+        kColorEmoji        = 1ull << 8,     //!< 支持彩色 Emoji
+        kBoxShadow         = 1ull << 9,     //!< 支持阴影
+        kBoxShadowBlur     = 1ull << 10,    //!< 支持高斯模糊阴影
+        kTextPathEllipsis  = 1ull << 11,    //!< 支持路径中间省略
+        kAntiAlias         = 1ull << 12     //!< 支持抗锯齿
+    };
+
+    uint64_t m_value = kNone;
+
+    RenderCapabilities() = default;
+    explicit RenderCapabilities(uint64_t value): m_value(value) { }
+
+    bool Has(Flags flag) const { return (m_value & (uint64_t)flag) != 0; }
+    void Add(Flags flag) { m_value |= (uint64_t)flag; }
+    void Remove(Flags flag) { m_value &= ~(uint64_t)flag; }
+    void Clear() { m_value = kNone; }
+    bool IsEmpty() const { return m_value == kNone; }
 };
 
 /** 格式文本数据
@@ -803,6 +843,10 @@ public:
     /** 获取Render实现类型
     */
     virtual RenderType GetRenderType() const = 0;
+
+    /** 获取当前渲染目标的能力集
+    */
+    virtual RenderCapabilities GetCapabilities() const = 0;
 
     /** 获取后台渲染的类型
     */

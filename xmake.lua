@@ -104,6 +104,27 @@ option("examples")
     set_description("编译 examples 目录下的示例程序")
 option_end()
 
+option("render")
+    set_default("skia")
+    set_showmenu(true)
+    set_values("skia", "gdi", "both")
+    set_description("渲染后端：skia、gdi 或 both（gdi/both 仅 Windows）")
+option_end()
+
+option("svg")
+    set_default("auto")
+    set_showmenu(true)
+    set_values("auto", "nanosvg", "skia", "off")
+    set_description("SVG 解码模块：auto、nanosvg、skia 或 off")
+option_end()
+
+option("lottie")
+    set_default("auto")
+    set_showmenu(true)
+    set_values("auto", "off", "skia")
+    set_description("Lottie 解码模块：auto、off 或 skia")
+option_end()
+
 option("skia_dir")
     set_default("")
     set_showmenu(true)
@@ -129,7 +150,7 @@ includes("xmake/common.lua")
 if duilib_sdl_enabled() then
     add_requires("libsdl3", {configs = {shared = false}})
 end
-if not duilib_skia_dir() then
+if duilib_skia_base_enabled() and not duilib_skia_dir() then
     add_requires("duilib-skia", {configs = {
         clang = (get_config("skia_clang") == true),
         clang_dir = duilib_skia_clang_dir(),

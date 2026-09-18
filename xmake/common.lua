@@ -100,6 +100,106 @@ function duilib_sdl_enabled()
     return true
 end
 
+-- 渲染后端：skia / gdi / both（gdi、both 仅 Windows）
+function duilib_render_mode()
+    local mode = get_config("render")
+    if not mode or mode == "" then
+        mode = "skia"
+    end
+    if (not duilib_is_windows()) and (mode ~= "skia") then
+        raise("--render=" .. mode .. " 仅支持 Windows；当前平台请使用 --render=skia")
+    end
+    return mode
+end
+
+function duilib_render_skia_enabled()
+    local mode = duilib_render_mode()
+    return (mode == "skia") or (mode == "both")
+end
+
+function duilib_render_gdi_enabled()
+    local mode = duilib_render_mode()
+    return duilib_is_windows() and ((mode == "gdi") or (mode == "both"))
+end
+
+-- Lottie 解码模块：auto / off / skia
+function duilib_lottie_mode()
+    local mode = get_config("lottie")
+    if not mode or mode == "" then
+        mode = "auto"
+    end
+    if mode == "auto" then
+        if duilib_render_skia_enabled() then
+            return "skia"
+        end
+        return "off"
+    end
+    return mode
+end
+
+function duilib_lottie_skia_enabled()
+    return duilib_lottie_mode() == "skia"
+end
+
+-- SVG 解码模块：auto / nanosvg / skia / off
+function duilib_svg_mode()
+    local mode = get_config("svg")
+    if not mode or mode == "" then
+        mode = "auto"
+    end
+    if mode == "auto" then
+        if duilib_render_skia_enabled() or duilib_lottie_skia_enabled() then
+            return "skia"
+        end
+        return "nanosvg"
+    end
+    return mode
+end
+
+function duilib_svg_nanosvg_enabled()
+    return duilib_svg_mode() == "nanosvg"
+end
+
+function duilib_svg_skia_enabled()
+    return duilib_svg_mode() == "skia"
+end
+
+-- 是否需要链接 Skia 基础层
+function duilib_skia_base_enabled()
+    return duilib_render_skia_enabled() or duilib_svg_skia_enabled() or duilib_lottie_skia_enabled()
+end
+
+-- 需要链接的渲染后端
+function duilib_render_targets()
+    local targets = {}
+    if duilib_render_skia_enabled() then
+        table.insert(targets, "duilib-render-skia")
+    end
+    if duilib_render_gdi_enabled() then
+        table.insert(targets, "duilib-render-gdi")
+    end
+    return targets
+end
+
+-- 需要链接的图片解码模块
+function duilib_image_targets()
+    local targets = {}
+    if duilib_svg_nanosvg_enabled() then
+        table.insert(targets, "duilib-image-svg-nanosvg")
+    elseif duilib_svg_skia_enabled() then
+        table.insert(targets, "duilib-image-svg-skia")
+    end
+    if duilib_lottie_skia_enabled() then
+        table.insert(targets, "duilib-image-lottie-skia")
+    end
+    return targets
+end
+
+-- Skia 相关宏定义
+function duilib_skia_defines()
+    add_defines("SK_GANESH", "SK_GL", "SK_RELEASE")
+end
+
 -- WebView2：仅 Windows 有效，默认开启
 function duilib_webview2_enabled()
     if not duilib_is_windows() then
@@ -114,11 +214,16 @@ end
 
 -- 公共宏定义（duilib 功能开关，与 Skia/CEF/WebView2 的编译配置保持一致）
 function duilib_common_defines()
-    add_defines("SK_GANESH", "SK_GL", "SK_RELEASE")
     add_defines("DUILIB_SDL=" .. (duilib_sdl_enabled() and "1" or "0"))
     add_defines("DUILIB_CEF=" .. (get_config("cef") and "1" or "0"))
     add_defines("DUILIB_JPEG_TURBO=" .. (get_config("jpeg_turbo") and "1" or "0"))
     add_defines("DUILIB_LIB_PAG=" .. (get_config("pag") and "1" or "0"))
+    add_defines("DUILIB_RENDER_SKIA=" .. (duilib_render_skia_enabled() and "1" or "0"))
+    add_defines("DUILIB_RENDER_GDI=" .. (duilib_render_gdi_enabled() and "1" or "0"))
+    add_defines("DUILIB_RENDER_DEFAULT_GDI=" .. ((duilib_render_mode() == "gdi") and "1" or "0"))
+    add_defines("DUILIB_IMAGE_SVG_NANOSVG=" .. (duilib_svg_nanosvg_enabled() and "1" or "0"))
+    add_defines("DUILIB_IMAGE_SVG_SKIA=" .. (duilib_svg_skia_enabled() and "1" or "0"))
+    add_defines("DUILIB_IMAGE_LOTTIE_SKIA=" .. (duilib_lottie_skia_enabled() and "1" or "0"))
     if duilib_is_windows() then
         add_defines("DUILIB_WEBVIEW2=" .. (duilib_webview2_enabled() and "1" or "0"))
     end

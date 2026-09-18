@@ -1,19 +1,59 @@
--- nim_duilib xmake 构建脚本：duilib 主库
+-- nim_duilib xmake 构建脚本：核心库与独立渲染/图片模块
 
 local droot = path.join(os.projectdir(), "duilib")
 
+-- 给当前 target 应用 Skia 包（包含头文件、链接目录和系统依赖）
+local function duilib_apply_skia_package()
+    local skia_dir = duilib_skia_dir()
+    if skia_dir then
+        add_includedirs(skia_dir)
+        local skia_libdir = duilib_skia_libdir()
+        if skia_libdir then
+            add_linkdirs(skia_libdir)
+        end
+        add_links(DUILIB_SKIA_LIBS)
+    else
+        add_packages("duilib-skia")
+    end
+    duilib_skia_defines()
+end
+
+-- 添加 Skia 窗口层源码（仅 render-skia 需要）
+local function duilib_add_skia_window_sources()
+    local skia_dir = duilib_skia_dir()
+    if skia_dir then
+        add_files(path.join(skia_dir, "tools/window/WindowContext.cpp"))
+        add_files(path.join(skia_dir, "tools/window/GLWindowContext.cpp"))
+        if os.isfile(path.join(skia_dir, "tools/ganesh/gl/win/SkWGL_win.cpp")) then
+            add_files(path.join(skia_dir, "tools/ganesh/gl/win/SkWGL_win.cpp"))
+        end
+    end
+end
+
+-- -----------------------------------------------------------------------------
+-- duilib：核心静态库，不依赖 Skia/GDI+
+-- -----------------------------------------------------------------------------
 target("duilib")
     set_kind("static")
     set_targetdir(DUILIB_LIB_DIR)
     duilib_target_settings()
     duilib_common_defines()
 
-    -- duilib 自身的源码
     add_files(path.join(droot, "*.cpp"))
-    local subdirs = {"Animation", "Box", "Layout", "Control", "Core", "Image", "Render", "RenderSkia", "Utils"}
+    local subdirs = {"Animation", "Box", "Layout", "Control", "Core", "Image", "Render", "Utils"}
     for _, dir in ipairs(subdirs) do
         add_files(path.join(droot, dir, "*.cpp"))
     end
+
+    -- Skia 相关解码器不属于核心库
+    remove_files(
+        path.join(droot, "Image", "ImageDecoder_SVG.cpp"),
+        path.join(droot, "Image", "ImageDecoder_LOTTIE.cpp"),
+        path.join(droot, "Image", "Image_LOTTIE.cpp"),
+        path.join(droot, "Image", "ImageDecoderModule_SvgSkia.cpp"),
+        path.join(droot, "Image", "ImageDecoderModule_LottieSkia.cpp"),
+        path.join(droot, "Image", "ImageDecoder_SVG_NanoSvg.cpp")
+    )
 
     -- CEF 控件（FreeBSD 平台不支持 CEF）
     if not duilib_is_freebsd() then
@@ -36,7 +76,7 @@ target("duilib")
         add_files(path.join(droot, "CEFControl", "*.mm"))
     end
 
-    -- 内置的第三方源码（源码列表与原构建方式一致）
+    -- 内置的第三方源码
     add_files(path.join(droot, "third_party/giflib", "*.c"))
     add_files(path.join(droot, "third_party/zlib/contrib/minizip", "ioapi.c"))
     add_files(path.join(droot, "third_party/zlib/contrib/minizip", "unzip.c"))
@@ -46,7 +86,7 @@ target("duilib")
         add_files(path.join(droot, "third_party/libudis86", "*.c"))
     end
 
-    -- 头文件目录：仓库根目录（duilib/third_party/... 头文件）、CEF、C++ 内置第三方库
+    -- 头文件目录
     add_includedirs(
         DUILIB_ROOT,
         path.join(droot, "third_party/zlib"),
@@ -60,31 +100,12 @@ target("duilib")
         add_includedirs(path.join(droot, "third_party/libcef", duilib_cef_src_dir()))
     end
 
-    -- 第三方静态库（链接关系会传递给示例程序）
+    -- 第三方静态库
     add_deps("duilib-zlib", "duilib-png", "duilib-cximage", "duilib-webp")
 
     -- SDL3（可选项，Windows 默认关闭，其他平台默认开启）
     if duilib_sdl_enabled() then
         add_packages("libsdl3")
-    end
-
-    -- Skia（本地包自动下载编译，或者使用 --skia_dir 指定的已有目录）
-    local skia_dir = duilib_skia_dir()
-    if skia_dir then
-        -- 使用已有的 Skia 源码树：路径在解析阶段即可确定，直接添加源码和链接库
-        add_includedirs(skia_dir)
-        add_files(path.join(skia_dir, "tools/window/WindowContext.cpp"))
-        add_files(path.join(skia_dir, "tools/window/GLWindowContext.cpp"))
-        if os.isfile(path.join(skia_dir, "tools/ganesh/gl/win/SkWGL_win.cpp")) then
-            add_files(path.join(skia_dir, "tools/ganesh/gl/win/SkWGL_win.cpp"))
-        end
-        local skia_libdir = duilib_skia_libdir()
-        if skia_libdir then
-            add_linkdirs(skia_libdir)
-            add_links(DUILIB_SKIA_LIBS)
-        end
-    else
-        add_packages("duilib-skia")
     end
 
     -- WebView2（Windows，可选项）
@@ -116,49 +137,153 @@ target("duilib")
         add_linkdirs(pagdir)
         add_links("libpag")
     end
+target_end()
 
-    on_load(function (target)
-        -- libpag 检查：需要先编译好 libpag.lib
-        if get_config("pag") then
-            local arch = get_config("arch") or os.arch()
-            local archdir = (arch == "x86" or arch == "i386" or arch == "i686") and "lib-vc-x86" or "lib-vc-x64"
-            local libfile = path.join(os.projectdir(), "duilib/third_party/libpag/windows", archdir, "libpag.lib")
-            if not os.isfile(libfile) then
-                raise("未找到 " .. libfile .. "，请先按照 duilib/third_party/libpag/windows/libpag-build.md 编译 libpag")
-            end
+-- -----------------------------------------------------------------------------
+-- duilib-skia-base：Skia 字体和公共基础封装
+-- -----------------------------------------------------------------------------
+if duilib_skia_base_enabled() then
+    target("duilib-skia-base")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        duilib_apply_skia_package()
+        add_deps("duilib")
+        add_files(
+            path.join(droot, "RenderSkia", "Font_Skia.cpp"),
+            path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
+        )
+        add_includedirs(DUILIB_ROOT)
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
+-- duilib-render-skia：Skia 渲染后端
+-- -----------------------------------------------------------------------------
+if duilib_render_skia_enabled() then
+    target("duilib-render-skia")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        duilib_apply_skia_package()
+        add_deps("duilib")
+        if duilib_skia_base_enabled() then
+            add_deps("duilib-skia-base")
         end
+        add_files(path.join(droot, "RenderSkia", "*.cpp"))
+        remove_files(
+            path.join(droot, "RenderSkia", "Font_Skia.cpp"),
+            path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
+        )
+        add_includedirs(DUILIB_ROOT)
+        duilib_add_skia_window_sources()
 
-        -- Skia：本地包安装完成后，才会知道 Skia 源码树的位置，
-        -- 因此在这里把 Skia 的窗口相关源码（与 Skia 库的编译配置保持一致）加入编译列表
-        local pkg = target:pkg("duilib-skia")
-        if pkg then
-            local root = path.join(pkg:installdir(), "skia")
-            local sources = {
-                "tools/window/WindowContext.cpp",
-                "tools/window/GLWindowContext.cpp",
-                "tools/ganesh/gl/win/SkWGL_win.cpp"
-            }
-            for _, name in ipairs(sources) do
-                local file = path.join(root, name)
-                if os.isfile(file) then
-                    target:add("files", file)
+        on_load(function (target)
+            local pkg = target:pkg("duilib-skia")
+            if pkg then
+                local root = path.join(pkg:installdir(), "skia")
+                local sources = {
+                    "tools/window/WindowContext.cpp",
+                    "tools/window/GLWindowContext.cpp",
+                    "tools/ganesh/gl/win/SkWGL_win.cpp"
+                }
+                for _, name in ipairs(sources) do
+                    local file = path.join(root, name)
+                    if os.isfile(file) then
+                        target:add("files", file)
+                    end
                 end
             end
+        end)
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
+-- duilib-render-gdi：Windows GDI/GDI+ 渲染后端
+-- -----------------------------------------------------------------------------
+if duilib_render_gdi_enabled() then
+    target("duilib-render-gdi")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        add_deps("duilib")
+        add_files(path.join(droot, "RenderGDI", "*.cpp"))
+        add_includedirs(DUILIB_ROOT)
+        add_syslinks("Gdi32", "Gdiplus", "Msimg32", "User32")
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
+-- 图片解码模块
+-- -----------------------------------------------------------------------------
+if duilib_svg_nanosvg_enabled() then
+    target("duilib-image-svg-nanosvg")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        add_deps("duilib")
+        add_files(path.join(droot, "Image", "ImageDecoder_SVG_NanoSvg.cpp"))
+        add_includedirs(DUILIB_ROOT, path.join(droot, "third_party/svg"))
+    target_end()
+end
+
+if duilib_svg_skia_enabled() then
+    target("duilib-image-svg-skia")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        duilib_apply_skia_package()
+        add_deps("duilib")
+        if duilib_skia_base_enabled() then
+            add_deps("duilib-skia-base")
         end
-    end)
-target_end()
+        add_files(
+            path.join(droot, "Image", "ImageDecoder_SVG.cpp"),
+            path.join(droot, "Image", "ImageDecoderModule_SvgSkia.cpp")
+        )
+        add_includedirs(DUILIB_ROOT)
+    target_end()
+end
+
+if duilib_lottie_skia_enabled() then
+    target("duilib-image-lottie-skia")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        duilib_apply_skia_package()
+        add_deps("duilib")
+        if duilib_skia_base_enabled() then
+            add_deps("duilib-skia-base")
+        end
+        add_files(
+            path.join(droot, "Image", "ImageDecoder_LOTTIE.cpp"),
+            path.join(droot, "Image", "Image_LOTTIE.cpp"),
+            path.join(droot, "Image", "ImageDecoderModule_LottieSkia.cpp")
+        )
+        add_includedirs(DUILIB_ROOT)
+    target_end()
+end
 
 -- 输出当前的编译配置（--log=y 时）
 if get_config("log") and get_config("plat") then
     print("duilib xmake build config:")
-    print("    plat         : " .. duilib_plat() .. " / " .. duilib_arch_name())
-    print("    mode         : " .. get_config("mode"))
-    print("    sdl          : " .. tostring(duilib_sdl_enabled()))
-    print("    cef          : " .. tostring(get_config("cef")) .. " (109: " .. tostring(get_config("cef109")) .. ")")
-    print("    webview2     : " .. tostring(duilib_webview2_enabled()))
-    print("    jpeg_turbo   : " .. tostring(get_config("jpeg_turbo")))
-    print("    libpag       : " .. tostring(get_config("pag")))
-    print("    skia_dir     : " .. (duilib_skia_dir() or "(本地包自动编译)"))
-    print("    lib dir      : " .. DUILIB_LIB_DIR)
-    print("    bin dir      : " .. DUILIB_BIN_DIR)
+    print("    plat          : " .. duilib_plat() .. " / " .. duilib_arch_name())
+    print("    mode          : " .. duilib_build_mode())
+    print("    render        : " .. duilib_render_mode())
+    print("    svg           : " .. duilib_svg_mode())
+    print("    lottie        : " .. duilib_lottie_mode())
+    print("    sdl           : " .. tostring(duilib_sdl_enabled()))
+    print("    cef           : " .. tostring(get_config("cef")) .. " (109: " .. tostring(get_config("cef109")) .. ")")
+    print("    webview2      : " .. tostring(duilib_webview2_enabled()))
+    print("    jpeg_turbo    : " .. tostring(get_config("jpeg_turbo")))
+    print("    libpag        : " .. tostring(get_config("pag")))
+    print("    skia_dir      : " .. (duilib_skia_dir() or "(本地包自动编译)"))
+    print("    lib dir       : " .. DUILIB_LIB_DIR)
+    print("    bin dir       : " .. DUILIB_BIN_DIR)
 end

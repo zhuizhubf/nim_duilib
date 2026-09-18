@@ -60,6 +60,12 @@ for _, name in ipairs(examples) do
         end
 
         add_deps("duilib")
+        for _, dep in ipairs(duilib_render_targets()) do
+            add_deps(dep)
+        end
+        for _, dep in ipairs(duilib_image_targets()) do
+            add_deps(dep)
+        end
 
         if is_cef_example and get_config("cef") then
             add_deps(duilib_cef_wrapper_name())
@@ -81,6 +87,9 @@ for _, name in ipairs(examples) do
             add_syslinks("Comctl32", "Imm32", "Opengl32", "User32", "Gdi32", "shlwapi",
                          "Ole32", "OleAut32", "Uuid", "Advapi32", "Shell32", "WinInet", "Ws2_32",
                          "Comdlg32", "Winspool", "Odbc32")
+            if duilib_render_gdi_enabled() then
+                add_syslinks("Gdiplus", "Msimg32")
+            end
             if not get_config("md") then
                 -- 使用静态运行库(/MT)时，需要显式链接静态 UCRT（Skia 的数学函数依赖它）
                 add_syslinks("libucrt")
