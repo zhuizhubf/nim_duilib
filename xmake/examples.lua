@@ -50,7 +50,7 @@ for _, name in ipairs(examples) do
         end
 
         -- 头文件目录：仓库根目录（duilib/duilib.h 等）、示例自己的目录
-        add_includedirs(DUILIB_ROOT, exdir)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT, exdir)
 
         -- CefBrowser 示例的额外源码目录
         if name == "CefBrowser" then
@@ -71,7 +71,7 @@ for _, name in ipairs(examples) do
 
         if is_cef_example and get_config("cef") then
             add_deps(duilib_cef_wrapper_name())
-            add_includedirs(path.join(os.projectdir(), "duilib/third_party/libcef", duilib_cef_src_dir()))
+            add_includedirs(path.join(DUILIB_THIRD_DIR, "libcef", duilib_cef_src_dir()))
         end
 
         if duilib_is_windows() then

@@ -1,7 +1,7 @@
 -- nim_duilib xmake 构建脚本：第三方库
 -- 说明：源码全部取自仓库，编译方式与项目原有构建方式保持一致。
 
-local thirdroot = path.join(os.projectdir(), "duilib", "third_party")
+local thirdroot = DUILIB_THIRD_DIR
 
 -- -----------------------------------------------------------------------------
 -- zlib

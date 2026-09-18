@@ -1,6 +1,6 @@
 -- nim_duilib xmake 构建脚本：核心库与独立渲染/图片模块
 
-local droot = path.join(os.projectdir(), "duilib")
+local droot = DUILIB_CORE_DIR
 
 -- 给当前 target 应用 Skia 包（包含头文件、链接目录和系统依赖）
 local function duilib_apply_skia_package()
@@ -88,6 +88,7 @@ target("duilib")
 
     -- 头文件目录
     add_includedirs(
+        DUILIB_SRC_DIR,
         DUILIB_ROOT,
         path.join(droot, "third_party/zlib"),
         path.join(droot, "third_party/giflib"),
@@ -149,7 +150,7 @@ target("duilib-text")
     duilib_common_defines()
     add_deps("duilib")
     add_files(path.join(droot, "Text", "*.cpp"))
-    add_includedirs(DUILIB_ROOT)
+    add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
 target_end()
 
 -- -----------------------------------------------------------------------------
@@ -167,7 +168,7 @@ if duilib_skia_base_enabled() then
             path.join(droot, "RenderSkia", "Font_Skia.cpp"),
             path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
         )
-        add_includedirs(DUILIB_ROOT)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
     target_end()
 end
 
@@ -190,7 +191,7 @@ if duilib_render_skia_enabled() then
             path.join(droot, "RenderSkia", "Font_Skia.cpp"),
             path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
         )
-        add_includedirs(DUILIB_ROOT)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         duilib_add_skia_window_sources()
 
         on_load(function (target)
@@ -224,7 +225,7 @@ if duilib_render_gdi_enabled() then
         duilib_common_defines()
         add_deps("duilib", "duilib-text")
         add_files(path.join(droot, "RenderGDI", "*.cpp"))
-        add_includedirs(DUILIB_ROOT)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         add_syslinks("Gdi32", "Gdiplus", "Msimg32", "User32")
     target_end()
 end
@@ -240,7 +241,7 @@ if duilib_svg_nanosvg_enabled() then
         duilib_common_defines()
         add_deps("duilib")
         add_files(path.join(droot, "Image", "ImageDecoder_SVG_NanoSvg.cpp"))
-        add_includedirs(DUILIB_ROOT, path.join(droot, "third_party/svg"))
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT, path.join(droot, "third_party/svg"))
     target_end()
 end
 
@@ -259,7 +260,7 @@ if duilib_svg_skia_enabled() then
             path.join(droot, "Image", "ImageDecoder_SVG.cpp"),
             path.join(droot, "Image", "ImageDecoderModule_SvgSkia.cpp")
         )
-        add_includedirs(DUILIB_ROOT)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
     target_end()
 end
 
@@ -279,7 +280,7 @@ if duilib_lottie_skia_enabled() then
             path.join(droot, "Image", "Image_LOTTIE.cpp"),
             path.join(droot, "Image", "ImageDecoderModule_LottieSkia.cpp")
         )
-        add_includedirs(DUILIB_ROOT)
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
     target_end()
 end
 
