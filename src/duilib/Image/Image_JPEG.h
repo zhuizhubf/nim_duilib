@@ -2,7 +2,7 @@
 #define UI_IMAGE_IMAGE_JPEG_H_
 
 #include "duilib/Image/ImageDecoder.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 #ifdef DUILIB_IMAGE_SUPPORT_JPEG_TURBO
 

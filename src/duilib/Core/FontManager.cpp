@@ -1,7 +1,7 @@
 #include "FontManager.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/DpiManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include <memory>

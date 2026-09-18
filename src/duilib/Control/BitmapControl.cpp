@@ -1,5 +1,5 @@
 #include "BitmapControl.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Utils/AttributeUtil.h"

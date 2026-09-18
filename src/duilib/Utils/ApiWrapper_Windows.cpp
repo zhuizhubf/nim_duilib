@@ -4,7 +4,7 @@
 
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/DllManager_Windows.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include <VersionHelpers.h>
 #include <dwmapi.h>
 #include <shellapi.h>

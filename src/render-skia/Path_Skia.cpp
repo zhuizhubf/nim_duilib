@@ -1,0 +1,290 @@
+#include "Path_Skia.h"
+#include "render-skia/Matrix_Skia.h"
+
+#include "SkiaHeaderBegin.h"
+#include "include/core/SkPathBuilder.h"
+#include "SkiaHeaderEnd.h"
+
+namespace ui {
+
+Path_Skia::Path_Skia()
+{
+    m_skPathBuilder = std::make_unique<SkPathBuilder>();
+}
+
+Path_Skia::~Path_Skia()
+{
+}
+
+Path_Skia::Path_Skia(const Path_Skia& r)
+{
+    if (r.m_skPathBuilder.get() != nullptr) {
+        m_skPathBuilder = std::make_unique<SkPathBuilder>(*r.m_skPathBuilder.get());
+    }
+    else {
+        m_skPathBuilder = std::make_unique<SkPathBuilder>();
+    }
+}
+
+ui::IPath* Path_Skia::Clone()
+{
+    return new Path_Skia(*this);
+}
+
+void Path_Skia::Reset()
+{
+    m_skPathBuilder->reset();
+}
+
+void Path_Skia::Close()
+{
+    m_skPathBuilder->close();
+}
+
+void Path_Skia::SetFillType(FillType mode)
+{
+    switch(mode) {
+    case FillType::kEvenOdd:
+        m_skPathBuilder->setFillType(SkPathFillType::kEvenOdd);
+        break;
+    case FillType::kWinding:
+        m_skPathBuilder->setFillType(SkPathFillType::kWinding);
+        break;
+    case FillType::kInverseEvenOdd:
+        m_skPathBuilder->setFillType(SkPathFillType::kInverseEvenOdd);
+        break;
+    case FillType::kInverseWinding:
+        m_skPathBuilder->setFillType(SkPathFillType::kInverseWinding);
+        break;
+    default:
+        break;
+    }
+}
+
+IPath::FillType Path_Skia::GetFillType()
+{
+    IPath::FillType fillType = FillType::kWinding;
+    SkPathFillType skPathFillType = m_skPathBuilder->fillType();
+    switch (skPathFillType) {
+    case SkPathFillType::kEvenOdd:
+        fillType = FillType::kEvenOdd;
+        break;
+    case SkPathFillType::kWinding:
+        fillType = FillType::kWinding;
+        break;
+    case SkPathFillType::kInverseEvenOdd:
+        fillType = FillType::kInverseEvenOdd;
+        break;
+    case SkPathFillType::kInverseWinding:
+        fillType = FillType::kInverseWinding;
+        break;
+    default:
+        fillType = FillType::kWinding;
+    }
+    return fillType;
+}
+
+void Path_Skia::MoveToPoint(int32_t x1, int32_t y1)
+{
+    // 仅在 lastPt 与目标点不同时才调用 moveTo，避免连续 moveTo 破坏路径闭合逻辑
+    const SkPoint newPt = SkPoint::Make(static_cast<float>(x1), static_cast<float>(y1));
+    std::optional<SkPoint> lastPt = m_skPathBuilder->getLastPt();
+    if (!lastPt.has_value() || *lastPt != newPt) {
+        m_skPathBuilder->moveTo(newPt);
+    }
+}
+
+void Path_Skia::MoveToPoint(float x1, float y1)
+{
+    // 仅在 lastPt 与目标点不同时才调用 moveTo，避免连续 moveTo 破坏路径闭合逻辑
+    const SkPoint newPt = SkPoint::Make(x1, y1);
+    std::optional<SkPoint> lastPt = m_skPathBuilder->getLastPt();
+    if (!lastPt.has_value() || *lastPt != newPt) {
+        m_skPathBuilder->moveTo(newPt);
+    }
+}
+
+void Path_Skia::AddLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    MoveToPoint(x1, y1);
+    m_skPathBuilder->lineTo(SkPoint::Make(static_cast<float>(x2), static_cast<float>(y2)));
+}
+
+void Path_Skia::AddLine(float x1, float y1, float x2, float y2)
+{
+    MoveToPoint(x1, y1);
+    m_skPathBuilder->lineTo(SkPoint::Make(x2, y2));
+}
+
+void Path_Skia::AddLines(const UiPoint* points, int32_t count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 2);
+    if ((count < 2) || (points == nullptr)) {
+        return;
+    }
+    MoveToPoint(points[0].x, points[0].y);
+    for (int32_t i = 1; i < count; ++i) {
+        m_skPathBuilder->lineTo(SkPoint::Make(static_cast<float>(points[i].x), static_cast<float>(points[i].y)));
+    }
+}
+
+void Path_Skia::AddLines(const UiPointF* points, int32_t count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 2);
+    if ((count < 2) || (points == nullptr)) {
+        return;
+    }
+    MoveToPoint(points[0].x, points[0].y);
+    for (int32_t i = 1; i < count; ++i) {
+        m_skPathBuilder->lineTo(SkPoint::Make(points[i].x, points[i].y));
+    }
+}
+
+void Path_Skia::AddBezier(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, int32_t x4, int32_t y4)
+{
+    MoveToPoint(x1, y1);
+    m_skPathBuilder->cubicTo(SkPoint::Make(static_cast<float>(x2), static_cast<float>(y2)),
+                             SkPoint::Make(static_cast<float>(x3), static_cast<float>(y3)), 
+                             SkPoint::Make(static_cast<float>(x4), static_cast<float>(y4)));
+}
+
+void Path_Skia::AddBezier(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+{
+    MoveToPoint(x1, y1);
+    m_skPathBuilder->cubicTo(SkPoint::Make(x2, y2),
+                             SkPoint::Make(x3, y3),
+                             SkPoint::Make(x4, y4));
+}
+
+void Path_Skia::AddBeziers(const UiPoint* points, int32_t count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 4);
+    if ((count < 4) || (points == nullptr)) {
+        return;
+    }
+    MoveToPoint(points[0].x, points[0].y);
+    int32_t i = 1;
+    for (; i < count; i += 3) {
+        m_skPathBuilder->cubicTo(SkPoint::Make(static_cast<float>(points[i].x), static_cast<float>(points[i].y)),
+                                 SkPoint::Make(static_cast<float>(points[i + 1].x), static_cast<float>(points[i + 1].y)),
+                                 SkPoint::Make(static_cast<float>(points[i + 2].x), static_cast<float>(points[i + 2].y)));
+    }
+    ASSERT(i == (count - 1));
+}
+
+void Path_Skia::AddBeziers(const UiPointF* points, int32_t count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 4);
+    if ((count < 4) || (points == nullptr)) {
+        return;
+    }
+    MoveToPoint(points[0].x, points[0].y);
+    int32_t i = 1;
+    for (; i < count; i += 3) {
+        m_skPathBuilder->cubicTo(SkPoint::Make(points[i].x, points[i].y),
+                                 SkPoint::Make(points[i + 1].x, points[i + 1].y),
+                                 SkPoint::Make(points[i + 2].x, points[i + 2].y));
+    }
+    ASSERT(i == (count - 1));
+}
+
+void Path_Skia::AddRect(const UiRect& rect)
+{
+    m_skPathBuilder->addRect(SkRect::MakeLTRB(static_cast<float>(rect.left), static_cast<float>(rect.top),
+                                              static_cast<float>(rect.right), static_cast<float>(rect.bottom)));
+}
+
+void Path_Skia::AddRect(const UiRectF& rect)
+{
+    m_skPathBuilder->addRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom));
+}
+
+void Path_Skia::AddEllipse(const UiRect& rect)
+{
+    m_skPathBuilder->addOval(SkRect::MakeLTRB(static_cast<float>(rect.left), static_cast<float>(rect.top),
+                                              static_cast<float>(rect.right), static_cast<float>(rect.bottom)));
+}
+
+void Path_Skia::AddEllipse(const UiRectF& rect)
+{
+    m_skPathBuilder->addOval(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom));
+}
+
+void Path_Skia::AddArc(const UiRect& rect, float startAngle, float sweepAngle)
+{
+    m_skPathBuilder->arcTo(SkRect::MakeLTRB(static_cast<float>(rect.left), static_cast<float>(rect.top),
+                                            static_cast<float>(rect.right), static_cast<float>(rect.bottom)), 
+                           startAngle, sweepAngle, false);
+}
+
+void Path_Skia::AddArc(const UiRectF& rect, float startAngle, float sweepAngle)
+{
+    m_skPathBuilder->arcTo(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom),
+                           startAngle, sweepAngle, false);
+}
+
+void Path_Skia::AddPolygon(const UiPoint* points, int count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 1);
+    if ((count < 1) || (points == nullptr)) {
+        return;
+    }
+    SkPoint* skPts = new SkPoint[count];
+    for (int32_t i = 0; i < count; ++i)    {
+        skPts[i].fX = (float)points[i].x;
+        skPts[i].fY = (float)points[i].y;
+    }
+    m_skPathBuilder->addPolygon(SkSpan<const SkPoint>(skPts, count), false);
+    delete[] skPts;
+}
+
+void Path_Skia::AddPolygon(const UiPointF* points, int32_t count)
+{
+    ASSERT(points != nullptr);
+    ASSERT(count >= 1);
+    if ((count < 1) || (points == nullptr)) {
+        return;
+    }
+    SkPoint* skPts = new SkPoint[count];
+    for (int32_t i = 0; i < count; ++i) {
+        skPts[i].fX = points[i].x;
+        skPts[i].fY = points[i].y;
+    }
+    m_skPathBuilder->addPolygon(SkSpan<const SkPoint>(skPts, count), false);
+    delete[] skPts;
+}
+
+void Path_Skia::Transform(IMatrix* pMatrix)
+{
+    if (pMatrix != nullptr) {
+        Matrix_Skia* pSkMatrix = dynamic_cast<Matrix_Skia*>(pMatrix);
+        if (pSkMatrix != nullptr) {
+            m_skPathBuilder->transform(*pSkMatrix->GetMatrix());
+        }
+    }
+}
+
+ui::UiRect Path_Skia::GetBounds(const IPen* /*pen*/)
+{
+    SkRect bounds;
+    std::optional<SkRect> optBounds = m_skPathBuilder->computeFiniteBounds();
+    if (optBounds.has_value()) {
+        bounds = *optBounds;
+    }    
+    return ui::UiRect(SkScalarTruncToInt(bounds.fLeft), 
+                      SkScalarTruncToInt(bounds.fTop), 
+                      SkScalarTruncToInt(bounds.fRight), 
+                      SkScalarTruncToInt(bounds.fBottom));
+}
+
+SkPathBuilder* Path_Skia::GetSkPathBuilder() const
+{
+    return m_skPathBuilder.get();
+}
+
+} // namespace ui

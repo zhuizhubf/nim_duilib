@@ -1,6 +1,6 @@
 #include "ScrollBox.h"
-#include "duilib/Render/IRender.h"
-#include "duilib/Render/AutoClip.h"
+#include "render/IRender.h"
+#include "render/AutoClip.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Core/Keyboard.h"
 #include "duilib/Core/GlobalManager.h"

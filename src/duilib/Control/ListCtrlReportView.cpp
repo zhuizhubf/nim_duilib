@@ -1,6 +1,6 @@
 #include "ListCtrlReportView.h" 
 #include "ListCtrl.h"
-#include "duilib/Render/AutoClip.h"
+#include "render/AutoClip.h"
 
 //包含类：ListCtrlReportView / ListCtrlReportLayout
 

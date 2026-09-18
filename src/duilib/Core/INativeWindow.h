@@ -6,7 +6,7 @@
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Core/WindowMessage.h"
 #include "duilib/Core/DpiManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

@@ -3,8 +3,8 @@
 #include "duilib/Core/Window.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/ClickThrough.h"
-#include "duilib/Render/IRender.h"
-#include "duilib/Render/AutoClip.h"
+#include "render/IRender.h"
+#include "render/AutoClip.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
     #include <VersionHelpers.h>

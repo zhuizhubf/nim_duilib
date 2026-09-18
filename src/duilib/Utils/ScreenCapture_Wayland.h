@@ -1,7 +1,7 @@
 #ifndef UI_UTILS_SCREEN_CAPTURE_WAYLAND_H_
 #define UI_UTILS_SCREEN_CAPTURE_WAYLAND_H_
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Core/Window.h"
 #include <memory>
 

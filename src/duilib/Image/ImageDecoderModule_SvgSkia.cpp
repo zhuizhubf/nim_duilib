@@ -1,4 +1,4 @@
-#include "duilib/Render/IRenderBackend.h"
+#include "render/IRenderBackend.h"
 #include "duilib/Image/ImageDecoderFactory.h"
 #include "duilib/Image/ImageDecoder_SVG.h"
 

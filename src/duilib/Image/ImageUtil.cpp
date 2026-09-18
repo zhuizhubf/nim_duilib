@@ -1,5 +1,5 @@
 #include "ImageUtil.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Core/GlobalManager.h"
 #include <cmath>
 #include <cstdint>

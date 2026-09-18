@@ -2,8 +2,8 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Image/Image.h"
-#include "duilib/Render/AutoClip.h"
-#include "duilib/Render/IRender.h"
+#include "render/AutoClip.h"
+#include "render/IRender.h"
 
 namespace ui 
 {

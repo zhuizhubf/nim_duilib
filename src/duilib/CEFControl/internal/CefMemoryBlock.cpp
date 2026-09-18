@@ -2,7 +2,7 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui {
 

@@ -1,6 +1,6 @@
 #include "Image_WEBP.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Utils/FileUtil.h"
 
 #include "duilib/third_party/libwebp/src/webp/decode.h"

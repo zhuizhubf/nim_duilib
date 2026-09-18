@@ -2,7 +2,7 @@
 #include "duilib/Core/Box.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Utils/AttributeUtil.h"
 
 namespace ui 

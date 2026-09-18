@@ -1,7 +1,7 @@
 #include "Line.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Utils/StringUtil.h"
 
 namespace ui

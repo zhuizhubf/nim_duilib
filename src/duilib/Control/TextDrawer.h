@@ -3,7 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Control/RichText.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

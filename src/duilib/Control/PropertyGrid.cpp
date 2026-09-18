@@ -1,6 +1,6 @@
 #include "PropertyGrid.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Control/ColorPicker.h"
 #include "duilib/Control/ColorPickerRegular.h"
 #include "duilib/Core/WindowCreateParam.h"

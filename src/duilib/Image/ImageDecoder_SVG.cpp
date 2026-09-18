@@ -26,13 +26,13 @@
     #pragma GCC diagnostic pop
 #endif
 
-#include "duilib/RenderSkia/SkiaHeaderBegin.h"
+#include "render-skia/SkiaHeaderBegin.h"
 #include "modules/svg/include/SkSVGDOM.h"
 #include "modules/svg/include/SkSVGRenderContext.h"
 #include "include/core/SkStream.h"
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
-#include "duilib/RenderSkia/SkiaHeaderEnd.h"
+#include "render-skia/SkiaHeaderEnd.h"
 
 namespace ui
 {

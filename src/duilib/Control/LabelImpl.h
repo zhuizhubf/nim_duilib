@@ -2,7 +2,7 @@
 #define UI_CONTROL_LABEL_IMPL_H_
 
 #include "duilib/Core/Control.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

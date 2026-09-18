@@ -4,7 +4,7 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Core/Box.h"
 #include "duilib/Utils/WinImplBase.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

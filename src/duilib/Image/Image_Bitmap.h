@@ -2,7 +2,7 @@
 #define UI_IMAGE_IMAGE_BITMAP_H_
 
 #include "duilib/Image/ImageDecoder.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

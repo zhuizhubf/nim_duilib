@@ -1,6 +1,6 @@
 #include "Image_ICO.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Image/ImageUtil.h"
 
 namespace ui

@@ -1,7 +1,7 @@
 #ifndef UI_UTILS_BITMAP_HELPER_SDL_H_
 #define UI_UTILS_BITMAP_HELPER_SDL_H_
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 #if defined (DUILIB_BUILD_FOR_SDL) && !defined (DUILIB_BUILD_FOR_WIN)
 

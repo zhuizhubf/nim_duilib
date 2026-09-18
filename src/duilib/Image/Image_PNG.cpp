@@ -1,7 +1,7 @@
 #include "Image_PNG.h"
 #include "duilib/Image/APngDecoder.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 #include <vector>
 #include <cmath>

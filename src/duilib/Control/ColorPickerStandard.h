@@ -2,7 +2,7 @@
 #define UI_CONTROL_COLORPICKER_STANDARD_H_
 
 #include "duilib/Core/Control.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 namespace ui
 {

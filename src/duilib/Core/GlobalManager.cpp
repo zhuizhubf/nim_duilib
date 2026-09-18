@@ -8,7 +8,7 @@
 #include "duilib/Core/Box.h"
 
 //渲染引擎接口
-#include "duilib/Render/IRenderBackend.h"
+#include "render/IRenderBackend.h"
 
 //图片解码接口
 #include "duilib/Image/ImageDecoder_ICO.h"

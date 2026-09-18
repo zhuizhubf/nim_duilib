@@ -1,7 +1,7 @@
 #include "Image_GIF.h"
 #include "FrameSequence_gif.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 #include "duilib/third_party/giflib/gif_lib.h"
 #include <atomic>

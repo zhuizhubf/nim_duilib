@@ -1,6 +1,6 @@
 #include "Image_PAG.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Image/ImageDecoder.h"
 #include "duilib/Utils/FileUtil.h"
 

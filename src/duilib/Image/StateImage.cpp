@@ -2,7 +2,7 @@
 #include "duilib/Image/Image.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Animation/AnimationManager.h"
 
 namespace ui 

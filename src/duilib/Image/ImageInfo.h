@@ -1,7 +1,7 @@
 #ifndef UI_IMAGE_IMAGE_INFO_H_
 #define UI_IMAGE_IMAGE_INFO_H_
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Image/ImageDecoder.h"
 #include "duilib/Image/ImageLoadParam.h"

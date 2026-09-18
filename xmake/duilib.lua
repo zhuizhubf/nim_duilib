@@ -40,10 +40,12 @@ target("duilib")
     duilib_common_defines()
 
     add_files(path.join(droot, "*.cpp"))
-    local subdirs = {"Animation", "Box", "Layout", "Control", "Core", "Image", "Render", "Utils"}
+    local subdirs = {"Animation", "Box", "Layout", "Control", "Core", "Image", "Utils"}
     for _, dir in ipairs(subdirs) do
         add_files(path.join(droot, dir, "*.cpp"))
     end
+    -- 渲染接口层（Render 已移出核心目录，但其源码仍编入核心库）
+    add_files(path.join(DUILIB_SRC_DIR, "render", "*.cpp"))
 
     -- Skia 相关解码器不属于核心库
     remove_files(
@@ -149,7 +151,7 @@ target("duilib-text")
     duilib_target_settings()
     duilib_common_defines()
     add_deps("duilib")
-    add_files(path.join(droot, "Text", "*.cpp"))
+    add_files(path.join(DUILIB_SRC_DIR, "text", "*.cpp"))
     add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
 target_end()
 
@@ -165,8 +167,8 @@ if duilib_skia_base_enabled() then
         duilib_apply_skia_package()
         add_deps("duilib")
         add_files(
-            path.join(droot, "RenderSkia", "Font_Skia.cpp"),
-            path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
+            path.join(DUILIB_SRC_DIR, "render-skia", "Font_Skia.cpp"),
+            path.join(DUILIB_SRC_DIR, "render-skia", "FontMgr_Skia.cpp")
         )
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
     target_end()
@@ -186,10 +188,10 @@ if duilib_render_skia_enabled() then
         if duilib_skia_base_enabled() then
             add_deps("duilib-skia-base")
         end
-        add_files(path.join(droot, "RenderSkia", "*.cpp"))
+        add_files(path.join(DUILIB_SRC_DIR, "render-skia", "*.cpp"))
         remove_files(
-            path.join(droot, "RenderSkia", "Font_Skia.cpp"),
-            path.join(droot, "RenderSkia", "FontMgr_Skia.cpp")
+            path.join(DUILIB_SRC_DIR, "render-skia", "Font_Skia.cpp"),
+            path.join(DUILIB_SRC_DIR, "render-skia", "FontMgr_Skia.cpp")
         )
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         duilib_add_skia_window_sources()
@@ -224,7 +226,7 @@ if duilib_render_gdi_enabled() then
         duilib_target_settings()
         duilib_common_defines()
         add_deps("duilib", "duilib-text")
-        add_files(path.join(droot, "RenderGDI", "*.cpp"))
+        add_files(path.join(DUILIB_SRC_DIR, "render-gdi", "*.cpp"))
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         add_syslinks("Gdi32", "Gdiplus", "Msimg32", "User32")
     target_end()

@@ -1,15 +1,15 @@
 #include "Image_LOTTIE.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Render/IRender.h"
-#include "duilib/RenderSkia/FontMgr_Skia.h"
+#include "render/IRender.h"
+#include "render-skia/FontMgr_Skia.h"
 
-#include "duilib/RenderSkia/SkiaHeaderBegin.h"
+#include "render-skia/SkiaHeaderBegin.h"
 #include "modules/skottie/include/Skottie.h"
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkFontMgr.h"
 #include <climits>
-#include "duilib/RenderSkia/SkiaHeaderEnd.h"
+#include "render-skia/SkiaHeaderEnd.h"
 
 namespace ui
 {

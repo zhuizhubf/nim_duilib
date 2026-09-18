@@ -1,7 +1,7 @@
 #include "duilib/Image/ImageDecoder_SVG.h"
 
 #include "duilib/Image/Image_Svg.h"
-#include "duilib/Render/IRenderBackend.h"
+#include "render/IRenderBackend.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Image/ImageDecoderFactory.h"
 #include "duilib/Utils/FileUtil.h"

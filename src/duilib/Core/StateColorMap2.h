@@ -1,7 +1,7 @@
 #ifndef UI_CORE_STATE_COLOR_MAP2_H_
 #define UI_CORE_STATE_COLOR_MAP2_H_
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Core/UiTypes.h"
 
 namespace ui 

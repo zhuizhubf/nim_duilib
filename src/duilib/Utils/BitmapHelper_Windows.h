@@ -1,7 +1,7 @@
 #ifndef UI_UTILS_BITMAP_HELPER_WINDOWS_H_
 #define UI_UTILS_BITMAP_HELPER_WINDOWS_H_
 
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
 #include "duilib/duilib_config_windows.h"

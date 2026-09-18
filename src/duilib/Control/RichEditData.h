@@ -3,7 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Core/SharePtr.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include <unordered_map>
 #include <map>
 #include <list>

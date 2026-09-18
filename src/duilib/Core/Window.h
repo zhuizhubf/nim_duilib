@@ -7,7 +7,7 @@
 #include "duilib/Core/ColorManager.h"
 #include "duilib/Core/ThemeManager.h"
 #include "duilib/Core/ControlPtrT.h"
-#include "duilib/Render/IRender.h"
+#include "render/IRender.h"
 #include "duilib/Utils/FilePath.h"
 
 namespace ui
