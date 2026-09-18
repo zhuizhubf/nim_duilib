@@ -158,6 +158,10 @@
 | IMatrix | [duilib/Render/IRender.h](../duilib/Render/IRender.h) | 矩阵接口 |
 | IRender | [duilib/Render/IRender.h](../duilib/Render/IRender.h) | 渲染接口，用于画图、绘制文字等 |
 
+* 渲染后端与静态库拆分
+
+渲染后端、文本布局和图片解码模块的拆分方式、构建选项及运行期切换方式，参见 [RenderBackend.md](RenderBackend.md)。
+
 * Skia渲染引擎
 
 | 类名称/说明 | 关联头文件| 用途 |
