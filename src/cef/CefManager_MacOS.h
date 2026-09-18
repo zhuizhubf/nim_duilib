@@ -1,25 +1,25 @@
-#ifndef UI_CEF_CONTROL_CEF_MANAGER_LINUX_H_
-#define UI_CEF_CONTROL_CEF_MANAGER_LINUX_H_
+#ifndef UI_CEF_CONTROL_CEF_MANAGER_MACOS_H_
+#define UI_CEF_CONTROL_CEF_MANAGER_MACOS_H_
 
-#include "duilib/CEFControl/CefManager.h"
+#include "cef/CefManager.h"
 
-#if defined (DUILIB_BUILD_FOR_LINUX) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
 
 namespace ui
 {
-/** CEF组件管理器（Linux实现）
+/** CEF组件管理器（MacOS实现）
  */
-class CefManager_Linux : public CefManager
+class CefManager_MacOS : public CefManager
 {
     friend class CefManager;
     typedef CefManager BaseClass;
 
 protected:
-    CefManager_Linux();
-    CefManager_Linux(const CefManager_Linux&) = delete;
-    CefManager_Linux& operator=(const CefManager_Linux&) = delete;
+    CefManager_MacOS();
+    CefManager_MacOS(const CefManager_MacOS&) = delete;
+    CefManager_MacOS& operator=(const CefManager_MacOS&) = delete;
 protected:
-    virtual ~CefManager_Linux() override;
+    virtual ~CefManager_MacOS() override;
 
 public:
     /** 初始化cef组件
@@ -38,10 +38,14 @@ public:
                             OnCefSettingsEvent callback,
                             int32_t& nExitCode) override;
 
+    /** 当前CEF是否运行在多线程消息循环状态(Windows/Linux平台支持，但MacOS不支持)
+    */
+    virtual bool IsMultiThreadedMessageLoop() const override;
+
 };
 
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_LINUX/DUILIB_BUILD_FOR_CEF)
+#endif //defined (DUILIB_BUILD_FOR_MACOS/DUILIB_BUILD_FOR_CEF)
 
-#endif //UI_CEF_CONTROL_CEF_MANAGER_LINUX_H_
+#endif //UI_CEF_CONTROL_CEF_MANAGER_MACOS_H_

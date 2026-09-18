@@ -1,7 +1,7 @@
 #ifndef UI_CEF_CONTROL_CEF_MANAGER_WINDOWS_H_
 #define UI_CEF_CONTROL_CEF_MANAGER_WINDOWS_H_
 
-#include "duilib/CEFControl/CefManager.h"
+#include "cef/CefManager.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
 

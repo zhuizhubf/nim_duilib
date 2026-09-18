@@ -1,7 +1,7 @@
 #ifndef UI_CEF_CONTROL_CEF_REGISTERED_FUNCTIONS_H_
 #define UI_CEF_CONTROL_CEF_REGISTERED_FUNCTIONS_H_
 
-#include "duilib/CEFControl/CefControlEvent.h"
+#include "cef/CefControlEvent.h"
 #ifdef DUILIB_BUILD_FOR_CEF
 
 #pragma warning (push)

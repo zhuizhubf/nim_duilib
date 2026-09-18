@@ -1,23 +1,21 @@
-#include "CefManager_MacOS.h"
+#include "CefManager_Linux.h"
 
-#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined (DUILIB_BUILD_FOR_LINUX) && defined (DUILIB_BUILD_FOR_CEF)
 
-#include "duilib/CEFControl/internal/CefClientApp.h"
-#include "duilib/CEFControl/internal/CefBrowserHandler.h"
-
-#include "include/wrapper/cef_library_loader.h"
+#include "cef/internal/CefClientApp.h"
+#include "cef/internal/CefBrowserHandler.h"
 
 namespace ui
 {
-CefManager_MacOS::CefManager_MacOS()
+CefManager_Linux::CefManager_Linux()
 {
 }
 
-CefManager_MacOS::~CefManager_MacOS()
+CefManager_Linux::~CefManager_Linux()
 {
 }
 
-bool CefManager_MacOS::Initialize(bool bEnableOffScreenRendering,
+bool CefManager_Linux::Initialize(bool bEnableOffScreenRendering,
                                   const DString& appName,
                                   int argc,
                                   char** argv,
@@ -31,22 +29,24 @@ bool CefManager_MacOS::Initialize(bool bEnableOffScreenRendering,
     CefMainArgs main_args(argc, argv);
     CefRefPtr<CefClientApp> app(new CefClientApp);
 
+    // 如果是在子进程中调用，会堵塞直到子进程退出，并且exit_code返回大于等于0
+    // 如果在Browser进程中调用，则立即返回-1
+    int exit_code = CefExecuteProcess(main_args, app.get(), nullptr);
+    if (exit_code >= 0) {
+        nExitCode = exit_code;
+        return false;
+    }
+
     CefSettings settings;
     GetCefSetting(settings);
 
     bool bRet = CefInitialize(main_args, settings, app.get(), nullptr);
     if (!bRet) {
-        nExitCode = 1;
         return false;
     }
     return true;
 }
 
-bool CefManager_MacOS::IsMultiThreadedMessageLoop() const
-{
-    return false;
-}
-
 } //namespace ui
 
-#endif //defined (DUILIB_BUILD_FOR_MACOS/DUILIB_BUILD_FOR_CEF)
+#endif //defined (DUILIB_BUILD_FOR_LINUX/DUILIB_BUILD_FOR_CEF)

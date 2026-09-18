@@ -2,15 +2,15 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/CefManager.h"
-#include "duilib/CEFControl/CefWindowUtils.h"
-#include "duilib/CEFControl/internal/CefIPCStringDefs.h"
-#include "duilib/CEFControl/internal/CefJSBridge.h"
-#include "duilib/CEFControl/internal/CefBrowserHandlerDelegate.h"
+#include "cef/CefManager.h"
+#include "cef/CefWindowUtils.h"
+#include "cef/internal/CefIPCStringDefs.h"
+#include "cef/internal/CefJSBridge.h"
+#include "cef/internal/CefBrowserHandlerDelegate.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
-    #include "duilib/CEFControl/internal/Windows/osr_dragdrop_win.h"
-    #include "duilib/CEFControl/internal/Windows/CefOsrDropTarget.h"
+    #include "cef/internal/Windows/osr_dragdrop_win.h"
+    #include "cef/internal/Windows/CefOsrDropTarget.h"
 #endif
 
 #include "duilib/Core/GlobalManager.h"

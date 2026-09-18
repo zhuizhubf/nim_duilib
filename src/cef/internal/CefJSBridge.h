@@ -1,7 +1,7 @@
 #ifndef UI_CEF_CONTROL_CEF_JS_BRIDGE_H_
 #define UI_CEF_CONTROL_CEF_JS_BRIDGE_H_
 
-#include "duilib/CEFControl/internal/CefRegisteredFunctions.h"
+#include "cef/internal/CefRegisteredFunctions.h"
 
 #ifdef DUILIB_BUILD_FOR_CEF
 

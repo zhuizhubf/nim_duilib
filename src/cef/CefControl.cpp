@@ -6,9 +6,9 @@
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FilePathUtil.h"
 
-#include "duilib/CEFControl/internal/CefJSBridge.h"
-#include "duilib/CEFControl/internal/CefBrowserHandler.h"
-#include "duilib/CEFControl/CefManager.h"
+#include "cef/internal/CefJSBridge.h"
+#include "cef/internal/CefBrowserHandler.h"
+#include "cef/CefManager.h"
 #include <thread>
 
 namespace ui {

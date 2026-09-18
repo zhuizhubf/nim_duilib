@@ -10,9 +10,9 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/internal/CefAutoUnregister.h"
-#include "duilib/CEFControl/internal/CefJSBridge.h"
-#include "duilib/CEFControl/internal/osr_dragdrop_events.h"
+#include "cef/internal/CefAutoUnregister.h"
+#include "cef/internal/CefJSBridge.h"
+#include "cef/internal/osr_dragdrop_events.h"
 
 #pragma warning (push)
 #pragma warning (disable:4100)

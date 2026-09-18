@@ -57,25 +57,10 @@ target("duilib")
         path.join(droot, "Image", "ImageDecoder_SVG_NanoSvg.cpp")
     )
 
-    -- CEF 控件（FreeBSD 平台不支持 CEF）
-    if not duilib_is_freebsd() then
-        add_files(path.join(droot, "CEFControl", "*.cpp"))
-        add_files(path.join(droot, "CEFControl/internal", "*.cpp"))
-        if duilib_is_windows() then
-            add_files(path.join(droot, "CEFControl/internal/Windows", "*.cc"))
-        end
-    end
-
-    -- WebView2 控件（仅 Windows）
-    if duilib_is_windows() then
-        add_files(path.join(droot, "WebView2", "*.cpp"))
-    end
-
     -- macOS 平台专用的 Objective-C++ 实现
     if duilib_is_macos() then
         add_files(path.join(droot, "Core", "*.mm"))
         add_files(path.join(droot, "Utils", "*.mm"))
-        add_files(path.join(droot, "CEFControl", "*.mm"))
     end
 
     -- 内置的第三方源码
@@ -99,24 +84,12 @@ target("duilib")
         path.join(droot, "third_party/xml")
     )
 
-    if not duilib_is_freebsd() then
-        add_includedirs(path.join(droot, "third_party/libcef", duilib_cef_src_dir()))
-    end
-
     -- 第三方静态库
     add_deps("duilib-zlib", "duilib-png", "duilib-cximage", "duilib-webp")
 
     -- SDL3（可选项，Windows 默认关闭，其他平台默认开启）
     if duilib_sdl_enabled() then
         add_packages("libsdl3")
-    end
-
-    -- WebView2（Windows，可选项）
-    if duilib_webview2_enabled() then
-        add_includedirs(path.join(droot, "third_party/Microsoft.Web.WebView2/build/native/include"))
-        add_linkdirs(path.join(droot, "third_party/Microsoft.Web.WebView2/build/native", duilib_arch_name()))
-        add_links("WebView2LoaderStatic")
-        add_syslinks("advapi32", "ole32", "shell32", "version", "wininet")
     end
 
     -- libjpeg-turbo（可选项）
@@ -229,6 +202,51 @@ if duilib_render_gdi_enabled() then
         add_files(path.join(DUILIB_SRC_DIR, "render-gdi", "*.cpp"))
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         add_syslinks("Gdi32", "Gdiplus", "Msimg32", "User32")
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
+-- duilib-cef：CEF 控件模块（可选，--cef=y，仅 Windows 支持）
+-- -----------------------------------------------------------------------------
+if get_config("cef") and not duilib_is_freebsd() then
+    target("duilib-cef")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        set_languages("c++17")
+        add_deps("duilib")
+        add_files(
+            path.join(DUILIB_SRC_DIR, "cef", "*.cpp"),
+            path.join(DUILIB_SRC_DIR, "cef", "internal", "*.cpp")
+        )
+        if duilib_is_windows() then
+            add_files(path.join(DUILIB_SRC_DIR, "cef", "internal/Windows", "*.cc"))
+        end
+        if duilib_is_macos() then
+            add_files(path.join(DUILIB_SRC_DIR, "cef", "*.mm"))
+        end
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
+                        path.join(DUILIB_THIRD_DIR, "libcef", duilib_cef_src_dir()))
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
+-- duilib-webview2：WebView2 控件模块（可选，Windows 且 --webview2=y）
+-- -----------------------------------------------------------------------------
+if duilib_webview2_enabled() then
+    target("duilib-webview2")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        add_deps("duilib")
+        add_files(path.join(DUILIB_SRC_DIR, "webview2", "*.cpp"))
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
+                        path.join(DUILIB_THIRD_DIR, "Microsoft.Web.WebView2/build/native/include"))
+        add_linkdirs(path.join(DUILIB_THIRD_DIR, "Microsoft.Web.WebView2/build/native", duilib_arch_name()))
+        add_links("WebView2LoaderStatic")
+        add_syslinks("advapi32", "ole32", "shell32", "version", "wininet")
     target_end()
 end
 

@@ -2,8 +2,8 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/CefControlNative.h"
-#include "duilib/CEFControl/CefControlOffScreen.h"
+#include "cef/CefControlNative.h"
+#include "cef/CefControlOffScreen.h"
 
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Core/GlobalManager.h"

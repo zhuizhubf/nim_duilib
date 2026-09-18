@@ -2,7 +2,7 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/CefManager.h"
+#include "cef/CefManager.h"
 #include "duilib/Core/GlobalManager.h"
 
 namespace ui

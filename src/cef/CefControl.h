@@ -5,8 +5,8 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/CefControlEvent.h"
-#include "duilib/CEFControl/internal/CefBrowserHandlerDelegate.h"
+#include "cef/CefControlEvent.h"
+#include "cef/internal/CefBrowserHandlerDelegate.h"
 #include <memory>
 
 namespace ui {

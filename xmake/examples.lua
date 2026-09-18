@@ -60,11 +60,7 @@ for _, name in ipairs(examples) do
         end
 
         add_deps("duilib")
-        for _, dep in ipairs(duilib_render_targets()) do
-            add_deps(dep)
-            add_linkorders("duilib", dep)
-        end
-        for _, dep in ipairs(duilib_image_targets()) do
+        for _, dep in ipairs(duilib_module_targets()) do
             add_deps(dep)
             add_linkorders("duilib", dep)
         end

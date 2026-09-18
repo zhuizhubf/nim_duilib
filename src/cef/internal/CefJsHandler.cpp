@@ -2,8 +2,8 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/internal/CefIPCStringDefs.h"
-#include "duilib/CEFControl/internal/CefJSBridge.h"
+#include "cef/internal/CefIPCStringDefs.h"
+#include "cef/internal/CefJSBridge.h"
 #include "duilib/Utils/StringUtil.h"
 
 namespace ui

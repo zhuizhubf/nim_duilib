@@ -5,7 +5,7 @@
 // duilib
 #include "duilib/duilib.h"
 #include "duilib/duilib_cef.h"
-#include "duilib/CEFControl/internal/CefClientApp.h"
+#include "cef/internal/CefClientApp.h"
 
 #include "include/cef_app.h"
 #include "include/wrapper/cef_library_loader.h"

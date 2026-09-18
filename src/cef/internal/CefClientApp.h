@@ -10,7 +10,7 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "duilib/CEFControl/internal/CefJSBridge.h"
+#include "cef/internal/CefJSBridge.h"
 
 #pragma warning (push)
 #pragma warning (disable:4100)

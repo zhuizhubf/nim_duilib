@@ -1,6 +1,6 @@
 #include "MainThread.h"
 #include "BrowserManager.h"
-#include "duilib/WebView2/WebView2Manager.h"
+#include "webview2/WebView2Manager.h"
 
 MainThread::MainThread() :
     FrameworkThread(_T("MainThread"), ui::kThreadUI)

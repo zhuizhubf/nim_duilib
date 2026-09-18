@@ -18,7 +18,7 @@
 #include <objidl.h>
 #include <stdio.h>
 
-#include "duilib/CEFControl/internal/osr_dragdrop_events.h"
+#include "cef/internal/osr_dragdrop_events.h"
 
 namespace client {
 

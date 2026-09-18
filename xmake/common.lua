@@ -195,6 +195,35 @@ function duilib_image_targets()
     return targets
 end
 
+-- 需要链接的可选控件模块
+function duilib_cef_targets()
+    local targets = {}
+    if get_config("cef") and not duilib_is_freebsd() then
+        table.insert(targets, "duilib-cef")
+    end
+    return targets
+end
+
+function duilib_webview2_targets()
+    local targets = {}
+    if duilib_webview2_enabled() then
+        table.insert(targets, "duilib-webview2")
+    end
+    return targets
+end
+
+-- 全部可选模块：渲染 + 图片解码 + 可选控件
+function duilib_module_targets()
+    local targets = {}
+    for _, group in ipairs({duilib_render_targets(), duilib_image_targets(),
+                            duilib_cef_targets(), duilib_webview2_targets()}) do
+        for _, name in ipairs(group) do
+            table.insert(targets, name)
+        end
+    end
+    return targets
+end
+
 -- Skia 相关宏定义
 function duilib_skia_defines()
     add_defines("SK_GANESH", "SK_GL", "SK_RELEASE")

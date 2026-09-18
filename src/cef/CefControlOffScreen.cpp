@@ -4,16 +4,16 @@
 
 #include "duilib/Core/Window.h"
 
-#include "duilib/CEFControl/CefManager.h"
-#include "duilib/CEFControl/internal/CefBrowserHandler.h"
-#include "duilib/CEFControl/internal/CefMemoryBlock.h"
+#include "cef/CefManager.h"
+#include "cef/internal/CefBrowserHandler.h"
+#include "cef/internal/CefMemoryBlock.h"
 
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Box.h"
 
 #if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    #include "duilib/CEFControl/internal/Windows/util_win.h"
-    #include "duilib/CEFControl/internal/Windows/osr_ime_handler_win.h"
+    #include "cef/internal/Windows/util_win.h"
+    #include "cef/internal/Windows/osr_ime_handler_win.h"
 #endif
 
 #if defined (DUILIB_BUILD_FOR_SDL)

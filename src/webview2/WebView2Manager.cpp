@@ -2,7 +2,7 @@
 
 #if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
 
-#include "duilib/WebView2/WebView2Control.h"
+#include "webview2/WebView2Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include <objbase.h>

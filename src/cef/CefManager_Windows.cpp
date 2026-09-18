@@ -6,8 +6,8 @@
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/ProcessSingleton.h"
 #include "duilib/Utils/StringConvert.h"
-#include "duilib/CEFControl/internal/CefClientApp.h"
-#include "duilib/CEFControl/internal/CefBrowserHandler.h"
+#include "cef/internal/CefClientApp.h"
+#include "cef/internal/CefBrowserHandler.h"
 
 #pragma warning (push)
 #pragma warning (disable:4100)
