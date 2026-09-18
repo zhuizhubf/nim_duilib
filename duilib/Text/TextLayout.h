@@ -11,6 +11,11 @@ namespace ui
 class DUILIB_API TextLayout
 {
 public:
+    /** 判断两组 RichText 数据是否一致
+    */
+    static bool IsRichTextDataEqual(const std::vector<RichTextData>& first,
+                                    const std::vector<RichTextData>& second);
+
     /** 计算普通字符串的绘制区域
     */
     static UiRect MeasureString(ITextShaper& textShaper,

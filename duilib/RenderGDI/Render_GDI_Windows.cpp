@@ -36,42 +36,6 @@ public:
     std::vector<RichTextData> m_richTextData;
 };
 
-bool IsRichTextDataEqual(const RichTextData& first, const RichTextData& second)
-{
-    if ((first.m_textView.data() != second.m_textView.data()) ||
-        (first.m_textView.size() != second.m_textView.size())) {
-        return false;
-    }
-    if ((first.m_textColor != second.m_textColor) || (first.m_bgColor != second.m_bgColor)) {
-        return false;
-    }
-    if ((first.m_pFontInfo == nullptr) || (second.m_pFontInfo == nullptr)) {
-        if (first.m_pFontInfo != second.m_pFontInfo) {
-            return false;
-        }
-    }
-    else if (*first.m_pFontInfo != *second.m_pFontInfo) {
-        return false;
-    }
-    return (first.m_fRowSpacingMul == second.m_fRowSpacingMul) &&
-           (first.m_fRowSpacingAdd == second.m_fRowSpacingAdd) &&
-           (first.m_textStyle == second.m_textStyle);
-}
-
-bool IsRichTextCacheDataEqual(const std::vector<RichTextData>& first,
-                              const std::vector<RichTextData>& second)
-{
-    if (first.size() != second.size()) {
-        return false;
-    }
-    for (size_t i = 0; i < first.size(); ++i) {
-        if (!IsRichTextDataEqual(first[i], second[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 std::unique_ptr<Gdiplus::Graphics> CreateGdiplusGraphics(HDC hdc, UiPoint ptOrg)
 {
     std::unique_ptr<Gdiplus::Graphics> graphics = std::make_unique<Gdiplus::Graphics>(hdc);
@@ -885,7 +849,7 @@ bool Render_GDI_Windows::IsValidDrawRichTextCache(const UiRect& textRect,
     }
     return (pCache->m_textRect.Width() == textRect.Width()) &&
            (pCache->m_textRect.Height() == textRect.Height()) &&
-           IsRichTextCacheDataEqual(pCache->m_richTextData, richTextData);
+           TextLayout::IsRichTextDataEqual(pCache->m_richTextData, richTextData);
 }
 
 bool Render_GDI_Windows::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& spOldDrawRichTextCache,
@@ -914,7 +878,7 @@ bool Render_GDI_Windows::IsDrawRichTextCacheEqual(const DrawRichTextCache& first
         return false;
     }
     return (pFirst->m_textRect == pSecond->m_textRect) &&
-           IsRichTextCacheDataEqual(pFirst->m_richTextData, pSecond->m_richTextData);
+           TextLayout::IsRichTextDataEqual(pFirst->m_richTextData, pSecond->m_richTextData);
 }
 
 void Render_GDI_Windows::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,

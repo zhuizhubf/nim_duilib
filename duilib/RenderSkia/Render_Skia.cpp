@@ -11,6 +11,7 @@
 #include "duilib/RenderSkia/DrawSkiaImage.h"
 #include "duilib/RenderSkia/SkiaTextShaper.h"
 #include "duilib/Render/BitmapAlpha.h"
+#include "duilib/Text/DrawRichTextCache.h"
 #include "duilib/Text/TextLayout.h"
 
 #include "duilib/Utils/StringUtil.h"
@@ -44,6 +45,16 @@
 #include <cstdint>
 
 namespace ui {
+
+namespace
+{
+class SkiaCommonTextCache: public DrawRichTextCache
+{
+public:
+    UiRect m_textRect;
+    std::vector<RichTextData> m_richTextData;
+};
+}
 
 Render_Skia::Render_Skia():
     m_saveCount(0)
@@ -1883,6 +1894,12 @@ void Render_Skia::MeasureRichText(const UiRect& textRect,
                                   const std::vector<RichTextData>& richTextData,
                                   std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        TextLayout::MeasureRichText(*m_textShaper, textRect, szScrollOffset, richTextData, pRichTextRects);
+        return;
+    }
+#endif
      ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, nullptr, nullptr, pRichTextRects);
 }
@@ -1894,6 +1911,12 @@ void Render_Skia::MeasureRichText2(const UiRect& textRect,
                                    RichTextLineInfoParam* pLineInfoParam,
                                    std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        TextLayout::MeasureRichText2(*m_textShaper, textRect, szScrollOffset, richTextData, pLineInfoParam, pRichTextRects);
+        return;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, pLineInfoParam, nullptr, pRichTextRects);
 }
@@ -1906,6 +1929,16 @@ void Render_Skia::MeasureRichText3(const UiRect& textRect,
                                    std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
                                    std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        TextLayout::MeasureRichText2(*m_textShaper, textRect, szScrollOffset, richTextData, pLineInfoParam, pRichTextRects);
+        std::shared_ptr<SkiaCommonTextCache> spCache = std::make_shared<SkiaCommonTextCache>();
+        spCache->m_textRect = textRect;
+        spCache->m_richTextData = richTextData;
+        spDrawRichTextCache = spCache;
+        return;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, pLineInfoParam, &spDrawRichTextCache, pRichTextRects);
 }
@@ -1917,6 +1950,12 @@ void Render_Skia::DrawRichText(const UiRect& textRect,
                                uint8_t uFade,
                                std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        TextLayout::DrawRichText(*m_textShaper, this, textRect, szScrollOffset, richTextData, uFade, pRichTextRects);
+        return;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, uFade, false, nullptr, nullptr, pRichTextRects);
 }
@@ -1928,6 +1967,15 @@ bool Render_Skia::CreateDrawRichTextCache(const UiRect& textRect,
                                           std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache)
 {
     spDrawRichTextCache.reset();
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        std::shared_ptr<SkiaCommonTextCache> spCache = std::make_shared<SkiaCommonTextCache>();
+        spCache->m_textRect = textRect;
+        spCache->m_richTextData = richTextData;
+        spDrawRichTextCache = spCache;
+        return true;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     drawRichText.InternalDrawRichText(textRect, szScrollOffset, pRenderFactory, richTextData, 255, true, nullptr, &spDrawRichTextCache, nullptr);
     return spDrawRichTextCache != nullptr;
@@ -1937,6 +1985,17 @@ bool Render_Skia::IsValidDrawRichTextCache(const UiRect& textRect,
                                            const std::vector<RichTextData>& richTextData,
                                            const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        SkiaCommonTextCache* pCache = dynamic_cast<SkiaCommonTextCache*>(spDrawRichTextCache.get());
+        if (pCache == nullptr) {
+            return false;
+        }
+        return (pCache->m_textRect.Width() == textRect.Width()) &&
+               (pCache->m_textRect.Height() == textRect.Height()) &&
+               TextLayout::IsRichTextDataEqual(pCache->m_richTextData, richTextData);
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     return drawRichText.IsValidDrawRichTextCache(textRect, richTextData, spDrawRichTextCache);
 }
@@ -1951,6 +2010,16 @@ bool Render_Skia::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& sp
                                           size_t nDeletedRows,
                                           const std::vector<int32_t>& rowRectTopList)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        SkiaCommonTextCache* pOldCache = dynamic_cast<SkiaCommonTextCache*>(spOldDrawRichTextCache.get());
+        if (pOldCache == nullptr) {
+            return false;
+        }
+        pOldCache->m_richTextData = richTextDataNew;
+        return true;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     return drawRichText.UpdateDrawRichTextCache(spOldDrawRichTextCache,
                                                 spUpdateDrawRichTextCache,
@@ -1965,6 +2034,17 @@ bool Render_Skia::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& sp
 
 bool Render_Skia::IsDrawRichTextCacheEqual(const DrawRichTextCache& first, const DrawRichTextCache& second) const
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        const SkiaCommonTextCache* pFirst = dynamic_cast<const SkiaCommonTextCache*>(&first);
+        const SkiaCommonTextCache* pSecond = dynamic_cast<const SkiaCommonTextCache*>(&second);
+        if ((pFirst == nullptr) || (pSecond == nullptr)) {
+            return false;
+        }
+        return (pFirst->m_textRect == pSecond->m_textRect) &&
+               TextLayout::IsRichTextDataEqual(pFirst->m_richTextData, pSecond->m_richTextData);
+    }
+#endif
     ui::DrawRichText drawRichText(const_cast<Render_Skia*>(this), GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     return drawRichText.IsDrawRichTextCacheEqual(first, second);
 }
@@ -1976,6 +2056,17 @@ void Render_Skia::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>
                                         uint8_t uFade,
                                         std::vector<std::vector<UiRect>>* pRichTextRects)
 {
+#if DUILIB_COMMON_TEXT_LAYOUT
+    if (m_textShaper != nullptr) {
+        SkiaCommonTextCache* pCache = dynamic_cast<SkiaCommonTextCache*>(spDrawRichTextCache.get());
+        if (pCache == nullptr) {
+            return;
+        }
+        TextLayout::DrawRichText(*m_textShaper, this, rcNewTextRect, szNewScrollOffset,
+                                 pCache->m_richTextData, uFade, pRichTextRects);
+        return;
+    }
+#endif
     ui::DrawRichText drawRichText(this, GetSkCanvas(), m_pSkPaint.get(), m_pSkPointOrg.get());
     return drawRichText.DrawRichTextCacheData(spDrawRichTextCache,
                                               rcNewTextRect,

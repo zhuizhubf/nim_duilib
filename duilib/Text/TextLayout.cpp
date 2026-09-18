@@ -483,6 +483,39 @@ void BuildRichLayout(ITextShaper& textShaper,
 }
 }
 
+bool TextLayout::IsRichTextDataEqual(const std::vector<RichTextData>& first,
+                                     const std::vector<RichTextData>& second)
+{
+    if (first.size() != second.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < first.size(); ++i) {
+        const RichTextData& v1 = first[i];
+        const RichTextData& v2 = second[i];
+        if ((v1.m_textView.data() != v2.m_textView.data()) ||
+            (v1.m_textView.size() != v2.m_textView.size())) {
+            return false;
+        }
+        if ((v1.m_textColor != v2.m_textColor) || (v1.m_bgColor != v2.m_bgColor)) {
+            return false;
+        }
+        if ((v1.m_pFontInfo == nullptr) || (v2.m_pFontInfo == nullptr)) {
+            if (v1.m_pFontInfo != v2.m_pFontInfo) {
+                return false;
+            }
+        }
+        else if (*v1.m_pFontInfo != *v2.m_pFontInfo) {
+            return false;
+        }
+        if ((v1.m_fRowSpacingMul != v2.m_fRowSpacingMul) ||
+            (v1.m_fRowSpacingAdd != v2.m_fRowSpacingAdd) ||
+            (v1.m_textStyle != v2.m_textStyle)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 UiRect TextLayout::MeasureString(ITextShaper& textShaper,
                                  const DString& strText,
                                  const MeasureStringParam& measureParam)
