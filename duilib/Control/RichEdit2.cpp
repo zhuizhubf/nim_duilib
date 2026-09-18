@@ -1909,13 +1909,17 @@ void RichEdit2::Paint(IRender* pRender, const UiRect& rcPaint)
             IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
             ASSERT(pRenderFactory != nullptr);
             pRender->CreateDrawRichTextCache(rcDrawText, szScrollOffset, pRenderFactory, richTextDataList, spDrawRichTextCache);
-            ASSERT(spDrawRichTextCache != nullptr);
             if (spDrawRichTextCache != nullptr) {
                 ASSERT(pRender->IsValidDrawRichTextCache(rcDrawText, richTextDataList, spDrawRichTextCache));
                 //通过缓存绘制
                 rcDrawText.Offset(0, m_pTextData->GetTextRectOfssetY());
                 pRender->DrawRichTextCacheData(spDrawRichTextCache, rcDrawText, szScrollOffset, m_pTextData->GetTextRowXOffset(), GetAlpha());
                 m_pTextData->SetDrawRichTextCache(spDrawRichTextCache);
+            }
+            else {
+                //当前后端不支持绘制缓存，直接绘制文本
+                rcDrawText.Offset(0, m_pTextData->GetTextRectOfssetY());
+                pRender->DrawRichText(rcDrawText, szScrollOffset, pRenderFactory, richTextDataList, GetAlpha());
             }
         }
     }

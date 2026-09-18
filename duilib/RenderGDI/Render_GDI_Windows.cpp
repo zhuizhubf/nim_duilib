@@ -4,6 +4,7 @@
 
 #include "duilib/Render/BitmapAlpha.h"
 #include "duilib/RenderGDI/GdiTypes.h"
+#include "duilib/Text/TextLayout.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
 #include <gdiplus.h>
@@ -756,46 +757,12 @@ void Render_GDI_Windows::FillPath(const IPath* path, const UiRectF& rc, UiColor 
 
 UiRect Render_GDI_Windows::MeasureString(const DString& strText, const MeasureStringParam& measureParam)
 {
-    if ((m_hMemDC == nullptr) || (measureParam.pFont == nullptr)) {
-        return UiRect();
-    }
-    Font_GDI* pFont = dynamic_cast<Font_GDI*>(measureParam.pFont);
-    if ((pFont == nullptr) || (pFont->GetFontHandle() == nullptr)) {
-        return UiRect();
-    }
-    HGDIOBJ hOldFont = ::SelectObject(m_hMemDC, pFont->GetFontHandle());
-    RECT rc = { 0, 0, measureParam.rectSize > 0 ? measureParam.rectSize : 0, 0 };
-    if (measureParam.rectSize <= 0) {
-        rc.right = 0x7FFFFFFF;
-    }
-    UINT nFormat = ToDrawTextFormat(measureParam.uFormat, false) | DT_CALCRECT;
-    ::DrawTextW(m_hMemDC, strText.c_str(), (int)strText.size(), &rc, nFormat);
-    ::SelectObject(m_hMemDC, hOldFont);
-    return UiRect(rc.left, rc.top, rc.right, rc.bottom);
+    return TextLayout::MeasureString(*this, strText, measureParam);
 }
 
 void Render_GDI_Windows::DrawString(const DString& strText, const DrawStringParam& drawParam)
 {
-    if (strText.empty() || (drawParam.pFont == nullptr)) {
-        return;
-    }
-    Font_GDI* pFont = dynamic_cast<Font_GDI*>(drawParam.pFont);
-    if ((pFont == nullptr) || (pFont->GetFontHandle() == nullptr)) {
-        return;
-    }
-    std::unique_ptr<Gdiplus::Graphics> graphics = CreateGdiplusGraphics(m_hMemDC, m_ptOrg);
-    if (graphics == nullptr) {
-        return;
-    }
-    Gdiplus::Font gdiplusFont(m_hMemDC, pFont->GetFontHandle());
-    std::unique_ptr<Gdiplus::StringFormat> pFormat = CreateStringFormat(drawParam.uFormat);
-    if (pFormat == nullptr) {
-        return;
-    }
-    Gdiplus::SolidBrush brush(ToGdiplusColor(drawParam.dwTextColor, drawParam.uFade));
-    const Gdiplus::RectF rc((float)drawParam.textRect.left, (float)drawParam.textRect.top,
-                            (float)drawParam.textRect.Width(), (float)drawParam.textRect.Height());
-    graphics->DrawString(strText.c_str(), (INT)strText.size(), &gdiplusFont, rc, pFormat.get(), &brush);
+    TextLayout::DrawString(*this, this, strText, drawParam);
 }
 
 void Render_GDI_Windows::MeasureRichText(const UiRect& textRect,
@@ -804,21 +771,8 @@ void Render_GDI_Windows::MeasureRichText(const UiRect& textRect,
                                          const std::vector<RichTextData>& richTextData,
                                          std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    if (pRichTextRects != nullptr) {
-        pRichTextRects->clear();
-    }
-    int32_t x = textRect.left;
-    for (const RichTextData& data : richTextData) {
-        if (data.m_pFontInfo == nullptr) {
-            continue;
-        }
-        Font_GDI font(nullptr);
-        font.InitFont(*data.m_pFontInfo);
-        MeasureStringParam measureParam;
-        measureParam.pFont = &font;
-        measureParam.uFormat = data.m_textStyle;
-        MeasureString(DString(data.m_textView.data(), data.m_textView.size()), measureParam);
-    }
+    UiSize szScrollOffset;
+    TextLayout::MeasureRichText(*this, textRect, szScrollOffset, richTextData, pRichTextRects);
 }
 
 void Render_GDI_Windows::MeasureRichText2(const UiRect& textRect,
@@ -828,10 +782,7 @@ void Render_GDI_Windows::MeasureRichText2(const UiRect& textRect,
                                           RichTextLineInfoParam* pLineInfoParam,
                                           std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    MeasureRichText(textRect, szScrollOffset, pRenderFactory, richTextData, pRichTextRects);
-    if (pLineInfoParam != nullptr) {
-        pLineInfoParam->m_pLineInfoList->clear();
-    }
+    TextLayout::MeasureRichText2(*this, textRect, szScrollOffset, richTextData, pLineInfoParam, pRichTextRects);
 }
 
 void Render_GDI_Windows::MeasureRichText3(const UiRect& textRect,
@@ -843,7 +794,7 @@ void Render_GDI_Windows::MeasureRichText3(const UiRect& textRect,
                                           std::vector<std::vector<UiRect>>* pRichTextRects)
 {
     spDrawRichTextCache.reset();
-    MeasureRichText2(textRect, szScrollOffset, pRenderFactory, richTextData, pLineInfoParam, pRichTextRects);
+    TextLayout::MeasureRichText2(*this, textRect, szScrollOffset, richTextData, pLineInfoParam, pRichTextRects);
 }
 
 void Render_GDI_Windows::DrawRichText(const UiRect& textRect,
@@ -853,34 +804,8 @@ void Render_GDI_Windows::DrawRichText(const UiRect& textRect,
                                       uint8_t uFade,
                                       std::vector<std::vector<UiRect>>* pRichTextRects)
 {
-    if (pRichTextRects != nullptr) {
-        pRichTextRects->clear();
-        pRichTextRects->resize(richTextData.size());
-    }
-    int32_t x = textRect.left;
-    for (size_t i = 0; i < richTextData.size(); ++i) {
-        const RichTextData& data = richTextData[i];
-        if ((data.m_pFontInfo == nullptr) || data.m_textView.empty()) {
-            continue;
-        }
-        Font_GDI font(nullptr);
-        font.InitFont(*data.m_pFontInfo);
-        DrawStringParam drawParam;
-        drawParam.textRect = UiRect(x, textRect.top, textRect.right, textRect.bottom);
-        drawParam.dwTextColor = data.m_textColor;
-        drawParam.uFade = uFade;
-        drawParam.pFont = &font;
-        drawParam.uFormat = data.m_textStyle;
-        DrawString(DString(data.m_textView.data(), data.m_textView.size()), drawParam);
-        MeasureStringParam measureParam;
-        measureParam.pFont = &font;
-        measureParam.uFormat = data.m_textStyle;
-        UiRect rc = MeasureString(DString(data.m_textView.data(), data.m_textView.size()), measureParam);
-        if (pRichTextRects != nullptr) {
-            (*pRichTextRects)[i].push_back(UiRect(x, textRect.top, x + rc.Width(), textRect.bottom));
-        }
-        x += rc.Width();
-    }
+    UiSize szScrollOffset;
+    TextLayout::DrawRichText(*this, this, textRect, szScrollOffset, richTextData, uFade, pRichTextRects);
 }
 
 bool Render_GDI_Windows::CreateDrawRichTextCache(const UiRect& /*textRect*/,
@@ -1186,6 +1111,116 @@ void Render_GDI_Windows::ReleaseRenderDC(HDC hdc)
     if (hdc == m_hMemDC) {
         ::SetViewportOrgEx(m_hMemDC, 0, 0, nullptr);
     }
+}
+
+IFont* Render_GDI_Windows::CreateFont(const UiFont& fontInfo)
+{
+    for (const auto& item : m_fontCache) {
+        if (item.first == fontInfo) {
+            return item.second.get();
+        }
+    }
+    std::unique_ptr<Font_GDI> pFont = std::make_unique<Font_GDI>(nullptr);
+    if ((pFont == nullptr) || !pFont->InitFont(fontInfo)) {
+        return nullptr;
+    }
+    IFont* pFontPtr = pFont.get();
+    m_fontCache.emplace_back(fontInfo, std::move(pFont));
+    return pFontPtr;
+}
+
+bool Render_GDI_Windows::GetFontMetrics(const IFont* pFont, TextFontMetrics& metrics)
+{
+    Font_GDI* pGdiFont = dynamic_cast<Font_GDI*>(const_cast<IFont*>(pFont));
+    if ((pGdiFont == nullptr) || (pGdiFont->GetFontHandle() == nullptr) || (m_hMemDC == nullptr)) {
+        return false;
+    }
+    HGDIOBJ hOldFont = ::SelectObject(m_hMemDC, pGdiFont->GetFontHandle());
+    TEXTMETRICW tm = {};
+    const BOOL bRet = ::GetTextMetricsW(m_hMemDC, &tm);
+    ::SelectObject(m_hMemDC, hOldFont);
+    if (!bRet) {
+        return false;
+    }
+    metrics.m_fAscent = (float)tm.tmAscent;
+    metrics.m_fDescent = (float)tm.tmDescent;
+    metrics.m_fHeight = (float)tm.tmHeight;
+    return true;
+}
+
+bool Render_GDI_Windows::ResolveGlyph(const IFont* pFont, uint32_t unicodeChar, TextGlyphInfo& glyph, bool bUseDefaultCharWhenFailed)
+{
+    if (pFont == nullptr) {
+        return false;
+    }
+    IFont* pResolvedFont = const_cast<IFont*>(pFont);
+    uint16_t glyphId = 0;
+    bool bSupported = pResolvedFont->IsUnicodeCharSupported(unicodeChar, &glyphId);
+    if (!bSupported) {
+        Font_GDI* pGdiFont = dynamic_cast<Font_GDI*>(pResolvedFont);
+        IFallbackFontMgr* pFallbackFontMgr = nullptr;
+        if ((pGdiFont != nullptr) && (pGdiFont->GetFontMgr() != nullptr)) {
+            pFallbackFontMgr = pGdiFont->GetFontMgr()->GetFallbackFontMgr();
+        }
+        if (pFallbackFontMgr != nullptr) {
+            uint16_t nFallbackGlyphId = 0;
+            IFont* pFallbackFont = pFallbackFontMgr->CreateFallbackFont(pFont, unicodeChar, &nFallbackGlyphId);
+            if ((pFallbackFont != nullptr) && (nFallbackGlyphId != 0)) {
+                pResolvedFont = pFallbackFont;
+                glyphId = nFallbackGlyphId;
+                bSupported = true;
+            }
+        }
+    }
+    if (!bSupported && bUseDefaultCharWhenFailed) {
+        bSupported = pResolvedFont->IsUnicodeCharSupported((uint32_t)'A', &glyphId);
+        unicodeChar = (uint32_t)'A';
+    }
+    if (!bSupported) {
+        glyph.m_bMissing = true;
+        return false;
+    }
+    TextFontMetrics metrics;
+    if (!GetFontMetrics(pResolvedFont, metrics)) {
+        return false;
+    }
+    float fAdvance = 0.0f;
+    Font_GDI* pResolvedGdiFont = dynamic_cast<Font_GDI*>(pResolvedFont);
+    if ((pResolvedGdiFont != nullptr) && (pResolvedGdiFont->GetFontHandle() != nullptr)) {
+        HGDIOBJ hOldFont = ::SelectObject(m_hMemDC, pResolvedGdiFont->GetFontHandle());
+        SIZE size = {};
+        const wchar_t ch = (unicodeChar <= 0xFFFF) ? (wchar_t)unicodeChar : L'A';
+        ::GetTextExtentPoint32W(m_hMemDC, &ch, 1, &size);
+        ::SelectObject(m_hMemDC, hOldFont);
+        fAdvance = (float)size.cx;
+    }
+    glyph.m_pFont = pResolvedFont;
+    glyph.m_glyphId = glyphId;
+    glyph.m_unicodeChar = unicodeChar;
+    glyph.m_fAdvance = fAdvance;
+    glyph.m_bounds = UiRectF(0.0f, -metrics.m_fAscent, fAdvance, metrics.m_fDescent);
+    glyph.m_bMissing = false;
+    return true;
+}
+
+void Render_GDI_Windows::DrawGlyph(const TextGlyphInfo& glyph, float x, float y, UiColor textColor, uint8_t uFade)
+{
+    if ((glyph.m_pFont == nullptr) || (glyph.m_glyphId == 0) || (m_hMemDC == nullptr)) {
+        return;
+    }
+    Font_GDI* pFont = dynamic_cast<Font_GDI*>(glyph.m_pFont);
+    if ((pFont == nullptr) || (pFont->GetFontHandle() == nullptr)) {
+        return;
+    }
+    std::unique_ptr<Gdiplus::Graphics> graphics = CreateGdiplusGraphics(m_hMemDC, m_ptOrg);
+    if (graphics == nullptr) {
+        return;
+    }
+    Gdiplus::Font gdiplusFont(m_hMemDC, pFont->GetFontHandle());
+    Gdiplus::SolidBrush brush(ToGdiplusColor(textColor, uFade));
+    const Gdiplus::PointF position(x, y);
+    graphics->DrawDriverString(&glyph.m_glyphId, 1, &gdiplusFont, &brush, &position,
+                               Gdiplus::DriverStringOptionsCmapLookup, nullptr);
 }
 
 } // namespace ui

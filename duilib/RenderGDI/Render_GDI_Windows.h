@@ -2,6 +2,7 @@
 #define UI_RENDER_GDI_WINDOWS_H_
 
 #include "duilib/RenderGDI/GdiTypes.h"
+#include "duilib/Text/ITextShaper.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
@@ -10,7 +11,7 @@ namespace ui
 
 /** Windows GDI/GDI+ 渲染实现
 */
-class Render_GDI_Windows: public IRender
+class Render_GDI_Windows: public IRender, public ITextShaper
 {
 public:
     explicit Render_GDI_Windows(HWND hWnd);
@@ -169,6 +170,12 @@ public:
     virtual HDC GetRenderDC(HWND hWnd) override;
     virtual void ReleaseRenderDC(HDC hdc) override;
 
+    // ITextShaper
+    virtual IFont* CreateFont(const UiFont& fontInfo) override;
+    virtual bool GetFontMetrics(const IFont* pFont, TextFontMetrics& metrics) override;
+    virtual bool ResolveGlyph(const IFont* pFont, uint32_t unicodeChar, TextGlyphInfo& glyph, bool bUseDefaultCharWhenFailed) override;
+    virtual void DrawGlyph(const TextGlyphInfo& glyph, float x, float y, UiColor textColor, uint8_t uFade) override;
+
 private:
     bool CreateDib(int32_t nWidth, int32_t nHeight);
     void DeleteDib();
@@ -185,6 +192,7 @@ private:
     int32_t m_nHeight = 0;
     UiPoint m_ptOrg = { 0, 0 };
     IRenderDpiPtr m_spRenderDpi;
+    std::vector<std::pair<UiFont, std::unique_ptr<IFont>>> m_fontCache;
 };
 
 } // namespace ui

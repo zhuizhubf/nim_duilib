@@ -140,6 +140,19 @@ target("duilib")
 target_end()
 
 -- -----------------------------------------------------------------------------
+-- duilib-text：后端无关的文本布局
+-- -----------------------------------------------------------------------------
+target("duilib-text")
+    set_kind("static")
+    set_targetdir(DUILIB_LIB_DIR)
+    duilib_target_settings()
+    duilib_common_defines()
+    add_deps("duilib")
+    add_files(path.join(droot, "Text", "*.cpp"))
+    add_includedirs(DUILIB_ROOT)
+target_end()
+
+-- -----------------------------------------------------------------------------
 -- duilib-skia-base：Skia 字体和公共基础封装
 -- -----------------------------------------------------------------------------
 if duilib_skia_base_enabled() then
@@ -168,7 +181,7 @@ if duilib_render_skia_enabled() then
         duilib_target_settings()
         duilib_common_defines()
         duilib_apply_skia_package()
-        add_deps("duilib")
+        add_deps("duilib", "duilib-text")
         if duilib_skia_base_enabled() then
             add_deps("duilib-skia-base")
         end
@@ -209,7 +222,7 @@ if duilib_render_gdi_enabled() then
         set_targetdir(DUILIB_LIB_DIR)
         duilib_target_settings()
         duilib_common_defines()
-        add_deps("duilib")
+        add_deps("duilib", "duilib-text")
         add_files(path.join(droot, "RenderGDI", "*.cpp"))
         add_includedirs(DUILIB_ROOT)
         add_syslinks("Gdi32", "Gdiplus", "Msimg32", "User32")
