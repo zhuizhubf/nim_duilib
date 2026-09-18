@@ -1,4 +1,4 @@
-﻿## `Control`（基础控件）的属性
+## `Control`（基础控件）的属性
 
 `Control` 控件为所有可用控件的基类，包含了控件常用的属性，如宽度、高度、边距等属性。一般情况下不作为具体可用控件使用，但常用于一些占位符，请参考示例。
 `Control` 是所有控件的基类，包含了所有控件的可用通用属性。
@@ -8,7 +8,7 @@
 <Control width="stretch"/>
 ```
 
-| 属性名称 | 默认值 | 参数类型 |关联[Control.h](../duilib/Core/Control.h)中的函数| 用途 |
+| 属性名称 | 默认值 | 参数类型 |关联[Control.h](../src/duilib/Core/Control.h)中的函数| 用途 |
 | :--- | :--- | :--- | :---| :--- |
 | class |  | string | SetClass|控件样式,用样式里面的属性值来设置本控件的属性,如"btn_default",可以同时指定多个样式,各个样式之间用空格分隔,需要写在第一个属性位置 |
 | enable_vars | true | bool | SetEnableVars| 属性值中是否支持变量展开。<br> 用法举例：假设在globle.xml中增加一行变量定义：`<Define name="SIZE_ICON_SMALL" value="16"/>` <br> XML中的控件属性字符串中可以这样使用这个变量：`width="${SIZE_ICON_SMALL}"` <br> 代码中也可以这样调用函数设置属性代码：`Control::SetAttribute(_T("width"), _T("${SIZE_ICON_SMALL}"));`|

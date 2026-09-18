@@ -58,7 +58,7 @@ duilib 的窗口阴影为窗口提供"立体悬浮"的视觉外观。实现方�
 | `shadow_border_size` | `2` | int | 阴影边框的像素大小。实际显示宽度为该值的一半（如 `2` 显示 1 像素）。 |
 | `shadow_snap` | `true` | bool | 窗口贴近屏幕边缘时，对应侧的阴影是否自动隐藏。**仅自绘阴影有效**。 |
 
-> 说明：所有 `shadow_*` 属性的代码接口都在 [Window.h](../duilib/Core/Window.h) 中，方法名与属性名一一对应（驼峰式），如 `SetShadowType`、`SetShadowImage` 等。
+> 说明：所有 `shadow_*` 属性的代码接口都在 [Window.h](../src/duilib/Core/Window.h) 中，方法名与属性名一一对应（驼峰式），如 `SetShadowType`、`SetShadowImage` 等。
 
 ---
 
@@ -144,7 +144,7 @@ duilib 的窗口阴影为窗口提供"立体悬浮"的视觉外观。实现方�
 
 ## 6. C++ 代码接口
 
-所有 `shadow_*` 属性都有对应的 C++ 接口，集中在 `Window` 类和 `Shadow` 类中（见 [Window.h](../duilib/Core/Window.h) 与 [Shadow.h](../duilib/Core/Shadow.h)）。
+所有 `shadow_*` 属性都有对应的 C++ 接口，集中在 `Window` 类和 `Shadow` 类中（见 [Window.h](../src/duilib/Core/Window.h) 与 [Shadow.h](../src/duilib/Core/Shadow.h)）。
 
 ### 6.1 启用 / 关闭
 
@@ -283,10 +283,10 @@ Win7、Win10 仅 `system_default` 可用，其他 3 个 `system_*` 类型会自�
 
 ## 10. 相关文档与源码
 
-- 源码：[Shadow.h](../duilib/Core/Shadow.h) / [Shadow.cpp](../duilib/Core/Shadow.cpp)
-- 窗口接口：[Window.h](../duilib/Core/Window.h) / [Window.cpp](../duilib/Core/Window.cpp)
-- 系统阴影定义：[NativeWindowShadow.h](../duilib/Core/NativeWindowShadow.h)
-- XML 解析：[WindowBuilder.cpp](../duilib/Core/WindowBuilder.cpp)
+- 源码：[Shadow.h](../src/duilib/Core/Shadow.h) / [Shadow.cpp](../src/duilib/Core/Shadow.cpp)
+- 窗口接口：[Window.h](../src/duilib/Core/Window.h) / [Window.cpp](../src/duilib/Core/Window.cpp)
+- 系统阴影定义：[NativeWindowShadow.h](../src/duilib/Core/NativeWindowShadow.h)
+- XML 解析：[WindowBuilder.cpp](../src/duilib/Core/WindowBuilder.cpp)
 - 窗口属性表：[Window.md](./Window.md)
 - 阴影演示页：[page_window_shadow.xml](../../bin/resources/themes/default/render/page_window_shadow.xml)
 - 自绘阴影素材：`public/shadow/`（`shadow_big.svg`、`shadow_big_round.svg`、`shadow_small.svg`、`shadow_small_round.svg`、`shadow_menu.svg`、`shadow_menu_round.svg`）

@@ -1,4 +1,4 @@
-﻿## 一、控件（Control）、容器（Box）与布局（Layout）的基本概念
+## 一、控件（Control）、容器（Box）与布局（Layout）的基本概念
 ### 1. 控件（Control）    
    控件是界面库中的最基础的组件，其类名是Control，其基类为PlaceHolder。    
    控件(Control)包含如下基础属性：
@@ -28,36 +28,36 @@
   按照布局方案不同，容器（Box）的分类如下：    
 | 类名称（容器） | 基类名称 |关联头文件| 默认布局方案 | 功能说明 |
 | :---     | :---   |:--- | :--- | :--- |
-| Box      | Control|[duilib/Core/Box.h](../duilib/Core/Box.h) | 浮动布局（Layout） | 容器基类(Container)，子控件按浮动布局排列|
-| HBox     | Box|[duilib/Box/HBox.h](../duilib/Box/HBox.h) | 水平布局（HLayout） | 子控件在水平方向上，依次排列，不换行|
-| VBox     | Box|[duilib/Box/VBox.h](../duilib/Box/VBox.h) | 垂直布局（VLayout） | 子控件在垂直方向上，依次排列，不换行|
-| HFlowBox | Box|[duilib/Box/HBox.h](../duilib/Box/HBox.h) | 水平流式布局（HFlowLayout） | 子控件在水平方向上，依次排列，自动换行|
-| VFlowBox | Box|[duilib/Box/VBox.h](../duilib/Box/VBox.h) | 垂直流式布局（VFlowLayout） | 子控件在垂直方向上，依次排列，自动换行|
-| HTileBox | Box|[duilib/Box/TileBox.h](../duilib/Box/TileBox.h) | 水平瓦片布局（HTileLayout） |水平瓦片布局的容器，支持设置行数|
-| VTileBox | Box|[duilib/Box/TileBox.h](../duilib/Box/TileBox.h) | 垂直瓦片布局（VTileLayout） |垂直瓦片布局的容器，支持设置列数|
-| ScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 浮动布局（Layout）     | 支持垂直或水平滚动条的Box容器 |
-| HScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 水平布局（HLayout）   | 支持垂直或水平滚动条的HBox容器 |
-| VScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 垂直布局（VLayout）   | 支持垂直或水平滚动条的VBox容器 |
-| HFlowScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 水平流式布局（HFlowLayout）| 支持垂直或水平滚动条的HFlowBox容器 |
-| VFlowScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 垂直流式布局（VFlowLayout）| 支持垂直或水平滚动条的VFlowBox容器 |
-| HTileScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 水平瓦片布局（HTileLayout）| 支持垂直或水平滚动条的HTileBox容器 |
-| VTileScrollBox | Box|[duilib/Box/ScrollBox.h](../duilib/Box/ScrollBox.h) | 垂直瓦片布局（VTileLayout）| 支持垂直或水平滚动条的VTileBox容器 |
-| ListBox | ScrollBox|[duilib/Box/ListBox.h](../duilib/Box/ListBox.h) | 浮动布局（Layout）     | 支持垂直或水平滚动条的列表容器|
-| HListBox | ScrollBox|[duilib/Box/ListBox.h](../duilib/Box/ListBox.h) | 水平布局（HLayout）   | 支持垂直或水平滚动条的列表容器|
-| VListBox | ScrollBox|[duilib/Box/ListBox.h](../duilib/Box/ListBox.h) | 垂直布局（VLayout）   | 支持垂直或水平滚动条的列表容器 |
-| HTileListBox | ScrollBox|[duilib/Box/ListBox.h](../duilib/Box/ListBox.h) | 水平瓦片布局（HTileLayout）| 支持垂直或水平滚动条的列表容器 |
-| VTileListBox | ScrollBox|[duilib/Box/ListBox.h](../duilib/Box/ListBox.h) | 垂直瓦片布局（VTileLayout）| 支持垂直或水平滚动条的列表容器 |
-| VirtualListBox | ListBox|[duilib/Box/VirtualListBox.h](../duilib/Box/VirtualListBox.h) | 浮动布局（Layout）     | 虚表实现的ListBox，支持大数据量，支持滚动条 |
-| VirtualHListBox | ListBox|[duilib/Box/VirtualListBox.h](../duilib/Box/VirtualListBox.h) | 水平布局（HLayout）   | 虚表实现的ListBox，支持大数据量，支持滚动条 |
-| VirtualVListBox | ListBox|[duilib/Box/VirtualListBox.h](../duilib/Box/VirtualListBox.h) | 垂直布局（VLayout）   | 虚表实现的ListBox，支持大数据量，支持滚动条 |
-| VirtualHTileListBox | ListBox|[duilib/Box/VirtualListBox.h](../duilib/Box/VirtualListBox.h) | 水平瓦片布局（HTileLayout）| 虚表实现的ListBox，支持大数据量，支持滚动条 |
-| VirtualVTileListBox | ListBox|[duilib/Box/VirtualListBox.h](../duilib/Box/VirtualListBox.h) | 垂直瓦片布局（VTileLayout）| 虚表实现的ListBox，支持大数据量，支持滚动条 |
-| TabBox | Box|[duilib/Box/TabBox.h](../duilib/Box/TabBox.h) | 浮动布局（Layout） | 页管理容器，内部的多个子控件，只有一个可见，其他是隐藏的，可动态切换 |
-| GridBox | Box|[duilib/Box/GridBox.h](../duilib/Box/GridBox.h) | 网格布局（GridLayout） | 网格布局容器，支持单元格合并 |
-| GridScrollBox | ScrollBox|[duilib/Box/GridBox.h](../duilib/Box/GridBox.h) | 网格布局（GridLayout） | 网格布局容器，支持单元格合并，支持滚动条 |
-| BoxDragable | Box|[duilib/Core/ControlDragable.h](../duilib/Core/ControlDragable.h) | 浮动布局（Layout）    | 支持子控件的拖入/拖出操作的容器 |
-| HBoxDragable | HBox|[duilib/Core/ControlDragable.h](../duilib/Core/ControlDragable.h) | 水平布局（HLayout） | 支持子控件的拖入/拖出操作的容器 |
-| VBoxDragable | VBox|[duilib/Core/ControlDragable.h](../duilib/Core/ControlDragable.h) | 垂直布局（VLayout） | 支持子控件的拖入/拖出操作的容器 |
+| Box      | Control|[duilib/Core/Box.h](../src/duilib/Core/Box.h) | 浮动布局（Layout） | 容器基类(Container)，子控件按浮动布局排列|
+| HBox     | Box|[duilib/Box/HBox.h](../src/duilib/Box/HBox.h) | 水平布局（HLayout） | 子控件在水平方向上，依次排列，不换行|
+| VBox     | Box|[duilib/Box/VBox.h](../src/duilib/Box/VBox.h) | 垂直布局（VLayout） | 子控件在垂直方向上，依次排列，不换行|
+| HFlowBox | Box|[duilib/Box/HBox.h](../src/duilib/Box/HBox.h) | 水平流式布局（HFlowLayout） | 子控件在水平方向上，依次排列，自动换行|
+| VFlowBox | Box|[duilib/Box/VBox.h](../src/duilib/Box/VBox.h) | 垂直流式布局（VFlowLayout） | 子控件在垂直方向上，依次排列，自动换行|
+| HTileBox | Box|[duilib/Box/TileBox.h](../src/duilib/Box/TileBox.h) | 水平瓦片布局（HTileLayout） |水平瓦片布局的容器，支持设置行数|
+| VTileBox | Box|[duilib/Box/TileBox.h](../src/duilib/Box/TileBox.h) | 垂直瓦片布局（VTileLayout） |垂直瓦片布局的容器，支持设置列数|
+| ScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 浮动布局（Layout）     | 支持垂直或水平滚动条的Box容器 |
+| HScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 水平布局（HLayout）   | 支持垂直或水平滚动条的HBox容器 |
+| VScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 垂直布局（VLayout）   | 支持垂直或水平滚动条的VBox容器 |
+| HFlowScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 水平流式布局（HFlowLayout）| 支持垂直或水平滚动条的HFlowBox容器 |
+| VFlowScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 垂直流式布局（VFlowLayout）| 支持垂直或水平滚动条的VFlowBox容器 |
+| HTileScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 水平瓦片布局（HTileLayout）| 支持垂直或水平滚动条的HTileBox容器 |
+| VTileScrollBox | Box|[duilib/Box/ScrollBox.h](../src/duilib/Box/ScrollBox.h) | 垂直瓦片布局（VTileLayout）| 支持垂直或水平滚动条的VTileBox容器 |
+| ListBox | ScrollBox|[duilib/Box/ListBox.h](../src/duilib/Box/ListBox.h) | 浮动布局（Layout）     | 支持垂直或水平滚动条的列表容器|
+| HListBox | ScrollBox|[duilib/Box/ListBox.h](../src/duilib/Box/ListBox.h) | 水平布局（HLayout）   | 支持垂直或水平滚动条的列表容器|
+| VListBox | ScrollBox|[duilib/Box/ListBox.h](../src/duilib/Box/ListBox.h) | 垂直布局（VLayout）   | 支持垂直或水平滚动条的列表容器 |
+| HTileListBox | ScrollBox|[duilib/Box/ListBox.h](../src/duilib/Box/ListBox.h) | 水平瓦片布局（HTileLayout）| 支持垂直或水平滚动条的列表容器 |
+| VTileListBox | ScrollBox|[duilib/Box/ListBox.h](../src/duilib/Box/ListBox.h) | 垂直瓦片布局（VTileLayout）| 支持垂直或水平滚动条的列表容器 |
+| VirtualListBox | ListBox|[duilib/Box/VirtualListBox.h](../src/duilib/Box/VirtualListBox.h) | 浮动布局（Layout）     | 虚表实现的ListBox，支持大数据量，支持滚动条 |
+| VirtualHListBox | ListBox|[duilib/Box/VirtualListBox.h](../src/duilib/Box/VirtualListBox.h) | 水平布局（HLayout）   | 虚表实现的ListBox，支持大数据量，支持滚动条 |
+| VirtualVListBox | ListBox|[duilib/Box/VirtualListBox.h](../src/duilib/Box/VirtualListBox.h) | 垂直布局（VLayout）   | 虚表实现的ListBox，支持大数据量，支持滚动条 |
+| VirtualHTileListBox | ListBox|[duilib/Box/VirtualListBox.h](../src/duilib/Box/VirtualListBox.h) | 水平瓦片布局（HTileLayout）| 虚表实现的ListBox，支持大数据量，支持滚动条 |
+| VirtualVTileListBox | ListBox|[duilib/Box/VirtualListBox.h](../src/duilib/Box/VirtualListBox.h) | 垂直瓦片布局（VTileLayout）| 虚表实现的ListBox，支持大数据量，支持滚动条 |
+| TabBox | Box|[duilib/Box/TabBox.h](../src/duilib/Box/TabBox.h) | 浮动布局（Layout） | 页管理容器，内部的多个子控件，只有一个可见，其他是隐藏的，可动态切换 |
+| GridBox | Box|[duilib/Box/GridBox.h](../src/duilib/Box/GridBox.h) | 网格布局（GridLayout） | 网格布局容器，支持单元格合并 |
+| GridScrollBox | ScrollBox|[duilib/Box/GridBox.h](../src/duilib/Box/GridBox.h) | 网格布局（GridLayout） | 网格布局容器，支持单元格合并，支持滚动条 |
+| BoxDragable | Box|[duilib/Core/ControlDragable.h](../src/duilib/Core/ControlDragable.h) | 浮动布局（Layout）    | 支持子控件的拖入/拖出操作的容器 |
+| HBoxDragable | HBox|[duilib/Core/ControlDragable.h](../src/duilib/Core/ControlDragable.h) | 水平布局（HLayout） | 支持子控件的拖入/拖出操作的容器 |
+| VBoxDragable | VBox|[duilib/Core/ControlDragable.h](../src/duilib/Core/ControlDragable.h) | 垂直布局（VLayout） | 支持子控件的拖入/拖出操作的容器 |
 
 容器（Box）包含如下基础属性：    
 * 子控件之间的间隔（X方向和Y方向）: child_margin_x/child_margin_y
@@ -75,18 +75,18 @@
   按照布局方案不同，布局（Layout）的分类如下：    
 | 类名称（布局） | 基类名称 |关联头文件| 布局方案说明 |
 | :--- | :--- |:--- | :--- |
-| Layout | |[duilib/Layout/Layout.h](../duilib/Layout/Layout.h) | 浮动布局：子控件之间无关联，均使用自身的属性设置控件位置和大小 |
-| HLayout |Layout |[duilib/Layout/HLayout.h](../duilib/Layout/HLayout.h) | 水平布局：子控件在水平方向上，依次排列，不换行|
-| VLayout |Layout |[duilib/Layout/VLayout.h](../duilib/Layout/VLayout.h) | 垂直布局：子控件在垂直方向上，依次排列，不换行|
-| HFlowLayout |Layout |[duilib/Layout/HFlowLayout.h](../duilib/Layout/HFlowLayout.h) | 水平布局：子控件在水平方向上，依次排列，自动换行|
-| VFlowLayout |Layout |[duilib/Layout/VFlowLayout.h](../duilib/Layout/VFlowLayout.h) | 垂直布局：子控件在垂直方向上，依次排列，自动换行|
-| HTileLayout |Layout| [duilib/Layout/HTileLayout.h](../duilib/Layout/HTileLayout.h) | 水平瓦片布局，支持设置行数|
-| VTileLayout |Layout| [duilib/Layout/VTileLayout.h](../duilib/Layout/VTileLayout.h) | 垂直瓦片布局，支持设置列数|
-| GridLayout  |Layout |[duilib/Layout/GridLayout.h](../duilib/Layout/GridLayout.h) | 网格布局|
-| VirtualHLayout |HLayout| [duilib/Layout/VirtualHLayout.h](../duilib/Layout/VirtualHLayout.h) | 虚表水平布局，单行|
-| VirtualVLayout |VLayout| [duilib/Layout/VirtualVLayout.h](../duilib/Layout/VirtualVLayout.h) | 虚表垂直布局，单列|
-| VirtualHTileLayout |HTileLayout| [duilib/Layout/VirtualHTileLayout.h](../duilib/Layout/VirtualHTileLayout.h) | 虚表水平瓦片布局，支持设置行数|
-| VirtualVTileLayout |VTileLayout| [duilib/Layout/VirtualVTileLayout.h](../duilib/Layout/VirtualVTileLayout.h) | 虚表垂直瓦片布局，支持设置列数|
+| Layout | |[duilib/Layout/Layout.h](../src/duilib/Layout/Layout.h) | 浮动布局：子控件之间无关联，均使用自身的属性设置控件位置和大小 |
+| HLayout |Layout |[duilib/Layout/HLayout.h](../src/duilib/Layout/HLayout.h) | 水平布局：子控件在水平方向上，依次排列，不换行|
+| VLayout |Layout |[duilib/Layout/VLayout.h](../src/duilib/Layout/VLayout.h) | 垂直布局：子控件在垂直方向上，依次排列，不换行|
+| HFlowLayout |Layout |[duilib/Layout/HFlowLayout.h](../src/duilib/Layout/HFlowLayout.h) | 水平布局：子控件在水平方向上，依次排列，自动换行|
+| VFlowLayout |Layout |[duilib/Layout/VFlowLayout.h](../src/duilib/Layout/VFlowLayout.h) | 垂直布局：子控件在垂直方向上，依次排列，自动换行|
+| HTileLayout |Layout| [duilib/Layout/HTileLayout.h](../src/duilib/Layout/HTileLayout.h) | 水平瓦片布局，支持设置行数|
+| VTileLayout |Layout| [duilib/Layout/VTileLayout.h](../src/duilib/Layout/VTileLayout.h) | 垂直瓦片布局，支持设置列数|
+| GridLayout  |Layout |[duilib/Layout/GridLayout.h](../src/duilib/Layout/GridLayout.h) | 网格布局|
+| VirtualHLayout |HLayout| [duilib/Layout/VirtualHLayout.h](../src/duilib/Layout/VirtualHLayout.h) | 虚表水平布局，单行|
+| VirtualVLayout |VLayout| [duilib/Layout/VirtualVLayout.h](../src/duilib/Layout/VirtualVLayout.h) | 虚表垂直布局，单列|
+| VirtualHTileLayout |HTileLayout| [duilib/Layout/VirtualHTileLayout.h](../src/duilib/Layout/VirtualHTileLayout.h) | 虚表水平瓦片布局，支持设置行数|
+| VirtualVTileLayout |VTileLayout| [duilib/Layout/VirtualVTileLayout.h](../src/duilib/Layout/VirtualVTileLayout.h) | 虚表垂直瓦片布局，支持设置列数|
 
 容器在布局子控件时，关联的子控件（可以是Control或者Box及其子类）属性主要有：    
 * 容器的内边距：padding

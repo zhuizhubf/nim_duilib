@@ -1,5 +1,5 @@
 ## 菜单
-菜单的实现是基于窗口([WindowImplBase](../duilib/Utils/WinImplBase.h))实现的，主要由[Menu](../duilib/Control/Menu.h)和[MenuItem](../duilib/Control/Menu.h)两个类组成。
+菜单的实现是基于窗口([WindowImplBase](../src/duilib/Utils/WinImplBase.h))实现的，主要由[Menu](../src/duilib/Control/Menu.h)和[MenuItem](../src/duilib/Control/Menu.h)两个类组成。
 1. 菜单的效果预览
 这个预览是`examples/controls`示例程序中的菜单。
 <img src="./Images/Menu.png"/>

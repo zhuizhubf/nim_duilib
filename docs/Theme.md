@@ -251,7 +251,7 @@ duilib 在加载资源（图片、XML、Class）时按以下顺序查找：
 
 ### 8.1 启动期参数 `ResourceParam`
 
-详见 [ResourceParam.h](../duilib/Core/ResourceParam.h)：
+详见 [ResourceParam.h](../src/duilib/Core/ResourceParam.h)：
 
 | 字段 | 类型 | 说明 |
 | :--- | :--- | :--- |
@@ -482,13 +482,13 @@ duilib 自带以下工具协助主题调试：
 
 ## 14. 相关文档与源码
 
-- 源码：[ThemeManager.h](../duilib/Core/ThemeManager.h) / [ThemeManager.cpp](../duilib/Core/ThemeManager.cpp)
-- 颜色管理：[ColorManager.h](../duilib/Core/ColorManager.h) / [ColorManager.cpp](../duilib/Core/ColorManager.cpp)
-- 全局管理：[GlobalManager.h](../duilib/Core/GlobalManager.h) / [GlobalManager.cpp](../duilib/Core/GlobalManager.cpp)
-- 资源参数：[ResourceParam.h](../duilib/Core/ResourceParam.h)
+- 源码：[ThemeManager.h](../src/duilib/Core/ThemeManager.h) / [ThemeManager.cpp](../src/duilib/Core/ThemeManager.cpp)
+- 颜色管理：[ColorManager.h](../src/duilib/Core/ColorManager.h) / [ColorManager.cpp](../src/duilib/Core/ColorManager.cpp)
+- 全局管理：[GlobalManager.h](../src/duilib/Core/GlobalManager.h) / [GlobalManager.cpp](../src/duilib/Core/GlobalManager.cpp)
+- 资源参数：[ResourceParam.h](../src/duilib/Core/ResourceParam.h)
 - 主题格式规范：[ThemeColor.md](./ThemeColor.md)
 - 全局资源节点说明：[Global.md](./Global.md)
-- 主题生成器：[ThemeGenerator.h](../duilib/Core/ThemeGenerator.h) / [ThemeGenerator.cpp](../duilib/Core/ThemeGenerator.cpp)
+- 主题生成器：[ThemeGenerator.h](../src/duilib/Core/ThemeGenerator.h) / [ThemeGenerator.cpp](../src/duilib/Core/ThemeGenerator.cpp)
 - 示例工程：[examples/ColorTheme](../examples/ColorTheme)
 - 内置主题：`color_light/`、`color_dark/`
 - 主题编辑器（HTML）：[docs/Tools/ColorThemeMgr.html](./Tools/ColorThemeMgr.html)

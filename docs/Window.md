@@ -1,5 +1,5 @@
-﻿## 窗口的属性
-| 属性名称          | 属性分类| 默认值  |参数类型| 关联[Window.h](../duilib/Core/Window.h)中的函数| 用途 |
+## 窗口的属性
+| 属性名称          | 属性分类| 默认值  |参数类型| 关联[Window.h](../src/duilib/Core/Window.h)中的函数| 用途 |
 | :---              | :---    | :---    | :---   |:---                     |:--- |
 | caption           | 标题栏  | "0,0,0,0" | rect   | SetCaptionRect          |窗口可拖动的标题栏大小的边距, 最后一个参数是指离上边框的距离,如"0,0,0,36" |
 | use_system_caption| 标题栏  | false   | bool   | SetUseSystemCaption     |设置是否使用系统标题栏 |
@@ -30,7 +30,7 @@
 | render_backend_type|窗口绘制| "CPU"   | string |SetRenderBackendType     | "CPU": CPU绘制 <br> "GL": 使用OpenGL绘制 <br> 注意事项: <br> （1）一个线程内，只允许有一个窗口使用OpenGL绘制，否则会出现导致程序崩溃的问题 <br> （2）OpenGL绘制的窗口，不能是分层窗口（即带有WS_EX_LAYERED属性的窗口），因此使用GL渲染时，`layered_window`、`alpha`、`opacity` 属性均无效 <br> （3）使用OpenGL的窗口，每次绘制都是绘制整个窗口，不支持局部绘制，所以不一定比使用CPU绘制的情况下性能更好|
 
 备注：窗口阴影相关的内容，请参考文档：[WindowShadow.md](WindowShadow.md)    
-备注：窗口属性的解析函数参见：[WindowBuilder::ParseWindowAttributes函数](../duilib/Core/WindowBuilder.cpp)    
+备注：窗口属性的解析函数参见：[WindowBuilder::ParseWindowAttributes函数](../src/duilib/Core/WindowBuilder.cpp)    
 备注：窗口在XML中的标签名称是："Window"     
 使用示例：    
 ```xml

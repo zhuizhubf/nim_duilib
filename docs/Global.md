@@ -1,4 +1,4 @@
-﻿# Global（全局样式）
+# Global（全局样式）
 
 Global 全局样式提供了通用的样式列表，避免在多个不同的 XML 中出现相同的描述而产生冗余的代码和消耗开发人员在界面设置上的时间。
 
@@ -109,7 +109,7 @@ Font标签的id属性，定义了一个字体ID，该字体ID表示定义了一�
 一个合法的颜色取值（value）定义如下：
 1. 格式如："#FFFFFFFF"形式，以"#"开头，8个16进制字符构成，ARGB格式的颜色值（从左到右：第1、2个字符代表A（透明度），第3、4个字符代表R（红），第5、6个字符代表G（绿），第7、8个字符代表B（蓝）；
 2. 格式如："#FFFFFF"形式，以"#"开头，6个16进制字符构成，RGB格式的颜色值（从左到右：第1、2个字符代表R（红），第3、4个字符代表G（绿），第5、6个字符代表B（蓝）。这种格式的颜色不含透明通道，按照不透明处理；
-3. 直接指定预定义的颜色别名：比如"Blue"表示蓝色，"Aqua"表示浅绿色等，这个颜色别名在[duilib/Core/UiColors.cpp](../duilib/Core/UiColors.cpp)文件中定义，颜色值在[duilib/Core/UiColors.h](../duilib/Core/UiColors.h)文件中定义。这些颜色别名，可直接使用，不需要在`global.xml`中定义颜色。    
+3. 直接指定预定义的颜色别名：比如"Blue"表示蓝色，"Aqua"表示浅绿色等，这个颜色别名在[duilib/Core/UiColors.cpp](../src/duilib/Core/UiColors.cpp)文件中定义，颜色值在[duilib/Core/UiColors.h](../src/duilib/Core/UiColors.h)文件中定义。这些颜色别名，可直接使用，不需要在`global.xml`中定义颜色。    
 举例：以下XML配置都是正确的：
 ```xml
 <Label text="Hello Label" normal_text_color="Aqua"/>
@@ -250,18 +250,18 @@ Font标签的id属性，定义了一个字体ID，该字体ID表示定义了一�
 
 | 类名称 | 关联头文件| 用途 |
 | :--- | :--- | :--- |
-| GlobalManager | [duilib/Core/GlobalManager.h](../duilib/Core/GlobalManager.h) | 全局属性管理工具类，用于管理一些全局属性的工具类，包含全局样式（global.xml）和语言设置等 |
-| IRenderFactory | [duilib/Render/IRender.h](../duilib/Render/IRender.h) | 渲染接口的管理类，渲染接口管理，用于创建Font、Pen、Brush、Path、Matrix、Bitmap、Render等渲染实现对象 |
-| FontManager | [duilib/Core/FontManager.h](../duilib/Core/FontManager.h) | 字体的管理类 |
-| ColorManager | [duilib/Core/ColorManager.h](../duilib/Core/ColorManager.h) | 颜色的管理类 |
-| IconManager | [duilib/Core/IconManager.h](../duilib/Core/IconManager.h) | HICON句柄管理器 |
-| ZipManager | [duilib/Core/ZipManager.h](../duilib/Core/ZipManager.h) | ZIP压缩包管理器 |
-| DpiManager | [duilib/Core/DpiManager.h](../duilib/Core/DpiManager.h) | DPI管理器，用于支持DPI自适应等功能 |
-| TimerManager | [duilib/Core/TimerManager.h](../duilib/Core/TimerManager.h) | 定时器管理器 |
-| LangManager | [duilib/Core/LangManager.h](../duilib/Core/LangManager.h) | 多语言支持管理器 |
-| ImageManager | [duilib/Core/ImageManager.h](../duilib/Core/ImageManager.h) | 图片的管理类 |
-| ImageDecoderFactory | [duilib/Image/ImageDecoderFactory.h](../duilib/Image/ImageDecoderFactory.h) | 图片解码器的管理类，支持扩展图片格式 |
-| ThreadManager | [duilib/Core/ThreadManager.h](../duilib/Core/ThreadManager.h) | 线程管理器，用以支持线程间通信 |
-| CursorManager | [duilib/Core/CursorManager.h](../duilib/Core/CursorManager.h) | 光标管理类 |
-| WindowManager | [duilib/Core/WindowManager.h](../duilib/Core/WindowManager.h) | 窗口管理类 |
-| ThemeManager  | [duilib/Core/ThemeManager.h](../duilib/Core/ThemeManager.h) | 主题管理类 |
+| GlobalManager | [duilib/Core/GlobalManager.h](../src/duilib/Core/GlobalManager.h) | 全局属性管理工具类，用于管理一些全局属性的工具类，包含全局样式（global.xml）和语言设置等 |
+| IRenderFactory | [render/IRender.h](../src/render/IRender.h) | 渲染接口的管理类，渲染接口管理，用于创建Font、Pen、Brush、Path、Matrix、Bitmap、Render等渲染实现对象 |
+| FontManager | [duilib/Core/FontManager.h](../src/duilib/Core/FontManager.h) | 字体的管理类 |
+| ColorManager | [duilib/Core/ColorManager.h](../src/duilib/Core/ColorManager.h) | 颜色的管理类 |
+| IconManager | [duilib/Core/IconManager.h](../src/duilib/Core/IconManager.h) | HICON句柄管理器 |
+| ZipManager | [duilib/Core/ZipManager.h](../src/duilib/Core/ZipManager.h) | ZIP压缩包管理器 |
+| DpiManager | [duilib/Core/DpiManager.h](../src/duilib/Core/DpiManager.h) | DPI管理器，用于支持DPI自适应等功能 |
+| TimerManager | [duilib/Core/TimerManager.h](../src/duilib/Core/TimerManager.h) | 定时器管理器 |
+| LangManager | [duilib/Core/LangManager.h](../src/duilib/Core/LangManager.h) | 多语言支持管理器 |
+| ImageManager | [duilib/Core/ImageManager.h](../src/duilib/Core/ImageManager.h) | 图片的管理类 |
+| ImageDecoderFactory | [duilib/Image/ImageDecoderFactory.h](../src/duilib/Image/ImageDecoderFactory.h) | 图片解码器的管理类，支持扩展图片格式 |
+| ThreadManager | [duilib/Core/ThreadManager.h](../src/duilib/Core/ThreadManager.h) | 线程管理器，用以支持线程间通信 |
+| CursorManager | [duilib/Core/CursorManager.h](../src/duilib/Core/CursorManager.h) | 光标管理类 |
+| WindowManager | [duilib/Core/WindowManager.h](../src/duilib/Core/WindowManager.h) | 窗口管理类 |
+| ThemeManager  | [duilib/Core/ThemeManager.h](../src/duilib/Core/ThemeManager.h) | 主题管理类 |
