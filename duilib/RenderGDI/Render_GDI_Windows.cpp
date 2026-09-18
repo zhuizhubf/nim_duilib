@@ -455,7 +455,7 @@ void Render_GDI_Windows::DrawImage(const UiRect& /*rcPaint*/, IBitmap* pBitmap,
                                    const UiRect& rcSource, const UiRect& rcSourceCorners,
                                    uint8_t uFade,
                                    const TiledDrawParam* pTiledDrawParam,
-                                   bool /*bWindowShadowMode*/)
+                                   bool bWindowShadowMode)
 {
     if ((pBitmap == nullptr) || rcDest.IsEmpty() || rcSource.IsEmpty()) {
         return;
@@ -477,6 +477,13 @@ void Render_GDI_Windows::DrawImage(const UiRect& /*rcPaint*/, IBitmap* pBitmap,
             UiRect rcSrc(xSrc[x], ySrc[y], xSrc[x + 1], ySrc[y + 1]);
             UiRect rcDst(xDest[x], yDest[y], xDest[x + 1], yDest[y + 1]);
             if ((x == 1) && (y == 1)) {
+                if (bWindowShadowMode) {
+                    continue;
+                }
+                if ((pTiledDrawParam != nullptr) &&
+                    !pTiledDrawParam->m_bTiledX && !pTiledDrawParam->m_bTiledY) {
+                    continue;
+                }
                 if (pTiledDrawParam != nullptr) {
                     for (int32_t nY = rcDst.top; nY < rcDst.bottom; nY += rcSrc.Height()) {
                         for (int32_t nX = rcDst.left; nX < rcDst.right; nX += rcSrc.Width()) {

@@ -257,6 +257,7 @@ private:
     DString m_defaultFontName;
     IFallbackFontMgr* m_pFallbackFontMgr = nullptr;
     std::vector<HANDLE> m_fontMemHandles;
+    std::vector<std::vector<uint8_t>> m_fontDataBuffers;
     std::vector<DString> m_fontFilePaths;
 };
 

@@ -746,13 +746,16 @@ bool GdiFontMgr::LoadFontFileData(const void* data, size_t length)
     if ((data == nullptr) || (length == 0)) {
         return false;
     }
+    m_fontDataBuffers.emplace_back((const uint8_t*)data, (const uint8_t*)data + length);
+    std::vector<uint8_t>& fontData = m_fontDataBuffers.back();
     DWORD nFonts = 0;
-    HANDLE hFont = ::AddFontMemResourceEx(const_cast<void*>(data), (DWORD)length, nullptr, &nFonts);
+    HANDLE hFont = ::AddFontMemResourceEx(fontData.data(), (DWORD)fontData.size(), nullptr, &nFonts);
     if ((hFont != nullptr) && (nFonts > 0)) {
         m_fontMemHandles.push_back(hFont);
         ClearFontCache();
         return true;
     }
+    m_fontDataBuffers.pop_back();
     return false;
 }
 
@@ -766,6 +769,7 @@ void GdiFontMgr::ClearFontFiles()
         ::RemoveFontMemResourceEx(hFont);
     }
     m_fontMemHandles.clear();
+    m_fontDataBuffers.clear();
     ClearFontCache();
 }
 
