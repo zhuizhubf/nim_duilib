@@ -1,6 +1,7 @@
 #ifndef DUILIB_HEADERS_H_
 #define DUILIB_HEADERS_H_
 
+#include "Utils/AttributeIds.g.h"
 #include "Utils/Clipboard.h"
 #include "Utils/FilePath.h"
 #include "Utils/FilePathUtil.h"

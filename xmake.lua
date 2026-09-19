@@ -197,6 +197,25 @@ task("format-check")
     }
 task_end()
 
+task("attribute-gen")
+    on_run("attribute_gen")
+    set_menu {
+        usage = "xmake attribute-gen",
+        description = "由 attribute_defs.lua 生成 src/duilib/Utils/AttributeIds.g.h 与 .g.cpp",
+    }
+task_end()
+
+task("attribute-check")
+    on_run("attribute_check")
+    set_menu {
+        usage = "xmake attribute-check [options]",
+        description = "检查属性名登记表：生成物同步、裸字面量残留、XML 语料覆盖（加 --baseline 再比对 git HEAD）",
+        options = {
+            {'b', "baseline", "k", nil, "额外比对 git HEAD 的名字集合与登记表是否完全一致"},
+        }
+    }
+task_end()
+
 includes("xmake/third_party.lua")
 includes("xmake/duilib.lua")
 
