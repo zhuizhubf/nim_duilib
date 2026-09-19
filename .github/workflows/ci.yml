@@ -160,6 +160,10 @@ jobs:
           xmake f -y -o build/build_temp/xmake -c -m release -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}
           xmake -y
 
+      - name: Check attribute registry
+        shell: bash
+        run: xmake attribute-check
+
       - name: Smoke test (Linux, Xvfb)
         if: matrix.smoke == true
         shell: bash
