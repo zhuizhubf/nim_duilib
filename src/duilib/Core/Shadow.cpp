@@ -3,6 +3,7 @@
 #include "duilib/Core/ClickThrough.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "render/AutoClip.h"
 #include "render/IRender.h"
 
@@ -488,37 +489,68 @@ bool Shadow::HasShadowBox() const
 
 bool Shadow::GetShadowType(const DString &typeString, ShadowType &nShadowType)
 {
-    if (typeString == _T("big")) {
+    switch (attr::shadow::IdOf(typeString)) {
+    case attr::shadow::kBig: {
         nShadowType = ShadowType::kShadowBig;
-    } else if (typeString == _T("big_round")) {
+        break;
+    }
+    case attr::shadow::kBigRound: {
         nShadowType = ShadowType::kShadowBigRound;
-    } else if (typeString == _T("small")) {
+        break;
+    }
+    case attr::shadow::kSmall: {
         nShadowType = ShadowType::kShadowSmall;
-    } else if (typeString == _T("small_round")) {
+        break;
+    }
+    case attr::shadow::kSmallRound: {
         nShadowType = ShadowType::kShadowSmallRound;
-    } else if (typeString == _T("menu")) {
+        break;
+    }
+    case attr::shadow::kMenu: {
         nShadowType = ShadowType::kShadowMenu;
-    } else if (typeString == _T("menu_round")) {
+        break;
+    }
+    case attr::shadow::kMenuRound: {
         nShadowType = ShadowType::kShadowMenuRound;
-    } else if (typeString == _T("none")) {
+        break;
+    }
+    case attr::shadow::kNone: {
         nShadowType = ShadowType::kShadowNone;
-    } else if (typeString == _T("none_round")) {
+        break;
+    }
+    case attr::shadow::kNoneRound: {
         nShadowType = ShadowType::kShadowNoneRound;
-    } else if (typeString == _T("custom")) {
+        break;
+    }
+    case attr::shadow::kCustom: {
         nShadowType = ShadowType::kShadowCustom;
-    } else if (typeString == _T("default")) {
+        break;
+    }
+    case attr::shadow::kDefault: {
         nShadowType = ShadowType::kShadowDefault;
-    } else if (typeString == _T("system_default")) {
+        break;
+    }
+    case attr::shadow::kSystemDefault: {
         nShadowType = ShadowType::kShadowSystemDefault;
-    } else if (typeString == _T("system_not_round")) {
+        break;
+    }
+    case attr::shadow::kSystemNotRound: {
         nShadowType = ShadowType::kShadowSystemDoNotRound;
-    } else if (typeString == _T("system_round")) {
+        break;
+    }
+    case attr::shadow::kSystemRound: {
         nShadowType = ShadowType::kShadowSystemRound;
-    } else if (typeString == _T("system_small_round")) {
+        break;
+    }
+    case attr::shadow::kSystemSmallRound: {
         nShadowType = ShadowType::kShadowSystemSmallRound;
-    } else {
+        break;
+    }
+    default: {
         ASSERT(0);
         return false;
+        break;
+    }
     }
     return true;
 }

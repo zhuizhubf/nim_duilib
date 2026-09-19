@@ -2,6 +2,7 @@
 #include "duilib/Core/Box.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "render/IRender.h"
 
@@ -79,44 +80,67 @@ bool ControlLoading::InitAttribute(LoadingAttribute &loadingAttribute, const DSt
         if (name.empty() || value.empty()) {
             continue;
         }
-        if (name == _T("file")) {
+        switch (attr::loading::IdOf(name)) {
+        case attr::loading::kFile: {
             //XML资源文件名，根据此设置去加载XML资源，最终放在一个Box容器中显示
             loadingAttribute.m_sXmlPath = value;
-        } else if (name == _T("width")) {
+            break;
+        }
+        case attr::loading::kWidth: {
             //设置宽度
             loadingAttribute.m_nWidth = StringUtil::StringToInt32(value);
-        } else if (name == _T("height")) {
+            break;
+        }
+        case attr::loading::kHeight: {
             //设置高度
             loadingAttribute.m_nHeight = StringUtil::StringToInt32(value);
-        } else if (name == _T("offset_x")) {
+            break;
+        }
+        case attr::loading::kOffsetX: {
             //设置X偏移
             loadingAttribute.m_nOffsetX = StringUtil::StringToInt32(value);
-        } else if (name == _T("offset_y")) {
+            break;
+        }
+        case attr::loading::kOffsetY: {
             //设置Y偏移
             loadingAttribute.m_nOffsetY = StringUtil::StringToInt32(value);
-        } else if (name == _T("halign")) {
+            break;
+        }
+        case attr::loading::kHalign: {
             //在目标区域中设置横向对齐方式
             ASSERT((value == _T("left")) || (value == _T("center")) || (value == _T("right")));
             if ((value == _T("left")) || (value == _T("center")) || (value == _T("right"))) {
                 loadingAttribute.m_hAlign = value;
             }
-        } else if (name == _T("valign")) {
+            break;
+        }
+        case attr::loading::kValign: {
             //在目标区域中设置纵向对齐方式
             ASSERT((value == _T("top")) || (value == _T("center")) || (value == _T("bottom")));
             if ((value == _T("top")) || (value == _T("center")) || (value == _T("bottom"))) {
                 loadingAttribute.m_vAlign = value;
             }
-        } else if (name == _T("fade")) {
+            break;
+        }
+        case attr::loading::kFade: {
             //loading控件的透明度
             loadingAttribute.m_bFade = (uint8_t) StringUtil::StringToInt32(value);
-        } else if (name == _T("auto_stop")) {
+            break;
+        }
+        case attr::loading::kAutoStop: {
             //loading动画播放结束以后，自动停止loading状态
             loadingAttribute.m_bAutoStopWhenAnimationEnd = value == _T("true");
-        } else if (name == _T("animation_control")) {
+            break;
+        }
+        case attr::loading::kAnimationControl: {
             //动画控件的名称，用于Loading功能与loading控件上的动画控件交互使用
             loadingAttribute.m_sAnimationControlName = value;
-        } else {
+            break;
+        }
+        default: {
             ASSERT(!"ControlLoading::InitAttribute: fount unknown attribute!");
+            break;
+        }
         }
     }
     return !loadingAttribute.m_sXmlPath.empty();
