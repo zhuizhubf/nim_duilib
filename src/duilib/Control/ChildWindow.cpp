@@ -26,15 +26,21 @@ DString ChildWindow::GetType() const
     return DUI_CTR_CHILD_WINDOW;
 }
 
-void ChildWindow::SetAttribute(const DString &strName, const DString &strValue2)
+void ChildWindow::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("child_window_margin")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kChildWindowMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetChildWindowMargin(rcMargin, true);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

@@ -32,33 +32,59 @@ DString AddressBar::GetType() const
     return DUI_CTR_ADDRESS_BAR;
 }
 
-void AddressBar::SetAttribute(const DString &strName, const DString &strValue2)
+void AddressBar::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("address_path")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kAddressPath: {
         SetAddressPath(strValue);
-    } else if (strName == _T("path_tooltip")) {
+        break;
+    }
+    case ui::attr::control::kPathTooltip: {
         SetEnablePathTooltip(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("return_update_ui")) {
+        break;
+    }
+    case ui::attr::control::kReturnUpdateUi: {
         SetReturnUpdateUI(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("esc_update_ui")) {
+        break;
+    }
+    case ui::attr::control::kEscUpdateUi: {
         SetEscUpdateUI(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("kill_focus_update_ui")) {
+        break;
+    }
+    case ui::attr::control::kKillFocusUpdateUi: {
         SetKillFocusUpdateUI(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("rich_edit_class")) {
+        break;
+    }
+    case ui::attr::control::kRichEditClass: {
         SetRichEditClass(strValue);
-    } else if (strName == _T("rich_edit_clear_btn_class")) {
+        break;
+    }
+    case ui::attr::control::kRichEditClearBtnClass: {
         SetRichEditClearBtnClass(strValue);
-    } else if (strName == _T("sub_path_hbox_class")) {
+        break;
+    }
+    case ui::attr::control::kSubPathHboxClass: {
         SetSubPathHBoxClass(strValue);
-    } else if (strName == _T("sub_path_button_class")) {
+        break;
+    }
+    case ui::attr::control::kSubPathButtonClass: {
         SetSubPathBtnClass(strValue);
-    } else if (strName == _T("sub_path_root_class")) {
+        break;
+    }
+    case ui::attr::control::kSubPathRootClass: {
         SetSubPathRootClass(strValue);
-    } else if (strName == _T("path_separator_class")) {
+        break;
+    }
+    case ui::attr::control::kPathSeparatorClass: {
         SetPathSeparatorClass(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

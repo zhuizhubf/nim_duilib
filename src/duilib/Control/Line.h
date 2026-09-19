@@ -16,7 +16,8 @@ public:
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比

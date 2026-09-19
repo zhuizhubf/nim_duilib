@@ -299,51 +299,81 @@ DString ComboButton::GetType() const
     return DUI_CTR_COMBO_BUTTON;
 }
 
-void ComboButton::SetAttribute(const DString &strName, const DString &strValue2)
+void ComboButton::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kDropboxSize:
+    case ui::attr::control::kDropboxsize: {
         //设置下拉列表的大小（宽度和高度）
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
-    } else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
+        break;
+    }
+    case ui::attr::control::kPopupTop:
+    case ui::attr::control::kPopuptop: {
         //下拉列表是否向上弹出
         SetPopupTop(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("combo_box_class")) {
+        break;
+    }
+    case ui::attr::control::kComboBoxClass: {
         SetComboBoxClass(strValue);
-    } else if (strName == _T("left_button_class")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonClass: {
         SetLeftButtonClass(strValue);
-    } else if (strName == _T("left_button_top_label_class")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonTopLabelClass: {
         SetLeftButtonTopLabelClass(strValue);
-    } else if (strName == _T("left_button_bottom_label_class")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonBottomLabelClass: {
         SetLeftButtonBottomLabelClass(strValue);
-    } else if (strName == _T("left_button_top_label_text")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonTopLabelText: {
         if (m_pLabelTop != nullptr) {
             m_pLabelTop->SetText(strValue);
         }
-    } else if (strName == _T("left_button_bottom_label_text")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonBottomLabelText: {
         if (m_pLabelBottom != nullptr) {
             m_pLabelBottom->SetText(strValue);
         }
-    } else if (strName == _T("left_button_top_label_bkcolor")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonTopLabelBkcolor: {
         if (m_pLabelTop != nullptr) {
             m_pLabelTop->SetBkColor(strValue);
         }
-    } else if (strName == _T("left_button_bottom_label_bkcolor")) {
+        break;
+    }
+    case ui::attr::control::kLeftButtonBottomLabelBkcolor: {
         if (m_pLabelBottom != nullptr) {
             m_pLabelBottom->SetBkColor(strValue);
         }
-    } else if (strName == _T("right_button_class")) {
+        break;
+    }
+    case ui::attr::control::kRightButtonClass: {
         SetRightButtonClass(strValue);
-    } else if (strName == _T("shadow_type")) {
+        break;
+    }
+    case ui::attr::control::kShadowType: {
         //设置下拉窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

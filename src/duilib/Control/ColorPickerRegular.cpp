@@ -205,10 +205,12 @@ void ColorPickerRegular::SetColumns(int32_t nColumns)
     }
 }
 
-void ColorPickerRegular::SetAttribute(const DString &strName, const DString &strValue2)
+void ColorPickerRegular::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("color_type")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kColorType: {
         if (strValue == _T("basic")) {
             //使用基本颜色
             std::vector<std::pair<DString, int32_t>> uiColors;
@@ -220,8 +222,12 @@ void ColorPickerRegular::SetAttribute(const DString &strName, const DString &str
             m_regularColors->GetDefaultColors(uiColors);
             m_regularColors->SetColors(uiColors);
         }
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

@@ -40,35 +40,66 @@ DString Progress::GetType() const
     return DUI_CTR_PROGRESS;
 }
 
-void Progress::SetAttribute(const DString &srName, const DString &strValue2)
+void Progress::SetAttributeById(
+    ui::attr::control::Id id, const DString &srName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if ((srName == _T("horizontal")) || (srName == _T("hor"))) {
+    switch (ui::attr::control::IdOf(srName)) {
+    case ui::attr::control::kHorizontal:
+    case ui::attr::control::kHor: {
         SetHorizontal(StringUtil::IsValueTrue(strValue));
-    } else if (srName == _T("min")) {
+        break;
+    }
+    case ui::attr::control::kMin: {
         SetMinValue(StringUtil::StringToInt32(strValue));
-    } else if (srName == _T("max")) {
+        break;
+    }
+    case ui::attr::control::kMax: {
         SetMaxValue(StringUtil::StringToInt32(strValue));
-    } else if (srName == _T("value")) {
+        break;
+    }
+    case ui::attr::control::kValue: {
         SetValue(StringUtil::StringToInt32(strValue));
-    } else if ((srName == _T("progress_image")) || (srName == _T("progressimage"))) {
+        break;
+    }
+    case ui::attr::control::kProgressImage:
+    case ui::attr::control::kProgressimage: {
         SetProgressImage(strValue);
-    } else if (
-        (srName == _T("stretch_fore_image")) || (srName == _T("is_stretch_fore"))
-        || (srName == _T("isstretchfore"))) {
+        break;
+    }
+    case ui::attr::control::kStretchForeImage:
+    case ui::attr::control::kIsStretchFore:
+    case ui::attr::control::kIsstretchfore: {
         SetStretchForeImage(StringUtil::IsValueTrue(strValue));
-    } else if ((srName == _T("progress_color")) || (srName == _T("progresscolor"))) {
+        break;
+    }
+    case ui::attr::control::kProgressColor:
+    case ui::attr::control::kProgresscolor: {
         SetProgressColor(strValue);
-    } else if (srName == _T("marquee")) {
+        break;
+    }
+    case ui::attr::control::kMarquee: {
         SetMarquee(StringUtil::IsValueTrue(strValue));
-    } else if ((srName == _T("marquee_width")) || (srName == _T("marqueewidth"))) {
+        break;
+    }
+    case ui::attr::control::kMarqueeWidth:
+    case ui::attr::control::kMarqueewidth: {
         SetMarqueeWidth(StringUtil::StringToInt32(strValue), true);
-    } else if ((srName == _T("marquee_step")) || (srName == _T("marqueestep"))) {
+        break;
+    }
+    case ui::attr::control::kMarqueeStep:
+    case ui::attr::control::kMarqueestep: {
         SetMarqueeStep(StringUtil::StringToInt32(strValue), true);
-    } else if (srName == _T("reverse")) {
+        break;
+    }
+    case ui::attr::control::kReverse: {
         SetReverse(StringUtil::IsValueTrue(strValue));
-    } else {
-        Label::SetAttribute(srName, strValue);
+        break;
+    }
+    default: {
+        Label::SetAttributeById(id, srName, strValue);
+        break;
+    }
     }
 }
 

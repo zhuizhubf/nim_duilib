@@ -184,33 +184,55 @@ void Slider::HandleEvent(const EventArgs &msg)
     Progress::HandleEvent(msg);
 }
 
-void Slider::SetAttribute(const DString &strName, const DString &strValue2)
+void Slider::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("step")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kStep: {
         SetChangeStep(StringUtil::StringToInt32(strValue));
-    } else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbNormalImage:
+    case ui::attr::control::kThumbnormalimage: {
         SetThumbStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image"))
-        || (strName == _T("thumbhotimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbHoveredImage:
+    case ui::attr::control::kThumbHotImage:
+    case ui::attr::control::kThumbhotimage: {
         SetThumbStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image"))
-        || (strName == _T("thumbpushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbPressedImage:
+    case ui::attr::control::kThumbPushedImage:
+    case ui::attr::control::kThumbpushedimage: {
         SetThumbStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbDisabledImage:
+    case ui::attr::control::kThumbdisabledimage: {
         SetThumbStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("thumb_size")) || (strName == _T("thumbsize"))) {
+        break;
+    }
+    case ui::attr::control::kThumbSize:
+    case ui::attr::control::kThumbsize: {
         UiSize szXY;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szXY);
         SetThumbSize(szXY, true);
-    } else if ((strName == _T("progress_bar_padding")) || (strName == _T("progressbarpadding"))) {
+        break;
+    }
+    case ui::attr::control::kProgressBarPadding:
+    case ui::attr::control::kProgressbarpadding: {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetProgressBarPadding(rcPadding, true);
-    } else {
-        Progress::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        Progress::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

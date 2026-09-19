@@ -36,7 +36,8 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比

@@ -346,41 +346,65 @@ DString Combo::GetType() const
     return DUI_CTR_COMBO;
 }
 
-void Combo::SetAttribute(const DString &strName, const DString &strValue2)
+void Combo::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("combo_type")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kComboType: {
         if (strValue == _T("drop_list")) {
             SetComboType(kCombo_DropList);
         } else if (strValue == _T("drop_down")) {
             SetComboType(kCombo_DropDown);
         }
-    } else if (strName == _T("shadow_type")) {
+        break;
+    }
+    case ui::attr::control::kShadowType: {
         //设置下拉窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
-    } else if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
+        break;
+    }
+    case ui::attr::control::kDropboxSize:
+    case ui::attr::control::kDropboxsize: {
         //设置下拉列表的大小（宽度和高度）
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
-    } else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
+        break;
+    }
+    case ui::attr::control::kPopupTop:
+    case ui::attr::control::kPopuptop: {
         //下拉列表是否向上弹出
         SetPopupTop(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("combo_tree_view_class")) {
+        break;
+    }
+    case ui::attr::control::kComboTreeViewClass: {
         SetComboTreeClass(strValue);
-    } else if (strName == _T("combo_tree_node_class")) {
+        break;
+    }
+    case ui::attr::control::kComboTreeNodeClass: {
         SetComboTreeNodeClass(strValue);
-    } else if (strName == _T("combo_icon_class")) {
+        break;
+    }
+    case ui::attr::control::kComboIconClass: {
         SetIconControlClass(strValue);
-    } else if (strName == _T("combo_edit_class")) {
+        break;
+    }
+    case ui::attr::control::kComboEditClass: {
         SetEditControlClass(strValue);
-    } else if (strName == _T("combo_button_class")) {
+        break;
+    }
+    case ui::attr::control::kComboButtonClass: {
         SetButtonControlClass(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

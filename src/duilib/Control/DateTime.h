@@ -141,7 +141,8 @@ public:
 public:
     //基类的虚函数
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void HandleEvent(const EventArgs &msg) override;
 
     //用于初始化xml属性

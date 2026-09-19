@@ -19,7 +19,8 @@ public:
     virtual DString GetType() const override;
     virtual UiRect GetProgressPos() override;
     virtual void HandleEvent(const EventArgs &msg) override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void PaintStateImages(IRender *pRender) override;
     virtual void PaintBkColor(IRender *pRender) override;
     virtual void ClearImageCache() override;

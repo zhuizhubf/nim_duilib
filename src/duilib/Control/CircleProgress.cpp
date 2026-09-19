@@ -27,26 +27,46 @@ DString CircleProgress::GetType() const
     return DUI_CTR_CIRCLEPROGRESS;
 }
 
-void CircleProgress::SetAttribute(const DString &srName, const DString &strValue2)
+void CircleProgress::SetAttributeById(
+    ui::attr::control::Id id, const DString &srName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (srName == _T("circular")) {
+    switch (ui::attr::control::IdOf(srName)) {
+    case ui::attr::control::kCircular: {
         SetCircular(StringUtil::IsValueTrue(strValue));
-    } else if ((srName == _T("circle_width")) || (srName == _T("circlewidth"))) {
+        break;
+    }
+    case ui::attr::control::kCircleWidth:
+    case ui::attr::control::kCirclewidth: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetCircleWidth((float) iValue, true);
-    } else if (srName == _T("indicator")) {
+        break;
+    }
+    case ui::attr::control::kIndicator: {
         SetIndicator(strValue);
-    } else if (srName == _T("clockwise")) {
+        break;
+    }
+    case ui::attr::control::kClockwise: {
         SetClockwiseRotation(StringUtil::IsValueTrue(strValue));
-    } else if (srName == _T("bgcolor")) {
+        break;
+    }
+    case ui::attr::control::kBgcolor: {
         SetBackgroudColor(strValue);
-    } else if (srName == _T("fgcolor")) {
+        break;
+    }
+    case ui::attr::control::kFgcolor: {
         SetForegroudColor(strValue);
-    } else if ((srName == _T("gradient_color")) || (srName == _T("gradientcolor"))) {
+        break;
+    }
+    case ui::attr::control::kGradientColor:
+    case ui::attr::control::kGradientcolor: {
         SetCircleGradientColor(strValue);
-    } else {
-        Progress::SetAttribute(srName, strValue);
+        break;
+    }
+    default: {
+        Progress::SetAttributeById(id, srName, strValue);
+        break;
+    }
     }
 }
 

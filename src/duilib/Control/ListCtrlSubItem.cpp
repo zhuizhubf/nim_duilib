@@ -17,13 +17,19 @@ DString ListCtrlSubItem::GetType() const
     return _T("ListCtrlSubItem");
 }
 
-void ListCtrlSubItem::SetAttribute(const DString &strName, const DString &strValue2)
+void ListCtrlSubItem::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("icon_spacing")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kIconSpacing: {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

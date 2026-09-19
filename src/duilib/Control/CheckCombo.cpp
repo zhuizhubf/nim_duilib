@@ -301,38 +301,60 @@ DString CheckCombo::GetType() const
     return DUI_CTR_CHECK_COMBO;
 }
 
-void CheckCombo::SetAttribute(const DString &strName, const DString &strValue2)
+void CheckCombo::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("dropbox")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kDropbox: {
         SetDropBoxAttributeList(strValue);
-    } else if (strName == _T("dropbox_item_class")) {
+        break;
+    }
+    case ui::attr::control::kDropboxItemClass: {
         SetDropboxItemClass(strValue);
-    } else if (strName == _T("selected_item_class")) {
+        break;
+    }
+    case ui::attr::control::kSelectedItemClass: {
         SetSelectedItemClass(strValue);
-    } else if (strName == _T("vscrollbar")) {
-    } else if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
+        break;
+    }
+    case ui::attr::control::kVscrollbar: {
+        break;
+    }
+    case ui::attr::control::kDropboxSize:
+    case ui::attr::control::kDropboxsize: {
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
-    } else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
+        break;
+    }
+    case ui::attr::control::kPopupTop:
+    case ui::attr::control::kPopuptop: {
         SetPopupTop(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("height")) {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    case ui::attr::control::kHeight: {
+        BaseClass::SetAttributeById(id, strName, strValue);
         if (strValue != _T("stretch") && strValue != _T("auto")) {
             m_iOrgHeight = StringUtil::StringToInt32(strValue);
             ASSERT(m_iOrgHeight >= 0);
             SetMaxHeight(m_iOrgHeight * 3, true);
             SetMinHeight(m_iOrgHeight, true);
         }
-    } else if (strName == _T("shadow_type")) {
+        break;
+    }
+    case ui::attr::control::kShadowType: {
         //设置下拉窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

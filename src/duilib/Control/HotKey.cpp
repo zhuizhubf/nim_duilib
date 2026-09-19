@@ -250,23 +250,31 @@ DString HotKey::GetType() const
     return DUI_CTR_HOTKEY;
 }
 
-void HotKey::SetAttribute(const DString &strName, const DString &strValue2)
+void HotKey::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("default_text")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kDefaultText: {
         if (m_pRichEdit != nullptr) {
             m_pRichEdit->SetDefaultText(strValue);
             m_pRichEdit->SetText(strValue);
             m_pRichEdit->SetLastDefaultText(m_pRichEdit->GetDefaultText());
         }
-    } else if (strName == _T("default_text_id")) {
+        break;
+    }
+    case ui::attr::control::kDefaultTextId: {
         if (m_pRichEdit != nullptr) {
             m_pRichEdit->SetDefaultTextId(strValue);
             m_pRichEdit->SetTextId(strValue);
             m_pRichEdit->SetLastDefaultText(m_pRichEdit->GetDefaultText());
         }
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

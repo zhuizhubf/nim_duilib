@@ -18,7 +18,8 @@ public:
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void SetPos(UiRect rc) override;
 
     /** 设置路径

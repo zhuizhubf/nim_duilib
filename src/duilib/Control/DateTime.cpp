@@ -38,12 +38,16 @@ DString DateTime::GetType() const
     return DUI_CTR_DATETIME;
 }
 
-void DateTime::SetAttribute(const DString &strName, const DString &strValue2)
+void DateTime::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("format")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kFormat: {
         SetStringFormat(strValue);
-    } else if (strName == _T("edit_format")) {
+        break;
+    }
+    case ui::attr::control::kEditFormat: {
         if (strValue == _T("date_calendar")) {
             SetEditFormat(EditFormat::kDateCalendar);
         } else if (strValue == _T("date_up_down")) {
@@ -59,10 +63,16 @@ void DateTime::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             ASSERT(0);
         }
-    } else if (strName == _T("spin_class")) {
+        break;
+    }
+    case ui::attr::control::kSpinClass: {
         SetSpinClass(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

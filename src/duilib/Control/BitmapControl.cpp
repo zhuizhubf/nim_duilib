@@ -29,10 +29,12 @@ DString BitmapControl::GetType() const
     return DUI_CTR_BITMAP_CONTROL;
 }
 
-void BitmapControl::SetAttribute(const DString &strName, const DString &strValue2)
+void BitmapControl::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("bitmap_halign")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kBitmapHalign: {
         ASSERT((strValue == _T("left")) || (strValue == _T("center")) || (strValue == _T("right")));
         if (strValue == _T("center")) {
             SetBitmapHAlignType(HorAlignType::kAlignCenter);
@@ -41,7 +43,9 @@ void BitmapControl::SetAttribute(const DString &strName, const DString &strValue
         } else {
             SetBitmapHAlignType(HorAlignType::kAlignLeft);
         }
-    } else if (strName == _T("bitmap_valign")) {
+        break;
+    }
+    case ui::attr::control::kBitmapValign: {
         ASSERT((strValue == _T("top")) || (strValue == _T("center")) || (strValue == _T("bottom")));
         if (strValue == _T("center")) {
             SetBitmapVAlignType(VerAlignType::kAlignCenter);
@@ -50,9 +54,13 @@ void BitmapControl::SetAttribute(const DString &strName, const DString &strValue
         } else {
             SetBitmapVAlignType(VerAlignType::kAlignTop);
         }
-    } else if (strName == _T("bitmap_alpha")) {
+        break;
+    }
+    case ui::attr::control::kBitmapAlpha: {
         SetBitmapAlpha((uint8_t) StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("bitmap_dest")) {
+        break;
+    }
+    case ui::attr::control::kBitmapDest: {
         UiRect rcDest;
         DString::value_type *pstr = nullptr;
         rcDest.left = StringUtil::StringToInt32(strValue.c_str(), &pstr, 10);
@@ -73,31 +81,47 @@ void BitmapControl::SetAttribute(const DString &strName, const DString &strValue
             ASSERT(pstr);
         }
         SetBitmapDest(rcDest, true);
-    } else if (strName == _T("bitmap_src")) {
+        break;
+    }
+    case ui::attr::control::kBitmapSrc: {
         UiRect rcSource;
         AttributeUtil::ParseRectValue(strValue.c_str(), rcSource);
         rcSource.left = std::max(rcSource.left, 0);
         rcSource.top = std::max(rcSource.top, 0);
         SetBitmapSource(rcSource, true);
-    } else if (strName == _T("bitmap_margin")) {
+        break;
+    }
+    case ui::attr::control::kBitmapMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetBitmapMargin(rcMargin, true);
-    } else if (strName == _T("bitmap_adaptive_dest_rect")) {
+        break;
+    }
+    case ui::attr::control::kBitmapAdaptiveDestRect: {
         SetAdaptiveDestRect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("bitmap_stretch")) {
+        break;
+    }
+    case ui::attr::control::kBitmapStretch: {
         SetStretchedDrawing(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("bitmap_multi_thread")) {
+        break;
+    }
+    case ui::attr::control::kBitmapMultiThread: {
         SetSupportMultiThread(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("bitmap_file")) {
+        break;
+    }
+    case ui::attr::control::kBitmapFile: {
         //设置关联的图片文件：主要用于测试
         m_bitmapFile = strValue;
         if (m_pBitmap != nullptr) {
             m_pBitmap.reset();
             CheckLoadBitmapFile();
         }
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

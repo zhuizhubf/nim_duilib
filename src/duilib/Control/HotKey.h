@@ -22,7 +22,8 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** 让控件获取焦点
      */

@@ -20,22 +20,34 @@ DString Line::GetType() const
     return DUI_CTR_LINE;
 }
 
-void Line::SetAttribute(const DString &strName, const DString &strValue2)
+void Line::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("vertical")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kVertical: {
         SetLineVertical(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("line_color")) {
+        break;
+    }
+    case ui::attr::control::kLineColor: {
         SetLineColor(strValue);
-    } else if (strName == _T("line_width")) {
+        break;
+    }
+    case ui::attr::control::kLineWidth: {
         if (!strValue.empty()) {
             ASSERT(StringUtil::StringToFloat(strValue.c_str(), nullptr) >= 0);
             SetLineWidth(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
         }
-    } else if (strName == _T("dash_style")) {
+        break;
+    }
+    case ui::attr::control::kDashStyle: {
         SetLineDashStyle(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
