@@ -8,6 +8,7 @@
 #include "duilib/Core/ToolTip.h"
 #include "duilib/Core/WindowMessage.h"
 #include "duilib/Core/WindowRoot.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
@@ -46,30 +47,50 @@ Window::~Window()
 
 void Window::SetAttribute(const DString &strName, const DString &strValue)
 {
-    if (strName == _T("use_system_caption")) {
+    switch (ui::attr::window::IdOf(strName)) {
+    case ui::attr::window::kUseSystemCaption: {
         //是否使用操作系统默认的标题栏
         SetUseSystemCaption(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("shadow_attached")) {
+        break;
+    }
+    case ui::attr::window::kShadowAttached: {
         //是否开启阴影
         SetShadowAttached(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("shadow_type")) {
+        break;
+    }
+    case ui::attr::window::kShadowType: {
         //设置窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetShadowType(nShadowType);
         }
-    } else if (strName == _T("layered_window")) {
+        break;
+    }
+    case ui::attr::window::kLayeredWindow: {
         //是否为分层窗口
         SetLayeredWindow(StringUtil::IsValueTrue(strValue), true);
-    } else if ((strName == _T("alpha")) || (strName == _T("layered_window_alpha"))) {
+        break;
+    }
+    case ui::attr::window::kAlpha:
+    case ui::attr::window::kLayeredWindowAlpha: {
         //分层窗口的透明度, 该值在UpdateLayeredWindow函数中作为参数使用
         SetLayeredWindowAlpha(StringUtil::StringToInt32(strValue));
-    } else if ((strName == _T("opacity")) || (strName == _T("layered_window_opacity"))) {
+        break;
+    }
+    case ui::attr::window::kOpacity:
+    case ui::attr::window::kLayeredWindowOpacity: {
         //分层窗口的透明度, 该值在SetLayeredWindowAttributes函数中作为参数使用
         SetLayeredWindowOpacity(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("drag_drop")) {
+        break;
+    }
+    case ui::attr::window::kDragDrop: {
         //是否允许拖放操作
         SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
+        break;
+    }
+    default: {
+        break;
+    }
     }
 }
 
