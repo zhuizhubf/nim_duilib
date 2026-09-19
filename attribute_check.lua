@@ -25,6 +25,7 @@ local g_nodeAllowlist = {
     ["Property"]            = "ThemeMeta 子节点，属全局/主题解析范围，不在本登记表的 7 个名字域内",
 }
 local g_dataDir = nil
+local g_baselineRev = "HEAD"
 
 local g_domains = {
     { name = "control", roots = { "src/duilib", "src/cef", "src/webview2" },
@@ -118,7 +119,7 @@ local function collect_domain_names(domain, fromHead)
         if fromHead then
             try{
                 function ()
-                    text = os.iorunv("git", { "-C", g_repoRoot, "show", "HEAD:" .. (norm(f):gsub("\\", "/")) })
+                    text = os.iorunv("git", { "-C", g_repoRoot, "show", g_baselineRev .. ":" .. (norm(f):gsub("\\", "/")) })
                 end,
                 catch{
                     function (errors)
@@ -319,8 +320,12 @@ function main(...)
     try{
         function ()
             import("core.base.option", { alias = "_attr_opt" })
-            if _attr_opt.get("baseline") then
+            local rev = _attr_opt.get("baseline")
+            if rev then
                 baseline = true
+                if (type(rev) == "string") and (rev ~= "") then
+                    g_baselineRev = rev
+                end
             end
         end,
         catch{
@@ -354,14 +359,14 @@ function main(...)
     print(check_residue())
 
     if baseline then
-        print("[C] 与 git HEAD 等价性（--baseline）")
+        print("[C] 与 " .. g_baselineRev .. " 的等价性（--baseline）")
         local ok, detail = check_baseline()
         print(detail)
         if not ok then
             failed = true
         end
     else
-        print("[C] 与 git HEAD 等价性（未启用，加 --baseline）")
+        print("[C] 与迁移前 revision 的等价性（未启用，加 --baseline=<rev>）")
     end
 
     print("[D] XML 语料覆盖")

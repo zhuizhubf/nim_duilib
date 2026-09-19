@@ -209,9 +209,9 @@ task("attribute-check")
     on_run("attribute_check")
     set_menu {
         usage = "xmake attribute-check [options]",
-        description = "检查属性名登记表：生成物同步、裸字面量残留、XML 语料覆盖（加 --baseline 再比对 git HEAD）",
+        description = "检查属性名登记表：生成物同步、裸字面量残留、XML 语料覆盖（--baseline=<迁移前revision> 再比对名字集合）",
         options = {
-            {'b', "baseline", "k", nil, "额外比对 git HEAD 的名字集合与登记表是否完全一致"},
+            {'b', "baseline", "kv", nil, "与指定 revision（迁移前的提交）比对名字集合，例如 --baseline=6cfce0f4"},
         }
     }
 task_end()
