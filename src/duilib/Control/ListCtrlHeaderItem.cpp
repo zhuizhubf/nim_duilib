@@ -39,19 +39,31 @@ DString ListCtrlHeaderItem::GetType() const
     return _T("ListCtrlHeaderItem");
 }
 
-void ListCtrlHeaderItem::SetAttribute(const DString &strName, const DString &strValue2)
+void ListCtrlHeaderItem::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("sorted_up_image")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kSortedUpImage: {
         SetSortedUpImage(strValue);
-    } else if (strName == _T("sorted_down_image")) {
+        break;
+    }
+    case ui::attr::control::kSortedDownImage: {
         SetSortedDownImage(strValue);
-    } else if (strName == _T("icon_spacing")) {
+        break;
+    }
+    case ui::attr::control::kIconSpacing: {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("show_icon_at_top")) {
+        break;
+    }
+    case ui::attr::control::kShowIconAtTop: {
         SetShowIconAtTop(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

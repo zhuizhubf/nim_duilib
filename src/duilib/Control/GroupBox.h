@@ -20,7 +20,8 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void PaintText(IRender *pRender) override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -70,8 +71,8 @@ GroupBoxTemplate<InheritType>::GroupBoxTemplate(Window *pWindow)
     : LabelTemplate<InheritType>(pWindow)
     , m_fLineWidth(0)
 {
-    SetAttribute(_T("text_align"), _T("top,left"));
-    SetAttribute(_T("text_padding"), _T("8,0,0,0"));
+    this->SetAttribute(_T("text_align"), _T("top,left"));
+    this->SetAttribute(_T("text_padding"), _T("8,0,0,0"));
 }
 
 template<typename InheritType>
@@ -177,26 +178,38 @@ UiColor GroupBoxTemplate<InheritType>::GetFadeColor(UiColor color, uint8_t nFade
 }
 
 template<typename InheritType>
-void GroupBoxTemplate<InheritType>::SetAttribute(const DString &strName, const DString &strValue2)
+void GroupBoxTemplate<InheritType>::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (strName == _T("corner_size")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kCornerSize: {
         //圆角大小
         UiSize cxyRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), cxyRound);
         this->SetCornerSize(cxyRound, true);
-    } else if (strName == _T("line_width")) {
+        break;
+    }
+    case ui::attr::control::kLineWidth: {
         //线条宽度
         ASSERT(StringUtil::StringToFloat(strValue.c_str(), nullptr) >= 0);
         this->SetLineWidth(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
-    } else if (strName == _T("line_color")) {
+        break;
+    }
+    case ui::attr::control::kLineColor: {
         //线条颜色
         this->SetLineColor(strValue);
-    } else if (strName == _T("text")) {
+        break;
+    }
+    case ui::attr::control::kText: {
         //设置文本内容
-        BaseClass::SetAttribute(strName, strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

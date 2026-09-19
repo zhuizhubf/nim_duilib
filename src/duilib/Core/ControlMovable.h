@@ -22,7 +22,8 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** 设置是否支持鼠标拖动改变控件的位置
     */
@@ -247,31 +248,51 @@ inline DString ControlMovableT<VBox>::GetType() const
 }
 
 template<typename T>
-void ControlMovableT<T>::SetAttribute(const DString &strName, const DString &strValue2)
+void ControlMovableT<T>::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (strName == _T("enable_move_pos")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kEnableMovePos: {
         SetEnableMovePos(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("move_parent_pos")) {
+        break;
+    }
+    case ui::attr::control::kMoveParentPos: {
         SetMoveParentPos(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("move_pos_alpha")) {
+        break;
+    }
+    case ui::attr::control::kMovePosAlpha: {
         SetMovePosAlpha((uint8_t) StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("move_pos_non_draggable_margin")) {
+        break;
+    }
+    case ui::attr::control::kMovePosNonDraggableMargin: {
         UiMargin rcNonDraggableMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcNonDraggableMargin);
         SetNonDraggableMargin(rcNonDraggableMargin);
-    } else if (strName == _T("move_pos_draggable_border")) {
+        break;
+    }
+    case ui::attr::control::kMovePosDraggableBorder: {
         UiPadding rcDraggableBorder;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcDraggableBorder);
         SetDraggableBorder(rcDraggableBorder);
-    } else if (strName == _T("move_pos_reserve_width")) {
+        break;
+    }
+    case ui::attr::control::kMovePosReserveWidth: {
         SetMovePosReserveWidth(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("move_pos_reserve_height")) {
+        break;
+    }
+    case ui::attr::control::kMovePosReserveHeight: {
         SetMovePosReserveHeight(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("move_pos_keep_within_parent")) {
+        break;
+    }
+    case ui::attr::control::kMovePosKeepWithinParent: {
         SetMovePosKeepWithinParent(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

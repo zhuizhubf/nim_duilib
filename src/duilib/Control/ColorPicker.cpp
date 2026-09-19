@@ -441,13 +441,19 @@ public:
 
     /** 设置控件指定属性
      */
-    virtual void SetAttribute(const DString &strName, const DString &strValue2) override
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue2) override
     {
         DString strValue = GetExpandVarStrings(strValue2);
-        if (strName == _T("cursor_file")) {
+        switch (ui::attr::control::IdOf(strName)) {
+        case ui::attr::control::kCursorFile: {
             m_cursorFile = strValue;
-        } else {
-            BaseClass::SetAttribute(strName, strValue);
+            break;
+        }
+        default: {
+            BaseClass::SetAttributeById(id, strName, strValue);
+            break;
+        }
         }
     }
 

@@ -30,7 +30,8 @@ RichTextImpl::~RichTextImpl()
 
 bool RichTextImpl::SetAttribute(const DString &strName, const DString &strValue)
 {
-    if (strName == _T("text_align")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kTextAlign: {
         //水平方向对齐方式
         if (strValue.find(_T("left")) != DString::npos) {
             SetTextHAlignType(HorAlignType::kAlignLeft);
@@ -50,36 +51,60 @@ bool RichTextImpl::SetAttribute(const DString &strName, const DString &strValue)
         }
         m_textData.clear();
         m_spDrawRichTextCache.reset();
-    } else if (strName == _T("font")) {
+        break;
+    }
+    case ui::attr::control::kFont: {
         SetFontId(strValue);
-    } else if ((strName == _T("text_color")) || (strName == _T("normal_text_color"))) {
+        break;
+    }
+    case ui::attr::control::kTextColor:
+    case ui::attr::control::kNormalTextColor: {
         SetTextColor(strValue);
-    } else if ((strName == _T("text_padding")) || (strName == _T("textpadding"))) {
+        break;
+    }
+    case ui::attr::control::kTextPadding:
+    case ui::attr::control::kTextpadding: {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding);
-    } else if (strName == _T("row_spacing_mul")) {
+        break;
+    }
+    case ui::attr::control::kRowSpacingMul: {
         SetRowSpacingMul(StringUtil::StringToFloat(strValue.c_str(), nullptr));
-    } else if (strName == _T("row_spacing_add")) {
+        break;
+    }
+    case ui::attr::control::kRowSpacingAdd: {
         SetRowSpacingAdd(StringUtil::StringToFloat(strValue.c_str(), nullptr));
-    } else if (strName == _T("default_link_font_color")) {
+        break;
+    }
+    case ui::attr::control::kDefaultLinkFontColor: {
         //超级链接：常规文本颜色值
         m_linkNormalTextColor = strValue;
-    } else if ((strName == _T("hovered_link_font_color")) || (strName == _T("hover_link_font_color"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredLinkFontColor:
+    case ui::attr::control::kHoverLinkFontColor: {
         //超级链接：Hover状态文本颜色值
         m_linkHoveredTextColor = strValue;
-    } else if (
-        (strName == _T("pressed_link_font_color"))
-        || (strName == _T("mouse_down_link_font_color"))) {
+        break;
+    }
+    case ui::attr::control::kPressedLinkFontColor:
+    case ui::attr::control::kMouseDownLinkFontColor: {
         //超级链接：鼠标按下状态文本颜色值
         m_linkPressedTextColor = strValue;
-    } else if (strName == _T("link_font_underline")) {
+        break;
+    }
+    case ui::attr::control::kLinkFontUnderline: {
         //超级链接：是否使用带下划线的字体
         m_bLinkUnderlineFont = (StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("replace_brace")) {
+        break;
+    }
+    case ui::attr::control::kReplaceBrace: {
         //对text属性，是否允许替换花括号
         m_bReplaceBrace = StringUtil::IsValueTrue(strValue);
-    } else if (strName == _T("text")) {
+        break;
+    }
+    case ui::attr::control::kText: {
         //允许使用'{'代替'<'，'}'代替'>' (m_bReplaceBrace变量为开关)
         if (m_bReplaceBrace
             && ((strValue.find(_T('<')) == DString::npos)
@@ -93,9 +118,14 @@ bool RichTextImpl::SetAttribute(const DString &strName, const DString &strValue)
         } else {
             SetText(strValue);
         }
-    } else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
+        break;
+    }
+    case ui::attr::control::kTextId:
+    case ui::attr::control::kTextid: {
         SetTextId(strValue);
-    } else if (strName == _T("trim_policy")) {
+        break;
+    }
+    case ui::attr::control::kTrimPolicy: {
         if (strValue == _T("all")) {
             m_trimPolicy = TrimPolicy::kAll;
         } else if (strValue == _T("none")) {
@@ -105,10 +135,16 @@ bool RichTextImpl::SetAttribute(const DString &strName, const DString &strValue)
         } else {
             m_trimPolicy = TrimPolicy::kAll;
         }
-    } else if (strName == _T("word_wrap")) {
+        break;
+    }
+    case ui::attr::control::kWordWrap: {
         SetWordWrap(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         return false;
+        break;
+    }
     }
     return true;
 }

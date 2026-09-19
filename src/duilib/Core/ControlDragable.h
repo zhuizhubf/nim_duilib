@@ -32,7 +32,8 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** 设置是否支持拖动改变控件的顺序
     */
@@ -310,19 +311,29 @@ inline DString ControlDragableT<VBox>::GetType() const
 }
 
 template<typename T>
-void ControlDragableT<T>::SetAttribute(const DString &strName, const DString &strValue2)
+void ControlDragableT<T>::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (strName == _T("drag_order")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kDragOrder: {
         //是否支持拖动调整顺序（在同一个容器内）
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("drag_alpha")) {
+        break;
+    }
+    case ui::attr::control::kDragAlpha: {
         SetDragAlpha((uint8_t) StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("drag_out")) {
+        break;
+    }
+    case ui::attr::control::kDragOut: {
         //是否支持拖出操作（在相同窗口的不同容器内）
         SetEnableDragOut(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

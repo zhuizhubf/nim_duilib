@@ -37,7 +37,8 @@ public:
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
     virtual void Activate(const EventArgs *pMsg) override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void PaintStateColors(IRender *pRender) override;
     virtual void PaintStateImages(IRender *pRender) override;
     virtual void PaintText(IRender *pRender) override;
@@ -427,149 +428,224 @@ inline DString CheckBoxTemplate<VBox>::GetType() const
 }
 
 template<typename InheritType>
-void CheckBoxTemplate<InheritType>::SetAttribute(const DString &strName, const DString &strValue2)
+void CheckBoxTemplate<InheritType>::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (strName == _T("selected")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kSelected: {
         Selected(StringUtil::IsValueTrue(strValue), true);
-    } else if ((strName == _T("switch_select")) || (strName == _T("switchselect"))) {
+        break;
+    }
+    case ui::attr::control::kSwitchSelect:
+    case ui::attr::control::kSwitchselect: {
         Selected(!IsSelected());
-    } else if (strName == _T("support_check_Mode")) {
+        break;
+    }
+    case ui::attr::control::kSupportCheckMode: {
         SetSupportCheckMode(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("auto_check_select")) {
+        break;
+    }
+    case ui::attr::control::kAutoCheckSelect: {
         //设置当选择状态变化时，是否自动同步到勾选状态，保持勾选状态与选择状态一致(Select->Check)
         SetAutoCheckSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("auto_select_check")) {
+        break;
+    }
+    case ui::attr::control::kAutoSelectCheck: {
         //设置当勾选状态变化时，是否自动同步到选择状态，保持选择状态与勾选状态一致(Check -> Select)
         SetAutoSelectCheck(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("normal_first")) || (strName == _T("normalfirst"))) {
+        break;
+    }
+    case ui::attr::control::kNormalFirst:
+    case ui::attr::control::kNormalfirst: {
         SetPaintNormalFirst(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("selected_normal_image")) || (strName == _T("selectednormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedNormalImage:
+    case ui::attr::control::kSelectednormalimage: {
         SetSelectedStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("selected_hovered_image")) || (strName == _T("selected_hot_image"))
-        || (strName == _T("selectedhotimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedHoveredImage:
+    case ui::attr::control::kSelectedHotImage:
+    case ui::attr::control::kSelectedhotimage: {
         SetSelectedStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("selected_pressed_image")) || (strName == _T("selected_pushed_image"))
-        || (strName == _T("selectedpushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedPressedImage:
+    case ui::attr::control::kSelectedPushedImage:
+    case ui::attr::control::kSelectedpushedimage: {
         SetSelectedStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("selected_disabled_image")) || (strName == _T("selecteddisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedDisabledImage:
+    case ui::attr::control::kSelecteddisabledimage: {
         SetSelectedStateImage(kControlStateDisabled, strValue);
-    } else if (
-        (strName == _T("selected_fore_normal_image"))
-        || (strName == _T("selectedforenormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedForeNormalImage:
+    case ui::attr::control::kSelectedforenormalimage: {
         SetSelectedForeStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("selected_fore_hovered_image")) || (strName == _T("selected_fore_hot_image"))
-        || (strName == _T("selectedforehotimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedForeHoveredImage:
+    case ui::attr::control::kSelectedForeHotImage:
+    case ui::attr::control::kSelectedforehotimage: {
         SetSelectedForeStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("selected_fore_pressed_image"))
-        || (strName == _T("selected_fore_pushed_image"))
-        || (strName == _T("selectedforepushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedForePressedImage:
+    case ui::attr::control::kSelectedForePushedImage:
+    case ui::attr::control::kSelectedforepushedimage: {
         SetSelectedForeStateImage(kControlStatePressed, strValue);
-    } else if (
-        (strName == _T("selected_fore_disabled_image"))
-        || (strName == _T("selectedforedisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedForeDisabledImage:
+    case ui::attr::control::kSelectedforedisabledimage: {
         SetSelectedForeStateImage(kControlStateDisabled, strValue);
-    } else if (strName == _T("part_selected_normal_image")) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedNormalImage: {
         SetPartSelectedStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("part_selected_hovered_image"))
-        || (strName == _T("part_selected_hot_image"))) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedHoveredImage:
+    case ui::attr::control::kPartSelectedHotImage: {
         SetPartSelectedStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("part_selected_pressed_image"))
-        || (strName == _T("part_selected_pushed_image"))) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedPressedImage:
+    case ui::attr::control::kPartSelectedPushedImage: {
         SetPartSelectedStateImage(kControlStatePressed, strValue);
-    } else if (strName == _T("part_selected_disabled_image")) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedDisabledImage: {
         SetPartSelectedStateImage(kControlStateDisabled, strValue);
-    } else if (strName == _T("part_selected_fore_normal_image")) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedForeNormalImage: {
         SetPartSelectedForeStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("part_selected_fore_hovered_image"))
-        || (strName == _T("part_selected_fore_hot_image"))) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedForeHoveredImage:
+    case ui::attr::control::kPartSelectedForeHotImage: {
         SetPartSelectedForeStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("part_selected_fore_pressed_image"))
-        || (strName == _T("part_selected_fore_pushed_image"))) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedForePressedImage:
+    case ui::attr::control::kPartSelectedForePushedImage: {
         SetPartSelectedForeStateImage(kControlStatePressed, strValue);
-    } else if (strName == _T("part_selected_fore_disabled_image")) {
+        break;
+    }
+    case ui::attr::control::kPartSelectedForeDisabledImage: {
         SetPartSelectedForeStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("selected_text_color")) || (strName == _T("selectedtextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedTextColor:
+    case ui::attr::control::kSelectedtextcolor: {
         SetSelectedTextColor(strValue);
-    } else if (
-        (strName == _T("selected_normal_text_color"))
-        || (strName == _T("selectednormaltextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedNormalTextColor:
+    case ui::attr::control::kSelectednormaltextcolor: {
         SetSelectedStateTextColor(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("selected_hovered_text_color")) || (strName == _T("selected_hot_text_color"))
-        || (strName == _T("selectedhottextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedHoveredTextColor:
+    case ui::attr::control::kSelectedHotTextColor:
+    case ui::attr::control::kSelectedhottextcolor: {
         SetSelectedStateTextColor(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("selected_pressed_text_color"))
-        || (strName == _T("selected_pushed_text_color"))
-        || (strName == _T("selectedpushedtextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedPressedTextColor:
+    case ui::attr::control::kSelectedPushedTextColor:
+    case ui::attr::control::kSelectedpushedtextcolor: {
         SetSelectedStateTextColor(kControlStatePressed, strValue);
-    } else if (
-        (strName == _T("selected_disabled_text_color"))
-        || (strName == _T("selecteddisabledtextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedDisabledTextColor:
+    case ui::attr::control::kSelecteddisabledtextcolor: {
         SetSelectedStateTextColor(kControlStateDisabled, strValue);
-    } else if ((strName == _T("selected_normal_color")) || (strName == _T("selectednormalcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedNormalColor:
+    case ui::attr::control::kSelectednormalcolor: {
         SetSelectedStateColor(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("selected_hovered_color")) || (strName == _T("selected_hot_color"))
-        || (strName == _T("selectedhotcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedHoveredColor:
+    case ui::attr::control::kSelectedHotColor:
+    case ui::attr::control::kSelectedhotcolor: {
         SetSelectedStateColor(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("selected_pressed_color")) || (strName == _T("selected_pushed_color"))
-        || (strName == _T("selectedpushedcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedPressedColor:
+    case ui::attr::control::kSelectedPushedColor:
+    case ui::attr::control::kSelectedpushedcolor: {
         SetSelectedStateColor(kControlStatePressed, strValue);
-    } else if ((strName == _T("selected_disabled_color")) || (strName == _T("selecteddisabledcolor"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedDisabledColor:
+    case ui::attr::control::kSelecteddisabledcolor: {
         SetSelectedStateColor(kControlStateDisabled, strValue);
-    } else if (strName == _T("selected_normal_color_margin")) {
+        break;
+    }
+    case ui::attr::control::kSelectedNormalColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStateNormal, rcMargin, true);
-    } else if (
-        (strName == _T("selected_hovered_color_margin"))
-        || (strName == _T("selected_hot_color_margin"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedHoveredColorMargin:
+    case ui::attr::control::kSelectedHotColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStateHovered, rcMargin, true);
-    } else if (
-        (strName == _T("selected_pressed_color_margin"))
-        || (strName == _T("selected_pushed_color_margin"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedPressedColorMargin:
+    case ui::attr::control::kSelectedPushedColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStatePressed, rcMargin, true);
-    } else if (strName == _T("selected_disabled_color_margin")) {
+        break;
+    }
+    case ui::attr::control::kSelectedDisabledColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetSelectedStateColorMargin(kControlStateDisabled, rcMargin, true);
-    } else if (strName == _T("selected_normal_color_round")) {
+        break;
+    }
+    case ui::attr::control::kSelectedNormalColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStateNormal, szRound, true);
-    } else if (
-        (strName == _T("selected_hovered_color_round"))
-        || (strName == _T("selected_hot_color_round"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedHoveredColorRound:
+    case ui::attr::control::kSelectedHotColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStateHovered, szRound, true);
-    } else if (
-        (strName == _T("selected_pressed_color_round"))
-        || (strName == _T("selected_pushed_color_round"))) {
+        break;
+    }
+    case ui::attr::control::kSelectedPressedColorRound:
+    case ui::attr::control::kSelectedPushedColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStatePressed, szRound, true);
-    } else if (strName == _T("selected_disabled_color_round")) {
+        break;
+    }
+    case ui::attr::control::kSelectedDisabledColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetSelectedStateColorRound(kControlStateDisabled, szRound, true);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

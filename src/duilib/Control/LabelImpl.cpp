@@ -46,7 +46,8 @@ LabelImpl::~LabelImpl()
 
 bool LabelImpl::OnSetAttribute(const DString &strName, const DString &strValue)
 {
-    if (strName == _T("text_align")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kTextAlign: {
         bool bHCenter = false;
         size_t centerPos = strValue.find(_T("center"));
         if (centerPos != DString::npos) {
@@ -100,82 +101,136 @@ bool LabelImpl::OnSetAttribute(const DString &strName, const DString &strValue)
             m_uTextStyle &= ~TEXT_VALIGN_ALL;
             m_uTextStyle |= TEXT_VJUSTIFY;
         }
-    } else if ((strName == _T("end_ellipsis")) || (strName == _T("endellipsis"))) {
+        break;
+    }
+    case ui::attr::control::kEndEllipsis:
+    case ui::attr::control::kEndellipsis: {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_END_ELLIPSIS;
         } else {
             m_uTextStyle &= ~TEXT_END_ELLIPSIS;
         }
-    } else if ((strName == _T("path_ellipsis")) || (strName == _T("pathellipsis"))) {
+        break;
+    }
+    case ui::attr::control::kPathEllipsis:
+    case ui::attr::control::kPathellipsis: {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_PATH_ELLIPSIS;
         } else {
             m_uTextStyle &= ~TEXT_PATH_ELLIPSIS;
         }
-    } else if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
+        break;
+    }
+    case ui::attr::control::kSingleLine:
+    case ui::attr::control::kSingleline: {
         SetSingleLine(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
+        break;
+    }
+    case ui::attr::control::kMultiLine:
+    case ui::attr::control::kMultiline: {
         SetSingleLine(strValue != _T("true"));
-    } else if (strName == _T("text")) {
+        break;
+    }
+    case ui::attr::control::kText: {
         SetText(strValue);
-    } else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
+        break;
+    }
+    case ui::attr::control::kTextId:
+    case ui::attr::control::kTextid: {
         SetTextId(strValue);
-    } else if ((strName == _T("auto_tooltip")) || (strName == _T("autotooltip"))) {
+        break;
+    }
+    case ui::attr::control::kAutoTooltip:
+    case ui::attr::control::kAutotooltip: {
         SetAutoShowToolTipEnabled(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("font")) {
+        break;
+    }
+    case ui::attr::control::kFont: {
         SetFontId(strValue);
-    } else if (
-        (strName == _T("text_color")) || (strName == _T("normal_text_color"))
-        || (strName == _T("normaltextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kTextColor:
+    case ui::attr::control::kNormalTextColor:
+    case ui::attr::control::kNormaltextcolor: {
         SetStateTextColor(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("hovered_text_color")) || (strName == _T("hot_text_color"))
-        || (strName == _T("hottextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredTextColor:
+    case ui::attr::control::kHotTextColor:
+    case ui::attr::control::kHottextcolor: {
         SetStateTextColor(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("pressed_text_color")) || (strName == _T("pushed_text_color"))
-        || (strName == _T("pushedtextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kPressedTextColor:
+    case ui::attr::control::kPushedTextColor:
+    case ui::attr::control::kPushedtextcolor: {
         SetStateTextColor(kControlStatePressed, strValue);
-    } else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
+        break;
+    }
+    case ui::attr::control::kDisabledTextColor:
+    case ui::attr::control::kDisabledtextcolor: {
         SetStateTextColor(kControlStateDisabled, strValue);
-    } else if ((strName == _T("text_padding")) || (strName == _T("textpadding"))) {
+        break;
+    }
+    case ui::attr::control::kTextPadding:
+    case ui::attr::control::kTextpadding: {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding, true);
-    } else if (strName == _T("replace_newline")) {
+        break;
+    }
+    case ui::attr::control::kReplaceNewline: {
         // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
         SetReplaceNewline(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("spacing_mul")) {
+        break;
+    }
+    case ui::attr::control::kSpacingMul: {
         // 设置行间距倍数
         float mul = 1.0f;
         float add = 0;
         GetLineSpacing(&mul, &add);
         mul = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         SetLineSpacing(mul, add, false);
-    } else if (strName == _T("spacing_add")) {
+        break;
+    }
+    case ui::attr::control::kSpacingAdd: {
         // 设置行间距固定的附加像素值
         float mul = 1.0f;
         float add = 0;
         GetLineSpacing(&mul, &add);
         add = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         SetLineSpacing(mul, add, true);
-    } else if (strName == _T("vertical_text")) {
+        break;
+    }
+    case ui::attr::control::kVerticalText: {
         // 设置是否为纵向文本
         SetVerticalText(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("word_spacing")) {
+        break;
+    }
+    case ui::attr::control::kWordSpacing: {
         // 设置两个相邻的字符之间的间隔（像素）
         SetWordSpacing(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
-    } else if (strName == _T("use_font_height")) {
+        break;
+    }
+    case ui::attr::control::kUseFontHeight: {
         // 设置当纵向绘制文本时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
         SetUseFontHeight(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("ascii_rotate_90")) {
+        break;
+    }
+    case ui::attr::control::kAsciiRotate90: {
         // 设置当纵向绘制文本时，对于字母数字等，顺时针旋转90度显示
         SetRotate90ForAscii(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("rich_text")) {
+        break;
+    }
+    case ui::attr::control::kRichText: {
         // 设置文本内容是否为RichText
         SetRichText(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         return false;
+        break;
+    }
     }
     return true;
 }

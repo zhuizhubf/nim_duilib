@@ -20,7 +20,8 @@ public:
     explicit SplitTemplate(Window *pWindow);
 
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
 
     /** 是否可以拖动
     */
@@ -129,13 +130,19 @@ inline DString SplitTemplate<Box>::GetType() const
 }
 
 template<typename InheritType>
-void SplitTemplate<InheritType>::SetAttribute(const DString &strName, const DString &strValue2)
+void SplitTemplate<InheritType>::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (strName == _T("enable_split_single")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kEnableSplitSingle: {
         SetEnableSplitSingle(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
