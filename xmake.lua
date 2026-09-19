@@ -40,6 +40,13 @@ set_version("1.0.0")
 set_xmakever("2.9.0")
 set_languages("c++20")
 
+-- 挂载 xmake 的模式规则，把 `-m release` / `-m debug` 翻译成对应的编译参数：
+--   release：/O2 + -DNDEBUG（无调试符号）
+--   debug  ：/Od + /Zi（生成调试符号）
+-- 说明：xmake 不会自动挂载这两条规则，缺少它们时 `xmake f -m release` 会退化为"无优化"编译，
+--       体积显著偏大且运行性能下降，因此必须在项目根目录显式挂载（作用于全部 target）。
+add_rules("mode.debug", "mode.release")
+
 -- 项目内的本地包仓库（Skia 自动下载并编译）
 add_repositories("duilib-repo xmake/repos")
 
@@ -172,6 +179,23 @@ end
 if get_config("jpeg_turbo") and duilib_plat() ~= "windows" then
     add_requires("libjpeg-turbo")
 end
+
+
+task("format")
+    on_run("format_apply")
+    set_menu {
+        usage = "xmake format",
+        description = "按 .clang-format 就地格式化本地 C++ 源码（并行，跳过 3rd/tools）",
+    }
+task_end()
+
+task("format-check")
+    on_run("format_check")
+    set_menu {
+        usage = "xmake format-check",
+        description = "检查本地 C++ 源码是否符合 .clang-format（不符则非零退出）",
+    }
+task_end()
 
 includes("xmake/third_party.lua")
 includes("xmake/duilib.lua")
