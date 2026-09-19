@@ -36,41 +36,73 @@ DString PropertyGrid::GetType() const
     return DUI_CTR_PROPERTY_GRID;
 }
 
-void PropertyGrid::SetAttribute(const DString &strName, const DString &strValue2)
+void PropertyGrid::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("property_grid_xml")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kPropertyGridXml: {
         if (!strValue.empty()) {
             m_configXml = strValue;
         }
-    } else if (strName == _T("row_grid_line_width")) {
+        break;
+    }
+    case ui::attr::control::kRowGridLineWidth: {
         SetRowGridLineWidth(StringUtil::StringToFloat(strValue.c_str()), true);
-    } else if (strName == _T("row_grid_line_color")) {
+        break;
+    }
+    case ui::attr::control::kRowGridLineColor: {
         SetRowGridLineColor(strValue);
-    } else if (strName == _T("column_grid_line_width")) {
+        break;
+    }
+    case ui::attr::control::kColumnGridLineWidth: {
         SetColumnGridLineWidth(StringUtil::StringToFloat(strValue.c_str()), true);
-    } else if (strName == _T("column_grid_line_color")) {
+        break;
+    }
+    case ui::attr::control::kColumnGridLineColor: {
         SetColumnGridLineColor(strValue);
-    } else if (strName == _T("header_class")) {
+        break;
+    }
+    case ui::attr::control::kHeaderClass: {
         SetHeaderClass(strValue);
-    } else if (strName == _T("group_class")) {
+        break;
+    }
+    case ui::attr::control::kGroupClass: {
         SetGroupClass(strValue);
-    } else if (strName == _T("group_label_class")) {
+        break;
+    }
+    case ui::attr::control::kGroupLabelClass: {
         SetGroupLabelClass(strValue);
-    } else if (strName == _T("property_class")) {
+        break;
+    }
+    case ui::attr::control::kPropertyClass: {
         SetPropertyClass(strValue);
-    } else if (strName == _T("property_name_label_class")) {
+        break;
+    }
+    case ui::attr::control::kPropertyNameLabelClass: {
         SetPropertyNameLabelClass(strValue);
-    } else if (strName == _T("property_value_label_class")) {
+        break;
+    }
+    case ui::attr::control::kPropertyValueLabelClass: {
         SetPropertyValueLabelClass(strValue);
-    } else if (strName == _T("left_column_width")) {
+        break;
+    }
+    case ui::attr::control::kLeftColumnWidth: {
         SetLeftColumnWidth(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("property_font_normal")) {
+        break;
+    }
+    case ui::attr::control::kPropertyFontNormal: {
         SetPropertyNormalFontId(strValue);
-    } else if (strName == _T("property_font_modified")) {
+        break;
+    }
+    case ui::attr::control::kPropertyFontModified: {
         SetPropertyModifiedFontId(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

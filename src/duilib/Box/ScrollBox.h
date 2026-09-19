@@ -25,7 +25,8 @@ public:
     virtual ~ScrollBox() override;
 
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void SetPos(UiRect rc) override;
     virtual void HandleEvent(const EventArgs &msg) override;
     virtual bool MouseEnter(const EventArgs &msg) override;

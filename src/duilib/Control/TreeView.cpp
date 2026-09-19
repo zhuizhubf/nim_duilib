@@ -33,36 +33,66 @@ DString TreeNode::GetType() const
     return DUI_CTR_TREENODE;
 }
 
-void TreeNode::SetAttribute(const DString &strName, const DString &strValue2)
+void TreeNode::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("expand_normal_image")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kExpandNormalImage: {
         SetExpandStateImage(kControlStateNormal, strValue);
-    } else if ((strName == _T("expand_hovered_image")) || (strName == _T("expand_hot_image"))) {
+        break;
+    }
+    case ui::attr::control::kExpandHoveredImage:
+    case ui::attr::control::kExpandHotImage: {
         SetExpandStateImage(kControlStateHovered, strValue);
-    } else if ((strName == _T("expand_pressed_image")) || (strName == _T("expand_pushed_image"))) {
+        break;
+    }
+    case ui::attr::control::kExpandPressedImage:
+    case ui::attr::control::kExpandPushedImage: {
         SetExpandStateImage(kControlStatePressed, strValue);
-    } else if (strName == _T("expand_disabled_image")) {
+        break;
+    }
+    case ui::attr::control::kExpandDisabledImage: {
         SetExpandStateImage(kControlStateDisabled, strValue);
-    } else if (strName == _T("collapse_normal_image")) {
+        break;
+    }
+    case ui::attr::control::kCollapseNormalImage: {
         SetCollapseStateImage(kControlStateNormal, strValue);
-    } else if ((strName == _T("collapse_hovered_image")) || (strName == _T("collapse_hot_image"))) {
+        break;
+    }
+    case ui::attr::control::kCollapseHoveredImage:
+    case ui::attr::control::kCollapseHotImage: {
         SetCollapseStateImage(kControlStateHovered, strValue);
-    } else if ((strName == _T("collapse_pressed_image")) || (strName == _T("collapse_pushed_image"))) {
+        break;
+    }
+    case ui::attr::control::kCollapsePressedImage:
+    case ui::attr::control::kCollapsePushedImage: {
         SetCollapseStateImage(kControlStatePressed, strValue);
-    } else if (strName == _T("collapse_disabled_image")) {
+        break;
+    }
+    case ui::attr::control::kCollapseDisabledImage: {
         SetCollapseStateImage(kControlStateDisabled, strValue);
-    } else if (strName == _T("expand_image_right_space")) {
+        break;
+    }
+    case ui::attr::control::kExpandImageRightSpace: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetExpandIndent(iValue, true);
-    } else if (strName == _T("check_box_image_right_space")) {
+        break;
+    }
+    case ui::attr::control::kCheckBoxImageRightSpace: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetCheckBoxIndent(iValue, true);
-    } else if (strName == _T("icon_image_right_space")) {
+        break;
+    }
+    case ui::attr::control::kIconImageRightSpace: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetIconIndent(iValue, true);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
@@ -1119,7 +1149,8 @@ DString TreeView::GetType() const
     return DUI_CTR_TREEVIEW;
 }
 
-void TreeView::SetAttribute(const DString &strName, const DString &strValue2)
+void TreeView::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
@@ -1139,7 +1170,7 @@ void TreeView::SetAttribute(const DString &strName, const DString &strValue2)
         //是否显示图标
         SetEnableIcon(StringUtil::IsValueTrue(strValue));
     } else {
-        BaseClass::SetAttribute(strName, strValue);
+        BaseClass::SetAttributeById(id, strName, strValue);
     }
 }
 

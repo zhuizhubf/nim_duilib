@@ -60,20 +60,32 @@ DString DirectoryTree::GetType() const
     return DUI_CTR_DIRECTORY_TREE;
 }
 
-void DirectoryTree::SetAttribute(const DString &strName, const DString &strValue2)
+void DirectoryTree::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
-    if (strName == _T("small_icon_size")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kSmallIconSize: {
         SetSmallIconSize(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("large_icon_size")) {
+        break;
+    }
+    case ui::attr::control::kLargeIconSize: {
         SetLargeIconSize(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("show_hiden_files")) {
+        break;
+    }
+    case ui::attr::control::kShowHidenFiles: {
         SetShowHidenFiles(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("show_system_files")) {
+        break;
+    }
+    case ui::attr::control::kShowSystemFiles: {
         SetShowSystemFiles(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

@@ -26,15 +26,23 @@ DString XmlBox::GetType() const
     return DUI_CTR_XMLBOX;
 }
 
-void XmlBox::SetAttribute(const DString &strName, const DString &strValue2)
+void XmlBox::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("xml_file_path")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kXmlFilePath: {
         SetXmlFilePath(FilePath(strValue));
-    } else if (strName == _T("res_path")) {
+        break;
+    }
+    case ui::attr::control::kResPath: {
         SetResPath(FilePath(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

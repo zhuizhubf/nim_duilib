@@ -103,58 +103,102 @@ ImageListPtr ListCtrl::GetImageList(ListCtrlType type) const
     }
 }
 
-void ListCtrl::SetAttribute(const DString &strName, const DString &strValue2)
+void ListCtrl::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("header_class")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kHeaderClass: {
         SetHeaderClass(strValue);
-    } else if (strName == _T("header_item_class")) {
+        break;
+    }
+    case ui::attr::control::kHeaderItemClass: {
         SetHeaderItemClass(strValue);
-    } else if (strName == _T("header_split_box_class")) {
+        break;
+    }
+    case ui::attr::control::kHeaderSplitBoxClass: {
         SetHeaderSplitBoxClass(strValue);
-    } else if (strName == _T("header_split_control_class")) {
+        break;
+    }
+    case ui::attr::control::kHeaderSplitControlClass: {
         SetHeaderSplitControlClass(strValue);
-    } else if (strName == _T("enable_header_drag_order")) {
+        break;
+    }
+    case ui::attr::control::kEnableHeaderDragOrder: {
         SetEnableHeaderDragOrder(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("check_box_class")) {
+        break;
+    }
+    case ui::attr::control::kCheckBoxClass: {
         SetCheckBoxClass(strValue);
-    } else if (strName == _T("data_item_class")) {
+        break;
+    }
+    case ui::attr::control::kDataItemClass: {
         SetDataItemClass(strValue);
-    } else if (strName == _T("data_sub_item_class")) {
+        break;
+    }
+    case ui::attr::control::kDataSubItemClass: {
         SetDataSubItemClass(strValue);
-    } else if (strName == _T("row_grid_line_width")) {
+        break;
+    }
+    case ui::attr::control::kRowGridLineWidth: {
         //注意：StringToFloat 调用 1 次，提取到局部变量避免重复计算且防止结果不一致
         float fValue = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         ASSERT(fValue >= 0);
         SetRowGridLineWidth(fValue, true);
-    } else if (strName == _T("row_grid_line_color")) {
+        break;
+    }
+    case ui::attr::control::kRowGridLineColor: {
         SetRowGridLineColor(strValue);
-    } else if (strName == _T("column_grid_line_width")) {
+        break;
+    }
+    case ui::attr::control::kColumnGridLineWidth: {
         //注意：StringToFloat 调用 1 次，提取到局部变量避免重复计算且防止结果不一致
         float fValue = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         ASSERT(fValue >= 0);
         SetColumnGridLineWidth(fValue, true);
-    } else if (strName == _T("column_grid_line_color")) {
+        break;
+    }
+    case ui::attr::control::kColumnGridLineColor: {
         SetColumnGridLineColor(strValue);
-    } else if (strName == _T("report_view_class")) {
+        break;
+    }
+    case ui::attr::control::kReportViewClass: {
         SetReportViewClass(strValue);
-    } else if (strName == _T("header_height")) {
+        break;
+    }
+    case ui::attr::control::kHeaderHeight: {
         SetHeaderHeight(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("data_item_height")) {
+        break;
+    }
+    case ui::attr::control::kDataItemHeight: {
         SetDataItemHeight(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("show_header")) {
+        break;
+    }
+    case ui::attr::control::kShowHeader: {
         SetHeaderVisible(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("multi_select")) {
+        break;
+    }
+    case ui::attr::control::kMultiSelect: {
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("enable_column_width_auto")) {
+        break;
+    }
+    case ui::attr::control::kEnableColumnWidthAuto: {
         SetEnableColumnWidthAuto(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("auto_check_select")) {
+        break;
+    }
+    case ui::attr::control::kAutoCheckSelect: {
         SetAutoCheckSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("show_header_checkbox")) {
+        break;
+    }
+    case ui::attr::control::kShowHeaderCheckbox: {
         SetHeaderShowCheckBox(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("show_data_item_checkbox")) {
+        break;
+    }
+    case ui::attr::control::kShowDataItemCheckbox: {
         SetDataItemShowCheckBox(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("type")) {
+        break;
+    }
+    case ui::attr::control::kType: {
         if (strValue == _T("report")) {
             SetListCtrlType(ListCtrlType::Report);
         } else if (strValue == _T("icon")) {
@@ -162,28 +206,52 @@ void ListCtrl::SetAttribute(const DString &strName, const DString &strValue2)
         } else if (strValue == _T("list")) {
             SetListCtrlType(ListCtrlType::List);
         }
-    } else if (strName == _T("icon_view_class")) {
+        break;
+    }
+    case ui::attr::control::kIconViewClass: {
         SetIconViewClass(strValue);
-    } else if (strName == _T("icon_view_item_class")) {
+        break;
+    }
+    case ui::attr::control::kIconViewItemClass: {
         SetIconViewItemClass(strValue);
-    } else if (strName == _T("icon_view_item_image_class")) {
+        break;
+    }
+    case ui::attr::control::kIconViewItemImageClass: {
         SetIconViewItemImageClass(strValue);
-    } else if (strName == _T("icon_view_item_label_class")) {
+        break;
+    }
+    case ui::attr::control::kIconViewItemLabelClass: {
         SetIconViewItemLabelClass(strValue);
-    } else if (strName == _T("list_view_class")) {
+        break;
+    }
+    case ui::attr::control::kListViewClass: {
         SetListViewClass(strValue);
-    } else if (strName == _T("list_view_item_class")) {
+        break;
+    }
+    case ui::attr::control::kListViewItemClass: {
         SetListViewItemClass(strValue);
-    } else if (strName == _T("list_view_item_image_class")) {
+        break;
+    }
+    case ui::attr::control::kListViewItemImageClass: {
         SetListViewItemImageClass(strValue);
-    } else if (strName == _T("list_view_item_label_class")) {
+        break;
+    }
+    case ui::attr::control::kListViewItemLabelClass: {
         SetListViewItemLabelClass(strValue);
-    } else if (strName == _T("enable_item_edit")) {
+        break;
+    }
+    case ui::attr::control::kEnableItemEdit: {
         SetEnableItemEdit(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("list_ctrl_richedit_class")) {
+        break;
+    }
+    case ui::attr::control::kListCtrlRicheditClass: {
         SetRichEditClass(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

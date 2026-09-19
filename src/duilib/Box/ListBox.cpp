@@ -47,37 +47,64 @@ DString ListBox::GetType() const
     return _T("ListBox");
 }
 
-void ListBox::SetAttribute(const DString &strName, const DString &strValue2)
+void ListBox::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("multi_select")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kMultiSelect: {
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("paint_selected_colors")) {
+        break;
+    }
+    case ui::attr::control::kPaintSelectedColors: {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uPaintSelectedColors = PAINT_SELECTED_COLORS_YES;
         } else {
             m_uPaintSelectedColors = PAINT_SELECTED_COLORS_NO;
         }
-    } else if ((strName == _T("scroll_select")) || (strName == _T("scrollselect"))) {
+        break;
+    }
+    case ui::attr::control::kScrollSelect:
+    case ui::attr::control::kScrollselect: {
         SetScrollSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("select_next_when_active_removed")) {
+        break;
+    }
+    case ui::attr::control::kSelectNextWhenActiveRemoved: {
         SetSelectNextWhenActiveRemoved(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("frame_selection")) {
+        break;
+    }
+    case ui::attr::control::kFrameSelection: {
         SetEnableFrameSelection(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("frame_selection_color")) {
+        break;
+    }
+    case ui::attr::control::kFrameSelectionColor: {
         SetFrameSelectionColor(strValue);
-    } else if (strName == _T("frame_selection_alpha")) {
+        break;
+    }
+    case ui::attr::control::kFrameSelectionAlpha: {
         SetFrameSelectionAlpha((uint8_t) StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("frame_selection_border_size")) {
+        break;
+    }
+    case ui::attr::control::kFrameSelectionBorderSize: {
         SetFrameSelectionBorderSize(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("frame_selection_border_color")) {
+        break;
+    }
+    case ui::attr::control::kFrameSelectionBorderColor: {
         SetFrameSelectionBorderColor(strValue);
-    } else if (strName == _T("select_none_when_click_blank")) {
+        break;
+    }
+    case ui::attr::control::kSelectNoneWhenClickBlank: {
         SetSelectNoneWhenClickBlank(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("select_like_list_ctrl")) {
+        break;
+    }
+    case ui::attr::control::kSelectLikeListCtrl: {
         SetSelectLikeListCtrl(StringUtil::IsValueTrue(strValue));
-    } else {
-        ScrollBox::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        ScrollBox::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

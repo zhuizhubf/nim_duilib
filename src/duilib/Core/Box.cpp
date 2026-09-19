@@ -40,21 +40,33 @@ DString Box::GetType() const
     return DUI_CTR_BOX;
 }
 
-void Box::SetAttribute(const DString &strName, const DString &strValue2)
+void Box::SetAttributeById(ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (m_pLayout->SetAttribute(strName, strValue, Dpi())) {
         return;
-    } else if ((strName == _T("mouse_child")) || (strName == _T("mousechild"))) {
-        SetMouseChildEnabled(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("drag_out_id")) {
-        uint8_t nValue = ui::TruncateToUInt8(StringUtil::StringToInt32(strValue));
-        SetDragOutId(nValue);
-    } else if (strName == _T("drop_in_id")) {
-        uint8_t nValue = ui::TruncateToUInt8(StringUtil::StringToInt32(strValue));
-        SetDropInId(nValue);
     } else {
-        Control::SetAttribute(strName, strValue);
+        switch (ui::attr::control::IdOf(strName)) {
+        case ui::attr::control::kMouseChild:
+        case ui::attr::control::kMousechild: {
+            SetMouseChildEnabled(StringUtil::IsValueTrue(strValue));
+            break;
+        }
+        case ui::attr::control::kDragOutId: {
+            uint8_t nValue = ui::TruncateToUInt8(StringUtil::StringToInt32(strValue));
+            SetDragOutId(nValue);
+            break;
+        }
+        case ui::attr::control::kDropInId: {
+            uint8_t nValue = ui::TruncateToUInt8(StringUtil::StringToInt32(strValue));
+            SetDropInId(nValue);
+            break;
+        }
+        default: {
+            Control::SetAttributeById(id, strName, strValue);
+            break;
+        }
+        }
     }
 }
 

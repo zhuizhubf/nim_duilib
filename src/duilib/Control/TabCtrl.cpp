@@ -15,30 +15,48 @@ DString TabCtrl::GetType() const
     return DUI_CTR_TAB_CTRL;
 }
 
-void TabCtrl::SetAttribute(const DString &strName, const DString &strValue2)
+void TabCtrl::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("selected_id")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kSelectedId: {
         int32_t nValue = StringUtil::StringToInt32(strValue);
         if (nValue >= 0) {
             m_nSelectedId = nValue;
         }
-    } else if (strName == _T("tab_box_name")) {
+        break;
+    }
+    case ui::attr::control::kTabBoxName: {
         //绑定的TabBox控件名称，绑定后TabCtrl的选择项变化时，TabBox的选择项会跟随变化
         SetTabBoxName(strValue);
-    } else if (strName == _T("drag_order")) {
+        break;
+    }
+    case ui::attr::control::kDragOrder: {
         //是否支持拖动调整顺序（在同一个标签内），默认是开启的
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("selected_tab_item_outline_width")) {
+        break;
+    }
+    case ui::attr::control::kSelectedTabItemOutlineWidth: {
         SetSelectedTabItemOutlineWidth(StringUtil::StringToFloat(strValue.c_str()));
-    } else if (strName == _T("selected_tab_item_outline_color")) {
+        break;
+    }
+    case ui::attr::control::kSelectedTabItemOutlineColor: {
         SetSelectedTabItemOutlineColor(strValue);
-    } else if (strName == _T("tab_ctrl_bottom_line_height")) {
+        break;
+    }
+    case ui::attr::control::kTabCtrlBottomLineHeight: {
         SetTabCtrlBottomLineHeight(StringUtil::StringToFloat(strValue.c_str()));
-    } else if (strName == _T("tab_ctrl_bottom_line_color")) {
+        break;
+    }
+    case ui::attr::control::kTabCtrlBottomLineColor: {
         SetTabCtrlBottomLineColor(strValue);
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
@@ -330,7 +348,8 @@ DString TabCtrlItem::GetType() const
     return DUI_CTR_TAB_CTRL_ITEM;
 }
 
-void TabCtrlItem::SetAttribute(const DString &strName, const DString &strValue2)
+void TabCtrlItem::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("tab_box_item_index")) {
@@ -364,7 +383,7 @@ void TabCtrlItem::SetAttribute(const DString &strName, const DString &strValue2)
     } else if (strName == _T("auto_hide_close_button")) {
         SetAutoHideCloseButton(StringUtil::IsValueTrue(strValue));
     } else {
-        BaseClass::SetAttribute(strName, strValue);
+        BaseClass::SetAttributeById(id, strName, strValue);
     }
 }
 

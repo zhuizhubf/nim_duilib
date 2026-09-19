@@ -69,87 +69,163 @@ DString ScrollBar::GetType() const
     return DUI_CTR_SCROLLBAR;
 }
 
-void ScrollBar::SetAttribute(const DString &strName, const DString &strValue2)
+void ScrollBar::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if ((strName == _T("button1_normal_image")) || (strName == _T("button1normalimage"))) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kButton1NormalImage:
+    case ui::attr::control::kButton1normalimage: {
         SetButton1StateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("button1_hovered_image")) || (strName == _T("button1_hot_image"))
-        || (strName == _T("button1hotimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton1HoveredImage:
+    case ui::attr::control::kButton1HotImage:
+    case ui::attr::control::kButton1hotimage: {
         SetButton1StateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("button1_pressed_image")) || (strName == _T("button1_pushed_image"))
-        || (strName == _T("button1pushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton1PressedImage:
+    case ui::attr::control::kButton1PushedImage:
+    case ui::attr::control::kButton1pushedimage: {
         SetButton1StateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("button1_disabled_image")) || (strName == _T("button1disabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton1DisabledImage:
+    case ui::attr::control::kButton1disabledimage: {
         SetButton1StateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("button2_normal_image")) || (strName == _T("button2normalimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton2NormalImage:
+    case ui::attr::control::kButton2normalimage: {
         SetButton2StateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("button2_hovered_image")) || (strName == _T("button2_hot_image"))
-        || (strName == _T("button2hotimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton2HoveredImage:
+    case ui::attr::control::kButton2HotImage:
+    case ui::attr::control::kButton2hotimage: {
         SetButton2StateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("button2_pressed_image")) || (strName == _T("button2_pushed_image"))
-        || (strName == _T("button2pushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton2PressedImage:
+    case ui::attr::control::kButton2PushedImage:
+    case ui::attr::control::kButton2pushedimage: {
         SetButton2StateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("button2_disabled_image")) || (strName == _T("button2disabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kButton2DisabledImage:
+    case ui::attr::control::kButton2disabledimage: {
         SetButton2StateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbNormalImage:
+    case ui::attr::control::kThumbnormalimage: {
         SetThumbStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image"))
-        || (strName == _T("thumbhotimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbHoveredImage:
+    case ui::attr::control::kThumbHotImage:
+    case ui::attr::control::kThumbhotimage: {
         SetThumbStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image"))
-        || (strName == _T("thumbpushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbPressedImage:
+    case ui::attr::control::kThumbPushedImage:
+    case ui::attr::control::kThumbpushedimage: {
         SetThumbStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kThumbDisabledImage:
+    case ui::attr::control::kThumbdisabledimage: {
         SetThumbStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("rail_normal_image")) || (strName == _T("railnormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kRailNormalImage:
+    case ui::attr::control::kRailnormalimage: {
         SetRailStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("rail_hovered_image")) || (strName == _T("rail_hot_image"))
-        || (strName == _T("railhotimage"))) {
+        break;
+    }
+    case ui::attr::control::kRailHoveredImage:
+    case ui::attr::control::kRailHotImage:
+    case ui::attr::control::kRailhotimage: {
         SetRailStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("rail_pressed_image")) || (strName == _T("rail_pushed_image"))
-        || (strName == _T("railpushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kRailPressedImage:
+    case ui::attr::control::kRailPushedImage:
+    case ui::attr::control::kRailpushedimage: {
         SetRailStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("rail_disabled_image")) || (strName == _T("raildisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kRailDisabledImage:
+    case ui::attr::control::kRaildisabledimage: {
         SetRailStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("bk_normal_image")) || (strName == _T("bknormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kBkNormalImage:
+    case ui::attr::control::kBknormalimage: {
         SetBkStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("bk_hovered_image")) || (strName == _T("bk_hot_image"))
-        || (strName == _T("bkhotimage"))) {
+        break;
+    }
+    case ui::attr::control::kBkHoveredImage:
+    case ui::attr::control::kBkHotImage:
+    case ui::attr::control::kBkhotimage: {
         SetBkStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("bk_pressed_image")) || (strName == _T("bk_pushed_image"))
-        || (strName == _T("bkpushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kBkPressedImage:
+    case ui::attr::control::kBkPushedImage:
+    case ui::attr::control::kBkpushedimage: {
         SetBkStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("bk_disabled_image")) || (strName == _T("bkdisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kBkDisabledImage:
+    case ui::attr::control::kBkdisabledimage: {
         SetBkStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("horizontal")) || (strName == _T("hor"))) {
+        break;
+    }
+    case ui::attr::control::kHorizontal:
+    case ui::attr::control::kHor: {
         SetHorizontal(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("line_size")) || (strName == _T("linesize"))) {
+        break;
+    }
+    case ui::attr::control::kLineSize:
+    case ui::attr::control::kLinesize: {
         SetLineSize(StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("thumb_min_length")) || (strName == _T("thumbminlength"))) {
+        break;
+    }
+    case ui::attr::control::kThumbMinLength:
+    case ui::attr::control::kThumbminlength: {
         SetThumbMinLength(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("range")) {
+        break;
+    }
+    case ui::attr::control::kRange: {
         SetScrollRange(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("value")) {
+        break;
+    }
+    case ui::attr::control::kValue: {
         SetScrollPos(StringUtil::StringToInt32(strValue));
-    } else if ((strName == _T("show_button1")) || (strName == _T("showbutton1"))) {
+        break;
+    }
+    case ui::attr::control::kShowButton1:
+    case ui::attr::control::kShowbutton1: {
         SetShowButton1(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("show_button2")) || (strName == _T("showbutton2"))) {
+        break;
+    }
+    case ui::attr::control::kShowButton2:
+    case ui::attr::control::kShowbutton2: {
         SetShowButton2(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("auto_hide_scroll")) || (strName == _T("autohidescroll"))) {
+        break;
+    }
+    case ui::attr::control::kAutoHideScroll:
+    case ui::attr::control::kAutohidescroll: {
         SetAutoHideScroll(StringUtil::IsValueTrue(strValue));
-    } else {
-        Control::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        Control::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

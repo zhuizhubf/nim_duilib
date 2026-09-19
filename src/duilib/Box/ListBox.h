@@ -37,7 +37,8 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void HandleEvent(const EventArgs &msg) override;
     virtual void SendEventMsg(const EventArgs &msg) override;
 

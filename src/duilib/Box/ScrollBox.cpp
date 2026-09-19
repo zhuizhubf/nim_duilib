@@ -30,51 +30,87 @@ DString ScrollBox::GetType() const
     return DUI_CTR_SCROLLBOX;
 } //ScrollBox
 
-void ScrollBox::SetAttribute(const DString &strName, const DString &strValue2)
+void ScrollBox::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("vscrollbar")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kVscrollbar: {
         EnableScrollBar(StringUtil::IsValueTrue(strValue), GetHScrollBar() != nullptr);
-    } else if ((strName == _T("vscrollbar_style")) || (strName == _T("vscrollbarstyle"))) {
+        break;
+    }
+    case ui::attr::control::kVscrollbarStyle:
+    case ui::attr::control::kVscrollbarstyle: {
         EnableScrollBar(true, GetHScrollBar() != nullptr);
         if (GetVScrollBar() != nullptr) {
             GetVScrollBar()->ApplyAttributeList(strValue);
         }
-    } else if (strName == _T("vscrollbar_class")) {
+        break;
+    }
+    case ui::attr::control::kVscrollbarClass: {
         EnableScrollBar(true, GetHScrollBar() != nullptr);
         if (GetVScrollBar() != nullptr) {
             GetVScrollBar()->SetClass(strValue);
         }
-    } else if (strName == _T("hscrollbar")) {
+        break;
+    }
+    case ui::attr::control::kHscrollbar: {
         EnableScrollBar(GetVScrollBar() != nullptr, StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("hscrollbar_style")) || (strName == _T("hscrollbarstyle"))) {
+        break;
+    }
+    case ui::attr::control::kHscrollbarStyle:
+    case ui::attr::control::kHscrollbarstyle: {
         EnableScrollBar(GetVScrollBar() != nullptr, true);
         if (GetHScrollBar() != nullptr) {
             GetHScrollBar()->ApplyAttributeList(strValue);
         }
-    } else if (strName == _T("hscrollbar_class")) {
+        break;
+    }
+    case ui::attr::control::kHscrollbarClass: {
         EnableScrollBar(GetVScrollBar() != nullptr, true);
         if (GetHScrollBar() != nullptr) {
             GetHScrollBar()->SetClass(strValue);
         }
-    } else if ((strName == _T("scrollbar_padding")) || (strName == _T("scrollbarpadding"))) {
+        break;
+    }
+    case ui::attr::control::kScrollbarPadding:
+    case ui::attr::control::kScrollbarpadding: {
         UiPadding rcScrollbarPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcScrollbarPadding);
         SetScrollBarPadding(rcScrollbarPadding, true);
-    } else if ((strName == _T("vscroll_unit")) || (strName == _T("vscrollunit"))) {
+        break;
+    }
+    case ui::attr::control::kVscrollUnit:
+    case ui::attr::control::kVscrollunit: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetVerScrollUnitPixels(iValue, true);
-    } else if ((strName == _T("hscroll_unit")) || (strName == _T("hscrollunit"))) {
+        break;
+    }
+    case ui::attr::control::kHscrollUnit:
+    case ui::attr::control::kHscrollunit: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetHorScrollUnitPixels(iValue, true);
-    } else if ((strName == _T("scrollbar_float")) || (strName == _T("scrollbarfloat"))) {
+        break;
+    }
+    case ui::attr::control::kScrollbarFloat:
+    case ui::attr::control::kScrollbarfloat: {
         SetScrollBarFloat(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("vscrollbar_left")) || (strName == _T("vscrollbarleft"))) {
+        break;
+    }
+    case ui::attr::control::kVscrollbarLeft:
+    case ui::attr::control::kVscrollbarleft: {
         SetVScrollBarAtLeft(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("hold_end")) || (strName == _T("holdend"))) {
+        break;
+    }
+    case ui::attr::control::kHoldEnd:
+    case ui::attr::control::kHoldend: {
         SetHoldEnd(StringUtil::IsValueTrue(strValue));
-    } else {
-        Box::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        Box::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

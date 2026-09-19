@@ -31,7 +31,8 @@ public:
 
     virtual void SetPos(UiRect rc) override;
     virtual void HandleEvent(const EventArgs &msg) override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(
+        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
     virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
     virtual void ClearImageCache() override;
 
