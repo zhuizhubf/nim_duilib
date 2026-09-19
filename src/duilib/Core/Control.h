@@ -6,6 +6,7 @@
 #include "duilib/Core/EventArgs.h"
 #include "duilib/Core/Keyboard.h"
 #include "duilib/Core/PlaceHolder.h"
+#include "duilib/Utils/AttributeIds.g.h"
 
 namespace ui {
 class Control;
@@ -613,6 +614,14 @@ public:
      * @return 无
      */
     virtual void SetAttribute(const DString &strName, const DString &strValue);
+
+    /** 按属性 ID 设置属性（字符串→枚举只在 XML 边界转换一次，派生类重写此函数）
+    * @param [in] nAttributeId 属性 ID，由 attr::control::IdOf() 得到
+    * @param [in] strName 属性名称
+    * @param [in] strValue 属性值
+    */
+    virtual void SetAttributeById(
+        attr::control::Id nAttributeId, const DString &strName, const DString &strValue);
 
     /**
      * @brief 设置控件的 class 全局属性

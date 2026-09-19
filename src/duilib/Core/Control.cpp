@@ -9,6 +9,7 @@
 #include "duilib/Core/StateColorMap2.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Image/Image.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
 #include "duilib/Utils/StringConvert.h"
@@ -80,15 +81,25 @@ DString Control::GetType() const
 
 void Control::SetAttribute(const DString &strName, const DString &strValue2)
 {
+    SetAttributeById(attr::control::IdOf(strName), strName, strValue2);
+}
+
+void Control::SetAttributeById(attr::control::Id id, const DString &strName, const DString &strValue2)
+{
     ASSERT(GetWindow() != nullptr); //由于需要做DPI感知功能，所以必须先设置关联窗口
 
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("class")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kClass: {
         SetClass(strValue);
-    } else if (strName == _T("enable_vars")) {
+        break;
+    }
+    case ui::attr::control::kEnableVars: {
         //属性值中是否支持变量展开
         SetEnableVars(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("halign")) {
+        break;
+    }
+    case ui::attr::control::kHalign: {
         if (strValue == _T("left")) {
             SetHorAlignType(HorAlignType::kAlignLeft);
         } else if (strValue == _T("center")) {
@@ -98,7 +109,9 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             ASSERT(0);
         }
-    } else if (strName == _T("valign")) {
+        break;
+    }
+    case ui::attr::control::kValign: {
         if (strValue == _T("top")) {
             SetVerAlignType(VerAlignType::kAlignTop);
         } else if (strValue == _T("center")) {
@@ -108,7 +121,9 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             ASSERT(0);
         }
-    } else if (strName == _T("align")) {
+        break;
+    }
+    case ui::attr::control::kAlign: {
         //水平方向对齐方式
         if (strValue.find(_T("left")) != DString::npos) {
             SetHorAlignType(HorAlignType::kAlignLeft);
@@ -125,29 +140,46 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else if (strValue.find(_T("bottom")) != DString::npos) {
             SetVerAlignType(VerAlignType::kAlignBottom);
         }
-    } else if (strName == _T("margin")) {
+        break;
+    }
+    case ui::attr::control::kMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetMargin(rcMargin, true);
-    } else if (strName == _T("padding")) {
+        break;
+    }
+    case ui::attr::control::kPadding: {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetPadding(rcPadding, true);
-    } else if (strName == _T("control_padding")) {
+        break;
+    }
+    case ui::attr::control::kControlPadding: {
         SetEnableControlPadding(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("bkcolor")) {
+        break;
+    }
+    case ui::attr::control::kBkcolor: {
         //背景色
         SetBkColor(strValue);
-    } else if (strName == _T("bkcolor2")) {
+        break;
+    }
+    case ui::attr::control::kBkcolor2: {
         //第二背景色（实现渐变背景色）
         SetBkColor2(strValue);
-    } else if (strName == _T("bkcolor2_direction")) {
+        break;
+    }
+    case ui::attr::control::kBkcolor2Direction: {
         //第二背景色的方向："1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
         SetBkColor2Direction(strValue);
-    } else if (strName == _T("fore_color")) {
+        break;
+    }
+    case ui::attr::control::kForeColor: {
         //前景色
         SetForeColor(strValue);
-    } else if ((strName == _T("border_size")) || (strName == _T("bordersize"))) {
+        break;
+    }
+    case ui::attr::control::kBorderSize:
+    case ui::attr::control::kBordersize: {
         //边线宽度
         DString nValue = strValue;
         if (nValue.find(_T(',')) == DString::npos) {
@@ -168,7 +200,9 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
                 (float) rcMargin.bottom);
             SetBorderSize(rcBorder, true);
         }
-    } else if (strName == _T("border_dash_style")) {
+        break;
+    }
+    case ui::attr::control::kBorderDashStyle: {
         //边线的线形（四个边的边线的线形只能一致，不支持分开设置）
         IPen::DashStyle dashStyle = IPen::kDashStyleSolid;
         if (strValue == _T("solid")) {
@@ -183,17 +217,27 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
             dashStyle = IPen::kDashStyleDashDotDot;
         }
         SetBorderDashStyle((int8_t) dashStyle);
-    } else if (strName == _T("borders_on_top")) {
+        break;
+    }
+    case ui::attr::control::kBordersOnTop: {
         //边框是否在顶层（即先绘制子控件，后绘制边框，避免边框被子控件覆盖）
         SetBordersOnTop(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("border_round")) || (strName == _T("borderround"))) {
+        break;
+    }
+    case ui::attr::control::kBorderRound:
+    case ui::attr::control::kBorderround: {
         //圆角大小
         UiSize cxyRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), cxyRound);
         SetBorderRound(cxyRound);
-    } else if ((strName == _T("box_shadow")) || (strName == _T("boxshadow"))) {
+        break;
+    }
+    case ui::attr::control::kBoxShadow:
+    case ui::attr::control::kBoxshadow: {
         SetBoxShadow(strValue);
-    } else if (strName == _T("width")) {
+        break;
+    }
+    case ui::attr::control::kWidth: {
         if (strValue == _T("stretch")) {
             //宽度为拉伸：由父容器负责分配宽度
             SetFixedWidth(UiFixedInt::MakeStretch(), true, true);
@@ -216,7 +260,9 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             SetFixedWidth(UiFixedInt(0), true, true);
         }
-    } else if (strName == _T("height")) {
+        break;
+    }
+    case ui::attr::control::kHeight: {
         if (strValue == _T("stretch")) {
             //高度为拉伸：由父容器负责分配高度
             SetFixedHeight(UiFixedInt::MakeStretch(), true, true);
@@ -239,7 +285,9 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             SetFixedHeight(UiFixedInt(0), true, true);
         }
-    } else if (strName == _T("state")) {
+        break;
+    }
+    case ui::attr::control::kState: {
         if (strValue == _T("normal")) {
             SetState(kControlStateNormal);
         } else if (strValue == _T("hot")) {
@@ -251,7 +299,10 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             ASSERT(0);
         }
-    } else if ((strName == _T("cursor_type")) || (strName == _T("cursortype"))) {
+        break;
+    }
+    case ui::attr::control::kCursorType:
+    case ui::attr::control::kCursortype: {
         if (strValue == _T("arrow")) {
             SetCursorType(CursorType::kCursorArrow);
         } else if (strValue == _T("ibeam")) {
@@ -279,149 +330,290 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
         } else {
             ASSERT(0);
         }
-    } else if ((strName == _T("render_offset")) || (strName == _T("renderoffset"))) {
+        break;
+    }
+    case ui::attr::control::kRenderOffset:
+    case ui::attr::control::kRenderoffset: {
         UiPoint renderOffset;
         AttributeUtil::ParsePointValue(strValue.c_str(), renderOffset);
         SetRenderOffset(renderOffset, true);
-    } else if ((strName == _T("normal_color")) || (strName == _T("normalcolor"))) {
+        break;
+    }
+    case ui::attr::control::kNormalColor:
+    case ui::attr::control::kNormalcolor: {
         SetStateColor(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("hovered_color")) || (strName == _T("hot_color"))
-        || (strName == _T("hotcolor"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredColor:
+    case ui::attr::control::kHotColor:
+    case ui::attr::control::kHotcolor: {
         SetStateColor(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("pressed_color")) || (strName == _T("pushed_color"))
-        || (strName == _T("pushedcolor"))) {
+        break;
+    }
+    case ui::attr::control::kPressedColor:
+    case ui::attr::control::kPushedColor:
+    case ui::attr::control::kPushedcolor: {
         SetStateColor(kControlStatePressed, strValue);
-    } else if ((strName == _T("disabled_color")) || (strName == _T("disabledcolor"))) {
+        break;
+    }
+    case ui::attr::control::kDisabledColor:
+    case ui::attr::control::kDisabledcolor: {
         SetStateColor(kControlStateDisabled, strValue);
-    } else if (strName == _T("normal_color_margin")) {
+        break;
+    }
+    case ui::attr::control::kNormalColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStateNormal, rcMargin, true);
-    } else if ((strName == _T("hovered_color_margin")) || (strName == _T("hot_color_margin"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredColorMargin:
+    case ui::attr::control::kHotColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStateHovered, rcMargin, true);
-    } else if ((strName == _T("pressed_color_margin")) || (strName == _T("pushed_color_margin"))) {
+        break;
+    }
+    case ui::attr::control::kPressedColorMargin:
+    case ui::attr::control::kPushedColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStatePressed, rcMargin, true);
-    } else if (strName == _T("disabled_color_margin")) {
+        break;
+    }
+    case ui::attr::control::kDisabledColorMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetStateColorMargin(kControlStateDisabled, rcMargin, true);
-    } else if (strName == _T("state_color_min_width")) {
+        break;
+    }
+    case ui::attr::control::kStateColorMinWidth: {
         //状态颜色区域的最小宽度（解决DPI缩放后的运算精度损失导致线条宽度失真问题）
         SetStateColorMinWidth(StringUtil::StringToFloat(strValue.c_str(), nullptr));
-    } else if (strName == _T("state_color_min_height")) {
+        break;
+    }
+    case ui::attr::control::kStateColorMinHeight: {
         //状态颜色区域的最小高度（解决DPI缩放后的运算精度损失导致线条高度失真问题）
         SetStateColorMinHeight(StringUtil::StringToFloat(strValue.c_str(), nullptr));
-    } else if (strName == _T("normal_color_round")) {
+        break;
+    }
+    case ui::attr::control::kNormalColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStateNormal, szRound, true);
-    } else if ((strName == _T("hovered_color_round")) || (strName == _T("hot_color_round"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredColorRound:
+    case ui::attr::control::kHotColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStateHovered, szRound, true);
-    } else if ((strName == _T("pressed_color_round")) || (strName == _T("pushed_color_round"))) {
+        break;
+    }
+    case ui::attr::control::kPressedColorRound:
+    case ui::attr::control::kPushedColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStatePressed, szRound, true);
-    } else if (strName == _T("disabled_color_round")) {
+        break;
+    }
+    case ui::attr::control::kDisabledColorRound: {
         UiSize szRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szRound);
         SetStateColorRound(kControlStateDisabled, szRound, true);
-    } else if ((strName == _T("border_color")) || (strName == _T("bordercolor"))) {
+        break;
+    }
+    case ui::attr::control::kBorderColor:
+    case ui::attr::control::kBordercolor: {
         SetBorderColor(strValue);
-    } else if (strName == _T("normal_border_color")) {
+        break;
+    }
+    case ui::attr::control::kNormalBorderColor: {
         SetBorderColor(kControlStateNormal, strValue);
-    } else if ((strName == _T("hovered_border_color")) || (strName == _T("hot_border_color"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredBorderColor:
+    case ui::attr::control::kHotBorderColor: {
         SetBorderColor(kControlStateHovered, strValue);
-    } else if ((strName == _T("pressed_border_color")) || (strName == _T("pushed_border_color"))) {
+        break;
+    }
+    case ui::attr::control::kPressedBorderColor:
+    case ui::attr::control::kPushedBorderColor: {
         SetBorderColor(kControlStatePressed, strValue);
-    } else if (strName == _T("disabled_border_color")) {
+        break;
+    }
+    case ui::attr::control::kDisabledBorderColor: {
         SetBorderColor(kControlStateDisabled, strValue);
-    } else if ((strName == _T("focused_border_color")) || (strName == _T("focus_border_color"))) {
+        break;
+    }
+    case ui::attr::control::kFocusedBorderColor:
+    case ui::attr::control::kFocusBorderColor: {
         SetFocusedBorderColor(strValue);
-    } else if ((strName == _T("left_border_size")) || (strName == _T("leftbordersize"))) {
+        break;
+    }
+    case ui::attr::control::kLeftBorderSize:
+    case ui::attr::control::kLeftbordersize: {
         SetLeftBorderSize((float) StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("top_border_size")) || (strName == _T("topbordersize"))) {
+        break;
+    }
+    case ui::attr::control::kTopBorderSize:
+    case ui::attr::control::kTopbordersize: {
         SetTopBorderSize((float) StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("right_border_size")) || (strName == _T("rightbordersize"))) {
+        break;
+    }
+    case ui::attr::control::kRightBorderSize:
+    case ui::attr::control::kRightbordersize: {
         SetRightBorderSize((float) StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("bottom_border_size")) || (strName == _T("bottombordersize"))) {
+        break;
+    }
+    case ui::attr::control::kBottomBorderSize:
+    case ui::attr::control::kBottombordersize: {
         SetBottomBorderSize((float) StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("bkimage")) {
+        break;
+    }
+    case ui::attr::control::kBkimage: {
         SetBkImage(strValue);
-    } else if ((strName == _T("min_width")) || (strName == _T("minwidth"))) {
+        break;
+    }
+    case ui::attr::control::kMinWidth:
+    case ui::attr::control::kMinwidth: {
         SetMinWidth(StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("max_width")) || (strName == _T("maxwidth"))) {
+        break;
+    }
+    case ui::attr::control::kMaxWidth:
+    case ui::attr::control::kMaxwidth: {
         SetMaxWidth(StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("min_height")) || (strName == _T("minheight"))) {
+        break;
+    }
+    case ui::attr::control::kMinHeight:
+    case ui::attr::control::kMinheight: {
         SetMinHeight(StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("max_height")) || (strName == _T("maxheight"))) {
+        break;
+    }
+    case ui::attr::control::kMaxHeight:
+    case ui::attr::control::kMaxheight: {
         SetMaxHeight(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("name")) {
+        break;
+    }
+    case ui::attr::control::kName: {
         SetName(strValue);
-    } else if ((strName == _T("tooltip_text")) || (strName == _T("tooltiptext"))) {
+        break;
+    }
+    case ui::attr::control::kTooltipText:
+    case ui::attr::control::kTooltiptext: {
         SetToolTipText(strValue);
-    } else if (
-        (strName == _T("tooltip_text_id")) || (strName == _T("tooltip_textid"))
-        || (strName == _T("tooltiptextid"))) {
+        break;
+    }
+    case ui::attr::control::kTooltipTextId:
+    case ui::attr::control::kTooltipTextid:
+    case ui::attr::control::kTooltiptextid: {
         SetToolTipTextId(strValue);
-    } else if (strName == _T("tooltip_width")) {
+        break;
+    }
+    case ui::attr::control::kTooltipWidth: {
         SetToolTipWidth(StringUtil::StringToInt32(strValue), true);
-    } else if ((strName == _T("data_id")) || (strName == _T("dataid"))) {
+        break;
+    }
+    case ui::attr::control::kDataId:
+    case ui::attr::control::kDataid: {
         SetDataID(strValue);
-    } else if ((strName == _T("user_data_id")) || (strName == _T("user_dataid"))) {
+        break;
+    }
+    case ui::attr::control::kUserDataId:
+    case ui::attr::control::kUserDataid: {
         SetUserDataID(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("enabled")) {
+        break;
+    }
+    case ui::attr::control::kEnabled: {
         SetEnabled(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("mouse_enabled")) || (strName == _T("mouse"))) {
+        break;
+    }
+    case ui::attr::control::kMouseEnabled:
+    case ui::attr::control::kMouse: {
         SetMouseEnabled(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("keyboard_enabled")) || (strName == _T("keyboard"))) {
+        break;
+    }
+    case ui::attr::control::kKeyboardEnabled:
+    case ui::attr::control::kKeyboard: {
         SetKeyboardEnabled(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("visible")) {
+        break;
+    }
+    case ui::attr::control::kVisible: {
         SetVisible(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("fade_visible")) || (strName == _T("fadevisible"))) {
+        break;
+    }
+    case ui::attr::control::kFadeVisible:
+    case ui::attr::control::kFadevisible: {
         SetFadeVisible(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("float")) {
+        break;
+    }
+    case ui::attr::control::kFloat: {
         SetFloat(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("keep_float_pos")) {
+        break;
+    }
+    case ui::attr::control::kKeepFloatPos: {
         SetKeepFloatPos(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("cache")) {
+        break;
+    }
+    case ui::attr::control::kCache: {
         //忽略该选项：对应功能已经删除
-    } else if ((strName == _T("no_focus")) || (strName == _T("nofocus"))) {
+        break;
+    }
+    case ui::attr::control::kNoFocus:
+    case ui::attr::control::kNofocus: {
         SetNoFocus();
-    } else if (strName == _T("alpha")) {
+        break;
+    }
+    case ui::attr::control::kAlpha: {
         SetAlpha(ui::TruncateToUInt8(StringUtil::StringToInt32(strValue)));
-    } else if ((strName == _T("normal_image")) || (strName == _T("normalimage"))) {
+        break;
+    }
+    case ui::attr::control::kNormalImage:
+    case ui::attr::control::kNormalimage: {
         SetStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("hovered_image")) || (strName == _T("hot_image"))
-        || (strName == _T("hotimage"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredImage:
+    case ui::attr::control::kHotImage:
+    case ui::attr::control::kHotimage: {
         SetStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("pressed_image")) || (strName == _T("pushed_image"))
-        || (strName == _T("pushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kPressedImage:
+    case ui::attr::control::kPushedImage:
+    case ui::attr::control::kPushedimage: {
         SetStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("disabled_image")) || (strName == _T("disabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kDisabledImage:
+    case ui::attr::control::kDisabledimage: {
         SetStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("fore_normal_image")) || (strName == _T("forenormalimage"))) {
+        break;
+    }
+    case ui::attr::control::kForeNormalImage:
+    case ui::attr::control::kForenormalimage: {
         SetForeStateImage(kControlStateNormal, strValue);
-    } else if (
-        (strName == _T("fore_hovered_image")) || (strName == _T("fore_hot_image"))
-        || (strName == _T("forehotimage"))) {
+        break;
+    }
+    case ui::attr::control::kForeHoveredImage:
+    case ui::attr::control::kForeHotImage:
+    case ui::attr::control::kForehotimage: {
         SetForeStateImage(kControlStateHovered, strValue);
-    } else if (
-        (strName == _T("fore_pressed_image")) || (strName == _T("fore_pushed_image"))
-        || (strName == _T("forepushedimage"))) {
+        break;
+    }
+    case ui::attr::control::kForePressedImage:
+    case ui::attr::control::kForePushedImage:
+    case ui::attr::control::kForepushedimage: {
         SetForeStateImage(kControlStatePressed, strValue);
-    } else if ((strName == _T("fore_disabled_image")) || (strName == _T("foredisabledimage"))) {
+        break;
+    }
+    case ui::attr::control::kForeDisabledImage:
+    case ui::attr::control::kForedisabledimage: {
         SetForeStateImage(kControlStateDisabled, strValue);
-    } else if ((strName == _T("fade_alpha")) || (strName == _T("fadealpha"))) {
+        break;
+    }
+    case ui::attr::control::kFadeAlpha:
+    case ui::attr::control::kFadealpha: {
         bool bFadeVisible = strValue != _T("false");
         uint8_t nEndAlpha = GetAlpha();
         if (bFadeVisible) {
@@ -430,75 +622,143 @@ void Control::SetAttribute(const DString &strName, const DString &strValue2)
             }
         }
         GetAnimationManager().SetFadeAlpha(bFadeVisible, nEndAlpha);
-    } else if (
-        (strName == _T("fade_hovered")) || (strName == _T("fade_hot"))
-        || (strName == _T("fadehot"))) {
+        break;
+    }
+    case ui::attr::control::kFadeHovered:
+    case ui::attr::control::kFadeHot:
+    case ui::attr::control::kFadehot: {
         SetFadeHovered(StringUtil::IsValueTrue(strValue));
-    } else if (
-        (strName == _T("fade_hovered_frame_interval_ms"))
-        || (strName == _T("fade_hot_frame_interval_ms"))) {
+        break;
+    }
+    case ui::attr::control::kFadeHoveredFrameIntervalMs:
+    case ui::attr::control::kFadeHotFrameIntervalMs: {
         SetFadeHoveredFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
-    } else if ((strName == _T("fade_hovered_total_ms")) || (strName == _T("fade_hot_total_ms"))) {
+        break;
+    }
+    case ui::attr::control::kFadeHoveredTotalMs:
+    case ui::attr::control::kFadeHotTotalMs: {
         SetFadeHoveredTotalMillSeconds(StringUtil::StringToInt32(strValue));
-    } else if (
-        (strName == _T("fade_hovered_easing_function"))
-        || (strName == _T("fade_hot_easing_function"))) {
+        break;
+    }
+    case ui::attr::control::kFadeHoveredEasingFunction:
+    case ui::attr::control::kFadeHotEasingFunction: {
         SetFadeHoveredEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
-    } else if ((strName == _T("fade_width")) || (strName == _T("fadewidth"))) {
+        break;
+    }
+    case ui::attr::control::kFadeWidth:
+    case ui::attr::control::kFadewidth: {
         GetAnimationManager().SetFadeWidth(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("fade_height")) || (strName == _T("fadeheight"))) {
+        break;
+    }
+    case ui::attr::control::kFadeHeight:
+    case ui::attr::control::kFadeheight: {
         GetAnimationManager().SetFadeHeight(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("fade_size")) {
+        break;
+    }
+    case ui::attr::control::kFadeSize: {
         GetAnimationManager().SetFadeSize(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("fade_in_out_x_from_left")) || (strName == _T("fadeinoutxfromleft"))) {
+        break;
+    }
+    case ui::attr::control::kFadeInOutXFromLeft:
+    case ui::attr::control::kFadeinoutxfromleft: {
         GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), false);
-    } else if ((strName == _T("fade_in_out_x_from_right")) || (strName == _T("fadeinoutxfromright"))) {
+        break;
+    }
+    case ui::attr::control::kFadeInOutXFromRight:
+    case ui::attr::control::kFadeinoutxfromright: {
         GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), true);
-    } else if ((strName == _T("fade_in_out_y_from_top")) || (strName == _T("fadeinoutyfromtop"))) {
+        break;
+    }
+    case ui::attr::control::kFadeInOutYFromTop:
+    case ui::attr::control::kFadeinoutyfromtop: {
         GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), false);
-    } else if ((strName == _T("fade_in_out_y_from_bottom")) || (strName == _T("fadeinoutyfrombottom"))) {
+        break;
+    }
+    case ui::attr::control::kFadeInOutYFromBottom:
+    case ui::attr::control::kFadeinoutyfrombottom: {
         GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), true);
-    } else if (strName == _T("fade_frame_interval_ms")) {
+        break;
+    }
+    case ui::attr::control::kFadeFrameIntervalMs: {
         GetAnimationManager().SetFrameIntervalMillSeconds(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("fade_total_ms")) {
+        break;
+    }
+    case ui::attr::control::kFadeTotalMs: {
         GetAnimationManager().SetTotalMillSeconds(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("fade_easing_function")) {
+        break;
+    }
+    case ui::attr::control::kFadeEasingFunction: {
         GetAnimationManager().SetEasingFunctionType(
             EasingFunctions::GetEasingFunctionType(strValue));
-    } else if ((strName == _T("tab_stop")) || (strName == _T("tabstop"))) {
+        break;
+    }
+    case ui::attr::control::kTabStop:
+    case ui::attr::control::kTabstop: {
         SetTabStop(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("loading")) {
+        break;
+    }
+    case ui::attr::control::kLoading: {
         SetLoadingAttribute(strValue);
-    } else if ((strName == _T("show_focused_rect")) || (strName == _T("show_focus_rect"))) {
+        break;
+    }
+    case ui::attr::control::kShowFocusedRect:
+    case ui::attr::control::kShowFocusRect: {
         SetShowFocusedRect(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("focused_rect_color")) || (strName == _T("focus_rect_color"))) {
+        break;
+    }
+    case ui::attr::control::kFocusedRectColor:
+    case ui::attr::control::kFocusRectColor: {
         SetFocusedRectColor(strValue);
-    } else if (strName == _T("paint_order")) {
+        break;
+    }
+    case ui::attr::control::kPaintOrder: {
         uint8_t nPaintOrder = TruncateToUInt8(StringUtil::StringToInt32(strValue));
         SetPaintOrder(nPaintOrder);
-    } else if ((strName == _T("start_image_animation")) || (strName == _T("start_gif_play"))) {
+        break;
+    }
+    case ui::attr::control::kStartImageAnimation:
+    case ui::attr::control::kStartGifPlay: {
         ParseStartImageAnimation(strValue);
-    } else if ((strName == _T("stop_image_animation")) || (strName == _T("stop_gif_play"))) {
+        break;
+    }
+    case ui::attr::control::kStopImageAnimation:
+    case ui::attr::control::kStopGifPlay: {
         ParseStopImageAnimation(strValue);
-    } else if (strName == _T("set_image_animation_frame")) {
+        break;
+    }
+    case ui::attr::control::kSetImageAnimationFrame: {
         ParseSetImageAnimationFrame(strValue);
-    } else if (strName == _T("enable_drag_drop")) {
+        break;
+    }
+    case ui::attr::control::kEnableDragDrop: {
         //是否允许拖放操作
         SetEnableDragDrop(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("enable_drop_file")) {
+        break;
+    }
+    case ui::attr::control::kEnableDropFile: {
         //是否允许拖放文件操作
         SetEnableDropFile(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("drop_file_types")) {
+        break;
+    }
+    case ui::attr::control::kDropFileTypes: {
         //拖放文件的扩展名列表
         SetDropFileTypes(strValue);
-    } else if (strName == _T("row_span")) {
+        break;
+    }
+    case ui::attr::control::kRowSpan: {
         //设置单元格合并属性（占几行），仅在GridLayout布局中生效
         SetRowSpan(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("col_span")) {
+        break;
+    }
+    case ui::attr::control::kColSpan: {
         //设置单元格合并属性（占几列），仅在GridLayout布局中生效
         SetColumnSpan(StringUtil::StringToInt32(strValue));
-    } else {
+        break;
+    }
+    default: {
         ASSERT(!"Control::SetAttribute failed: unknown attribute name!");
+        break;
+    }
     }
 }
 
