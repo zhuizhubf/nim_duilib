@@ -162,7 +162,7 @@ local function check_generated()
     end
     os.execv("xmake", { "l", genScript, outDir }, { try = true })
     local problems = {}
-    for _, name in ipairs({ "AttributeIds.g.h", "AttributeIds.g.cpp" }) do
+    for _, name in ipairs({ "AttributeIds.g.h", "AttributeIds.g.cpp", "CtrlDefs.g.h" }) do
         local a = path.join(g_repoRoot, "src", "duilib", "Utils", name)
         local b = path.join(outDir, name)
         if not os.isfile(a) then
@@ -250,7 +250,9 @@ local function check_xml()
     for _, name in ipairs(defs["node"] or {}) do
         nodeNames[name] = true
     end
-    local defsText = io.readfile(path.join(g_repoRoot, "src", "duilib", "duilib_defs.h")) or ""
+    -- 宏定义来自生成文件；duilib_defs.h 不应再手写 DUI_CTR_ 定义
+    local ctrlDefsFile = path.join(g_repoRoot, "src", "duilib", "Utils", "CtrlDefs.g.h")
+    local defsText = io.readfile(ctrlDefsFile) or ""
     for name in defsText:gmatch("DUI_CTR_%u[%w_]*%s+%(_T%(\"([^\"]+)\"%)%)") do
         ctrlClasses[name] = true
     end
@@ -283,12 +285,15 @@ end
 local function check_ctrl()
     local defs = get_defs()
     local expected = {}
-    for _, name in ipairs(defs["ctrl"] or {}) do
-        expected[name] = true
+    for _, item in ipairs(defs["ctrl"] or {}) do
+        local name = (type(item) == "table") and item.name or item
+        if name then
+            expected[name] = true
+        end
     end
     local allOk = true
     local lines = {}
-    local defsText = io.readfile(path.join(g_repoRoot, "src", "duilib", "duilib_defs.h")) or ""
+    local defsText = io.readfile(path.join(g_repoRoot, "src", "duilib", "Utils", "CtrlDefs.g.h")) or ""
     local actual = {}
     for name in defsText:gmatch("#define%s+DUI_CTR_[A-Z0-9_]+%s+%(_T%(\"([^\"]+)\"%)%)") do
         actual[name] = true
@@ -304,7 +309,7 @@ local function check_ctrl()
             extra[#extra + 1] = name
         end
     end
-    lines[#lines + 1] = string.format("  DUI_CTR_* 宏=%d 数据表=%d 缺失=%d 多余=%d", #sorted_keys(actual),
+    lines[#lines + 1] = string.format("  CtrlDefs.g.h 宏=%d 数据表=%d 缺失=%d 多余=%d", #sorted_keys(actual),
                                       #sorted_keys(expected), #missing, #extra)
     if (#missing > 0) or (#extra > 0) then
         allOk = false
@@ -326,6 +331,12 @@ local function check_ctrl()
     end
     lines[#lines + 1] = string.format("  宏形式的类名比较残留: %d %s", residue, table.concat(samples, " | "))
     if residue > 0 then
+        allOk = false
+    end
+    local headerText = io.readfile(path.join(g_repoRoot, "src", "duilib", "duilib_defs.h")) or ""
+    local _, manualDefines = headerText:gsub("#define%s+DUI_CTR_", "")
+    lines[#lines + 1] = string.format("  duilib_defs.h 中的手写 DUI_CTR_ 定义: %d（应为 0）", manualDefines)
+    if manualDefines > 0 then
         allOk = false
     end
     return allOk, table.concat(lines, "\n")

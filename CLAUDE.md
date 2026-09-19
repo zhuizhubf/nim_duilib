@@ -91,10 +91,10 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - 控件类支持模板变体: `Label`(Control基)、`LabelBox`(Box基)、`LabelHBox`(HBox基)、`LabelVBox`(VBox基)
 - 窗口析构由框架管理，使用 `new` 创建，不需要手动 `delete`
 - **属性名统一登记表**：新增/修改 XML 属性只在 `attribute_defs.lua` 对应域列表**末尾**追加名字，然后运行 `xmake attribute-gen`
-- `src/duilib/Utils/AttributeIds.g.h/.cpp` 是生成文件，**禁止手改**；CI 用 `xmake attribute-check` 校验生成物同步与 XML 语料覆盖
+- `src/duilib/Utils/AttributeIds.g.h`、`AttributeIds.g.cpp`、`CtrlDefs.g.h` 是生成文件，**禁止手改**；CI 用 `xmake attribute-check` 校验生成物同步与 XML 语料覆盖
 - 属性派发一律用枚举：链上写 `switch (id)` + `case ui::attr::<域>::kXxx`，禁止再引入字符串比较；`SetAttribute(name, value)` 只在 XML 边界转换一次
 - 代码内设置属性用 `SetAttributeById(ui::attr::control::kXxx, _T("xxx"), value)`，避免重复的字符串→枚举转换
-- **控件类名域**：`ui::attr::ctrl` 覆盖全部 `DUI_CTR_*`（115 个），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；类名比较不再直接用宏比较，`DUI_CTR_*` 宏与其名字集合必须一致（`xmake attribute-check` 会校验）
+- **控件类名域**：`ui::attr::ctrl` 覆盖全部控件类名（115 个，含宏名），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；`DUI_CTR_*` 宏由 `attribute_defs.lua` 的 `ctrl` 域生成到 `CtrlDefs.g.h`（不再手写），类名比较不再直接用宏比较
 
 ## 构建
 - 配置: `xmake f -o build/build_temp/xmake -c`（首次会自动下载并编译 Skia，默认用 MSVC，无需 LLVM）

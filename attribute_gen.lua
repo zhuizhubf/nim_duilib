@@ -68,8 +68,16 @@ local function normalize(defs, domains)
     local result = {}
     for _, domain in ipairs(domains) do
         local list, seenName, seenIdent, seenHash = {}, {}, {}, {}
-        for _, name in ipairs(defs[domain]) do
-            assert(type(name) == "string", domain .. " 域存在非字符串条目")
+        for _, raw in ipairs(defs[domain]) do
+            -- 条目可以是字符串，也可以是 { name = "...", macro = "..." } 表（ctrl 域用后者携带宏名）
+            local name, macro
+            if type(raw) == "table" then
+                name = raw.name
+                macro = raw.macro
+            else
+                name = raw
+            end
+            assert(type(name) == "string", domain .. " 域条目缺少 name")
             assert(name:match("^[A-Za-z0-9_]+$"), "非法属性名（仅允许 ASCII 字母数字下划线）: " .. name)
             assert(name ~= "none" or true, "")
             assert(seenName[name] == nil, "同域属性名重复: " .. domain .. "." .. name)
@@ -86,7 +94,7 @@ local function normalize(defs, domains)
             assert(seenHash[hash] == nil,
                    string.format("同域哈希冲突: %s 的 %s 与 %s 都映射到 0x%08X", domain, name, tostring(seenHash[hash]), hash))
             seenName[name], seenIdent[ident], seenHash[hash] = true, name, name
-            list[#list + 1] = { name = name, ident = ident, hash = hash, id = #list }
+            list[#list + 1] = { name = name, ident = ident, hash = hash, id = #list, macro = macro }
         end
         result[domain] = list
     end
@@ -218,5 +226,32 @@ function main(...)
     os.mkdir(outDir)
     io.writefile(path.join(outDir, "AttributeIds.g.h"), table.concat(emit_header(domains, data), "\n") .. "\n")
     io.writefile(path.join(outDir, "AttributeIds.g.cpp"), table.concat(emit_source(domains, data), "\n") .. "\n")
+
+    -- 控件类名宏：与数据表一起生成，保持公开 API（DUI_CTR_*）兼容且不再手写
+    local macroLines = {}
+    for _, item in ipairs(data["ctrl"] or {}) do
+        if (item.macro ~= nil) and (item.macro ~= "") then
+            macroLines[#macroLines + 1] = "#define " .. item.macro .. " (_T(\"" .. item.name .. "\"))"
+        end
+    end
+    if #macroLines > 0 then
+        local m = {}
+        local function madd(line)
+            m[#m + 1] = line
+        end
+        madd("// 本文件由 tools/attribute_gen.lua 生成，请勿手改。")
+        madd("// 数据来源：tools/attribute_defs.lua 的 ctrl 域（控件类名宏，保持公开 API 兼容）")
+        madd("")
+        madd("#ifndef UI_DUILIB_CTRL_DEFS_G_H_")
+        madd("#define UI_DUILIB_CTRL_DEFS_G_H_")
+        madd("")
+        for _, line in ipairs(macroLines) do
+            madd(line)
+        end
+        madd("")
+        madd("#endif //UI_DUILIB_CTRL_DEFS_G_H_")
+        io.writefile(path.join(outDir, "CtrlDefs.g.h"), table.concat(m, "\n") .. "\n")
+        print(string.format("生成完成：控件类名宏 %d 个 -> CtrlDefs.g.h", #macroLines))
+    end
     print(string.format("生成完成：names=%d，输出目录 %s", total, outDir))
 end
