@@ -1,0 +1,262 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  XMAKE_VERSION: '3.0.9'
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            runner: windows-2022
+            xmake_arch: x64
+            xmake_flags: ''
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: default
+            min_examples: 20
+            cache_mode: read-write
+            cache_id: x64-mt
+            smoke: false
+          - name: windows-x86
+            runner: windows-2022
+            xmake_arch: x86
+            xmake_flags: ''
+            pkg_platform: windows
+            pkg_arch: x86
+            variant: default
+            min_examples: 20
+            cache_mode: read-write
+            cache_id: x86-mt
+            smoke: false
+          - name: windows-x64-sdl
+            runner: windows-2022
+            xmake_arch: x64
+            xmake_flags: '--sdl=y'
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: sdl
+            min_examples: 20
+            cache_mode: read-only
+            cache_id: x64-mt
+            smoke: false
+          - name: windows-x64-md
+            runner: windows-2022
+            xmake_arch: x64
+            xmake_flags: '--md=y'
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: md
+            min_examples: 20
+            cache_mode: read-write
+            cache_id: x64-md
+            smoke: false
+          - name: windows-x64-gdi
+            runner: windows-2022
+            xmake_arch: x64
+            xmake_flags: '--render=gdi'
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: gdi
+            min_examples: 20
+            cache_mode: none
+            cache_id: x64-mt
+            smoke: false
+          - name: linux-x64
+            runner: ubuntu-22.04
+            xmake_arch: x64
+            xmake_flags: ''
+            pkg_platform: linux
+            pkg_arch: x64
+            variant: default
+            min_examples: 18
+            cache_mode: read-write
+            cache_id: x64-mt
+            smoke: true
+          - name: macos-arm64
+            runner: macos-15
+            xmake_arch: arm64
+            xmake_flags: ''
+            pkg_platform: macos
+            pkg_arch: arm64
+            variant: default
+            min_examples: 18
+            cache_mode: read-write
+            cache_id: arm64-mt
+            smoke: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Compute package version
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            version="${GITHUB_REF_NAME}"
+          else
+            version="${GITHUB_REF_NAME}-b${GITHUB_RUN_NUMBER}"
+          fi
+          version="$(printf '%s' "${version}" | tr '/ ' '--' | tr -cd 'A-Za-z0-9._-')"
+          echo "PKG_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "package version: ${version}"
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxcursor-dev \
+            libxi-dev libxinerama-dev libxss-dev libxtst-dev \
+            libgl1-mesa-dev libegl1-mesa-dev \
+            libfreetype6-dev libfontconfig1-dev xvfb xauth
+
+      - name: Set up xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: ${{ env.XMAKE_VERSION }}
+
+      - name: Cache xmake packages
+        if: matrix.cache_mode == 'read-write'
+        uses: actions/cache@v4
+        with:
+          path: ~/.xmake/packages
+          key: xmake-pkgs-${{ runner.os }}-${{ matrix.cache_id }}-${{ hashFiles('xmake/repos/packages/d/duilib-skia/**') }}
+
+      - name: Restore xmake packages (read-only)
+        if: matrix.cache_mode == 'read-only'
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.xmake/packages
+          key: xmake-pkgs-${{ runner.os }}-${{ matrix.cache_id }}-${{ hashFiles('xmake/repos/packages/d/duilib-skia/**') }}
+
+      - name: Configure and build (Release)
+        shell: bash
+        env:
+          XMAKE_BUILD_FLAGS: ${{ matrix.xmake_flags }}
+        run: |
+          set -euo pipefail
+          xmake f -y -o build/build_temp/xmake -c -m release -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}
+          xmake -y
+
+      - name: Smoke test (Linux, Xvfb)
+        if: matrix.smoke == true
+        shell: bash
+        run: |
+          set -uo pipefail
+          cd bin
+          failed=0
+          for exe in basic render controls; do
+            log="/tmp/smoke-${exe}.log"
+            set +e
+            timeout -s TERM 15s xvfb-run -a -s "-screen 0 1920x1080x24" env SDL_VIDEODRIVER=x11 "./${exe}" > "${log}" 2>&1
+            rc=$?
+            set -e
+            if [ "${rc}" -ne 124 ]; then
+              echo "::error::${exe} exited with code ${rc} (expected 124: still running after 15s)"
+              cat "${log}" || true
+              failed=1
+            else
+              echo "${exe}: ok (still running after 15s)"
+            fi
+          done
+          exit ${failed}
+
+      - name: Package build outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          xmake l .github/scripts/package.lua \
+            "${PKG_VERSION}" \
+            "${{ matrix.pkg_platform }}" \
+            "${{ matrix.pkg_arch }}" \
+            "${{ matrix.variant }}" \
+            "${{ matrix.min_examples }}" \
+            "${{ matrix.xmake_flags }}" \
+            "dist"
+          ls -l dist
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nim_duilib-${{ matrix.pkg_platform }}-${{ matrix.pkg_arch }}-${{ matrix.variant }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload smoke test logs
+        if: failure() && matrix.smoke == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-logs-${{ matrix.name }}
+          path: /tmp/smoke-*.log
+          if-no-files-found: ignore
+          retention-days: 14
+          compression-level: 0
+
+  release:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nim_duilib-*
+          path: dist
+          merge-multiple: true
+
+      - name: Generate aggregated checksums
+        shell: bash
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          rm -f SHA256SUMS.txt
+          cat ./*.sha256 > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            gh release upload "${tag}" dist/* --clobber
+          else
+            gh release create "${tag}" dist/* --title "${tag}" --generate-notes
+          fi

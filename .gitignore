@@ -355,6 +355,7 @@ healthchecksdb
 /third_party/prebuilt/libpag/windows/lib-vc-x86
 /bin/libpag.dll
 /.temp
+/dist/
 /bin/*.dll
 # xmake
 /.xmake

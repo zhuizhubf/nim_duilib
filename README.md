@@ -4,6 +4,8 @@
 
 ![GitHub](https://img.shields.io/badge/license-MIT-green.svg)
 
+[![CI](https://github.com/rhett-lee/nim_duilib/actions/workflows/ci.yml/badge.svg)](https://github.com/rhett-lee/nim_duilib/actions/workflows/ci.yml)
+
 ## 核心技术特性
 
  - XML布局驱动：采用 XML 文件定义界面结构，将界面布局与业务逻辑完全分离。开发者可通过修改 XML 快速调整控件位置、尺寸和样式，无需改动 C++ 核心代码，极大提升开发与迭代效率。
@@ -246,6 +248,23 @@ xmake run basic                          # 运行示例程序（可执行文件�
 - Windows：使用 MSVC 编译；`--cef=y` 可启用 CEF（需自行准备 CEF 运行库）；WebView2 默认开启
 - Linux/macOS/FreeBSD：SDL3 自动启用（窗口系统基于 SDL3）；CEF 暂不支持，配置 `--cef=y` 会给出明确错误提示
 - 重新配置与重编：`xmake f -c` 清除配置重新配置；`xmake -r` 重新编译全部目标
+
+### 七、持续集成（GitHub Actions）
+
+仓库已配置 GitHub Actions 持续集成（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)）：向 `main` 分支提交、提交 Pull Request、手动触发，以及推送 `v*` 标签时自动构建。
+
+| 构建任务 | 运行环境 | 说明 |
+| :--- | :--- | :--- |
+| windows-x64 / windows-x86 | Windows Server 2022 + MSVC | 默认配置（Skia 渲染、/MT 运行库、WebView2） |
+| windows-x64-sdl / windows-x64-md / windows-x64-gdi | Windows Server 2022 + MSVC | 可选配置：SDL3 窗口、/MD 运行库、GDI 渲染 |
+| linux-x64 | Ubuntu 22.04 | SDL3 窗口；在虚拟显示（Xvfb）下运行示例做冒烟验证 |
+| macos-arm64 | macOS 15（Apple Silicon） | SDL3 窗口 |
+
+- 编译产物（全部示例程序 + 静态库）按平台打包为 `nim_duilib-<版本>-<平台>-<架构>[-<变体>].zip`（Windows）或 `.tar.gz`（Linux/macOS），并附带同名 `.sha256` 校验文件，可在 Actions 运行页面的 Artifacts 中下载。
+- 推送 `v*` 标签时，同批压缩包会自动发布到对应版本的 Release 中。
+- 首次构建需要从源码编译 Skia，耗时较长；CI 会缓存已编译的 xmake 依赖包（主要是 Skia），后续构建会明显加快。
+- 打包与校验由 xmake 脚本完成（[`.github/scripts/package.lua`](.github/scripts/package.lua)），不需要 Python 等额外运行时。
+- 本地复现 CI 构建：执行 `xmake f -o build/build_temp/xmake -c -m release`，然后执行 `xmake`；需要打包时执行 `xmake l .github/scripts/package.lua <版本> <平台> <架构> <变体> <最少示例数> "" dist`（其他可选配置见上文"常用配置项"）。
 
 
 ## 开发计划
