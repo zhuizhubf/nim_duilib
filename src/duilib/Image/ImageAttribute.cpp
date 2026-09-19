@@ -1,6 +1,7 @@
 #include "ImageAttribute.h"
 #include "duilib/Core/DpiManager.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 
 namespace ui {
@@ -213,19 +214,30 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
         if (name.empty() || value.empty()) {
             continue;
         }
-        if (name == _T("file") || name == _T("res")) {
+        switch (attr::image::IdOf(name)) {
+        case attr::image::kFile:
+        case attr::image::kRes: {
             //图片资源文件名，根据此设置去加载图片资源
             imageAttribute.m_sImagePath = value;
-        } else if (name == _T("name")) {
+            break;
+        }
+        case attr::image::kName: {
             //图片资源名称
             imageAttribute.m_sImageName = value;
-        } else if (name == _T("width")) {
+            break;
+        }
+        case attr::image::kWidth: {
             //设置图片宽度，可以放大或缩小图像：pixels或者百分比%，比如300，或者30%
             imageAttribute.m_srcWidth = value;
-        } else if (name == _T("height")) {
+            break;
+        }
+        case attr::image::kHeight: {
             //设置图片高度，可以放大或缩小图像：pixels或者百分比%，比如200，或者30%
             imageAttribute.m_srcHeight = value;
-        } else if ((name == _T("src")) || (name == _T("source"))) {
+            break;
+        }
+        case attr::image::kSrc:
+        case attr::image::kSource: {
             //图片源区域设置：可以用于仅包含源图片的部分图片内容（比如通过此机制，将按钮的各个状态图片整合到一张大图片上，方便管理图片资源）
             if (imageAttribute.m_rcSource == nullptr) {
                 imageAttribute.m_rcSource = new UiRect;
@@ -233,7 +245,9 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             AttributeUtil::ParseRectValue(value.c_str(), *imageAttribute.m_rcSource);
             imageAttribute.m_rcSource->left = std::max(imageAttribute.m_rcSource->left, 0);
             imageAttribute.m_rcSource->top = std::max(imageAttribute.m_rcSource->top, 0);
-        } else if (name == _T("corner")) {
+            break;
+        }
+        case attr::image::kCorner: {
             //图片的圆角属性，如果设置此属性，绘制图片的时候，采用九宫格绘制方式绘制图片：
             //    四个角不拉伸图片，四个边部分拉伸，中间部分可以拉伸或者根据xtiled、ytiled属性来平铺绘制
             if (imageAttribute.m_rcCorner == nullptr) {
@@ -244,17 +258,27 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_rcCorner->top = std::max(imageAttribute.m_rcCorner->top, 0);
             imageAttribute.m_rcCorner->right = std::max(imageAttribute.m_rcCorner->right, 0);
             imageAttribute.m_rcCorner->bottom = std::max(imageAttribute.m_rcCorner->bottom, 0);
-        } else if (name == _T("window_shadow_mode")) {
+            break;
+        }
+        case attr::image::kWindowShadowMode: {
             //九宫格绘制时，不绘制中间部分（比如窗口阴影，只需要绘制边框，不需要绘制中间部分）
             imageAttribute.m_bWindowShadowMode = (value == _T("true"));
-        } else if ((name == _T("dpi_scale")) || (name == _T("dpiscale"))) {
+            break;
+        }
+        case attr::image::kDpiScale:
+        case attr::image::kDpiscale: {
             //加载图片时，按照DPI缩放图片大小
             imageAttribute.m_bImageDpiScaleEnabled = (value == _T("true"));
-        } else if ((name == _T("dest_scale")) || (name == _T("destscale"))) {
+            break;
+        }
+        case attr::image::kDestScale:
+        case attr::image::kDestscale: {
             //加载时，对dest属性按照DPI缩放图片，仅当设置了dest属性时有效（会影响dest属性）
             //绘制时（内部使用），控制是否对dest属性进行DPI缩放
             imageAttribute.m_bDestDpiScaleEnabled = (value == _T("true"));
-        } else if (name == _T("dest")) {
+            break;
+        }
+        case attr::image::kDest: {
             //设置目标区域，该区域是指相对于所属控件的Rect区域
             if (!value.empty()) {
                 if (imageAttribute.m_rcDest == nullptr) {
@@ -280,51 +304,74 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
                     ASSERT(pstr);
                 }
             }
-        } else if ((name == _T("margin") || (name == _T("padding")))) {
+            break;
+        }
+        case attr::image::kMargin:
+        case attr::image::kPadding: {
             //在目标区域中设置图片的外边距(旧的名字"padding"，保留兼容性)
             UiMargin margin;
             AttributeUtil::ParseMarginValue(value.c_str(), margin);
             imageAttribute.SetImageMargin(margin, true, dpi);
-        } else if (name == _T("halign")) {
+            break;
+        }
+        case attr::image::kHalign: {
             //在目标区域中设置横向对齐方式
             ASSERT((value == _T("left")) || (value == _T("center")) || (value == _T("right")));
             if ((value == _T("left")) || (value == _T("center")) || (value == _T("right"))) {
                 imageAttribute.m_hAlign = value;
             }
-        } else if (name == _T("valign")) {
+            break;
+        }
+        case attr::image::kValign: {
             //在目标区域中设置纵向对齐方式
             ASSERT((value == _T("top")) || (value == _T("center")) || (value == _T("bottom")));
             if ((value == _T("top")) || (value == _T("center")) || (value == _T("bottom"))) {
                 imageAttribute.m_vAlign = value;
             }
-        } else if ((name == _T("fade")) || (name == _T("alpha"))) {
+            break;
+        }
+        case attr::image::kFade:
+        case attr::image::kAlpha: {
             //图片的透明度
             imageAttribute.m_bFade = (uint8_t) StringUtil::StringToInt32(value);
-        } else if (name == _T("xtiled")) {
+            break;
+        }
+        case attr::image::kXtiled: {
             //横向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_bTiledX = (value == _T("true"));
-        } else if ((name == _T("full_xtiled")) || (name == _T("fullxtiled"))) {
+            break;
+        }
+        case attr::image::kFullXtiled:
+        case attr::image::kFullxtiled: {
             //横向平铺时，保证整张图片绘制
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_bFullTiledX = (value == _T("true"));
-        } else if (name == _T("ytiled")) {
+            break;
+        }
+        case attr::image::kYtiled: {
             //纵向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_bTiledY = (value == _T("true"));
-        } else if ((name == _T("full_ytiled")) || (name == _T("fullytiled"))) {
+            break;
+        }
+        case attr::image::kFullYtiled:
+        case attr::image::kFullytiled: {
             //纵向平铺时，保证整张图片绘制
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_bFullTiledY = (value == _T("true"));
-        } else if ((name == _T("tiled_margin")) || (name == _T("tiledmargin"))) {
+            break;
+        }
+        case attr::image::kTiledMargin:
+        case attr::image::kTiledmargin: {
             //平铺绘制时，各平铺图片之间的间隔，包括横向平铺和纵向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
@@ -332,41 +379,59 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_pTiledDrawParam->m_nTiledMarginX = StringUtil::StringToInt32(value);
             imageAttribute.m_pTiledDrawParam->m_nTiledMarginY
                 = imageAttribute.m_pTiledDrawParam->m_nTiledMarginX;
-        } else if (name == _T("tiled_margin_x")) {
+            break;
+        }
+        case attr::image::kTiledMarginX: {
             //平铺绘制时，各平铺图片之间的间隔，横向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_nTiledMarginX = StringUtil::StringToInt32(value);
-        } else if (name == _T("tiled_margin_y")) {
+            break;
+        }
+        case attr::image::kTiledMarginY: {
             //平铺绘制时，各平铺图片之间的间隔，纵向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             imageAttribute.m_pTiledDrawParam->m_nTiledMarginY = StringUtil::StringToInt32(value);
-        } else if (name == _T("tiled_padding")) {
+            break;
+        }
+        case attr::image::kTiledPadding: {
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
             }
             UiPadding rcPadding;
             AttributeUtil::ParsePaddingValue(value.c_str(), rcPadding);
             m_pTiledDrawParam->m_rcTiledPadding = rcPadding;
-        } else if ((name == _T("icon_size")) || (name == _T("iconsize"))) {
+            break;
+        }
+        case attr::image::kIconSize:
+        case attr::image::kIconsize: {
             //指定加载ICO文件的图片大小(仅当图片文件是ICO文件时有效)
             imageAttribute.m_nIconSize = (uint32_t) StringUtil::StringToInt32(value);
-        } else if (name == _T("icon_as_animation")) {
+            break;
+        }
+        case attr::image::kIconAsAnimation: {
             //如果是ICO文件，指定是否按多帧图片加载（按动画图片显示）
             imageAttribute.m_bIconAsAnimation = (value == _T("true"));
-        } else if (name == _T("icon_frame_delay")) {
+            break;
+        }
+        case attr::image::kIconFrameDelay: {
             //如果是ICO文件，当按多帧图片显示时，每帧播放的时间间隔，毫秒
             imageAttribute.m_nIconFrameDelayMs = StringUtil::StringToInt32(value);
             if (imageAttribute.m_nIconFrameDelayMs <= 0) {
                 imageAttribute.m_nIconFrameDelayMs = 1000;
             }
-        } else if (name == _T("pag_max_frame_rate")) {
+            break;
+        }
+        case attr::image::kPagMaxFrameRate: {
             //如果是PAG文件，用于指定动画的帧率，默认为30.0f
             imageAttribute.m_fPagMaxFrameRate = (float) StringUtil::StringToInt32(value);
-        } else if ((name == _T("play_count")) || (name == _T("playcount"))) {
+            break;
+        }
+        case attr::image::kPlayCount:
+        case attr::image::kPlaycount: {
             //如果是动画图片，取值代表的含义
             //  -1: 表示一直播放
             //  0 : 表示无有效的播放次数，使用图片的默认值
@@ -375,26 +440,40 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             if (imageAttribute.m_nPlayCount < 0) {
                 imageAttribute.m_nPlayCount = -1;
             }
-        } else if (name == _T("auto_play")) {
+            break;
+        }
+        case attr::image::kAutoPlay: {
             //如果是动画图片，是否自动播放
             imageAttribute.m_bAutoPlay = (value == _T("true"));
-        } else if (name == _T("async_load")) {
+            break;
+        }
+        case attr::image::kAsyncLoad: {
             //该图片是否支持异步加载（即放在子线程中加载图片数据，避免主界面卡顿）
             imageAttribute.m_bAsyncLoad = (value == _T("true"));
-        } else if (name == _T("adaptive_dest_rect")) {
+            break;
+        }
+        case attr::image::kAdaptiveDestRect: {
             //自动适应目标区域（等比例缩放图片）
             imageAttribute.m_bAdaptiveDestRect = (value == _T("true"));
-        } else if (name == _T("svg_replace_colors")) {
+            break;
+        }
+        case attr::image::kSvgReplaceColors: {
             // SVG格式的颜色替换参数：支持将颜色A替换为颜色B，从而避免每个颜色主题下，都要单独配置一个svg文件，使用这个功能只要一个svg就够了。
             // 使用示例: "#B5B5B5|color_gray_light"，表示将"#B5B5B5"替换为"color_gray_light"，"color_gray_light"在global.xml中定义。
             // 若有多组颜色需要替换，则用分号分割，比如："#B5B5B5|color_gray_light;#B2B2B2|color_gray_dark"。
             // 该功能当目标不是颜色值时，按字符串替换。
             imageAttribute.m_svgReplaceColors = value;
-        } else if (name == _T("assert")) {
+            break;
+        }
+        case attr::image::kAssert: {
             //图片加载失败时，代码断言的设置（debug编译时启用，用于排查图片加载过程中的错误，尤其时图片数据错误导致加载失败的问题）
             imageAttribute.m_bAssertEnabled = (value == _T("true"));
-        } else {
+            break;
+        }
+        default: {
             ASSERT(!"ImageAttribute::ModifyAttribute: fount unknown attribute!");
+            break;
+        }
         }
     }
 }
