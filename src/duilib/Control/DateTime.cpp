@@ -20,12 +20,13 @@ DateTime::DateTime(Window *pWindow)
     , m_dateSeparator(_T('-'))
 {
     //设置默认属性
-    SetAttribute(_T("border_size"), _T("1"));
-    SetAttribute(_T("border_color"), _T("border_richedit_normal"));
-    SetAttribute(_T("text_align"), _T("vcenter"));
-    SetAttribute(_T("text_padding"), _T("2,0,0,0"));
+    SetAttributeById(ui::attr::control::kBorderSize, _T("border_size"), _T("1"));
+    SetAttributeById(
+        ui::attr::control::kBorderColor, _T("border_color"), _T("border_richedit_normal"));
+    SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter"));
+    SetAttributeById(ui::attr::control::kTextPadding, _T("text_padding"), _T("2,0,0,0"));
 #ifdef DUILIB_BUILD_FOR_SDL
-    SetAttribute(_T("padding"), _T("1,1,1,1"));
+    SetAttributeById(ui::attr::control::kPadding, _T("padding"), _T("1,1,1,1"));
     SetAttribute(
         _T("spin_class"), _T("rich_edit_spin_box,rich_edit_spin_btn_up,rich_edit_spin_btn_down"));
 #endif

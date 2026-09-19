@@ -62,7 +62,10 @@ UiRect TextDrawer::MeasureString(
         //RichText文本
         if (m_pRichText == nullptr) {
             m_pRichText = std::make_unique<RichText>(pOwner->GetWindow());
-            m_pRichText->SetAttribute(_T("trim_policy"), _T("none")); //对空格不执行trim操作
+            m_pRichText->SetAttributeById(
+                ui::attr::control::kTrimPolicy,
+                _T("trim_policy"),
+                _T("none")); //对空格不执行trim操作
         }
         m_pRichText->SetEnableRedraw(false);
         m_pRichText->SetWindow(nullptr); //不设置关联窗口，避免产生Invalidate调用
@@ -110,7 +113,10 @@ void TextDrawer::DrawString(
         //RichText文本
         if (m_pRichText == nullptr) {
             m_pRichText = std::make_unique<RichText>(pOwner->GetWindow());
-            m_pRichText->SetAttribute(_T("trim_policy"), _T("none")); //对空格不执行trim操作
+            m_pRichText->SetAttributeById(
+                ui::attr::control::kTrimPolicy,
+                _T("trim_policy"),
+                _T("none")); //对空格不执行trim操作
         }
         m_pRichText->SetEnableRedraw(false);
         m_pRichText->SetWindow(nullptr);          //不设置关联窗口，避免产生Invalidate调用

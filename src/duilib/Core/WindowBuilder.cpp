@@ -1859,10 +1859,10 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty->SetName(propName);
             }
             if (!propMargin.empty()) {
-                pProperty->SetAttribute(_T("margin"), propMargin);
+                pProperty->SetAttributeById(ui::attr::control::kMargin, _T("margin"), propMargin);
             }
             if (!propPadding.empty()) {
-                pProperty->SetAttribute(_T("padding"), propPadding);
+                pProperty->SetAttributeById(ui::attr::control::kPadding, _T("padding"), propPadding);
             }
         }
     }

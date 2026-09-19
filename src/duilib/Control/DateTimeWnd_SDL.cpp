@@ -108,14 +108,19 @@ bool DateTimeWnd::Init(DateTime *pOwner)
     //设置公共属性
     for (RichEdit *pRichEdit : m_editList) {
         if (pRichEdit != nullptr) {
-            pRichEdit->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
-            pRichEdit->SetAttribute(_T("number_only"), _T("true"));
-            pRichEdit->SetAttribute(_T("height"), _T("100%"));
-            pRichEdit->SetAttribute(_T("width"), _T("auto"));
-            pRichEdit->SetAttribute(_T("text_padding"), _T("2,1,2,1"));
-            pRichEdit->SetAttribute(_T("hide_selection"), _T("true"));
-            pRichEdit->SetAttribute(_T("want_tab"), _T("false"));
-            pRichEdit->SetAttribute(_T("want_return_msg"), _T("false"));
+            pRichEdit->SetAttributeById(
+                ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
+            pRichEdit
+                ->SetAttributeById(ui::attr::control::kNumberOnly, _T("number_only"), _T("true"));
+            pRichEdit->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
+            pRichEdit->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("auto"));
+            pRichEdit->SetAttributeById(
+                ui::attr::control::kTextPadding, _T("text_padding"), _T("2,1,2,1"));
+            pRichEdit->SetAttributeById(
+                ui::attr::control::kHideSelection, _T("hide_selection"), _T("true"));
+            pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("want_tab"), _T("false"));
+            pRichEdit->SetAttributeById(
+                ui::attr::control::kWantReturnMsg, _T("want_return_msg"), _T("false"));
             pRichEdit->SetBkColor(_T("white"));
             pRichEdit->SetTabStop(true);
         }
@@ -123,8 +128,8 @@ bool DateTimeWnd::Init(DateTime *pOwner)
 
     //右侧填充
     Control *pEmpty = new Control(m_pOwner->GetWindow());
-    pEmpty->SetAttribute(_T("width"), _T("100%"));
-    pEmpty->SetAttribute(_T("height"), _T("100%"));
+    pEmpty->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("100%"));
+    pEmpty->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
     pEmpty->SetBkColor(_T("white"));
     pEmpty->SetTabStop(false);
     pEmpty->SetNoFocus();
@@ -328,8 +333,8 @@ void DateTimeWnd::EndEditDateTime()
 RichEdit *DateTimeWnd::CreateEditYear() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("4"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%04I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("4"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%04I64d"));
     pRichEdit->SetText(L"2024");
     pRichEdit->SetMinNumber(1900);
     return pRichEdit;
@@ -338,8 +343,8 @@ RichEdit *DateTimeWnd::CreateEditYear() const
 RichEdit *DateTimeWnd::CreateEditMon() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("2"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"01");
     pRichEdit->SetMinNumber(1);
     pRichEdit->SetMaxNumber(12);
@@ -349,8 +354,8 @@ RichEdit *DateTimeWnd::CreateEditMon() const
 RichEdit *DateTimeWnd::CreateEditMDay() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("2"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"01");
     pRichEdit->SetMinNumber(1);
     pRichEdit->SetMaxNumber(31);
@@ -360,8 +365,8 @@ RichEdit *DateTimeWnd::CreateEditMDay() const
 RichEdit *DateTimeWnd::CreateEditHour() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("2"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
     pRichEdit->SetMinNumber(0);
     pRichEdit->SetMaxNumber(23);
@@ -371,8 +376,8 @@ RichEdit *DateTimeWnd::CreateEditHour() const
 RichEdit *DateTimeWnd::CreateEditMin() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("2"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
     pRichEdit->SetMinNumber(0);
     pRichEdit->SetMaxNumber(59);
@@ -382,8 +387,8 @@ RichEdit *DateTimeWnd::CreateEditMin() const
 RichEdit *DateTimeWnd::CreateEditSec() const
 {
     RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
-    pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
-    pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
+    pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("2"));
+    pRichEdit->SetAttributeById(ui::attr::control::kNumberFormat, _T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
     pRichEdit->SetMinNumber(0);
     pRichEdit->SetMaxNumber(59);
@@ -394,10 +399,10 @@ Control *DateTimeWnd::CreateLabel(const DString &text) const
 {
     Label *pLabel = new Label(m_pOwner->GetWindow());
     pLabel->SetText(text);
-    pLabel->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
-    pLabel->SetAttribute(_T("width"), _T("auto"));
-    pLabel->SetAttribute(_T("min_width"), _T("4"));
-    pLabel->SetAttribute(_T("height"), _T("100%"));
+    pLabel->SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
+    pLabel->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("auto"));
+    pLabel->SetAttributeById(ui::attr::control::kMinWidth, _T("min_width"), _T("4"));
+    pLabel->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
     pLabel->SetBkColor(_T("white"));
     pLabel->SetTabStop(false);
     pLabel->SetNoFocus();

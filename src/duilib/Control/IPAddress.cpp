@@ -40,11 +40,13 @@ void IPAddress::OnInit()
     for (size_t index = 0; index < 4; ++index) {
         RichEdit *pRichEdit = new RichEdit(GetWindow());
         pRichEdit->SetText(_T(""));
-        pRichEdit->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
-        pRichEdit->SetAttribute(_T("limit_text"), _T("3"));
-        pRichEdit->SetAttribute(_T("want_return_msg"), _T("false"));
-        pRichEdit->SetAttribute(_T("want_tab"), _T("false"));
-        pRichEdit->SetAttribute(_T("number_only"), _T("true"));
+        pRichEdit->SetAttributeById(
+            ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
+        pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("3"));
+        pRichEdit
+            ->SetAttributeById(ui::attr::control::kWantReturnMsg, _T("want_return_msg"), _T("false"));
+        pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("want_tab"), _T("false"));
+        pRichEdit->SetAttributeById(ui::attr::control::kNumberOnly, _T("number_only"), _T("true"));
         pRichEdit->SetMinNumber(0);
         pRichEdit->SetMaxNumber(255);
         AddItem(pRichEdit);
@@ -52,8 +54,9 @@ void IPAddress::OnInit()
         if (index != 3) {
             Label *pLabel = new Label(GetWindow());
             pLabel->SetText(_T("."));
-            pLabel->SetAttribute(_T("text_align"), _T("bottom,hcenter"));
-            pLabel->SetAttribute(_T("width"), _T("4"));
+            pLabel->SetAttributeById(
+                ui::attr::control::kTextAlign, _T("text_align"), _T("bottom,hcenter"));
+            pLabel->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("4"));
             pLabel->SetTabStop(false);
             pLabel->SetNoFocus();
             pLabel->SetMouseEnabled(false);

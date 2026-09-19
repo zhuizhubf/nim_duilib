@@ -71,8 +71,8 @@ GroupBoxTemplate<InheritType>::GroupBoxTemplate(Window *pWindow)
     : LabelTemplate<InheritType>(pWindow)
     , m_fLineWidth(0)
 {
-    this->SetAttribute(_T("text_align"), _T("top,left"));
-    this->SetAttribute(_T("text_padding"), _T("8,0,0,0"));
+    this->SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("top,left"));
+    this->SetAttributeById(ui::attr::control::kTextPadding, _T("text_padding"), _T("8,0,0,0"));
 }
 
 template<typename InheritType>

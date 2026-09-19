@@ -908,9 +908,9 @@ template<typename T>
 Control *ControlDragableT<T>::CreateDestControl(Box *pTargetBox)
 {
     Control *pDestControl = new Control(this->GetWindow());
-    pDestControl->SetAttribute(_T("bkcolor"), _T("#FF5D6B99"));
-    pDestControl->SetAttribute(_T("valign"), _T("center"));
-    pDestControl->SetAttribute(_T("halign"), _T("center"));
+    pDestControl->SetAttributeById(ui::attr::control::kBkcolor, _T("bkcolor"), _T("#FF5D6B99"));
+    pDestControl->SetAttributeById(ui::attr::control::kValign, _T("valign"), _T("center"));
+    pDestControl->SetAttributeById(ui::attr::control::kHalign, _T("halign"), _T("center"));
 
     Layout *pLayout = nullptr;
     if (pTargetBox != nullptr) {
@@ -930,11 +930,11 @@ Control *ControlDragableT<T>::CreateDestControl(Box *pTargetBox)
     }
     if (!bInited) {
         if ((pLayout != nullptr) && pLayout->IsVLayout()) {
-            pDestControl->SetAttribute(_T("height"), _T("4"));
-            pDestControl->SetAttribute(_T("width"), _T("80%"));
+            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("4"));
+            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("80%"));
         } else {
-            pDestControl->SetAttribute(_T("width"), _T("4"));
-            pDestControl->SetAttribute(_T("height"), _T("80%"));
+            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("4"));
+            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("80%"));
         }
     }
     return pDestControl;

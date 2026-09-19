@@ -128,9 +128,9 @@ void DragWindow::SetDragImage(const std::shared_ptr<IBitmap> &pBitmap)
 
     DragWindowBitmap *pBitmapControl = new DragWindowBitmap(this);
     pBitmapControl->SetBitmap(pBitmap);
-    pBitmapControl->SetAttribute(_T("width"), _T("100%"));
-    pBitmapControl->SetAttribute(_T("height"), _T("100%"));
-    pBitmapControl->SetAttribute(_T("bkcolor"), _T("white"));
+    pBitmapControl->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("100%"));
+    pBitmapControl->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
+    pBitmapControl->SetAttributeById(ui::attr::control::kBkcolor, _T("bkcolor"), _T("white"));
     pBox->AddItem(pBitmapControl);
 
     //根据位图的大小，调整窗口大小

@@ -229,10 +229,11 @@ HotKey::HotKey(Window *pWindow)
 {
     ASSERT(pWindow != nullptr);
     m_pRichEdit = new HotKeyRichEdit(pWindow);
-    m_pRichEdit->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
-    m_pRichEdit->SetAttribute(_T("want_tab"), _T("false"));
-    m_pRichEdit->SetAttribute(_T("width"), _T("100%"));
-    m_pRichEdit->SetAttribute(_T("height"), _T("100%"));
+    m_pRichEdit
+        ->SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("want_tab"), _T("false"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("100%"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
 }
 
 HotKey::~HotKey()
