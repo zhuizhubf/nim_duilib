@@ -60,12 +60,11 @@ DString DirectoryTree::GetType() const
     return DUI_CTR_DIRECTORY_TREE;
 }
 
-void DirectoryTree::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void DirectoryTree::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSmallIconSize: {
         SetSmallIconSize(StringUtil::StringToInt32(strValue));
         break;
@@ -83,7 +82,7 @@ void DirectoryTree::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

@@ -40,13 +40,13 @@ DString Box::GetType() const
     return DUI_CTR_BOX;
 }
 
-void Box::SetAttributeById(ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void Box::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (m_pLayout->SetAttribute(strName, strValue, Dpi())) {
+    if (m_pLayout->SetAttributeById(id, strValue, Dpi())) {
         return;
     } else {
-        switch (ui::attr::control::IdOf(strName)) {
+        switch (id) {
         case ui::attr::control::kMouseChild:
         case ui::attr::control::kMousechild: {
             SetMouseChildEnabled(StringUtil::IsValueTrue(strValue));
@@ -63,7 +63,7 @@ void Box::SetAttributeById(ui::attr::control::Id id, const DString &strName, con
             break;
         }
         default: {
-            Control::SetAttributeById(id, strName, strValue);
+            Control::SetAttributeById(id, strValue);
             break;
         }
         }

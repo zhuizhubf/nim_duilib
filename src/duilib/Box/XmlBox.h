@@ -20,8 +20,7 @@ public:
 
     //基类的虚函数
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
 
 public:
     /** 设置XML文件的路径

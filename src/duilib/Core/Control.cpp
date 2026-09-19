@@ -81,15 +81,22 @@ DString Control::GetType() const
 
 void Control::SetAttribute(const DString &strName, const DString &strValue2)
 {
-    SetAttributeById(attr::control::IdOf(strName), strName, strValue2);
+    //字符串→枚举的转换只在此处做一次；后续链上仅使用枚举
+    const attr::control::Id id = attr::control::IdOf(strName);
+#ifdef _DEBUG
+    //检查属性名是否已登记（未登记的名字会落到 Id::kInvalidId）
+    ASSERT(
+        (id != attr::control::kInvalidId) && _T("Control::SetAttribute: unknown attribute name!"));
+#endif
+    SetAttributeById(id, strValue2);
 }
 
-void Control::SetAttributeById(attr::control::Id id, const DString &strName, const DString &strValue2)
+void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
 {
     ASSERT(GetWindow() != nullptr); //由于需要做DPI感知功能，所以必须先设置关联窗口
 
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kClass: {
         SetClass(strValue);
         break;

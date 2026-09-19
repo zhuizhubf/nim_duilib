@@ -20,8 +20,7 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void PaintText(IRender *pRender) override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -71,8 +70,8 @@ GroupBoxTemplate<InheritType>::GroupBoxTemplate(Window *pWindow)
     : LabelTemplate<InheritType>(pWindow)
     , m_fLineWidth(0)
 {
-    this->SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("top,left"));
-    this->SetAttributeById(ui::attr::control::kTextPadding, _T("text_padding"), _T("8,0,0,0"));
+    this->SetAttributeById(ui::attr::control::kTextAlign, _T("top,left"));
+    this->SetAttributeById(ui::attr::control::kTextPadding, _T("8,0,0,0"));
 }
 
 template<typename InheritType>
@@ -179,10 +178,10 @@ UiColor GroupBoxTemplate<InheritType>::GetFadeColor(UiColor color, uint8_t nFade
 
 template<typename InheritType>
 void GroupBoxTemplate<InheritType>::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+    ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kCornerSize: {
         //圆角大小
         UiSize cxyRound;
@@ -203,11 +202,11 @@ void GroupBoxTemplate<InheritType>::SetAttributeById(
     }
     case ui::attr::control::kText: {
         //设置文本内容
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

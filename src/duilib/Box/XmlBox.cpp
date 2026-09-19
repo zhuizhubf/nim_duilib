@@ -26,11 +26,10 @@ DString XmlBox::GetType() const
     return DUI_CTR_XMLBOX;
 }
 
-void XmlBox::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void XmlBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kXmlFilePath: {
         SetXmlFilePath(FilePath(strValue));
         break;
@@ -40,7 +39,7 @@ void XmlBox::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

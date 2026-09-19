@@ -43,7 +43,7 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     bool HasHoveredStateColor();
-    bool OnSetAttribute(const DString &strName, const DString &strValue);
+    bool OnSetAttribute(ui::attr::control::Id id, const DString &strValue);
     void OnPaintText(IRender *pRender);
 
     /** 绑定的窗口发生了变化

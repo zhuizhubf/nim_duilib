@@ -301,11 +301,10 @@ DString CheckCombo::GetType() const
     return DUI_CTR_CHECK_COMBO;
 }
 
-void CheckCombo::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void CheckCombo::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kDropbox: {
         SetDropBoxAttributeList(strValue);
         break;
@@ -334,7 +333,7 @@ void CheckCombo::SetAttributeById(
         break;
     }
     case ui::attr::control::kHeight: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         if (strValue != _T("stretch") && strValue != _T("auto")) {
             m_iOrgHeight = StringUtil::StringToInt32(strValue);
             ASSERT(m_iOrgHeight >= 0);
@@ -352,7 +351,7 @@ void CheckCombo::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

@@ -346,11 +346,10 @@ DString Combo::GetType() const
     return DUI_CTR_COMBO;
 }
 
-void Combo::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void Combo::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kComboType: {
         if (strValue == _T("drop_list")) {
             SetComboType(kCombo_DropList);
@@ -402,7 +401,7 @@ void Combo::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

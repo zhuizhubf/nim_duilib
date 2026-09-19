@@ -14,17 +14,16 @@ DString IPAddress::GetType() const
     return DUI_CTR_IPADDRESS;
 }
 
-void IPAddress::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void IPAddress::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kIp: {
         SetIPAddress(strValue);
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }
@@ -40,13 +39,11 @@ void IPAddress::OnInit()
     for (size_t index = 0; index < 4; ++index) {
         RichEdit *pRichEdit = new RichEdit(GetWindow());
         pRichEdit->SetText(_T(""));
-        pRichEdit->SetAttributeById(
-            ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
-        pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("limit_text"), _T("3"));
-        pRichEdit
-            ->SetAttributeById(ui::attr::control::kWantReturnMsg, _T("want_return_msg"), _T("false"));
-        pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("want_tab"), _T("false"));
-        pRichEdit->SetAttributeById(ui::attr::control::kNumberOnly, _T("number_only"), _T("true"));
+        pRichEdit->SetAttributeById(ui::attr::control::kTextAlign, _T("vcenter,hcenter"));
+        pRichEdit->SetAttributeById(ui::attr::control::kLimitText, _T("3"));
+        pRichEdit->SetAttributeById(ui::attr::control::kWantReturnMsg, _T("false"));
+        pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("false"));
+        pRichEdit->SetAttributeById(ui::attr::control::kNumberOnly, _T("true"));
         pRichEdit->SetMinNumber(0);
         pRichEdit->SetMaxNumber(255);
         AddItem(pRichEdit);
@@ -54,9 +51,8 @@ void IPAddress::OnInit()
         if (index != 3) {
             Label *pLabel = new Label(GetWindow());
             pLabel->SetText(_T("."));
-            pLabel->SetAttributeById(
-                ui::attr::control::kTextAlign, _T("text_align"), _T("bottom,hcenter"));
-            pLabel->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("4"));
+            pLabel->SetAttributeById(ui::attr::control::kTextAlign, _T("bottom,hcenter"));
+            pLabel->SetAttributeById(ui::attr::control::kWidth, _T("4"));
             pLabel->SetTabStop(false);
             pLabel->SetNoFocus();
             pLabel->SetMouseEnabled(false);

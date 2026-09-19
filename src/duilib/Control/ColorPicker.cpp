@@ -441,17 +441,16 @@ public:
 
     /** 设置控件指定属性
      */
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue2) override
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue2) override
     {
         DString strValue = GetExpandVarStrings(strValue2);
-        switch (ui::attr::control::IdOf(strName)) {
+        switch (id) {
         case ui::attr::control::kCursorFile: {
             m_cursorFile = strValue;
             break;
         }
         default: {
-            BaseClass::SetAttributeById(id, strName, strValue);
+            BaseClass::SetAttributeById(id, strValue);
             break;
         }
         }
@@ -578,8 +577,7 @@ private:
             //设置文本
             DString text = m_pColorPreview->GetColorString(selColor);
             m_pColorPreview->SetText(text);
-            m_pColorPreview->SetAttributeById(
-                ui::attr::control::kTextAlign, _T("text_align"), _T("hcenter,vcenter"));
+            m_pColorPreview->SetAttributeById(ui::attr::control::kTextAlign, _T("hcenter,vcenter"));
             m_pColorPreview
                 ->SetTextPadding(UiPadding(0, m_pColorPreview->GetHeight() / 2, 0, 0), false);
             //设置文本颜色

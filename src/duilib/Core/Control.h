@@ -620,8 +620,7 @@ public:
     * @param [in] strName 属性名称
     * @param [in] strValue 属性值
     */
-    virtual void SetAttributeById(
-        attr::control::Id nAttributeId, const DString &strName, const DString &strValue);
+    virtual void SetAttributeById(attr::control::Id nAttributeId, const DString &strValue);
 
     /**
      * @brief 设置控件的 class 全局属性

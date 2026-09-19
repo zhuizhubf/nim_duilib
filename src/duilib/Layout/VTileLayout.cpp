@@ -17,21 +17,21 @@ VTileLayout::VTileLayout()
     SetChildHAlignType(HorAlignType::kAlignCenter);
 }
 
-bool VTileLayout::SetAttribute(
-    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
+bool VTileLayout::SetAttributeById(
+    ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    switch (attr::layout::IdOf(strName)) {
-    case attr::layout::kItemSize:
-    case attr::layout::kItemsize: {
+    switch (id) {
+    case attr::control::kItemSize:
+    case attr::control::kItemsize: {
         UiSize szItem;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);
         SetItemSize(szItem, true);
         break;
     }
-    case attr::layout::kColumns:
-    case attr::layout::kRows: {
+    case attr::control::kColumns:
+    case attr::control::kRows: {
         if (strValue == _T("auto")) {
             //自动计算列数
             SetAutoCalcColumns(true);
@@ -41,17 +41,17 @@ bool VTileLayout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kAutoCalcItemSize: {
+    case attr::control::kAutoCalcItemSize: {
         SetAutoCalcItemWidth(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case attr::layout::kScaleDown:
-    case attr::layout::kScaledown: {
+    case attr::control::kScaleDown:
+    case attr::control::kScaledown: {
         SetScaleDown(StringUtil::IsValueTrue(strValue));
         break;
     }
     default: {
-        hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
+        hasAttribute = BaseClass::SetAttributeById(id, strValue, dpiManager);
         break;
     }
     }

@@ -21,7 +21,7 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void PaintText(IRender *pRender) override;
 
     /** 设置容器所属窗口
@@ -238,11 +238,11 @@ inline DString RichTextT<VBox>::GetType() const
 }
 
 template<typename T>
-void RichTextT<T>::SetAttribute(const DString &strName, const DString &strValue2)
+void RichTextT<T>::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    if (!m_impl->SetAttribute(strName, strValue)) {
-        BaseClass::SetAttribute(strName, strValue);
+    if (!m_impl->SetAttribute(id, strValue)) {
+        BaseClass::SetAttributeById(id, strValue);
     }
 }
 

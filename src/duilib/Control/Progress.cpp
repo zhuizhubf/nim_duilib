@@ -40,11 +40,10 @@ DString Progress::GetType() const
     return DUI_CTR_PROGRESS;
 }
 
-void Progress::SetAttributeById(
-    ui::attr::control::Id id, const DString &srName, const DString &strValue2)
+void Progress::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(srName)) {
+    switch (id) {
     case ui::attr::control::kHorizontal:
     case ui::attr::control::kHor: {
         SetHorizontal(StringUtil::IsValueTrue(strValue));
@@ -97,7 +96,7 @@ void Progress::SetAttributeById(
         break;
     }
     default: {
-        Label::SetAttributeById(id, srName, strValue);
+        Label::SetAttributeById(id, strValue);
         break;
     }
     }

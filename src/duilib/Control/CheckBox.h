@@ -37,8 +37,7 @@ public:
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
     virtual void Activate(const EventArgs *pMsg) override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void PaintStateColors(IRender *pRender) override;
     virtual void PaintStateImages(IRender *pRender) override;
     virtual void PaintText(IRender *pRender) override;
@@ -429,10 +428,10 @@ inline DString CheckBoxTemplate<VBox>::GetType() const
 
 template<typename InheritType>
 void CheckBoxTemplate<InheritType>::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+    ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSelected: {
         Selected(StringUtil::IsValueTrue(strValue), true);
         break;
@@ -643,7 +642,7 @@ void CheckBoxTemplate<InheritType>::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

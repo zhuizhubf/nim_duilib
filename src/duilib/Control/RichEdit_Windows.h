@@ -32,8 +32,7 @@ public:
 public:
     //基类的虚函数重写
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &pstrName, const DString &pstrValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &pstrValue) override;
     virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;
     virtual void SetPos(UiRect rc) override;
     virtual void SetScrollPos(UiSize64 szPos) override;

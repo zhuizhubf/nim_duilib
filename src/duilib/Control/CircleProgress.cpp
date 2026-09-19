@@ -27,11 +27,10 @@ DString CircleProgress::GetType() const
     return DUI_CTR_CIRCLEPROGRESS;
 }
 
-void CircleProgress::SetAttributeById(
-    ui::attr::control::Id id, const DString &srName, const DString &strValue2)
+void CircleProgress::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(srName)) {
+    switch (id) {
     case ui::attr::control::kCircular: {
         SetCircular(StringUtil::IsValueTrue(strValue));
         break;
@@ -64,7 +63,7 @@ void CircleProgress::SetAttributeById(
         break;
     }
     default: {
-        Progress::SetAttributeById(id, srName, strValue);
+        Progress::SetAttributeById(id, strValue);
         break;
     }
     }

@@ -18,17 +18,16 @@ ListCtrlListView::ListCtrlListView(Window *pWindow)
 
 ListCtrlListView::~ListCtrlListView() {}
 
-void ListCtrlListView::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ListCtrlListView::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kHorizontalLayout: {
         SetHorizontalLayout(StringUtil::IsValueTrue(strValue));
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

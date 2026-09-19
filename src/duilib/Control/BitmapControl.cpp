@@ -29,11 +29,10 @@ DString BitmapControl::GetType() const
     return DUI_CTR_BITMAP_CONTROL;
 }
 
-void BitmapControl::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void BitmapControl::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kBitmapHalign: {
         ASSERT((strValue == _T("left")) || (strValue == _T("center")) || (strValue == _T("right")));
         if (strValue == _T("center")) {
@@ -119,7 +118,7 @@ void BitmapControl::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

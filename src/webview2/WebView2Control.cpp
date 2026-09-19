@@ -24,11 +24,10 @@ DString WebView2Control::GetType() const
     return DUI_CTR_WEBVIEW2;
 }
 
-void WebView2Control::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void WebView2Control::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kUrl: {
         //初始化加载的URL
         SetInitURL(strValue);
@@ -55,7 +54,7 @@ void WebView2Control::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

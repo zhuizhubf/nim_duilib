@@ -672,6 +672,24 @@ enum Id : uint32_t {
     kF11 = 654,
     kDownloadFaviconImage = 655,
     kDevtoolsEnabled = 656,
+    kRows = 657,
+    kColumns = 658,
+    kGridWidth = 659,
+    kGridHeight = 660,
+    kScaleDown = 661,
+    kItemSize = 662,
+    kItemsize = 663,
+    kAutoCalcItemSize = 664,
+    kScaledown = 665,
+    kChildMargin = 666,
+    kChildmargin = 667,
+    kChildMarginX = 668,
+    kChildmarginx = 669,
+    kChildMarginY = 670,
+    kChildmarginy = 671,
+    kChildValign = 672,
+    kChildHalign = 673,
+    kChildAlign = 674,
 };
 
 Id IdOf(const DString &strName);
@@ -853,33 +871,6 @@ enum Id : uint32_t {
 Id IdOf(const DString &strName);
 DString IdToString(Id id);
 } //namespace image
-
-namespace layout {
-enum Id : uint32_t {
-    kInvalidId = 0xFFFFFFFFu,
-    kRows = 0,
-    kColumns = 1,
-    kGridWidth = 2,
-    kGridHeight = 3,
-    kScaleDown = 4,
-    kItemSize = 5,
-    kItemsize = 6,
-    kAutoCalcItemSize = 7,
-    kScaledown = 8,
-    kChildMargin = 9,
-    kChildmargin = 10,
-    kChildMarginX = 11,
-    kChildmarginx = 12,
-    kChildMarginY = 13,
-    kChildmarginy = 14,
-    kChildValign = 15,
-    kChildHalign = 16,
-    kChildAlign = 17,
-};
-
-Id IdOf(const DString &strName);
-DString IdToString(Id id);
-} //namespace layout
 
 namespace loading {
 enum Id : uint32_t {

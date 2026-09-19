@@ -19,12 +19,12 @@ GridLayout::GridLayout()
     SetChildVAlignType(VerAlignType::kAlignTop);
 }
 
-bool GridLayout::SetAttribute(
-    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
+bool GridLayout::SetAttributeById(
+    ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    switch (attr::layout::IdOf(strName)) {
-    case attr::layout::kRows: {
+    switch (id) {
+    case attr::control::kRows: {
         if (strValue == _T("auto")) {
             //自动计算
             SetRows(0);
@@ -33,7 +33,7 @@ bool GridLayout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kColumns: {
+    case attr::control::kColumns: {
         if (strValue == _T("auto")) {
             //自动计算
             SetColumns(0);
@@ -42,7 +42,7 @@ bool GridLayout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kGridWidth: {
+    case attr::control::kGridWidth: {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridWidth(0, false);
@@ -53,7 +53,7 @@ bool GridLayout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kGridHeight: {
+    case attr::control::kGridHeight: {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridHeight(0, false);
@@ -64,12 +64,12 @@ bool GridLayout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kScaleDown: {
+    case attr::control::kScaleDown: {
         SetScaleDown(StringUtil::IsValueTrue(strValue));
         break;
     }
     default: {
-        hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
+        hasAttribute = BaseClass::SetAttributeById(id, strValue, dpiManager);
         break;
     }
     }

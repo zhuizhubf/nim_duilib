@@ -50,7 +50,7 @@ public:
     RichTextImpl &operator=(const RichTextImpl &r) = delete;
     ~RichTextImpl();
 
-    bool SetAttribute(const DString &strName, const DString &strValue);
+    bool SetAttribute(ui::attr::control::Id id, const DString &strValue);
     void PaintText(IRender *pRender);
 
     /** 绑定的窗口发生了变化

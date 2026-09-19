@@ -401,11 +401,10 @@ RichEdit::~RichEdit()
     m_pLimitChars.reset();
 }
 
-void RichEdit::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void RichEdit::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
 #ifdef DUILIB_RICHEDIT_SUPPORT_RICHTEXT
 #else
 #endif
@@ -659,7 +658,7 @@ void RichEdit::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

@@ -32,8 +32,7 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
 
     /** 设置是否支持拖动改变控件的顺序
     */
@@ -311,11 +310,10 @@ inline DString ControlDragableT<VBox>::GetType() const
 }
 
 template<typename T>
-void ControlDragableT<T>::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ControlDragableT<T>::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kDragOrder: {
         //是否支持拖动调整顺序（在同一个容器内）
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
@@ -331,7 +329,7 @@ void ControlDragableT<T>::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }
@@ -908,9 +906,9 @@ template<typename T>
 Control *ControlDragableT<T>::CreateDestControl(Box *pTargetBox)
 {
     Control *pDestControl = new Control(this->GetWindow());
-    pDestControl->SetAttributeById(ui::attr::control::kBkcolor, _T("bkcolor"), _T("#FF5D6B99"));
-    pDestControl->SetAttributeById(ui::attr::control::kValign, _T("valign"), _T("center"));
-    pDestControl->SetAttributeById(ui::attr::control::kHalign, _T("halign"), _T("center"));
+    pDestControl->SetAttributeById(ui::attr::control::kBkcolor, _T("#FF5D6B99"));
+    pDestControl->SetAttributeById(ui::attr::control::kValign, _T("center"));
+    pDestControl->SetAttributeById(ui::attr::control::kHalign, _T("center"));
 
     Layout *pLayout = nullptr;
     if (pTargetBox != nullptr) {
@@ -930,11 +928,11 @@ Control *ControlDragableT<T>::CreateDestControl(Box *pTargetBox)
     }
     if (!bInited) {
         if ((pLayout != nullptr) && pLayout->IsVLayout()) {
-            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("4"));
-            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("80%"));
+            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("4"));
+            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("80%"));
         } else {
-            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("4"));
-            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("80%"));
+            pDestControl->SetAttributeById(ui::attr::control::kWidth, _T("4"));
+            pDestControl->SetAttributeById(ui::attr::control::kHeight, _T("80%"));
         }
     }
     return pDestControl;

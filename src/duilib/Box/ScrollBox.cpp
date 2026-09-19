@@ -30,11 +30,10 @@ DString ScrollBox::GetType() const
     return DUI_CTR_SCROLLBOX;
 } //ScrollBox
 
-void ScrollBox::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ScrollBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kVscrollbar: {
         EnableScrollBar(StringUtil::IsValueTrue(strValue), GetHScrollBar() != nullptr);
         break;
@@ -108,7 +107,7 @@ void ScrollBox::SetAttributeById(
         break;
     }
     default: {
-        Box::SetAttributeById(id, strName, strValue);
+        Box::SetAttributeById(id, strValue);
         break;
     }
     }

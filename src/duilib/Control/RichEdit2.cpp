@@ -148,11 +148,10 @@ DString RichEdit2::GetType() const
     return DUI_CTR_RICHEDIT2;
 }
 
-void RichEdit2::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSingleLine:
     case ui::attr::control::kSingleline: {
         SetMultiLine(strValue != _T("true"));
@@ -477,7 +476,7 @@ void RichEdit2::SetAttributeById(
         break;
     }
     default: {
-        ScrollBox::SetAttributeById(id, strName, strValue);
+        ScrollBox::SetAttributeById(id, strValue);
         break;
     }
     }

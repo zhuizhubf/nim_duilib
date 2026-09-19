@@ -20,11 +20,10 @@ DString Line::GetType() const
     return DUI_CTR_LINE;
 }
 
-void Line::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void Line::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kVertical: {
         SetLineVertical(StringUtil::IsValueTrue(strValue));
         break;
@@ -45,7 +44,7 @@ void Line::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

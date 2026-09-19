@@ -15,11 +15,10 @@ DString TabCtrl::GetType() const
     return DUI_CTR_TAB_CTRL;
 }
 
-void TabCtrl::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void TabCtrl::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSelectedId: {
         int32_t nValue = StringUtil::StringToInt32(strValue);
         if (nValue >= 0) {
@@ -54,7 +53,7 @@ void TabCtrl::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }
@@ -348,11 +347,10 @@ DString TabCtrlItem::GetType() const
     return DUI_CTR_TAB_CTRL_ITEM;
 }
 
-void TabCtrlItem::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void TabCtrlItem::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kTabBoxItemIndex: {
         SetTabBoxItemIndex((size_t) StringUtil::StringToInt32(strValue));
         break;
@@ -410,7 +408,7 @@ void TabCtrlItem::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

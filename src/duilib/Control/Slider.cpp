@@ -184,11 +184,10 @@ void Slider::HandleEvent(const EventArgs &msg)
     Progress::HandleEvent(msg);
 }
 
-void Slider::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void Slider::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kStep: {
         SetChangeStep(StringUtil::StringToInt32(strValue));
         break;
@@ -230,7 +229,7 @@ void Slider::SetAttributeById(
         break;
     }
     default: {
-        Progress::SetAttributeById(id, strName, strValue);
+        Progress::SetAttributeById(id, strValue);
         break;
     }
     }

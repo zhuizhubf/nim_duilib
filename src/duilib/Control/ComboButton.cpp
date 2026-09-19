@@ -299,11 +299,10 @@ DString ComboButton::GetType() const
     return DUI_CTR_COMBO_BUTTON;
 }
 
-void ComboButton::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ComboButton::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kDropboxSize:
     case ui::attr::control::kDropboxsize: {
         //设置下拉列表的大小（宽度和高度）
@@ -371,7 +370,7 @@ void ComboButton::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

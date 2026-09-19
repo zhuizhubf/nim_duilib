@@ -39,11 +39,10 @@ DString ListCtrlHeaderItem::GetType() const
     return _T("ListCtrlHeaderItem");
 }
 
-void ListCtrlHeaderItem::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ListCtrlHeaderItem::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSortedUpImage: {
         SetSortedUpImage(strValue);
         break;
@@ -61,7 +60,7 @@ void ListCtrlHeaderItem::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

@@ -31,8 +31,7 @@ public:
     virtual DString GetType() const override;
     virtual void SetParent(Box *pParent) override;
     virtual void SetWindow(Window *pWindow) override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
     virtual void PaintFocusRect(IRender *pRender) override;
     virtual Control *FindControl(

@@ -47,11 +47,10 @@ DString ListBox::GetType() const
     return _T("ListBox");
 }
 
-void ListBox::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ListBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kMultiSelect: {
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
         break;
@@ -102,7 +101,7 @@ void ListBox::SetAttributeById(
         break;
     }
     default: {
-        ScrollBox::SetAttributeById(id, strName, strValue);
+        ScrollBox::SetAttributeById(id, strValue);
         break;
     }
     }

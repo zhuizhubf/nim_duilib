@@ -69,11 +69,10 @@ DString ScrollBar::GetType() const
     return DUI_CTR_SCROLLBAR;
 }
 
-void ScrollBar::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ScrollBar::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kButton1NormalImage:
     case ui::attr::control::kButton1normalimage: {
         SetButton1StateImage(kControlStateNormal, strValue);
@@ -223,7 +222,7 @@ void ScrollBar::SetAttributeById(
         break;
     }
     default: {
-        Control::SetAttributeById(id, strName, strValue);
+        Control::SetAttributeById(id, strValue);
         break;
     }
     }

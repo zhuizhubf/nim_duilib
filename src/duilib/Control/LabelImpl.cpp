@@ -44,9 +44,9 @@ LabelImpl::~LabelImpl()
     m_pTextDrawer.reset();
 }
 
-bool LabelImpl::OnSetAttribute(const DString &strName, const DString &strValue)
+bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue)
 {
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kTextAlign: {
         bool bHCenter = false;
         size_t centerPos = strValue.find(_T("center"));

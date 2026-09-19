@@ -30,10 +30,8 @@ local g_baselineRev = "HEAD"
 local g_domains = {
     { name = "control", roots = { "src/duilib", "src/cef", "src/webview2" },
       excludeFiles = { "Window.cpp", "WindowBuilder.cpp", "ImageAttribute.cpp", "Shadow.cpp", "ControlLoading.cpp", "ThemeGenerator.cpp" },
-      excludeFragments = { "\\Layout\\" },
       vars = { "strName", "srName" } },
     { name = "window", roots = { "src/duilib/Core/Window.cpp", "src/duilib/Core/WindowBuilder.cpp" }, vars = { "strName" } },
-    { name = "layout", roots = { "src/duilib/Layout" }, vars = { "strName" } },
     { name = "node", roots = { "src/duilib/Core/WindowBuilder.cpp", "src/duilib/Core/ThemeGenerator.cpp" }, vars = { "nodeName", "strClass" } },
     { name = "image", roots = { "src/duilib/Image/ImageAttribute.cpp" }, vars = { "name" } },
     { name = "shadow", roots = { "src/duilib/Core/Shadow.cpp" }, vars = { "typeString" } },

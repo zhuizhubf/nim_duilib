@@ -45,8 +45,8 @@ public:
      * @param [in] dpiManager DPI管理接口
      * @return true 设置成功，false 属性不存在
      */
-    virtual bool SetAttribute(
-        const DString &strName, const DString &strValue, const DpiManager &dpiManager) override;
+    virtual bool SetAttributeById(
+        ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比

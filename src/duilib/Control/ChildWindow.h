@@ -24,8 +24,7 @@ public:
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void SetWindow(Window *pWindow) override;
     virtual void SetPos(UiRect rc) override;
     virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;

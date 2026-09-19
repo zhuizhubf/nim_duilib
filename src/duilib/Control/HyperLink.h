@@ -18,11 +18,10 @@ public:
     {}
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override { return DUI_CTR_HYPER_LINK; }
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue2) override
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue2) override
     {
         DString strValue = GetExpandVarStrings(strValue2);
-        switch (ui::attr::control::IdOf(strName)) {
+        switch (id) {
         case ui::attr::control::kUrl: {
             SetUrl(strValue);
             break;
@@ -32,7 +31,7 @@ public:
             break;
         }
         default: {
-            BaseClass::SetAttributeById(id, strName, strValue);
+            BaseClass::SetAttributeById(id, strValue);
             break;
         }
         }

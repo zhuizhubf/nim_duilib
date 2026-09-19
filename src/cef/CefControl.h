@@ -479,8 +479,7 @@ public:
 
     /** 设置控件指定属性
      */
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
 
 protected:
     /** 重新创建Browser对象

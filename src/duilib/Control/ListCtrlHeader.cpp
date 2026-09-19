@@ -20,17 +20,16 @@ DString ListCtrlHeader::GetType() const
     return _T("ListCtrlHeader");
 }
 
-void ListCtrlHeader::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ListCtrlHeader::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kIconSpacing: {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

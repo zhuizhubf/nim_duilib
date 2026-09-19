@@ -20,11 +20,10 @@ DString TabBox::GetType() const
     return DUI_CTR_TABBOX;
 }
 
-void TabBox::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void TabBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kSelectedId:
     case ui::attr::control::kSelectedid: {
         size_t iSel = (size_t) StringUtil::StringToInt32(strValue);
@@ -63,7 +62,7 @@ void TabBox::SetAttributeById(
         break;
     }
     default: {
-        Box::SetAttributeById(id, strName, strValue);
+        Box::SetAttributeById(id, strValue);
         break;
     }
     }

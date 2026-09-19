@@ -33,11 +33,10 @@ DString TreeNode::GetType() const
     return DUI_CTR_TREENODE;
 }
 
-void TreeNode::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void TreeNode::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kExpandNormalImage: {
         SetExpandStateImage(kControlStateNormal, strValue);
         break;
@@ -90,7 +89,7 @@ void TreeNode::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }
@@ -1149,12 +1148,11 @@ DString TreeView::GetType() const
     return DUI_CTR_TREEVIEW;
 }
 
-void TreeView::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void TreeView::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kIndent: {
         //树节点的缩进（每层节点缩进一个indent单位）
         SetIndent(StringUtil::StringToInt32(strValue), true);
@@ -1181,7 +1179,7 @@ void TreeView::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

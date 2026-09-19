@@ -103,11 +103,10 @@ ImageListPtr ListCtrl::GetImageList(ListCtrlType type) const
     }
 }
 
-void ListCtrl::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ListCtrl::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kHeaderClass: {
         SetHeaderClass(strValue);
         break;
@@ -249,7 +248,7 @@ void ListCtrl::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

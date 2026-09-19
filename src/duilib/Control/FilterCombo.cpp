@@ -15,17 +15,16 @@ DString FilterCombo::GetType() const
     return DUI_CTR_FILTER_COMBO;
 }
 
-void FilterCombo::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void FilterCombo::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kComboType: {
         //忽略该属性设置
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

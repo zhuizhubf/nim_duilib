@@ -2,6 +2,7 @@
 #define UI_LAYOUT_LAYOUT_H_
 
 #include "duilib/Core/UiTypes.h"
+#include "duilib/Utils/AttributeIds.g.h"
 
 namespace ui {
 class Box;
@@ -53,8 +54,19 @@ public:
      * @param [in] dpiManager DPI管理接口
      * @return true 设置成功，false 属性不存在
      */
-    virtual bool SetAttribute(
-        const DString &strName, const DString &strValue, const DpiManager &dpiManager);
+    bool SetAttribute(const DString &strName, const DString &strValue, const DpiManager &dpiManager)
+    {
+        return SetAttributeById(attr::control::IdOf(strName), strValue, dpiManager);
+    }
+
+    /** 按属性 ID 设置属性（字符串→枚举只在 name 入口转换一次，派生类重写此函数）
+     * @param [in] id 属性 ID，由 attr::control::IdOf() 得到
+     * @param [in] strValue 属性值
+     * @param [in] dpiManager DPI管理接口
+     * @return true 设置成功，false 属性不存在
+     */
+    virtual bool SetAttributeById(
+        ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager);
 
     /** DPI发生变化，更新控件大小和布局
      * @param [in] nOldDpiScale 旧的DPI缩放百分比

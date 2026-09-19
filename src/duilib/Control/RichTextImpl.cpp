@@ -28,9 +28,9 @@ RichTextImpl::~RichTextImpl()
     m_spDrawRichTextCache.reset();
 }
 
-bool RichTextImpl::SetAttribute(const DString &strName, const DString &strValue)
+bool RichTextImpl::SetAttribute(ui::attr::control::Id id, const DString &strValue)
 {
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kTextAlign: {
         //水平方向对齐方式
         if (strValue.find(_T("left")) != DString::npos) {

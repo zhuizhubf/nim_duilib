@@ -1340,6 +1340,42 @@ Id IdOf(const DString &strName)
         return Id::kDownloadFaviconImage;
     case 0xFBE6E7F1u: //devtools_enabled
         return Id::kDevtoolsEnabled;
+    case 0x2A37B398u: //rows
+        return Id::kRows;
+    case 0x8AB31A3Cu: //columns
+        return Id::kColumns;
+    case 0xD74E9376u: //grid_width
+        return Id::kGridWidth;
+    case 0xF656DC89u: //grid_height
+        return Id::kGridHeight;
+    case 0x96E1F7C2u: //scale_down
+        return Id::kScaleDown;
+    case 0x1677065Au: //item_size
+        return Id::kItemSize;
+    case 0x1F455FE7u: //itemsize
+        return Id::kItemsize;
+    case 0x54605FE4u: //auto_calc_item_size
+        return Id::kAutoCalcItemSize;
+    case 0xF7148201u: //scaledown
+        return Id::kScaledown;
+    case 0x3919BB40u: //child_margin
+        return Id::kChildMargin;
+    case 0x49425B63u: //childmargin
+        return Id::kChildmargin;
+    case 0xA6F85FEFu: //child_margin_x
+        return Id::kChildMarginX;
+    case 0x6E756B81u: //childmarginx
+        return Id::kChildmarginx;
+    case 0xA5F85E5Cu: //child_margin_y
+        return Id::kChildMarginY;
+    case 0x6D7569EEu: //childmarginy
+        return Id::kChildmarginy;
+    case 0xDD2CFBBDu: //child_valign
+        return Id::kChildValign;
+    case 0x95B39AFBu: //child_halign
+        return Id::kChildHalign;
+    case 0x530F2027u: //child_align
+        return Id::kChildAlign;
     default:
         break;
     }
@@ -2663,6 +2699,42 @@ DString IdToString(Id id)
         return _T("download_favicon_image");
     case Id::kDevtoolsEnabled:
         return _T("devtools_enabled");
+    case Id::kRows:
+        return _T("rows");
+    case Id::kColumns:
+        return _T("columns");
+    case Id::kGridWidth:
+        return _T("grid_width");
+    case Id::kGridHeight:
+        return _T("grid_height");
+    case Id::kScaleDown:
+        return _T("scale_down");
+    case Id::kItemSize:
+        return _T("item_size");
+    case Id::kItemsize:
+        return _T("itemsize");
+    case Id::kAutoCalcItemSize:
+        return _T("auto_calc_item_size");
+    case Id::kScaledown:
+        return _T("scaledown");
+    case Id::kChildMargin:
+        return _T("child_margin");
+    case Id::kChildmargin:
+        return _T("childmargin");
+    case Id::kChildMarginX:
+        return _T("child_margin_x");
+    case Id::kChildmarginx:
+        return _T("childmarginx");
+    case Id::kChildMarginY:
+        return _T("child_margin_y");
+    case Id::kChildmarginy:
+        return _T("childmarginy");
+    case Id::kChildValign:
+        return _T("child_valign");
+    case Id::kChildHalign:
+        return _T("child_halign");
+    case Id::kChildAlign:
+        return _T("child_align");
     default:
         break;
     }
@@ -3341,98 +3413,6 @@ DString IdToString(Id id)
     return DString();
 }
 } //namespace image
-
-namespace layout {
-Id IdOf(const DString &strName)
-{
-    switch (Hash(strName)) {
-    case 0x2A37B398u: //rows
-        return Id::kRows;
-    case 0x8AB31A3Cu: //columns
-        return Id::kColumns;
-    case 0xD74E9376u: //grid_width
-        return Id::kGridWidth;
-    case 0xF656DC89u: //grid_height
-        return Id::kGridHeight;
-    case 0x96E1F7C2u: //scale_down
-        return Id::kScaleDown;
-    case 0x1677065Au: //item_size
-        return Id::kItemSize;
-    case 0x1F455FE7u: //itemsize
-        return Id::kItemsize;
-    case 0x54605FE4u: //auto_calc_item_size
-        return Id::kAutoCalcItemSize;
-    case 0xF7148201u: //scaledown
-        return Id::kScaledown;
-    case 0x3919BB40u: //child_margin
-        return Id::kChildMargin;
-    case 0x49425B63u: //childmargin
-        return Id::kChildmargin;
-    case 0xA6F85FEFu: //child_margin_x
-        return Id::kChildMarginX;
-    case 0x6E756B81u: //childmarginx
-        return Id::kChildmarginx;
-    case 0xA5F85E5Cu: //child_margin_y
-        return Id::kChildMarginY;
-    case 0x6D7569EEu: //childmarginy
-        return Id::kChildmarginy;
-    case 0xDD2CFBBDu: //child_valign
-        return Id::kChildValign;
-    case 0x95B39AFBu: //child_halign
-        return Id::kChildHalign;
-    case 0x530F2027u: //child_align
-        return Id::kChildAlign;
-    default:
-        break;
-    }
-    return Id::kInvalidId;
-}
-
-DString IdToString(Id id)
-{
-    switch (id) {
-    case Id::kRows:
-        return _T("rows");
-    case Id::kColumns:
-        return _T("columns");
-    case Id::kGridWidth:
-        return _T("grid_width");
-    case Id::kGridHeight:
-        return _T("grid_height");
-    case Id::kScaleDown:
-        return _T("scale_down");
-    case Id::kItemSize:
-        return _T("item_size");
-    case Id::kItemsize:
-        return _T("itemsize");
-    case Id::kAutoCalcItemSize:
-        return _T("auto_calc_item_size");
-    case Id::kScaledown:
-        return _T("scaledown");
-    case Id::kChildMargin:
-        return _T("child_margin");
-    case Id::kChildmargin:
-        return _T("childmargin");
-    case Id::kChildMarginX:
-        return _T("child_margin_x");
-    case Id::kChildmarginx:
-        return _T("childmarginx");
-    case Id::kChildMarginY:
-        return _T("child_margin_y");
-    case Id::kChildmarginy:
-        return _T("childmarginy");
-    case Id::kChildValign:
-        return _T("child_valign");
-    case Id::kChildHalign:
-        return _T("child_halign");
-    case Id::kChildAlign:
-        return _T("child_align");
-    default:
-        break;
-    }
-    return DString();
-}
-} //namespace layout
 
 namespace loading {
 Id IdOf(const DString &strName)

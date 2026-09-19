@@ -15,33 +15,33 @@ Layout::Layout()
     , m_vChildAlignType(VerAlignType::kAlignTop)
 {}
 
-bool Layout::SetAttribute(
-    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
+bool Layout::SetAttributeById(
+    ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    switch (attr::layout::IdOf(strName)) {
-    case attr::layout::kChildMargin:
-    case attr::layout::kChildmargin: {
+    switch (id) {
+    case attr::control::kChildMargin:
+    case attr::control::kChildmargin: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMargin(iMargin);
         break;
     }
-    case attr::layout::kChildMarginX:
-    case attr::layout::kChildmarginx: {
+    case attr::control::kChildMarginX:
+    case attr::control::kChildmarginx: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginX(iMargin);
         break;
     }
-    case attr::layout::kChildMarginY:
-    case attr::layout::kChildmarginy: {
+    case attr::control::kChildMarginY:
+    case attr::control::kChildmarginy: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginY(iMargin);
         break;
     }
-    case attr::layout::kChildValign: {
+    case attr::control::kChildValign: {
         //垂直对齐方式
         if (strValue == _T("top")) {
             SetChildVAlignType(VerAlignType::kAlignTop);
@@ -54,7 +54,7 @@ bool Layout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kChildHalign: {
+    case attr::control::kChildHalign: {
         //水平对齐方式
         if (strValue == _T("left")) {
             SetChildHAlignType(HorAlignType::kAlignLeft);
@@ -67,7 +67,7 @@ bool Layout::SetAttribute(
         }
         break;
     }
-    case attr::layout::kChildAlign: {
+    case attr::control::kChildAlign: {
         //水平对齐
         if (strValue.find(_T("left")) != DString::npos) {
             SetChildHAlignType(HorAlignType::kAlignLeft);

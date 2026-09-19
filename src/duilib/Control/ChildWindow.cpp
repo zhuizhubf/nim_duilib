@@ -26,11 +26,10 @@ DString ChildWindow::GetType() const
     return DUI_CTR_CHILD_WINDOW;
 }
 
-void ChildWindow::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ChildWindow::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kChildWindowMargin: {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
@@ -38,7 +37,7 @@ void ChildWindow::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

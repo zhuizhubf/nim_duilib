@@ -205,11 +205,10 @@ void ColorPickerRegular::SetColumns(int32_t nColumns)
     }
 }
 
-void ColorPickerRegular::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ColorPickerRegular::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kColorType: {
         if (strValue == _T("basic")) {
             //使用基本颜色
@@ -225,7 +224,7 @@ void ColorPickerRegular::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

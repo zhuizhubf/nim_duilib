@@ -304,8 +304,7 @@ public:
 public:
     // 控件类型相关的属性
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
     virtual void OnInit() override;
     virtual void SetPos(UiRect rc) override;
     virtual bool OnSetFocus(const EventArgs &msg) override;

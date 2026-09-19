@@ -17,8 +17,7 @@ public:
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
 
     /** 设置是否支持鼠标拖动改变控件的大小
     */
@@ -223,11 +222,10 @@ inline DString ControlResizableT<VBox>::GetType() const
 }
 
 template<typename T>
-void ControlResizableT<T>::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void ControlResizableT<T>::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kEnableResize: {
         SetEnableResize(StringUtil::IsValueTrue(strValue));
         break;
@@ -251,7 +249,7 @@ void ControlResizableT<T>::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

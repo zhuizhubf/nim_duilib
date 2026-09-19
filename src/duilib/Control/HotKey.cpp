@@ -229,11 +229,10 @@ HotKey::HotKey(Window *pWindow)
 {
     ASSERT(pWindow != nullptr);
     m_pRichEdit = new HotKeyRichEdit(pWindow);
-    m_pRichEdit
-        ->SetAttributeById(ui::attr::control::kTextAlign, _T("text_align"), _T("vcenter,hcenter"));
-    m_pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("want_tab"), _T("false"));
-    m_pRichEdit->SetAttributeById(ui::attr::control::kWidth, _T("width"), _T("100%"));
-    m_pRichEdit->SetAttributeById(ui::attr::control::kHeight, _T("height"), _T("100%"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kTextAlign, _T("vcenter,hcenter"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kWantTab, _T("false"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kWidth, _T("100%"));
+    m_pRichEdit->SetAttributeById(ui::attr::control::kHeight, _T("100%"));
 }
 
 HotKey::~HotKey()
@@ -251,11 +250,10 @@ DString HotKey::GetType() const
     return DUI_CTR_HOTKEY;
 }
 
-void HotKey::SetAttributeById(
-    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
+void HotKey::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    switch (ui::attr::control::IdOf(strName)) {
+    switch (id) {
     case ui::attr::control::kDefaultText: {
         if (m_pRichEdit != nullptr) {
             m_pRichEdit->SetDefaultText(strValue);
@@ -273,7 +271,7 @@ void HotKey::SetAttributeById(
         break;
     }
     default: {
-        BaseClass::SetAttributeById(id, strName, strValue);
+        BaseClass::SetAttributeById(id, strValue);
         break;
     }
     }

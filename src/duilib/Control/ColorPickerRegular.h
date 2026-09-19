@@ -49,8 +49,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttributeById(
-        ui::attr::control::Id id, const DString &strName, const DString &strValue) override;
+    virtual void SetAttributeById(ui::attr::control::Id id, const DString &strValue) override;
 
 private:
     /** 常用颜色数据提供者

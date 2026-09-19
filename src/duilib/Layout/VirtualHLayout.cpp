@@ -10,25 +10,25 @@ VirtualHLayout::VirtualHLayout()
     SetChildVAlignType(VerAlignType::kAlignCenter);
 }
 
-bool VirtualHLayout::SetAttribute(
-    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
+bool VirtualHLayout::SetAttributeById(
+    ui::attr::control::Id id, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    switch (attr::layout::IdOf(strName)) {
-    case attr::layout::kItemSize:
-    case attr::layout::kItemsize: {
+    switch (id) {
+    case attr::control::kItemSize:
+    case attr::control::kItemsize: {
         UiSize szItem;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);
         SetItemSize(szItem);
         break;
     }
-    case attr::layout::kAutoCalcItemSize: {
+    case attr::control::kAutoCalcItemSize: {
         SetAutoCalcItemHeight(StringUtil::IsValueTrue(strValue));
         break;
     }
     default: {
-        hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
+        hasAttribute = BaseClass::SetAttributeById(id, strValue, dpiManager);
         break;
     }
     }
