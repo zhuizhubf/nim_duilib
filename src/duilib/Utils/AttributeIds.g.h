@@ -13,7 +13,7 @@ namespace ui {
 namespace attr {
 
 namespace control {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kMultiSelect = 0,
     kPaintSelectedColors = 1,
@@ -679,7 +679,7 @@ DString IdToString(Id id);
 } //namespace control
 
 namespace image {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kFile = 0,
     kRes = 1,
@@ -731,7 +731,7 @@ DString IdToString(Id id);
 } //namespace image
 
 namespace layout {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kRows = 0,
     kColumns = 1,
@@ -758,7 +758,7 @@ DString IdToString(Id id);
 } //namespace layout
 
 namespace loading {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kFile = 0,
     kWidth = 1,
@@ -777,7 +777,7 @@ DString IdToString(Id id);
 } //namespace loading
 
 namespace node {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kWindow = 0,
     kGlobal = 1,
@@ -829,7 +829,7 @@ DString IdToString(Id id);
 } //namespace node
 
 namespace shadow {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kBig = 0,
     kBigRound = 1,
@@ -852,7 +852,7 @@ DString IdToString(Id id);
 } //namespace shadow
 
 namespace window {
-enum class Id : uint32_t {
+enum Id : uint32_t {
     kInvalidId = 0xFFFFFFFFu,
     kUseSystemCaption = 0,
     kShadowAttached = 1,

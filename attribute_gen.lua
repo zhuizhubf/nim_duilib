@@ -112,7 +112,7 @@ local function emit_header(domains, data)
     for _, domain in ipairs(domains) do
         add("")
         add("namespace " .. domain .. " {")
-        add("enum class Id : uint32_t {")
+        add("enum Id : uint32_t {")
         add("    kInvalidId = 0xFFFFFFFFu,")
         for _, item in ipairs(data[domain]) do
             add(string.format("    %s = %d,", item.ident, item.id))
