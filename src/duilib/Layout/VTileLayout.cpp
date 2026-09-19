@@ -22,8 +22,7 @@ bool VTileLayout::SetAttributeById(
 {
     bool hasAttribute = true;
     switch (id) {
-    case attr::control::kItemSize:
-    case attr::control::kItemsize: {
+    case attr::control::kItemSize: {
         UiSize szItem;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);
@@ -45,8 +44,7 @@ bool VTileLayout::SetAttributeById(
         SetAutoCalcItemWidth(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case attr::control::kScaleDown:
-    case attr::control::kScaledown: {
+    case attr::control::kScaleDown: {
         SetScaleDown(StringUtil::IsValueTrue(strValue));
         break;
     }

@@ -47,8 +47,7 @@ void Box::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
         return;
     } else {
         switch (id) {
-        case ui::attr::control::kMouseChild:
-        case ui::attr::control::kMousechild: {
+        case ui::attr::control::kMouseChild: {
             SetMouseChildEnabled(StringUtil::IsValueTrue(strValue));
             break;
         }

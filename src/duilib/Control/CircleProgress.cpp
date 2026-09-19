@@ -35,8 +35,7 @@ void CircleProgress::SetAttributeById(ui::attr::control::Id id, const DString &s
         SetCircular(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kCircleWidth:
-    case ui::attr::control::kCirclewidth: {
+    case ui::attr::control::kCircleWidth: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetCircleWidth((float) iValue, true);
         break;
@@ -57,8 +56,7 @@ void CircleProgress::SetAttributeById(ui::attr::control::Id id, const DString &s
         SetForegroudColor(strValue);
         break;
     }
-    case ui::attr::control::kGradientColor:
-    case ui::attr::control::kGradientcolor: {
+    case ui::attr::control::kGradientColor: {
         SetCircleGradientColor(strValue);
         break;
     }

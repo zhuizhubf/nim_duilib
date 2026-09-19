@@ -20,22 +20,19 @@ bool Layout::SetAttributeById(
 {
     bool hasAttribute = true;
     switch (id) {
-    case attr::control::kChildMargin:
-    case attr::control::kChildmargin: {
+    case attr::control::kChildMargin: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMargin(iMargin);
         break;
     }
-    case attr::control::kChildMarginX:
-    case attr::control::kChildmarginx: {
+    case attr::control::kChildMarginX: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginX(iMargin);
         break;
     }
-    case attr::control::kChildMarginY:
-    case attr::control::kChildmarginy: {
+    case attr::control::kChildMarginY: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginY(iMargin);

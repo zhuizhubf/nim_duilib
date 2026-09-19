@@ -436,8 +436,7 @@ void CheckBoxTemplate<InheritType>::SetAttributeById(
         Selected(StringUtil::IsValueTrue(strValue), true);
         break;
     }
-    case ui::attr::control::kSwitchSelect:
-    case ui::attr::control::kSwitchselect: {
+    case ui::attr::control::kSwitchSelect: {
         Selected(!IsSelected());
         break;
     }
@@ -455,52 +454,39 @@ void CheckBoxTemplate<InheritType>::SetAttributeById(
         SetAutoSelectCheck(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kNormalFirst:
-    case ui::attr::control::kNormalfirst: {
+    case ui::attr::control::kNormalFirst: {
         SetPaintNormalFirst(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kSelectedNormalImage:
-    case ui::attr::control::kSelectednormalimage: {
+    case ui::attr::control::kSelectedNormalImage: {
         SetSelectedStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kSelectedHoveredImage:
-    case ui::attr::control::kSelectedHotImage:
-    case ui::attr::control::kSelectedhotimage: {
+    case ui::attr::control::kSelectedHoveredImage: {
         SetSelectedStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kSelectedPressedImage:
-    case ui::attr::control::kSelectedPushedImage:
-    case ui::attr::control::kSelectedpushedimage: {
+    case ui::attr::control::kSelectedPressedImage: {
         SetSelectedStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kSelectedDisabledImage:
-    case ui::attr::control::kSelecteddisabledimage: {
+    case ui::attr::control::kSelectedDisabledImage: {
         SetSelectedStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kSelectedForeNormalImage:
-    case ui::attr::control::kSelectedforenormalimage: {
+    case ui::attr::control::kSelectedForeNormalImage: {
         SetSelectedForeStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kSelectedForeHoveredImage:
-    case ui::attr::control::kSelectedForeHotImage:
-    case ui::attr::control::kSelectedforehotimage: {
+    case ui::attr::control::kSelectedForeHoveredImage: {
         SetSelectedForeStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kSelectedForePressedImage:
-    case ui::attr::control::kSelectedForePushedImage:
-    case ui::attr::control::kSelectedforepushedimage: {
+    case ui::attr::control::kSelectedForePressedImage: {
         SetSelectedForeStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kSelectedForeDisabledImage:
-    case ui::attr::control::kSelectedforedisabledimage: {
+    case ui::attr::control::kSelectedForeDisabledImage: {
         SetSelectedForeStateImage(kControlStateDisabled, strValue);
         break;
     }
@@ -540,52 +526,39 @@ void CheckBoxTemplate<InheritType>::SetAttributeById(
         SetPartSelectedForeStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kSelectedTextColor:
-    case ui::attr::control::kSelectedtextcolor: {
+    case ui::attr::control::kSelectedTextColor: {
         SetSelectedTextColor(strValue);
         break;
     }
-    case ui::attr::control::kSelectedNormalTextColor:
-    case ui::attr::control::kSelectednormaltextcolor: {
+    case ui::attr::control::kSelectedNormalTextColor: {
         SetSelectedStateTextColor(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kSelectedHoveredTextColor:
-    case ui::attr::control::kSelectedHotTextColor:
-    case ui::attr::control::kSelectedhottextcolor: {
+    case ui::attr::control::kSelectedHoveredTextColor: {
         SetSelectedStateTextColor(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kSelectedPressedTextColor:
-    case ui::attr::control::kSelectedPushedTextColor:
-    case ui::attr::control::kSelectedpushedtextcolor: {
+    case ui::attr::control::kSelectedPressedTextColor: {
         SetSelectedStateTextColor(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kSelectedDisabledTextColor:
-    case ui::attr::control::kSelecteddisabledtextcolor: {
+    case ui::attr::control::kSelectedDisabledTextColor: {
         SetSelectedStateTextColor(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kSelectedNormalColor:
-    case ui::attr::control::kSelectednormalcolor: {
+    case ui::attr::control::kSelectedNormalColor: {
         SetSelectedStateColor(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kSelectedHoveredColor:
-    case ui::attr::control::kSelectedHotColor:
-    case ui::attr::control::kSelectedhotcolor: {
+    case ui::attr::control::kSelectedHoveredColor: {
         SetSelectedStateColor(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kSelectedPressedColor:
-    case ui::attr::control::kSelectedPushedColor:
-    case ui::attr::control::kSelectedpushedcolor: {
+    case ui::attr::control::kSelectedPressedColor: {
         SetSelectedStateColor(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kSelectedDisabledColor:
-    case ui::attr::control::kSelecteddisabledcolor: {
+    case ui::attr::control::kSelectedDisabledColor: {
         SetSelectedStateColor(kControlStateDisabled, strValue);
         break;
     }

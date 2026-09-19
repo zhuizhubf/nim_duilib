@@ -61,19 +61,15 @@ void Progress::SetAttributeById(ui::attr::control::Id id, const DString &strValu
         SetValue(StringUtil::StringToInt32(strValue));
         break;
     }
-    case ui::attr::control::kProgressImage:
-    case ui::attr::control::kProgressimage: {
+    case ui::attr::control::kProgressImage: {
         SetProgressImage(strValue);
         break;
     }
-    case ui::attr::control::kStretchForeImage:
-    case ui::attr::control::kIsStretchFore:
-    case ui::attr::control::kIsstretchfore: {
+    case ui::attr::control::kStretchForeImage: {
         SetStretchForeImage(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kProgressColor:
-    case ui::attr::control::kProgresscolor: {
+    case ui::attr::control::kProgressColor: {
         SetProgressColor(strValue);
         break;
     }
@@ -81,13 +77,11 @@ void Progress::SetAttributeById(ui::attr::control::Id id, const DString &strValu
         SetMarquee(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kMarqueeWidth:
-    case ui::attr::control::kMarqueewidth: {
+    case ui::attr::control::kMarqueeWidth: {
         SetMarqueeWidth(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kMarqueeStep:
-    case ui::attr::control::kMarqueestep: {
+    case ui::attr::control::kMarqueeStep: {
         SetMarqueeStep(StringUtil::StringToInt32(strValue), true);
         break;
     }

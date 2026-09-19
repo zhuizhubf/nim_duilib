@@ -57,13 +57,11 @@ bool RichTextImpl::SetAttribute(ui::attr::control::Id id, const DString &strValu
         SetFontId(strValue);
         break;
     }
-    case ui::attr::control::kTextColor:
-    case ui::attr::control::kNormalTextColor: {
+    case ui::attr::control::kTextColor: {
         SetTextColor(strValue);
         break;
     }
-    case ui::attr::control::kTextPadding:
-    case ui::attr::control::kTextpadding: {
+    case ui::attr::control::kTextPadding: {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding);
@@ -120,8 +118,7 @@ bool RichTextImpl::SetAttribute(ui::attr::control::Id id, const DString &strValu
         }
         break;
     }
-    case ui::attr::control::kTextId:
-    case ui::attr::control::kTextid: {
+    case ui::attr::control::kTextId: {
         SetTextId(strValue);
         break;
     }

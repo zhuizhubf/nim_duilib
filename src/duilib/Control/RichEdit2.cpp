@@ -152,13 +152,11 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
 {
     DString strValue = GetExpandVarStrings(strValue2);
     switch (id) {
-    case ui::attr::control::kSingleLine:
-    case ui::attr::control::kSingleline: {
+    case ui::attr::control::kSingleLine: {
         SetMultiLine(strValue != _T("true"));
         break;
     }
-    case ui::attr::control::kMultiLine:
-    case ui::attr::control::kMultiline: {
+    case ui::attr::control::kMultiLine: {
         SetMultiLine(StringUtil::IsValueTrue(strValue));
         break;
     }
@@ -221,44 +219,36 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         }
         break;
     }
-    case ui::attr::control::kTextPadding:
-    case ui::attr::control::kTextpadding: {
+    case ui::attr::control::kTextPadding: {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding, true);
         break;
     }
-    case ui::attr::control::kTextColor:
-    case ui::attr::control::kNormalTextColor:
-    case ui::attr::control::kNormaltextcolor: {
+    case ui::attr::control::kTextColor: {
         SetTextColor(strValue);
         break;
     }
-    case ui::attr::control::kDisabledTextColor:
-    case ui::attr::control::kDisabledtextcolor: {
+    case ui::attr::control::kDisabledTextColor: {
         SetDisabledTextColor(strValue);
         break;
     }
-    case ui::attr::control::kCaretColor:
-    case ui::attr::control::kCaretcolor: {
+    case ui::attr::control::kCaretColor: {
         //设置光标的颜色
         SetCaretColor(strValue);
         break;
     }
-    case ui::attr::control::kPromptMode:
-    case ui::attr::control::kPromptmode: {
+    case ui::attr::control::kPromptMode: {
         //提示模式
         SetPromptMode(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kPromptColor:
-    case ui::attr::control::kPromptcolor: {
+    case ui::attr::control::kPromptColor: {
         //提示文字的颜色
         SetPromptTextColor(strValue);
         break;
     }
-    case ui::attr::control::kPromptText:
-    case ui::attr::control::kPrompttext: {
+    case ui::attr::control::kPromptText: {
         //提示文字
         SetPromptText(strValue);
         break;
@@ -270,8 +260,7 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetPromptTextId(strValue);
         break;
     }
-    case ui::attr::control::kFocusedImage:
-    case ui::attr::control::kFocusedimage: {
+    case ui::attr::control::kFocusedImage: {
         SetFocusedImage(strValue);
         break;
     }
@@ -287,8 +276,7 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetText(strValue);
         break;
     }
-    case ui::attr::control::kTextId:
-    case ui::attr::control::kTextid: {
+    case ui::attr::control::kTextId: {
         DString strText = GlobalManager::Instance().Lang().GetStringByID(strValue);
         if (IsReplaceNewline()) {
             //将反斜杠+n这两个字符替换成换行符
@@ -297,26 +285,19 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetText(strText);
         break;
     }
-    case ui::attr::control::kWantTab:
-    case ui::attr::control::kWanttab: {
+    case ui::attr::control::kWantTab: {
         SetWantTab(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kWantReturn:
-    case ui::attr::control::kWantReturnMsg:
-    case ui::attr::control::kWantreturnmsg: {
+    case ui::attr::control::kWantReturn: {
         SetWantReturn(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kWantCtrlReturn:
-    case ui::attr::control::kReturnMsgWantCtrl:
-    case ui::attr::control::kReturnmsgwantctrl: {
+    case ui::attr::control::kWantCtrlReturn: {
         SetWantCtrlReturn(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kLimitText:
-    case ui::attr::control::kMaxChar:
-    case ui::attr::control::kMaxchar: {
+    case ui::attr::control::kLimitText: {
         //限制最多字符数
         SetLimitText(StringUtil::StringToInt32(strValue));
         break;
@@ -402,13 +383,11 @@ void RichEdit2::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetZoomPercent(nZoomPercent);
         break;
     }
-    case ui::attr::control::kAutoVscroll:
-    case ui::attr::control::kAutovscroll: {
+    case ui::attr::control::kAutoVscroll: {
         //当用户在最后一行按 ENTER 时，自动将文本向上滚动一页。
         break;
     }
-    case ui::attr::control::kAutoHscroll:
-    case ui::attr::control::kAutohscroll: {
+    case ui::attr::control::kAutoHscroll: {
         //当用户在行尾键入一个字符时，自动将文本向右滚动 10 个字符。
         //当用户按 Enter 时，控件会将所有文本滚动回零位置。
         break;

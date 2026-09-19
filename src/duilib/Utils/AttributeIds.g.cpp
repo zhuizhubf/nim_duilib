@@ -32,8 +32,8 @@ Id IdOf(const DString &strName)
         return Id::kPaintSelectedColors;
     case 0xFBE00531u: //scroll_select
         return Id::kScrollSelect;
-    case 0xD2056F94u: //scrollselect
-        return Id::kScrollselect;
+    case 0xD2056F94u: //scrollselect（别名，归一到 scroll_select）
+        return Id::kScrollSelect;
     case 0x50AE2588u: //select_next_when_active_removed
         return Id::kSelectNextWhenActiveRemoved;
     case 0xFF458ECFu: //frame_selection
@@ -54,50 +54,50 @@ Id IdOf(const DString &strName)
         return Id::kVscrollbar;
     case 0x8F685DFBu: //vscrollbar_style
         return Id::kVscrollbarStyle;
-    case 0x7F5A74AEu: //vscrollbarstyle
-        return Id::kVscrollbarstyle;
+    case 0x7F5A74AEu: //vscrollbarstyle（别名，归一到 vscrollbar_style）
+        return Id::kVscrollbarStyle;
     case 0x85B8ACF6u: //vscrollbar_class
         return Id::kVscrollbarClass;
     case 0x4101035Fu: //hscrollbar
         return Id::kHscrollbar;
     case 0x9BDA40E5u: //hscrollbar_style
         return Id::kHscrollbarStyle;
-    case 0xC2C03080u: //hscrollbarstyle
-        return Id::kHscrollbarstyle;
+    case 0xC2C03080u: //hscrollbarstyle（别名，归一到 hscrollbar_style）
+        return Id::kHscrollbarStyle;
     case 0x72013C18u: //hscrollbar_class
         return Id::kHscrollbarClass;
     case 0xCA79D1EBu: //scrollbar_padding
         return Id::kScrollbarPadding;
-    case 0x9E9FF992u: //scrollbarpadding
-        return Id::kScrollbarpadding;
+    case 0x9E9FF992u: //scrollbarpadding（别名，归一到 scrollbar_padding）
+        return Id::kScrollbarPadding;
     case 0xFB589697u: //vscroll_unit
         return Id::kVscrollUnit;
-    case 0x6DC07916u: //vscrollunit
-        return Id::kVscrollunit;
+    case 0x6DC07916u: //vscrollunit（别名，归一到 vscroll_unit）
+        return Id::kVscrollUnit;
     case 0x245D5151u: //hscroll_unit
         return Id::kHscrollUnit;
-    case 0xB9FDCCF0u: //hscrollunit
-        return Id::kHscrollunit;
+    case 0xB9FDCCF0u: //hscrollunit（别名，归一到 hscroll_unit）
+        return Id::kHscrollUnit;
     case 0xE2A526B0u: //scrollbar_float
         return Id::kScrollbarFloat;
-    case 0xB2A4D241u: //scrollbarfloat
-        return Id::kScrollbarfloat;
+    case 0xB2A4D241u: //scrollbarfloat（别名，归一到 scrollbar_float）
+        return Id::kScrollbarFloat;
     case 0xFC61EC73u: //vscrollbar_left
         return Id::kVscrollbarLeft;
-    case 0xDCE83188u: //vscrollbarleft
-        return Id::kVscrollbarleft;
+    case 0xDCE83188u: //vscrollbarleft（别名，归一到 vscrollbar_left）
+        return Id::kVscrollbarLeft;
     case 0xD4367E0Au: //hold_end
         return Id::kHoldEnd;
-    case 0xA06270DDu: //holdend
-        return Id::kHoldend;
+    case 0xA06270DDu: //holdend（别名，归一到 hold_end）
+        return Id::kHoldEnd;
     case 0x542B1E04u: //selected_id
         return Id::kSelectedId;
-    case 0x696178F9u: //selectedid
-        return Id::kSelectedid;
+    case 0x696178F9u: //selectedid（别名，归一到 selected_id）
+        return Id::kSelectedId;
     case 0xEE437CF0u: //fade_switch
         return Id::kFadeSwitch;
-    case 0xB7803243u: //fadeswitch
-        return Id::kFadeswitch;
+    case 0xB7803243u: //fadeswitch（别名，归一到 fade_switch）
+        return Id::kFadeSwitch;
     case 0xEC051ED5u: //fade_switch_type
         return Id::kFadeSwitchType;
     case 0x8A3E46DFu: //fade_switch_frame_interval_ms
@@ -160,12 +160,12 @@ Id IdOf(const DString &strName)
         return Id::kSelectedItemClass;
     case 0xE4B3054Fu: //dropbox_size
         return Id::kDropboxSize;
-    case 0x3F2A35BCu: //dropboxsize
-        return Id::kDropboxsize;
+    case 0x3F2A35BCu: //dropboxsize（别名，归一到 dropbox_size）
+        return Id::kDropboxSize;
     case 0xB75EC2D1u: //popup_top
         return Id::kPopupTop;
-    case 0xBF0F3414u: //popuptop
-        return Id::kPopuptop;
+    case 0xBF0F3414u: //popuptop（别名，归一到 popup_top）
+        return Id::kPopupTop;
     case 0xD5BDBB42u: //height
         return Id::kHeight;
     case 0xB1B4685Au: //shadow_type
@@ -176,8 +176,8 @@ Id IdOf(const DString &strName)
         return Id::kCircular;
     case 0x9C2D035Eu: //circle_width
         return Id::kCircleWidth;
-    case 0x8907F8E3u: //circlewidth
-        return Id::kCirclewidth;
+    case 0x8907F8E3u: //circlewidth（别名，归一到 circle_width）
+        return Id::kCircleWidth;
     case 0x04AD815Eu: //indicator
         return Id::kIndicator;
     case 0x53980915u: //clockwise
@@ -188,8 +188,8 @@ Id IdOf(const DString &strName)
         return Id::kFgcolor;
     case 0xAA23AEF1u: //gradient_color
         return Id::kGradientColor;
-    case 0x686EA4B8u: //gradientcolor
-        return Id::kGradientcolor;
+    case 0x686EA4B8u: //gradientcolor（别名，归一到 gradient_color）
+        return Id::kGradientColor;
     case 0x93DC7806u: //cursor_file
         return Id::kCursorFile;
     case 0xE821108Du: //color_type
@@ -248,58 +248,58 @@ Id IdOf(const DString &strName)
         return Id::kTextAlign;
     case 0xA5C431FCu: //end_ellipsis
         return Id::kEndEllipsis;
-    case 0xA3D09645u: //endellipsis
-        return Id::kEndellipsis;
+    case 0xA3D09645u: //endellipsis（别名，归一到 end_ellipsis）
+        return Id::kEndEllipsis;
     case 0xC0B426D0u: //path_ellipsis
         return Id::kPathEllipsis;
-    case 0x84448139u: //pathellipsis
-        return Id::kPathellipsis;
+    case 0x84448139u: //pathellipsis（别名，归一到 path_ellipsis）
+        return Id::kPathEllipsis;
     case 0x0A74C270u: //single_line
         return Id::kSingleLine;
-    case 0xD5A2F4B3u: //singleline
-        return Id::kSingleline;
+    case 0xD5A2F4B3u: //singleline（别名，归一到 single_line）
+        return Id::kSingleLine;
     case 0xAA937CA5u: //multi_line
         return Id::kMultiLine;
-    case 0x2419AFA0u: //multiline
-        return Id::kMultiline;
+    case 0x2419AFA0u: //multiline（别名，归一到 multi_line）
+        return Id::kMultiLine;
     case 0xBDE64E3Eu: //text
         return Id::kText;
     case 0x7ACD9B7Eu: //text_id
         return Id::kTextId;
-    case 0xC778FA43u: //textid
-        return Id::kTextid;
+    case 0xC778FA43u: //textid（别名，归一到 text_id）
+        return Id::kTextId;
     case 0xA2E409AAu: //auto_tooltip
         return Id::kAutoTooltip;
-    case 0xA47B3F0Du: //autotooltip
-        return Id::kAutotooltip;
+    case 0xA47B3F0Du: //autotooltip（别名，归一到 auto_tooltip）
+        return Id::kAutoTooltip;
     case 0x274E1290u: //font
         return Id::kFont;
     case 0xA74C1692u: //text_color
         return Id::kTextColor;
     case 0x95591870u: //normal_text_color
         return Id::kNormalTextColor;
-    case 0x2BC4C61Cu: //normaltextcolor
-        return Id::kNormaltextcolor;
+    case 0x2BC4C61Cu: //normaltextcolor（别名，归一到 normal_text_color）
+        return Id::kNormalTextColor;
     case 0xEFFBEBB6u: //hovered_text_color
         return Id::kHoveredTextColor;
     case 0xAC86A296u: //hot_text_color
         return Id::kHotTextColor;
-    case 0x49ED93A2u: //hottextcolor
-        return Id::kHottextcolor;
+    case 0x49ED93A2u: //hottextcolor（别名，归一到 hot_text_color）
+        return Id::kHotTextColor;
     case 0x3421EAF9u: //pressed_text_color
         return Id::kPressedTextColor;
     case 0x8E9ACB86u: //pushed_text_color
         return Id::kPushedTextColor;
-    case 0xF2C58E52u: //pushedtextcolor
-        return Id::kPushedtextcolor;
+    case 0xF2C58E52u: //pushedtextcolor（别名，归一到 pushed_text_color）
+        return Id::kPushedTextColor;
     case 0x732B9F59u: //disabled_text_color
         return Id::kDisabledTextColor;
-    case 0x04E4DBE1u: //disabledtextcolor
-        return Id::kDisabledtextcolor;
+    case 0x04E4DBE1u: //disabledtextcolor（别名，归一到 disabled_text_color）
+        return Id::kDisabledTextColor;
     case 0x5E9F4868u: //text_padding
         return Id::kTextPadding;
-    case 0xD4CBDF2Fu: //textpadding
-        return Id::kTextpadding;
+    case 0xD4CBDF2Fu: //textpadding（别名，归一到 text_padding）
+        return Id::kTextPadding;
     case 0xCF3B0DE0u: //replace_newline
         return Id::kReplaceNewline;
     case 0xF4132023u: //spacing_mul
@@ -408,28 +408,28 @@ Id IdOf(const DString &strName)
         return Id::kValue;
     case 0x56BC98A0u: //progress_image
         return Id::kProgressImage;
-    case 0xCC819F2Bu: //progressimage
-        return Id::kProgressimage;
+    case 0xCC819F2Bu: //progressimage（别名，归一到 progress_image）
+        return Id::kProgressImage;
     case 0x211FCDBBu: //stretch_fore_image
         return Id::kStretchForeImage;
     case 0x4DF158A2u: //is_stretch_fore
         return Id::kIsStretchFore;
-    case 0xC3634E44u: //isstretchfore
-        return Id::kIsstretchfore;
+    case 0xC3634E44u: //isstretchfore（别名，归一到 is_stretch_fore）
+        return Id::kIsStretchFore;
     case 0x1CD8603Au: //progress_color
         return Id::kProgressColor;
-    case 0x395FB3A9u: //progresscolor
-        return Id::kProgresscolor;
+    case 0x395FB3A9u: //progresscolor（别名，归一到 progress_color）
+        return Id::kProgressColor;
     case 0x02ACE84Bu: //marquee
         return Id::kMarquee;
     case 0x3171E7C8u: //marquee_width
         return Id::kMarqueeWidth;
-    case 0x2667884Du: //marqueewidth
-        return Id::kMarqueewidth;
+    case 0x2667884Du: //marqueewidth（别名，归一到 marquee_width）
+        return Id::kMarqueeWidth;
     case 0xC67C576Eu: //marquee_step
         return Id::kMarqueeStep;
-    case 0xE8C72E29u: //marqueestep
-        return Id::kMarqueestep;
+    case 0xE8C72E29u: //marqueestep（别名，归一到 marquee_step）
+        return Id::kMarqueeStep;
     case 0x21506C05u: //reverse
         return Id::kReverse;
     case 0x33D51DE7u: //property_grid_xml
@@ -472,20 +472,20 @@ Id IdOf(const DString &strName)
         return Id::kNumberFormat;
     case 0x2882C428u: //caret_color
         return Id::kCaretColor;
-    case 0xCF4CF1FFu: //caretcolor
-        return Id::kCaretcolor;
+    case 0xCF4CF1FFu: //caretcolor（别名，归一到 caret_color）
+        return Id::kCaretColor;
     case 0xBA66A50Fu: //prompt_mode
         return Id::kPromptMode;
-    case 0xEC8D1D64u: //promptmode
-        return Id::kPromptmode;
+    case 0xEC8D1D64u: //promptmode（别名，归一到 prompt_mode）
+        return Id::kPromptMode;
     case 0x3DF6AA33u: //prompt_color
         return Id::kPromptColor;
-    case 0x93068D9Au: //promptcolor
-        return Id::kPromptcolor;
+    case 0x93068D9Au: //promptcolor（别名，归一到 prompt_color）
+        return Id::kPromptColor;
     case 0x4DC331ABu: //prompt_text
         return Id::kPromptText;
-    case 0x40F3DBCCu: //prompttext
-        return Id::kPrompttext;
+    case 0x40F3DBCCu: //prompttext（别名，归一到 prompt_text）
+        return Id::kPromptText;
     case 0x9031F911u: //prompt_text_id
         return Id::kPromptTextId;
     case 0xB6493F26u: //prompt_textid
@@ -494,30 +494,30 @@ Id IdOf(const DString &strName)
         return Id::kPrompttextid;
     case 0x4F46186Cu: //focused_image
         return Id::kFocusedImage;
-    case 0x794F10B7u: //focusedimage
-        return Id::kFocusedimage;
+    case 0x794F10B7u: //focusedimage（别名，归一到 focused_image）
+        return Id::kFocusedImage;
     case 0x4A22DE4Fu: //want_tab
         return Id::kWantTab;
-    case 0xF37B5B26u: //wanttab
-        return Id::kWanttab;
+    case 0xF37B5B26u: //wanttab（别名，归一到 want_tab）
+        return Id::kWantTab;
     case 0x05AF06F6u: //want_return
         return Id::kWantReturn;
     case 0xA014BE3Cu: //want_return_msg
         return Id::kWantReturnMsg;
-    case 0xE64E72CAu: //wantreturnmsg
-        return Id::kWantreturnmsg;
+    case 0xE64E72CAu: //wantreturnmsg（别名，归一到 want_return_msg）
+        return Id::kWantReturnMsg;
     case 0xE0150E5Cu: //want_ctrl_return
         return Id::kWantCtrlReturn;
     case 0x1BD4273Cu: //return_msg_want_ctrl
         return Id::kReturnMsgWantCtrl;
-    case 0x1A728717u: //returnmsgwantctrl
-        return Id::kReturnmsgwantctrl;
+    case 0x1A728717u: //returnmsgwantctrl（别名，归一到 return_msg_want_ctrl）
+        return Id::kReturnMsgWantCtrl;
     case 0x7F900142u: //limit_text
         return Id::kLimitText;
     case 0xC2E9BC66u: //max_char
         return Id::kMaxChar;
-    case 0x1902D821u: //maxchar
-        return Id::kMaxchar;
+    case 0x1902D821u: //maxchar（别名，归一到 max_char）
+        return Id::kMaxChar;
     case 0xD9D7502Eu: //limit_chars
         return Id::kLimitChars;
     case 0x363BBB42u: //word_wrap
@@ -546,12 +546,12 @@ Id IdOf(const DString &strName)
         return Id::kZoom;
     case 0xF3BD77D6u: //auto_vscroll
         return Id::kAutoVscroll;
-    case 0x674175F1u: //autovscroll
-        return Id::kAutovscroll;
+    case 0x674175F1u: //autovscroll（别名，归一到 auto_vscroll）
+        return Id::kAutoVscroll;
     case 0x4C91E398u: //auto_hscroll
         return Id::kAutoHscroll;
-    case 0x23AB8B43u: //autohscroll
-        return Id::kAutohscroll;
+    case 0x23AB8B43u: //autohscroll（别名，归一到 auto_hscroll）
+        return Id::kAutoHscroll;
     case 0x1252D727u: //rich
         return Id::kRich;
     case 0x8C6123CAu: //auto_detect_url
@@ -598,32 +598,32 @@ Id IdOf(const DString &strName)
         return Id::kStep;
     case 0x90C00B85u: //thumb_normal_image
         return Id::kThumbNormalImage;
-    case 0x9EFD80A9u: //thumbnormalimage
-        return Id::kThumbnormalimage;
+    case 0x9EFD80A9u: //thumbnormalimage（别名，归一到 thumb_normal_image）
+        return Id::kThumbNormalImage;
     case 0x47791675u: //thumb_hovered_image
         return Id::kThumbHoveredImage;
     case 0x7B437A2Du: //thumb_hot_image
         return Id::kThumbHotImage;
-    case 0xF6A6593Fu: //thumbhotimage
-        return Id::kThumbhotimage;
+    case 0xF6A6593Fu: //thumbhotimage（别名，归一到 thumb_hot_image）
+        return Id::kThumbHotImage;
     case 0x821AD674u: //thumb_pressed_image
         return Id::kThumbPressedImage;
     case 0x62A5F5DFu: //thumb_pushed_image
         return Id::kThumbPushedImage;
-    case 0xDF729DFBu: //thumbpushedimage
-        return Id::kThumbpushedimage;
+    case 0xDF729DFBu: //thumbpushedimage（别名，归一到 thumb_pushed_image）
+        return Id::kThumbPushedImage;
     case 0x96264A7Eu: //thumb_disabled_image
         return Id::kThumbDisabledImage;
-    case 0xBBEC1628u: //thumbdisabledimage
-        return Id::kThumbdisabledimage;
+    case 0xBBEC1628u: //thumbdisabledimage（别名，归一到 thumb_disabled_image）
+        return Id::kThumbDisabledImage;
     case 0x023175ADu: //thumb_size
         return Id::kThumbSize;
-    case 0xD3E01A62u: //thumbsize
-        return Id::kThumbsize;
+    case 0xD3E01A62u: //thumbsize（别名，归一到 thumb_size）
+        return Id::kThumbSize;
     case 0xDC01E67Au: //progress_bar_padding
         return Id::kProgressBarPadding;
-    case 0x8259FCDCu: //progressbarpadding
-        return Id::kProgressbarpadding;
+    case 0x8259FCDCu: //progressbarpadding（别名，归一到 progress_bar_padding）
+        return Id::kProgressBarPadding;
     case 0x8C219EC0u: //tab_box_name
         return Id::kTabBoxName;
     case 0xC9D18F6Cu: //drag_order
@@ -702,8 +702,8 @@ Id IdOf(const DString &strName)
         return Id::kShowIcon;
     case 0x4606CAB1u: //mouse_child
         return Id::kMouseChild;
-    case 0xBF5DE7F2u: //mousechild
-        return Id::kMousechild;
+    case 0xBF5DE7F2u: //mousechild（别名，归一到 mouse_child）
+        return Id::kMouseChild;
     case 0x6C5106A0u: //drag_out_id
         return Id::kDragOutId;
     case 0x460FA622u: //drop_in_id
@@ -734,52 +734,52 @@ Id IdOf(const DString &strName)
         return Id::kForeColor;
     case 0x53B4B849u: //border_size
         return Id::kBorderSize;
-    case 0xCE89D74Eu: //bordersize
-        return Id::kBordersize;
+    case 0xCE89D74Eu: //bordersize（别名，归一到 border_size）
+        return Id::kBorderSize;
     case 0x61307092u: //border_dash_style
         return Id::kBorderDashStyle;
     case 0x64C40180u: //borders_on_top
         return Id::kBordersOnTop;
     case 0x9E59B620u: //border_round
         return Id::kBorderRound;
-    case 0x2DFD7D25u: //borderround
-        return Id::kBorderround;
+    case 0x2DFD7D25u: //borderround（别名，归一到 border_round）
+        return Id::kBorderRound;
     case 0x4B00B2BFu: //box_shadow
         return Id::kBoxShadow;
-    case 0x2C1DD9CAu: //boxshadow
-        return Id::kBoxshadow;
+    case 0x2C1DD9CAu: //boxshadow（别名，归一到 box_shadow）
+        return Id::kBoxShadow;
     case 0x95876E1Fu: //width
         return Id::kWidth;
     case 0x783132F6u: //state
         return Id::kState;
     case 0x4D4150F8u: //cursor_type
         return Id::kCursorType;
-    case 0x53CF22F7u: //cursortype
-        return Id::kCursortype;
+    case 0x53CF22F7u: //cursortype（别名，归一到 cursor_type）
+        return Id::kCursorType;
     case 0xC543CCB1u: //render_offset
         return Id::kRenderOffset;
-    case 0x7703E402u: //renderoffset
-        return Id::kRenderoffset;
+    case 0x7703E402u: //renderoffset（别名，归一到 render_offset）
+        return Id::kRenderOffset;
     case 0x1E43B3C6u: //normal_color
         return Id::kNormalColor;
-    case 0xB9D69A25u: //normalcolor
-        return Id::kNormalcolor;
+    case 0xB9D69A25u: //normalcolor（别名，归一到 normal_color）
+        return Id::kNormalColor;
     case 0xD38C7ED4u: //hovered_color
         return Id::kHoveredColor;
     case 0xF68C6B74u: //hot_color
         return Id::kHotColor;
-    case 0x29CE06FBu: //hotcolor
-        return Id::kHotcolor;
+    case 0x29CE06FBu: //hotcolor（别名，归一到 hot_color）
+        return Id::kHotColor;
     case 0x33B9CE71u: //pressed_color
         return Id::kPressedColor;
     case 0x07BC1C84u: //pushed_color
         return Id::kPushedColor;
-    case 0xA5E4EF0Bu: //pushedcolor
-        return Id::kPushedcolor;
+    case 0xA5E4EF0Bu: //pushedcolor（别名，归一到 pushed_color）
+        return Id::kPushedColor;
     case 0xF2F34C91u: //disabled_color
         return Id::kDisabledColor;
-    case 0x838EB598u: //disabledcolor
-        return Id::kDisabledcolor;
+    case 0x838EB598u: //disabledcolor（别名，归一到 disabled_color）
+        return Id::kDisabledColor;
     case 0xB63B4BADu: //normal_color_margin
         return Id::kNormalColorMargin;
     case 0x4A46659Fu: //hovered_color_margin
@@ -810,8 +810,8 @@ Id IdOf(const DString &strName)
         return Id::kDisabledColorRound;
     case 0x94C31ACFu: //border_color
         return Id::kBorderColor;
-    case 0x625B5B86u: //bordercolor
-        return Id::kBordercolor;
+    case 0x625B5B86u: //bordercolor（别名，归一到 border_color）
+        return Id::kBorderColor;
     case 0x608D53CDu: //normal_border_color
         return Id::kNormalBorderColor;
     case 0x8FB91013u: //hovered_border_color
@@ -830,44 +830,44 @@ Id IdOf(const DString &strName)
         return Id::kFocusBorderColor;
     case 0x63FE3091u: //left_border_size
         return Id::kLeftBorderSize;
-    case 0x85B0742Fu: //leftbordersize
-        return Id::kLeftbordersize;
+    case 0x85B0742Fu: //leftbordersize（别名，归一到 left_border_size）
+        return Id::kLeftBorderSize;
     case 0xFB195DBDu: //top_border_size
         return Id::kTopBorderSize;
-    case 0x2F18DA3Bu: //topbordersize
-        return Id::kTopbordersize;
+    case 0x2F18DA3Bu: //topbordersize（别名，归一到 top_border_size）
+        return Id::kTopBorderSize;
     case 0xB89C1308u: //right_border_size
         return Id::kRightBorderSize;
-    case 0xEC65A96Eu: //rightbordersize
-        return Id::kRightbordersize;
+    case 0xEC65A96Eu: //rightbordersize（别名，归一到 right_border_size）
+        return Id::kRightBorderSize;
     case 0x5C84A34Bu: //bottom_border_size
         return Id::kBottomBorderSize;
-    case 0xCBBB9C21u: //bottombordersize
-        return Id::kBottombordersize;
+    case 0xCBBB9C21u: //bottombordersize（别名，归一到 bottom_border_size）
+        return Id::kBottomBorderSize;
     case 0x1AA2391Fu: //bkimage
         return Id::kBkimage;
     case 0x8CCB3D54u: //min_width
         return Id::kMinWidth;
-    case 0x5514FC59u: //minwidth
-        return Id::kMinwidth;
+    case 0x5514FC59u: //minwidth（别名，归一到 min_width）
+        return Id::kMinWidth;
     case 0x40C08F4Eu: //max_width
         return Id::kMaxWidth;
-    case 0xB8BFA853u: //maxwidth
-        return Id::kMaxwidth;
+    case 0xB8BFA853u: //maxwidth（别名，归一到 max_width）
+        return Id::kMaxWidth;
     case 0x72BD9403u: //min_height
         return Id::kMinHeight;
-    case 0x5F92C5C8u: //minheight
-        return Id::kMinheight;
+    case 0x5F92C5C8u: //minheight（别名，归一到 min_height）
+        return Id::kMinHeight;
     case 0xB37541C1u: //max_height
         return Id::kMaxHeight;
-    case 0x6B9EE08Eu: //maxheight
-        return Id::kMaxheight;
+    case 0x6B9EE08Eu: //maxheight（别名，归一到 max_height）
+        return Id::kMaxHeight;
     case 0x8D39BDE6u: //name
         return Id::kName;
     case 0x95446FA6u: //tooltip_text
         return Id::kTooltipText;
-    case 0x2F7A1C87u: //tooltiptext
-        return Id::kTooltiptext;
+    case 0x2F7A1C87u: //tooltiptext（别名，归一到 tooltip_text）
+        return Id::kTooltipText;
     case 0xC2097B36u: //tooltip_text_id
         return Id::kTooltipTextId;
     case 0x4BF8493Bu: //tooltip_textid
@@ -878,8 +878,8 @@ Id IdOf(const DString &strName)
         return Id::kTooltipWidth;
     case 0x89D607D3u: //data_id
         return Id::kDataId;
-    case 0xB0CC69C0u: //dataid
-        return Id::kDataid;
+    case 0xB0CC69C0u: //dataid（别名，归一到 data_id）
+        return Id::kDataId;
     case 0x84872F7Du: //user_data_id
         return Id::kUserDataId;
     case 0xF728BF12u: //user_dataid
@@ -898,8 +898,8 @@ Id IdOf(const DString &strName)
         return Id::kVisible;
     case 0xABFDE986u: //fade_visible
         return Id::kFadeVisible;
-    case 0x2836FA57u: //fadevisible
-        return Id::kFadevisible;
+    case 0x2836FA57u: //fadevisible（别名，归一到 fade_visible）
+        return Id::kFadeVisible;
     case 0xA6C45D85u: //float
         return Id::kFloat;
     case 0x4A523E04u: //keep_float_pos
@@ -908,60 +908,60 @@ Id IdOf(const DString &strName)
         return Id::kCache;
     case 0x3E379DE1u: //no_focus
         return Id::kNoFocus;
-    case 0x1AEB97EEu: //nofocus
-        return Id::kNofocus;
+    case 0x1AEB97EEu: //nofocus（别名，归一到 no_focus）
+        return Id::kNoFocus;
     case 0x5D8B6DABu: //alpha
         return Id::kAlpha;
     case 0x392DD06Cu: //normal_image
         return Id::kNormalImage;
-    case 0xC57B78B7u: //normalimage
-        return Id::kNormalimage;
+    case 0xC57B78B7u: //normalimage（别名，归一到 normal_image）
+        return Id::kNormalImage;
     case 0x781CF0A6u: //hovered_image
         return Id::kHoveredImage;
     case 0x9B1E7046u: //hot_image
         return Id::kHotImage;
-    case 0xBB4D1F81u: //hotimage
-        return Id::kHotimage;
+    case 0xBB4D1F81u: //hotimage（别名，归一到 hot_image）
+        return Id::kHotImage;
     case 0x9CFBD723u: //pressed_image
         return Id::kPressedImage;
     case 0xE540DD76u: //pushed_image
         return Id::kPushedImage;
-    case 0xDC21FF31u: //pushedimage
-        return Id::kPushedimage;
+    case 0xDC21FF31u: //pushedimage（别名，归一到 pushed_image）
+        return Id::kPushedImage;
     case 0x75820A43u: //disabled_image
         return Id::kDisabledImage;
-    case 0xF961893Au: //disabledimage
-        return Id::kDisabledimage;
+    case 0xF961893Au: //disabledimage（别名，归一到 disabled_image）
+        return Id::kDisabledImage;
     case 0xDCA1B111u: //fore_normal_image
         return Id::kForeNormalImage;
-    case 0x1F879725u: //forenormalimage
-        return Id::kForenormalimage;
+    case 0x1F879725u: //forenormalimage（别名，归一到 fore_normal_image）
+        return Id::kForeNormalImage;
     case 0x37AC3DF1u: //fore_hovered_image
         return Id::kForeHoveredImage;
     case 0xE2557D61u: //fore_hot_image
         return Id::kForeHotImage;
-    case 0x8F019D53u: //forehotimage
-        return Id::kForehotimage;
+    case 0x8F019D53u: //forehotimage（别名，归一到 fore_hot_image）
+        return Id::kForeHotImage;
     case 0xFC13C760u: //fore_pressed_image
         return Id::kForePressedImage;
     case 0x5741CA03u: //fore_pushed_image
         return Id::kForePushedImage;
-    case 0x0709439Fu: //forepushedimage
-        return Id::kForepushedimage;
+    case 0x0709439Fu: //forepushedimage（别名，归一到 fore_pushed_image）
+        return Id::kForePushedImage;
     case 0xF3B954BAu: //fore_disabled_image
         return Id::kForeDisabledImage;
-    case 0x88BC9D24u: //foredisabledimage
-        return Id::kForedisabledimage;
+    case 0x88BC9D24u: //foredisabledimage（别名，归一到 fore_disabled_image）
+        return Id::kForeDisabledImage;
     case 0x58681118u: //fade_alpha
         return Id::kFadeAlpha;
-    case 0x51C2E1D5u: //fadealpha
-        return Id::kFadealpha;
+    case 0x51C2E1D5u: //fadealpha（别名，归一到 fade_alpha）
+        return Id::kFadeAlpha;
     case 0x50F89AB7u: //fade_hovered
         return Id::kFadeHovered;
     case 0x6B51AAFFu: //fade_hot
         return Id::kFadeHot;
-    case 0xC1A9429Au: //fadehot
-        return Id::kFadehot;
+    case 0xC1A9429Au: //fadehot（别名，归一到 fade_hot）
+        return Id::kFadeHot;
     case 0x776CAAD0u: //fade_hovered_frame_interval_ms
         return Id::kFadeHoveredFrameIntervalMs;
     case 0x0282D1B8u: //fade_hot_frame_interval_ms
@@ -976,30 +976,30 @@ Id IdOf(const DString &strName)
         return Id::kFadeHotEasingFunction;
     case 0x6748D1A0u: //fade_width
         return Id::kFadeWidth;
-    case 0xF0653125u: //fadewidth
-        return Id::kFadewidth;
+    case 0xF0653125u: //fadewidth（别名，归一到 fade_width）
+        return Id::kFadeWidth;
     case 0xD6B9A2D7u: //fade_height
         return Id::kFadeHeight;
-    case 0x8C3A89FCu: //fadeheight
-        return Id::kFadeheight;
+    case 0x8C3A89FCu: //fadeheight（别名，归一到 fade_height）
+        return Id::kFadeHeight;
     case 0xF82C585Du: //fade_size
         return Id::kFadeSize;
     case 0xD56F1938u: //fade_in_out_x_from_left
         return Id::kFadeInOutXFromLeft;
-    case 0xAACDA20Du: //fadeinoutxfromleft
-        return Id::kFadeinoutxfromleft;
+    case 0xAACDA20Du: //fadeinoutxfromleft（别名，归一到 fade_in_out_x_from_left）
+        return Id::kFadeInOutXFromLeft;
     case 0x7ABFCD8Du: //fade_in_out_x_from_right
         return Id::kFadeInOutXFromRight;
-    case 0x820922C6u: //fadeinoutxfromright
-        return Id::kFadeinoutxfromright;
+    case 0x820922C6u: //fadeinoutxfromright（别名，归一到 fade_in_out_x_from_right）
+        return Id::kFadeInOutXFromRight;
     case 0xEB7356DDu: //fade_in_out_y_from_top
         return Id::kFadeInOutYFromTop;
-    case 0xE065D3F2u: //fadeinoutyfromtop
-        return Id::kFadeinoutyfromtop;
+    case 0xE065D3F2u: //fadeinoutyfromtop（别名，归一到 fade_in_out_y_from_top）
+        return Id::kFadeInOutYFromTop;
     case 0x92CEA119u: //fade_in_out_y_from_bottom
         return Id::kFadeInOutYFromBottom;
-    case 0x8FF6AFF4u: //fadeinoutyfrombottom
-        return Id::kFadeinoutyfrombottom;
+    case 0x8FF6AFF4u: //fadeinoutyfrombottom（别名，归一到 fade_in_out_y_from_bottom）
+        return Id::kFadeInOutYFromBottom;
     case 0x4347769Cu: //fade_frame_interval_ms
         return Id::kFadeFrameIntervalMs;
     case 0x8AFBA643u: //fade_total_ms
@@ -1008,8 +1008,8 @@ Id IdOf(const DString &strName)
         return Id::kFadeEasingFunction;
     case 0x120C71D9u: //tab_stop
         return Id::kTabStop;
-    case 0xF6237084u: //tabstop
-        return Id::kTabstop;
+    case 0xF6237084u: //tabstop（别名，归一到 tab_stop）
+        return Id::kTabStop;
     case 0x68CC88B7u: //loading
         return Id::kLoading;
     case 0xB27FECDDu: //show_focused_rect
@@ -1044,160 +1044,160 @@ Id IdOf(const DString &strName)
         return Id::kColSpan;
     case 0x482BAC04u: //button1_normal_image
         return Id::kButton1NormalImage;
-    case 0x8B856D38u: //button1normalimage
-        return Id::kButton1normalimage;
+    case 0x8B856D38u: //button1normalimage（别名，归一到 button1_normal_image）
+        return Id::kButton1NormalImage;
     case 0x902AFD2Eu: //button1_hovered_image
         return Id::kButton1HoveredImage;
     case 0x43A552AEu: //button1_hot_image
         return Id::kButton1HotImage;
-    case 0x681EC1E8u: //button1hotimage
-        return Id::kButton1hotimage;
+    case 0x681EC1E8u: //button1hotimage（别名，归一到 button1_hot_image）
+        return Id::kButton1HotImage;
     case 0x812E472Bu: //button1_pressed_image
         return Id::kButton1PressedImage;
     case 0xF271FF9Eu: //button1_pushed_image
         return Id::kButton1PushedImage;
-    case 0xFF4951AAu: //button1pushedimage
-        return Id::kButton1pushedimage;
+    case 0xFF4951AAu: //button1pushedimage（别名，归一到 button1_pushed_image）
+        return Id::kButton1PushedImage;
     case 0xFB2FE4BBu: //button1_disabled_image
         return Id::kButton1DisabledImage;
-    case 0xD618CBB5u: //button1disabledimage
-        return Id::kButton1disabledimage;
+    case 0xD618CBB5u: //button1disabledimage（别名，归一到 button1_disabled_image）
+        return Id::kButton1DisabledImage;
     case 0x0C9AA8AFu: //button2_normal_image
         return Id::kButton2NormalImage;
-    case 0x21488F4Bu: //button2normalimage
-        return Id::kButton2normalimage;
+    case 0x21488F4Bu: //button2normalimage（别名，归一到 button2_normal_image）
+        return Id::kButton2NormalImage;
     case 0x923AAF63u: //button2_hovered_image
         return Id::kButton2HoveredImage;
     case 0x4BB52743u: //button2_hot_image
         return Id::kButton2HotImage;
-    case 0x2C809D0Du: //button2hotimage
-        return Id::kButton2hotimage;
+    case 0x2C809D0Du: //button2hotimage（别名，归一到 button2_hot_image）
+        return Id::kButton2HotImage;
     case 0x8150F28Au: //button2_pressed_image
         return Id::kButton2PressedImage;
     case 0x4B1EE9E1u: //button2_pushed_image
         return Id::kButton2PushedImage;
-    case 0x2E92AECDu: //button2pushedimage
-        return Id::kButton2pushedimage;
+    case 0x2E92AECDu: //button2pushedimage（别名，归一到 button2_pushed_image）
+        return Id::kButton2PushedImage;
     case 0xF7160F34u: //button2_disabled_image
         return Id::kButton2DisabledImage;
-    case 0xF006A83Eu: //button2disabledimage
-        return Id::kButton2disabledimage;
+    case 0xF006A83Eu: //button2disabledimage（别名，归一到 button2_disabled_image）
+        return Id::kButton2DisabledImage;
     case 0x99AAB32Fu: //rail_normal_image
         return Id::kRailNormalImage;
-    case 0x944DF5CBu: //railnormalimage
-        return Id::kRailnormalimage;
+    case 0x944DF5CBu: //railnormalimage（别名，归一到 rail_normal_image）
+        return Id::kRailNormalImage;
     case 0x227B36E3u: //rail_hovered_image
         return Id::kRailHoveredImage;
     case 0x553436C3u: //rail_hot_image
         return Id::kRailHotImage;
-    case 0x0A2A408Du: //railhotimage
-        return Id::kRailhotimage;
+    case 0x0A2A408Du: //railhotimage（别名，归一到 rail_hot_image）
+        return Id::kRailHotImage;
     case 0x11917A0Au: //rail_pressed_image
         return Id::kRailPressedImage;
     case 0xD82EF461u: //rail_pushed_image
         return Id::kRailPushedImage;
-    case 0xA198154Du: //railpushedimage
-        return Id::kRailpushedimage;
+    case 0xA198154Du: //railpushedimage（别名，归一到 rail_pushed_image）
+        return Id::kRailPushedImage;
     case 0x8CAB5DB4u: //rail_disabled_image
         return Id::kRailDisabledImage;
-    case 0x7D16B2BEu: //raildisabledimage
-        return Id::kRaildisabledimage;
+    case 0x7D16B2BEu: //raildisabledimage（别名，归一到 rail_disabled_image）
+        return Id::kRailDisabledImage;
     case 0x554BFC7Au: //bk_normal_image
         return Id::kBkNormalImage;
-    case 0x3FA0187Eu: //bknormalimage
-        return Id::kBknormalimage;
+    case 0x3FA0187Eu: //bknormalimage（别名，归一到 bk_normal_image）
+        return Id::kBkNormalImage;
     case 0x85CFC718u: //bk_hovered_image
         return Id::kBkHoveredImage;
     case 0xF67D0F88u: //bk_hot_image
         return Id::kBkHotImage;
-    case 0x709AD532u: //bkhotimage
-        return Id::kBkhotimage;
+    case 0x709AD532u: //bkhotimage（别名，归一到 bk_hot_image）
+        return Id::kBkHotImage;
     case 0xB1C53495u: //bk_pressed_image
         return Id::kBkPressedImage;
     case 0x2A87ABF4u: //bk_pushed_image
         return Id::kBkPushedImage;
-    case 0x1B2A6A50u: //bkpushedimage
-        return Id::kBkpushedimage;
+    case 0x1B2A6A50u: //bkpushedimage（别名，归一到 bk_pushed_image）
+        return Id::kBkPushedImage;
     case 0x80CD8E1Du: //bk_disabled_image
         return Id::kBkDisabledImage;
-    case 0x51C59FC7u: //bkdisabledimage
-        return Id::kBkdisabledimage;
+    case 0x51C59FC7u: //bkdisabledimage（别名，归一到 bk_disabled_image）
+        return Id::kBkDisabledImage;
     case 0xB200BCB9u: //line_size
         return Id::kLineSize;
-    case 0x79C19C3Eu: //linesize
-        return Id::kLinesize;
+    case 0x79C19C3Eu: //linesize（别名，归一到 line_size）
+        return Id::kLineSize;
     case 0xB3681E65u: //thumb_min_length
         return Id::kThumbMinLength;
-    case 0x83547685u: //thumbminlength
-        return Id::kThumbminlength;
+    case 0x83547685u: //thumbminlength（别名，归一到 thumb_min_length）
+        return Id::kThumbMinLength;
     case 0xFADC0CD2u: //range
         return Id::kRange;
     case 0xD1ACD534u: //show_button1
         return Id::kShowButton1;
-    case 0x14B64B8Bu: //showbutton1
-        return Id::kShowbutton1;
+    case 0x14B64B8Bu: //showbutton1（别名，归一到 show_button1）
+        return Id::kShowButton1;
     case 0xD4ACD9EDu: //show_button2
         return Id::kShowButton2;
-    case 0x15B64D1Eu: //showbutton2
-        return Id::kShowbutton2;
+    case 0x15B64D1Eu: //showbutton2（别名，归一到 show_button2）
+        return Id::kShowButton2;
     case 0xED039CA5u: //auto_hide_scroll
         return Id::kAutoHideScroll;
-    case 0x5C6C1307u: //autohidescroll
-        return Id::kAutohidescroll;
+    case 0x5C6C1307u: //autohidescroll（别名，归一到 auto_hide_scroll）
+        return Id::kAutoHideScroll;
     case 0x4E0A1774u: //selected
         return Id::kSelected;
     case 0x5FF6ED72u: //switch_select
         return Id::kSwitchSelect;
-    case 0x65EC7389u: //switchselect
-        return Id::kSwitchselect;
+    case 0x65EC7389u: //switchselect（别名，归一到 switch_select）
+        return Id::kSwitchSelect;
     case 0x34650B2Bu: //support_check_Mode
         return Id::kSupportCheckMode;
     case 0xA13BF074u: //auto_select_check
         return Id::kAutoSelectCheck;
     case 0x9C1ADF73u: //normal_first
         return Id::kNormalFirst;
-    case 0xD062F558u: //normalfirst
-        return Id::kNormalfirst;
+    case 0xD062F558u: //normalfirst（别名，归一到 normal_first）
+        return Id::kNormalFirst;
     case 0x197DBC48u: //selected_normal_image
         return Id::kSelectedNormalImage;
-    case 0x1577158Cu: //selectednormalimage
-        return Id::kSelectednormalimage;
+    case 0x1577158Cu: //selectednormalimage（别名，归一到 selected_normal_image）
+        return Id::kSelectedNormalImage;
     case 0x3836A252u: //selected_hovered_image
         return Id::kSelectedHoveredImage;
     case 0xB1584B5Au: //selected_hot_image
         return Id::kSelectedHotImage;
-    case 0xA273F014u: //selectedhotimage
-        return Id::kSelectedhotimage;
+    case 0xA273F014u: //selectedhotimage（别名，归一到 selected_hot_image）
+        return Id::kSelectedHotImage;
     case 0x24DBF49Fu: //selected_pressed_image
         return Id::kSelectedPressedImage;
     case 0xD0F9AA7Au: //selected_pushed_image
         return Id::kSelectedPushedImage;
-    case 0xB00E3886u: //selectedpushedimage
-        return Id::kSelectedpushedimage;
+    case 0xB00E3886u: //selectedpushedimage（别名，归一到 selected_pushed_image）
+        return Id::kSelectedPushedImage;
     case 0x8BEC555Fu: //selected_disabled_image
         return Id::kSelectedDisabledImage;
-    case 0xB8EB4479u: //selecteddisabledimage
-        return Id::kSelecteddisabledimage;
+    case 0xB8EB4479u: //selecteddisabledimage（别名，归一到 selected_disabled_image）
+        return Id::kSelectedDisabledImage;
     case 0xE7541C05u: //selected_fore_normal_image
         return Id::kSelectedForeNormalImage;
-    case 0x9F58F2FEu: //selectedforenormalimage
-        return Id::kSelectedforenormalimage;
+    case 0x9F58F2FEu: //selectedforenormalimage（别名，归一到 selected_fore_normal_image）
+        return Id::kSelectedForeNormalImage;
     case 0x128F0FF5u: //selected_fore_hovered_image
         return Id::kSelectedForeHoveredImage;
     case 0x0D44DBADu: //selected_fore_hot_image
         return Id::kSelectedForeHotImage;
-    case 0x4BC254B2u: //selectedforehotimage
-        return Id::kSelectedforehotimage;
+    case 0x4BC254B2u: //selectedforehotimage（别名，归一到 selected_fore_hot_image）
+        return Id::kSelectedForeHotImage;
     case 0x4D30CFF4u: //selected_fore_pressed_image
         return Id::kSelectedForePressedImage;
     case 0xB93A065Fu: //selected_fore_pushed_image
         return Id::kSelectedForePushedImage;
-    case 0x7AE344D0u: //selectedforepushedimage
-        return Id::kSelectedforepushedimage;
+    case 0x7AE344D0u: //selectedforepushedimage（别名，归一到 selected_fore_pushed_image）
+        return Id::kSelectedForePushedImage;
     case 0xC9BE0EFEu: //selected_fore_disabled_image
         return Id::kSelectedForeDisabledImage;
-    case 0x61B83E47u: //selectedforedisabledimage
-        return Id::kSelectedforedisabledimage;
+    case 0x61B83E47u: //selectedforedisabledimage（别名，归一到 selected_fore_disabled_image）
+        return Id::kSelectedForeDisabledImage;
     case 0x75970784u: //part_selected_normal_image
         return Id::kPartSelectedNormalImage;
     case 0x902C07AEu: //part_selected_hovered_image
@@ -1224,48 +1224,48 @@ Id IdOf(const DString &strName)
         return Id::kPartSelectedForeDisabledImage;
     case 0x06FD7CB6u: //selected_text_color
         return Id::kSelectedTextColor;
-    case 0x4408E6C2u: //selectedtextcolor
-        return Id::kSelectedtextcolor;
+    case 0x4408E6C2u: //selectedtextcolor（别名，归一到 selected_text_color）
+        return Id::kSelectedTextColor;
     case 0x47913DD4u: //selected_normal_text_color
         return Id::kSelectedNormalTextColor;
-    case 0x121A70C7u: //selectednormaltextcolor
-        return Id::kSelectednormaltextcolor;
+    case 0x121A70C7u: //selectednormaltextcolor（别名，归一到 selected_normal_text_color）
+        return Id::kSelectedNormalTextColor;
     case 0x4F10068Au: //selected_hovered_text_color
         return Id::kSelectedHoveredTextColor;
     case 0x9AAC14B2u: //selected_hot_text_color
         return Id::kSelectedHotTextColor;
-    case 0x9850570Fu: //selectedhottextcolor
-        return Id::kSelectedhottextcolor;
+    case 0x9850570Fu: //selectedhottextcolor（别名，归一到 selected_hot_text_color）
+        return Id::kSelectedHotTextColor;
     case 0x4427E7EDu: //selected_pressed_text_color
         return Id::kSelectedPressedTextColor;
     case 0xF66C5412u: //selected_pushed_text_color
         return Id::kSelectedPushedTextColor;
-    case 0x7AE82875u: //selectedpushedtextcolor
-        return Id::kSelectedpushedtextcolor;
+    case 0x7AE82875u: //selectedpushedtextcolor（别名，归一到 selected_pushed_text_color）
+        return Id::kSelectedPushedTextColor;
     case 0xEC43FBADu: //selected_disabled_text_color
         return Id::kSelectedDisabledTextColor;
-    case 0x8CE8D2FAu: //selecteddisabledtextcolor
-        return Id::kSelecteddisabledtextcolor;
+    case 0x8CE8D2FAu: //selecteddisabledtextcolor（别名，归一到 selected_disabled_text_color）
+        return Id::kSelectedDisabledTextColor;
     case 0xED7E6712u: //selected_normal_color
         return Id::kSelectedNormalColor;
-    case 0x2451A0E6u: //selectednormalcolor
-        return Id::kSelectednormalcolor;
+    case 0x2451A0E6u: //selectednormalcolor（别名，归一到 selected_normal_color）
+        return Id::kSelectedNormalColor;
     case 0x76E02AA0u: //selected_hovered_color
         return Id::kSelectedHoveredColor;
     case 0x3B8577B8u: //selected_hot_color
         return Id::kSelectedHotColor;
-    case 0x94D612DEu: //selectedhotcolor
-        return Id::kSelectedhotcolor;
+    case 0x94D612DEu: //selectedhotcolor（别名，归一到 selected_hot_color）
+        return Id::kSelectedHotColor;
     case 0x645D461Du: //selected_pressed_color
         return Id::kSelectedPressedColor;
     case 0x5B26D6D8u: //selected_pushed_color
         return Id::kSelectedPushedColor;
-    case 0x0B7DC6B4u: //selectedpushedcolor
-        return Id::kSelectedpushedcolor;
+    case 0x0B7DC6B4u: //selectedpushedcolor（别名，归一到 selected_pushed_color）
+        return Id::kSelectedPushedColor;
     case 0xE73657DDu: //selected_disabled_color
         return Id::kSelectedDisabledColor;
-    case 0x4B40B403u: //selecteddisabledcolor
-        return Id::kSelecteddisabledcolor;
+    case 0x4B40B403u: //selecteddisabledcolor（别名，归一到 selected_disabled_color）
+        return Id::kSelectedDisabledColor;
     case 0x33C7D0F1u: //selected_normal_color_margin
         return Id::kSelectedNormalColorMargin;
     case 0x10CAD193u: //selected_hovered_color_margin
@@ -1350,26 +1350,26 @@ Id IdOf(const DString &strName)
         return Id::kGridHeight;
     case 0x96E1F7C2u: //scale_down
         return Id::kScaleDown;
+    case 0xF7148201u: //scaledown（别名，归一到 scale_down）
+        return Id::kScaleDown;
     case 0x1677065Au: //item_size
         return Id::kItemSize;
-    case 0x1F455FE7u: //itemsize
-        return Id::kItemsize;
+    case 0x1F455FE7u: //itemsize（别名，归一到 item_size）
+        return Id::kItemSize;
     case 0x54605FE4u: //auto_calc_item_size
         return Id::kAutoCalcItemSize;
-    case 0xF7148201u: //scaledown
-        return Id::kScaledown;
     case 0x3919BB40u: //child_margin
         return Id::kChildMargin;
-    case 0x49425B63u: //childmargin
-        return Id::kChildmargin;
+    case 0x49425B63u: //childmargin（别名，归一到 child_margin）
+        return Id::kChildMargin;
     case 0xA6F85FEFu: //child_margin_x
         return Id::kChildMarginX;
-    case 0x6E756B81u: //childmarginx
-        return Id::kChildmarginx;
+    case 0x6E756B81u: //childmarginx（别名，归一到 child_margin_x）
+        return Id::kChildMarginX;
     case 0xA5F85E5Cu: //child_margin_y
         return Id::kChildMarginY;
-    case 0x6D7569EEu: //childmarginy
-        return Id::kChildmarginy;
+    case 0x6D7569EEu: //childmarginy（别名，归一到 child_margin_y）
+        return Id::kChildMarginY;
     case 0xDD2CFBBDu: //child_valign
         return Id::kChildValign;
     case 0x95B39AFBu: //child_halign
@@ -1391,8 +1391,6 @@ DString IdToString(Id id)
         return _T("paint_selected_colors");
     case Id::kScrollSelect:
         return _T("scroll_select");
-    case Id::kScrollselect:
-        return _T("scrollselect");
     case Id::kSelectNextWhenActiveRemoved:
         return _T("select_next_when_active_removed");
     case Id::kFrameSelection:
@@ -1413,50 +1411,30 @@ DString IdToString(Id id)
         return _T("vscrollbar");
     case Id::kVscrollbarStyle:
         return _T("vscrollbar_style");
-    case Id::kVscrollbarstyle:
-        return _T("vscrollbarstyle");
     case Id::kVscrollbarClass:
         return _T("vscrollbar_class");
     case Id::kHscrollbar:
         return _T("hscrollbar");
     case Id::kHscrollbarStyle:
         return _T("hscrollbar_style");
-    case Id::kHscrollbarstyle:
-        return _T("hscrollbarstyle");
     case Id::kHscrollbarClass:
         return _T("hscrollbar_class");
     case Id::kScrollbarPadding:
         return _T("scrollbar_padding");
-    case Id::kScrollbarpadding:
-        return _T("scrollbarpadding");
     case Id::kVscrollUnit:
         return _T("vscroll_unit");
-    case Id::kVscrollunit:
-        return _T("vscrollunit");
     case Id::kHscrollUnit:
         return _T("hscroll_unit");
-    case Id::kHscrollunit:
-        return _T("hscrollunit");
     case Id::kScrollbarFloat:
         return _T("scrollbar_float");
-    case Id::kScrollbarfloat:
-        return _T("scrollbarfloat");
     case Id::kVscrollbarLeft:
         return _T("vscrollbar_left");
-    case Id::kVscrollbarleft:
-        return _T("vscrollbarleft");
     case Id::kHoldEnd:
         return _T("hold_end");
-    case Id::kHoldend:
-        return _T("holdend");
     case Id::kSelectedId:
         return _T("selected_id");
-    case Id::kSelectedid:
-        return _T("selectedid");
     case Id::kFadeSwitch:
         return _T("fade_switch");
-    case Id::kFadeswitch:
-        return _T("fadeswitch");
     case Id::kFadeSwitchType:
         return _T("fade_switch_type");
     case Id::kFadeSwitchFrameIntervalMs:
@@ -1519,12 +1497,8 @@ DString IdToString(Id id)
         return _T("selected_item_class");
     case Id::kDropboxSize:
         return _T("dropbox_size");
-    case Id::kDropboxsize:
-        return _T("dropboxsize");
     case Id::kPopupTop:
         return _T("popup_top");
-    case Id::kPopuptop:
-        return _T("popuptop");
     case Id::kHeight:
         return _T("height");
     case Id::kShadowType:
@@ -1535,8 +1509,6 @@ DString IdToString(Id id)
         return _T("circular");
     case Id::kCircleWidth:
         return _T("circle_width");
-    case Id::kCirclewidth:
-        return _T("circlewidth");
     case Id::kIndicator:
         return _T("indicator");
     case Id::kClockwise:
@@ -1547,8 +1519,6 @@ DString IdToString(Id id)
         return _T("fgcolor");
     case Id::kGradientColor:
         return _T("gradient_color");
-    case Id::kGradientcolor:
-        return _T("gradientcolor");
     case Id::kCursorFile:
         return _T("cursor_file");
     case Id::kColorType:
@@ -1607,58 +1577,36 @@ DString IdToString(Id id)
         return _T("text_align");
     case Id::kEndEllipsis:
         return _T("end_ellipsis");
-    case Id::kEndellipsis:
-        return _T("endellipsis");
     case Id::kPathEllipsis:
         return _T("path_ellipsis");
-    case Id::kPathellipsis:
-        return _T("pathellipsis");
     case Id::kSingleLine:
         return _T("single_line");
-    case Id::kSingleline:
-        return _T("singleline");
     case Id::kMultiLine:
         return _T("multi_line");
-    case Id::kMultiline:
-        return _T("multiline");
     case Id::kText:
         return _T("text");
     case Id::kTextId:
         return _T("text_id");
-    case Id::kTextid:
-        return _T("textid");
     case Id::kAutoTooltip:
         return _T("auto_tooltip");
-    case Id::kAutotooltip:
-        return _T("autotooltip");
     case Id::kFont:
         return _T("font");
     case Id::kTextColor:
         return _T("text_color");
     case Id::kNormalTextColor:
         return _T("normal_text_color");
-    case Id::kNormaltextcolor:
-        return _T("normaltextcolor");
     case Id::kHoveredTextColor:
         return _T("hovered_text_color");
     case Id::kHotTextColor:
         return _T("hot_text_color");
-    case Id::kHottextcolor:
-        return _T("hottextcolor");
     case Id::kPressedTextColor:
         return _T("pressed_text_color");
     case Id::kPushedTextColor:
         return _T("pushed_text_color");
-    case Id::kPushedtextcolor:
-        return _T("pushedtextcolor");
     case Id::kDisabledTextColor:
         return _T("disabled_text_color");
-    case Id::kDisabledtextcolor:
-        return _T("disabledtextcolor");
     case Id::kTextPadding:
         return _T("text_padding");
-    case Id::kTextpadding:
-        return _T("textpadding");
     case Id::kReplaceNewline:
         return _T("replace_newline");
     case Id::kSpacingMul:
@@ -1767,28 +1715,18 @@ DString IdToString(Id id)
         return _T("value");
     case Id::kProgressImage:
         return _T("progress_image");
-    case Id::kProgressimage:
-        return _T("progressimage");
     case Id::kStretchForeImage:
         return _T("stretch_fore_image");
     case Id::kIsStretchFore:
         return _T("is_stretch_fore");
-    case Id::kIsstretchfore:
-        return _T("isstretchfore");
     case Id::kProgressColor:
         return _T("progress_color");
-    case Id::kProgresscolor:
-        return _T("progresscolor");
     case Id::kMarquee:
         return _T("marquee");
     case Id::kMarqueeWidth:
         return _T("marquee_width");
-    case Id::kMarqueewidth:
-        return _T("marqueewidth");
     case Id::kMarqueeStep:
         return _T("marquee_step");
-    case Id::kMarqueestep:
-        return _T("marqueestep");
     case Id::kReverse:
         return _T("reverse");
     case Id::kPropertyGridXml:
@@ -1831,20 +1769,12 @@ DString IdToString(Id id)
         return _T("number_format");
     case Id::kCaretColor:
         return _T("caret_color");
-    case Id::kCaretcolor:
-        return _T("caretcolor");
     case Id::kPromptMode:
         return _T("prompt_mode");
-    case Id::kPromptmode:
-        return _T("promptmode");
     case Id::kPromptColor:
         return _T("prompt_color");
-    case Id::kPromptcolor:
-        return _T("promptcolor");
     case Id::kPromptText:
         return _T("prompt_text");
-    case Id::kPrompttext:
-        return _T("prompttext");
     case Id::kPromptTextId:
         return _T("prompt_text_id");
     case Id::kPromptTextid:
@@ -1853,30 +1783,20 @@ DString IdToString(Id id)
         return _T("prompttextid");
     case Id::kFocusedImage:
         return _T("focused_image");
-    case Id::kFocusedimage:
-        return _T("focusedimage");
     case Id::kWantTab:
         return _T("want_tab");
-    case Id::kWanttab:
-        return _T("wanttab");
     case Id::kWantReturn:
         return _T("want_return");
     case Id::kWantReturnMsg:
         return _T("want_return_msg");
-    case Id::kWantreturnmsg:
-        return _T("wantreturnmsg");
     case Id::kWantCtrlReturn:
         return _T("want_ctrl_return");
     case Id::kReturnMsgWantCtrl:
         return _T("return_msg_want_ctrl");
-    case Id::kReturnmsgwantctrl:
-        return _T("returnmsgwantctrl");
     case Id::kLimitText:
         return _T("limit_text");
     case Id::kMaxChar:
         return _T("max_char");
-    case Id::kMaxchar:
-        return _T("maxchar");
     case Id::kLimitChars:
         return _T("limit_chars");
     case Id::kWordWrap:
@@ -1905,12 +1825,8 @@ DString IdToString(Id id)
         return _T("zoom");
     case Id::kAutoVscroll:
         return _T("auto_vscroll");
-    case Id::kAutovscroll:
-        return _T("autovscroll");
     case Id::kAutoHscroll:
         return _T("auto_hscroll");
-    case Id::kAutohscroll:
-        return _T("autohscroll");
     case Id::kRich:
         return _T("rich");
     case Id::kAutoDetectUrl:
@@ -1957,32 +1873,20 @@ DString IdToString(Id id)
         return _T("step");
     case Id::kThumbNormalImage:
         return _T("thumb_normal_image");
-    case Id::kThumbnormalimage:
-        return _T("thumbnormalimage");
     case Id::kThumbHoveredImage:
         return _T("thumb_hovered_image");
     case Id::kThumbHotImage:
         return _T("thumb_hot_image");
-    case Id::kThumbhotimage:
-        return _T("thumbhotimage");
     case Id::kThumbPressedImage:
         return _T("thumb_pressed_image");
     case Id::kThumbPushedImage:
         return _T("thumb_pushed_image");
-    case Id::kThumbpushedimage:
-        return _T("thumbpushedimage");
     case Id::kThumbDisabledImage:
         return _T("thumb_disabled_image");
-    case Id::kThumbdisabledimage:
-        return _T("thumbdisabledimage");
     case Id::kThumbSize:
         return _T("thumb_size");
-    case Id::kThumbsize:
-        return _T("thumbsize");
     case Id::kProgressBarPadding:
         return _T("progress_bar_padding");
-    case Id::kProgressbarpadding:
-        return _T("progressbarpadding");
     case Id::kTabBoxName:
         return _T("tab_box_name");
     case Id::kDragOrder:
@@ -2061,8 +1965,6 @@ DString IdToString(Id id)
         return _T("show_icon");
     case Id::kMouseChild:
         return _T("mouse_child");
-    case Id::kMousechild:
-        return _T("mousechild");
     case Id::kDragOutId:
         return _T("drag_out_id");
     case Id::kDropInId:
@@ -2093,52 +1995,34 @@ DString IdToString(Id id)
         return _T("fore_color");
     case Id::kBorderSize:
         return _T("border_size");
-    case Id::kBordersize:
-        return _T("bordersize");
     case Id::kBorderDashStyle:
         return _T("border_dash_style");
     case Id::kBordersOnTop:
         return _T("borders_on_top");
     case Id::kBorderRound:
         return _T("border_round");
-    case Id::kBorderround:
-        return _T("borderround");
     case Id::kBoxShadow:
         return _T("box_shadow");
-    case Id::kBoxshadow:
-        return _T("boxshadow");
     case Id::kWidth:
         return _T("width");
     case Id::kState:
         return _T("state");
     case Id::kCursorType:
         return _T("cursor_type");
-    case Id::kCursortype:
-        return _T("cursortype");
     case Id::kRenderOffset:
         return _T("render_offset");
-    case Id::kRenderoffset:
-        return _T("renderoffset");
     case Id::kNormalColor:
         return _T("normal_color");
-    case Id::kNormalcolor:
-        return _T("normalcolor");
     case Id::kHoveredColor:
         return _T("hovered_color");
     case Id::kHotColor:
         return _T("hot_color");
-    case Id::kHotcolor:
-        return _T("hotcolor");
     case Id::kPressedColor:
         return _T("pressed_color");
     case Id::kPushedColor:
         return _T("pushed_color");
-    case Id::kPushedcolor:
-        return _T("pushedcolor");
     case Id::kDisabledColor:
         return _T("disabled_color");
-    case Id::kDisabledcolor:
-        return _T("disabledcolor");
     case Id::kNormalColorMargin:
         return _T("normal_color_margin");
     case Id::kHoveredColorMargin:
@@ -2169,8 +2053,6 @@ DString IdToString(Id id)
         return _T("disabled_color_round");
     case Id::kBorderColor:
         return _T("border_color");
-    case Id::kBordercolor:
-        return _T("bordercolor");
     case Id::kNormalBorderColor:
         return _T("normal_border_color");
     case Id::kHoveredBorderColor:
@@ -2189,44 +2071,26 @@ DString IdToString(Id id)
         return _T("focus_border_color");
     case Id::kLeftBorderSize:
         return _T("left_border_size");
-    case Id::kLeftbordersize:
-        return _T("leftbordersize");
     case Id::kTopBorderSize:
         return _T("top_border_size");
-    case Id::kTopbordersize:
-        return _T("topbordersize");
     case Id::kRightBorderSize:
         return _T("right_border_size");
-    case Id::kRightbordersize:
-        return _T("rightbordersize");
     case Id::kBottomBorderSize:
         return _T("bottom_border_size");
-    case Id::kBottombordersize:
-        return _T("bottombordersize");
     case Id::kBkimage:
         return _T("bkimage");
     case Id::kMinWidth:
         return _T("min_width");
-    case Id::kMinwidth:
-        return _T("minwidth");
     case Id::kMaxWidth:
         return _T("max_width");
-    case Id::kMaxwidth:
-        return _T("maxwidth");
     case Id::kMinHeight:
         return _T("min_height");
-    case Id::kMinheight:
-        return _T("minheight");
     case Id::kMaxHeight:
         return _T("max_height");
-    case Id::kMaxheight:
-        return _T("maxheight");
     case Id::kName:
         return _T("name");
     case Id::kTooltipText:
         return _T("tooltip_text");
-    case Id::kTooltiptext:
-        return _T("tooltiptext");
     case Id::kTooltipTextId:
         return _T("tooltip_text_id");
     case Id::kTooltipTextid:
@@ -2237,8 +2101,6 @@ DString IdToString(Id id)
         return _T("tooltip_width");
     case Id::kDataId:
         return _T("data_id");
-    case Id::kDataid:
-        return _T("dataid");
     case Id::kUserDataId:
         return _T("user_data_id");
     case Id::kUserDataid:
@@ -2257,8 +2119,6 @@ DString IdToString(Id id)
         return _T("visible");
     case Id::kFadeVisible:
         return _T("fade_visible");
-    case Id::kFadevisible:
-        return _T("fadevisible");
     case Id::kFloat:
         return _T("float");
     case Id::kKeepFloatPos:
@@ -2267,60 +2127,38 @@ DString IdToString(Id id)
         return _T("cache");
     case Id::kNoFocus:
         return _T("no_focus");
-    case Id::kNofocus:
-        return _T("nofocus");
     case Id::kAlpha:
         return _T("alpha");
     case Id::kNormalImage:
         return _T("normal_image");
-    case Id::kNormalimage:
-        return _T("normalimage");
     case Id::kHoveredImage:
         return _T("hovered_image");
     case Id::kHotImage:
         return _T("hot_image");
-    case Id::kHotimage:
-        return _T("hotimage");
     case Id::kPressedImage:
         return _T("pressed_image");
     case Id::kPushedImage:
         return _T("pushed_image");
-    case Id::kPushedimage:
-        return _T("pushedimage");
     case Id::kDisabledImage:
         return _T("disabled_image");
-    case Id::kDisabledimage:
-        return _T("disabledimage");
     case Id::kForeNormalImage:
         return _T("fore_normal_image");
-    case Id::kForenormalimage:
-        return _T("forenormalimage");
     case Id::kForeHoveredImage:
         return _T("fore_hovered_image");
     case Id::kForeHotImage:
         return _T("fore_hot_image");
-    case Id::kForehotimage:
-        return _T("forehotimage");
     case Id::kForePressedImage:
         return _T("fore_pressed_image");
     case Id::kForePushedImage:
         return _T("fore_pushed_image");
-    case Id::kForepushedimage:
-        return _T("forepushedimage");
     case Id::kForeDisabledImage:
         return _T("fore_disabled_image");
-    case Id::kForedisabledimage:
-        return _T("foredisabledimage");
     case Id::kFadeAlpha:
         return _T("fade_alpha");
-    case Id::kFadealpha:
-        return _T("fadealpha");
     case Id::kFadeHovered:
         return _T("fade_hovered");
     case Id::kFadeHot:
         return _T("fade_hot");
-    case Id::kFadehot:
-        return _T("fadehot");
     case Id::kFadeHoveredFrameIntervalMs:
         return _T("fade_hovered_frame_interval_ms");
     case Id::kFadeHotFrameIntervalMs:
@@ -2335,30 +2173,18 @@ DString IdToString(Id id)
         return _T("fade_hot_easing_function");
     case Id::kFadeWidth:
         return _T("fade_width");
-    case Id::kFadewidth:
-        return _T("fadewidth");
     case Id::kFadeHeight:
         return _T("fade_height");
-    case Id::kFadeheight:
-        return _T("fadeheight");
     case Id::kFadeSize:
         return _T("fade_size");
     case Id::kFadeInOutXFromLeft:
         return _T("fade_in_out_x_from_left");
-    case Id::kFadeinoutxfromleft:
-        return _T("fadeinoutxfromleft");
     case Id::kFadeInOutXFromRight:
         return _T("fade_in_out_x_from_right");
-    case Id::kFadeinoutxfromright:
-        return _T("fadeinoutxfromright");
     case Id::kFadeInOutYFromTop:
         return _T("fade_in_out_y_from_top");
-    case Id::kFadeinoutyfromtop:
-        return _T("fadeinoutyfromtop");
     case Id::kFadeInOutYFromBottom:
         return _T("fade_in_out_y_from_bottom");
-    case Id::kFadeinoutyfrombottom:
-        return _T("fadeinoutyfrombottom");
     case Id::kFadeFrameIntervalMs:
         return _T("fade_frame_interval_ms");
     case Id::kFadeTotalMs:
@@ -2367,8 +2193,6 @@ DString IdToString(Id id)
         return _T("fade_easing_function");
     case Id::kTabStop:
         return _T("tab_stop");
-    case Id::kTabstop:
-        return _T("tabstop");
     case Id::kLoading:
         return _T("loading");
     case Id::kShowFocusedRect:
@@ -2403,160 +2227,98 @@ DString IdToString(Id id)
         return _T("col_span");
     case Id::kButton1NormalImage:
         return _T("button1_normal_image");
-    case Id::kButton1normalimage:
-        return _T("button1normalimage");
     case Id::kButton1HoveredImage:
         return _T("button1_hovered_image");
     case Id::kButton1HotImage:
         return _T("button1_hot_image");
-    case Id::kButton1hotimage:
-        return _T("button1hotimage");
     case Id::kButton1PressedImage:
         return _T("button1_pressed_image");
     case Id::kButton1PushedImage:
         return _T("button1_pushed_image");
-    case Id::kButton1pushedimage:
-        return _T("button1pushedimage");
     case Id::kButton1DisabledImage:
         return _T("button1_disabled_image");
-    case Id::kButton1disabledimage:
-        return _T("button1disabledimage");
     case Id::kButton2NormalImage:
         return _T("button2_normal_image");
-    case Id::kButton2normalimage:
-        return _T("button2normalimage");
     case Id::kButton2HoveredImage:
         return _T("button2_hovered_image");
     case Id::kButton2HotImage:
         return _T("button2_hot_image");
-    case Id::kButton2hotimage:
-        return _T("button2hotimage");
     case Id::kButton2PressedImage:
         return _T("button2_pressed_image");
     case Id::kButton2PushedImage:
         return _T("button2_pushed_image");
-    case Id::kButton2pushedimage:
-        return _T("button2pushedimage");
     case Id::kButton2DisabledImage:
         return _T("button2_disabled_image");
-    case Id::kButton2disabledimage:
-        return _T("button2disabledimage");
     case Id::kRailNormalImage:
         return _T("rail_normal_image");
-    case Id::kRailnormalimage:
-        return _T("railnormalimage");
     case Id::kRailHoveredImage:
         return _T("rail_hovered_image");
     case Id::kRailHotImage:
         return _T("rail_hot_image");
-    case Id::kRailhotimage:
-        return _T("railhotimage");
     case Id::kRailPressedImage:
         return _T("rail_pressed_image");
     case Id::kRailPushedImage:
         return _T("rail_pushed_image");
-    case Id::kRailpushedimage:
-        return _T("railpushedimage");
     case Id::kRailDisabledImage:
         return _T("rail_disabled_image");
-    case Id::kRaildisabledimage:
-        return _T("raildisabledimage");
     case Id::kBkNormalImage:
         return _T("bk_normal_image");
-    case Id::kBknormalimage:
-        return _T("bknormalimage");
     case Id::kBkHoveredImage:
         return _T("bk_hovered_image");
     case Id::kBkHotImage:
         return _T("bk_hot_image");
-    case Id::kBkhotimage:
-        return _T("bkhotimage");
     case Id::kBkPressedImage:
         return _T("bk_pressed_image");
     case Id::kBkPushedImage:
         return _T("bk_pushed_image");
-    case Id::kBkpushedimage:
-        return _T("bkpushedimage");
     case Id::kBkDisabledImage:
         return _T("bk_disabled_image");
-    case Id::kBkdisabledimage:
-        return _T("bkdisabledimage");
     case Id::kLineSize:
         return _T("line_size");
-    case Id::kLinesize:
-        return _T("linesize");
     case Id::kThumbMinLength:
         return _T("thumb_min_length");
-    case Id::kThumbminlength:
-        return _T("thumbminlength");
     case Id::kRange:
         return _T("range");
     case Id::kShowButton1:
         return _T("show_button1");
-    case Id::kShowbutton1:
-        return _T("showbutton1");
     case Id::kShowButton2:
         return _T("show_button2");
-    case Id::kShowbutton2:
-        return _T("showbutton2");
     case Id::kAutoHideScroll:
         return _T("auto_hide_scroll");
-    case Id::kAutohidescroll:
-        return _T("autohidescroll");
     case Id::kSelected:
         return _T("selected");
     case Id::kSwitchSelect:
         return _T("switch_select");
-    case Id::kSwitchselect:
-        return _T("switchselect");
     case Id::kSupportCheckMode:
         return _T("support_check_Mode");
     case Id::kAutoSelectCheck:
         return _T("auto_select_check");
     case Id::kNormalFirst:
         return _T("normal_first");
-    case Id::kNormalfirst:
-        return _T("normalfirst");
     case Id::kSelectedNormalImage:
         return _T("selected_normal_image");
-    case Id::kSelectednormalimage:
-        return _T("selectednormalimage");
     case Id::kSelectedHoveredImage:
         return _T("selected_hovered_image");
     case Id::kSelectedHotImage:
         return _T("selected_hot_image");
-    case Id::kSelectedhotimage:
-        return _T("selectedhotimage");
     case Id::kSelectedPressedImage:
         return _T("selected_pressed_image");
     case Id::kSelectedPushedImage:
         return _T("selected_pushed_image");
-    case Id::kSelectedpushedimage:
-        return _T("selectedpushedimage");
     case Id::kSelectedDisabledImage:
         return _T("selected_disabled_image");
-    case Id::kSelecteddisabledimage:
-        return _T("selecteddisabledimage");
     case Id::kSelectedForeNormalImage:
         return _T("selected_fore_normal_image");
-    case Id::kSelectedforenormalimage:
-        return _T("selectedforenormalimage");
     case Id::kSelectedForeHoveredImage:
         return _T("selected_fore_hovered_image");
     case Id::kSelectedForeHotImage:
         return _T("selected_fore_hot_image");
-    case Id::kSelectedforehotimage:
-        return _T("selectedforehotimage");
     case Id::kSelectedForePressedImage:
         return _T("selected_fore_pressed_image");
     case Id::kSelectedForePushedImage:
         return _T("selected_fore_pushed_image");
-    case Id::kSelectedforepushedimage:
-        return _T("selectedforepushedimage");
     case Id::kSelectedForeDisabledImage:
         return _T("selected_fore_disabled_image");
-    case Id::kSelectedforedisabledimage:
-        return _T("selectedforedisabledimage");
     case Id::kPartSelectedNormalImage:
         return _T("part_selected_normal_image");
     case Id::kPartSelectedHoveredImage:
@@ -2583,48 +2345,30 @@ DString IdToString(Id id)
         return _T("part_selected_fore_disabled_image");
     case Id::kSelectedTextColor:
         return _T("selected_text_color");
-    case Id::kSelectedtextcolor:
-        return _T("selectedtextcolor");
     case Id::kSelectedNormalTextColor:
         return _T("selected_normal_text_color");
-    case Id::kSelectednormaltextcolor:
-        return _T("selectednormaltextcolor");
     case Id::kSelectedHoveredTextColor:
         return _T("selected_hovered_text_color");
     case Id::kSelectedHotTextColor:
         return _T("selected_hot_text_color");
-    case Id::kSelectedhottextcolor:
-        return _T("selectedhottextcolor");
     case Id::kSelectedPressedTextColor:
         return _T("selected_pressed_text_color");
     case Id::kSelectedPushedTextColor:
         return _T("selected_pushed_text_color");
-    case Id::kSelectedpushedtextcolor:
-        return _T("selectedpushedtextcolor");
     case Id::kSelectedDisabledTextColor:
         return _T("selected_disabled_text_color");
-    case Id::kSelecteddisabledtextcolor:
-        return _T("selecteddisabledtextcolor");
     case Id::kSelectedNormalColor:
         return _T("selected_normal_color");
-    case Id::kSelectednormalcolor:
-        return _T("selectednormalcolor");
     case Id::kSelectedHoveredColor:
         return _T("selected_hovered_color");
     case Id::kSelectedHotColor:
         return _T("selected_hot_color");
-    case Id::kSelectedhotcolor:
-        return _T("selectedhotcolor");
     case Id::kSelectedPressedColor:
         return _T("selected_pressed_color");
     case Id::kSelectedPushedColor:
         return _T("selected_pushed_color");
-    case Id::kSelectedpushedcolor:
-        return _T("selectedpushedcolor");
     case Id::kSelectedDisabledColor:
         return _T("selected_disabled_color");
-    case Id::kSelecteddisabledcolor:
-        return _T("selecteddisabledcolor");
     case Id::kSelectedNormalColorMargin:
         return _T("selected_normal_color_margin");
     case Id::kSelectedHoveredColorMargin:
@@ -2711,24 +2455,14 @@ DString IdToString(Id id)
         return _T("scale_down");
     case Id::kItemSize:
         return _T("item_size");
-    case Id::kItemsize:
-        return _T("itemsize");
     case Id::kAutoCalcItemSize:
         return _T("auto_calc_item_size");
-    case Id::kScaledown:
-        return _T("scaledown");
     case Id::kChildMargin:
         return _T("child_margin");
-    case Id::kChildmargin:
-        return _T("childmargin");
     case Id::kChildMarginX:
         return _T("child_margin_x");
-    case Id::kChildmarginx:
-        return _T("childmarginx");
     case Id::kChildMarginY:
         return _T("child_margin_y");
-    case Id::kChildmarginy:
-        return _T("childmarginy");
     case Id::kChildValign:
         return _T("child_valign");
     case Id::kChildHalign:
@@ -3246,12 +2980,12 @@ Id IdOf(const DString &strName)
         return Id::kWindowShadowMode;
     case 0xF9DDE169u: //dpi_scale
         return Id::kDpiScale;
-    case 0x375B8732u: //dpiscale
-        return Id::kDpiscale;
+    case 0x375B8732u: //dpiscale（别名，归一到 dpi_scale）
+        return Id::kDpiScale;
     case 0x32CEFE5Cu: //dest_scale
         return Id::kDestScale;
-    case 0xE48CD7C1u: //destscale
-        return Id::kDestscale;
+    case 0xE48CD7C1u: //destscale（别名，归一到 dest_scale）
+        return Id::kDestScale;
     case 0x9A032455u: //dest
         return Id::kDest;
     case 0xD7713C7Bu: //margin
@@ -3270,18 +3004,18 @@ Id IdOf(const DString &strName)
         return Id::kXtiled;
     case 0xD18F6E39u: //full_xtiled
         return Id::kFullXtiled;
-    case 0xDA08D534u: //fullxtiled
-        return Id::kFullxtiled;
+    case 0xDA08D534u: //fullxtiled（别名，归一到 full_xtiled）
+        return Id::kFullXtiled;
     case 0x0B6044ECu: //ytiled
         return Id::kYtiled;
     case 0x6B78EB30u: //full_ytiled
         return Id::kFullYtiled;
-    case 0x8F5D689Du: //fullytiled
-        return Id::kFullytiled;
+    case 0x8F5D689Du: //fullytiled（别名，归一到 full_ytiled）
+        return Id::kFullYtiled;
     case 0x28235E36u: //tiled_margin
         return Id::kTiledMargin;
-    case 0x32417511u: //tiledmargin
-        return Id::kTiledmargin;
+    case 0x32417511u: //tiledmargin（别名，归一到 tiled_margin）
+        return Id::kTiledMargin;
     case 0x8C519D49u: //tiled_margin_x
         return Id::kTiledMarginX;
     case 0x8B519BB6u: //tiled_margin_y
@@ -3290,8 +3024,8 @@ Id IdOf(const DString &strName)
         return Id::kTiledPadding;
     case 0xA17CD3B4u: //icon_size
         return Id::kIconSize;
-    case 0x50CE2E41u: //iconsize
-        return Id::kIconsize;
+    case 0x50CE2E41u: //iconsize（别名，归一到 icon_size）
+        return Id::kIconSize;
     case 0x915FBCFCu: //icon_as_animation
         return Id::kIconAsAnimation;
     case 0x561AA8C2u: //icon_frame_delay
@@ -3300,8 +3034,8 @@ Id IdOf(const DString &strName)
         return Id::kPagMaxFrameRate;
     case 0xDBD3742Bu: //play_count
         return Id::kPlayCount;
-    case 0xB0F30942u: //playcount
-        return Id::kPlaycount;
+    case 0xB0F30942u: //playcount（别名，归一到 play_count）
+        return Id::kPlayCount;
     case 0x6A70D161u: //auto_play
         return Id::kAutoPlay;
     case 0x71A5632Cu: //async_load
@@ -3341,12 +3075,8 @@ DString IdToString(Id id)
         return _T("window_shadow_mode");
     case Id::kDpiScale:
         return _T("dpi_scale");
-    case Id::kDpiscale:
-        return _T("dpiscale");
     case Id::kDestScale:
         return _T("dest_scale");
-    case Id::kDestscale:
-        return _T("destscale");
     case Id::kDest:
         return _T("dest");
     case Id::kMargin:
@@ -3365,18 +3095,12 @@ DString IdToString(Id id)
         return _T("xtiled");
     case Id::kFullXtiled:
         return _T("full_xtiled");
-    case Id::kFullxtiled:
-        return _T("fullxtiled");
     case Id::kYtiled:
         return _T("ytiled");
     case Id::kFullYtiled:
         return _T("full_ytiled");
-    case Id::kFullytiled:
-        return _T("fullytiled");
     case Id::kTiledMargin:
         return _T("tiled_margin");
-    case Id::kTiledmargin:
-        return _T("tiledmargin");
     case Id::kTiledMarginX:
         return _T("tiled_margin_x");
     case Id::kTiledMarginY:
@@ -3385,8 +3109,6 @@ DString IdToString(Id id)
         return _T("tiled_padding");
     case Id::kIconSize:
         return _T("icon_size");
-    case Id::kIconsize:
-        return _T("iconsize");
     case Id::kIconAsAnimation:
         return _T("icon_as_animation");
     case Id::kIconFrameDelay:
@@ -3395,8 +3117,6 @@ DString IdToString(Id id)
         return _T("pag_max_frame_rate");
     case Id::kPlayCount:
         return _T("play_count");
-    case Id::kPlaycount:
-        return _T("playcount");
     case Id::kAutoPlay:
         return _T("auto_play");
     case Id::kAsyncLoad:
@@ -3750,9 +3470,13 @@ Id IdOf(const DString &strName)
         return Id::kUseSystemCaption;
     case 0xA43C6CE2u: //shadow_attached
         return Id::kShadowAttached;
+    case 0x36EF2581u: //shadowattached（别名，归一到 shadow_attached）
+        return Id::kShadowAttached;
     case 0xB1B4685Au: //shadow_type
         return Id::kShadowType;
     case 0xFD4DBBA4u: //layered_window
+        return Id::kLayeredWindow;
+    case 0x488B50A7u: //layeredwindow（别名，归一到 layered_window）
         return Id::kLayeredWindow;
     case 0x5D8B6DABu: //alpha
         return Id::kAlpha;
@@ -3768,18 +3492,14 @@ Id IdOf(const DString &strName)
         return Id::kRenderBackendType;
     case 0x600E55D6u: //size_box
         return Id::kSizeBox;
-    case 0xC49BC175u: //sizebox
-        return Id::kSizebox;
+    case 0xC49BC175u: //sizebox（别名，归一到 size_box）
+        return Id::kSizeBox;
     case 0xEF131C65u: //caption
         return Id::kCaption;
-    case 0x36EF2581u: //shadowattached
-        return Id::kShadowattached;
     case 0xECA6B29Bu: //shadow_corner
         return Id::kShadowCorner;
-    case 0x242356A4u: //shadowcorner
-        return Id::kShadowcorner;
-    case 0x488B50A7u: //layeredwindow
-        return Id::kLayeredwindow;
+    case 0x242356A4u: //shadowcorner（别名，归一到 shadow_corner）
+        return Id::kShadowCorner;
     case 0x23A0D95Cu: //size
         return Id::kSize;
     case 0x77069CBCu: //size_contain_shadow
@@ -3806,16 +3526,16 @@ Id IdOf(const DString &strName)
         return Id::kText;
     case 0x7ACD9B7Eu: //text_id
         return Id::kTextId;
-    case 0xC778FA43u: //textid
-        return Id::kTextid;
+    case 0xC778FA43u: //textid（别名，归一到 text_id）
+        return Id::kTextId;
     case 0xA6DF5631u: //round_corner
         return Id::kRoundCorner;
-    case 0x49BBD5BAu: //roundcorner
-        return Id::kRoundcorner;
+    case 0x49BBD5BAu: //roundcorner（别名，归一到 round_corner）
+        return Id::kRoundCorner;
     case 0x27167A4Fu: //shadow_image
         return Id::kShadowImage;
-    case 0x3036D436u: //shadowimage
-        return Id::kShadowimage;
+    case 0x3036D436u: //shadowimage（别名，归一到 shadow_image）
+        return Id::kShadowImage;
     case 0x7F7347B3u: //shadow_border_round
         return Id::kShadowBorderRound;
     case 0xC3DCEB84u: //shadow_border_size
@@ -3848,9 +3568,9 @@ Id IdOf(const DString &strName)
         return Id::kType;
     case 0x6AAC6670u: //receiver
         return Id::kReceiver;
-    case 0xB98DDC81u: //applyattribute
-        return Id::kApplyattribute;
     case 0x57647D0Cu: //apply_attribute
+        return Id::kApplyAttribute;
+    case 0xB98DDC81u: //applyattribute（别名，归一到 apply_attribute）
         return Id::kApplyAttribute;
     default:
         break;
@@ -3883,18 +3603,10 @@ DString IdToString(Id id)
         return _T("render_backend_type");
     case Id::kSizeBox:
         return _T("size_box");
-    case Id::kSizebox:
-        return _T("sizebox");
     case Id::kCaption:
         return _T("caption");
-    case Id::kShadowattached:
-        return _T("shadowattached");
     case Id::kShadowCorner:
         return _T("shadow_corner");
-    case Id::kShadowcorner:
-        return _T("shadowcorner");
-    case Id::kLayeredwindow:
-        return _T("layeredwindow");
     case Id::kSize:
         return _T("size");
     case Id::kSizeContainShadow:
@@ -3921,16 +3633,10 @@ DString IdToString(Id id)
         return _T("text");
     case Id::kTextId:
         return _T("text_id");
-    case Id::kTextid:
-        return _T("textid");
     case Id::kRoundCorner:
         return _T("round_corner");
-    case Id::kRoundcorner:
-        return _T("roundcorner");
     case Id::kShadowImage:
         return _T("shadow_image");
-    case Id::kShadowimage:
-        return _T("shadowimage");
     case Id::kShadowBorderRound:
         return _T("shadow_border_round");
     case Id::kShadowBorderSize:
@@ -3963,8 +3669,6 @@ DString IdToString(Id id)
         return _T("type");
     case Id::kReceiver:
         return _T("receiver");
-    case Id::kApplyattribute:
-        return _T("applyattribute");
     case Id::kApplyAttribute:
         return _T("apply_attribute");
     default:

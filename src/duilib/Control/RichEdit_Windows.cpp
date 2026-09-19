@@ -441,7 +441,6 @@ void RichEdit::SetAttributeById(ui::attr::control::Id id, const DString &strValu
         break;
     }
     case ui::attr::control::kSingleLine:
-    case ui::attr::control::kMultiLine:
     case ui::attr::control::kReadonly: {
         SetReadOnly(StringUtil::IsValueTrue(strValue));
         break;
@@ -503,14 +502,7 @@ void RichEdit::SetAttributeById(ui::attr::control::Id id, const DString &strValu
     }
     case ui::attr::control::kTextPadding:
     case ui::attr::control::kTextColor:
-    case ui::attr::control::kNormalTextColor:
-    case ui::attr::control::kDisabledTextColor:
-    case ui::attr::control::kCaretColor:
-    case ui::attr::control::kPromptMode:
-    case ui::attr::control::kPromptColor:
-    case ui::attr::control::kPromptText:
     case ui::attr::control::kPromptTextId:
-    case ui::attr::control::kFocusedImage:
     case ui::attr::control::kFont: {
         SetFontId(strValue);
         break;
@@ -524,13 +516,9 @@ void RichEdit::SetAttributeById(ui::attr::control::Id id, const DString &strValu
         break;
     }
     case ui::attr::control::kTextId:
-    case ui::attr::control::kWantTab:
     case ui::attr::control::kWantReturn:
-    case ui::attr::control::kWantReturnMsg:
     case ui::attr::control::kWantCtrlReturn:
-    case ui::attr::control::kReturnMsgWantCtrl:
     case ui::attr::control::kLimitText:
-    case ui::attr::control::kMaxChar:
     case ui::attr::control::kLimitChars: {
         //限制允许输入哪些字符
         SetLimitChars(strValue);
@@ -622,7 +610,6 @@ void RichEdit::SetAttributeById(ui::attr::control::Id id, const DString &strValu
         break;
     }
     case ui::attr::control::kAutoVscroll:
-    case ui::attr::control::kAutoHscroll:
     case ui::attr::control::kRichText:
     case ui::attr::control::kRich: {
         //是否为富文本属性

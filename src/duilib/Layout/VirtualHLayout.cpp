@@ -15,8 +15,7 @@ bool VirtualHLayout::SetAttributeById(
 {
     bool hasAttribute = true;
     switch (id) {
-    case attr::control::kItemSize:
-    case attr::control::kItemsize: {
+    case attr::control::kItemSize: {
         UiSize szItem;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);

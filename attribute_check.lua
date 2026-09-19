@@ -204,14 +204,28 @@ local function get_defs()
     return attribute_defs.get_defs()
 end
 
+-- 把域的条目展开成"全部拼写"集合（{name, alias} 条目会同时计入规范名与别名）
+local function add_domain_spellings(target, entries, value)
+    for _, item in ipairs(entries or {}) do
+        if type(item) == "table" then
+            if item.name then
+                target[item.name] = value
+            end
+            for _, alias in ipairs(item.alias or {}) do
+                target[alias] = value
+            end
+        else
+            target[item] = value
+        end
+    end
+end
+
 local function check_baseline()
     local defs = get_defs()
     local allOk, lines = true, {}
     for _, domain in ipairs(g_domains) do
         local expected = {}
-        for _, name in ipairs(defs[domain.name] or {}) do
-            expected[name] = true
-        end
+        add_domain_spellings(expected, defs[domain.name], true)
         local actual = {}
         for _, name in ipairs(collect_domain_names(domain, true)) do
             actual[name] = true
@@ -241,13 +255,9 @@ local function check_xml()
     local defs = get_defs()
     local known, nodeNames, ctrlClasses = {}, {}, {}
     for _, domain in ipairs({ "control", "window", "layout", "image" }) do
-        for _, name in ipairs(defs[domain] or {}) do
-            known[name] = domain
-        end
+        add_domain_spellings(known, defs[domain], domain)
     end
-    for _, name in ipairs(defs["node"] or {}) do
-        nodeNames[name] = true
-    end
+    add_domain_spellings(nodeNames, defs["node"], true)
     -- 宏定义来自生成文件；duilib_defs.h 不应再手写 DUI_CTR_ 定义
     local ctrlDefsFile = path.join(g_repoRoot, "src", "duilib", "Utils", "CtrlDefs.g.h")
     local defsText = io.readfile(ctrlDefsFile) or ""
@@ -277,6 +287,33 @@ local function check_xml()
     lines[#lines + 1] = "  未登记的属性名（" .. #sorted_keys(attrMiss) .. "）: " .. table.concat(sorted_keys(attrMiss), ", ")
     lines[#lines + 1] = "  未登记的节点名（" .. #sorted_keys(nodeMiss) .. "）: " .. table.concat(sorted_keys(nodeMiss), ", ")
     return (#sorted_keys(attrMiss) == 0) and (#sorted_keys(nodeMiss) == 0), table.concat(lines, "\n")
+end
+
+-- 别名归一自检：数据表里的每个别名，都必须在生成文件的 IdOf 中归一到其规范名
+local function check_alias()
+    local defs = get_defs()
+    local cpp = io.readfile(path.join(g_repoRoot, "src", "duilib", "Utils", "AttributeIds.g.cpp")) or ""
+    local missing = {}
+    local total = 0
+    for _, domain in ipairs({ "control", "window", "node", "image", "shadow", "loading" }) do
+        for _, item in ipairs(defs[domain] or {}) do
+            if type(item) == "table" then
+                for _, alias in ipairs(item.alias or {}) do
+                    total = total + 1
+                    local marker = "//" .. alias .. "（别名，归一到 " .. item.name .. "）"
+                    if not cpp:find(marker, 1, true) then
+                        missing[#missing + 1] = domain .. "." .. alias .. " -> " .. item.name
+                    end
+                end
+            end
+        end
+    end
+    local lines = {}
+    lines[#lines + 1] = string.format("  别名数=%d 未归一的别名=%d", total, #missing)
+    if #missing > 0 then
+        lines[#lines + 1] = "  " .. table.concat(missing, ", ")
+    end
+    return (#missing == 0), table.concat(lines, "\n")
 end
 
 -- 控件类名域（ctrl）：数据表必须与 duilib_defs.h 的 DUI_CTR_* 宏完全一致，且不再有宏形式的类名比较
@@ -352,14 +389,47 @@ local function dump_data(pathOut)
     lines[#lines + 1] = "    return {"
     local total = 0
     for _, domain in ipairs(g_domains) do
-        local names = collect_domain_names(domain, false)
-        lines[#lines + 1] = "        " .. domain.name .. " = {"
+        -- 由指定 revision（默认 HEAD，迁移期用 --baseline=<迁移前>）的分组推断规范名与书写变体别名
+        local names = collect_domain_names(domain, true)
+        local byKey, order = {}, {}
         for _, name in ipairs(names) do
-            lines[#lines + 1] = "            \"" .. name .. "\","
+            local key = name:gsub("_", ""):lower()
+            if byKey[key] == nil then
+                byKey[key] = {}
+                order[#order + 1] = key
+            end
+            table.insert(byKey[key], name)
+        end
+        lines[#lines + 1] = "        " .. domain.name .. " = {"
+        local emitCount = 0
+        for _, key in ipairs(order) do
+            local group = byKey[key]
+            local withUnderscore = {}
+            for _, name in ipairs(group) do
+                if name:find("_", 1, true) then
+                    withUnderscore[#withUnderscore + 1] = name
+                end
+            end
+            if (#group >= 2) and (#withUnderscore == 1) then
+                local aliasText = {}
+                for _, name in ipairs(group) do
+                    if name ~= withUnderscore[1] then
+                        aliasText[#aliasText + 1] = "\"" .. name .. "\""
+                    end
+                end
+                lines[#lines + 1] = "            { name = \"" .. withUnderscore[1] .. "\", alias = { " ..
+                                        table.concat(aliasText, ", ") .. " } },"
+                emitCount = emitCount + 1
+            else
+                for _, name in ipairs(group) do
+                    lines[#lines + 1] = "            \"" .. name .. "\","
+                    emitCount = emitCount + 1
+                end
+            end
         end
         lines[#lines + 1] = "        },"
         total = total + #names
-        print(string.format("  %-8s names=%d", domain.name, #names))
+        print(string.format("  %-8s spellings=%d entries=%d", domain.name, #names, emitCount))
     end
     lines[#lines + 1] = "    }"
     lines[#lines + 1] = "end"
@@ -441,6 +511,13 @@ function main(...)
     local okE, detailE = check_ctrl()
     print(detailE)
     if not okE then
+        failed = true
+    end
+
+    print("[F] 别名归一自检")
+    local okF, detailF = check_alias()
+    print(detailF)
+    if not okF then
         failed = true
     end
 

@@ -38,8 +38,7 @@ void ScrollBox::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         EnableScrollBar(StringUtil::IsValueTrue(strValue), GetHScrollBar() != nullptr);
         break;
     }
-    case ui::attr::control::kVscrollbarStyle:
-    case ui::attr::control::kVscrollbarstyle: {
+    case ui::attr::control::kVscrollbarStyle: {
         EnableScrollBar(true, GetHScrollBar() != nullptr);
         if (GetVScrollBar() != nullptr) {
             GetVScrollBar()->ApplyAttributeList(strValue);
@@ -57,8 +56,7 @@ void ScrollBox::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         EnableScrollBar(GetVScrollBar() != nullptr, StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kHscrollbarStyle:
-    case ui::attr::control::kHscrollbarstyle: {
+    case ui::attr::control::kHscrollbarStyle: {
         EnableScrollBar(GetVScrollBar() != nullptr, true);
         if (GetHScrollBar() != nullptr) {
             GetHScrollBar()->ApplyAttributeList(strValue);
@@ -72,37 +70,31 @@ void ScrollBox::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         }
         break;
     }
-    case ui::attr::control::kScrollbarPadding:
-    case ui::attr::control::kScrollbarpadding: {
+    case ui::attr::control::kScrollbarPadding: {
         UiPadding rcScrollbarPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcScrollbarPadding);
         SetScrollBarPadding(rcScrollbarPadding, true);
         break;
     }
-    case ui::attr::control::kVscrollUnit:
-    case ui::attr::control::kVscrollunit: {
+    case ui::attr::control::kVscrollUnit: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetVerScrollUnitPixels(iValue, true);
         break;
     }
-    case ui::attr::control::kHscrollUnit:
-    case ui::attr::control::kHscrollunit: {
+    case ui::attr::control::kHscrollUnit: {
         int32_t iValue = StringUtil::StringToInt32(strValue);
         SetHorScrollUnitPixels(iValue, true);
         break;
     }
-    case ui::attr::control::kScrollbarFloat:
-    case ui::attr::control::kScrollbarfloat: {
+    case ui::attr::control::kScrollbarFloat: {
         SetScrollBarFloat(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kVscrollbarLeft:
-    case ui::attr::control::kVscrollbarleft: {
+    case ui::attr::control::kVscrollbarLeft: {
         SetVScrollBarAtLeft(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kHoldEnd:
-    case ui::attr::control::kHoldend: {
+    case ui::attr::control::kHoldEnd: {
         SetHoldEnd(StringUtil::IsValueTrue(strValue));
         break;
     }

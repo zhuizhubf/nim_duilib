@@ -320,15 +320,13 @@ void CheckCombo::SetAttributeById(ui::attr::control::Id id, const DString &strVa
     case ui::attr::control::kVscrollbar: {
         break;
     }
-    case ui::attr::control::kDropboxSize:
-    case ui::attr::control::kDropboxsize: {
+    case ui::attr::control::kDropboxSize: {
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
         break;
     }
-    case ui::attr::control::kPopupTop:
-    case ui::attr::control::kPopuptop: {
+    case ui::attr::control::kPopupTop: {
         SetPopupTop(StringUtil::IsValueTrue(strValue));
         break;
     }

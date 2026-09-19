@@ -192,37 +192,29 @@ void Slider::SetAttributeById(ui::attr::control::Id id, const DString &strValue2
         SetChangeStep(StringUtil::StringToInt32(strValue));
         break;
     }
-    case ui::attr::control::kThumbNormalImage:
-    case ui::attr::control::kThumbnormalimage: {
+    case ui::attr::control::kThumbNormalImage: {
         SetThumbStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kThumbHoveredImage:
-    case ui::attr::control::kThumbHotImage:
-    case ui::attr::control::kThumbhotimage: {
+    case ui::attr::control::kThumbHoveredImage: {
         SetThumbStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kThumbPressedImage:
-    case ui::attr::control::kThumbPushedImage:
-    case ui::attr::control::kThumbpushedimage: {
+    case ui::attr::control::kThumbPressedImage: {
         SetThumbStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kThumbDisabledImage:
-    case ui::attr::control::kThumbdisabledimage: {
+    case ui::attr::control::kThumbDisabledImage: {
         SetThumbStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kThumbSize:
-    case ui::attr::control::kThumbsize: {
+    case ui::attr::control::kThumbSize: {
         UiSize szXY;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szXY);
         SetThumbSize(szXY, true);
         break;
     }
-    case ui::attr::control::kProgressBarPadding:
-    case ui::attr::control::kProgressbarpadding: {
+    case ui::attr::control::kProgressBarPadding: {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetProgressBarPadding(rcPadding, true);

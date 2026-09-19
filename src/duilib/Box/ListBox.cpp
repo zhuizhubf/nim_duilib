@@ -63,8 +63,7 @@ void ListBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue
         }
         break;
     }
-    case ui::attr::control::kScrollSelect:
-    case ui::attr::control::kScrollselect: {
+    case ui::attr::control::kScrollSelect: {
         SetScrollSelect(StringUtil::IsValueTrue(strValue));
         break;
     }

@@ -24,8 +24,7 @@ void TabBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2
 {
     DString strValue = GetExpandVarStrings(strValue2);
     switch (id) {
-    case ui::attr::control::kSelectedId:
-    case ui::attr::control::kSelectedid: {
+    case ui::attr::control::kSelectedId: {
         size_t iSel = (size_t) StringUtil::StringToInt32(strValue);
         if (IsInited()) {
             SelectItem(iSel);
@@ -34,8 +33,7 @@ void TabBox::SetAttributeById(ui::attr::control::Id id, const DString &strValue2
         }
         break;
     }
-    case ui::attr::control::kFadeSwitch:
-    case ui::attr::control::kFadeswitch: {
+    case ui::attr::control::kFadeSwitch: {
         if (StringUtil::IsValueTrue(strValue)) {
             SetFadeSwitch(true);
         } else if (strValue == _T("false")) {

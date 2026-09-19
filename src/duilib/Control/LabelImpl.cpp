@@ -103,8 +103,7 @@ bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue
         }
         break;
     }
-    case ui::attr::control::kEndEllipsis:
-    case ui::attr::control::kEndellipsis: {
+    case ui::attr::control::kEndEllipsis: {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_END_ELLIPSIS;
         } else {
@@ -112,8 +111,7 @@ bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue
         }
         break;
     }
-    case ui::attr::control::kPathEllipsis:
-    case ui::attr::control::kPathellipsis: {
+    case ui::attr::control::kPathEllipsis: {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_PATH_ELLIPSIS;
         } else {
@@ -121,13 +119,11 @@ bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue
         }
         break;
     }
-    case ui::attr::control::kSingleLine:
-    case ui::attr::control::kSingleline: {
+    case ui::attr::control::kSingleLine: {
         SetSingleLine(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kMultiLine:
-    case ui::attr::control::kMultiline: {
+    case ui::attr::control::kMultiLine: {
         SetSingleLine(strValue != _T("true"));
         break;
     }
@@ -135,13 +131,11 @@ bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue
         SetText(strValue);
         break;
     }
-    case ui::attr::control::kTextId:
-    case ui::attr::control::kTextid: {
+    case ui::attr::control::kTextId: {
         SetTextId(strValue);
         break;
     }
-    case ui::attr::control::kAutoTooltip:
-    case ui::attr::control::kAutotooltip: {
+    case ui::attr::control::kAutoTooltip: {
         SetAutoShowToolTipEnabled(StringUtil::IsValueTrue(strValue));
         break;
     }
@@ -149,31 +143,23 @@ bool LabelImpl::OnSetAttribute(ui::attr::control::Id id, const DString &strValue
         SetFontId(strValue);
         break;
     }
-    case ui::attr::control::kTextColor:
-    case ui::attr::control::kNormalTextColor:
-    case ui::attr::control::kNormaltextcolor: {
+    case ui::attr::control::kTextColor: {
         SetStateTextColor(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kHoveredTextColor:
-    case ui::attr::control::kHotTextColor:
-    case ui::attr::control::kHottextcolor: {
+    case ui::attr::control::kHoveredTextColor: {
         SetStateTextColor(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kPressedTextColor:
-    case ui::attr::control::kPushedTextColor:
-    case ui::attr::control::kPushedtextcolor: {
+    case ui::attr::control::kPressedTextColor: {
         SetStateTextColor(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kDisabledTextColor:
-    case ui::attr::control::kDisabledtextcolor: {
+    case ui::attr::control::kDisabledTextColor: {
         SetStateTextColor(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kTextPadding:
-    case ui::attr::control::kTextpadding: {
+    case ui::attr::control::kTextPadding: {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding, true);

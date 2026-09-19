@@ -265,14 +265,12 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_bWindowShadowMode = (value == _T("true"));
             break;
         }
-        case attr::image::kDpiScale:
-        case attr::image::kDpiscale: {
+        case attr::image::kDpiScale: {
             //加载图片时，按照DPI缩放图片大小
             imageAttribute.m_bImageDpiScaleEnabled = (value == _T("true"));
             break;
         }
-        case attr::image::kDestScale:
-        case attr::image::kDestscale: {
+        case attr::image::kDestScale: {
             //加载时，对dest属性按照DPI缩放图片，仅当设置了dest属性时有效（会影响dest属性）
             //绘制时（内部使用），控制是否对dest属性进行DPI缩放
             imageAttribute.m_bDestDpiScaleEnabled = (value == _T("true"));
@@ -344,8 +342,7 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_pTiledDrawParam->m_bTiledX = (value == _T("true"));
             break;
         }
-        case attr::image::kFullXtiled:
-        case attr::image::kFullxtiled: {
+        case attr::image::kFullXtiled: {
             //横向平铺时，保证整张图片绘制
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
@@ -361,8 +358,7 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_pTiledDrawParam->m_bTiledY = (value == _T("true"));
             break;
         }
-        case attr::image::kFullYtiled:
-        case attr::image::kFullytiled: {
+        case attr::image::kFullYtiled: {
             //纵向平铺时，保证整张图片绘制
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
@@ -370,8 +366,7 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_pTiledDrawParam->m_bFullTiledY = (value == _T("true"));
             break;
         }
-        case attr::image::kTiledMargin:
-        case attr::image::kTiledmargin: {
+        case attr::image::kTiledMargin: {
             //平铺绘制时，各平铺图片之间的间隔，包括横向平铺和纵向平铺
             if (m_pTiledDrawParam == nullptr) {
                 m_pTiledDrawParam = std::make_unique<TiledDrawParam>();
@@ -406,8 +401,7 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             m_pTiledDrawParam->m_rcTiledPadding = rcPadding;
             break;
         }
-        case attr::image::kIconSize:
-        case attr::image::kIconsize: {
+        case attr::image::kIconSize: {
             //指定加载ICO文件的图片大小(仅当图片文件是ICO文件时有效)
             imageAttribute.m_nIconSize = (uint32_t) StringUtil::StringToInt32(value);
             break;
@@ -430,8 +424,7 @@ void ImageAttribute::ModifyAttribute(const DString &strImageString, const DpiMan
             imageAttribute.m_fPagMaxFrameRate = (float) StringUtil::StringToInt32(value);
             break;
         }
-        case attr::image::kPlayCount:
-        case attr::image::kPlaycount: {
+        case attr::image::kPlayCount: {
             //如果是动画图片，取值代表的含义
             //  -1: 表示一直播放
             //  0 : 表示无有效的播放次数，使用图片的默认值

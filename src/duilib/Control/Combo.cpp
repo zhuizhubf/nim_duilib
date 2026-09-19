@@ -366,16 +366,14 @@ void Combo::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
         }
         break;
     }
-    case ui::attr::control::kDropboxSize:
-    case ui::attr::control::kDropboxsize: {
+    case ui::attr::control::kDropboxSize: {
         //设置下拉列表的大小（宽度和高度）
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
         break;
     }
-    case ui::attr::control::kPopupTop:
-    case ui::attr::control::kPopuptop: {
+    case ui::attr::control::kPopupTop: {
         //下拉列表是否向上弹出
         SetPopupTop(StringUtil::IsValueTrue(strValue));
         break;

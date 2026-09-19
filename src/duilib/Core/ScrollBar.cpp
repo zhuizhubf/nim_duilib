@@ -73,113 +73,83 @@ void ScrollBar::SetAttributeById(ui::attr::control::Id id, const DString &strVal
 {
     DString strValue = GetExpandVarStrings(strValue2);
     switch (id) {
-    case ui::attr::control::kButton1NormalImage:
-    case ui::attr::control::kButton1normalimage: {
+    case ui::attr::control::kButton1NormalImage: {
         SetButton1StateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kButton1HoveredImage:
-    case ui::attr::control::kButton1HotImage:
-    case ui::attr::control::kButton1hotimage: {
+    case ui::attr::control::kButton1HoveredImage: {
         SetButton1StateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kButton1PressedImage:
-    case ui::attr::control::kButton1PushedImage:
-    case ui::attr::control::kButton1pushedimage: {
+    case ui::attr::control::kButton1PressedImage: {
         SetButton1StateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kButton1DisabledImage:
-    case ui::attr::control::kButton1disabledimage: {
+    case ui::attr::control::kButton1DisabledImage: {
         SetButton1StateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kButton2NormalImage:
-    case ui::attr::control::kButton2normalimage: {
+    case ui::attr::control::kButton2NormalImage: {
         SetButton2StateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kButton2HoveredImage:
-    case ui::attr::control::kButton2HotImage:
-    case ui::attr::control::kButton2hotimage: {
+    case ui::attr::control::kButton2HoveredImage: {
         SetButton2StateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kButton2PressedImage:
-    case ui::attr::control::kButton2PushedImage:
-    case ui::attr::control::kButton2pushedimage: {
+    case ui::attr::control::kButton2PressedImage: {
         SetButton2StateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kButton2DisabledImage:
-    case ui::attr::control::kButton2disabledimage: {
+    case ui::attr::control::kButton2DisabledImage: {
         SetButton2StateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kThumbNormalImage:
-    case ui::attr::control::kThumbnormalimage: {
+    case ui::attr::control::kThumbNormalImage: {
         SetThumbStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kThumbHoveredImage:
-    case ui::attr::control::kThumbHotImage:
-    case ui::attr::control::kThumbhotimage: {
+    case ui::attr::control::kThumbHoveredImage: {
         SetThumbStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kThumbPressedImage:
-    case ui::attr::control::kThumbPushedImage:
-    case ui::attr::control::kThumbpushedimage: {
+    case ui::attr::control::kThumbPressedImage: {
         SetThumbStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kThumbDisabledImage:
-    case ui::attr::control::kThumbdisabledimage: {
+    case ui::attr::control::kThumbDisabledImage: {
         SetThumbStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kRailNormalImage:
-    case ui::attr::control::kRailnormalimage: {
+    case ui::attr::control::kRailNormalImage: {
         SetRailStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kRailHoveredImage:
-    case ui::attr::control::kRailHotImage:
-    case ui::attr::control::kRailhotimage: {
+    case ui::attr::control::kRailHoveredImage: {
         SetRailStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kRailPressedImage:
-    case ui::attr::control::kRailPushedImage:
-    case ui::attr::control::kRailpushedimage: {
+    case ui::attr::control::kRailPressedImage: {
         SetRailStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kRailDisabledImage:
-    case ui::attr::control::kRaildisabledimage: {
+    case ui::attr::control::kRailDisabledImage: {
         SetRailStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kBkNormalImage:
-    case ui::attr::control::kBknormalimage: {
+    case ui::attr::control::kBkNormalImage: {
         SetBkStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kBkHoveredImage:
-    case ui::attr::control::kBkHotImage:
-    case ui::attr::control::kBkhotimage: {
+    case ui::attr::control::kBkHoveredImage: {
         SetBkStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kBkPressedImage:
-    case ui::attr::control::kBkPushedImage:
-    case ui::attr::control::kBkpushedimage: {
+    case ui::attr::control::kBkPressedImage: {
         SetBkStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kBkDisabledImage:
-    case ui::attr::control::kBkdisabledimage: {
+    case ui::attr::control::kBkDisabledImage: {
         SetBkStateImage(kControlStateDisabled, strValue);
         break;
     }
@@ -188,13 +158,11 @@ void ScrollBar::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetHorizontal(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kLineSize:
-    case ui::attr::control::kLinesize: {
+    case ui::attr::control::kLineSize: {
         SetLineSize(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kThumbMinLength:
-    case ui::attr::control::kThumbminlength: {
+    case ui::attr::control::kThumbMinLength: {
         SetThumbMinLength(StringUtil::StringToInt32(strValue), true);
         break;
     }
@@ -206,18 +174,15 @@ void ScrollBar::SetAttributeById(ui::attr::control::Id id, const DString &strVal
         SetScrollPos(StringUtil::StringToInt32(strValue));
         break;
     }
-    case ui::attr::control::kShowButton1:
-    case ui::attr::control::kShowbutton1: {
+    case ui::attr::control::kShowButton1: {
         SetShowButton1(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kShowButton2:
-    case ui::attr::control::kShowbutton2: {
+    case ui::attr::control::kShowButton2: {
         SetShowButton2(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kAutoHideScroll:
-    case ui::attr::control::kAutohidescroll: {
+    case ui::attr::control::kAutoHideScroll: {
         SetAutoHideScroll(StringUtil::IsValueTrue(strValue));
         break;
     }

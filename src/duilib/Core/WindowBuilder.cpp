@@ -712,8 +712,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(
             createAttributes.m_bUseSystemCaptionDefined = true;
             break;
         }
-        case ui::attr::window::kSizeBox:
-        case ui::attr::window::kSizebox: {
+        case ui::attr::window::kSizeBox: {
             AttributeUtil::ParseRectValue(strValue.c_str(), createAttributes.m_rcSizeBox);
             createAttributes.m_bSizeBoxDefined = true;
             break;
@@ -723,8 +722,7 @@ bool WindowBuilder::ParseWindowCreateAttributes(
             createAttributes.m_bCaptionDefined = true;
             break;
         }
-        case ui::attr::window::kShadowAttached:
-        case ui::attr::window::kShadowattached: {
+        case ui::attr::window::kShadowAttached: {
             createAttributes.m_bShadowAttached = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bShadowAttachedDefined = true;
             break;
@@ -734,14 +732,12 @@ bool WindowBuilder::ParseWindowCreateAttributes(
             Shadow::GetShadowType(strValue, nShadowType);
             break;
         }
-        case ui::attr::window::kShadowCorner:
-        case ui::attr::window::kShadowcorner: {
+        case ui::attr::window::kShadowCorner: {
             //设置窗口阴影的九宫格属性
             AttributeUtil::ParsePaddingValue(strValue.c_str(), rcShadowCorner);
             break;
         }
-        case ui::attr::window::kLayeredWindow:
-        case ui::attr::window::kLayeredwindow: {
+        case ui::attr::window::kLayeredWindow: {
             createAttributes.m_bIsLayeredWindow = (StringUtil::IsValueTrue(strValue));
             createAttributes.m_bIsLayeredWindowDefined = true;
             bIsLayeredWindowDefined = true;
@@ -1029,8 +1025,7 @@ void WindowBuilder::ParseWindowAttributes(Window *pWindow, const pugi::xml_node 
         strName = attr.name();
         strValue = attr.value();
         switch (ui::attr::window::IdOf(strName)) {
-        case ui::attr::window::kSizeBox:
-        case ui::attr::window::kSizebox: {
+        case ui::attr::window::kSizeBox: {
             UiRect rcSizeBox;
             AttributeUtil::ParseRectValue(strValue.c_str(), rcSizeBox, false);
             pWindow->SetSizeBox(rcSizeBox, true);
@@ -1067,13 +1062,11 @@ void WindowBuilder::ParseWindowAttributes(Window *pWindow, const pugi::xml_node 
             pWindow->SetText(strValue);
             break;
         }
-        case ui::attr::window::kTextId:
-        case ui::attr::window::kTextid: {
+        case ui::attr::window::kTextId: {
             pWindow->SetTextId(strValue);
             break;
         }
-        case ui::attr::window::kRoundCorner:
-        case ui::attr::window::kRoundcorner: {
+        case ui::attr::window::kRoundCorner: {
             UiSize size;
             AttributeUtil::ParseSizeValue(strValue.c_str(), size);
             pWindow->SetRoundCorner(size.cx, size.cy, true);
@@ -1084,8 +1077,7 @@ void WindowBuilder::ParseWindowAttributes(Window *pWindow, const pugi::xml_node 
             bSizeContainShadow = (StringUtil::IsValueTrue(strValue));
             break;
         }
-        case ui::attr::window::kShadowAttached:
-        case ui::attr::window::kShadowattached: {
+        case ui::attr::window::kShadowAttached: {
             //设置是否支持窗口阴影（阴影实现有两种：分层窗口和普通窗口）
             bShadowAttached = (StringUtil::IsValueTrue(strValue));
             bHasShadowAttached = true;
@@ -1098,14 +1090,12 @@ void WindowBuilder::ParseWindowAttributes(Window *pWindow, const pugi::xml_node 
             }
             break;
         }
-        case ui::attr::window::kShadowImage:
-        case ui::attr::window::kShadowimage: {
+        case ui::attr::window::kShadowImage: {
             //设置阴影图片
             pWindow->SetShadowImage(strValue);
             break;
         }
-        case ui::attr::window::kShadowCorner:
-        case ui::attr::window::kShadowcorner: {
+        case ui::attr::window::kShadowCorner: {
             //设置窗口阴影的九宫格属性
             UiPadding padding;
             AttributeUtil::ParsePaddingValue(strValue.c_str(), padding);
@@ -1134,8 +1124,7 @@ void WindowBuilder::ParseWindowAttributes(Window *pWindow, const pugi::xml_node 
             pWindow->SetEnableShadowSnap(StringUtil::IsValueTrue(strValue));
             break;
         }
-        case ui::attr::window::kLayeredWindow:
-        case ui::attr::window::kLayeredwindow: {
+        case ui::attr::window::kLayeredWindow: {
             //设置是否设置分层窗口属性（分层窗口还是普通窗口）
             pWindow->SetLayeredWindow(StringUtil::IsValueTrue(strValue), false);
             break;
@@ -2406,9 +2395,9 @@ void WindowBuilder::AttachXmlEvent(bool bBubbled, const pugi::xml_node &node, Co
         ASSERT_UNUSED_VARIABLE(i != 0 || ui::attr::window::IdOf(strName) == ui::attr::window::kType);
         ASSERT_UNUSED_VARIABLE(
             i != 1 || ui::attr::window::IdOf(strName) == ui::attr::window::kReceiver);
+        //applyattribute 与 apply_attribute 是同一属性（别名归一到同一 ID）
         ASSERT_UNUSED_VARIABLE(
-            i != 2 || (ui::attr::window::IdOf(strName) == ui::attr::window::kApplyattribute)
-            || (ui::attr::window::IdOf(strName) == ui::attr::window::kApplyAttribute));
+            i != 2 || (ui::attr::window::IdOf(strName) == ui::attr::window::kApplyAttribute));
         ++i;
         switch (ui::attr::window::IdOf(strName)) {
         case ui::attr::window::kType: {
@@ -2419,8 +2408,7 @@ void WindowBuilder::AttachXmlEvent(bool bBubbled, const pugi::xml_node &node, Co
             strReceiver = strValue;
             break;
         }
-        case ui::attr::window::kApplyAttribute:
-        case ui::attr::window::kApplyattribute: {
+        case ui::attr::window::kApplyAttribute: {
             strApplyAttribute = strValue;
             break;
         }

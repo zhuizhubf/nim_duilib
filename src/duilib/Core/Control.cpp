@@ -185,8 +185,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetForeColor(strValue);
         break;
     }
-    case ui::attr::control::kBorderSize:
-    case ui::attr::control::kBordersize: {
+    case ui::attr::control::kBorderSize: {
         //边线宽度
         DString nValue = strValue;
         if (nValue.find(_T(',')) == DString::npos) {
@@ -231,16 +230,14 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetBordersOnTop(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kBorderRound:
-    case ui::attr::control::kBorderround: {
+    case ui::attr::control::kBorderRound: {
         //圆角大小
         UiSize cxyRound;
         AttributeUtil::ParseSizeValue(strValue.c_str(), cxyRound);
         SetBorderRound(cxyRound);
         break;
     }
-    case ui::attr::control::kBoxShadow:
-    case ui::attr::control::kBoxshadow: {
+    case ui::attr::control::kBoxShadow: {
         SetBoxShadow(strValue);
         break;
     }
@@ -308,8 +305,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         }
         break;
     }
-    case ui::attr::control::kCursorType:
-    case ui::attr::control::kCursortype: {
+    case ui::attr::control::kCursorType: {
         if (strValue == _T("arrow")) {
             SetCursorType(CursorType::kCursorArrow);
         } else if (strValue == _T("ibeam")) {
@@ -339,32 +335,25 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         }
         break;
     }
-    case ui::attr::control::kRenderOffset:
-    case ui::attr::control::kRenderoffset: {
+    case ui::attr::control::kRenderOffset: {
         UiPoint renderOffset;
         AttributeUtil::ParsePointValue(strValue.c_str(), renderOffset);
         SetRenderOffset(renderOffset, true);
         break;
     }
-    case ui::attr::control::kNormalColor:
-    case ui::attr::control::kNormalcolor: {
+    case ui::attr::control::kNormalColor: {
         SetStateColor(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kHoveredColor:
-    case ui::attr::control::kHotColor:
-    case ui::attr::control::kHotcolor: {
+    case ui::attr::control::kHoveredColor: {
         SetStateColor(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kPressedColor:
-    case ui::attr::control::kPushedColor:
-    case ui::attr::control::kPushedcolor: {
+    case ui::attr::control::kPressedColor: {
         SetStateColor(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kDisabledColor:
-    case ui::attr::control::kDisabledcolor: {
+    case ui::attr::control::kDisabledColor: {
         SetStateColor(kControlStateDisabled, strValue);
         break;
     }
@@ -430,8 +419,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetStateColorRound(kControlStateDisabled, szRound, true);
         break;
     }
-    case ui::attr::control::kBorderColor:
-    case ui::attr::control::kBordercolor: {
+    case ui::attr::control::kBorderColor: {
         SetBorderColor(strValue);
         break;
     }
@@ -458,23 +446,19 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetFocusedBorderColor(strValue);
         break;
     }
-    case ui::attr::control::kLeftBorderSize:
-    case ui::attr::control::kLeftbordersize: {
+    case ui::attr::control::kLeftBorderSize: {
         SetLeftBorderSize((float) StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kTopBorderSize:
-    case ui::attr::control::kTopbordersize: {
+    case ui::attr::control::kTopBorderSize: {
         SetTopBorderSize((float) StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kRightBorderSize:
-    case ui::attr::control::kRightbordersize: {
+    case ui::attr::control::kRightBorderSize: {
         SetRightBorderSize((float) StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kBottomBorderSize:
-    case ui::attr::control::kBottombordersize: {
+    case ui::attr::control::kBottomBorderSize: {
         SetBottomBorderSize((float) StringUtil::StringToInt32(strValue), true);
         break;
     }
@@ -482,23 +466,19 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetBkImage(strValue);
         break;
     }
-    case ui::attr::control::kMinWidth:
-    case ui::attr::control::kMinwidth: {
+    case ui::attr::control::kMinWidth: {
         SetMinWidth(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kMaxWidth:
-    case ui::attr::control::kMaxwidth: {
+    case ui::attr::control::kMaxWidth: {
         SetMaxWidth(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kMinHeight:
-    case ui::attr::control::kMinheight: {
+    case ui::attr::control::kMinHeight: {
         SetMinHeight(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kMaxHeight:
-    case ui::attr::control::kMaxheight: {
+    case ui::attr::control::kMaxHeight: {
         SetMaxHeight(StringUtil::StringToInt32(strValue), true);
         break;
     }
@@ -506,8 +486,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetName(strValue);
         break;
     }
-    case ui::attr::control::kTooltipText:
-    case ui::attr::control::kTooltiptext: {
+    case ui::attr::control::kTooltipText: {
         SetToolTipText(strValue);
         break;
     }
@@ -521,8 +500,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetToolTipWidth(StringUtil::StringToInt32(strValue), true);
         break;
     }
-    case ui::attr::control::kDataId:
-    case ui::attr::control::kDataid: {
+    case ui::attr::control::kDataId: {
         SetDataID(strValue);
         break;
     }
@@ -549,8 +527,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetVisible(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kFadeVisible:
-    case ui::attr::control::kFadevisible: {
+    case ui::attr::control::kFadeVisible: {
         SetFadeVisible(StringUtil::IsValueTrue(strValue));
         break;
     }
@@ -566,8 +543,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         //忽略该选项：对应功能已经删除
         break;
     }
-    case ui::attr::control::kNoFocus:
-    case ui::attr::control::kNofocus: {
+    case ui::attr::control::kNoFocus: {
         SetNoFocus();
         break;
     }
@@ -575,52 +551,39 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetAlpha(ui::TruncateToUInt8(StringUtil::StringToInt32(strValue)));
         break;
     }
-    case ui::attr::control::kNormalImage:
-    case ui::attr::control::kNormalimage: {
+    case ui::attr::control::kNormalImage: {
         SetStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kHoveredImage:
-    case ui::attr::control::kHotImage:
-    case ui::attr::control::kHotimage: {
+    case ui::attr::control::kHoveredImage: {
         SetStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kPressedImage:
-    case ui::attr::control::kPushedImage:
-    case ui::attr::control::kPushedimage: {
+    case ui::attr::control::kPressedImage: {
         SetStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kDisabledImage:
-    case ui::attr::control::kDisabledimage: {
+    case ui::attr::control::kDisabledImage: {
         SetStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kForeNormalImage:
-    case ui::attr::control::kForenormalimage: {
+    case ui::attr::control::kForeNormalImage: {
         SetForeStateImage(kControlStateNormal, strValue);
         break;
     }
-    case ui::attr::control::kForeHoveredImage:
-    case ui::attr::control::kForeHotImage:
-    case ui::attr::control::kForehotimage: {
+    case ui::attr::control::kForeHoveredImage: {
         SetForeStateImage(kControlStateHovered, strValue);
         break;
     }
-    case ui::attr::control::kForePressedImage:
-    case ui::attr::control::kForePushedImage:
-    case ui::attr::control::kForepushedimage: {
+    case ui::attr::control::kForePressedImage: {
         SetForeStateImage(kControlStatePressed, strValue);
         break;
     }
-    case ui::attr::control::kForeDisabledImage:
-    case ui::attr::control::kForedisabledimage: {
+    case ui::attr::control::kForeDisabledImage: {
         SetForeStateImage(kControlStateDisabled, strValue);
         break;
     }
-    case ui::attr::control::kFadeAlpha:
-    case ui::attr::control::kFadealpha: {
+    case ui::attr::control::kFadeAlpha: {
         bool bFadeVisible = strValue != _T("false");
         uint8_t nEndAlpha = GetAlpha();
         if (bFadeVisible) {
@@ -631,9 +594,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         GetAnimationManager().SetFadeAlpha(bFadeVisible, nEndAlpha);
         break;
     }
-    case ui::attr::control::kFadeHovered:
-    case ui::attr::control::kFadeHot:
-    case ui::attr::control::kFadehot: {
+    case ui::attr::control::kFadeHovered: {
         SetFadeHovered(StringUtil::IsValueTrue(strValue));
         break;
     }
@@ -652,13 +613,11 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         SetFadeHoveredEasingFunctionType(EasingFunctions::GetEasingFunctionType(strValue));
         break;
     }
-    case ui::attr::control::kFadeWidth:
-    case ui::attr::control::kFadewidth: {
+    case ui::attr::control::kFadeWidth: {
         GetAnimationManager().SetFadeWidth(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kFadeHeight:
-    case ui::attr::control::kFadeheight: {
+    case ui::attr::control::kFadeHeight: {
         GetAnimationManager().SetFadeHeight(StringUtil::IsValueTrue(strValue));
         break;
     }
@@ -666,23 +625,19 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
         GetAnimationManager().SetFadeSize(StringUtil::IsValueTrue(strValue));
         break;
     }
-    case ui::attr::control::kFadeInOutXFromLeft:
-    case ui::attr::control::kFadeinoutxfromleft: {
+    case ui::attr::control::kFadeInOutXFromLeft: {
         GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), false);
         break;
     }
-    case ui::attr::control::kFadeInOutXFromRight:
-    case ui::attr::control::kFadeinoutxfromright: {
+    case ui::attr::control::kFadeInOutXFromRight: {
         GetAnimationManager().SetFadeInOutX(StringUtil::IsValueTrue(strValue), true);
         break;
     }
-    case ui::attr::control::kFadeInOutYFromTop:
-    case ui::attr::control::kFadeinoutyfromtop: {
+    case ui::attr::control::kFadeInOutYFromTop: {
         GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), false);
         break;
     }
-    case ui::attr::control::kFadeInOutYFromBottom:
-    case ui::attr::control::kFadeinoutyfrombottom: {
+    case ui::attr::control::kFadeInOutYFromBottom: {
         GetAnimationManager().SetFadeInOutY(StringUtil::IsValueTrue(strValue), true);
         break;
     }
@@ -699,8 +654,7 @@ void Control::SetAttributeById(attr::control::Id id, const DString &strValue2)
             EasingFunctions::GetEasingFunctionType(strValue));
         break;
     }
-    case ui::attr::control::kTabStop:
-    case ui::attr::control::kTabstop: {
+    case ui::attr::control::kTabStop: {
         SetTabStop(StringUtil::IsValueTrue(strValue));
         break;
     }

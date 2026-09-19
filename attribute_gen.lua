@@ -69,13 +69,15 @@ local function normalize(defs, domains)
     for _, domain in ipairs(domains) do
         local list, seenName, seenIdent, seenHash = {}, {}, {}, {}
         for _, raw in ipairs(defs[domain]) do
-            -- 条目可以是字符串，也可以是 { name = "...", macro = "..." } 表（ctrl 域用后者携带宏名）
-            local name, macro
+            -- 条目可以是字符串，也可以是 { name, alias } / { name, macro } 表
+            local name, macro, aliasList
             if type(raw) == "table" then
                 name = raw.name
                 macro = raw.macro
+                aliasList = raw.alias or {}
             else
                 name = raw
+                aliasList = {}
             end
             assert(type(name) == "string", domain .. " 域条目缺少 name")
             assert(name:match("^[A-Za-z0-9_]+$"), "非法属性名（仅允许 ASCII 字母数字下划线）: " .. name)
@@ -94,7 +96,21 @@ local function normalize(defs, domains)
             assert(seenHash[hash] == nil,
                    string.format("同域哈希冲突: %s 的 %s 与 %s 都映射到 0x%08X", domain, name, tostring(seenHash[hash]), hash))
             seenName[name], seenIdent[ident], seenHash[hash] = true, name, name
-            list[#list + 1] = { name = name, ident = ident, hash = hash, id = #list, macro = macro }
+            -- 别名：归一到同一个 Id；必须与规范名不同，且不能与同域任何名字冲突
+            for _, alias in ipairs(aliasList) do
+                assert(type(alias) == "string", domain .. " 域别名必须是字符串: " .. name)
+                assert(alias:match("^[A-Za-z0-9_]+$"), "非法别名（仅允许 ASCII 字母数字下划线）: " .. domain .. "." .. alias)
+                assert(alias ~= name, "别名不能与规范名相同: " .. domain .. "." .. alias)
+                assert(seenName[alias] == nil,
+                       "别名与同域已有名字冲突: " .. domain .. "." .. alias .. "（来自 " .. name .. "）")
+                local aliasHash = fnv1a(alias)
+                assert(seenHash[aliasHash] == nil,
+                       string.format("同域哈希冲突: %s 的别名 %s 与 %s 都映射到 0x%08X", domain, alias,
+                                     tostring(seenHash[aliasHash]), aliasHash))
+                seenName[alias] = name
+                seenHash[aliasHash] = alias
+            end
+            list[#list + 1] = { name = name, ident = ident, hash = hash, id = #list, macro = macro, alias = aliasList }
         end
         result[domain] = list
     end
@@ -174,6 +190,10 @@ local function emit_source(domains, data)
         for _, item in ipairs(data[domain]) do
             add(string.format("    case 0x%08Xu: //%s", item.hash, item.name))
             add("        return Id::" .. item.ident .. ";")
+            for _, alias in ipairs(item.alias or {}) do
+                add(string.format("    case 0x%08Xu: //%s（别名，归一到 %s）", fnv1a(alias), alias, item.name))
+                add("        return Id::" .. item.ident .. ";")
+            end
         end
         add("    default:")
         add("        break;")

@@ -90,7 +90,7 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - XML属性值中内嵌引号用单引号`'`或花括号`{}`代替双引号
 - 控件类支持模板变体: `Label`(Control基)、`LabelBox`(Box基)、`LabelHBox`(HBox基)、`LabelVBox`(VBox基)
 - 窗口析构由框架管理，使用 `new` 创建，不需要手动 `delete`
-- **属性名统一登记表**：新增/修改 XML 属性只在 `attribute_defs.lua` 对应域列表**末尾**追加名字，然后运行 `xmake attribute-gen`
+- **属性名统一登记表**：新增/修改 XML 属性只在 `attribute_defs.lua` 对应域列表**末尾**追加名字，然后运行 `xmake attribute-gen`；历史书写变体写进 `alias`（如 `{ name = "scroll_select", alias = { "scrollselect" } }`），别名在 `IdOf` 中归一到规范名，链上每个属性只需一个 `case`
 - `src/duilib/Utils/AttributeIds.g.h`、`AttributeIds.g.cpp`、`CtrlDefs.g.h` 是生成文件，**禁止手改**；CI 用 `xmake attribute-check` 校验生成物同步与 XML 语料覆盖
 - 属性派发一律用枚举：链上写 `switch (id)` + `case ui::attr::control::kXxx`，禁止再引入字符串比较；链上签名是 `SetAttributeById(attr::control::Id id, const DString &strValue)`，**不传名字**
 - 代码内设置属性用 `SetAttributeById(ui::attr::control::kXxx, _T("xxx"), value)`，避免重复的字符串→枚举转换
