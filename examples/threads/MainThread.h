@@ -31,7 +31,7 @@ public:
     /** 输出日志，可以在任何线程中调用，最终在主线程中执行
     * @param [in] log 日志内容
     */
-    void PrintLog(const DString& log);
+    void PrintLog(const DString &log);
 
 private:
     /** 运行前初始化，在进入消息循环前调用，如果初始化失败则不进入消息循环

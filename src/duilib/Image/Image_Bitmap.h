@@ -4,11 +4,10 @@
 #include "duilib/Image/ImageDecoder.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 /** 位图格式的图片数据
 */
-class Image_Bitmap: public IImage
+class Image_Bitmap : public IImage
 {
 public:
     /** 创建一个位图的图片数据（ARGB格式）
@@ -18,24 +17,27 @@ public:
     @param [in] fImageSizeScale 图片的缩放比例，1.0f表示原值
     @param [in] alphaType 位图的Alpha类型    
     */
-    static std::unique_ptr<IImage> MakeImage(uint32_t nWidth, uint32_t nHeight, const void* pPixelBits,
-                                             float fImageSizeScale = 1.0f,
-                                             BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType);
-
+    static std::unique_ptr<IImage> MakeImage(
+        uint32_t nWidth,
+        uint32_t nHeight,
+        const void *pPixelBits,
+        float fImageSizeScale = 1.0f,
+        BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType);
 
     /** 创建一个位图的图片数据（ARGB格式）
     @param [in] pBitmap 已经生成的位图
     @param [in] fImageSizeScale 图片的缩放比例，1.0f表示原值
     */
-    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<IBitmap>& pBitmap, float fImageSizeScale);
+    static std::unique_ptr<IImage> MakeImage(
+        const std::shared_ptr<IBitmap> &pBitmap, float fImageSizeScale);
 
     /** 从一个支持延迟解码的位图对象创建
     */
-    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<IBitmapImage>& pBitmap);
+    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<IBitmapImage> &pBitmap);
 
     /** 从一个支持延迟解码的动画图片对象创建(取第一帧)
     */
-    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<IAnimationImage>& pAnimationImage);
+    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<IAnimationImage> &pAnimationImage);
 
 public:
     Image_Bitmap();
@@ -92,9 +94,8 @@ private:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool AsyncDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override;
+    virtual bool AsyncDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override;
 
     /** 合并异步解码图片数据的结果
     */

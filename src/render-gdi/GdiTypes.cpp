@@ -11,11 +11,9 @@
 
 #pragma comment(lib, "gdiplus.lib")
 
-namespace ui
-{
+namespace ui {
 
-namespace
-{
+namespace {
 /** 线程内复用的测量用DC
 *   文本布局时会按字符查询字形（IsUnicodeCharSupported），如果每次调用都
 *   创建并销毁一个兼容DC，开销极大（实测会导致界面卡顿数秒）。
@@ -24,10 +22,9 @@ namespace
 class ThreadMeasureDC
 {
 public:
-    ThreadMeasureDC():
-        m_hDC(::CreateCompatibleDC(nullptr))
-    {
-    }
+    ThreadMeasureDC()
+        : m_hDC(::CreateCompatibleDC(nullptr))
+    {}
     ~ThreadMeasureDC()
     {
         if (m_hDC != nullptr) {
@@ -35,8 +32,8 @@ public:
             m_hDC = nullptr;
         }
     }
-    ThreadMeasureDC(const ThreadMeasureDC&) = delete;
-    ThreadMeasureDC& operator=(const ThreadMeasureDC&) = delete;
+    ThreadMeasureDC(const ThreadMeasureDC &) = delete;
+    ThreadMeasureDC &operator=(const ThreadMeasureDC &) = delete;
 
     HDC GetDC() const { return m_hDC; }
 
@@ -54,11 +51,11 @@ HDC GetThreadMeasureDC()
 
 Gdiplus::Color ToGdiplusColor(UiColor color, uint8_t alpha = 255)
 {
-    const uint8_t a = (uint8_t)((uint32_t)color.GetAlpha() * alpha / 255);
+    const uint8_t a = (uint8_t) ((uint32_t) color.GetAlpha() * alpha / 255);
     return Gdiplus::Color(a, color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
-HBITMAP CreateDibSection(int32_t nWidth, int32_t nHeight, void** ppBits)
+HBITMAP CreateDibSection(int32_t nWidth, int32_t nHeight, void **ppBits)
 {
     if ((nWidth <= 0) || (nHeight <= 0)) {
         return nullptr;
@@ -70,7 +67,7 @@ HBITMAP CreateDibSection(int32_t nWidth, int32_t nHeight, void** ppBits)
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biSizeImage = (DWORD)(nWidth * nHeight * (int32_t)sizeof(uint32_t));
+    bmi.bmiHeader.biSizeImage = (DWORD) (nWidth * nHeight * (int32_t) sizeof(uint32_t));
 
     HDC hdc = ::GetDC(nullptr);
     HBITMAP hBitmap = ::CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, ppBits, nullptr, 0);
@@ -78,55 +75,49 @@ HBITMAP CreateDibSection(int32_t nWidth, int32_t nHeight, void** ppBits)
     return hBitmap;
 }
 
-void CopyPixelsToBitmap(uint8_t* pDest, uint32_t nWidth, uint32_t nHeight,
-                        const void* pSrc, BitmapAlphaType alphaType)
+void CopyPixelsToBitmap(
+    uint8_t *pDest, uint32_t nWidth, uint32_t nHeight, const void *pSrc, BitmapAlphaType alphaType)
 {
     ASSERT(pDest != nullptr);
     if ((pDest == nullptr) || (nWidth == 0) || (nHeight == 0)) {
         return;
     }
-    const size_t nCount = (size_t)nWidth * nHeight;
+    const size_t nCount = (size_t) nWidth * nHeight;
     if (pSrc == nullptr) {
         std::memset(pDest, 0, nCount * sizeof(uint32_t));
         return;
     }
-    const uint32_t* pSrcPixels = (const uint32_t*)pSrc;
-    uint32_t* pDestPixels = (uint32_t*)pDest;
+    const uint32_t *pSrcPixels = (const uint32_t *) pSrc;
+    uint32_t *pDestPixels = (uint32_t *) pDest;
     if (alphaType == BitmapAlphaType::kOpaque_SkAlphaType) {
         for (size_t i = 0; i < nCount; ++i) {
             pDestPixels[i] = (pSrcPixels[i] & 0x00FFFFFFu) | 0xFF000000u;
         }
-    }
-    else if (alphaType == BitmapAlphaType::kUnpremul_SkAlphaType) {
+    } else if (alphaType == BitmapAlphaType::kUnpremul_SkAlphaType) {
         for (size_t i = 0; i < nCount; ++i) {
             const uint32_t value = pSrcPixels[i];
             const uint32_t a = (value >> 24) & 0xFF;
             if (a == 0) {
                 pDestPixels[i] = 0;
-            }
-            else if (a == 255) {
+            } else if (a == 255) {
                 pDestPixels[i] = value;
-            }
-            else {
+            } else {
                 const uint32_t r = ((value >> 16) & 0xFF) * a / 255;
                 const uint32_t g = ((value >> 8) & 0xFF) * a / 255;
                 const uint32_t b = (value & 0xFF) * a / 255;
                 pDestPixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
             }
         }
-    }
-    else {
+    } else {
         std::memcpy(pDest, pSrc, nCount * sizeof(uint32_t));
     }
 }
-}
+} // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // Bitmap_GDI
 ////////////////////////////////////////////////////////////////////////////////
-Bitmap_GDI::Bitmap_GDI()
-{
-}
+Bitmap_GDI::Bitmap_GDI() {}
 
 Bitmap_GDI::~Bitmap_GDI()
 {
@@ -144,23 +135,25 @@ void Bitmap_GDI::DeleteBitmap()
     m_nHeight = 0;
 }
 
-bool Bitmap_GDI::Init(uint32_t nWidth, uint32_t nHeight,
-                      const void* pPixelBits,
-                      float /*fImageSizeScale*/,
-                      BitmapAlphaType alphaType)
+bool Bitmap_GDI::Init(
+    uint32_t nWidth,
+    uint32_t nHeight,
+    const void *pPixelBits,
+    float /*fImageSizeScale*/,
+    BitmapAlphaType alphaType)
 {
     DeleteBitmap();
     if ((nWidth == 0) || (nHeight == 0)) {
         return false;
     }
-    m_hBitmap = CreateDibSection((int32_t)nWidth, (int32_t)nHeight, &m_pPixelBits);
+    m_hBitmap = CreateDibSection((int32_t) nWidth, (int32_t) nHeight, &m_pPixelBits);
     ASSERT(m_hBitmap != nullptr);
     if (m_hBitmap == nullptr) {
         return false;
     }
     m_nWidth = nWidth;
     m_nHeight = nHeight;
-    CopyPixelsToBitmap((uint8_t*)m_pPixelBits, nWidth, nHeight, pPixelBits, alphaType);
+    CopyPixelsToBitmap((uint8_t *) m_pPixelBits, nWidth, nHeight, pPixelBits, alphaType);
     return true;
 }
 
@@ -176,22 +169,21 @@ uint32_t Bitmap_GDI::GetHeight() const
 
 UiSize Bitmap_GDI::GetSize() const
 {
-    return UiSize((int32_t)m_nWidth, (int32_t)m_nHeight);
+    return UiSize((int32_t) m_nWidth, (int32_t) m_nHeight);
 }
 
-void* Bitmap_GDI::LockPixelBits()
+void *Bitmap_GDI::LockPixelBits()
 {
     return m_pPixelBits;
 }
 
-void Bitmap_GDI::UnLockPixelBits()
-{
-}
+void Bitmap_GDI::UnLockPixelBits() {}
 
-IBitmap* Bitmap_GDI::Clone()
+IBitmap *Bitmap_GDI::Clone()
 {
-    Bitmap_GDI* pBitmap = new Bitmap_GDI;
-    if (!pBitmap->Init(m_nWidth, m_nHeight, m_pPixelBits, 1.0f, BitmapAlphaType::kPremul_SkAlphaType)) {
+    Bitmap_GDI *pBitmap = new Bitmap_GDI;
+    if (!pBitmap
+             ->Init(m_nWidth, m_nHeight, m_pPixelBits, 1.0f, BitmapAlphaType::kPremul_SkAlphaType)) {
         delete pBitmap;
         pBitmap = nullptr;
     }
@@ -201,9 +193,9 @@ IBitmap* Bitmap_GDI::Clone()
 ////////////////////////////////////////////////////////////////////////////////
 // Pen_GDI
 ////////////////////////////////////////////////////////////////////////////////
-Pen_GDI::Pen_GDI(UiColor color, float fWidth):
-    m_color(color),
-    m_fWidth(fWidth)
+Pen_GDI::Pen_GDI(UiColor color, float fWidth)
+    : m_color(color)
+    , m_fWidth(fWidth)
 {
     if (m_fWidth <= 0.0f) {
         m_fWidth = 1.0f;
@@ -280,9 +272,9 @@ IPen::DashStyle Pen_GDI::GetDashStyle() const
     return m_dashStyle;
 }
 
-IPen* Pen_GDI::Clone() const
+IPen *Pen_GDI::Clone() const
 {
-    Pen_GDI* pPen = new Pen_GDI(m_color, m_fWidth);
+    Pen_GDI *pPen = new Pen_GDI(m_color, m_fWidth);
     pPen->m_startCap = m_startCap;
     pPen->m_endCap = m_endCap;
     pPen->m_dashCap = m_dashCap;
@@ -294,12 +286,11 @@ IPen* Pen_GDI::Clone() const
 ////////////////////////////////////////////////////////////////////////////////
 // Brush_GDI
 ////////////////////////////////////////////////////////////////////////////////
-Brush_GDI::Brush_GDI(UiColor color):
-    m_color(color)
-{
-}
+Brush_GDI::Brush_GDI(UiColor color)
+    : m_color(color)
+{}
 
-IBrush* Brush_GDI::Clone()
+IBrush *Brush_GDI::Clone()
 {
     return new Brush_GDI(m_color);
 }
@@ -314,7 +305,7 @@ UiColor Brush_GDI::GetColor() const
 ////////////////////////////////////////////////////////////////////////////////
 Matrix_GDI::Matrix_GDI() = default;
 
-void Matrix_GDI::Concat(const std::array<float, 6>& matrix)
+void Matrix_GDI::Concat(const std::array<float, 6> &matrix)
 {
     const float m11 = m_matrix[0];
     const float m12 = m_matrix[1];
@@ -340,12 +331,12 @@ void Matrix_GDI::Concat(const std::array<float, 6>& matrix)
 
 void Matrix_GDI::Translate(float offsetX, float offsetY)
 {
-    Concat({ 1.0f, 0.0f, 0.0f, 1.0f, offsetX, offsetY });
+    Concat({1.0f, 0.0f, 0.0f, 1.0f, offsetX, offsetY});
 }
 
 void Matrix_GDI::Scale(float scaleX, float scaleY)
 {
-    Concat({ scaleX, 0.0f, 0.0f, scaleY, 0.0f, 0.0f });
+    Concat({scaleX, 0.0f, 0.0f, scaleY, 0.0f, 0.0f});
 }
 
 void Matrix_GDI::Scale(float scaleX, float scaleY, float px, float py)
@@ -360,7 +351,7 @@ void Matrix_GDI::Rotate(float angle)
     const float radians = angle * 3.14159265358979323846f / 180.0f;
     const float cs = std::cos(radians);
     const float sn = std::sin(radians);
-    Concat({ cs, sn, -sn, cs, 0.0f, 0.0f });
+    Concat({cs, sn, -sn, cs, 0.0f, 0.0f});
 }
 
 void Matrix_GDI::RotateAt(float angle, float px, float py)
@@ -374,7 +365,7 @@ void Matrix_GDI::Skew(float kx, float ky)
 {
     const float tx = std::tan(kx * 3.14159265358979323846f / 180.0f);
     const float ty = std::tan(ky * 3.14159265358979323846f / 180.0f);
-    Concat({ 1.0f, ty, tx, 1.0f, 0.0f, 0.0f });
+    Concat({1.0f, ty, tx, 1.0f, 0.0f, 0.0f});
 }
 
 void Matrix_GDI::Skew(float kx, float ky, float px, float py)
@@ -387,10 +378,9 @@ void Matrix_GDI::Skew(float kx, float ky, float px, float py)
 ////////////////////////////////////////////////////////////////////////////////
 // Path_GDI
 ////////////////////////////////////////////////////////////////////////////////
-Path_GDI::Path_GDI():
-    m_impl(std::make_unique<TImpl>())
-{
-}
+Path_GDI::Path_GDI()
+    : m_impl(std::make_unique<TImpl>())
+{}
 
 Path_GDI::~Path_GDI() = default;
 
@@ -405,12 +395,13 @@ void Path_GDI::SetFillType(FillType mode)
 
 IPath::FillType Path_GDI::GetFillType()
 {
-    return (m_impl->m_path.GetFillMode() == Gdiplus::FillModeWinding) ? FillType::kWinding : FillType::kEvenOdd;
+    return (m_impl->m_path.GetFillMode() == Gdiplus::FillModeWinding) ? FillType::kWinding
+                                                                      : FillType::kEvenOdd;
 }
 
 void Path_GDI::AddLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-    AddLine((float)x1, (float)y1, (float)x2, (float)y2);
+    AddLine((float) x1, (float) y1, (float) x2, (float) y2);
 }
 
 void Path_GDI::AddLine(float x1, float y1, float x2, float y2)
@@ -418,136 +409,148 @@ void Path_GDI::AddLine(float x1, float y1, float x2, float y2)
     m_impl->m_path.AddLine(x1, y1, x2, y2);
 }
 
-void Path_GDI::AddLines(const UiPoint* points, int32_t count)
+void Path_GDI::AddLines(const UiPoint *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 0)) {
         return;
     }
     std::vector<Gdiplus::Point> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddLines(pts.data(), count);
 }
 
-void Path_GDI::AddLines(const UiPointF* points, int32_t count)
+void Path_GDI::AddLines(const UiPointF *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 0)) {
         return;
     }
     std::vector<Gdiplus::PointF> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddLines(pts.data(), count);
 }
 
-void Path_GDI::AddBezier(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, int32_t x4, int32_t y4)
+void Path_GDI::AddBezier(
+    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, int32_t x4, int32_t y4)
 {
-    AddBezier((float)x1, (float)y1, (float)x2, (float)y2, (float)x3, (float)y3, (float)x4, (float)y4);
+    AddBezier(
+        (float) x1,
+        (float) y1,
+        (float) x2,
+        (float) y2,
+        (float) x3,
+        (float) y3,
+        (float) x4,
+        (float) y4);
 }
 
-void Path_GDI::AddBezier(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+void Path_GDI::AddBezier(
+    float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
     m_impl->m_path.AddBezier(x1, y1, x2, y2, x3, y3, x4, y4);
 }
 
-void Path_GDI::AddBeziers(const UiPoint* points, int32_t count)
+void Path_GDI::AddBeziers(const UiPoint *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 1)) {
         return;
     }
     std::vector<Gdiplus::Point> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddBeziers(pts.data(), count);
 }
 
-void Path_GDI::AddBeziers(const UiPointF* points, int32_t count)
+void Path_GDI::AddBeziers(const UiPointF *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 1)) {
         return;
     }
     std::vector<Gdiplus::PointF> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddBeziers(pts.data(), count);
 }
 
-void Path_GDI::AddRect(const UiRect& rect)
+void Path_GDI::AddRect(const UiRect &rect)
 {
     m_impl->m_path.AddRectangle(Gdiplus::Rect(rect.left, rect.top, rect.Width(), rect.Height()));
 }
 
-void Path_GDI::AddRect(const UiRectF& rect)
+void Path_GDI::AddRect(const UiRectF &rect)
 {
     m_impl->m_path.AddRectangle(Gdiplus::RectF(rect.left, rect.top, rect.Width(), rect.Height()));
 }
 
-void Path_GDI::AddEllipse(const UiRect& rect)
+void Path_GDI::AddEllipse(const UiRect &rect)
 {
     m_impl->m_path.AddEllipse(Gdiplus::Rect(rect.left, rect.top, rect.Width(), rect.Height()));
 }
 
-void Path_GDI::AddEllipse(const UiRectF& rect)
+void Path_GDI::AddEllipse(const UiRectF &rect)
 {
     m_impl->m_path.AddEllipse(Gdiplus::RectF(rect.left, rect.top, rect.Width(), rect.Height()));
 }
 
-void Path_GDI::AddArc(const UiRect& rect, float startAngle, float sweepAngle)
+void Path_GDI::AddArc(const UiRect &rect, float startAngle, float sweepAngle)
 {
-    m_impl->m_path.AddArc(Gdiplus::Rect(rect.left, rect.top, rect.Width(), rect.Height()), startAngle, sweepAngle);
+    m_impl->m_path.AddArc(
+        Gdiplus::Rect(rect.left, rect.top, rect.Width(), rect.Height()), startAngle, sweepAngle);
 }
 
-void Path_GDI::AddArc(const UiRectF& rect, float startAngle, float sweepAngle)
+void Path_GDI::AddArc(const UiRectF &rect, float startAngle, float sweepAngle)
 {
-    m_impl->m_path.AddArc(Gdiplus::RectF(rect.left, rect.top, rect.Width(), rect.Height()), startAngle, sweepAngle);
+    m_impl->m_path.AddArc(
+        Gdiplus::RectF(rect.left, rect.top, rect.Width(), rect.Height()), startAngle, sweepAngle);
 }
 
-void Path_GDI::AddPolygon(const UiPoint* points, int32_t count)
+void Path_GDI::AddPolygon(const UiPoint *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 0)) {
         return;
     }
     std::vector<Gdiplus::Point> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddPolygon(pts.data(), count);
 }
 
-void Path_GDI::AddPolygon(const UiPointF* points, int32_t count)
+void Path_GDI::AddPolygon(const UiPointF *points, int32_t count)
 {
     if ((points == nullptr) || (count <= 0)) {
         return;
     }
     std::vector<Gdiplus::PointF> pts;
-    pts.reserve((size_t)count);
+    pts.reserve((size_t) count);
     for (int32_t i = 0; i < count; ++i) {
         pts.emplace_back(points[i].x, points[i].y);
     }
     m_impl->m_path.AddPolygon(pts.data(), count);
 }
 
-void Path_GDI::Transform(IMatrix* pMatrix)
+void Path_GDI::Transform(IMatrix *pMatrix)
 {
-    Matrix_GDI* pGdiMatrix = dynamic_cast<Matrix_GDI*>(pMatrix);
+    Matrix_GDI *pGdiMatrix = dynamic_cast<Matrix_GDI *>(pMatrix);
     if (pGdiMatrix == nullptr) {
         return;
     }
-    const std::array<float, 6>& values = pGdiMatrix->GetMatrix();
+    const std::array<float, 6> &values = pGdiMatrix->GetMatrix();
     Gdiplus::Matrix matrix(values[0], values[1], values[2], values[3], values[4], values[5]);
     m_impl->m_path.Transform(&matrix);
 }
 
-UiRect Path_GDI::GetBounds(const IPen* pen)
+UiRect Path_GDI::GetBounds(const IPen *pen)
 {
     Gdiplus::RectF bounds;
     if (m_impl->m_path.GetBounds(&bounds) != Gdiplus::Ok) {
@@ -557,10 +560,11 @@ UiRect Path_GDI::GetBounds(const IPen* pen)
         const float fInflate = pen->GetWidth() / 2.0f;
         bounds.Inflate(fInflate, fInflate);
     }
-    return UiRect((int32_t)std::floor(bounds.X),
-                  (int32_t)std::floor(bounds.Y),
-                  (int32_t)std::ceil(bounds.GetRight()),
-                  (int32_t)std::ceil(bounds.GetBottom()));
+    return UiRect(
+        (int32_t) std::floor(bounds.X),
+        (int32_t) std::floor(bounds.Y),
+        (int32_t) std::ceil(bounds.GetRight()),
+        (int32_t) std::ceil(bounds.GetBottom()));
 }
 
 void Path_GDI::Close()
@@ -573,10 +577,10 @@ void Path_GDI::Reset()
     m_impl->m_path.Reset();
 }
 
-IPath* Path_GDI::Clone()
+IPath *Path_GDI::Clone()
 {
-    Path_GDI* pPath = new Path_GDI;
-    Gdiplus::GraphicsPath* pClone = m_impl->m_path.Clone();
+    Path_GDI *pPath = new Path_GDI;
+    Gdiplus::GraphicsPath *pClone = m_impl->m_path.Clone();
     if (pClone != nullptr) {
         pPath->m_impl->m_path.Reset();
         pPath->m_impl->m_path.AddPath(pClone, TRUE);
@@ -588,10 +592,9 @@ IPath* Path_GDI::Clone()
 ////////////////////////////////////////////////////////////////////////////////
 // Font_GDI
 ////////////////////////////////////////////////////////////////////////////////
-Font_GDI::Font_GDI(GdiFontMgr* pFontMgr):
-    m_pFontMgr(pFontMgr)
-{
-}
+Font_GDI::Font_GDI(GdiFontMgr *pFontMgr)
+    : m_pFontMgr(pFontMgr)
+{}
 
 Font_GDI::~Font_GDI()
 {
@@ -606,7 +609,7 @@ void Font_GDI::DeleteFont()
     }
 }
 
-bool Font_GDI::InitFont(const UiFont& fontInfo)
+bool Font_GDI::InitFont(const UiFont &fontInfo)
 {
     DeleteFont();
     m_fontName = fontInfo.m_fontName.c_str();
@@ -669,7 +672,7 @@ bool Font_GDI::IsStrikeOut() const
     return m_logFont.lfStrikeOut != FALSE;
 }
 
-bool Font_GDI::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId)
+bool Font_GDI::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t *glyphId)
 {
     uint16_t nGlyphId = 0;
     float fAdvance = 0.0f;
@@ -682,7 +685,7 @@ bool Font_GDI::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId)
     return true;
 }
 
-bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdvance)
+bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t &glyphId, float &fAdvance)
 {
     glyphId = 0;
     fAdvance = 0.0f;
@@ -709,7 +712,7 @@ bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdv
     HDC hdc = GetThreadMeasureDC();
     if (hdc != nullptr) {
         HGDIOBJ hOldFont = ::SelectObject(hdc, m_hFont);
-        const wchar_t ch = (wchar_t)unicodeChar;
+        const wchar_t ch = (wchar_t) unicodeChar;
         WORD glyph = 0;
         const DWORD ret = ::GetGlyphIndicesW(hdc, &ch, 1, &glyph, GGI_MARK_NONEXISTING_GLYPHS);
         if ((ret != GDI_ERROR) && (glyph != 0xFFFF)) {
@@ -717,7 +720,7 @@ bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdv
             item.m_glyphId = glyph;
             SIZE size = {};
             if (::GetTextExtentPoint32W(hdc, &ch, 1, &size)) {
-                item.m_fAdvance = (float)size.cx;
+                item.m_fAdvance = (float) size.cx;
             }
         }
         ::SelectObject(hdc, hOldFont);
@@ -735,7 +738,7 @@ bool Font_GDI::GetGlyphInfo(uint32_t unicodeChar, uint16_t& glyphId, float& fAdv
     return true;
 }
 
-bool Font_GDI::GetFontMetrics(TextFontMetrics& metrics)
+bool Font_GDI::GetFontMetrics(TextFontMetrics &metrics)
 {
     if (m_hFont == nullptr) {
         return false;
@@ -759,9 +762,9 @@ bool Font_GDI::GetFontMetrics(TextFontMetrics& metrics)
     if (!bRet) {
         return false;
     }
-    metrics.m_fAscent = (float)tm.tmAscent;
-    metrics.m_fDescent = (float)tm.tmDescent;
-    metrics.m_fHeight = (float)tm.tmHeight;
+    metrics.m_fAscent = (float) tm.tmAscent;
+    metrics.m_fDescent = (float) tm.tmDescent;
+    metrics.m_fHeight = (float) tm.tmHeight;
     {
         std::lock_guard<std::mutex> lock(m_glyphCacheMutex);
         m_fontMetrics = metrics;
@@ -770,7 +773,7 @@ bool Font_GDI::GetFontMetrics(TextFontMetrics& metrics)
     return true;
 }
 
-Gdiplus::Font* Font_GDI::GetGdiplusFont()
+Gdiplus::Font *Font_GDI::GetGdiplusFont()
 {
     if (m_hFont == nullptr) {
         return nullptr;
@@ -802,18 +805,17 @@ Gdiplus::Font* Font_GDI::GetGdiplusFont()
 ////////////////////////////////////////////////////////////////////////////////
 // GdiFontMgr
 ////////////////////////////////////////////////////////////////////////////////
-GdiFontMgr::GdiFontMgr()
-{
-}
+GdiFontMgr::GdiFontMgr() {}
 
 GdiFontMgr::~GdiFontMgr()
 {
     ClearFontFiles();
 }
 
-int CALLBACK GdiFontMgr::EnumFontCallback(const LOGFONTW* lpelfe, const TEXTMETRICW*, DWORD /*fontType*/, LPARAM lParam)
+int CALLBACK GdiFontMgr::EnumFontCallback(
+    const LOGFONTW *lpelfe, const TEXTMETRICW *, DWORD /*fontType*/, LPARAM lParam)
 {
-    GdiFontMgr* pFontMgr = (GdiFontMgr*)lParam;
+    GdiFontMgr *pFontMgr = (GdiFontMgr *) lParam;
     if ((pFontMgr != nullptr) && (lpelfe != nullptr) && (lpelfe->lfFaceName[0] != 0)) {
         pFontMgr->m_fontNames.insert(lpelfe->lfFaceName);
     }
@@ -830,7 +832,7 @@ void GdiFontMgr::EnsureFontNames() const
     if (hdc != nullptr) {
         LOGFONTW lf = {};
         lf.lfCharSet = DEFAULT_CHARSET;
-        ::EnumFontFamiliesExW(hdc, &lf, (FONTENUMPROCW)EnumFontCallback, (LPARAM)this, 0);
+        ::EnumFontFamiliesExW(hdc, &lf, (FONTENUMPROCW) EnumFontCallback, (LPARAM) this, 0);
         ::ReleaseDC(nullptr, hdc);
     }
     m_fontNameList.assign(m_fontNames.begin(), m_fontNames.end());
@@ -840,10 +842,10 @@ void GdiFontMgr::EnsureFontNames() const
 uint32_t GdiFontMgr::GetFontCount() const
 {
     EnsureFontNames();
-    return (uint32_t)m_fontNameList.size();
+    return (uint32_t) m_fontNameList.size();
 }
 
-bool GdiFontMgr::GetFontName(uint32_t nIndex, DString& fontName) const
+bool GdiFontMgr::GetFontName(uint32_t nIndex, DString &fontName) const
 {
     EnsureFontNames();
     if (nIndex >= m_fontNameList.size()) {
@@ -853,10 +855,10 @@ bool GdiFontMgr::GetFontName(uint32_t nIndex, DString& fontName) const
     return true;
 }
 
-bool GdiFontMgr::HasFontName(const DString& fontName) const
+bool GdiFontMgr::HasFontName(const DString &fontName) const
 {
     EnsureFontNames();
-    for (const DString& name : m_fontNameList) {
+    for (const DString &name : m_fontNameList) {
         if (_wcsicmp(name.c_str(), fontName.c_str()) == 0) {
             return true;
         }
@@ -864,12 +866,12 @@ bool GdiFontMgr::HasFontName(const DString& fontName) const
     return false;
 }
 
-void GdiFontMgr::SetDefaultFontName(const DString& fontName)
+void GdiFontMgr::SetDefaultFontName(const DString &fontName)
 {
     m_defaultFontName = fontName;
 }
 
-bool GdiFontMgr::LoadFontFile(const DString& fontFilePath)
+bool GdiFontMgr::LoadFontFile(const DString &fontFilePath)
 {
     if (fontFilePath.empty()) {
         return false;
@@ -883,15 +885,16 @@ bool GdiFontMgr::LoadFontFile(const DString& fontFilePath)
     return false;
 }
 
-bool GdiFontMgr::LoadFontFileData(const void* data, size_t length)
+bool GdiFontMgr::LoadFontFileData(const void *data, size_t length)
 {
     if ((data == nullptr) || (length == 0)) {
         return false;
     }
-    m_fontDataBuffers.emplace_back((const uint8_t*)data, (const uint8_t*)data + length);
-    std::vector<uint8_t>& fontData = m_fontDataBuffers.back();
+    m_fontDataBuffers.emplace_back((const uint8_t *) data, (const uint8_t *) data + length);
+    std::vector<uint8_t> &fontData = m_fontDataBuffers.back();
     DWORD nFonts = 0;
-    HANDLE hFont = ::AddFontMemResourceEx(fontData.data(), (DWORD)fontData.size(), nullptr, &nFonts);
+    HANDLE hFont
+        = ::AddFontMemResourceEx(fontData.data(), (DWORD) fontData.size(), nullptr, &nFonts);
     if ((hFont != nullptr) && (nFonts > 0)) {
         m_fontMemHandles.push_back(hFont);
         ClearFontCache();
@@ -903,7 +906,7 @@ bool GdiFontMgr::LoadFontFileData(const void* data, size_t length)
 
 void GdiFontMgr::ClearFontFiles()
 {
-    for (const DString& fontFilePath : m_fontFilePaths) {
+    for (const DString &fontFilePath : m_fontFilePaths) {
         ::RemoveFontResourceExW(fontFilePath.c_str(), FR_PRIVATE, nullptr);
     }
     m_fontFilePaths.clear();
@@ -922,12 +925,12 @@ void GdiFontMgr::ClearFontCache()
     m_fontNameList.clear();
 }
 
-void GdiFontMgr::SetFallbackFontMgr(IFallbackFontMgr* pFallbackFontMgr)
+void GdiFontMgr::SetFallbackFontMgr(IFallbackFontMgr *pFallbackFontMgr)
 {
     m_pFallbackFontMgr = pFallbackFontMgr;
 }
 
-IFallbackFontMgr* GdiFontMgr::GetFallbackFontMgr() const
+IFallbackFontMgr *GdiFontMgr::GetFallbackFontMgr() const
 {
     return m_pFallbackFontMgr;
 }

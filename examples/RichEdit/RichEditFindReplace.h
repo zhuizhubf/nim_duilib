@@ -11,24 +11,41 @@ public:
 
 public:
     //设置关联的RichEdit控件
-    void SetRichEdit(ui::RichEdit* pRichEdit);
+    void SetRichEdit(ui::RichEdit *pRichEdit);
 
 public:
     //查找
-    bool FindRichText(const DString& findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog);
+    bool FindRichText(
+        const DString &findText,
+        bool bFindDown,
+        bool bMatchCase,
+        bool bMatchWholeWord,
+        ui::Window *pWndDialog);
 
     //查找下一个
     bool FindNext();
 
     //替换
-    bool ReplaceRichText(const DString& findText, const DString& replaceText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog);
-    
+    bool ReplaceRichText(
+        const DString &findText,
+        const DString &replaceText,
+        bool bFindDown,
+        bool bMatchCase,
+        bool bMatchWholeWord,
+        ui::Window *pWndDialog);
+
     //全部替换
-    bool ReplaceAllRichText(const DString& findText, const DString& replaceText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog);
+    bool ReplaceAllRichText(
+        const DString &findText,
+        const DString &replaceText,
+        bool bFindDown,
+        bool bMatchCase,
+        bool bMatchWholeWord,
+        ui::Window *pWndDialog);
 
 protected:
     //没找到，回调函数
-    virtual void OnTextNotFound(const DString& findText);
+    virtual void OnTextNotFound(const DString &findText);
 
     //开始全部替换
     virtual void OnReplaceAllCoreBegin();
@@ -38,23 +55,24 @@ protected:
 
 private:
     //查找函数实现
-    bool FindTextSimple(const DString& findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord);
+    bool FindTextSimple(
+        const DString &findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord);
 
     //查找并选择
-    bool FindAndSelect(const ui::FindTextParam& findParam);
+    bool FindAndSelect(const ui::FindTextParam &findParam);
 
     //比较当前选择与文本是否匹配
-    bool SameAsSelected(const DString& replaceText, bool bMatchCase);
+    bool SameAsSelected(const DString &replaceText, bool bMatchCase);
 
     //没找到，回调函数
-    void TextNotFound(const DString& findText);
+    void TextNotFound(const DString &findText);
 
     //调整查找替换窗口的位置
-    void AdjustDialogPosition(ui::Window* pWndDialog);
+    void AdjustDialogPosition(ui::Window *pWndDialog);
 
 private:
     //RichEdit控件接口
-    ui::RichEdit* m_pRichEdit;
+    ui::RichEdit *m_pRichEdit;
 
     //查找文字
     DString m_sFindNext;

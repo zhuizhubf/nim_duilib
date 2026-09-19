@@ -2,14 +2,15 @@
 #define EXAMPLES_MAIN_FORM_H_
 
 // duilib
-#include "duilib/duilib.h"
 #include "ChildWindowPaintScheduler.h"
+#include "duilib/duilib.h"
 
 class MyChildWindowEvents;
 
 class MainForm : public ui::WindowImplBase, public ChildWindowPaintScheduler
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
     MainForm();
     virtual ~MainForm() override;
@@ -25,12 +26,12 @@ public:
     /** 立即绘制该子窗口
     * @param [in] pChildWindow 子窗口的指针
     */
-    virtual bool PaintChildWindow(ui::ChildWindow* pChildWindow) override;
+    virtual bool PaintChildWindow(ui::ChildWindow *pChildWindow) override;
 
     /** 立即绘制该子窗口的下一个子窗口（按顺序依次绘制每个子窗口）
     * @param [in] pChildWindow 子窗口的指针
     */
-    virtual bool PaintNextChildWindow(ui::ChildWindow* pChildWindow) override;
+    virtual bool PaintNextChildWindow(ui::ChildWindow *pChildWindow) override;
 
 public:
     /** 立即绘制该子窗口的下一个子窗口（按顺序依次绘制每个子窗口）
@@ -62,16 +63,16 @@ private:
     /** 立即绘制该子窗口的下一个子窗口（按顺序依次绘制每个子窗口）
     * @param [in] pChildWindow 子窗口的指针
     */
-    bool DoPaintNextChildWindow(ui::ChildWindow* pChildWindow);
+    bool DoPaintNextChildWindow(ui::ChildWindow *pChildWindow);
 
 private:
     /** 子窗口关联的事件
     */
-    std::vector<MyChildWindowEvents*> m_childWindowEvents;
+    std::vector<MyChildWindowEvents *> m_childWindowEvents;
 
     /** 当前绘制的子窗口
     */
-    ui::ChildWindow* m_pChildWindow;
+    ui::ChildWindow *m_pChildWindow;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

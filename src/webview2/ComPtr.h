@@ -3,13 +3,12 @@
 
 #include "duilib/duilib_defs.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
 #include <cstddef>
 #include <utility>
 
-namespace ui
-{
+namespace ui {
 /** 轻量级COM智能指针，自动管理COM对象的生命周期
  *  实现了COM对象的引用计数自动管理，避免内存泄漏
  */
@@ -21,16 +20,21 @@ public:
 
     /** 默认构造函数，初始化为空指针
      */
-    ComPtr(): m_pInterface(nullptr) {}
-    
+    ComPtr()
+        : m_pInterface(nullptr)
+    {}
+
     /** 空指针构造函数
      */
-    ComPtr(std::nullptr_t) : m_pInterface(nullptr) {}
+    ComPtr(std::nullptr_t)
+        : m_pInterface(nullptr)
+    {}
 
     /** 从原始COM指针构造
      * @param pInterface 原始COM接口指针，会增加引用计数
      */
-    explicit ComPtr(T* pInterface) : m_pInterface(pInterface)
+    explicit ComPtr(T *pInterface)
+        : m_pInterface(pInterface)
     {
         if (m_pInterface) {
             m_pInterface->AddRef(); // 获取所有权时增加引用计数
@@ -40,7 +44,8 @@ public:
     /** 拷贝构造函数
      * @param other 另一个ComPtr实例，共享同一个COM对象
      */
-    ComPtr(const ComPtr& other) : m_pInterface(other.m_pInterface)
+    ComPtr(const ComPtr &other)
+        : m_pInterface(other.m_pInterface)
     {
         if (m_pInterface) {
             m_pInterface->AddRef(); // 拷贝时增加引用计数
@@ -52,7 +57,8 @@ public:
      * @param other 源ComPtr实例
      */
     template<typename U>
-    ComPtr(const ComPtr<U>& other) : m_pInterface(other.Get())
+    ComPtr(const ComPtr<U> &other)
+        : m_pInterface(other.Get())
     {
         if (m_pInterface) {
             m_pInterface->AddRef(); // 跨接口类型拷贝时增加引用计数
@@ -62,7 +68,8 @@ public:
     /** 移动构造函数
      * @param other 被移动的ComPtr实例，移动后变为空
      */
-    ComPtr(ComPtr&& other) noexcept : m_pInterface(other.m_pInterface)
+    ComPtr(ComPtr &&other) noexcept
+        : m_pInterface(other.m_pInterface)
     {
         other.m_pInterface = nullptr; // 转移所有权，原指针置空
     }
@@ -72,7 +79,9 @@ public:
      * @param other 被移动的ComPtr实例
      */
     template<typename U>
-    ComPtr(ComPtr<U>&& other) noexcept : m_pInterface(other.Detach()) {}
+    ComPtr(ComPtr<U> &&other) noexcept
+        : m_pInterface(other.Detach())
+    {}
 
     /** 析构函数，自动释放持有的COM对象
      */
@@ -85,7 +94,7 @@ public:
 
     /** 空指针赋值运算符
      */
-    ComPtr& operator=(std::nullptr_t)
+    ComPtr &operator=(std::nullptr_t)
     {
         Reset();
         return *this;
@@ -94,7 +103,7 @@ public:
     /** 原始指针赋值运算符
      * @param pInterface 原始COM接口指针
      */
-    ComPtr& operator=(T* pInterface)
+    ComPtr &operator=(T *pInterface)
     {
         if (m_pInterface != pInterface) {
             ComPtr temp(pInterface);
@@ -106,7 +115,7 @@ public:
     /** 拷贝赋值运算符
      * @param other 另一个ComPtr实例
      */
-    ComPtr& operator=(const ComPtr& other)
+    ComPtr &operator=(const ComPtr &other)
     {
         if (this != &other) {
             ComPtr temp(other);
@@ -120,7 +129,7 @@ public:
      * @param other 源ComPtr实例
      */
     template<typename U>
-    ComPtr& operator=(const ComPtr<U>& other)
+    ComPtr &operator=(const ComPtr<U> &other)
     {
         ComPtr temp(other);
         Swap(temp);
@@ -130,7 +139,7 @@ public:
     /** 移动赋值运算符
      * @param other 被移动的ComPtr实例
      */
-    ComPtr& operator=(ComPtr&& other) noexcept
+    ComPtr &operator=(ComPtr &&other) noexcept
     {
         ComPtr temp(std::move(other));
         Swap(temp);
@@ -142,7 +151,7 @@ public:
      * @param other 被移动的ComPtr实例
      */
     template<typename U>
-    ComPtr& operator=(ComPtr<U>&& other) noexcept
+    ComPtr &operator=(ComPtr<U> &&other) noexcept
     {
         ComPtr temp(std::move(other));
         Swap(temp);
@@ -152,7 +161,7 @@ public:
     /** 获取指针地址，用于接收COM对象创建函数的输出
      * @note 调用此方法会重置当前指针
      */
-    T** GetAddressOf()
+    T **GetAddressOf()
     {
         Reset();
         return &m_pInterface;
@@ -160,15 +169,12 @@ public:
 
     /** 获取常量指针地址，用于const对象
      */
-    T* const* GetAddressOf() const
-    {
-        return &m_pInterface;
-    }
+    T *const *GetAddressOf() const { return &m_pInterface; }
 
     /** 释放当前对象并获取指针地址
      * @note 调用此方法会重置当前指针
      */
-    T** ReleaseAndGetAddressOf()
+    T **ReleaseAndGetAddressOf()
     {
         Reset();
         return &m_pInterface;
@@ -177,9 +183,9 @@ public:
     /** 分离当前指针，放弃所有权但不释放对象
      * @return 原始COM接口指针
      */
-    T* Detach()
+    T *Detach()
     {
-        T* pInterface = m_pInterface;
+        T *pInterface = m_pInterface;
         m_pInterface = nullptr;
         return pInterface;
     }
@@ -194,17 +200,14 @@ public:
     /** 重置指针为新值，释放原有对象
      * @param pInterface 新的COM接口指针
      */
-    void Reset(T* pInterface)
-    {
-        ComPtr(pInterface).Swap(*this);
-    }
+    void Reset(T *pInterface) { ComPtr(pInterface).Swap(*this); }
 
     /** 交换两个ComPtr实例的内容
      * @param other 要交换的另一个ComPtr实例
      */
-    void Swap(ComPtr& other) noexcept
+    void Swap(ComPtr &other) noexcept
     {
-        T* temp = m_pInterface;
+        T *temp = m_pInterface;
         m_pInterface = other.m_pInterface;
         other.m_pInterface = temp;
     }
@@ -212,14 +215,12 @@ public:
     /** 获取原始COM接口指针
      * @return 原始COM接口指针，可能为nullptr
      */
-    T* Get() const
-    {
-        return m_pInterface;
-    }
+    T *Get() const { return m_pInterface; }
 
     /** 获取原始COM接口指针的指针
     */
-    T** operator&() noexcept {
+    T **operator&() noexcept
+    {
         if (m_pInterface) {
             m_pInterface->Release();
             m_pInterface = nullptr;
@@ -229,49 +230,37 @@ public:
 
     /** 重载箭头运算符，直接访问COM接口方法
      */
-    T* operator->() const
-    {
-        return m_pInterface;
-    }
+    T *operator->() const { return m_pInterface; }
 
     /** 布尔类型转换，用于条件判断
      */
-    explicit operator bool() const
-    {
-        return m_pInterface != nullptr;
-    }
+    explicit operator bool() const { return m_pInterface != nullptr; }
 
     /** 相等比较运算符
      * @tparam U 比较的接口类型
      */
     template<typename U>
-    bool operator==(const ComPtr<U>& other) const
+    bool operator==(const ComPtr<U> &other) const
     {
         return m_pInterface == other.Get();
     }
 
     /** 与空指针比较
      */
-    bool operator==(std::nullptr_t) const
-    {
-        return m_pInterface == nullptr;
-    }
+    bool operator==(std::nullptr_t) const { return m_pInterface == nullptr; }
 
     /** 不等比较运算符
      * @tparam U 比较的接口类型
      */
     template<typename U>
-    bool operator!=(const ComPtr<U>& other) const
+    bool operator!=(const ComPtr<U> &other) const
     {
         return !(*this == other);
     }
 
     /** 与空指针比较
      */
-    bool operator!=(std::nullptr_t) const
-    {
-        return !(*this == nullptr);
-    }
+    bool operator!=(std::nullptr_t) const { return !(*this == nullptr); }
 
     /** 查询接口，获取另一个COM接口
      * @tparam U 目标接口类型
@@ -279,7 +268,7 @@ public:
      * @return HRESULT表示操作结果
      */
     template<typename U>
-    HRESULT As(ComPtr<U>* p) const
+    HRESULT As(ComPtr<U> *p) const
     {
         if (!p) {
             return E_POINTER;
@@ -305,10 +294,9 @@ public:
      * @return HRESULT表示操作结果
      */
     template<typename U>
-    HRESULT AsIID(REFIID riid, void** ppvObject) const
+    HRESULT AsIID(REFIID riid, void **ppvObject) const
     {
-        if (!ppvObject)
-        {
+        if (!ppvObject) {
             return E_POINTER;
         }
         *ppvObject = nullptr;
@@ -316,8 +304,9 @@ public:
     }
 
 private:
-    template<typename U> friend class ComPtr;
-    T* m_pInterface; // 管理的COM接口指针
+    template<typename U>
+    friend class ComPtr;
+    T *m_pInterface; // 管理的COM接口指针
 };
 
 // 辅助函数
@@ -329,7 +318,7 @@ private:
  * @return ComPtr实例
  */
 template<typename T, typename U>
-ComPtr<T> MakeComPtr(U* p)
+ComPtr<T> MakeComPtr(U *p)
 {
     return ComPtr<T>(p);
 }
@@ -346,7 +335,7 @@ ComPtr<T> MakeComPtr()
  * @brief 原始指针与ComPtr比较的辅助函数
  */
 template<typename T, typename U>
-bool operator==(U* lhs, const ComPtr<T>& rhs)
+bool operator==(U *lhs, const ComPtr<T> &rhs)
 {
     return lhs == rhs.Get();
 }
@@ -354,7 +343,7 @@ bool operator==(U* lhs, const ComPtr<T>& rhs)
 /** 原始指针与ComPtr比较的辅助函数
  */
 template<typename T, typename U>
-bool operator!=(U* lhs, const ComPtr<T>& rhs)
+bool operator!=(U *lhs, const ComPtr<T> &rhs)
 {
     return !(lhs == rhs);
 }

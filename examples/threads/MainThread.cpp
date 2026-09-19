@@ -1,16 +1,13 @@
 #include "MainThread.h"
-#include "WorkerThread.h"
 #include "MainForm.h"
+#include "WorkerThread.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI),
-    m_pMainForm(nullptr)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+    , m_pMainForm(nullptr)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -49,7 +46,8 @@ void MainThread::StartThreads()
     //创建线程池（线程创建后，需要使用线程标识符来进行线程间通信：ui::kThreadUser + nThread）
     const size_t nMaxThreads = 6;
     for (size_t nThread = 0; nThread < nMaxThreads; ++nThread) {
-        std::shared_ptr<WorkerThread> pThread = std::make_shared<WorkerThread>(ui::kThreadUser + (int32_t)nThread);
+        std::shared_ptr<WorkerThread> pThread = std::make_shared<WorkerThread>(
+            ui::kThreadUser + (int32_t) nThread);
         pThread->SetMainForm(m_pMainForm.get());
         pThread->Start();
         m_threadPools.push_back(pThread);
@@ -79,23 +77,36 @@ void MainThread::StopThreads()
 
 int32_t MainThread::GetPoolThreadCount() const
 {
-    return (int32_t)m_threadPools.size();
+    return (int32_t) m_threadPools.size();
 }
 
-void MainThread::PrintLog(const DString& log)
+void MainThread::PrintLog(const DString &log)
 {
     //_T("[调用线程ID：%s][线程ID：%s, 线程名称: %s, 线程标识符：%d]: %s
-    DString logMsg = ui::StringUtil::Printf(_T("[%s:%s][%s:%s, %s:%s, %s:%d]: %s"),
-        ui::GlobalManager::Instance().Lang().GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_1")).c_str(),
-                                            ThreadIdToString(std::this_thread::get_id()).c_str(),
-        ui::GlobalManager::Instance().Lang().GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_2")).c_str(),
-                                            ThreadIdToString(GetThreadId()).c_str(),
-        ui::GlobalManager::Instance().Lang().GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_3")).c_str(),
-                                            GetThreadName().c_str(),
-        ui::GlobalManager::Instance().Lang().GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_4")).c_str(),
-                                            GetThreadIdentifier(),
-                                            log.c_str());
-    if (m_pMainForm != nullptr) {        
+    DString logMsg = ui::StringUtil::Printf(
+        _T("[%s:%s][%s:%s, %s:%s, %s:%d]: %s"),
+        ui::GlobalManager::Instance()
+            .Lang()
+            .GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_1"))
+            .c_str(),
+        ThreadIdToString(std::this_thread::get_id()).c_str(),
+        ui::GlobalManager::Instance()
+            .Lang()
+            .GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_2"))
+            .c_str(),
+        ThreadIdToString(GetThreadId()).c_str(),
+        ui::GlobalManager::Instance()
+            .Lang()
+            .GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_3"))
+            .c_str(),
+        GetThreadName().c_str(),
+        ui::GlobalManager::Instance()
+            .Lang()
+            .GetStringByID(_T("STRID_THREADS_EXECUTE_LOG_02_4"))
+            .c_str(),
+        GetThreadIdentifier(),
+        log.c_str());
+    if (m_pMainForm != nullptr) {
         m_pMainForm->PrintLog(logMsg);
     }
 }

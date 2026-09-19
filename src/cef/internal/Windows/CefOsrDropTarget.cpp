@@ -1,27 +1,26 @@
 #include "CefOsrDropTarget.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_CEF)
 
-#include "duilib/Core/Control.h"
 #include "cef/internal/CefBrowserHandler.h"
 #include "cef/internal/Windows/osr_dragdrop_win.h"
+#include "duilib/Core/Control.h"
 
 namespace ui {
 
-CefOsrDropTarget::CefOsrDropTarget(const std::shared_ptr<client::DropTargetWin>& pDropTargetWin):
-    m_pDropTargetWin(pDropTargetWin)
+CefOsrDropTarget::CefOsrDropTarget(const std::shared_ptr<client::DropTargetWin> &pDropTargetWin)
+    : m_pDropTargetWin(pDropTargetWin)
 {
     ASSERT(m_pDropTargetWin != nullptr);
 }
 
-CefOsrDropTarget::~CefOsrDropTarget()
-{
-}
+CefOsrDropTarget::~CefOsrDropTarget() {}
 
-int32_t CefOsrDropTarget::DragEnter(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t CefOsrDropTarget::DragEnter(
+    void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     if (m_pDropTargetWin != nullptr) {
-        IDataObject* data_object = (IDataObject*)pDataObj;
+        IDataObject *data_object = (IDataObject *) pDataObj;
         DWORD key_state = grfKeyState;
         POINTL cursor_position = {pt.x, pt.y};
         DWORD dwEffect = (pdwEffect != nullptr) ? *pdwEffect : DROPEFFECT_NONE;
@@ -29,22 +28,22 @@ int32_t CefOsrDropTarget::DragEnter(void* pDataObj, uint32_t grfKeyState, const 
         if (pdwEffect != nullptr) {
             *pdwEffect = dwEffect;
         }
-        return (int32_t)hr;
+        return (int32_t) hr;
     }
     return S_FALSE;
 }
 
-int32_t CefOsrDropTarget::DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t CefOsrDropTarget::DragOver(uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     if (m_pDropTargetWin != nullptr) {
         DWORD key_state = grfKeyState;
-        POINTL cursor_position = { pt.x, pt.y };
+        POINTL cursor_position = {pt.x, pt.y};
         DWORD dwEffect = (pdwEffect != nullptr) ? *pdwEffect : DROPEFFECT_NONE;
         HRESULT hr = m_pDropTargetWin->DragOver(key_state, cursor_position, &dwEffect);
         if (pdwEffect != nullptr) {
             *pdwEffect = dwEffect;
         }
-        return (int32_t)hr;
+        return (int32_t) hr;
     }
     return S_FALSE;
 }
@@ -57,18 +56,19 @@ int32_t CefOsrDropTarget::DragLeave(void)
     return S_FALSE;
 }
 
-int32_t CefOsrDropTarget::Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t CefOsrDropTarget::Drop(
+    void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     if (m_pDropTargetWin != nullptr) {
-        IDataObject* data_object = (IDataObject*)pDataObj;
+        IDataObject *data_object = (IDataObject *) pDataObj;
         DWORD key_state = grfKeyState;
-        POINTL cursor_position = { pt.x, pt.y };
+        POINTL cursor_position = {pt.x, pt.y};
         DWORD dwEffect = (pdwEffect != nullptr) ? *pdwEffect : DROPEFFECT_NONE;
         HRESULT hr = m_pDropTargetWin->Drop(data_object, key_state, cursor_position, &dwEffect);
         if (pdwEffect != nullptr) {
             *pdwEffect = dwEffect;
         }
-        return (int32_t)hr;
+        return (int32_t) hr;
     }
     return S_FALSE;
 }

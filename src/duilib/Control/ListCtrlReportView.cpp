@@ -1,26 +1,25 @@
-#include "ListCtrlReportView.h" 
+#include "ListCtrlReportView.h"
 #include "ListCtrl.h"
 #include "render/AutoClip.h"
 
 //包含类：ListCtrlReportView / ListCtrlReportLayout
 
-namespace ui
+namespace ui {
+ListCtrlReportView::ListCtrlReportView(Window *pWindow)
+    : ListCtrlView(pWindow, new ListCtrlReportLayout)
+    , m_pListCtrl(nullptr)
+    , m_pData(nullptr)
+    , m_nTopElementIndex(0)
+    , m_fRowGridLineWidth(0)
+    , m_fColumnGridLineWidth(0)
 {
-ListCtrlReportView::ListCtrlReportView(Window* pWindow) :
-    ListCtrlView(pWindow, new ListCtrlReportLayout),
-    m_pListCtrl(nullptr),
-    m_pData(nullptr),
-    m_nTopElementIndex(0),
-    m_fRowGridLineWidth(0),
-    m_fColumnGridLineWidth(0)
-{
-    ListCtrlReportLayout* pDataLayout = dynamic_cast<ListCtrlReportLayout*>(GetLayout());
+    ListCtrlReportLayout *pDataLayout = dynamic_cast<ListCtrlReportLayout *>(GetLayout());
     ASSERT(pDataLayout != nullptr);
 
-    VirtualLayout* pVirtualLayout = pDataLayout;
+    VirtualLayout *pVirtualLayout = pDataLayout;
     ASSERT(pVirtualLayout != nullptr);
     SetVirtualLayout(pVirtualLayout);
-    
+
     if (pDataLayout != nullptr) {
         pDataLayout->SetDataView(this);
     }
@@ -28,36 +27,32 @@ ListCtrlReportView::ListCtrlReportView(Window* pWindow) :
     SetColumnGridLineWidth(1, true);
 }
 
-ListCtrlReportView::~ListCtrlReportView() 
-{
-}
+ListCtrlReportView::~ListCtrlReportView() {}
 
-void ListCtrlReportView::HandleEvent(const EventArgs& msg)
+void ListCtrlReportView::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
     if (m_pListCtrl != nullptr) {
         if ((msg.eventType > kEventKeyBegin) && (msg.eventType < kEventKeyEnd)) {
             m_pListCtrl->OnViewKeyboardEvents(msg);
-        }
-        else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
+        } else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
             m_pListCtrl->OnViewMouseEvents(msg);
         }
     }
 }
 
-void ListCtrlReportView::SetListCtrl(ListCtrl* pListCtrl)
+void ListCtrlReportView::SetListCtrl(ListCtrl *pListCtrl)
 {
     m_pListCtrl = pListCtrl;
 }
 
-void ListCtrlReportView::SetDataProvider(VirtualListBoxElement* pProvider)
+void ListCtrlReportView::SetDataProvider(VirtualListBoxElement *pProvider)
 {
     BaseClass::SetDataProvider(pProvider);
     if (GetDataProvider() != nullptr) {
-        m_pData = dynamic_cast<ListCtrlData*>(GetDataProvider());
+        m_pData = dynamic_cast<ListCtrlData *>(GetDataProvider());
         ASSERT(m_pData != nullptr);
-    }
-    else {
+    } else {
         m_pData = nullptr;
     }
 }
@@ -90,7 +85,7 @@ void ListCtrlReportView::Refresh(bool bSync)
 
 void ListCtrlReportView::AjustItemCount()
 {
-    VirtualLayout* pVirtualLayout = GetVirtualLayout();
+    VirtualLayout *pVirtualLayout = GetVirtualLayout();
     if (pVirtualLayout == nullptr) {
         return;
     }
@@ -123,12 +118,11 @@ void ListCtrlReportView::AjustItemCount()
                 RemoveItemAt(itemCount - 1);
             }
         }
-    }
-    else if (nItemCount < nNewItemCount) {
+    } else if (nItemCount < nNewItemCount) {
         //如果现有子项总数小于新计算的子项数，新增比数据总数少的子项
         size_t n = nNewItemCount - nItemCount;
         for (size_t i = 0; i < n; ++i) {
-            Control* pControl = CreateElement();
+            Control *pControl = CreateElement();
             ASSERT(pControl != nullptr);
             if (pControl != nullptr) {
                 AddItem(pControl);
@@ -144,13 +138,13 @@ int32_t ListCtrlReportView::GetListCtrlWidth() const
     if (m_pListCtrl == nullptr) {
         return nToltalWidth;
     }
-    ListCtrlHeader* pHeaderCtrl = m_pListCtrl->GetHeaderCtrl();
+    ListCtrlHeader *pHeaderCtrl = m_pListCtrl->GetHeaderCtrl();
     if (pHeaderCtrl == nullptr) {
         return nToltalWidth;
     }
     size_t nColumnCount = pHeaderCtrl->GetColumnCount();
     for (size_t index = 0; index < nColumnCount; ++index) {
-        ListCtrlHeaderItem* pHeaderItem = pHeaderCtrl->GetColumn(index);
+        ListCtrlHeaderItem *pHeaderItem = pHeaderCtrl->GetColumn(index);
         if ((pHeaderItem != nullptr) && pHeaderItem->IsColumnVisible()) {
             nToltalWidth += pHeaderItem->GetColumnWidth();
         }
@@ -171,12 +165,12 @@ size_t ListCtrlReportView::GetTopElementIndex() const
     return m_nTopElementIndex;
 }
 
-void ListCtrlReportView::SetDisplayDataItems(const std::vector<size_t>& itemIndexList)
+void ListCtrlReportView::SetDisplayDataItems(const std::vector<size_t> &itemIndexList)
 {
     m_diplayItemIndexList = itemIndexList;
 }
 
-void ListCtrlReportView::GetDisplayDataItems(std::vector<size_t>& itemIndexList) const
+void ListCtrlReportView::GetDisplayDataItems(std::vector<size_t> &itemIndexList) const
 {
     itemIndexList = m_diplayItemIndexList;
 }
@@ -192,7 +186,7 @@ bool ListCtrlReportView::EnsureDataItemVisible(size_t itemIndex, bool bToTop)
     if (!Box::IsValidItemIndex(itemIndex) || (itemIndex >= GetElementCount())) {
         return false;
     }
-    VirtualLayout* pVirtualLayout = GetVirtualLayout();
+    VirtualLayout *pVirtualLayout = GetVirtualLayout();
     if (pVirtualLayout != nullptr) {
         pVirtualLayout->EnsureVisible(GetRect(), itemIndex, bToTop);
         return true;
@@ -210,23 +204,23 @@ size_t ListCtrlReportView::GetTopDataItemIndex(int64_t nScrollPosY) const
     if (nScrollPosY <= 0) {
         return itemIndex;
     }
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return itemIndex;
     }
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     int64_t totalItemHeight = 0;
     int32_t nItemHeight = 0;
     const size_t dataItemCount = itemDataList.size();
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = rowData.nItemHeight;
         if (nItemHeight < 0) {
             //取默认行高
             nItemHeight = m_pListCtrl->GetDataItemHeight();
         }
-        if (!rowData.bVisible || (nItemHeight  == 0)){
+        if (!rowData.bVisible || (nItemHeight == 0)) {
             continue;
         }
         totalItemHeight += nItemHeight;
@@ -247,25 +241,27 @@ int32_t ListCtrlReportView::GetDataItemHeight(size_t itemIndex) const
         return 0;
     }
     nItemHeight = m_pListCtrl->GetDataItemHeight();
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return 0;
     }
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     ASSERT(itemIndex < itemDataList.size());
     if (itemIndex < itemDataList.size()) {
         if (itemDataList[itemIndex].nItemHeight >= 0) {
             nItemHeight = itemDataList[itemIndex].nItemHeight;
-        }        
+        }
     }
     return nItemHeight;
 }
 
-void ListCtrlReportView::GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount, 
-                                            std::vector<ShowItemInfo>& itemIndexList,
-                                            std::vector<ShowItemInfo>& atTopItemIndexList,
-                                            int64_t& nPrevItemHeights) const
+void ListCtrlReportView::GetDataItemsToShow(
+    int64_t nScrollPosY,
+    size_t maxCount,
+    std::vector<ShowItemInfo> &itemIndexList,
+    std::vector<ShowItemInfo> &atTopItemIndexList,
+    int64_t &nPrevItemHeights) const
 {
     nPrevItemHeights = 0;
     itemIndexList.clear();
@@ -282,28 +278,28 @@ void ListCtrlReportView::GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount
     if (maxCount == 0) {
         return;
     }
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return;
     }
-    size_t nTopDataItemIndex = Box::InvalidIndex; //顶部可见的第一个元素序号
+    size_t nTopDataItemIndex = Box::InvalidIndex;                        //顶部可见的第一个元素序号
     const int32_t nDefaultItemHeight = m_pListCtrl->GetDataItemHeight(); //默认行高
     //置顶的元素序号
     struct AlwaysAtTopData
     {
-        int8_t nAlwaysAtTop;    //置顶优先级
-        size_t nItemIndex;      //元素索引
-        int32_t nItemHeight;    //元素的高度
+        int8_t nAlwaysAtTop; //置顶优先级
+        size_t nItemIndex;   //元素索引
+        int32_t nItemHeight; //元素的高度
     };
     std::vector<AlwaysAtTopData> alwaysAtTopItemList;
-    
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     int64_t totalItemHeight = 0;
     int32_t nItemHeight = 0;
     const size_t dataItemCount = itemDataList.size();
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = (rowData.nItemHeight < 0) ? nDefaultItemHeight : rowData.nItemHeight;
         if (!rowData.bVisible || (nItemHeight == 0)) {
             //不可见的，跳过
@@ -313,7 +309,7 @@ void ListCtrlReportView::GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount
         if (rowData.nAlwaysAtTop >= 0) {
             //置顶的元素
             if (alwaysAtTopItemList.size() < maxCount) {
-                alwaysAtTopItemList.push_back({ rowData.nAlwaysAtTop, index, nItemHeight });
+                alwaysAtTopItemList.push_back({rowData.nAlwaysAtTop, index, nItemHeight});
             }
             continue;
         }
@@ -327,27 +323,28 @@ void ListCtrlReportView::GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount
             }
         }
 
-        if ((nTopDataItemIndex != Box::InvalidIndex) && (itemIndexList.size() < maxCount)){
-            itemIndexList.push_back({ index, nItemHeight });
+        if ((nTopDataItemIndex != Box::InvalidIndex) && (itemIndexList.size() < maxCount)) {
+            itemIndexList.push_back({index, nItemHeight});
         }
     }
 
     //对置顶的排序
     if (!alwaysAtTopItemList.empty()) {
-        std::stable_sort(alwaysAtTopItemList.begin(), alwaysAtTopItemList.end(),
-            [](const AlwaysAtTopData& a, const AlwaysAtTopData& b) {
+        std::stable_sort(
+            alwaysAtTopItemList.begin(),
+            alwaysAtTopItemList.end(),
+            [](const AlwaysAtTopData &a, const AlwaysAtTopData &b) {
                 //nAlwaysAtTop值大的，排在前面
                 return a.nAlwaysAtTop > b.nAlwaysAtTop;
             });
     }
-    for (const AlwaysAtTopData& item : alwaysAtTopItemList) {
-        atTopItemIndexList.push_back({ item.nItemIndex, item.nItemHeight });
+    for (const AlwaysAtTopData &item : alwaysAtTopItemList) {
+        atTopItemIndexList.push_back({item.nItemIndex, item.nItemHeight});
     }
     if (atTopItemIndexList.size() >= maxCount) {
         atTopItemIndexList.resize(maxCount);
         itemIndexList.clear();
-    }
-    else {
+    } else {
         size_t nLeftCount = maxCount - atTopItemIndexList.size();
         if (itemIndexList.size() > nLeftCount) {
             itemIndexList.resize(nLeftCount);
@@ -356,9 +353,11 @@ void ListCtrlReportView::GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount
     ASSERT((itemIndexList.size() + atTopItemIndexList.size()) <= maxCount);
 }
 
-int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t nRectHeight, 
-                                                std::vector<size_t>* pItemIndexList,
-                                                std::vector<size_t>* pAtTopItemIndexList) const
+int32_t ListCtrlReportView::GetMaxDataItemsToShow(
+    int64_t nScrollPosY,
+    int32_t nRectHeight,
+    std::vector<size_t> *pItemIndexList,
+    std::vector<size_t> *pAtTopItemIndexList) const
 {
     if (pItemIndexList) {
         pItemIndexList->clear();
@@ -375,12 +374,12 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
     if (nRectHeight <= 0) {
         return 0;
     }
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return 0;
     }
-    size_t nTopDataItemIndex = Box::InvalidIndex; //顶部可见的第一个元素序号
+    size_t nTopDataItemIndex = Box::InvalidIndex;                        //顶部可见的第一个元素序号
     const int32_t nDefaultItemHeight = m_pListCtrl->GetDataItemHeight(); //默认行高
     //置顶的元素序号
     struct AlwaysAtTopData
@@ -391,12 +390,12 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
     std::vector<AlwaysAtTopData> alwaysAtTopItemList;
     std::vector<size_t> itemIndexList;
 
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     int64_t totalItemHeight = 0;
     int32_t nItemHeight = 0;
     const size_t dataItemCount = itemDataList.size();
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = (rowData.nItemHeight < 0) ? nDefaultItemHeight : rowData.nItemHeight;
         if (!rowData.bVisible || (nItemHeight == 0)) {
             //不可见的，跳过
@@ -405,7 +404,7 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
 
         if (rowData.nAlwaysAtTop >= 0) {
             //置顶的元素
-            alwaysAtTopItemList.push_back({ rowData.nAlwaysAtTop, index });
+            alwaysAtTopItemList.push_back({rowData.nAlwaysAtTop, index});
             continue;
         }
 
@@ -424,8 +423,10 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
 
     //对置顶的排序
     if (!alwaysAtTopItemList.empty()) {
-        std::stable_sort(alwaysAtTopItemList.begin(), alwaysAtTopItemList.end(),
-            [](const AlwaysAtTopData& a, const AlwaysAtTopData& b) {
+        std::stable_sort(
+            alwaysAtTopItemList.begin(),
+            alwaysAtTopItemList.end(),
+            [](const AlwaysAtTopData &a, const AlwaysAtTopData &b) {
                 //nAlwaysAtTop值大的，排在前面
                 return a.nAlwaysAtTop > b.nAlwaysAtTop;
             });
@@ -433,7 +434,7 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
     std::vector<size_t> atTopIndexList;
     std::vector<size_t> tempItemIndexList;
     tempItemIndexList.swap(itemIndexList);
-    for (const AlwaysAtTopData& item : alwaysAtTopItemList) {
+    for (const AlwaysAtTopData &item : alwaysAtTopItemList) {
         itemIndexList.push_back(item.index);
         atTopIndexList.push_back(item.index);
     }
@@ -446,7 +447,7 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
         if (index >= dataItemCount) {
             continue;
         }
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = rowData.nItemHeight;
         if (nItemHeight < 0) {
             //取默认行高
@@ -458,14 +459,13 @@ int32_t ListCtrlReportView::GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t n
                 pItemIndexList->push_back(index);
             }
             if (pAtTopItemIndexList != nullptr) {
-                if (std::find(atTopIndexList.begin(),
-                              atTopIndexList.end(), index) != atTopIndexList.end()) {
+                if (std::find(atTopIndexList.begin(), atTopIndexList.end(), index)
+                    != atTopIndexList.end()) {
                     pAtTopItemIndexList->push_back(index);
                 }
             }
             ++nShowItemCount;
-        }
-        else {
+        } else {
             nShowItemCount += 2;
             break;
         }
@@ -479,18 +479,18 @@ int64_t ListCtrlReportView::GetDataItemTotalHeights(size_t itemIndex, bool bIncl
     if (m_pListCtrl == nullptr) {
         return 0;
     }
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return 0;
     }
     const int32_t nDefaultItemHeight = m_pListCtrl->GetDataItemHeight(); //默认行高
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     int64_t totalItemHeight = 0;
     int32_t nItemHeight = 0;
     const size_t dataItemCount = itemDataList.size();
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = (rowData.nItemHeight < 0) ? nDefaultItemHeight : rowData.nItemHeight;
         if (!rowData.bVisible || (nItemHeight == 0)) {
             //不可见的，跳过
@@ -501,13 +501,11 @@ int64_t ListCtrlReportView::GetDataItemTotalHeights(size_t itemIndex, bool bIncl
             //置顶的元素，需要统计在内
             if (bIncludeAtTops) {
                 totalItemHeight += nItemHeight;
-            }            
-        }
-        else if (index < itemIndex) {
+            }
+        } else if (index < itemIndex) {
             //符合要求的元素
             totalItemHeight += nItemHeight;
-        }
-        else if (!bIncludeAtTops) {
+        } else if (!bIncludeAtTops) {
             //已经完成
             break;
         }
@@ -518,19 +516,20 @@ int64_t ListCtrlReportView::GetDataItemTotalHeights(size_t itemIndex, bool bIncl
 bool ListCtrlReportView::IsNormalMode() const
 {
     bool bNormalMode = true;
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     if (pDataProvider != nullptr) {
         bNormalMode = pDataProvider->IsNormalMode();
     }
     return bNormalMode;
 }
 
-void ListCtrlReportView::SetAtTopControlIndex(const std::vector<size_t>& atTopControlList)
+void ListCtrlReportView::SetAtTopControlIndex(const std::vector<size_t> &atTopControlList)
 {
     m_atTopControlList = atTopControlList;
 }
 
-void ListCtrlReportView::MoveTopItemsToLast(std::vector<Control*>& items, std::vector<Control*>& atTopItems) const
+void ListCtrlReportView::MoveTopItemsToLast(
+    std::vector<Control *> &items, std::vector<Control *> &atTopItems) const
 {
     atTopItems.clear();
     if (items.empty()) {
@@ -541,29 +540,29 @@ void ListCtrlReportView::MoveTopItemsToLast(std::vector<Control*>& items, std::v
             atTopItems.push_back(items[index]);
         }
     }
-    for (int32_t i = (int32_t)m_atTopControlList.size() - 1; i >= 0; --i) {
+    for (int32_t i = (int32_t) m_atTopControlList.size() - 1; i >= 0; --i) {
         size_t index = m_atTopControlList[i];
         if (index < items.size()) {
             items.erase(items.begin() + index);
         }
     }
-    for (Control* pControl : atTopItems) {
+    for (Control *pControl : atTopItems) {
         items.push_back(pControl);
     }
-    ListCtrlHeader* pHeaderCtrl = dynamic_cast<ListCtrlHeader*>(GetItemAt(0));
+    ListCtrlHeader *pHeaderCtrl = dynamic_cast<ListCtrlHeader *>(GetItemAt(0));
     if ((pHeaderCtrl != nullptr) && pHeaderCtrl->IsVisible()) {
         //最后绘制Header控件，避免被其他的覆盖
-        Control* pHeader = items.front();
+        Control *pHeader = items.front();
         items.erase(items.begin());
         items.push_back(pHeader);
 
         //将Header控件添加到列表
         atTopItems.push_back(pHeader);
-    }    
+    }
     ASSERT(items.size() == m_items.size());
 }
 
-void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
+void ListCtrlReportView::PaintChild(IRender *pRender, const UiRect &rcPaint)
 {
     //重写VirtualListBox::PaintChild / ScrollBox::PaintChild函数，确保Header正常绘制
     ASSERT(pRender != nullptr);
@@ -581,7 +580,7 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
         BaseClass::PaintChild(pRender, rcPaint);
         return;
     }
-    ListCtrlHeader* pHeaderCtrl = dynamic_cast<ListCtrlHeader*>(GetItemAt(0));
+    ListCtrlHeader *pHeaderCtrl = dynamic_cast<ListCtrlHeader *>(GetItemAt(0));
     ASSERT(pHeaderCtrl != nullptr);
     if (pHeaderCtrl == nullptr) {
         BaseClass::PaintChild(pRender, rcPaint);
@@ -590,27 +589,26 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
 
     //需要调整绘制策略
     ReArrangeChild(false);
-    std::vector<Control*> items = m_items;
+    std::vector<Control *> items = m_items;
     //Header和置顶的元素，移动到最后
-    std::vector<Control*> atTopItems;
+    std::vector<Control *> atTopItems;
     MoveTopItemsToLast(items, atTopItems);
 
     UiRect rcTopControls; //所有置顶控件的矩形区域
     for (size_t i = 0; i < atTopItems.size(); ++i) {
-        const Control* pTopControl = atTopItems[i];
+        const Control *pTopControl = atTopItems[i];
         if (pTopControl == nullptr) {
             continue;
         }
         if (i == 0) {
             rcTopControls = pTopControl->GetRect();
-        }
-        else {
+        } else {
             rcTopControls.Union(pTopControl->GetRect());
         }
     }
 
     //绘制列表项子控件
-    for (Control* pControl : items) {
+    for (Control *pControl : items) {
         if (pControl == nullptr) {
             continue;
         }
@@ -625,8 +623,8 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
         rcNewPaint.Offset(GetRenderOffset().x, GetRenderOffset().y);
 
         int32_t nClipState = -1;
-        if (!atTopItems.empty() &&
-            (std::find(atTopItems.begin(), atTopItems.end(), pControl) == atTopItems.end())) {            
+        if (!atTopItems.empty()
+            && (std::find(atTopItems.begin(), atTopItems.end(), pControl) == atTopItems.end())) {
             UiRect rcControlRect = pControl->GetRect();
             UiRect rUnion;
             if (UiRect::Intersect(rUnion, rcTopControls, rcControlRect)) {
@@ -648,8 +646,8 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
     PaintGridLines(pRender);
 
     //绘制滚动条
-    ScrollBar* pVScrollBar = GetVScrollBar();
-    ScrollBar* pHScrollBar = GetHScrollBar();
+    ScrollBar *pVScrollBar = GetVScrollBar();
+    ScrollBar *pHScrollBar = GetHScrollBar();
     if ((pHScrollBar != nullptr) && pHScrollBar->IsVisible()) {
         pHScrollBar->AlphaPaint(pRender, rcPaint);
     }
@@ -662,7 +660,7 @@ void ListCtrlReportView::PaintChild(IRender* pRender, const UiRect& rcPaint)
     PaintFrameSelection(pRender);
 }
 
-void ListCtrlReportView::PaintGridLines(IRender* pRender)
+void ListCtrlReportView::PaintGridLines(IRender *pRender)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
@@ -676,8 +674,8 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
     std::unique_ptr<AutoClip> rectClip = CreateRectClip(pRender, viewRect, bRectClip);
     std::unique_ptr<AutoClip> roundClip = CreateRoundClip(pRender, viewRect, bRoundClip);
 
-    float fColumnLineWidth = GetColumnGridLineWidth();//纵向边线宽度        
-    float fRowLineWidth = GetRowGridLineWidth();   //横向边线宽度
+    float fColumnLineWidth = GetColumnGridLineWidth(); //纵向边线宽度
+    float fRowLineWidth = GetRowGridLineWidth();       //横向边线宽度
     UiColor columnLineColor;
     UiColor rowLineColor;
     DString color = GetColumnGridLineColor();
@@ -690,13 +688,13 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
     }
 
     if ((fColumnLineWidth > 0.001f) && !columnLineColor.IsEmpty()) {
-        //绘制纵向网格线        
+        //绘制纵向网格线
         int32_t yTop = viewRect.top;
         std::vector<int32_t> xPosList;
         const size_t itemCount = GetItemCount();
         for (size_t index = 0; index < itemCount; ++index) {
             if (index == 0) {
-                ListCtrlHeader* pHeader = dynamic_cast<ListCtrlHeader*>(GetItemAt(index));
+                ListCtrlHeader *pHeader = dynamic_cast<ListCtrlHeader *>(GetItemAt(index));
                 if (pHeader != nullptr) {
                     if (pHeader->IsVisible() && (pHeader->GetHeight() > 0)) {
                         //从Header的低端开始画线
@@ -706,7 +704,7 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
                         std::vector<UiRect> rcSplitControls;
                         pHeader->GetHeaderSplitControlRect(rcSplitControls);
                         if (!rcSplitControls.empty()) {
-                            for (const UiRect& rc : rcSplitControls) {
+                            for (const UiRect &rc : rcSplitControls) {
                                 //以每列的列表项表头拖动控件的右侧为画线的X轴起点坐标
                                 xPosList.push_back(rc.right);
                             }
@@ -716,13 +714,14 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
                     continue;
                 }
             }
-            ListCtrlItem* pItem = dynamic_cast<ListCtrlItem*>(GetItemAt(index));
+            ListCtrlItem *pItem = dynamic_cast<ListCtrlItem *>(GetItemAt(index));
             if ((pItem == nullptr) || !pItem->IsVisible() || (pItem->GetWidth() <= 0)) {
                 continue;
             }
             size_t nSubItemCount = pItem->GetItemCount();
             for (size_t nSubItem = 0; nSubItem < nSubItemCount; ++nSubItem) {
-                ListCtrlSubItem* pSubItem = dynamic_cast<ListCtrlSubItem*>(pItem->GetItemAt(nSubItem));
+                ListCtrlSubItem *pSubItem = dynamic_cast<ListCtrlSubItem *>(
+                    pItem->GetItemAt(nSubItem));
                 if ((pSubItem == nullptr) || !pSubItem->IsVisible() || (pSubItem->GetWidth() <= 0)) {
                     continue;
                 }
@@ -737,9 +736,9 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
 
         for (int32_t xPos : xPosList) {
             //横坐标位置放在每个子项控件的右侧部
-            float fXPos = (float)xPos - (float)fColumnLineWidth / 2;
-            UiPointF pt1(fXPos, (float)yTop);
-            UiPointF pt2(fXPos, (float)viewRect.bottom);
+            float fXPos = (float) xPos - (float) fColumnLineWidth / 2;
+            UiPointF pt1(fXPos, (float) yTop);
+            UiPointF pt2(fXPos, (float) viewRect.bottom);
             pRender->DrawLine(pt1, pt2, columnLineColor, fColumnLineWidth);
         }
     }
@@ -747,14 +746,14 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
         //绘制横向网格线
         const size_t itemCount = GetItemCount();
         for (size_t index = 0; index < itemCount; ++index) {
-            ListCtrlItem* pItem = dynamic_cast<ListCtrlItem*>(GetItemAt(index));
+            ListCtrlItem *pItem = dynamic_cast<ListCtrlItem *>(GetItemAt(index));
             if ((pItem == nullptr) || !pItem->IsVisible() || (pItem->GetHeight() <= 0)) {
                 continue;
             }
             //纵坐标位置放在每个子项控件的底部（Header控件的底部不画线）
             int32_t yPos = pItem->GetRect().bottom;
             int32_t nChildMarginY = 0;
-            Layout* pLayout = GetLayout();
+            Layout *pLayout = GetLayout();
             if (pLayout != nullptr) {
                 nChildMarginY = pLayout->GetChildMarginY();
             }
@@ -767,18 +766,21 @@ void ListCtrlReportView::PaintGridLines(IRender* pRender)
     }
 }
 
-Control* ListCtrlReportView::FindControl(FINDCONTROLPROC Proc, void* pProcData,
-                                         uint32_t uFlags, const UiPoint& ptMouse,
-                                         const UiPoint& scrollPos)
+Control *ListCtrlReportView::FindControl(
+    FINDCONTROLPROC Proc,
+    void *pProcData,
+    uint32_t uFlags,
+    const UiPoint &ptMouse,
+    const UiPoint &scrollPos)
 {
     //重写：ScrollBox::FindControl 函数，让Header/置顶的Item优先被查找到，只处理含有UIFIND_TOP_FIRST标志的情况
     if ((uFlags & UIFIND_TOP_FIRST) == 0) {
         return BaseClass::FindControl(Proc, pProcData, uFlags, ptMouse, scrollPos);
     }
 
-    std::vector<Control*> newItems = m_items;
+    std::vector<Control *> newItems = m_items;
     //Header和置顶的元素，移动到最后
-    std::vector<Control*> atTopItems;
+    std::vector<Control *> atTopItems;
     MoveTopItemsToLast(newItems, atTopItems);
 
     // Check if this guy is valid
@@ -791,23 +793,24 @@ Control* ListCtrlReportView::FindControl(FINDCONTROLPROC Proc, void* pProcData,
     UiPoint boxPt(ptMouse);
     boxPt.Offset(scrollPos);
 #ifdef _DEBUG
-    if (((uFlags & UIFIND_HITTEST) != 0) && ((uFlags & UIFIND_DRAG_DROP) == 0) && (pProcData != nullptr)) {
-        UiPoint ptOrg(*(UiPoint*)pProcData);
+    if (((uFlags & UIFIND_HITTEST) != 0) && ((uFlags & UIFIND_DRAG_DROP) == 0)
+        && (pProcData != nullptr)) {
+        UiPoint ptOrg(*(UiPoint *) pProcData);
         ptOrg.Offset(this->GetScrollOffsetInScrollBox());
         ASSERT(ptOrg == boxPt);
     }
 #endif // _DEBUG
-    ScrollBar* pVScrollBar = GetVScrollBar();
-    ScrollBar* pHScrollBar = GetHScrollBar();
+    ScrollBar *pVScrollBar = GetVScrollBar();
+    ScrollBar *pHScrollBar = GetHScrollBar();
     if ((uFlags & UIFIND_HITTEST) != 0) {
         if (!GetRect().ContainsPt(boxPt)) {
             return nullptr;
         }
         if (!IsMouseChildEnabled() && ((uFlags & UIFIND_TOOLTIP) == 0)) {
-            Control* pResult = nullptr;            
+            Control *pResult = nullptr;
             if (pVScrollBar != nullptr) {
                 pResult = pVScrollBar->FindControl(Proc, pProcData, uFlags, boxPt);
-            }            
+            }
             if ((pResult == nullptr) && (pHScrollBar != nullptr)) {
                 pResult = pHScrollBar->FindControl(Proc, pProcData, uFlags, boxPt);
             }
@@ -818,7 +821,7 @@ Control* ListCtrlReportView::FindControl(FINDCONTROLPROC Proc, void* pProcData,
         }
     }
 
-    Control* pResult = nullptr;
+    Control *pResult = nullptr;
     if (pVScrollBar != nullptr) {
         pResult = pVScrollBar->FindControl(Proc, pProcData, uFlags, boxPt);
     }
@@ -834,42 +837,43 @@ Control* ListCtrlReportView::FindControl(FINDCONTROLPROC Proc, void* pProcData,
     return FindControlInItems(newItems, Proc, pProcData, uFlags, boxPt, boxScrollPos);
 }
 
-Control* ListCtrlReportView::CreateDataItem()
+Control *ListCtrlReportView::CreateDataItem()
 {
     ASSERT(m_pListCtrl != nullptr);
     if (m_pListCtrl == nullptr) {
         return nullptr;
     }
-    ListCtrlItem* pItem = new ListCtrlItem(GetWindow());
+    ListCtrlItem *pItem = new ListCtrlItem(GetWindow());
     pItem->SetListCtrl(m_pListCtrl);
     pItem->SetClass(m_pListCtrl->GetDataItemClass());
     pItem->SetAutoCheckSelect(m_pListCtrl->IsAutoCheckSelect());
     return pItem;
 }
 
-bool ListCtrlReportView::FillDataItem(Control* pControl,
-                                     size_t nElementIndex,
-                                     const ListCtrlItemData& itemData,
-                                     const std::vector<ListCtrlSubItemData2Pair>& subItemList)
+bool ListCtrlReportView::FillDataItem(
+    Control *pControl,
+    size_t nElementIndex,
+    const ListCtrlItemData &itemData,
+    const std::vector<ListCtrlSubItemData2Pair> &subItemList)
 {
     //该函数中控制数据元素数据与UI的展示，控制每列的显示宽度
     ASSERT(m_pListCtrl != nullptr);
     if (m_pListCtrl == nullptr) {
         return false;
     }
-    ListCtrlHeader* pHeaderCtrl = m_pListCtrl->GetHeaderCtrl();
+    ListCtrlHeader *pHeaderCtrl = m_pListCtrl->GetHeaderCtrl();
     ASSERT(pHeaderCtrl != nullptr);
     if (pHeaderCtrl == nullptr) {
         return false;
     }
 
-    ListCtrlItem* pItem = dynamic_cast<ListCtrlItem*>(pControl);
+    ListCtrlItem *pItem = dynamic_cast<ListCtrlItem *>(pControl);
     ASSERT(pItem != nullptr);
     if (pItem == nullptr) {
         return false;
     }
 
-    //数据项是否显示CheckBox    
+    //数据项是否显示CheckBox
     bool bShowCheckBox = m_pListCtrl->IsDataItemShowCheckBox();
     pItem->SetShowCheckBox(bShowCheckBox);
     pItem->SetEnableControlPadding(false);
@@ -895,14 +899,14 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
     const UiPadding rcHeaderPadding = pHeaderCtrl->GetPadding();
 
     // 基本结构: <ListCtrlItem> <ListCtrlSubItem/> ... <ListCtrlSubItem/>  </ListCtrlItem>
-    // 附加说明: 1. ListCtrlItem 是 HBox的子类;   
+    // 附加说明: 1. ListCtrlItem 是 HBox的子类;
     //          2. 每一列，放置一个ListCtrlSubItem控件
     //          3. ListCtrlSubItem 是LabelBox的子类
 
     // 详细的结构说明，参见：ListCtrlItem.h
 
     std::map<size_t, ListCtrlSubItemData2Ptr> subItemDataMap;
-    for (const ListCtrlSubItemData2Pair& dataPair : subItemList) {
+    for (const ListCtrlSubItemData2Pair &dataPair : subItemList) {
         subItemDataMap[dataPair.nColumnId] = dataPair.pSubItemData;
     }
 
@@ -917,7 +921,7 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
     std::vector<ElementData> elementDataList;
     const size_t nColumnCount = pHeaderCtrl->GetColumnCount();
     for (size_t nColumnIndex = 0; nColumnIndex < nColumnCount; ++nColumnIndex) {
-        ListCtrlHeaderItem* pHeaderItem = pHeaderCtrl->GetColumn(nColumnIndex);
+        ListCtrlHeaderItem *pHeaderItem = pHeaderCtrl->GetColumn(nColumnIndex);
         if ((pHeaderItem == nullptr) || !pHeaderItem->IsColumnVisible()) {
             continue;
         }
@@ -927,7 +931,7 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
         }
         ElementData data;
         data.nColumnIndex = nColumnIndex;
-        data.nColumnId = pHeaderCtrl->GetColumnId(nColumnIndex);        
+        data.nColumnId = pHeaderCtrl->GetColumnId(nColumnIndex);
         data.pStorage = subItemDataMap[data.nColumnId];
         if (nColumnIndex == 0) {
             //第1列：确保表头与数据项右侧对齐
@@ -935,14 +939,13 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
             if (data.nColumnWidth < 0) {
                 data.nColumnWidth = 0;
             }
-        }
-        else {
+        } else {
             //第2列开始的其他列
             data.nColumnWidth = nColumnWidth;
         }
         elementDataList.push_back(data);
     }
-    
+
     ASSERT(!elementDataList.empty());
     if (elementDataList.empty()) {
         return false;
@@ -964,16 +967,15 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
 
     std::vector<ControlPtrT<ListCtrlSubItem>> subItemPtrList;
     for (size_t nColumn = 0; nColumn < showColumnCount; ++nColumn) {
-        const ElementData& elementData = elementDataList[nColumn];
-        ListCtrlSubItem* pSubItem = nullptr;
+        const ElementData &elementData = elementDataList[nColumn];
+        ListCtrlSubItem *pSubItem = nullptr;
         if (nColumn < pItem->GetItemCount()) {
-            pSubItem = dynamic_cast<ListCtrlSubItem*>(pItem->GetItemAt(nColumn));
+            pSubItem = dynamic_cast<ListCtrlSubItem *>(pItem->GetItemAt(nColumn));
             ASSERT(pSubItem != nullptr);
             if (pSubItem == nullptr) {
                 return false;
             }
-        }
-        else {
+        } else {
             pSubItem = new ListCtrlSubItem(GetWindow());
             pSubItem->SetListCtrlItem(pItem);
             pSubItem->SetListBoxItem(pItem);
@@ -981,32 +983,32 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
             if (!defaultSubItemClass.empty()) {
                 pSubItem->SetClass(defaultSubItemClass);
             }
-            pSubItem->AttachMouseEnter([this, pItem, pSubItem](const EventArgs& args) {
+            pSubItem->AttachMouseEnter([this, pItem, pSubItem](const EventArgs &args) {
                 if (m_pListCtrl != nullptr) {
                     EventArgs msg = args;
                     msg.SetSender(m_pListCtrl);
                     msg.eventType = kEventSubItemMouseEnter;
-                    msg.listCtrlType = (int32_t)ListCtrlType::Report;
-                    msg.wParam = (WPARAM)pItem->GetListBoxIndex();
-                    msg.lParam = (LPARAM)pSubItem->GetDataItemIndex();
+                    msg.listCtrlType = (int32_t) ListCtrlType::Report;
+                    msg.wParam = (WPARAM) pItem->GetListBoxIndex();
+                    msg.lParam = (LPARAM) pSubItem->GetDataItemIndex();
                     msg.pEventData = pSubItem;
                     m_pListCtrl->FireAllEvents(msg);
                 }
                 return true;
-                });
-            pSubItem->AttachMouseLeave([this, pItem, pSubItem](const EventArgs& args) {
+            });
+            pSubItem->AttachMouseLeave([this, pItem, pSubItem](const EventArgs &args) {
                 if (m_pListCtrl != nullptr) {
                     EventArgs msg = args;
                     msg.SetSender(m_pListCtrl);
                     msg.eventType = kEventSubItemMouseLeave;
-                    msg.listCtrlType = (int32_t)ListCtrlType::Report;
-                    msg.wParam = (WPARAM)pItem->GetListBoxIndex();
-                    msg.lParam = (LPARAM)pSubItem->GetDataItemIndex();
+                    msg.listCtrlType = (int32_t) ListCtrlType::Report;
+                    msg.wParam = (WPARAM) pItem->GetListBoxIndex();
+                    msg.lParam = (LPARAM) pSubItem->GetDataItemIndex();
                     msg.pEventData = pSubItem;
                     m_pListCtrl->FireAllEvents(msg);
                 }
                 return true;
-                });
+            });
         }
         subItemPtrList.push_back(ControlPtrT<ListCtrlSubItem>(pSubItem));
         //设置不获取焦点
@@ -1017,49 +1019,51 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
         pSubItem->SetDataColumnId(nColumnId);
 
         //设置可编辑属性
-        const EventCallbackID callbackID = (EventCallbackID)this;
-        bool bEditable = (elementData.pStorage != nullptr) ? elementData.pStorage->bEditable : false;
-        if (bEditable && m_pListCtrl->IsEnableItemEdit()) {            
+        const EventCallbackID callbackID = (EventCallbackID) this;
+        bool bEditable = (elementData.pStorage != nullptr) ? elementData.pStorage->bEditable
+                                                           : false;
+        if (bEditable && m_pListCtrl->IsEnableItemEdit()) {
             pSubItem->SetEnableEdit(true);
             pSubItem->DetachEventByID(kEventEnterEdit, callbackID);
-            pSubItem->AttachEvent(kEventEnterEdit, [this, nElementIndex, nColumnId, pItem, pSubItem](const EventArgs& /*args*/) {
-                if (m_pListCtrl != nullptr) {
-                    m_pListCtrl->OnItemEnterEditMode(nElementIndex, nColumnId, pItem, pSubItem);
-                }
-                return true;
-                }, callbackID);
-        }
-        else {
+            pSubItem->AttachEvent(
+                kEventEnterEdit,
+                [this, nElementIndex, nColumnId, pItem, pSubItem](const EventArgs & /*args*/) {
+                    if (m_pListCtrl != nullptr) {
+                        m_pListCtrl->OnItemEnterEditMode(nElementIndex, nColumnId, pItem, pSubItem);
+                    }
+                    return true;
+                },
+                callbackID);
+        } else {
             pSubItem->SetEnableEdit(false);
             pSubItem->DetachEventByID(kEventEnterEdit, callbackID);
         }
 
-        //填充数据，设置属性        
+        //填充数据，设置属性
         pSubItem->SetFixedWidth(UiFixedInt(elementData.nColumnWidth), true, false);
-        const ListCtrlSubItemData2Ptr& pStorage = elementData.pStorage;
+        const ListCtrlSubItemData2Ptr &pStorage = elementData.pStorage;
         if (pStorage != nullptr) {
             pSubItem->SetText(pStorage->text.c_str());
             if (pStorage->nTextFormat != 0) {
                 pSubItem->SetTextStyle(pStorage->nTextFormat, false);
-            }
-            else {
+            } else {
                 pSubItem->SetTextStyle(defaultSubItem.GetTextStyle(), false);
             }
             pSubItem->SetTextPadding(defaultSubItem.GetTextPadding(), false);
             for (int32_t nState = kControlStateNormal; nState < kControlStateCount; ++nState) {
-                ControlStateType stateType = (ControlStateType)nState;
+                ControlStateType stateType = (ControlStateType) nState;
                 pSubItem->SetStateTextColor(stateType, defaultSubItem.GetStateTextColor(stateType));
             }
             if (!pStorage->textColor.IsEmpty()) {
-                pSubItem->SetStateTextColor(kControlStateNormal, pSubItem->GetColorString(pStorage->textColor));
-            }
-            else {
-                pSubItem->SetStateTextColor(kControlStateNormal, defaultSubItem.GetStateTextColor(kControlStateNormal));
+                pSubItem->SetStateTextColor(
+                    kControlStateNormal, pSubItem->GetColorString(pStorage->textColor));
+            } else {
+                pSubItem->SetStateTextColor(
+                    kControlStateNormal, defaultSubItem.GetStateTextColor(kControlStateNormal));
             }
             if (!pStorage->bkColor.IsEmpty()) {
                 pSubItem->SetBkColor(pStorage->bkColor);
-            }
-            else {
+            } else {
                 pSubItem->SetBkColor(defaultSubItem.GetBkColor());
             }
             if (pStorage->bShowCheckBox) {
@@ -1069,29 +1073,28 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
                 pSubItem->DetachEvent(kEventCheck);
                 pSubItem->DetachEvent(kEventUnCheck);
                 pSubItem->SetChecked(pStorage->bChecked, false);
-                pSubItem->AttachCheck([this, nColumnId, nElementIndex](const EventArgs& /*args*/) {
+                pSubItem->AttachCheck([this, nColumnId, nElementIndex](const EventArgs & /*args*/) {
                     OnSubItemColumnChecked(nElementIndex, nColumnId, true);
                     return true;
+                });
+                pSubItem->AttachUnCheck(
+                    [this, nColumnId, nElementIndex](const EventArgs & /*args*/) {
+                        OnSubItemColumnChecked(nElementIndex, nColumnId, false);
+                        return true;
                     });
-                pSubItem->AttachUnCheck([this, nColumnId, nElementIndex](const EventArgs& /*args*/) {
-                    OnSubItemColumnChecked(nElementIndex, nColumnId, false);
-                    return true;
-                    });
-            }
-            else {
+            } else {
                 pSubItem->SetShowCheckBox(false);
                 pSubItem->DetachEvent(kEventCheck);
                 pSubItem->DetachEvent(kEventUnCheck);
                 pSubItem->SetChecked(false, false);
             }
             pSubItem->SetImageId(pStorage->nImageId);
-        }
-        else {
+        } else {
             pSubItem->SetTextStyle(defaultSubItem.GetTextStyle(), false);
             pSubItem->SetText(defaultSubItem.GetText());
             pSubItem->SetTextPadding(defaultSubItem.GetTextPadding(), false);
             for (int32_t nState = kControlStateNormal; nState < kControlStateCount; ++nState) {
-                ControlStateType stateType = (ControlStateType)nState;
+                ControlStateType stateType = (ControlStateType) nState;
                 pSubItem->SetStateTextColor(stateType, defaultSubItem.GetStateTextColor(stateType));
             }
             pSubItem->SetBkColor(defaultSubItem.GetBkColor());
@@ -1105,21 +1108,30 @@ bool ListCtrlReportView::FillDataItem(Control* pControl,
     auto viewFlag = GetWeakFlag();
     //先给出各个列的数据填充回调
     for (size_t nIndex = 0; nIndex < subItemPtrList.size(); ++nIndex) {
-        const ControlPtrT<ListCtrlSubItem>& pSubItem = subItemPtrList[nIndex];
+        const ControlPtrT<ListCtrlSubItem> &pSubItem = subItemPtrList[nIndex];
         if (viewFlag.expired() || pSubItem.expired()) {
             break;
         }
-        SendEvent(kEventReportViewSubItemFilled, (WPARAM)pItem->GetListBoxIndex(), (LPARAM)pItem->GetDataItemIndex(), pSubItem.get());
+        SendEvent(
+            kEventReportViewSubItemFilled,
+            (WPARAM) pItem->GetListBoxIndex(),
+            (LPARAM) pItem->GetDataItemIndex(),
+            pSubItem.get());
     }
 
     //给出当前行的数据填充回调
     if (!viewFlag.expired()) {
-        SendEvent(kEventReportViewItemFilled, (WPARAM)pItem->GetListBoxIndex(), (LPARAM)pItem->GetDataItemIndex(), pItem);
+        SendEvent(
+            kEventReportViewItemFilled,
+            (WPARAM) pItem->GetListBoxIndex(),
+            (LPARAM) pItem->GetDataItemIndex(),
+            pItem);
     }
     return true;
 }
 
-int32_t ListCtrlReportView::GetMaxDataItemWidth(const std::vector<ListCtrlSubItemData2Ptr>& subItemList)
+int32_t ListCtrlReportView::GetMaxDataItemWidth(
+    const std::vector<ListCtrlSubItemData2Ptr> &subItemList)
 {
     int32_t nMaxWidth = -1;
     if (m_pListCtrl == nullptr) {
@@ -1140,7 +1152,7 @@ int32_t ListCtrlReportView::GetMaxDataItemWidth(const std::vector<ListCtrlSubIte
     subItem.SetClass(defaultSubItemClass);
     subItem.SetListCtrlItem(&defaultItem);
 
-    for (const ListCtrlSubItemData2Ptr& pStorage : subItemList) {
+    for (const ListCtrlSubItemData2Ptr &pStorage : subItemList) {
         if (pStorage == nullptr) {
             continue;
         }
@@ -1151,8 +1163,7 @@ int32_t ListCtrlReportView::GetMaxDataItemWidth(const std::vector<ListCtrlSubIte
         subItem.SetText(pStorage->text.c_str());
         if (pStorage->nTextFormat != 0) {
             subItem.SetTextStyle(pStorage->nTextFormat, false);
-        }
-        else {
+        } else {
             subItem.SetTextStyle(defaultSubItem.GetTextStyle(), false);
         }
         subItem.SetTextPadding(defaultSubItem.GetTextPadding(), false);
@@ -1167,22 +1178,21 @@ int32_t ListCtrlReportView::GetMaxDataItemWidth(const std::vector<ListCtrlSubIte
 
     if (nMaxWidth <= 0) {
         nMaxWidth = -1;
-    }
-    else {
+    } else {
         //增加一点余量
         nMaxWidth += Dpi().GetScaleInt(4);
     }
     return nMaxWidth;
 }
 
-void ListCtrlReportView::AdjustSubItemWidth(const std::map<size_t, int32_t>& subItemWidths)
+void ListCtrlReportView::AdjustSubItemWidth(const std::map<size_t, int32_t> &subItemWidths)
 {
     if (subItemWidths.empty()) {
         return;
     }
     size_t itemCount = GetItemCount();
     for (size_t index = 1; index < itemCount; ++index) {
-        ListCtrlItem* pItem = dynamic_cast<ListCtrlItem*>(GetItemAt(index));
+        ListCtrlItem *pItem = dynamic_cast<ListCtrlItem *>(GetItemAt(index));
         if (pItem == nullptr) {
             continue;
         }
@@ -1194,7 +1204,8 @@ void ListCtrlReportView::AdjustSubItemWidth(const std::map<size_t, int32_t>& sub
                 if (nColumnWidth < 0) {
                     nColumnWidth = 0;
                 }
-                ListCtrlSubItem* pSubItem = dynamic_cast<ListCtrlSubItem*>(pItem->GetItemAt(nColumn));
+                ListCtrlSubItem *pSubItem = dynamic_cast<ListCtrlSubItem *>(
+                    pItem->GetItemAt(nColumn));
                 if (pSubItem != nullptr) {
                     pSubItem->SetFixedWidth(UiFixedInt(nColumnWidth), true, false);
                 }
@@ -1205,7 +1216,7 @@ void ListCtrlReportView::AdjustSubItemWidth(const std::map<size_t, int32_t>& sub
 
 void ListCtrlReportView::OnSubItemColumnChecked(size_t nElementIndex, size_t nColumnId, bool bChecked)
 {
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider != nullptr) {
         pDataProvider->SetSubItemCheck(nElementIndex, nColumnId, bChecked, false);
@@ -1216,18 +1227,19 @@ void ListCtrlReportView::OnSubItemColumnChecked(size_t nElementIndex, size_t nCo
     }
 }
 
-size_t ListCtrlReportView::GetDisplayItemCount(bool /*bIsHorizontal*/, size_t& nColumns, size_t& nRows) const
+size_t ListCtrlReportView::GetDisplayItemCount(
+    bool /*bIsHorizontal*/, size_t &nColumns, size_t &nRows) const
 {
     nColumns = 1;
     size_t nDiplayItemCount = m_diplayItemIndexList.size();
     size_t nAtTopItemCount = m_atTopControlList.size();
     nRows = nDiplayItemCount;
     if (nRows > nAtTopItemCount) {
-        nRows -= nAtTopItemCount;//减去置顶项
+        nRows -= nAtTopItemCount; //减去置顶项
     }
     if (nRows > 1) {
         if ((m_pListCtrl != nullptr) && (m_pListCtrl->GetHeaderHeight() > 0)) {
-            nRows -= 1;//减去Header
+            nRows -= 1; //减去Header
         }
     }
     return nRows * nColumns;
@@ -1236,7 +1248,7 @@ size_t ListCtrlReportView::GetDisplayItemCount(bool /*bIsHorizontal*/, size_t& n
 bool ListCtrlReportView::IsSelectableElement(size_t nElementIndex) const
 {
     bool bSelectable = true;
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider != nullptr) {
         bSelectable = pDataProvider->IsSelectableElement(nElementIndex);
@@ -1246,7 +1258,7 @@ bool ListCtrlReportView::IsSelectableElement(size_t nElementIndex) const
 
 size_t ListCtrlReportView::FindSelectableElement(size_t nElementIndex, bool bForward) const
 {
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return nElementIndex;
@@ -1266,21 +1278,20 @@ size_t ListCtrlReportView::FindSelectableElement(size_t nElementIndex, bool bFor
                     break;
                 }
             }
-        }
-        else {
+        } else {
             //向后查找下一个不是置顶的
-            for (int32_t i = (int32_t)nStartIndex - 1; i >= 0; --i) {
+            for (int32_t i = (int32_t) nStartIndex - 1; i >= 0; --i) {
                 if (pDataProvider->IsSelectableElement(i)) {
                     nElementIndex = i;
                     break;
                 }
             }
-        }        
+        }
     }
     return nElementIndex;
 }
 
-void ListCtrlReportView::GetScrollDeltaValue(int32_t& nHScrollValue, int32_t& nVScrollValue) const
+void ListCtrlReportView::GetScrollDeltaValue(int32_t &nHScrollValue, int32_t &nVScrollValue) const
 {
     nHScrollValue = DUI_NOSET_VALUE;
     nVScrollValue = DUI_NOSET_VALUE;
@@ -1294,14 +1305,15 @@ void ListCtrlReportView::GetScrollDeltaValue(int32_t& nHScrollValue, int32_t& nV
     }
 }
 
-bool ListCtrlReportView::OnFrameSelection(int64_t left, int64_t /*right*/, int64_t top, int64_t bottom)
+bool ListCtrlReportView::OnFrameSelection(
+    int64_t left, int64_t /*right*/, int64_t top, int64_t bottom)
 {
     if (left > GetListCtrlWidth()) {
         //在空白处，不做框选处理，只是取消所有选择项
         bool bRet = SetSelectNone();
         if (bRet) {
             OnSelectStatusChanged();
-        }        
+        }
         return bRet;
     }
     ASSERT(top <= bottom);
@@ -1312,12 +1324,12 @@ bool ListCtrlReportView::OnFrameSelection(int64_t left, int64_t /*right*/, int64
     if (m_pListCtrl == nullptr) {
         return false;
     }
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return false;
     }
-    const ListCtrlData::RowDataList& itemDataList = pDataProvider->GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = pDataProvider->GetItemDataList();
     const size_t dataItemCount = itemDataList.size();
     if (dataItemCount == 0) {
         return false;
@@ -1329,9 +1341,9 @@ bool ListCtrlReportView::OnFrameSelection(int64_t left, int64_t /*right*/, int64
     std::vector<size_t> itemIndexList;
 
     int64_t totalItemHeight = 0;
-    int32_t nItemHeight = 0;    
+    int32_t nItemHeight = 0;
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = (rowData.nItemHeight < 0) ? nDefaultItemHeight : rowData.nItemHeight;
         if (!rowData.bVisible || (nItemHeight == 0)) {
             //不可见的，跳过
@@ -1354,7 +1366,7 @@ bool ListCtrlReportView::OnFrameSelection(int64_t left, int64_t /*right*/, int64
         bottom = 0;
     }
     for (size_t index = 0; index < dataItemCount; ++index) {
-        const ListCtrlItemData& rowData = itemDataList[index];
+        const ListCtrlItemData &rowData = itemDataList[index];
         nItemHeight = (rowData.nItemHeight < 0) ? nDefaultItemHeight : rowData.nItemHeight;
         if (!rowData.bVisible || (nItemHeight == 0)) {
             //不可见的，跳过
@@ -1380,11 +1392,11 @@ bool ListCtrlReportView::OnFrameSelection(int64_t left, int64_t /*right*/, int64
     bool bRet = SetSelectedElements(itemIndexList, true);
     if (bRet) {
         OnSelectStatusChanged();
-    }    
+    }
     return bRet;
 }
 
-void ListCtrlReportView::OnItemSelectedChanged(size_t iIndex, IListBoxItem* pListBoxItem)
+void ListCtrlReportView::OnItemSelectedChanged(size_t iIndex, IListBoxItem *pListBoxItem)
 {
     if (!IsEnableUpdateProvider()) {
         return;
@@ -1393,7 +1405,7 @@ void ListCtrlReportView::OnItemSelectedChanged(size_t iIndex, IListBoxItem* pLis
     OnSelectStatusChanged();
 }
 
-void ListCtrlReportView::OnItemCheckedChanged(size_t /*iIndex*/, IListBoxItem* pListBoxItem)
+void ListCtrlReportView::OnItemCheckedChanged(size_t /*iIndex*/, IListBoxItem *pListBoxItem)
 {
     if (!IsEnableUpdateProvider()) {
         return;
@@ -1402,12 +1414,12 @@ void ListCtrlReportView::OnItemCheckedChanged(size_t /*iIndex*/, IListBoxItem* p
     if (pListBoxItem == nullptr) {
         return;
     }
-    ListCtrlItem* pItem = dynamic_cast<ListCtrlItem*>(pListBoxItem);
+    ListCtrlItem *pItem = dynamic_cast<ListCtrlItem *>(pListBoxItem);
     if (pItem == nullptr) {
         return;
     }
 
-    ListCtrlData* pDataProvider = m_pData;
+    ListCtrlData *pDataProvider = m_pData;
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return;
@@ -1447,11 +1459,11 @@ void ListCtrlReportView::SetRowGridLineWidth(float fLineWidth, bool bNeedDpiScal
 }
 
 float ListCtrlReportView::GetRowGridLineWidth() const
-{   
+{
     return m_fRowGridLineWidth;
 }
 
-void ListCtrlReportView::SetRowGridLineColor(const DString& color)
+void ListCtrlReportView::SetRowGridLineColor(const DString &color)
 {
     if (m_rowGridLineColor != color) {
         m_rowGridLineColor = color;
@@ -1483,7 +1495,7 @@ float ListCtrlReportView::GetColumnGridLineWidth() const
     return m_fColumnGridLineWidth;
 }
 
-void ListCtrlReportView::SetColumnGridLineColor(const DString& color)
+void ListCtrlReportView::SetColumnGridLineColor(const DString &color)
 {
     if (m_columnGridLineColor != color) {
         m_columnGridLineColor = color;
@@ -1499,21 +1511,21 @@ DString ListCtrlReportView::GetColumnGridLineColor() const
 ////////////////////////////////////////////////////////////////////////
 /// ListCtrlReportLayout 的实现
 
-ListCtrlReportLayout::ListCtrlReportLayout():
-    m_pDataView(nullptr),
-    m_bReserveSet(false)
-{
-}
+ListCtrlReportLayout::ListCtrlReportLayout()
+    : m_pDataView(nullptr)
+    , m_bReserveSet(false)
+{}
 
-void ListCtrlReportLayout::SetDataView(ListCtrlReportView* pDataView)
+void ListCtrlReportLayout::SetDataView(ListCtrlReportView *pDataView)
 {
     ASSERT(pDataView != nullptr);
     m_pDataView = pDataView;
 }
 
-UiSize64 ListCtrlReportLayout::ArrangeChildren(const std::vector<ui::Control*>& /*items*/, ui::UiRect rc, bool bEstimateOnly)
+UiSize64 ListCtrlReportLayout::ArrangeChildren(
+    const std::vector<ui::Control *> & /*items*/, ui::UiRect rc, bool bEstimateOnly)
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return UiSize64();
@@ -1535,15 +1547,16 @@ UiSize64 ListCtrlReportLayout::ArrangeChildren(const std::vector<ui::Control*>& 
     sz.cx = std::max(GetItemWidth(), rc.Width()); //允许出现横向滚动条
     if (!bEstimateOnly) {
         LazyArrangeChild(rc);
-    }    
+    }
     return sz;
 }
 
-UiSize64 ListCtrlReportLayout::EstimateLayoutSize(const std::vector<Control*>& items, ui::UiSize szAvailable)
+UiSize64 ListCtrlReportLayout::EstimateLayoutSize(
+    const std::vector<Control *> &items, ui::UiSize szAvailable)
 {
     //估算控件大小时（主要是用于宽高为"auto"类型的情况），只估算容器本身的大小，不包含列表数据的大小
     //因为列表实现为虚表，其数据规模较大，不适合用于估算"auto"控件的大小
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         //如果未设置数据接口，则兼容基类的功能
@@ -1592,7 +1605,7 @@ UiSize64 ListCtrlReportLayout::EstimateLayoutSize(const std::vector<Control*>& i
 void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
 {
     rc.Validate();
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return;
@@ -1614,7 +1627,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     const size_t nItemCount = pDataView->GetItemCount();
     if (nItemCount > 0) {
         //第一个元素是表头控件，设置其位置大小
-        ListCtrlHeader* pHeaderCtrl = dynamic_cast<ListCtrlHeader*>(pDataView->GetItemAt(0));
+        ListCtrlHeader *pHeaderCtrl = dynamic_cast<ListCtrlHeader *>(pDataView->GetItemAt(0));
         if ((pHeaderCtrl != nullptr) && pHeaderCtrl->IsVisible()) {
             int32_t nHeaderHeight = pHeaderCtrl->GetFixedHeight().GetInt32();
             if (nHeaderHeight < 0) {
@@ -1643,7 +1656,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     if (!rc.IsEmpty()) {
         pDataView->GetMaxDataItemsToShow(nScrollPosY, rc.Height());
     }
-    if (nCalcItemCount > (int32_t)(nItemCount - 1)) {
+    if (nCalcItemCount > (int32_t) (nItemCount - 1)) {
         //UI控件的个数不足，重新调整
         pDataView->AjustItemCount();
     }
@@ -1652,8 +1665,8 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     std::vector<ListCtrlReportView::ShowItemInfo> showItemIndexList;
     std::vector<ListCtrlReportView::ShowItemInfo> atTopItemIndexList;
     int64_t nPrevItemHeights = 0;
-    pDataView->GetDataItemsToShow(nScrollPosY, nItemCount - 1, 
-                                  showItemIndexList, atTopItemIndexList, nPrevItemHeights);
+    pDataView->GetDataItemsToShow(
+        nScrollPosY, nItemCount - 1, showItemIndexList, atTopItemIndexList, nPrevItemHeights);
     if (showItemIndexList.empty() && atTopItemIndexList.empty()) {
         //没有需要显示的数据
         pDataView->SetScrollVirtualOffsetY(nScrollPosY);
@@ -1668,11 +1681,10 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     size_t nTopElementIndex = Box::InvalidIndex;
     if (!atTopItemIndexList.empty()) {
         nTopElementIndex = atTopItemIndexList.front().nItemIndex;
-    }
-    else if (!showItemIndexList.empty()) {
+    } else if (!showItemIndexList.empty()) {
         nTopElementIndex = showItemIndexList.front().nItemIndex;
     }
-    pDataView->SetTopElementIndex(nTopElementIndex); 
+    pDataView->SetTopElementIndex(nTopElementIndex);
 
     //设置虚拟偏移，否则当数据量较大时，rc这个32位的矩形的高度会越界，需要64位整型才能容纳
     pDataView->SetScrollVirtualOffsetY(nScrollPosY);
@@ -1681,7 +1693,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     int32_t yOffset = 0;
     if ((nScrollPosY > 0) && !showItemIndexList.empty()) {
         int32_t nFirstHeight = showItemIndexList.front().nItemHeight;
-        if (nFirstHeight > 0) {            
+        if (nFirstHeight > 0) {
             yOffset = std::abs(nScrollPosY - nPrevItemHeights) % nFirstHeight;
         }
     }
@@ -1696,13 +1708,14 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
                     rcHeights -= GetReserveHeight();
                     if (pDataView->GetHScrollBar() != nullptr) {
                         rcHeights -= pDataView->GetHScrollBar()->GetHeight();
-                    }                    
+                    }
                 }
-                for (const auto& info : atTopItemIndexList) {
+                for (const auto &info : atTopItemIndexList) {
                     rcHeights -= info.nItemHeight;
                 }
-                for (int32_t nIndex = (int32_t)showItemIndexList.size() - 1; nIndex >= 0; --nIndex) {
-                    const auto& info = showItemIndexList[nIndex];
+                for (int32_t nIndex = (int32_t) showItemIndexList.size() - 1; nIndex >= 0;
+                     --nIndex) {
+                    const auto &info = showItemIndexList[nIndex];
                     if ((rcHeights - info.nItemHeight) > 0) {
                         rcHeights -= info.nItemHeight;
                     }
@@ -1722,21 +1735,21 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
 
     struct ShowItemIndex
     {
-        size_t nElementIndex;   //元素索引 
-        int32_t nItemHeight;    //元素的高度
-        bool bAtTop;            //是否置顶
-        int32_t yOffset;        //Y轴偏移量
+        size_t nElementIndex; //元素索引
+        int32_t nItemHeight;  //元素的高度
+        bool bAtTop;          //是否置顶
+        int32_t yOffset;      //Y轴偏移量
     };
     std::vector<ShowItemIndex> itemIndexList;
-    for (const auto& info : atTopItemIndexList) {
-        itemIndexList.push_back({ info.nItemIndex, info.nItemHeight, true, 0});
+    for (const auto &info : atTopItemIndexList) {
+        itemIndexList.push_back({info.nItemIndex, info.nItemHeight, true, 0});
     }
-    for (const auto& info : showItemIndexList) {
-        itemIndexList.push_back({ info.nItemIndex, info.nItemHeight, false, yOffset });
-        yOffset = 0;    //只有第一个元素设置偏移
+    for (const auto &info : showItemIndexList) {
+        itemIndexList.push_back({info.nItemIndex, info.nItemHeight, false, yOffset});
+        yOffset = 0; //只有第一个元素设置偏移
     }
     //元素的宽度：所有元素宽度都相同
-    const int32_t cx = GetItemWidth(); 
+    const int32_t cx = GetItemWidth();
     ASSERT(cx > 0);
 
     //控件的左上角坐标值
@@ -1750,7 +1763,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     std::vector<size_t> atTopUiItemIndexList;
     //第一个元素是表头控件，跳过填充数据，所以从1开始
     for (size_t index = 1; index < nItemCount; ++index) {
-        Control* pControl = pDataView->GetItemAt(index);
+        Control *pControl = pDataView->GetItemAt(index);
         if (pControl == nullptr) {
             continue;
         }
@@ -1760,7 +1773,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
         bool bFillElement = true;
         if (iCount < itemIndexList.size()) {
             //当前数据元素的索引号
-            const ShowItemIndex& showItemIndex = itemIndexList[iCount];
+            const ShowItemIndex &showItemIndex = itemIndexList[iCount];
             nElementIndex = showItemIndex.nElementIndex;
             bAlwaysAtTop = showItemIndex.bAtTop;
             szItem.cx = cx;
@@ -1775,10 +1788,9 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
             pControl->SetPos(rcTile);
             if (rcTile.top > orgRect.bottom) {
                 //如果元素已经不可见，则停止填充数据
-                bFillElement = false;                
+                bFillElement = false;
             }
-        }
-        else {
+        } else {
             //数据已经展示完成
             bFillElement = false;
         }
@@ -1786,7 +1798,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
         if (nElementIndex >= pDataView->GetElementCount()) {
             bFillElement = false;
         }
-        
+
         if (bFillElement) {
             if (!pControl->IsVisible()) {
                 pControl->SetVisible(true);
@@ -1801,7 +1813,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
             refreshData.nElementIndex = nElementIndex;
             refreshDataList.push_back(refreshData);
 
-            ListCtrlItem* pListCtrlItem = dynamic_cast<ListCtrlItem*>(pControl);
+            ListCtrlItem *pListCtrlItem = dynamic_cast<ListCtrlItem *>(pControl);
             if (pListCtrlItem != nullptr) {
                 //置顶项不允许选择
                 pListCtrlItem->SetSelectableType(bAlwaysAtTop ? false : true);
@@ -1812,12 +1824,11 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
                 //记录置顶项的底部坐标
                 nNormalItemTop = pControl->GetRect().bottom;
             }
-        }
-        else {
+        } else {
             if (pControl->IsVisible()) {
                 pControl->SetVisible(false);
             }
-            ListCtrlItem* pListCtrlItem = dynamic_cast<ListCtrlItem*>(pControl);
+            ListCtrlItem *pListCtrlItem = dynamic_cast<ListCtrlItem *>(pControl);
             if (pListCtrlItem != nullptr) {
                 pListCtrlItem->SetElementIndex(Box::InvalidIndex);
             }
@@ -1829,7 +1840,7 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
     }
 
     pDataView->SetAtTopControlIndex(atTopUiItemIndexList);
-    pDataView->SetDisplayDataItems(diplayItemIndexList);    
+    pDataView->SetDisplayDataItems(diplayItemIndexList);
     pDataView->SetNormalItemTop(nNormalItemTop);
 
     if (!refreshDataList.empty()) {
@@ -1839,8 +1850,8 @@ void ListCtrlReportLayout::LazyArrangeChild(UiRect rc) const
 }
 
 void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
-{    
-    ListCtrlReportView* pDataView = GetDataView();
+{
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return;
@@ -1850,7 +1861,7 @@ void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
     const size_t nItemCount = pDataView->GetItemCount();
     if (nItemCount > 0) {
         //第一个元素是表头控件，设置其位置大小
-        Control* pHeaderCtrl = pDataView->GetItemAt(0);
+        Control *pHeaderCtrl = pDataView->GetItemAt(0);
         if ((pHeaderCtrl != nullptr) && pHeaderCtrl->IsVisible()) {
             int32_t nHeaderHeight = pHeaderCtrl->GetFixedHeight().GetInt32();
             if (nHeaderHeight < 0) {
@@ -1909,7 +1920,7 @@ void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
     size_t iCount = 0;
     //第一个元素是表头控件，跳过填充数据，所以从1开始
     for (size_t index = 1; index < nItemCount; ++index) {
-        Control* pControl = pDataView->GetItemAt(index);
+        Control *pControl = pDataView->GetItemAt(index);
         if (pControl == nullptr) {
             continue;
         }
@@ -1920,7 +1931,7 @@ void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
         ui::UiRect rcTile(ptTile.x, ptTile.y, ptTile.x + cx, ptTile.y + cy);
         pControl->SetPos(rcTile);
 
-        // 填充数据        
+        // 填充数据
         if (nElementIndex < pDataView->GetElementCount()) {
             if (!pControl->IsVisible()) {
                 pControl->SetVisible(true);
@@ -1932,12 +1943,11 @@ void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
             refreshData.pControl = pControl;
             refreshData.nElementIndex = nElementIndex;
             refreshDataList.push_back(refreshData);
-        }
-        else {
+        } else {
             if (pControl->IsVisible()) {
                 pControl->SetVisible(false);
             }
-            ListCtrlItem* pListCtrlItem = dynamic_cast<ListCtrlItem*>(pControl);
+            ListCtrlItem *pListCtrlItem = dynamic_cast<ListCtrlItem *>(pControl);
             if (pListCtrlItem != nullptr) {
                 pListCtrlItem->SetElementIndex(Box::InvalidIndex);
             }
@@ -1955,7 +1965,7 @@ void ListCtrlReportLayout::LazyArrangeChildNormal(UiRect rc) const
 
 size_t ListCtrlReportLayout::AjustMaxItem(UiRect rc) const
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return 1;
@@ -1984,7 +1994,7 @@ size_t ListCtrlReportLayout::AjustMaxItem(UiRect rc) const
             nRows += 1;
         }
     }
-    
+
     if (!pDataView->IsNormalMode()) {
         //非标准模式，需要复杂计算得到结果
         int64_t nScrollPosY = pDataView->GetScrollPos().cy;
@@ -2005,7 +2015,7 @@ size_t ListCtrlReportLayout::AjustMaxItem(UiRect rc) const
 size_t ListCtrlReportLayout::GetTopElementIndex(UiRect /*rc*/) const
 {
     size_t nTopElementIndex = 0;
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return nTopElementIndex;
@@ -2014,8 +2024,7 @@ size_t ListCtrlReportLayout::GetTopElementIndex(UiRect /*rc*/) const
     if (!pDataView->IsNormalMode()) {
         //非标准模式
         nTopElementIndex = pDataView->GetTopDataItemIndex(nScrollPosY);
-    }
-    else {
+    } else {
         int32_t nItemHeight = GetItemHeight();
         ASSERT(nItemHeight > 0);
         if (nItemHeight > 0) {
@@ -2035,16 +2044,16 @@ bool ListCtrlReportLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
     return std::find(itemIndexList.begin(), itemIndexList.end(), iIndex) != itemIndexList.end();
 }
 
-void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const
+void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const
 {
     GetDisplayElements(rc, collection, nullptr);
 }
 
-void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collection,
-                                            std::vector<size_t>* pAtTopItemIndexList) const
+void ListCtrlReportLayout::GetDisplayElements(
+    UiRect rc, std::vector<size_t> &collection, std::vector<size_t> *pAtTopItemIndexList) const
 {
     collection.clear();
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return;
@@ -2055,8 +2064,7 @@ void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& co
     int64_t nScrollPosY = pDataView->GetScrollPos().cy;
     if (!pDataView->IsNormalMode()) {
         //非标准模式
-        pDataView->GetMaxDataItemsToShow(nScrollPosY, rc.Height(), 
-                                         &collection, pAtTopItemIndexList);
+        pDataView->GetMaxDataItemsToShow(nScrollPosY, rc.Height(), &collection, pAtTopItemIndexList);
         return;
     }
 
@@ -2068,15 +2076,14 @@ void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& co
     rc.top += GetHeaderHeight();
     rc.Validate();
 
-    size_t min = (size_t)(nScrollPosY / nItemHeight);
-    size_t max = min + (size_t)(rc.Height() / nItemHeight);
+    size_t min = (size_t) (nScrollPosY / nItemHeight);
+    size_t max = min + (size_t) (rc.Height() / nItemHeight);
     size_t nCount = pDataView->GetElementCount();
     if (nCount > 0) {
         if (max >= nCount) {
             max = nCount - 1;
         }
-    }
-    else {
+    } else {
         return;
     }
     for (size_t i = min; i <= max; ++i) {
@@ -2086,7 +2093,7 @@ void ListCtrlReportLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& co
 
 bool ListCtrlReportLayout::NeedReArrange() const
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return false;
@@ -2097,15 +2104,15 @@ bool ListCtrlReportLayout::NeedReArrange() const
         return false;
     }
 
-    int64_t nScrollPosY = pDataView->GetScrollPos().cy;//新滚动条位置
-    int64_t nVirtualOffsetY = pDataView->GetScrollVirtualOffset().cy;//原滚动条位置
+    int64_t nScrollPosY = pDataView->GetScrollPos().cy;               //新滚动条位置
+    int64_t nVirtualOffsetY = pDataView->GetScrollVirtualOffset().cy; //原滚动条位置
     //只要滚动位置发生变化，就需要重新布局
     return (nScrollPosY != nVirtualOffsetY);
 }
 
 void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) const
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return;
@@ -2113,7 +2120,7 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
     if (!Box::IsValidItemIndex(iIndex) || (iIndex >= pDataView->GetElementCount())) {
         return;
     }
-    ScrollBar* pVScrollBar = pDataView->GetVScrollBar();
+    ScrollBar *pVScrollBar = pDataView->GetVScrollBar();
     if (pVScrollBar == nullptr) {
         return;
     }
@@ -2121,19 +2128,19 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
         std::vector<size_t> atTopItemIndexList;
         std::vector<size_t> itemIndexList;
         GetDisplayElements(rc, itemIndexList, &atTopItemIndexList);
-        bool bDisplay = std::find(itemIndexList.begin(), itemIndexList.end(), iIndex) != itemIndexList.end();
+        bool bDisplay = std::find(itemIndexList.begin(), itemIndexList.end(), iIndex)
+                        != itemIndexList.end();
         bool bFirst = false;
         bool bLast = false;
         if (!itemIndexList.empty()) {
             for (size_t i = 0; i < itemIndexList.size(); ++i) {
-                if (std::find(atTopItemIndexList.begin(), 
-                              atTopItemIndexList.end(), 
-                              itemIndexList[i]) == atTopItemIndexList.end()) {
+                if (std::find(atTopItemIndexList.begin(), atTopItemIndexList.end(), itemIndexList[i])
+                    == atTopItemIndexList.end()) {
                     //第一个不置顶的索引
                     bFirst = itemIndexList[i] == iIndex;
                     break;
                 }
-            }            
+            }
             bLast = itemIndexList[itemIndexList.size() - 1] == iIndex;
         }
         if (bDisplay && !bLast && !bFirst) {
@@ -2142,8 +2149,8 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
         }
     }
     const UiSize szElementSize = GetElementSize(0, iIndex); //目标元素的大小
-    int64_t nNewTopPos = 0;     //顶部对齐时的位置
-    int64_t nNewBottomPos = 0;  //底部对齐时的位置
+    int64_t nNewTopPos = 0;                                 //顶部对齐时的位置
+    int64_t nNewBottomPos = 0;                              //底部对齐时的位置
     if (iIndex > 0) {
         nNewTopPos = GetElementsHeight(iIndex, false);
         if (!bToTop) {
@@ -2179,14 +2186,14 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
     if (bToTop) {
         //顶部对齐
         nNewPos = nNewTopPos;
-    }
-    else {
+    } else {
         //未指定对齐，智能判断
         int64_t diffTop = nNewTopPos - nScrollPosY;
         int64_t diffBottom = nNewBottomPos - nScrollPosY;
         bool bFullDisplay = false; //是否已经可以完全显示出来（纵向）
         if ((nScrollPosY >= nNewBottomPos) && (nScrollPosY <= nNewTopPos)) {
-            if ((std::abs(diffTop) >= szElementSize.cy) && (std::abs(diffBottom) >= szElementSize.cy)) {
+            if ((std::abs(diffTop) >= szElementSize.cy)
+                && (std::abs(diffBottom) >= szElementSize.cy)) {
                 //当前是完全显示的，不需要滚动
                 bFullDisplay = true;
             }
@@ -2195,8 +2202,7 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
             if (std::abs(diffTop) > std::abs(diffBottom)) {
                 //向上滚动：底部对齐
                 nNewPos = nNewBottomPos;
-            }
-            else {
+            } else {
                 //向下滚动：顶部对齐
                 nNewPos = nNewTopPos;
             }
@@ -2205,12 +2211,12 @@ void ListCtrlReportLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) 
     if (scrollPos.cy != nNewPos) {
         scrollPos.cy = nNewPos;
         pDataView->SetScrollPos(scrollPos);
-    }    
+    }
 }
 
 int64_t ListCtrlReportLayout::GetElementsHeight(size_t nCount, bool bIncludeAtTops) const
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return 0;
@@ -2218,15 +2224,14 @@ int64_t ListCtrlReportLayout::GetElementsHeight(size_t nCount, bool bIncludeAtTo
     if (!Box::IsValidItemIndex(nCount)) {
         nCount = pDataView->GetElementCount();
     }
-    if ((nCount == 0) || !Box::IsValidItemIndex(nCount)){
+    if ((nCount == 0) || !Box::IsValidItemIndex(nCount)) {
         return 0;
     }
     int64_t nTotalHeight = 0;
     if (!pDataView->IsNormalMode()) {
         //非标准模式
         nTotalHeight = pDataView->GetDataItemTotalHeights(nCount, bIncludeAtTops);
-    }
-    else {
+    } else {
         int32_t nItemHeight = GetItemHeight();
         ASSERT(nItemHeight > 0);
         if (nItemHeight <= 0) {
@@ -2234,14 +2239,13 @@ int64_t ListCtrlReportLayout::GetElementsHeight(size_t nCount, bool bIncludeAtTo
         }
         if (nCount <= 1) {
             //只有1行
-            nTotalHeight = (int64_t)nItemHeight + GetChildMarginY();
-        }
-        else {
+            nTotalHeight = (int64_t) nItemHeight + GetChildMarginY();
+        } else {
             int64_t iChildMargin = 0;
             if (GetChildMarginY() > 0) {
                 iChildMargin = GetChildMarginY();
             }
-            int64_t childMarginTotal = ((int64_t)nCount - 1) * iChildMargin;
+            int64_t childMarginTotal = ((int64_t) nCount - 1) * iChildMargin;
             nTotalHeight = nItemHeight * nCount + childMarginTotal;
         }
     }
@@ -2250,7 +2254,7 @@ int64_t ListCtrlReportLayout::GetElementsHeight(size_t nCount, bool bIncludeAtTo
 
 UiSize ListCtrlReportLayout::GetElementSize(int32_t rcWidth, size_t nElementIndex) const
 {
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView == nullptr) || !pDataView->HasDataProvider()) {
         ASSERT(0);
         return UiSize();
@@ -2260,11 +2264,10 @@ UiSize ListCtrlReportLayout::GetElementSize(int32_t rcWidth, size_t nElementInde
     if (!pDataView->IsNormalMode()) {
         //非标准模式，行高可能各不相同
         szElementSize.cy = pDataView->GetDataItemHeight(nElementIndex);
-    }
-    else {
+    } else {
         //标准模式，所有行的高度都相同的
         szElementSize.cy = GetItemHeight();
-    }    
+    }
     return szElementSize;
 }
 
@@ -2272,7 +2275,7 @@ int32_t ListCtrlReportLayout::GetItemWidth() const
 {
     //宽度与表头的宽度相同
     int32_t nItemWidth = 0;
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if (pDataView != nullptr) {
         nItemWidth = pDataView->GetListCtrlWidth();
     }
@@ -2283,7 +2286,7 @@ int32_t ListCtrlReportLayout::GetItemHeight() const
 {
     //所有行的高度相同，并且从配置读取
     int32_t nItemHeight = 0;
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if ((pDataView != nullptr) && (pDataView->m_pListCtrl != nullptr)) {
         nItemHeight = pDataView->m_pListCtrl->GetDataItemHeight();
     }
@@ -2293,13 +2296,13 @@ int32_t ListCtrlReportLayout::GetItemHeight() const
 int32_t ListCtrlReportLayout::GetHeaderHeight() const
 {
     int32_t nHeaderHeight = 0;
-    ListCtrlReportView* pDataView = GetDataView();
+    ListCtrlReportView *pDataView = GetDataView();
     if (pDataView != nullptr) {
-        Control* pHeaderCtrl = nullptr;
+        Control *pHeaderCtrl = nullptr;
         size_t nItemCount = pDataView->GetItemCount();
         if (nItemCount > 0) {
             //第一个元素是表头控件，设置其位置大小
-            pHeaderCtrl = pDataView->GetItemAt(0);            
+            pHeaderCtrl = pDataView->GetItemAt(0);
         }
         if ((pHeaderCtrl != nullptr) && pHeaderCtrl->IsVisible()) {
             nHeaderHeight = pHeaderCtrl->GetFixedHeight().GetInt32();
@@ -2317,5 +2320,4 @@ int32_t ListCtrlReportLayout::GetReserveHeight() const
     return nReserveHeight;
 }
 
-}//namespace ui
-
+} //namespace ui

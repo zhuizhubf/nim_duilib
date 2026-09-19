@@ -2,16 +2,13 @@
 #include "CefForm.h"
 #include "TestApplication.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
-const ui::DpiInitParam& MainThread::GetDpiInitParam() const
+const ui::DpiInitParam &MainThread::GetDpiInitParam() const
 {
     return m_dpiInitParam;
 }
@@ -19,7 +16,7 @@ const ui::DpiInitParam& MainThread::GetDpiInitParam() const
 bool MainThread::OnInit()
 {
     // 创建一个默认带有阴影的居中窗口
-    CefForm* window = new CefForm();
+    CefForm *window = new CefForm();
     uint32_t dwExStyle = 0;
     if (ui::CefManager::GetInstance()->IsEnableOffScreenRendering()) {
         dwExStyle |= ui::kWS_EX_LAYERED;

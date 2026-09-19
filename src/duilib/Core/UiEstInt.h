@@ -4,8 +4,7 @@
 #include "duilib/duilib_defs.h"
 #include <cstdint>
 
-namespace ui
-{
+namespace ui {
 
 /** 控件估算长度（或宽度）数值
 */
@@ -13,10 +12,9 @@ class DUILIB_API UiEstInt
 {
 public:
     //数值类型定义
-    enum class Type
-    {
-        Int32   = 0,    //正常32位整型值，固定数值
-        Stretch = 1     //拉伸（由外部的容器负责设置具体数值）
+    enum class Type {
+        Int32 = 0,  //正常32位整型值，固定数值
+        Stretch = 1 //拉伸（由外部的容器负责设置具体数值）
     };
 
     //数值类型
@@ -49,17 +47,21 @@ public:
 public:
     /** 构造函数, 默认为整型值0
     */
-    UiEstInt(): type(Type::Int32), value(0)
-    { }
+    UiEstInt()
+        : type(Type::Int32)
+        , value(0)
+    {}
 
     /** 构造函数, 设置为整型值
     */
-    explicit UiEstInt(int32_t iValue) : type(Type::Int32), value(iValue)
-    { }
+    explicit UiEstInt(int32_t iValue)
+        : type(Type::Int32)
+        , value(iValue)
+    {}
 
     /** 判断是否为拉伸类型
     */
-    bool IsStretch() const { return type == Type::Stretch;}
+    bool IsStretch() const { return type == Type::Stretch; }
 
     /** 判断是否为32位整型值类型
     */
@@ -109,9 +111,9 @@ public:
 
     /** 赋值为拉伸类型
     */
-    void SetStretch() 
-    { 
-        type = Type::Stretch; 
+    void SetStretch()
+    {
+        type = Type::Stretch;
         value = 100;
     }
 
@@ -123,20 +125,18 @@ public:
         ASSERT((iValue > 0) && (iValue <= 100));
         if ((iValue > 0) && (iValue <= 100)) {
             value = iValue;
-        }
-        else {
+        } else {
             value = 100;
         }
     }
 
     /** 判断是否与另外一个Size相同
     */
-    bool Equals(const UiEstInt& dst) const
+    bool Equals(const UiEstInt &dst) const
     {
         if (IsStretch() && dst.IsStretch()) {
             return value == dst.value;
-        }
-        else if (IsInt32() && dst.IsInt32()) {
+        } else if (IsInt32() && dst.IsInt32()) {
             return value == dst.value;
         }
         return false;
@@ -144,19 +144,13 @@ public:
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiEstInt& a, const UiEstInt& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiEstInt &a, const UiEstInt &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiEstInt& a, const UiEstInt& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiEstInt &a, const UiEstInt &b) { return !a.Equals(b); }
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif // UI_CORE_UIESTINT_H_

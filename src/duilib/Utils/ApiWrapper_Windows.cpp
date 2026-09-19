@@ -7,11 +7,10 @@
 #include "render/IRender.h"
 #include <VersionHelpers.h>
 #include <dwmapi.h>
-#include <shellapi.h>
 #include <map>
+#include <shellapi.h>
 
-namespace ui
-{
+namespace ui {
 
 UINT GetDpiForWnd(HWND hWnd)
 {
@@ -32,7 +31,7 @@ UINT GetDpiForWnd(HWND hWnd)
     if (uDPI == 0) {
         HDC hDC = ::GetDC(hWnd);
         if (hDC != nullptr) {
-            uDPI = (uint32_t)::GetDeviceCaps(hDC, LOGPIXELSX);
+            uDPI = (uint32_t) ::GetDeviceCaps(hDC, LOGPIXELSX);
             ::ReleaseDC(hWnd, hDC);
         }
     }
@@ -44,10 +43,11 @@ UINT GetDpiForWnd(HWND hWnd)
     return uDPI;
 }
 
-bool GetDpiForSystemWrapper(UINT& dpi)
+bool GetDpiForSystemWrapper(UINT &dpi)
 {
-    typedef UINT(WINAPI* GetDpiForSystemPtr)();
-    static GetDpiForSystemPtr get_dpi_for_system_func = reinterpret_cast<GetDpiForSystemPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForSystem"));
+    typedef UINT(WINAPI * GetDpiForSystemPtr)();
+    static GetDpiForSystemPtr get_dpi_for_system_func = reinterpret_cast<GetDpiForSystemPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForSystem"));
     dpi = 96;
     if (get_dpi_for_system_func) {
         dpi = get_dpi_for_system_func();
@@ -58,9 +58,10 @@ bool GetDpiForSystemWrapper(UINT& dpi)
 
 bool GetDpiForMonitorWrapper(HMONITOR hMonitor, MONITOR_DPI_TYPE dpiType, UINT *dpiX, UINT *dpiY)
 {
-    typedef HRESULT(WINAPI *GetDpiForMonitorPtr)(HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
+    typedef HRESULT(WINAPI * GetDpiForMonitorPtr)(HMONITOR, MONITOR_DPI_TYPE, UINT *, UINT *);
 
-    static GetDpiForMonitorPtr get_dpi_for_monitor_func = reinterpret_cast<GetDpiForMonitorPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForMonitorInternal"));
+    static GetDpiForMonitorPtr get_dpi_for_monitor_func = reinterpret_cast<GetDpiForMonitorPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForMonitorInternal"));
     if (get_dpi_for_monitor_func) {
         if (get_dpi_for_monitor_func(hMonitor, dpiType, dpiX, dpiY) != S_OK) {
             return true;
@@ -69,10 +70,11 @@ bool GetDpiForMonitorWrapper(HMONITOR hMonitor, MONITOR_DPI_TYPE dpiType, UINT *
     return false;
 }
 
-bool GetDpiForWindowWrapper(HWND hwnd, UINT& dpi)
+bool GetDpiForWindowWrapper(HWND hwnd, UINT &dpi)
 {
-    typedef UINT(WINAPI* GetDpiForWindowPtr)(HWND hwnd);
-    static GetDpiForWindowPtr get_dpi_for_window_func = reinterpret_cast<GetDpiForWindowPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForWindow"));
+    typedef UINT(WINAPI * GetDpiForWindowPtr)(HWND hwnd);
+    static GetDpiForWindowPtr get_dpi_for_window_func = reinterpret_cast<GetDpiForWindowPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiForWindow"));
     dpi = 96;
     if (get_dpi_for_window_func) {
         dpi = get_dpi_for_window_func(hwnd);
@@ -84,12 +86,13 @@ bool GetDpiForWindowWrapper(HWND hwnd, UINT& dpi)
 int GetSystemMetricsForDpiWrapper(int nIndex, UINT dpi)
 {
     int nMetrics = 0;
-    typedef int(WINAPI* GetSystemMetricsForDpiPtr)(int nIndex, UINT dpi);
-    static GetSystemMetricsForDpiPtr get_system_metrics_for_dpi_func = reinterpret_cast<GetSystemMetricsForDpiPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetSystemMetricsForDpi"));
+    typedef int(WINAPI * GetSystemMetricsForDpiPtr)(int nIndex, UINT dpi);
+    static GetSystemMetricsForDpiPtr get_system_metrics_for_dpi_func
+        = reinterpret_cast<GetSystemMetricsForDpiPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "GetSystemMetricsForDpi"));
     if (get_system_metrics_for_dpi_func) {
         nMetrics = get_system_metrics_for_dpi_func(nIndex, dpi);
-    }
-    else {
+    } else {
         nMetrics = ::GetSystemMetrics(nIndex);
     }
     return nMetrics;
@@ -97,8 +100,10 @@ int GetSystemMetricsForDpiWrapper(int nIndex, UINT dpi)
 
 bool SetProcessDpiAwarenessContextWrapper(PROCESS_DPI_AWARENESS_CONTEXT value)
 {
-    typedef    BOOL (WINAPI *SetProcessDpiAwarenessContextPtr)(PROCESS_DPI_AWARENESS_CONTEXT value);
-    static SetProcessDpiAwarenessContextPtr set_process_dpi_awareness_context_func = reinterpret_cast<SetProcessDpiAwarenessContextPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDpiAwarenessContext"));
+    typedef BOOL(WINAPI * SetProcessDpiAwarenessContextPtr)(PROCESS_DPI_AWARENESS_CONTEXT value);
+    static SetProcessDpiAwarenessContextPtr set_process_dpi_awareness_context_func
+        = reinterpret_cast<SetProcessDpiAwarenessContextPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDpiAwarenessContext"));
     bool isOk = false;
     if (set_process_dpi_awareness_context_func) {
         isOk = set_process_dpi_awareness_context_func(value) != FALSE;
@@ -106,10 +111,14 @@ bool SetProcessDpiAwarenessContextWrapper(PROCESS_DPI_AWARENESS_CONTEXT value)
     return isOk;
 }
 
-bool AreDpiAwarenessContextsEqualWrapper(PROCESS_DPI_AWARENESS_CONTEXT dpiContextA, PROCESS_DPI_AWARENESS_CONTEXT dpiContextB)
+bool AreDpiAwarenessContextsEqualWrapper(
+    PROCESS_DPI_AWARENESS_CONTEXT dpiContextA, PROCESS_DPI_AWARENESS_CONTEXT dpiContextB)
 {
-    typedef BOOL (WINAPI *AreDpiAwarenessContextsEqualPtr)(PROCESS_DPI_AWARENESS_CONTEXT dpiContextA, PROCESS_DPI_AWARENESS_CONTEXT dpiContextB);
-    static AreDpiAwarenessContextsEqualPtr are_process_dpi_awareness_context_equal_func = reinterpret_cast<AreDpiAwarenessContextsEqualPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "AreDpiAwarenessContextsEqual"));
+    typedef BOOL(WINAPI * AreDpiAwarenessContextsEqualPtr)(
+        PROCESS_DPI_AWARENESS_CONTEXT dpiContextA, PROCESS_DPI_AWARENESS_CONTEXT dpiContextB);
+    static AreDpiAwarenessContextsEqualPtr are_process_dpi_awareness_context_equal_func
+        = reinterpret_cast<AreDpiAwarenessContextsEqualPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "AreDpiAwarenessContextsEqual"));
     bool isOk = false;
     if (are_process_dpi_awareness_context_equal_func) {
         if (are_process_dpi_awareness_context_equal_func(dpiContextA, dpiContextB)) {
@@ -119,10 +128,13 @@ bool AreDpiAwarenessContextsEqualWrapper(PROCESS_DPI_AWARENESS_CONTEXT dpiContex
     return isOk;
 }
 
-bool GetProcessDpiAwarenessContextWrapper(PROCESS_DPI_AWARENESS_CONTEXT& value)
+bool GetProcessDpiAwarenessContextWrapper(PROCESS_DPI_AWARENESS_CONTEXT &value)
 {
-    typedef PROCESS_DPI_AWARENESS_CONTEXT(WINAPI *GetDpiAwarenessContextForProcessPtr)(HANDLE hProcess);
-    static GetDpiAwarenessContextForProcessPtr get_process_dpi_awareness_context_func = reinterpret_cast<GetDpiAwarenessContextForProcessPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiAwarenessContextForProcess"));
+    typedef PROCESS_DPI_AWARENESS_CONTEXT(WINAPI * GetDpiAwarenessContextForProcessPtr)(
+        HANDLE hProcess);
+    static GetDpiAwarenessContextForProcessPtr get_process_dpi_awareness_context_func
+        = reinterpret_cast<GetDpiAwarenessContextForProcessPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "GetDpiAwarenessContextForProcess"));
     bool isOk = false;
     if (get_process_dpi_awareness_context_func) {
         value = get_process_dpi_awareness_context_func(nullptr);
@@ -133,8 +145,10 @@ bool GetProcessDpiAwarenessContextWrapper(PROCESS_DPI_AWARENESS_CONTEXT& value)
 
 bool SetProcessDPIAwarenessWrapper(PROCESS_DPI_AWARENESS value)
 {
-    typedef BOOL(WINAPI *SetProcessDpiAwarenessPtr)(PROCESS_DPI_AWARENESS);
-    static SetProcessDpiAwarenessPtr set_process_dpi_awareness_func = reinterpret_cast<SetProcessDpiAwarenessPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDpiAwarenessInternal"));
+    typedef BOOL(WINAPI * SetProcessDpiAwarenessPtr)(PROCESS_DPI_AWARENESS);
+    static SetProcessDpiAwarenessPtr set_process_dpi_awareness_func
+        = reinterpret_cast<SetProcessDpiAwarenessPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDpiAwarenessInternal"));
     if (set_process_dpi_awareness_func) {
         if (set_process_dpi_awareness_func(value)) {
             return true;
@@ -143,10 +157,12 @@ bool SetProcessDPIAwarenessWrapper(PROCESS_DPI_AWARENESS value)
     return false;
 }
 
-bool GetProcessDPIAwarenessWrapper(PROCESS_DPI_AWARENESS& awareness)
+bool GetProcessDPIAwarenessWrapper(PROCESS_DPI_AWARENESS &awareness)
 {
-    typedef BOOL (WINAPI* GetProcessDpiAwarenessPtr)(HANDLE, PROCESS_DPI_AWARENESS*);
-    static GetProcessDpiAwarenessPtr get_process_dpi_awareness_func = reinterpret_cast<GetProcessDpiAwarenessPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetProcessDpiAwarenessInternal"));
+    typedef BOOL(WINAPI * GetProcessDpiAwarenessPtr)(HANDLE, PROCESS_DPI_AWARENESS *);
+    static GetProcessDpiAwarenessPtr get_process_dpi_awareness_func
+        = reinterpret_cast<GetProcessDpiAwarenessPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "GetProcessDpiAwarenessInternal"));
     if (get_process_dpi_awareness_func) {
         if (get_process_dpi_awareness_func(nullptr, &awareness)) {
             return true;
@@ -157,15 +173,18 @@ bool GetProcessDPIAwarenessWrapper(PROCESS_DPI_AWARENESS& awareness)
 
 bool SetProcessDPIAwareWrapper()
 {
-    typedef BOOL(WINAPI *SetProcessDPIAwarePtr)(VOID);
-    static SetProcessDPIAwarePtr set_process_dpi_aware_func = reinterpret_cast<SetProcessDPIAwarePtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDPIAware"));
+    typedef BOOL(WINAPI * SetProcessDPIAwarePtr)(VOID);
+    static SetProcessDPIAwarePtr set_process_dpi_aware_func
+        = reinterpret_cast<SetProcessDPIAwarePtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "SetProcessDPIAware"));
     return set_process_dpi_aware_func && set_process_dpi_aware_func();
 }
 
-bool IsProcessDPIAwareWrapper(bool& bAware)
+bool IsProcessDPIAwareWrapper(bool &bAware)
 {
-    typedef BOOL(WINAPI* IsProcessDPIAwarePtr)();
-    static IsProcessDPIAwarePtr is_process_dpi_aware_func = reinterpret_cast<IsProcessDPIAwarePtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "IsProcessDPIAware"));
+    typedef BOOL(WINAPI * IsProcessDPIAwarePtr)();
+    static IsProcessDPIAwarePtr is_process_dpi_aware_func = reinterpret_cast<IsProcessDPIAwarePtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "IsProcessDPIAware"));
     if (is_process_dpi_aware_func) {
         bAware = is_process_dpi_aware_func() != FALSE;
         return true;
@@ -175,9 +194,11 @@ bool IsProcessDPIAwareWrapper(bool& bAware)
 
 bool RegisterTouchWindowWrapper(HWND hwnd, ULONG ulFlags)
 {
-    typedef BOOL(WINAPI *RegisterTouchWindowPtr)(HWND, ULONG);
+    typedef BOOL(WINAPI * RegisterTouchWindowPtr)(HWND, ULONG);
 
-    static RegisterTouchWindowPtr register_touch_window_func = reinterpret_cast<RegisterTouchWindowPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "RegisterTouchWindow"));
+    static RegisterTouchWindowPtr register_touch_window_func
+        = reinterpret_cast<RegisterTouchWindowPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "RegisterTouchWindow"));
 
     if (register_touch_window_func) {
         return (TRUE == register_touch_window_func(hwnd, ulFlags));
@@ -186,12 +207,13 @@ bool RegisterTouchWindowWrapper(HWND hwnd, ULONG ulFlags)
     return false;
 }
 
-
 bool UnregisterTouchWindowWrapper(HWND hwnd)
 {
-    typedef BOOL(WINAPI *UnregisterTouchWindowPtr)(HWND);
+    typedef BOOL(WINAPI * UnregisterTouchWindowPtr)(HWND);
 
-    static UnregisterTouchWindowPtr unregister_touch_window_func = reinterpret_cast<UnregisterTouchWindowPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "UnregisterTouchWindow"));
+    static UnregisterTouchWindowPtr unregister_touch_window_func
+        = reinterpret_cast<UnregisterTouchWindowPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "UnregisterTouchWindow"));
 
     if (unregister_touch_window_func) {
         return (TRUE == unregister_touch_window_func(hwnd));
@@ -202,10 +224,11 @@ bool UnregisterTouchWindowWrapper(HWND hwnd)
 
 bool GetTouchInputInfoWrapper(HTOUCHINPUT hTouchInput, UINT cInputs, PTOUCHINPUT pInputs, int cbSize)
 {
-    typedef BOOL(WINAPI *GetTouchInputInfoPtr)(HTOUCHINPUT, UINT, PTOUCHINPUT, int);
+    typedef BOOL(WINAPI * GetTouchInputInfoPtr)(HTOUCHINPUT, UINT, PTOUCHINPUT, int);
 
-    static GetTouchInputInfoPtr get_touch_input_info_func = reinterpret_cast<GetTouchInputInfoPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetTouchInputInfo"));
-    
+    static GetTouchInputInfoPtr get_touch_input_info_func = reinterpret_cast<GetTouchInputInfoPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetTouchInputInfo"));
+
     if (get_touch_input_info_func) {
         return (TRUE == get_touch_input_info_func(hTouchInput, cInputs, pInputs, cbSize));
     }
@@ -213,12 +236,13 @@ bool GetTouchInputInfoWrapper(HTOUCHINPUT hTouchInput, UINT cInputs, PTOUCHINPUT
     return false;
 }
 
-
 bool CloseTouchInputHandleWrapper(HTOUCHINPUT hTouchInput)
 {
-    typedef BOOL(WINAPI *CloseTouchInputHandlePtr)(HTOUCHINPUT);
+    typedef BOOL(WINAPI * CloseTouchInputHandlePtr)(HTOUCHINPUT);
 
-    static CloseTouchInputHandlePtr close_touch_input_handle_func = reinterpret_cast<CloseTouchInputHandlePtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "CloseTouchInputHandle"));
+    static CloseTouchInputHandlePtr close_touch_input_handle_func
+        = reinterpret_cast<CloseTouchInputHandlePtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "CloseTouchInputHandle"));
 
     if (close_touch_input_handle_func) {
         return (TRUE == close_touch_input_handle_func(hTouchInput));
@@ -229,8 +253,9 @@ bool CloseTouchInputHandleWrapper(HTOUCHINPUT hTouchInput)
 
 bool GetPointerTypeWrapper(UINT32 pointerId, POINTER_INPUT_TYPE *pointerType)
 {
-    typedef BOOL(WINAPI* GetPointerTypePtr)(UINT32 pointerId, POINTER_INPUT_TYPE *pointerType);
-    static GetPointerTypePtr get_pointer_type = reinterpret_cast<GetPointerTypePtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerType"));
+    typedef BOOL(WINAPI * GetPointerTypePtr)(UINT32 pointerId, POINTER_INPUT_TYPE * pointerType);
+    static GetPointerTypePtr get_pointer_type = reinterpret_cast<GetPointerTypePtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerType"));
 
     if (get_pointer_type) {
         return (TRUE == get_pointer_type(pointerId, pointerType));
@@ -241,8 +266,9 @@ bool GetPointerTypeWrapper(UINT32 pointerId, POINTER_INPUT_TYPE *pointerType)
 
 bool GetPointerInfoWrapper(UINT32 pointerId, POINTER_INFO *pointerInfo)
 {
-    typedef BOOL(WINAPI* GetPointerInfoPtr)(UINT32 pointerId, POINTER_INFO *pointerInfo);
-    static GetPointerInfoPtr get_pointer_info = reinterpret_cast<GetPointerInfoPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerInfo"));
+    typedef BOOL(WINAPI * GetPointerInfoPtr)(UINT32 pointerId, POINTER_INFO * pointerInfo);
+    static GetPointerInfoPtr get_pointer_info = reinterpret_cast<GetPointerInfoPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerInfo"));
 
     if (get_pointer_info) {
         return (TRUE == get_pointer_info(pointerId, pointerInfo));
@@ -253,8 +279,9 @@ bool GetPointerInfoWrapper(UINT32 pointerId, POINTER_INFO *pointerInfo)
 
 bool GetPointerTouchInfoWrapper(UINT32 pointerId, POINTER_TOUCH_INFO *touchInfo)
 {
-    typedef BOOL(WINAPI* GetPointerTouchInfoPtr)(UINT32 pointerId, POINTER_TOUCH_INFO *touchInfo);
-    static GetPointerTouchInfoPtr get_pointer_touch_info = reinterpret_cast<GetPointerTouchInfoPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerTouchInfo"));
+    typedef BOOL(WINAPI * GetPointerTouchInfoPtr)(UINT32 pointerId, POINTER_TOUCH_INFO * touchInfo);
+    static GetPointerTouchInfoPtr get_pointer_touch_info = reinterpret_cast<GetPointerTouchInfoPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerTouchInfo"));
 
     if (get_pointer_touch_info) {
         return (TRUE == get_pointer_touch_info(pointerId, touchInfo));
@@ -265,8 +292,9 @@ bool GetPointerTouchInfoWrapper(UINT32 pointerId, POINTER_TOUCH_INFO *touchInfo)
 
 bool GetPointerPenInfoWrapper(UINT32 pointerId, POINTER_PEN_INFO *penInfo)
 {
-    typedef BOOL(WINAPI* GetPointerPenInfoPtr)(UINT32 pointerId, POINTER_PEN_INFO *penInfo);
-    static GetPointerPenInfoPtr get_pointer_pen_info = reinterpret_cast<GetPointerPenInfoPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerPenInfo"));
+    typedef BOOL(WINAPI * GetPointerPenInfoPtr)(UINT32 pointerId, POINTER_PEN_INFO * penInfo);
+    static GetPointerPenInfoPtr get_pointer_pen_info = reinterpret_cast<GetPointerPenInfoPtr>(
+        GetProcAddress(GetModuleHandleA("user32.dll"), "GetPointerPenInfo"));
 
     if (get_pointer_pen_info) {
         return (TRUE == get_pointer_pen_info(pointerId, penInfo));
@@ -277,8 +305,10 @@ bool GetPointerPenInfoWrapper(UINT32 pointerId, POINTER_PEN_INFO *penInfo)
 
 bool EnableMouseInPointerWrapper(BOOL fEnable)
 {
-    typedef BOOL(WINAPI* EnableMouseInPointerPtr)(BOOL);
-    static EnableMouseInPointerPtr enable_mouse_in_pointer = reinterpret_cast<EnableMouseInPointerPtr>(GetProcAddress(GetModuleHandleA("user32.dll"), "EnableMouseInPointer"));
+    typedef BOOL(WINAPI * EnableMouseInPointerPtr)(BOOL);
+    static EnableMouseInPointerPtr enable_mouse_in_pointer
+        = reinterpret_cast<EnableMouseInPointerPtr>(
+            GetProcAddress(GetModuleHandleA("user32.dll"), "EnableMouseInPointer"));
 
     if (enable_mouse_in_pointer) {
         return (TRUE == enable_mouse_in_pointer(fEnable));
@@ -290,26 +320,18 @@ bool EnableMouseInPointerWrapper(BOOL fEnable)
 // 检测「拖动窗口时显示窗口内容」是否开启 - 动态加载注册表API版本
 bool IsDragWindowContentsEnabled()
 {
-    typedef LONG(WINAPI* PFUNC_RegOpenKeyExW)(
-        HKEY hKey,
-        LPCWSTR lpSubKey,
-        DWORD ulOptions,
-        REGSAM samDesired,
-        PHKEY phkResult
-        );
+    typedef LONG(WINAPI * PFUNC_RegOpenKeyExW)(
+        HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
 
-    typedef LONG(WINAPI* PFUNC_RegQueryValueExW)(
+    typedef LONG(WINAPI * PFUNC_RegQueryValueExW)(
         HKEY hKey,
         LPCWSTR lpValueName,
         LPDWORD lpReserved,
         LPDWORD lpType,
         LPBYTE lpData,
-        LPDWORD lpcbData
-        );
+        LPDWORD lpcbData);
 
-    typedef LONG(WINAPI* PFUNC_RegCloseKey)(
-        HKEY hKey
-        );
+    typedef LONG(WINAPI * PFUNC_RegCloseKey)(HKEY hKey);
 
     HMODULE hModAdvapi32 = DllManager::Instance().LoadDll(_T("Advapi32.dll"));
     if (NULL == hModAdvapi32) {
@@ -317,9 +339,12 @@ bool IsDragWindowContentsEnabled()
     }
 
     // 获取注册表API的函数地址
-    PFUNC_RegOpenKeyExW pfnRegOpenKeyExW = (PFUNC_RegOpenKeyExW)GetProcAddress(hModAdvapi32, "RegOpenKeyExW");
-    PFUNC_RegQueryValueExW pfnRegQueryValueExW = (PFUNC_RegQueryValueExW)GetProcAddress(hModAdvapi32, "RegQueryValueExW");
-    PFUNC_RegCloseKey pfnRegCloseKey = (PFUNC_RegCloseKey)GetProcAddress(hModAdvapi32, "RegCloseKey");
+    PFUNC_RegOpenKeyExW pfnRegOpenKeyExW
+        = (PFUNC_RegOpenKeyExW) GetProcAddress(hModAdvapi32, "RegOpenKeyExW");
+    PFUNC_RegQueryValueExW pfnRegQueryValueExW
+        = (PFUNC_RegQueryValueExW) GetProcAddress(hModAdvapi32, "RegQueryValueExW");
+    PFUNC_RegCloseKey pfnRegCloseKey
+        = (PFUNC_RegCloseKey) GetProcAddress(hModAdvapi32, "RegCloseKey");
 
     if (NULL == pfnRegOpenKeyExW || NULL == pfnRegQueryValueExW || NULL == pfnRegCloseKey) {
         return false;
@@ -328,18 +353,12 @@ bool IsDragWindowContentsEnabled()
     HKEY hKey = NULL;
     LONG lResult = ERROR_SUCCESS;
     DWORD dwValueType = 0;
-    wchar_t szValueBuffer[8] = { 0 };
+    wchar_t szValueBuffer[8] = {0};
     DWORD dwValueBuffer = 0;
     DWORD dwBufferSize = 0;
 
     // 打开注册表项
-    lResult = pfnRegOpenKeyExW(
-        HKEY_CURRENT_USER,
-        L"Control Panel\\Desktop",
-        0,
-        KEY_READ,
-        &hKey
-    );
+    lResult = pfnRegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_READ, &hKey);
 
     if (lResult != ERROR_SUCCESS) {
         if (hKey) {
@@ -352,34 +371,20 @@ bool IsDragWindowContentsEnabled()
     // 先尝试读取为字符串类型（Win10/11主流场景）
     dwBufferSize = sizeof(szValueBuffer);
     lResult = pfnRegQueryValueExW(
-        hKey,
-        L"DragFullWindows",
-        NULL,
-        &dwValueType,
-        (LPBYTE)szValueBuffer,
-        &dwBufferSize
-    );
+        hKey, L"DragFullWindows", NULL, &dwValueType, (LPBYTE) szValueBuffer, &dwBufferSize);
 
     if (lResult == ERROR_SUCCESS) {
         if (dwValueType == REG_SZ) {
             bEnabled = (wcscmp(szValueBuffer, L"1") == 0);
-        }
-        else if (dwValueType == REG_DWORD) {
-            dwValueBuffer = *(DWORD*)szValueBuffer;
+        } else if (dwValueType == REG_DWORD) {
+            dwValueBuffer = *(DWORD *) szValueBuffer;
             bEnabled = (dwValueBuffer == 1);
         }
-    }
-    else {
+    } else {
         // 字符串读取失败，尝试按DWORD类型读取（兼容Win7）
         dwBufferSize = sizeof(dwValueBuffer);
         lResult = pfnRegQueryValueExW(
-            hKey,
-            L"DragFullWindows",
-            NULL,
-            NULL,
-            (LPBYTE)&dwValueBuffer,
-            &dwBufferSize
-        );
+            hKey, L"DragFullWindows", NULL, NULL, (LPBYTE) &dwValueBuffer, &dwBufferSize);
         if (lResult == ERROR_SUCCESS) {
             bEnabled = (dwValueBuffer == 1);
         }
@@ -393,26 +398,18 @@ bool IsDragWindowContentsEnabled()
 bool IsSystemThemeDarkMode()
 {
     bool bDarkMode = false; //默认不是Dark模式
-    typedef LONG(WINAPI* PFUNC_RegOpenKeyExW)(
-        HKEY hKey,
-        LPCWSTR lpSubKey,
-        DWORD ulOptions,
-        REGSAM samDesired,
-        PHKEY phkResult
-        );
+    typedef LONG(WINAPI * PFUNC_RegOpenKeyExW)(
+        HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
 
-    typedef LONG(WINAPI* PFUNC_RegQueryValueExW)(
+    typedef LONG(WINAPI * PFUNC_RegQueryValueExW)(
         HKEY hKey,
         LPCWSTR lpValueName,
         LPDWORD lpReserved,
         LPDWORD lpType,
         LPBYTE lpData,
-        LPDWORD lpcbData
-        );
+        LPDWORD lpcbData);
 
-    typedef LONG(WINAPI* PFUNC_RegCloseKey)(
-        HKEY hKey
-        );
+    typedef LONG(WINAPI * PFUNC_RegCloseKey)(HKEY hKey);
 
     HMODULE hModAdvapi32 = DllManager::Instance().LoadDll(_T("Advapi32.dll"));
     if (NULL == hModAdvapi32) {
@@ -420,9 +417,12 @@ bool IsSystemThemeDarkMode()
     }
 
     // 获取注册表API的函数地址
-    PFUNC_RegOpenKeyExW pfnRegOpenKeyExW = (PFUNC_RegOpenKeyExW)GetProcAddress(hModAdvapi32, "RegOpenKeyExW");
-    PFUNC_RegQueryValueExW pfnRegQueryValueExW = (PFUNC_RegQueryValueExW)GetProcAddress(hModAdvapi32, "RegQueryValueExW");
-    PFUNC_RegCloseKey pfnRegCloseKey = (PFUNC_RegCloseKey)GetProcAddress(hModAdvapi32, "RegCloseKey");
+    PFUNC_RegOpenKeyExW pfnRegOpenKeyExW
+        = (PFUNC_RegOpenKeyExW) GetProcAddress(hModAdvapi32, "RegOpenKeyExW");
+    PFUNC_RegQueryValueExW pfnRegQueryValueExW
+        = (PFUNC_RegQueryValueExW) GetProcAddress(hModAdvapi32, "RegQueryValueExW");
+    PFUNC_RegCloseKey pfnRegCloseKey
+        = (PFUNC_RegCloseKey) GetProcAddress(hModAdvapi32, "RegCloseKey");
 
     if (NULL == pfnRegOpenKeyExW || NULL == pfnRegQueryValueExW || NULL == pfnRegCloseKey) {
         return bDarkMode;
@@ -437,8 +437,7 @@ bool IsSystemThemeDarkMode()
         L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
         0,
         KEY_READ,
-        &hKey
-    );
+        &hKey);
 
     if (lResult != ERROR_SUCCESS) {
         if (hKey) {
@@ -452,7 +451,8 @@ bool IsSystemThemeDarkMode()
     DWORD length = sizeof(value);
 
     //读取注册表键值：1=浅色，0=深色
-    lResult = pfnRegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, &dwType, (LPBYTE)&value, &length);
+    lResult
+        = pfnRegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, &dwType, (LPBYTE) &value, &length);
     if (lResult == ERROR_SUCCESS) {
         bDarkMode = (value == 0);
     }
@@ -479,27 +479,31 @@ static DWORD GetIconSizeKey(BYTE bWidth, BYTE bHeight)
 * @param [out] outResSize 返回图标数据的长度
 * @return 返回图标资源数据的起始地址
 */
-static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
-                                       int32_t targetWidth, int32_t targetHeight, DWORD& outResSize)
+static const BYTE *ExtractIconResource(
+    const BYTE *pIconData,
+    DWORD nDataSize,
+    int32_t targetWidth,
+    int32_t targetHeight,
+    DWORD &outResSize)
 {
 #pragma pack(push, 1)
     typedef struct
     {
-        WORD idReserved;   // 保留字段，必须为0
-        WORD idType;       // 资源类型：1=图标，2=光标
-        WORD idCount;      // 图标/光标数量
+        WORD idReserved; // 保留字段，必须为0
+        WORD idType;     // 资源类型：1=图标，2=光标
+        WORD idCount;    // 图标/光标数量
     } ICONDIR;
 
     typedef struct
     {
-        BYTE bWidth;       // 图标宽度（0表示256px）
-        BYTE bHeight;      // 图标高度（0表示256px）
-        BYTE bColorCount;  // 颜色数（0表示>=8bpp）
-        BYTE bReserved;    // 保留字段，必须为0
-        WORD wPlanes;      // 位面数（图标固定为1）
-        WORD wBitCount;    // 每像素位数
-        DWORD dwBytesInRes;// 该图标资源的字节大小
-        DWORD dwImageOffset;// 该图标资源在文件中的偏移量
+        BYTE bWidth;         // 图标宽度（0表示256px）
+        BYTE bHeight;        // 图标高度（0表示256px）
+        BYTE bColorCount;    // 颜色数（0表示>=8bpp）
+        BYTE bReserved;      // 保留字段，必须为0
+        WORD wPlanes;        // 位面数（图标固定为1）
+        WORD wBitCount;      // 每像素位数
+        DWORD dwBytesInRes;  // 该图标资源的字节大小
+        DWORD dwImageOffset; // 该图标资源在文件中的偏移量
     } ICONDIRENTRY;
 #pragma pack(pop)
 
@@ -509,27 +513,27 @@ static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
     }
 
     // 解析ICO文件头
-    const ICONDIR* pIconDir = (const ICONDIR*)pIconData;
+    const ICONDIR *pIconDir = (const ICONDIR *) pIconData;
     if ((pIconDir->idReserved != 0 || pIconDir->idType != 1 || pIconDir->idCount == 0)) {
         return nullptr;
     }
 
     // 遍历所有图标项，初步筛选图标数据：相同尺寸的图标，只保留位深(wBitCount)最大的图标
-    const ICONDIRENTRY* pFirstEntry = (const ICONDIRENTRY*)(pIconData + sizeof(ICONDIR));
+    const ICONDIRENTRY *pFirstEntry = (const ICONDIRENTRY *) (pIconData + sizeof(ICONDIR));
     // 用map分组：key=宽度+高度的组合键，value=该尺寸下的所有图标条目
     std::map<DWORD, std::vector<ICONDIRENTRY>> iconGroups;
     for (UINT i = 0; i < pIconDir->idCount; i++) {
-        const ICONDIRENTRY* pEntry = &pFirstEntry[i];
+        const ICONDIRENTRY *pEntry = &pFirstEntry[i];
         DWORD sizeKey = GetIconSizeKey(pEntry->bWidth, pEntry->bHeight);
         iconGroups[sizeKey].push_back(*pEntry);
     }
     //遍历每个分组，筛选位深最大的图标，剔除其他图标数据，图标按尺寸由小到大排序
     std::vector<ICONDIRENTRY> allIconList;
-    for (auto& group : iconGroups) {
-        auto& entries = group.second;
+    for (auto &group : iconGroups) {
+        auto &entries = group.second;
         // 找到该分组中wBitCount最大的条目
-        auto maxEntryIt = std::max_element(entries.begin(), entries.end(),
-            [](const ICONDIRENTRY& a, const ICONDIRENTRY& b) {
+        auto maxEntryIt = std::max_element(
+            entries.begin(), entries.end(), [](const ICONDIRENTRY &a, const ICONDIRENTRY &b) {
                 return a.wBitCount < b.wBitCount;
             });
 
@@ -545,7 +549,7 @@ static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
     //筛选出匹配度最高的那个图标
     ICONDIRENTRY bestEntry = allIconList.back(); //默认选择尺寸最大的图标
     for (size_t nIndex = 0; nIndex < allIconList.size(); ++nIndex) {
-        const ICONDIRENTRY& entry = allIconList[nIndex];
+        const ICONDIRENTRY &entry = allIconList[nIndex];
         int entryWidth = (entry.bWidth == 0) ? 256 : entry.bWidth;
         int entryHeight = (entry.bHeight == 0) ? 256 : entry.bHeight;
         bool isSizeQualified = (entryWidth >= targetWidth) && (entryHeight >= targetHeight);
@@ -556,33 +560,29 @@ static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
         if ((entryWidth == targetWidth) && (entryHeight == targetHeight)) {
             //尺寸精确满足需要：直接选择
             bestEntry = allIconList[nIndex];
-        }
-        else if (nIndex == 0) {
+        } else if (nIndex == 0) {
             //首个图标满足需要：直接选择
             bestEntry = allIconList[nIndex];
-        }
-        else {
+        } else {
             //非首个图标满足需要：比较哪个更合适（缩放时图标失真度更小）
-            const ICONDIRENTRY& preEntry = allIconList[nIndex - 1];
+            const ICONDIRENTRY &preEntry = allIconList[nIndex - 1];
             int preEntryWidth = (preEntry.bWidth == 0) ? 256 : preEntry.bWidth;
             int preEntryHeight = (preEntry.bHeight == 0) ? 256 : preEntry.bHeight;
-            float wRatio = (float)(targetWidth - preEntryWidth) / (float)preEntryWidth;
-            float hRatio = (float)(targetHeight - preEntryHeight) / (float)preEntryHeight;
+            float wRatio = (float) (targetWidth - preEntryWidth) / (float) preEntryWidth;
+            float hRatio = (float) (targetHeight - preEntryHeight) / (float) preEntryHeight;
             float preRatio = std::max(wRatio, hRatio);
 
-            wRatio = (float)(entryWidth - targetWidth) / (float)entryWidth;
-            hRatio = (float)(entryHeight - targetHeight) / (float)entryHeight;
+            wRatio = (float) (entryWidth - targetWidth) / (float) entryWidth;
+            hRatio = (float) (entryHeight - targetHeight) / (float) entryHeight;
             float curRatio = std::max(wRatio, hRatio);
             if (curRatio < preRatio) {
-                bestEntry = allIconList[nIndex];            //选择尺寸大的
-            }
-            else {
+                bestEntry = allIconList[nIndex]; //选择尺寸大的
+            } else {
                 const float minRatio = 0.20f; //设置最小放大比例
                 if (preRatio < minRatio) {
-                    bestEntry = allIconList[nIndex - 1];    //选择尺寸小的
-                }
-                else {
-                    bestEntry = allIconList[nIndex];        //选择尺寸大的
+                    bestEntry = allIconList[nIndex - 1]; //选择尺寸小的
+                } else {
+                    bestEntry = allIconList[nIndex]; //选择尺寸大的
                 }
             }
         }
@@ -603,8 +603,11 @@ static const BYTE* ExtractIconResource(const BYTE* pIconData, DWORD nDataSize,
 
 /** 支持ICO格式
 */
-static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uint32_t uDpiScaleFactor,
-                                   HICON* hSmallIcon, HICON* hBigIcon)
+static bool CreateIconsFromIcoData(
+    const std::vector<uint8_t> &iconFileData,
+    uint32_t uDpiScaleFactor,
+    HICON *hSmallIcon,
+    HICON *hBigIcon)
 {
     if (iconFileData.empty()) {
         return false;
@@ -620,29 +623,31 @@ static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uin
     }
     //Little Endian Only
     int16_t test = 1;
-    bool bLittleEndianHost = (*((char*)&test) == 1);
+    bool bLittleEndianHost = (*((char *) &test) == 1);
     ASSERT_UNUSED_VARIABLE(bLittleEndianHost);
 
     bool bValidIcoFile = false;
     std::vector<uint8_t> fileData = iconFileData;
     fileData.resize(fileData.size() + 1024); //填充空白
-    typedef struct tagIconDir {
+    typedef struct tagIconDir
+    {
         uint16_t idReserved;
         uint16_t idType;
         uint16_t idCount;
     } ICONHEADER;
-    typedef struct tagIconDirectoryEntry {
-        uint8_t  bWidth;
-        uint8_t  bHeight;
-        uint8_t  bColorCount;
-        uint8_t  bReserved;
-        uint16_t  wPlanes;
-        uint16_t  wBitCount;
+    typedef struct tagIconDirectoryEntry
+    {
+        uint8_t bWidth;
+        uint8_t bHeight;
+        uint8_t bColorCount;
+        uint8_t bReserved;
+        uint16_t wPlanes;
+        uint16_t wBitCount;
         uint32_t dwBytesInRes;
         uint32_t dwImageOffset;
     } ICONDIRENTRY;
 
-    ICONHEADER* icon_header = (ICONHEADER*)fileData.data();
+    ICONHEADER *icon_header = (ICONHEADER *) fileData.data();
     if ((icon_header->idReserved == 0) && (icon_header->idType == 1)) {
         bValidIcoFile = true;
         for (int32_t c = 0; c < icon_header->idCount; ++c) {
@@ -651,12 +656,11 @@ static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uin
                 bValidIcoFile = false;
                 break;
             }
-            ICONDIRENTRY* pIconDir = (ICONDIRENTRY*)((uint8_t*)fileData.data() + nDataOffset);
+            ICONDIRENTRY *pIconDir = (ICONDIRENTRY *) ((uint8_t *) fileData.data() + nDataOffset);
             if (pIconDir->dwImageOffset >= iconFileData.size()) {
                 bValidIcoFile = false;
                 break;
-            }
-            else if ((pIconDir->dwImageOffset + pIconDir->dwBytesInRes) > iconFileData.size()) {
+            } else if ((pIconDir->dwImageOffset + pIconDir->dwBytesInRes) > iconFileData.size()) {
                 bValidIcoFile = false;
                 break;
             }
@@ -683,28 +687,45 @@ static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uin
     if (hBigIcon != nullptr) {
         int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXICON, uDpi);
         int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYICON, uDpi);
-        iconInfos.push_back({ TRUE, cxBestIcon, cyBestIcon });
+        iconInfos.push_back({TRUE, cxBestIcon, cyBestIcon});
     }
 
     //小图标
     if (hSmallIcon != nullptr) {
         int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXSMICON, uDpi);
         int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYSMICON, uDpi);
-        iconInfos.push_back({ FALSE, cxBestIcon, cyBestIcon });
+        iconInfos.push_back({FALSE, cxBestIcon, cyBestIcon});
     }
 
-    for (const TWinIconInfo& iconInfo : iconInfos) {
+    for (const TWinIconInfo &iconInfo : iconInfos) {
         DWORD nIconDataSize = 0;
-        const BYTE* pIconData = ExtractIconResource((const BYTE*)fileData.data(), (DWORD)fileData.size(), iconInfo.cxIcon, iconInfo.cyIcon, nIconDataSize);
+        const BYTE *pIconData = ExtractIconResource(
+            (const BYTE *) fileData.data(),
+            (DWORD) fileData.size(),
+            iconInfo.cxIcon,
+            iconInfo.cyIcon,
+            nIconDataSize);
         if (pIconData == nullptr) {
-            int32_t offset = ::LookupIconIdFromDirectoryEx((PBYTE)fileData.data(), TRUE, iconInfo.cxIcon, iconInfo.cyIcon, LR_DEFAULTCOLOR | LR_SHARED);
+            int32_t offset = ::LookupIconIdFromDirectoryEx(
+                (PBYTE) fileData.data(),
+                TRUE,
+                iconInfo.cxIcon,
+                iconInfo.cyIcon,
+                LR_DEFAULTCOLOR | LR_SHARED);
             if (offset > 0) {
-                pIconData = (PBYTE)fileData.data() + offset;
-                nIconDataSize = (DWORD)fileData.size() - (DWORD)offset;
+                pIconData = (PBYTE) fileData.data() + offset;
+                nIconDataSize = (DWORD) fileData.size() - (DWORD) offset;
             }
         }
         if (pIconData != nullptr) {
-            HICON hIcon = ::CreateIconFromResourceEx((PBYTE)pIconData, nIconDataSize, TRUE, 0x00030000, iconInfo.cxIcon, iconInfo.cyIcon, LR_DEFAULTCOLOR | LR_SHARED);
+            HICON hIcon = ::CreateIconFromResourceEx(
+                (PBYTE) pIconData,
+                nIconDataSize,
+                TRUE,
+                0x00030000,
+                iconInfo.cxIcon,
+                iconInfo.cyIcon,
+                LR_DEFAULTCOLOR | LR_SHARED);
             ASSERT(hIcon != nullptr);
             if (hIcon != nullptr) {
                 if (iconInfo.bLargeIcon) {
@@ -713,8 +734,7 @@ static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uin
                     if (hBigIcon != nullptr) {
                         *hBigIcon = hIcon;
                     }
-                }
-                else {
+                } else {
                     //小图标
                     ASSERT(hSmallIcon != nullptr);
                     if (hSmallIcon != nullptr) {
@@ -754,10 +774,12 @@ static bool CreateIconsFromIcoData(const std::vector<uint8_t>& iconFileData, uin
 
 /** 支持所有图片格式
 */
-static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
-                                     const FilePath& imageFilePath,
-                                     uint32_t uDpiScaleFactor,                                     
-                                     HICON* hSmallIcon, HICON* hBigIcon)
+static bool CreateIconsFromImageData(
+    const std::vector<uint8_t> &iconFileData,
+    const FilePath &imageFilePath,
+    uint32_t uDpiScaleFactor,
+    HICON *hSmallIcon,
+    HICON *hBigIcon)
 {
     if (iconFileData.empty()) {
         return false;
@@ -788,19 +810,19 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
     if (hBigIcon != nullptr) {
         int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXICON, uDpi);
         int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYICON, uDpi);
-        iconInfos.push_back({ TRUE, cxBestIcon, cyBestIcon });
+        iconInfos.push_back({TRUE, cxBestIcon, cyBestIcon});
     }
 
     //小图标
     if (hSmallIcon != nullptr) {
         int32_t cxBestIcon = GetSystemMetricsForDpiWrapper(SM_CXSMICON, uDpi);
         int32_t cyBestIcon = GetSystemMetricsForDpiWrapper(SM_CYSMICON, uDpi);
-        iconInfos.push_back({ FALSE, cxBestIcon, cyBestIcon });
+        iconInfos.push_back({FALSE, cxBestIcon, cyBestIcon});
     }
 
-    for (const TWinIconInfo& winIconInfo : iconInfos) {
+    for (const TWinIconInfo &winIconInfo : iconInfos) {
         //按图像数据加载
-        ImageDecoderFactory& imageDecoders = GlobalManager::Instance().ImageDecoders();
+        ImageDecoderFactory &imageDecoders = GlobalManager::Instance().ImageDecoders();
         float fImageSizeScale = uDpiScaleFactor / 100.0f;
         ImageDecodeParam decodeParam;
         decodeParam.m_imageFilePath = imageFilePath;
@@ -811,13 +833,13 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
         if (pBitmap == nullptr) {
             continue;
         }
-        int32_t nWidth = (int32_t)pBitmap->GetWidth();
-        int32_t nHeight = (int32_t)pBitmap->GetHeight();
+        int32_t nWidth = (int32_t) pBitmap->GetWidth();
+        int32_t nHeight = (int32_t) pBitmap->GetHeight();
         if ((nWidth < 1) || (nHeight < 1)) {
             continue;
         }
 
-        void* pPixelBits = pBitmap->LockPixelBits();
+        void *pPixelBits = pBitmap->LockPixelBits();
         ASSERT(pPixelBits != nullptr);
         if (pPixelBits == nullptr) {
             continue;
@@ -834,7 +856,7 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
         bmpInfo.bmiHeader.biCompression = BI_RGB;
 
         HDC hdc = ::GetDC(NULL);
-        void* pBits = NULL;
+        void *pBits = NULL;
         HBITMAP hBitmap = ::CreateDIBSection(hdc, &bmpInfo, DIB_RGB_COLORS, &pBits, NULL, 0);
         if (hBitmap == nullptr) {
             ::ReleaseDC(NULL, hdc);
@@ -853,7 +875,7 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
 
         for (int y = 0; y < nHeight; y++) {
             for (int x = 0; x < nWidth; x++) {
-                BYTE* pixel = (BYTE*)pBits + (y * nWidth + x) * 4;
+                BYTE *pixel = (BYTE *) pBits + (y * nWidth + x) * 4;
                 BYTE alpha = pixel[3];
                 COLORREF maskColor = (alpha == 0) ? RGB(0, 0, 0) : RGB(255, 255, 255);
                 ::SetPixel(hdcMem, x, y, maskColor);
@@ -876,8 +898,7 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
                 if (hBigIcon != nullptr) {
                     *hBigIcon = hIcon;
                 }
-            }
-            else {
+            } else {
                 //小图标
                 ASSERT(hSmallIcon != nullptr);
                 if (hSmallIcon != nullptr) {
@@ -921,33 +942,39 @@ static bool CreateIconsFromImageData(const std::vector<uint8_t>& iconFileData,
     return bRet;
 }
 
-bool CreateIconsFromData(const std::vector<uint8_t>& iconFileData,
-                         const DString& imageFilePath,
-                         uint32_t uDpiScaleFactor,
-                         HICON* hSmallIcon, HICON* hBigIcon)
+bool CreateIconsFromData(
+    const std::vector<uint8_t> &iconFileData,
+    const DString &imageFilePath,
+    uint32_t uDpiScaleFactor,
+    HICON *hSmallIcon,
+    HICON *hBigIcon)
 {
     if (CreateIconsFromIcoData(iconFileData, uDpiScaleFactor, hSmallIcon, hBigIcon)) {
         return true;
     }
-    return CreateIconsFromImageData(iconFileData, FilePath(imageFilePath), uDpiScaleFactor, hSmallIcon, hBigIcon);
+    return CreateIconsFromImageData(
+        iconFileData, FilePath(imageFilePath), uDpiScaleFactor, hSmallIcon, hBigIcon);
 }
 
 //判断是否为Windows 11的函数
 bool UiIsWindows11OrGreater()
 {
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
     DWORDLONG const dwlConditionMask = VerSetConditionMask(
         VerSetConditionMask(
-            VerSetConditionMask(
-                0, VER_MAJORVERSION, VER_GREATER_EQUAL),
-            VER_MINORVERSION, VER_GREATER_EQUAL),
-        VER_BUILDNUMBER, VER_GREATER_EQUAL);
+            VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+            VER_MINORVERSION,
+            VER_GREATER_EQUAL),
+        VER_BUILDNUMBER,
+        VER_GREATER_EQUAL);
 
     osvi.dwMajorVersion = 10;
     osvi.dwMinorVersion = 0;
     osvi.dwBuildNumber = 22000; //需要根据Build版本号区分
 
-    return ::VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
+    return ::VerifyVersionInfoW(
+               &osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask)
+           != FALSE;
 }
 
 bool UiIsWindows7OrOlder()
@@ -959,23 +986,22 @@ bool UiIsWindows7OrOlder()
 // 定义目标最低 SDK 版本：Windows 11 (21H2) -> 10.0.22000.0
 // NTDDI_WIN10_CO 对应 Windows 11 21H2 (Build 22000)
 #ifndef NTDDI_WIN10_CO
-    #define NTDDI_WIN10_CO 0x0A00000B
+#define NTDDI_WIN10_CO 0x0A00000B
 #endif
 
 #if (WDK_NTDDI_VERSION < NTDDI_WIN10_CO)
-    // DWM 窗口圆角偏好枚举
-    typedef enum
-    {
-        DWMWCP_DEFAULT = 0,
-        DWMWCP_DONOTROUND = 1,
-        DWMWCP_ROUND = 2,
-        DWMWCP_ROUNDSMALL = 3
-    } DWM_WINDOW_CORNER_PREFERENCE;
+// DWM 窗口圆角偏好枚举
+typedef enum {
+    DWMWCP_DEFAULT = 0,
+    DWMWCP_DONOTROUND = 1,
+    DWMWCP_ROUND = 2,
+    DWMWCP_ROUNDSMALL = 3
+} DWM_WINDOW_CORNER_PREFERENCE;
 
-    // 窗口圆角偏好属性
-    #define DWMWA_WINDOW_CORNER_PREFERENCE          33
-    // 可视边框厚度属性
-    #define DWMWA_VISIBLE_FRAME_BORDER_THICKNESS    37
+// 窗口圆角偏好属性
+#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+// 可视边框厚度属性
+#define DWMWA_VISIBLE_FRAME_BORDER_THICKNESS 37
 #endif
 // ==================================================================================
 
@@ -987,8 +1013,9 @@ bool IsDwmCompositionEnabled()
     }
     BOOL bEnabled = FALSE;
     if (hDwm) {
-        typedef HRESULT(WINAPI* LPDWMISCOMPOSITIONENABLED)(BOOL*);
-        LPDWMISCOMPOSITIONENABLED pfn = (LPDWMISCOMPOSITIONENABLED)GetProcAddress(hDwm, "DwmIsCompositionEnabled");
+        typedef HRESULT(WINAPI * LPDWMISCOMPOSITIONENABLED)(BOOL *);
+        LPDWMISCOMPOSITIONENABLED pfn
+            = (LPDWMISCOMPOSITIONENABLED) GetProcAddress(hDwm, "DwmIsCompositionEnabled");
         if (pfn) {
             pfn(&bEnabled);
         }
@@ -1008,12 +1035,14 @@ bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
     }
 
     // 动态 DWM API 定义
-    typedef HRESULT(WINAPI* DWM_SET_WINDOW_ATTRIBUTE)(HWND, DWORD, LPCVOID, DWORD);
-    typedef HRESULT(WINAPI* DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND, const MARGINS*);
+    typedef HRESULT(WINAPI * DWM_SET_WINDOW_ATTRIBUTE)(HWND, DWORD, LPCVOID, DWORD);
+    typedef HRESULT(WINAPI * DWM_EXTEND_FRAME_INTO_CLIENT_AREA)(HWND, const MARGINS *);
     //typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND, const DWM_BLURBEHIND*);
 
-    DWM_SET_WINDOW_ATTRIBUTE DwmSetWindowAttribute = (DWM_SET_WINDOW_ATTRIBUTE)GetProcAddress(hDwm, "DwmSetWindowAttribute");
-    DWM_EXTEND_FRAME_INTO_CLIENT_AREA DwmExtendFrameIntoClientArea = (DWM_EXTEND_FRAME_INTO_CLIENT_AREA)GetProcAddress(hDwm, "DwmExtendFrameIntoClientArea");
+    DWM_SET_WINDOW_ATTRIBUTE DwmSetWindowAttribute
+        = (DWM_SET_WINDOW_ATTRIBUTE) GetProcAddress(hDwm, "DwmSetWindowAttribute");
+    DWM_EXTEND_FRAME_INTO_CLIENT_AREA DwmExtendFrameIntoClientArea
+        = (DWM_EXTEND_FRAME_INTO_CLIENT_AREA) GetProcAddress(hDwm, "DwmExtendFrameIntoClientArea");
     //DWM_ENABLE_BLUR_BEHIND_WINDOW DwmEnableBlurBehindWindow = (DWM_ENABLE_BLUR_BEHIND_WINDOW)GetProcAddress(hDwm, "DwmEnableBlurBehindWindow");
 
     // Win11+：设置圆角
@@ -1032,7 +1061,8 @@ bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
         default:
             break;
         }
-        HRESULT hr = DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(DWORD));
+        HRESULT hr
+            = DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(DWORD));
         ASSERT_UNUSED_VARIABLE(SUCCEEDED(hr));
     }
 
@@ -1047,17 +1077,17 @@ bool ModifyDwmStyle(HWND hWnd, NativeWindowShadowType nativeShadowType)
     // 扩展框架到整个客户区（全版本兼容, 该函数为关键函数）
     HRESULT hr = E_FAIL;
     if (DwmExtendFrameIntoClientArea) {
-        MARGINS margins = { -1, -1, -1, -1 };
+        MARGINS margins = {-1, -1, -1, -1};
         if (nativeShadowType == NativeWindowShadowType::kShadowSystemDisabled) {
-            margins = { 0, 0, 0, 0 }; //关闭
-        }        
+            margins = {0, 0, 0, 0}; //关闭
+        }
         hr = DwmExtendFrameIntoClientArea(hWnd, &margins);
         ASSERT_UNUSED_VARIABLE(SUCCEEDED(hr));
     }
     return SUCCEEDED(hr);
 }
 
-bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness)
+bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT &outThickness)
 {
     // 初始化输出值
     outThickness = 0;
@@ -1074,12 +1104,14 @@ bool GetDwmVisibleFrameBorderThickness(HWND hWnd, UINT& outThickness)
     }
 
     // 获取函数地址
-    typedef HRESULT(WINAPI* DWM_GET_WINDOW_ATTRIBUTE)(HWND, DWORD, PVOID, DWORD);
-    DWM_GET_WINDOW_ATTRIBUTE pDwmGetWindowAttribute = reinterpret_cast<DWM_GET_WINDOW_ATTRIBUTE>(::GetProcAddress(hDwm, "DwmGetWindowAttribute"));
+    typedef HRESULT(WINAPI * DWM_GET_WINDOW_ATTRIBUTE)(HWND, DWORD, PVOID, DWORD);
+    DWM_GET_WINDOW_ATTRIBUTE pDwmGetWindowAttribute = reinterpret_cast<DWM_GET_WINDOW_ATTRIBUTE>(
+        ::GetProcAddress(hDwm, "DwmGetWindowAttribute"));
     if (pDwmGetWindowAttribute == nullptr) {
         return false;
     }
-    HRESULT hr = pDwmGetWindowAttribute(hWnd, DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, &outThickness, sizeof(UINT));
+    HRESULT hr = pDwmGetWindowAttribute(
+        hWnd, DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, &outThickness, sizeof(UINT));
     return SUCCEEDED(hr);
 }
 
@@ -1095,8 +1127,11 @@ bool SetDwmEnableBlurBehindWindow(HWND hWnd, bool bEnable)
     if (hDwm == nullptr) {
         return false;
     }
-    typedef HRESULT(WINAPI* DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND hWnd, const DWM_BLURBEHIND* pBlurBehind);
-    DWM_ENABLE_BLUR_BEHIND_WINDOW pDwmEnableBlurBehindWindow = reinterpret_cast<DWM_ENABLE_BLUR_BEHIND_WINDOW>(::GetProcAddress(hDwm, "DwmEnableBlurBehindWindow"));
+    typedef HRESULT(
+        WINAPI * DWM_ENABLE_BLUR_BEHIND_WINDOW)(HWND hWnd, const DWM_BLURBEHIND *pBlurBehind);
+    DWM_ENABLE_BLUR_BEHIND_WINDOW pDwmEnableBlurBehindWindow
+        = reinterpret_cast<DWM_ENABLE_BLUR_BEHIND_WINDOW>(
+            ::GetProcAddress(hDwm, "DwmEnableBlurBehindWindow"));
     if (pDwmEnableBlurBehindWindow == nullptr) {
         return false;
     }
@@ -1119,8 +1154,8 @@ bool IsTaskbarAutoHide()
         return false;
     }
 
-    using FuncSHAppBarMessage = UINT(WINAPI*)(UINT, PAPPBARDATA);
-    auto pSHAppBarMessage = (FuncSHAppBarMessage)GetProcAddress(hShell32, "SHAppBarMessage");
+    using FuncSHAppBarMessage = UINT(WINAPI *)(UINT, PAPPBARDATA);
+    auto pSHAppBarMessage = (FuncSHAppBarMessage) GetProcAddress(hShell32, "SHAppBarMessage");
     if (!pSHAppBarMessage) {
         return false;
     }
@@ -1139,8 +1174,9 @@ TaskbarPosition GetTaskbarPosition()
         return TASKBAR_BOTTOM;
     }
 
-    using FuncSHAppBarMessage = UINT(WINAPI*)(UINT, PAPPBARDATA);
-    FuncSHAppBarMessage pSHAppBarMessage = (FuncSHAppBarMessage)GetProcAddress(hShell32, "SHAppBarMessage");
+    using FuncSHAppBarMessage = UINT(WINAPI *)(UINT, PAPPBARDATA);
+    FuncSHAppBarMessage pSHAppBarMessage
+        = (FuncSHAppBarMessage) GetProcAddress(hShell32, "SHAppBarMessage");
     if (!pSHAppBarMessage) {
         return TASKBAR_BOTTOM;
     }
@@ -1151,13 +1187,21 @@ TaskbarPosition GetTaskbarPosition()
     abd.uEdge = TASKBAR_BOTTOM;
     pSHAppBarMessage(ABM_GETTASKBARPOS, &abd);
     TaskbarPosition pos = TASKBAR_BOTTOM;
-    switch (abd.uEdge)
-    {
-    case ABE_BOTTOM: pos = TASKBAR_BOTTOM; break;
-    case ABE_LEFT:   pos = TASKBAR_LEFT;   break;
-    case ABE_RIGHT:  pos = TASKBAR_RIGHT;  break;
-    case ABE_TOP:    pos = TASKBAR_TOP;   break;
-    default: break;
+    switch (abd.uEdge) {
+    case ABE_BOTTOM:
+        pos = TASKBAR_BOTTOM;
+        break;
+    case ABE_LEFT:
+        pos = TASKBAR_LEFT;
+        break;
+    case ABE_RIGHT:
+        pos = TASKBAR_RIGHT;
+        break;
+    case ABE_TOP:
+        pos = TASKBAR_TOP;
+        break;
+    default:
+        break;
     }
     return pos;
 }

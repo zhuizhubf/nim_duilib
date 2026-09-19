@@ -1,27 +1,26 @@
 #include "StateImageMap.h"
 #include "duilib/Core/Control.h"
 
-namespace ui 
-{
-StateImageMap::StateImageMap():
-    m_pControl(nullptr)
-{
-}
+namespace ui {
+StateImageMap::StateImageMap()
+    : m_pControl(nullptr)
+{}
 
-void StateImageMap::SetControl(Control* pControl)
+void StateImageMap::SetControl(Control *pControl)
 {
     m_pControl = pControl;
-    for (auto& it : m_stateImageMap) {
+    for (auto &it : m_stateImageMap) {
         it.second.SetControl(pControl);
     }
 }
 
-void StateImageMap::SetImageString(StateImageType stateImageType, 
-                                   ControlStateType stateType, 
-                                   const DString& strImagePath,
-                                   const DpiManager& dpi)
+void StateImageMap::SetImageString(
+    StateImageType stateImageType,
+    ControlStateType stateType,
+    const DString &strImagePath,
+    const DpiManager &dpi)
 {
-    StateImage& stateImage = m_stateImageMap[stateImageType];
+    StateImage &stateImage = m_stateImageMap[stateImageType];
     stateImage.SetControl(m_pControl);
     stateImage.SetImageString(stateType, strImagePath, dpi);
 }
@@ -38,7 +37,7 @@ DString StateImageMap::GetImageString(StateImageType stateImageType, ControlStat
 
 bool StateImageMap::HasHoveredImage() const
 {
-    for (auto& it : m_stateImageMap) {
+    for (auto &it : m_stateImageMap) {
         if (it.second.HasHoveredImage()) {
             return true;
         }
@@ -48,7 +47,7 @@ bool StateImageMap::HasHoveredImage() const
 
 bool StateImageMap::HasStateImages(void) const
 {
-    for (auto& it : m_stateImageMap) {
+    for (auto &it : m_stateImageMap) {
         if (it.second.HasImage()) {
             return true;
         }
@@ -66,11 +65,12 @@ bool StateImageMap::HasStateImage(StateImageType stateImageType) const
     return bHasImage;
 }
 
-bool StateImageMap::PaintStateImage(IRender* pRender, 
-                                    StateImageType stateImageType, 
-                                    ControlStateType stateType, 
-                                    const DString& sImageModify,
-                                    UiRect* pDestRect)
+bool StateImageMap::PaintStateImage(
+    IRender *pRender,
+    StateImageType stateImageType,
+    ControlStateType stateType,
+    const DString &sImageModify,
+    UiRect *pDestRect)
 {
     bool bRet = false;
     auto it = m_stateImageMap.find(stateImageType);
@@ -85,18 +85,19 @@ bool StateImageMap::PaintStateImage(IRender* pRender,
             }
             iter->second.PauseImageAnimation();
         }
-    }
-    else if ((stateImageType == kStateImageSelectedBk) || (stateImageType == kStateImageSelectedFore)) {
+    } else if ((stateImageType == kStateImageSelectedBk) || (stateImageType == kStateImageSelectedFore)) {
         for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
             if ((iter->first == kStateImageSelectedBk) || (iter->first == kStateImageSelectedFore)) {
                 continue;
             }
             iter->second.PauseImageAnimation();
         }
-    }
-    else if ((stateImageType == kStateImagePartSelectedBk) || (stateImageType == kStateImagePartSelectedFore)) {
+    } else if (
+        (stateImageType == kStateImagePartSelectedBk)
+        || (stateImageType == kStateImagePartSelectedFore)) {
         for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
-            if ((iter->first == kStateImagePartSelectedBk) || (iter->first == kStateImagePartSelectedFore)) {
+            if ((iter->first == kStateImagePartSelectedBk)
+                || (iter->first == kStateImagePartSelectedFore)) {
                 continue;
             }
             iter->second.PauseImageAnimation();
@@ -105,7 +106,7 @@ bool StateImageMap::PaintStateImage(IRender* pRender,
     return bRet;
 }
 
-Image* StateImageMap::GetEstimateImage(StateImageType stateImageType) const
+Image *StateImageMap::GetEstimateImage(StateImageType stateImageType) const
 {
     auto it = m_stateImageMap.find(stateImageType);
     if (it != m_stateImageMap.end()) {
@@ -114,17 +115,17 @@ Image* StateImageMap::GetEstimateImage(StateImageType stateImageType) const
     return nullptr;
 }
 
-Image* StateImageMap::GetStateImage(StateImageType stateImageType, ControlStateType stateType) const
+Image *StateImageMap::GetStateImage(StateImageType stateImageType, ControlStateType stateType) const
 {
     auto it = m_stateImageMap.find(stateImageType);
     if (it != m_stateImageMap.end()) {
-        const StateImage& stateImage = it->second;
+        const StateImage &stateImage = it->second;
         return stateImage.GetStateImage(stateType);
     }
     return nullptr;
 }
 
-void StateImageMap::GetAllImages(std::vector<Image*>& allImages) const
+void StateImageMap::GetAllImages(std::vector<Image *> &allImages) const
 {
     for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
         iter->second.GetAllImages(allImages);
@@ -152,13 +153,13 @@ void StateImageMap::PauseImageAnimation()
     }
 }
 
-Image* StateImageMap::FindImageByName(const DString& imageName) const
+Image *StateImageMap::FindImageByName(const DString &imageName) const
 {
     if (imageName.empty()) {
         return nullptr;
     }
     for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
-        Image* pImage = iter->second.FindImageByName(imageName);
+        Image *pImage = iter->second.FindImageByName(imageName);
         if (pImage != nullptr) {
             return pImage;
         }
@@ -166,4 +167,4 @@ Image* StateImageMap::FindImageByName(const DString& imageName) const
     return nullptr;
 }
 
-}//namespace ui 
+} //namespace ui

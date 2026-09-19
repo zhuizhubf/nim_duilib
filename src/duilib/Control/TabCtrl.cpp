@@ -1,20 +1,21 @@
 #include "TabCtrl.h"
 #include "duilib/Box/TabBox.h"
 
-namespace ui
-{
+namespace ui {
 
-TabCtrl::TabCtrl(Window* pWindow):
-    ListBox(pWindow, new HLayout),
-    m_nSelectedId(Box::InvalidIndex),
-    m_pTabBox(nullptr),
-    m_bEnableDragOrder(true)
+TabCtrl::TabCtrl(Window *pWindow)
+    : ListBox(pWindow, new HLayout)
+    , m_nSelectedId(Box::InvalidIndex)
+    , m_pTabBox(nullptr)
+    , m_bEnableDragOrder(true)
+{}
+
+DString TabCtrl::GetType() const
 {
+    return DUI_CTR_TAB_CTRL;
 }
 
-DString TabCtrl::GetType() const { return DUI_CTR_TAB_CTRL; }
-
-void TabCtrl::SetAttribute(const DString& strName, const DString& strValue2)
+void TabCtrl::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("selected_id")) {
@@ -22,28 +23,21 @@ void TabCtrl::SetAttribute(const DString& strName, const DString& strValue2)
         if (nValue >= 0) {
             m_nSelectedId = nValue;
         }
-    }
-    else if (strName == _T("tab_box_name")) {
+    } else if (strName == _T("tab_box_name")) {
         //绑定的TabBox控件名称，绑定后TabCtrl的选择项变化时，TabBox的选择项会跟随变化
         SetTabBoxName(strValue);
-    }
-    else if (strName == _T("drag_order")) {
+    } else if (strName == _T("drag_order")) {
         //是否支持拖动调整顺序（在同一个标签内），默认是开启的
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("selected_tab_item_outline_width")) {
+    } else if (strName == _T("selected_tab_item_outline_width")) {
         SetSelectedTabItemOutlineWidth(StringUtil::StringToFloat(strValue.c_str()));
-    }
-    else if (strName == _T("selected_tab_item_outline_color")) {
+    } else if (strName == _T("selected_tab_item_outline_color")) {
         SetSelectedTabItemOutlineColor(strValue);
-    }
-    else if (strName == _T("tab_ctrl_bottom_line_height")) {
+    } else if (strName == _T("tab_ctrl_bottom_line_height")) {
         SetTabCtrlBottomLineHeight(StringUtil::StringToFloat(strValue.c_str()));
-    }
-    else if (strName == _T("tab_ctrl_bottom_line_color")) {
+    } else if (strName == _T("tab_ctrl_bottom_line_color")) {
         SetTabCtrlBottomLineColor(strValue);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -71,12 +65,12 @@ float TabCtrl::GetSelectedTabItemOutlineWidth() const
     return m_fSelectedTabItemOutlineWidth;
 }
 
-void TabCtrl::SetSelectedTabItemOutlineColor(const DString& outlineColor)
+void TabCtrl::SetSelectedTabItemOutlineColor(const DString &outlineColor)
 {
     m_selectedTabItemOutlineColor = outlineColor;
 }
 
-const DString& TabCtrl::GetSelectedTabItemOutlineColor() const
+const DString &TabCtrl::GetSelectedTabItemOutlineColor() const
 {
     return m_selectedTabItemOutlineColor;
 }
@@ -94,12 +88,12 @@ float TabCtrl::GetTabCtrlBottomLineHeight() const
     return m_fTabCtrlBottomLineHeight;
 }
 
-void TabCtrl::SetTabCtrlBottomLineColor(const DString& lineColor)
+void TabCtrl::SetTabCtrlBottomLineColor(const DString &lineColor)
 {
     m_tabCtrlBottomLineColor = lineColor;
 }
 
-const DString& TabCtrl::GetTabCtrlBottomLineColor() const
+const DString &TabCtrl::GetTabCtrlBottomLineColor() const
 {
     return m_tabCtrlBottomLineColor;
 }
@@ -123,7 +117,7 @@ void TabCtrl::OnInit()
     AdjustItemLineStatus();
 }
 
-void TabCtrl::HandleEvent(const EventArgs& msg)
+void TabCtrl::HandleEvent(const EventArgs &msg)
 {
     if ((msg.GetSender() == this) && (msg.eventType == kEventSelect)) {
         //尝试设置关联的TabBox
@@ -131,11 +125,11 @@ void TabCtrl::HandleEvent(const EventArgs& msg)
             SetTabBoxName(m_tabBoxName.c_str());
         }
         if (m_pTabBox != nullptr) {
-            TabCtrlItem* pItem = nullptr;
+            TabCtrlItem *pItem = nullptr;
             size_t nSelectIndex = msg.wParam;
-            Control* pControl = GetItemAt(nSelectIndex);
+            Control *pControl = GetItemAt(nSelectIndex);
             if (pControl != nullptr) {
-                pItem = dynamic_cast<TabCtrlItem*>(pControl);
+                pItem = dynamic_cast<TabCtrlItem *>(pControl);
             }
             if (pItem != nullptr) {
                 size_t nItemIndex = pItem->GetTabBoxItemIndex();
@@ -147,12 +141,13 @@ void TabCtrl::HandleEvent(const EventArgs& msg)
     }
     BaseClass::HandleEvent(msg);
 
-    if ((msg.GetSender() == this) && ((msg.eventType == kEventSelect) || (msg.eventType == kEventUnSelect))) {
-        TabCtrlItem* pItem = nullptr;
+    if ((msg.GetSender() == this)
+        && ((msg.eventType == kEventSelect) || (msg.eventType == kEventUnSelect))) {
+        TabCtrlItem *pItem = nullptr;
         size_t nSelectIndex = msg.wParam;
-        Control* pControl = GetItemAt(nSelectIndex);
+        Control *pControl = GetItemAt(nSelectIndex);
         if (pControl != nullptr) {
-            pItem = dynamic_cast<TabCtrlItem*>(pControl);
+            pItem = dynamic_cast<TabCtrlItem *>(pControl);
         }
         if (pItem != nullptr) {
             pItem->AdjustItemLineStatus();
@@ -160,7 +155,7 @@ void TabCtrl::HandleEvent(const EventArgs& msg)
     }
 }
 
-void TabCtrl::PaintStateColors(IRender* pRender)
+void TabCtrl::PaintStateColors(IRender *pRender)
 {
     BaseClass::PaintStateColors(pRender);
     //在标签底部画线（但排除当前选择标签的区域，不覆盖选择标签）
@@ -172,7 +167,7 @@ void TabCtrl::PaintStateColors(IRender* pRender)
     }
     std::unique_ptr<IPen> pBottomLinePen;
     if ((fBottomLineHeight > 0.01f) && !bottomLineColor.IsEmpty()) {
-        IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+        IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
         if (pRenderFactory != nullptr) {
             pBottomLinePen.reset(pRenderFactory->CreatePen(bottomLineColor, fBottomLineHeight));
         }
@@ -180,26 +175,27 @@ void TabCtrl::PaintStateColors(IRender* pRender)
     if (pBottomLinePen != nullptr) {
         UiRectF rcTabCtrl = UiRectF::MakeFromRect(GetRect());
         rcTabCtrl.bottom -= (fBottomLineHeight / 2);
-        pRender->DrawLine(UiPointF(rcTabCtrl.left, rcTabCtrl.bottom),
-                          UiPointF(rcTabCtrl.right, rcTabCtrl.bottom),
-                          pBottomLinePen.get());
+        pRender->DrawLine(
+            UiPointF(rcTabCtrl.left, rcTabCtrl.bottom),
+            UiPointF(rcTabCtrl.right, rcTabCtrl.bottom),
+            pBottomLinePen.get());
     }
 }
 
-void TabCtrl::SetTabBoxName(const DString& tabBoxName)
+void TabCtrl::SetTabBoxName(const DString &tabBoxName)
 {
     if (m_tabBoxName != tabBoxName) {
         m_tabBoxName = tabBoxName;
-    }    
-    if (!tabBoxName.empty() && (GetWindow() != nullptr) ) {
-        TabBox* pTabBox = nullptr;
-        Control* pSubControl = nullptr;
-        Box* pRoot = GetWindow()->GetRoot();
+    }
+    if (!tabBoxName.empty() && (GetWindow() != nullptr)) {
+        TabBox *pTabBox = nullptr;
+        Control *pSubControl = nullptr;
+        Box *pRoot = GetWindow()->GetRoot();
         if (pRoot != nullptr) {
             pSubControl = pRoot->FindSubControl(tabBoxName);
         }
         if (pSubControl != nullptr) {
-            pTabBox = dynamic_cast<TabBox*>(pSubControl);            
+            pTabBox = dynamic_cast<TabBox *>(pSubControl);
         }
         if (pTabBox != nullptr) {
             SetTabBox(pTabBox);
@@ -212,17 +208,17 @@ DString TabCtrl::GetTabBoxName() const
     return m_tabBoxName.c_str();
 }
 
-void TabCtrl::SetTabBox(TabBox* pTabBox)
+void TabCtrl::SetTabBox(TabBox *pTabBox)
 {
     m_pTabBox = pTabBox;
 }
 
-TabBox* TabCtrl::GetTabBox() const
+TabBox *TabCtrl::GetTabBox() const
 {
     return m_pTabBox;
 }
 
-bool TabCtrl::SetItemIndex(Control* pControl, size_t iIndex)
+bool TabCtrl::SetItemIndex(Control *pControl, size_t iIndex)
 {
     bool bRet = BaseClass::SetItemIndex(pControl, iIndex);
     if (bRet) {
@@ -231,7 +227,7 @@ bool TabCtrl::SetItemIndex(Control* pControl, size_t iIndex)
     return bRet;
 }
 
-bool TabCtrl::AddItem(Control* pControl)
+bool TabCtrl::AddItem(Control *pControl)
 {
     bool bRet = BaseClass::AddItem(pControl);
     if (bRet) {
@@ -240,7 +236,7 @@ bool TabCtrl::AddItem(Control* pControl)
     return bRet;
 }
 
-bool TabCtrl::AddItemAt(Control* pControl, size_t iIndex)
+bool TabCtrl::AddItemAt(Control *pControl, size_t iIndex)
 {
     bool bRet = BaseClass::AddItemAt(pControl, iIndex);
     if (bRet) {
@@ -249,7 +245,7 @@ bool TabCtrl::AddItemAt(Control* pControl, size_t iIndex)
     return bRet;
 }
 
-bool TabCtrl::RemoveItem(Control* pControl)
+bool TabCtrl::RemoveItem(Control *pControl)
 {
     bool bRet = BaseClass::RemoveItem(pControl);
     if (bRet) {
@@ -274,15 +270,16 @@ void TabCtrl::RemoveAllItems()
 
 void TabCtrl::AdjustItemLineStatus()
 {
-    TabCtrlItem* pLastItem = nullptr;
+    TabCtrlItem *pLastItem = nullptr;
     const size_t nCount = GetItemCount();
     for (size_t nItem = 0; nItem < nCount; ++nItem) {
-        TabCtrlItem* pItem = dynamic_cast<TabCtrlItem*>(GetItemAt(nItem));
+        TabCtrlItem *pItem = dynamic_cast<TabCtrlItem *>(GetItemAt(nItem));
         if ((pItem == nullptr) || !pItem->IsVisible()) {
             continue;
         }
         ControlStateType state = pItem->GetState();
-        if ((state == kControlStateHovered) || (state == kControlStatePressed) || pItem->IsSelected()) {
+        if ((state == kControlStateHovered) || (state == kControlStatePressed)
+            || pItem->IsSelected()) {
             //活动标签，不显示分割线
             pItem->SetItemLineVisible(false);
 
@@ -290,12 +287,11 @@ void TabCtrl::AdjustItemLineStatus()
                 //活动标签的前一个标签，不显示分割线
                 pLastItem->SetItemLineVisible(false);
             }
-        }
-        else {
+        } else {
             //其他状态的标签，显示分割线
             pItem->SetItemLineVisible(true);
         }
-        
+
         if (nItem == (nCount - 1)) {
             //最后一个标签，不显示分割线
             pItem->SetItemLineVisible(false);
@@ -308,75 +304,66 @@ void TabCtrl::AdjustItemLineStatus()
 
 ///////////////////////////////////////////////////////////////////
 ////
-TabCtrlItem::TabCtrlItem(Window* pWindow):
-    ControlDragableT<ListBoxItemH>(pWindow),
-    m_pIcon(nullptr),
-    m_pLabel(nullptr),
-    m_pCloseBtn(nullptr),
-    m_pLine(nullptr),
-    m_bAutoHideCloseBtn(false),
-    m_nTabBoxItemIndex(Box::InvalidIndex)
+TabCtrlItem::TabCtrlItem(Window *pWindow)
+    : ControlDragableT<ListBoxItemH>(pWindow)
+    , m_pIcon(nullptr)
+    , m_pLabel(nullptr)
+    , m_pCloseBtn(nullptr)
+    , m_pLine(nullptr)
+    , m_bAutoHideCloseBtn(false)
+    , m_nTabBoxItemIndex(Box::InvalidIndex)
 {
-    m_rcSelected.cx = (uint8_t)-1;
-    m_rcSelected.cy = (uint8_t)-1;
+    m_rcSelected.cx = (uint8_t) -1;
+    m_rcSelected.cy = (uint8_t) -1;
 
-    m_rcHovered.cx = (uint8_t)-1;
-    m_rcHovered.cy = (uint8_t)-1;
+    m_rcHovered.cx = (uint8_t) -1;
+    m_rcHovered.cy = (uint8_t) -1;
 
     m_hoveredPadding.top = 0;
-    m_hoveredPadding.left = (uint8_t)-1;
+    m_hoveredPadding.left = (uint8_t) -1;
     m_hoveredPadding.right = 0;
     m_hoveredPadding.bottom = 0;
 }
 
-DString TabCtrlItem::GetType() const { return DUI_CTR_TAB_CTRL_ITEM; }
+DString TabCtrlItem::GetType() const
+{
+    return DUI_CTR_TAB_CTRL_ITEM;
+}
 
-void TabCtrlItem::SetAttribute(const DString& strName, const DString& strValue2)
+void TabCtrlItem::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("tab_box_item_index")) {
-        SetTabBoxItemIndex((size_t)StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("title")) {
+        SetTabBoxItemIndex((size_t) StringUtil::StringToInt32(strValue));
+    } else if (strName == _T("title")) {
         SetTitle(strValue);
-    }
-    else if (strName == _T("title_id")) {
+    } else if (strName == _T("title_id")) {
         SetTitleId(strValue);
-    }
-    else if (strName == _T("icon")) {
+    } else if (strName == _T("icon")) {
         SetIcon(strValue);
-    }
-    else if (strName == _T("icon_class")) {
+    } else if (strName == _T("icon_class")) {
         SetIconClass(strValue);
-    }
-    else if (strName == _T("title_class")) {
+    } else if (strName == _T("title_class")) {
         SetTitleClass(strValue);
-    }
-    else if (strName == _T("close_button_class")) {
+    } else if (strName == _T("close_button_class")) {
         SetCloseButtonClass(strValue);
-    }
-    else if (strName == _T("line_class")) {
+    } else if (strName == _T("line_class")) {
         SetLineClass(strValue);
-    }
-    else if (strName == _T("selected_round_corner")) {
+    } else if (strName == _T("selected_round_corner")) {
         UiSize sz;
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetSelectedRoundCorner(sz, true);
-    }
-    else if ((strName == _T("hovered_round_corner")) || (strName == _T("hot_round_corner"))) {
+    } else if ((strName == _T("hovered_round_corner")) || (strName == _T("hot_round_corner"))) {
         UiSize sz;
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetHoveredRoundCorner(sz, true);
-    }
-    else if ((strName == _T("hovered_padding")) || (strName == _T("hot_padding"))) {
+    } else if ((strName == _T("hovered_padding")) || (strName == _T("hot_padding"))) {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetHoveredPadding(rcPadding, true);
-    }
-    else if (strName == _T("auto_hide_close_button")) {
+    } else if (strName == _T("auto_hide_close_button")) {
         SetAutoHideCloseButton(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -398,7 +385,7 @@ void TabCtrlItem::OnInit()
     AdjustItemLineStatus();
 }
 
-void TabCtrlItem::HandleEvent(const EventArgs& msg)
+void TabCtrlItem::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
     if ((msg.GetSender() == this) && (m_pLine != nullptr) && (msg.eventType == kEventStateChanged)) {
@@ -428,12 +415,12 @@ DString TabCtrlItem::GetToolTipText() const
     return tooltip;
 }
 
-void TabCtrlItem::SetIconClass(const DString& iconClass)
+void TabCtrlItem::SetIconClass(const DString &iconClass)
 {
     bool bChanged = m_iconClass != iconClass;
     if (bChanged) {
         m_iconClass = iconClass;
-    }    
+    }
     if (!IsInited()) {
         return;
     }
@@ -446,12 +433,10 @@ void TabCtrlItem::SetIconClass(const DString& iconClass)
                 m_pIcon->SetBkImage(m_iconImageString.c_str());
             }
             AdjustSubItemIndex();
-        }
-        else if(bChanged) {
+        } else if (bChanged) {
             m_pIcon->SetClass(iconClass);
         }
-    }
-    else {
+    } else {
         if (m_pIcon != nullptr) {
             RemoveItem(m_pIcon);
             m_pIcon = nullptr;
@@ -464,12 +449,12 @@ DString TabCtrlItem::GetIconClass() const
     return m_iconClass.c_str();
 }
 
-void TabCtrlItem::SetTitleClass(const DString& titleClass)
+void TabCtrlItem::SetTitleClass(const DString &titleClass)
 {
     bool bChanged = m_titleClass != titleClass;
     if (bChanged) {
         m_titleClass = titleClass;
-    }    
+    }
     if (!IsInited()) {
         return;
     }
@@ -487,12 +472,10 @@ void TabCtrlItem::SetTitleClass(const DString& titleClass)
                 m_titleId.clear();
             }
             AdjustSubItemIndex();
-        }
-        else if (bChanged) {
+        } else if (bChanged) {
             m_pLabel->SetClass(titleClass);
         }
-    }
-    else {
+    } else {
         if (m_pLabel != nullptr) {
             RemoveItem(m_pLabel);
             m_pLabel = nullptr;
@@ -505,7 +488,7 @@ DString TabCtrlItem::GetTitleClass() const
     return m_titleClass.c_str();
 }
 
-void TabCtrlItem::SetCloseButtonClass(const DString& closeButtonClass)
+void TabCtrlItem::SetCloseButtonClass(const DString &closeButtonClass)
 {
     bool bChanged = m_closeBtnClass != closeButtonClass;
     if (bChanged) {
@@ -520,12 +503,10 @@ void TabCtrlItem::SetCloseButtonClass(const DString& closeButtonClass)
             m_pCloseBtn->SetClass(closeButtonClass);
             AddItem(m_pCloseBtn);
             AdjustSubItemIndex();
-        }
-        else if (bChanged) {
+        } else if (bChanged) {
             m_pCloseBtn->SetClass(closeButtonClass);
         }
-    }
-    else {
+    } else {
         if (m_pCloseBtn != nullptr) {
             RemoveItem(m_pCloseBtn);
             m_pCloseBtn = nullptr;
@@ -538,7 +519,7 @@ DString TabCtrlItem::GetCloseButtonClass() const
     return m_closeBtnClass.c_str();
 }
 
-void TabCtrlItem::SetLineClass(const DString& lineClass)
+void TabCtrlItem::SetLineClass(const DString &lineClass)
 {
     bool bChanged = m_lineClass != lineClass;
     if (bChanged) {
@@ -553,12 +534,10 @@ void TabCtrlItem::SetLineClass(const DString& lineClass)
             m_pLine->SetClass(lineClass);
             AddItem(m_pLine);
             AdjustSubItemIndex();
-        }
-        else if (bChanged) {
+        } else if (bChanged) {
             m_pLine->SetClass(lineClass);
         }
-    }
-    else {
+    } else {
         if (m_pLine != nullptr) {
             RemoveItem(m_pLine);
             m_pLine = nullptr;
@@ -573,7 +552,7 @@ DString TabCtrlItem::GetLineClass() const
 
 void TabCtrlItem::AdjustSubItemIndex()
 {
-    std::vector<Control*> subItems;
+    std::vector<Control *> subItems;
     if (m_pIcon != nullptr) {
         subItems.push_back(m_pIcon);
     }
@@ -590,7 +569,7 @@ void TabCtrlItem::AdjustSubItemIndex()
         subItems.push_back(m_pCloseBtn);
     }
     for (size_t nIndex = 0; nIndex < subItems.size(); ++nIndex) {
-        Control* pControl = subItems[nIndex];
+        Control *pControl = subItems[nIndex];
         size_t nCurrentIndex = GetItemIndex(pControl);
         if (nIndex != nCurrentIndex) {
             SetItemIndex(pControl, nIndex);
@@ -600,7 +579,7 @@ void TabCtrlItem::AdjustSubItemIndex()
 
 void TabCtrlItem::AdjustItemLineStatus()
 {
-    TabCtrl* pTabCtrl = GetTabCtrl();
+    TabCtrl *pTabCtrl = GetTabCtrl();
     if (pTabCtrl != nullptr) {
         pTabCtrl->AdjustItemLineStatus();
     }
@@ -636,9 +615,9 @@ void TabCtrlItem::SetItemLineVisible(bool bVisible)
     }
 }
 
-TabCtrl* TabCtrlItem::GetTabCtrl() const
+TabCtrl *TabCtrlItem::GetTabCtrl() const
 {
-    TabCtrl* pTabCtrl = dynamic_cast<TabCtrl*>(GetParent());
+    TabCtrl *pTabCtrl = dynamic_cast<TabCtrl *>(GetParent());
     return pTabCtrl;
 }
 
@@ -656,8 +635,8 @@ void TabCtrlItem::SetSelectedRoundCorner(UiSize szCorner, bool bNeedDpiScale)
 UiSize TabCtrlItem::GetSelectedRoundCorner() const
 {
     UiSize szCorner;
-    szCorner.cx = (int8_t)m_rcSelected.cx;
-    szCorner.cy = (int8_t)m_rcSelected.cy;
+    szCorner.cx = (int8_t) m_rcSelected.cx;
+    szCorner.cy = (int8_t) m_rcSelected.cy;
     if (szCorner.cx < 0) {
         szCorner.cx = Dpi().GetScaleInt(12);
     }
@@ -681,8 +660,8 @@ void TabCtrlItem::SetHoveredRoundCorner(UiSize szCorner, bool bNeedDpiScale)
 UiSize TabCtrlItem::GetHoveredRoundCorner() const
 {
     UiSize szCorner;
-    szCorner.cx = (int8_t)m_rcHovered.cx;
-    szCorner.cy = (int8_t)m_rcHovered.cy;
+    szCorner.cx = (int8_t) m_rcHovered.cx;
+    szCorner.cy = (int8_t) m_rcHovered.cy;
     if (szCorner.cx < 0) {
         szCorner.cx = Dpi().GetScaleInt(5);
     }
@@ -694,7 +673,9 @@ UiSize TabCtrlItem::GetHoveredRoundCorner() const
 
 void TabCtrlItem::SetHoveredPadding(UiPadding rcPadding, bool bNeedDpiScale)
 {
-    ASSERT((rcPadding.left >= 0) && (rcPadding.top >= 0) && (rcPadding.right >= 0) && (rcPadding.bottom >= 0));
+    ASSERT(
+        (rcPadding.left >= 0) && (rcPadding.top >= 0) && (rcPadding.right >= 0)
+        && (rcPadding.bottom >= 0));
     rcPadding.Validate();
     if (bNeedDpiScale) {
         Dpi().ScalePadding(rcPadding);
@@ -708,13 +689,13 @@ void TabCtrlItem::SetHoveredPadding(UiPadding rcPadding, bool bNeedDpiScale)
 UiPadding TabCtrlItem::GetHoveredPadding() const
 {
     UiPadding rcPadding;
-    rcPadding.left = (int8_t)m_hoveredPadding.left;
-    rcPadding.top = (int8_t)m_hoveredPadding.top;
-    rcPadding.right = (int8_t)m_hoveredPadding.right;
-    rcPadding.bottom = (int8_t)m_hoveredPadding.bottom;
+    rcPadding.left = (int8_t) m_hoveredPadding.left;
+    rcPadding.top = (int8_t) m_hoveredPadding.top;
+    rcPadding.right = (int8_t) m_hoveredPadding.right;
+    rcPadding.bottom = (int8_t) m_hoveredPadding.bottom;
     if (rcPadding.left < 0) {
         rcPadding.top = 0;
-        rcPadding.left = (uint8_t)Dpi().GetScaleInt(3);
+        rcPadding.left = (uint8_t) Dpi().GetScaleInt(3);
         rcPadding.right = rcPadding.left;
         rcPadding.bottom = rcPadding.left;
     }
@@ -736,7 +717,7 @@ bool TabCtrlItem::IsAutoHideCloseButton() const
     return m_bAutoHideCloseBtn;
 }
 
-bool TabCtrlItem::MouseEnter(const EventArgs& msg)
+bool TabCtrlItem::MouseEnter(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseEnter(msg);
     if (IsAutoHideCloseButton() && (m_pCloseBtn != nullptr)) {
@@ -745,7 +726,7 @@ bool TabCtrlItem::MouseEnter(const EventArgs& msg)
     return bRet;
 }
 
-bool TabCtrlItem::MouseLeave(const EventArgs& msg)
+bool TabCtrlItem::MouseLeave(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseLeave(msg);
     UiPoint pt = msg.ptMouse;
@@ -767,7 +748,7 @@ void TabCtrlItem::OnPrivateSetSelected()
     AdjustItemLineStatus();
 }
 
-bool TabCtrlItem::ButtonDown(const EventArgs& msg)
+bool TabCtrlItem::ButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -787,24 +768,23 @@ bool TabCtrlItem::ButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-void TabCtrlItem::PaintStateColors(IRender* pRender)
+void TabCtrlItem::PaintStateColors(IRender *pRender)
 {
     //绘制标签页的形状（通过颜色体现）
     if (IsSelected()) {
         PaintTabItemSelected(pRender);
-    }
-    else if ((GetState() == ControlStateType::kControlStateHovered)    ||
-             (GetState() == ControlStateType::kControlStatePressed) ||
-             IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
+    } else if (
+        (GetState() == ControlStateType::kControlStateHovered)
+        || (GetState() == ControlStateType::kControlStatePressed)
+        || IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
         //鼠标悬停状态
         PaintTabItemHovered(pRender);
-    }
-    else {
+    } else {
         BaseClass::PaintStateColors(pRender);
     }
 }
 
-void TabCtrlItem::PaintTabItemSelected(IRender* pRender)
+void TabCtrlItem::PaintTabItemSelected(IRender *pRender)
 {
     if (pRender == nullptr) {
         return;
@@ -825,15 +805,15 @@ void TabCtrlItem::PaintTabItemSelected(IRender* pRender)
     }
 
     UiColor dwColor = GetUiColor(color);
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     if (pRenderFactory != nullptr) {
-        std::unique_ptr<IBrush> brush(pRenderFactory->CreateBrush(dwColor));        
+        std::unique_ptr<IBrush> brush(pRenderFactory->CreateBrush(dwColor));
         std::unique_ptr<IPath> path(pRenderFactory->CreatePath());
         if ((brush != nullptr) && (path != nullptr)) {
             //轮廓边线相关参数
             float fOutlineWidth = 0.0f;
             UiColor outlineColor;
-            TabCtrl* pTabCtrl = GetTabCtrl();
+            TabCtrl *pTabCtrl = GetTabCtrl();
             if (pTabCtrl != nullptr) {
                 fOutlineWidth = pTabCtrl->GetSelectedTabItemOutlineWidth();
                 DString strOutlineColor = pTabCtrl->GetSelectedTabItemOutlineColor();
@@ -849,7 +829,7 @@ void TabCtrlItem::PaintTabItemSelected(IRender* pRender)
             }
             if (pOutlinePen != nullptr) {
                 //为边线留出空间
-                rc.top += (int32_t)std::round(fOutlineWidth / 2);
+                rc.top += (int32_t) std::round(fOutlineWidth / 2);
             }
             //绘制选择标签的样式到路径
             AddTabItemPath(path.get(), rc, roundSize);
@@ -862,13 +842,16 @@ void TabCtrlItem::PaintTabItemSelected(IRender* pRender)
                     float fRoundWidth = 0;
                     float fRoundHeight = 0;
                     pTabCtrl->GetBorderRound(fRoundWidth, fRoundHeight);
-                    rcTabCtrl.left += (int32_t)fRoundWidth;
-                    rcTabCtrl.right -= (int32_t)fRoundWidth;
+                    rcTabCtrl.left += (int32_t) fRoundWidth;
+                    rcTabCtrl.right -= (int32_t) fRoundWidth;
 
                     rcSelectItem.left = std::max(rcSelectItem.left, rcTabCtrl.left);
                     rcSelectItem.right = std::min(rcSelectItem.right, rcTabCtrl.right);
                 }
-                pRender->DrawLine(UiPointF(rcSelectItem.left, rcSelectItem.bottom), UiPointF(rcSelectItem.right, rcSelectItem.bottom), pOutlinePen.get());
+                pRender->DrawLine(
+                    UiPointF(rcSelectItem.left, rcSelectItem.bottom),
+                    UiPointF(rcSelectItem.right, rcSelectItem.bottom),
+                    pOutlinePen.get());
             }
             //绘制选择标签的样式（从路径中绘制）
             pRender->FillPath(path.get(), brush.get());
@@ -886,7 +869,7 @@ void TabCtrlItem::PaintTabItemSelected(IRender* pRender)
  * @rect    ：Tab 标签项的整体绘制区域
  * @roundSize：圆角大小（cx=圆角宽度，cy=圆角高度）
  *************************************************************************/
-void TabCtrlItem::AddTabItemPath(IPath* path, const UiRect& rect, UiSize roundSize) const
+void TabCtrlItem::AddTabItemPath(IPath *path, const UiRect &rect, UiSize roundSize) const
 {
     // 安全校验：路径对象不能为空
     ASSERT(path != nullptr);
@@ -941,7 +924,8 @@ void TabCtrlItem::AddTabItemPath(IPath* path, const UiRect& rect, UiSize roundSi
     path->AddArc(UiRect(rc.left - roundSize.cx, rc.bottom - roundSize.cy, rc.left, rc.bottom), 0, 90);
 
     // 7. 右下角圆弧：90度起点，扫90度
-    path->AddArc(UiRect(rc.right, rc.bottom - roundSize.cy, rc.right + roundSize.cx, rc.bottom), 90, 90);
+    path->AddArc(
+        UiRect(rc.right, rc.bottom - roundSize.cy, rc.right + roundSize.cx, rc.bottom), 90, 90);
 
     // 8. 底部横线：左 → 右
     path->AddLine(rc.left - roundSize.cx / 2, rc.bottom, rc.right + roundSize.cx / 2, rc.bottom);
@@ -950,7 +934,7 @@ void TabCtrlItem::AddTabItemPath(IPath* path, const UiRect& rect, UiSize roundSi
     path->Close();
 }
 
-void TabCtrlItem::PaintTabItemHovered(IRender* pRender)
+void TabCtrlItem::PaintTabItemHovered(IRender *pRender)
 {
     if (pRender == nullptr) {
         return;
@@ -964,7 +948,7 @@ void TabCtrlItem::PaintTabItemHovered(IRender* pRender)
     rc.left += hotPadding.left;
     rc.right -= hotPadding.right;
     rc.bottom -= hotPadding.bottom;
- 
+
     UiSize roundSize = GetHoveredRoundCorner();
     DString color = GetStateColor(ControlStateType::kControlStateHovered);
     if (color.empty()) {
@@ -975,18 +959,18 @@ void TabCtrlItem::PaintTabItemHovered(IRender* pRender)
     if (IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
         uFade = GetHoveredAlpha();
     }
-    pRender->FillRoundRect(UiRectF::MakeFromRect(rc), (float)roundSize.cx, (float)roundSize.cy, dwColor, uFade);
+    pRender->FillRoundRect(
+        UiRectF::MakeFromRect(rc), (float) roundSize.cx, (float) roundSize.cy, dwColor, uFade);
 }
 
-void TabCtrlItem::SetIcon(const DString& iconImageString)
+void TabCtrlItem::SetIcon(const DString &iconImageString)
 {
-    Control* pIconControl = GetIconControl();
+    Control *pIconControl = GetIconControl();
     if (pIconControl != nullptr) {
         pIconControl->SetBkImage(iconImageString);
         m_iconImageString.clear();
         CheckIconVisible();
-    }
-    else {
+    } else {
         m_iconImageString = iconImageString;
     }
 }
@@ -994,20 +978,20 @@ void TabCtrlItem::SetIcon(const DString& iconImageString)
 DString TabCtrlItem::GetIcon() const
 {
     DString iconString;
-    Control* pIconControl = GetIconControl();
+    Control *pIconControl = GetIconControl();
     if (pIconControl != nullptr) {
         iconString = pIconControl->GetBkImage();
-    }
-    else {
+    } else {
         iconString = m_iconImageString.c_str();
     }
     return iconString;
 }
 
-bool TabCtrlItem::SetIconData(int32_t nWidth, int32_t nHeight, const uint8_t* pPixelBits, int32_t nPixelBitsSize)
+bool TabCtrlItem::SetIconData(
+    int32_t nWidth, int32_t nHeight, const uint8_t *pPixelBits, int32_t nPixelBitsSize)
 {
     bool bRet = false;
-    IconControl* pIconControl = GetIconControl();
+    IconControl *pIconControl = GetIconControl();
     if (pIconControl != nullptr) {
         bRet = pIconControl->SetIconData(nWidth, nHeight, pPixelBits, nPixelBitsSize);
         if (bRet) {
@@ -1019,7 +1003,7 @@ bool TabCtrlItem::SetIconData(int32_t nWidth, int32_t nHeight, const uint8_t* pP
 
 void TabCtrlItem::ClearIconData()
 {
-    IconControl* pIconControl = GetIconControl();
+    IconControl *pIconControl = GetIconControl();
     if (pIconControl != nullptr) {
         pIconControl->ClearIconData();
     }
@@ -1027,7 +1011,7 @@ void TabCtrlItem::ClearIconData()
 
 void TabCtrlItem::CheckIconVisible()
 {
-    IconControl* pIconControl = GetIconControl();
+    IconControl *pIconControl = GetIconControl();
     if (pIconControl != nullptr) {
         bool bVisible = !pIconControl->GetBkImage().empty() || pIconControl->HasIconData();
         if (!IsVisible()) {
@@ -1035,18 +1019,17 @@ void TabCtrlItem::CheckIconVisible()
         }
         if (pIconControl->IsVisible() != bVisible) {
             pIconControl->SetVisible(bVisible);
-        }        
+        }
     }
 }
 
-void TabCtrlItem::SetTitle(const DString& title)
+void TabCtrlItem::SetTitle(const DString &title)
 {
-    Label* pLabel = GetTextLabel();
+    Label *pLabel = GetTextLabel();
     if (pLabel != nullptr) {
         pLabel->SetText(title);
         m_title.clear();
-    }
-    else {
+    } else {
         m_title = title;
     }
 }
@@ -1054,24 +1037,22 @@ void TabCtrlItem::SetTitle(const DString& title)
 DString TabCtrlItem::GetTitle() const
 {
     DString title;
-    Label* pLabel = GetTextLabel();
+    Label *pLabel = GetTextLabel();
     if (pLabel != nullptr) {
         title = pLabel->GetText();
-    }
-    else {
+    } else {
         title = m_title.c_str();
     }
     return title;
 }
 
-void TabCtrlItem::SetTitleId(const DString& titleId)
+void TabCtrlItem::SetTitleId(const DString &titleId)
 {
-    Label* pLabel = GetTextLabel();
+    Label *pLabel = GetTextLabel();
     if (pLabel != nullptr) {
         pLabel->SetTextId(titleId);
         m_titleId.clear();
-    }
-    else {
+    } else {
         m_titleId = titleId;
     }
 }
@@ -1079,11 +1060,10 @@ void TabCtrlItem::SetTitleId(const DString& titleId)
 DString TabCtrlItem::GetTitleId() const
 {
     DString titleId;
-    Label* pLabel = GetTextLabel();
+    Label *pLabel = GetTextLabel();
     if (pLabel != nullptr) {
         titleId = pLabel->GetTextId();
-    }
-    else {
+    } else {
         titleId = m_titleId.c_str();
     }
     return titleId;
@@ -1101,7 +1081,7 @@ size_t TabCtrlItem::GetTabBoxItemIndex() const
 
 bool TabCtrlItem::IsEnableDragOrder() const
 {
-    TabCtrl* pTabCtrl = GetTabCtrl();
+    TabCtrl *pTabCtrl = GetTabCtrl();
     if (pTabCtrl != nullptr) {
         if (!pTabCtrl->IsEnableDragOrder()) {
             //TabCtrl的总开关，控制总体功能关闭
@@ -1111,5 +1091,4 @@ bool TabCtrlItem::IsEnableDragOrder() const
     return BaseClass::IsEnableDragOrder();
 }
 
-}//namespace ui
-
+} //namespace ui

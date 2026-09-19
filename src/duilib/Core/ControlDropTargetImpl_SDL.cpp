@@ -5,18 +5,14 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Core/ControlDropTargetUtils.h"
 
-namespace ui 
-{
-ControlDropTargetImpl_SDL::ControlDropTargetImpl_SDL(Control* pControl) :
-    m_pControl(pControl)
-{
-}
+namespace ui {
+ControlDropTargetImpl_SDL::ControlDropTargetImpl_SDL(Control *pControl)
+    : m_pControl(pControl)
+{}
 
-ControlDropTargetImpl_SDL::~ControlDropTargetImpl_SDL()
-{
-}
+ControlDropTargetImpl_SDL::~ControlDropTargetImpl_SDL() {}
 
-int32_t ControlDropTargetImpl_SDL::OnDropBegin(const UiPoint& pt)
+int32_t ControlDropTargetImpl_SDL::OnDropBegin(const UiPoint &pt)
 {
     if (m_pControl != nullptr) {
         ControlDropData_SDL data;
@@ -30,7 +26,7 @@ int32_t ControlDropTargetImpl_SDL::OnDropBegin(const UiPoint& pt)
         msg.eventType = EventType::kEventDropEnter;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeSDL;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         msg.modifierKey = 0;
         msg.eventData = 0;
@@ -40,7 +36,7 @@ int32_t ControlDropTargetImpl_SDL::OnDropBegin(const UiPoint& pt)
     return S_OK;
 }
 
-void ControlDropTargetImpl_SDL::OnDropPosition(const UiPoint& pt)
+void ControlDropTargetImpl_SDL::OnDropPosition(const UiPoint &pt)
 {
     if (m_pControl != nullptr) {
         ControlDropData_SDL data;
@@ -54,7 +50,7 @@ void ControlDropTargetImpl_SDL::OnDropPosition(const UiPoint& pt)
         msg.eventType = EventType::kEventDropOver;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeSDL;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         msg.modifierKey = 0;
         msg.eventData = 0;
@@ -63,7 +59,7 @@ void ControlDropTargetImpl_SDL::OnDropPosition(const UiPoint& pt)
     }
 }
 
-void ControlDropTargetImpl_SDL::OnDropTexts(const std::vector<DString>& textList, const UiPoint& pt)
+void ControlDropTargetImpl_SDL::OnDropTexts(const std::vector<DString> &textList, const UiPoint &pt)
 {
     if (m_pControl != nullptr) {
         ControlDropData_SDL data;
@@ -78,7 +74,7 @@ void ControlDropTargetImpl_SDL::OnDropTexts(const std::vector<DString>& textList
         msg.eventType = EventType::kEventDropData;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeSDL;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         msg.modifierKey = 0;
         msg.eventData = 0;
@@ -87,7 +83,8 @@ void ControlDropTargetImpl_SDL::OnDropTexts(const std::vector<DString>& textList
     }
 }
 
-void ControlDropTargetImpl_SDL::OnDropFiles(const DString& source, const std::vector<DString>& fileList, const UiPoint& pt)
+void ControlDropTargetImpl_SDL::OnDropFiles(
+    const DString &source, const std::vector<DString> &fileList, const UiPoint &pt)
 {
     if (m_pControl != nullptr) {
         if (!fileList.empty()) {
@@ -117,7 +114,7 @@ void ControlDropTargetImpl_SDL::OnDropFiles(const DString& source, const std::ve
         msg.eventType = EventType::kEventDropData;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeSDL;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         msg.modifierKey = 0;
         msg.eventData = 0;

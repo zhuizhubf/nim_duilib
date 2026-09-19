@@ -5,24 +5,24 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-namespace ui 
-{
+namespace ui {
 /** 控件的拖放支持接口的实现（Windows）
 */
 class ControlDropTargetImpl_Windows : public ControlDropTarget_Windows
 {
 public:
-    explicit ControlDropTargetImpl_Windows(Control* pControl);
+    explicit ControlDropTargetImpl_Windows(Control *pControl);
     virtual ~ControlDropTargetImpl_Windows();
 
 public:
     /** IDropTarget::DragEnter
     */
-    virtual int32_t DragEnter(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t DragEnter(
+        void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
     /** IDropTarget::DragOver
     */
-    virtual int32_t DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t DragOver(uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
     /** IDropTarget::DragLeave
     */
@@ -30,12 +30,14 @@ public:
 
     /** IDropTarget::Drop
     */
-    virtual int32_t Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t Drop(
+        void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
 public:
     /** 解析pDataObj内容，分离文本和文件路径数据
     */
-    static void ParseWindowsDataObject(void* pDataObj, std::vector<DString>& textList, std::vector<DString>& fileList);
+    static void ParseWindowsDataObject(
+        void *pDataObj, std::vector<DString> &textList, std::vector<DString> &fileList);
 
 private:
     /** 清理拖放状态
@@ -49,7 +51,7 @@ private:
 
     /** 关联的IDataObject对象
     */
-    void* m_pDataObj;
+    void *m_pDataObj;
 
     /** 关联的文本数据
     */

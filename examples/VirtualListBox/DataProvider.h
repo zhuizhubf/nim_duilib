@@ -9,9 +9,9 @@
 
 struct DownloadTask
 {
-    int nId; //唯一ID
-    bool bSelected = false;//选择状态
-    DString::value_type* sName = nullptr;//名称
+    int nId;                              //唯一ID
+    bool bSelected = false;               //选择状态
+    DString::value_type *sName = nullptr; //名称
 };
 
 class DataProvider : public ui::VirtualListBoxElement
@@ -24,13 +24,13 @@ public:
     * @param [in] pVirtualListBox 关联的虚表的接口
     * @return 返回创建后的数据项指针
     */
-    virtual ui::Control* CreateElement(ui::VirtualListBox* pVirtualListBox) override;
+    virtual ui::Control *CreateElement(ui::VirtualListBox *pVirtualListBox) override;
 
     /** 填充指定数据项
     * @param[in] pControl 数据项控件指针
     * @param[in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
     */
-    virtual bool FillElement(ui::Control* pControl, size_t nElementIndex) override;
+    virtual bool FillElement(ui::Control *pControl, size_t nElementIndex) override;
 
     /**
     * @brief 获取子项总数
@@ -53,7 +53,7 @@ public:
     /** 获取选择的元素列表
     * @param [in] selectedIndexs 返回当前选择的元素列表，有效范围：[0, GetElementCount())
     */
-    virtual void GetSelectedElements(std::vector<size_t>& selectedIndexs) const override;
+    virtual void GetSelectedElements(std::vector<size_t> &selectedIndexs) const override;
 
     /** 是否支持多选
     */
@@ -68,7 +68,7 @@ public:
     void SetTotal(int nTotal);
     void Refresh();
     void RemoveTask(size_t nIndex);
-    void ChangeTaskName(size_t nIndex, const DString& sName);
+    void ChangeTaskName(size_t nIndex, const DString &sName);
 
 private:
     int m_nTotal;

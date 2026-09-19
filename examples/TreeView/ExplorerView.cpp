@@ -1,10 +1,10 @@
 #include "ExplorerView.h"
 #include "MainForm.h"
 
-ExplorerView::ExplorerView(MainForm* pMainForm, ui::ListCtrl* pListCtrl):
-    m_pMainForm(pMainForm),
-    m_pListCtrl(pListCtrl),
-    m_nRemoveIconCallbackId(0)
+ExplorerView::ExplorerView(MainForm *pMainForm, ui::ListCtrl *pListCtrl)
+    : m_pMainForm(pMainForm)
+    , m_pListCtrl(pListCtrl)
+    , m_nRemoveIconCallbackId(0)
 {
     Initialize();
 }
@@ -16,12 +16,12 @@ ExplorerView::~ExplorerView()
     m_pathInfoList.clear();
 }
 
-ui::ListCtrl* ExplorerView::GetListCtrl() const
+ui::ListCtrl *ExplorerView::GetListCtrl() const
 {
     return m_pListCtrl.get();
 }
 
-bool ExplorerView::GetSortColumnInfo(ExplorerViewColumn& viewColumn, bool& bSortUp) const
+bool ExplorerView::GetSortColumnInfo(ExplorerViewColumn &viewColumn, bool &bSortUp) const
 {
     if (m_pListCtrl == nullptr) {
         return false;
@@ -31,19 +31,15 @@ bool ExplorerView::GetSortColumnInfo(ExplorerViewColumn& viewColumn, bool& bSort
     if (m_pListCtrl->GetSortColumn(nSortColumnId, bSortUp)) {
         bRet = true;
         size_t nColumnIndex = m_pListCtrl->GetColumnIndex(nSortColumnId);
-        if (nColumnIndex == (size_t)ExplorerViewColumn::kName) {
+        if (nColumnIndex == (size_t) ExplorerViewColumn::kName) {
             viewColumn = ExplorerViewColumn::kName;
-        }
-        else if (nColumnIndex == (size_t)ExplorerViewColumn::kModifyDateTime) {
+        } else if (nColumnIndex == (size_t) ExplorerViewColumn::kModifyDateTime) {
             viewColumn = ExplorerViewColumn::kModifyDateTime;
-        }
-        else if (nColumnIndex == (size_t)ExplorerViewColumn::kType) {
+        } else if (nColumnIndex == (size_t) ExplorerViewColumn::kType) {
             viewColumn = ExplorerViewColumn::kType;
-        }
-        else if (nColumnIndex == (size_t)ExplorerViewColumn::kSize) {
+        } else if (nColumnIndex == (size_t) ExplorerViewColumn::kSize) {
             viewColumn = ExplorerViewColumn::kSize;
-        }
-        else {
+        } else {
             bRet = false;
         }
     }
@@ -68,7 +64,8 @@ void ExplorerView::Initialize()
     }
 
     //挂载图标删除事件
-    m_nRemoveIconCallbackId = ui::GlobalManager::Instance().Icon().AttachRemoveIconEvent(ui::UiBind(&ExplorerView::OnRemoveIcon, this, std::placeholders::_1));
+    m_nRemoveIconCallbackId = ui::GlobalManager::Instance().Icon().AttachRemoveIconEvent(
+        ui::UiBind(&ExplorerView::OnRemoveIcon, this, std::placeholders::_1));
 
     InitViewHeader();
 
@@ -81,17 +78,18 @@ void ExplorerView::Initialize()
         m_pListCtrl->SetImageList(ui::ListCtrlType::List, pImageList);
 
         //挂载列表项鼠标双击事件
-        m_pListCtrl->AttachDoubleClick(UiBind(&ExplorerView::OnExplorerViewDoubleClick, this, std::placeholders::_1));
+        m_pListCtrl->AttachDoubleClick(
+            UiBind(&ExplorerView::OnExplorerViewDoubleClick, this, std::placeholders::_1));
     }
 }
 
-bool ExplorerView::OnExplorerViewDoubleClick(const ui::EventArgs& msg)
+bool ExplorerView::OnExplorerViewDoubleClick(const ui::EventArgs &msg)
 {
     if ((m_pListCtrl != nullptr) && (msg.wParam != 0) && (m_pMainForm != nullptr)) {
         size_t nItemIndex = msg.lParam;
         size_t nIndex = m_pListCtrl->GetDataItemUserData(nItemIndex);
         if (nIndex < m_pathInfoList.size()) {
-            const ui::DirectoryTree::PathInfo& pathInfo = m_pathInfoList[nIndex];
+            const ui::DirectoryTree::PathInfo &pathInfo = m_pathInfoList[nIndex];
             if (!pathInfo.m_filePath.IsEmpty() && pathInfo.m_filePath.IsExistsDirectory()) {
                 //进入所选的目录
                 m_pMainForm->SelectSubPath(pathInfo.m_filePath);
@@ -105,8 +103,10 @@ void ExplorerView::OnRemoveIcon(uint32_t nIconId)
 {
     if (!ui::GlobalManager::Instance().IsInUIThread()) {
         //如果不是在主线程中执行，则转到主线程去执行
-        ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, this->ToWeakCallback([this, nIconId]() {
-            OnRemoveIcon(nIconId);
+        ui::GlobalManager::Instance()
+            .Thread()
+            .PostTask(ui::kThreadUI, this->ToWeakCallback([this, nIconId]() {
+                OnRemoveIcon(nIconId);
             }));
         return;
     }
@@ -133,27 +133,27 @@ void ExplorerView::InitViewHeader()
     if (m_pListCtrl == nullptr) {
         return;
     }
-    ui::ListCtrlHeaderItem* pHeaderItem = nullptr;
+    ui::ListCtrlHeaderItem *pHeaderItem = nullptr;
     ui::ListCtrlColumn columnInfo;
-    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_NAME");//文件名称
+    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_NAME"); //文件名称
     columnInfo.nColumnWidth = 360;
     pHeaderItem = m_pListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ExplorerViewColumn::kName] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_MODIFY_DATE");//修改日期
+    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_MODIFY_DATE"); //修改日期
     columnInfo.nColumnWidth = 160;
     pHeaderItem = m_pListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ExplorerViewColumn::kModifyDateTime] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_TYPE");//文件类型
+    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_TYPE"); //文件类型
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ExplorerViewColumn::kType] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_SIZE");//文件大小
+    columnInfo.textId = _T("STRID_TREEVIEW_EXPLORER_FILE_SIZE"); //文件大小
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
@@ -170,7 +170,10 @@ size_t ExplorerView::GetColumnId(ExplorerViewColumn nOriginIndex) const
     return nColumnIndex;
 }
 
-void ExplorerView::SetFileList(const ui::FilePath& currentPath, const std::vector<PathInfo>& pathList, const ui::FilePath& selectedPath)
+void ExplorerView::SetFileList(
+    const ui::FilePath &currentPath,
+    const std::vector<PathInfo> &pathList,
+    const ui::FilePath &selectedPath)
 {
     //在主线程中执行
     ui::GlobalManager::Instance().AssertUIThread();
@@ -200,7 +203,7 @@ void ExplorerView::SetFileList(const ui::FilePath& currentPath, const std::vecto
     size_t nItemIndex = 0;
     size_t nColumnId = 0;
     for (size_t nIndex = 0; nIndex < pathList.size(); ++nIndex) {
-        const ui::DirectoryTree::PathInfo& pathInfo = pathList[nIndex];
+        const ui::DirectoryTree::PathInfo &pathInfo = pathList[nIndex];
         nItemIndex = m_pListCtrl->AddDataItem(itemData);
         if (!ui::Box::IsValidItemIndex(nItemIndex)) {
             continue;
@@ -208,23 +211,28 @@ void ExplorerView::SetFileList(const ui::FilePath& currentPath, const std::vecto
         //记录关联关系
         m_pListCtrl->SetDataItemUserData(nItemIndex, nIndex);
 
-        if ((nSelectedItemIndex == ui::Box::InvalidIndex) && !selectedPath.IsEmpty() && (selectedPath == pathInfo.m_filePath)) {
+        if ((nSelectedItemIndex == ui::Box::InvalidIndex) && !selectedPath.IsEmpty()
+            && (selectedPath == pathInfo.m_filePath)) {
             //保存选择状态
             nSelectedItemIndex = nItemIndex;
         }
 
         //设置图标
         if (pImageList != nullptr) {
-            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(pathInfo.m_nIconID);
+            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(
+                pathInfo.m_nIconID);
             if (!iconString.empty()) {
-                int32_t nImageId = pImageList->AddImageStringWithSize(iconString, m_pMainForm->Dpi());
+                int32_t nImageId
+                    = pImageList->AddImageStringWithSize(iconString, m_pMainForm->Dpi());
                 m_iconToImageMap[pathInfo.m_nIconID] = nImageId;
                 m_pListCtrl->SetDataItemImageId(nItemIndex, nImageId);
             }
         }
         ui::ListCtrlSubItemData subItemData;
-        subItemData.nSortGroup = pathInfo.m_bFolder ? SortGroup::kFolder : SortGroup::kFile; //排序分组
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nSortGroup = pathInfo.m_bFolder ? SortGroup::kFolder
+                                                    : SortGroup::kFile; //排序分组
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         subItemData.text = pathInfo.m_displayName;
         nColumnId = GetColumnId(ExplorerViewColumn::kName);
         m_pListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //文件名称
@@ -237,22 +245,26 @@ void ExplorerView::SetFileList(const ui::FilePath& currentPath, const std::vecto
 #endif
         m_pListCtrl->SetColumnSortFlagById(nColumnId, nSortFlag);
 
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         subItemData.text = FormatFileTime(pathInfo.m_lastWriteTime);
         nColumnId = GetColumnId(ExplorerViewColumn::kModifyDateTime);
         m_pListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //修改日期
 
         //设置"修改日期"列的排序方式
-        m_pListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, pathInfo.m_lastWriteTime.GetValue());
+        m_pListCtrl
+            ->SetSubItemUserDataNById(nItemIndex, nColumnId, pathInfo.m_lastWriteTime.GetValue());
         m_pListCtrl->SetColumnSortFlagById(nColumnId, ui::kSortByUserDataN | ui::kSortByGroup);
 
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         subItemData.text = pathInfo.m_typeName;
         nColumnId = GetColumnId(ExplorerViewColumn::kType);
         m_pListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //文件类型
         m_pListCtrl->SetColumnSortFlagById(nColumnId, ui::kSortByGroup);
 
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_RIGHT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_RIGHT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         subItemData.text = FormatFileSize(pathInfo.m_bFolder, pathInfo.m_fileSize);
         nColumnId = GetColumnId(ExplorerViewColumn::kSize);
         m_pListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //文件大小
@@ -271,7 +283,7 @@ void ExplorerView::SetFileList(const ui::FilePath& currentPath, const std::vecto
     }
 }
 
-void ExplorerView::GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selectedPath) const
+void ExplorerView::GetCurrentPath(ui::FilePath &currentPath, ui::FilePath &selectedPath) const
 {
     currentPath = m_currentPath;
     if (m_pListCtrl != nullptr) {
@@ -280,7 +292,7 @@ void ExplorerView::GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selec
         for (size_t nItemIndex : itemIndexs) {
             size_t nIndex = m_pListCtrl->GetDataItemUserData(nItemIndex);
             if (nIndex < m_pathInfoList.size()) {
-                const ui::DirectoryTree::PathInfo& pathInfo = m_pathInfoList[nIndex];
+                const ui::DirectoryTree::PathInfo &pathInfo = m_pathInfoList[nIndex];
                 if (!pathInfo.m_filePath.IsEmpty()) {
                     //记录当前所选的目录
                     selectedPath = pathInfo.m_filePath;
@@ -288,7 +300,7 @@ void ExplorerView::GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selec
                 }
             }
         }
-    }       
+    }
 }
 
 DString ExplorerView::FormatFileSize(bool bFolder, uint64_t nFileSize) const
@@ -301,28 +313,24 @@ DString ExplorerView::FormatFileSize(bool bFolder, uint64_t nFileSize) const
         //GB
         double total_gb = static_cast<double>(nFileSize) / (1024 * 1024 * 1024);
         value = ui::StringUtil::Printf(_T("%.01lf GB"), total_gb);
-    }
-    else if (nFileSize > 1 * 1024 * 1024) {
+    } else if (nFileSize > 1 * 1024 * 1024) {
         //MB
         double total_mb = static_cast<double>(nFileSize) / (1024 * 1024);
         value = ui::StringUtil::Printf(_T("%.01lf MB"), total_mb);
-    }
-    else if (nFileSize > 1 * 1024) {
+    } else if (nFileSize > 1 * 1024) {
         //KB
         double total_kb = static_cast<double>(nFileSize) / (1024);
         value = ui::StringUtil::Printf(_T("%.01lf KB"), total_kb);
-    }
-    else if (nFileSize == 0) {
+    } else if (nFileSize == 0) {
         value = _T("0");
-    }
-    else {
+    } else {
         //B
-        value = ui::StringUtil::Printf(_T("%d B"), (int32_t)nFileSize);
+        value = ui::StringUtil::Printf(_T("%d B"), (int32_t) nFileSize);
     }
     return value;
 }
 
-DString ExplorerView::FormatFileTime(const ui::FileTime& fileTime) const
+DString ExplorerView::FormatFileTime(const ui::FileTime &fileTime) const
 {
     return fileTime.ToString();
 }

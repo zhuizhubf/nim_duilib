@@ -1,20 +1,18 @@
 #include "ThreadManager.h"
 #include "duilib/Core/ScopedLock.h"
 
-namespace ui 
-{
-ThreadManager::ThreadManager():
-    m_nNextTaskId(1),
-    m_bMainThreadExit(false)
-{
-}
+namespace ui {
+ThreadManager::ThreadManager()
+    : m_nNextTaskId(1)
+    , m_bMainThreadExit(false)
+{}
 
 ThreadManager::~ThreadManager()
 {
     Clear();
 }
 
-bool ThreadManager::RegisterThread(int32_t nThreadIdentifier, FrameworkThread* pThread)
+bool ThreadManager::RegisterThread(int32_t nThreadIdentifier, FrameworkThread *pThread)
 {
     ASSERT(nThreadIdentifier >= 0);
     ASSERT(pThread != nullptr);
@@ -45,8 +43,7 @@ bool ThreadManager::UnregisterThread(int32_t nThreadIdentifier)
     auto iter = m_threadsMap.find(nThreadIdentifier);
     if (iter == m_threadsMap.end()) {
         return false;
-    }
-    else {
+    } else {
         m_threadsMap.erase(iter);
         return true;
     }
@@ -74,7 +71,7 @@ int32_t ThreadManager::GetCurrentThreadIdentifier() const
     return nThreadIdentifier;
 }
 
-size_t ThreadManager::PostTask(int32_t nThreadIdentifier, const StdClosure& task)
+size_t ThreadManager::PostTask(int32_t nThreadIdentifier, const StdClosure &task)
 {
     ASSERT(task != nullptr);
     if (task == nullptr) {
@@ -94,9 +91,7 @@ size_t ThreadManager::PostTask(int32_t nThreadIdentifier, const StdClosure& task
             // 释放 ThreadManager::m_threadMutex；FrameworkThread 内部还会
             // 释放其自身的 m_taskMutex。两个 ScopedLock 的析构函数均已
             // 实现幂等 Unlock()，因此即便闭包提前解锁也不会重复释放。
-            StdClosure unlockClosure = [&threadGuard]() {
-                    threadGuard.Unlock();
-                };
+            StdClosure unlockClosure = [&threadGuard]() { threadGuard.Unlock(); };
             nTaskId = spFrameworkThread->PostTask(task, unlockClosure);
         }
     }
@@ -104,7 +99,8 @@ size_t ThreadManager::PostTask(int32_t nThreadIdentifier, const StdClosure& task
     return nTaskId;
 }
 
-size_t ThreadManager::PostDelayedTask(int32_t nThreadIdentifier, const StdClosure& task, int32_t nDelayMs)
+size_t ThreadManager::PostDelayedTask(
+    int32_t nThreadIdentifier, const StdClosure &task, int32_t nDelayMs)
 {
     ASSERT(task != nullptr);
     if (task == nullptr) {
@@ -123,8 +119,8 @@ size_t ThreadManager::PostDelayedTask(int32_t nThreadIdentifier, const StdClosur
     return nTaskId;
 }
 
-size_t ThreadManager::PostRepeatedTask(int32_t nThreadIdentifier, const StdClosure& task,
-                                       int32_t nIntervalMs, int32_t nTimes)
+size_t ThreadManager::PostRepeatedTask(
+    int32_t nThreadIdentifier, const StdClosure &task, int32_t nIntervalMs, int32_t nTimes)
 {
     ASSERT(task != nullptr);
     if (task == nullptr) {
@@ -182,4 +178,4 @@ void ThreadManager::SetMainThreadExit()
     m_bMainThreadExit = true;
 }
 
-}//namespace ui 
+} //namespace ui

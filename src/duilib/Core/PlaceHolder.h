@@ -4,20 +4,19 @@
 #include "duilib/Core/Callback.h"
 #include "duilib/Core/UiTypes.h"
 
-namespace ui 
-{
-    class Box;
-    class Window;
-    class DpiManager;
+namespace ui {
+class Box;
+class Window;
+class DpiManager;
 
 /** 控件的位置、大小、外观形状的基本封装
 */
 class DUILIB_API PlaceHolder : public virtual SupportWeakCallback
 {
 public:
-    explicit PlaceHolder(Window* pWindow);
-    PlaceHolder(const PlaceHolder& r) = delete;
-    PlaceHolder& operator=(const PlaceHolder& r) = delete;
+    explicit PlaceHolder(Window *pWindow);
+    PlaceHolder(const PlaceHolder &r) = delete;
+    PlaceHolder &operator=(const PlaceHolder &r) = delete;
     virtual ~PlaceHolder() override;
 
     /** 控件类型
@@ -36,16 +35,16 @@ public:
     /** 设置控件名称，内存中设置不会写入 xml 中
      * @param [in] strName 要设置的名称
      */
-    void SetName(const DString& strName);
+    void SetName(const DString &strName);
 
     /** 设置控件名称，内存中设置不会写入 xml 中（UTF8 编码）
      * @param [in] strName 要设置的名称
      */
-    void SetUTF8Name(const std::string& strName);
+    void SetUTF8Name(const std::string &strName);
 
     /** 判断控件名称是否相等
     */
-    bool IsNameEquals(const DString& name) const;
+    bool IsNameEquals(const DString &name) const;
 
     /** 判断是否有名称
     */
@@ -54,26 +53,26 @@ public:
     /** 根据名称获取祖先容器指针
     * @param [in] strName 要获取的祖先容器名称
     */
-    Box* GetAncestor(const DString& strName);
+    Box *GetAncestor(const DString &strName);
 
     /** 设置容器所属窗口
      * @param [in] pParent 父容器指针
      */
-    virtual void SetParent(Box* pParent);
+    virtual void SetParent(Box *pParent);
 
     /** 设置容器所属窗口
      * @param [in] pWindow 窗口指针
      */
-    virtual void SetWindow(Window* pWindow);
+    virtual void SetWindow(Window *pWindow);
 
     /** 获取父容器指针
     */
-    Box* GetParent() const { return m_pParent; }
+    Box *GetParent() const { return m_pParent; }
 
     /** 获取关联的窗口指针
      * @return 返回关联窗口的指针
      */
-    Window* GetWindow() const { return m_pWindow; }
+    Window *GetWindow() const { return m_pWindow; }
 
     /** 初始化函数(当该控件被添加到父控件的时候，调用该Init函数)
      */
@@ -165,15 +164,15 @@ public:
 public:
     /** 获取控件设置的宽度和高度，宽高均包含内边距，但均不包含外边距
     */
-    const UiFixedSize& GetFixedSize() const;
+    const UiFixedSize &GetFixedSize() const;
 
     /** 获取设置的宽度（包含内边距，不包含外边距），对应 xml 中 width 属性; 如果未设置，默认值是拉伸
      */
-    const UiFixedInt& GetFixedWidth() const;
+    const UiFixedInt &GetFixedWidth() const;
 
     /** 获取固定高度（包含内边距，不包含外边距），对应 xml 中 height 属性; 如果未设置，默认值是拉伸
      */
-    const UiFixedInt& GetFixedHeight() const;
+    const UiFixedInt &GetFixedHeight() const;
 
     /** 设置控件的宽度
      * @param [in] cx 要设置的宽度（包含内边距，不包含外边距）
@@ -193,7 +192,7 @@ public:
     /** 判断是否需要重新评估大小
     * @param [in] szAvailable 估算时，区域矩形大小
     */
-    bool IsReEstimateSize(const UiSize& szAvailable) const;
+    bool IsReEstimateSize(const UiSize &szAvailable) const;
 
     /** 设置是否需要重新评估大小
     * @param [in] bReEstimateSize 是否需要重新估算
@@ -208,7 +207,7 @@ public:
     *@param [in] szEstimateSize 估算的结果，作为缓存保存下来
     *@param [in] szAvailable szAvailable 估算时，区域矩形大小
     */
-    void SetEstimateSize(const UiEstSize& szEstimateSize, const UiSize& szAvailable);
+    void SetEstimateSize(const UiEstSize &szEstimateSize, const UiSize &szAvailable);
 
 public:
     /** 获取最小宽度
@@ -331,11 +330,11 @@ public:
 
     /** 获取控件矩形区域(单纯返回m_uiRect值)，包含内边距，不包含外边距
     */
-    const UiRect& GetRect() const { return m_uiRect; }
+    const UiRect &GetRect() const { return m_uiRect; }
 
     /** 设置控件矩形区域(单纯设置m_uiRect值)，包含内边距，不包含外边距
     */
-    void SetRect(const UiRect& rc);
+    void SetRect(const UiRect &rc);
 
     /** 设置单元格合并属性（占几行），仅在GridLayout布局中生效
     */
@@ -362,12 +361,12 @@ public:
     /** 重绘控件的部分区域
     * @param [in] rc 需要重绘的区域
     */
-    virtual void InvalidateRect(const UiRect& rc);
+    virtual void InvalidateRect(const UiRect &rc);
 
     /** 获取本控件包含box-shadow的绘制扩展区域
     * @return 返回rc + box-shadow 扩展后的总区域，如果无box-shadow则返回rc
     */
-    virtual UiRect GetBoxShadowExpandedRect(const UiRect& rc) const;
+    virtual UiRect GetBoxShadowExpandedRect(const UiRect &rc) const;
 
     /** 控件布局重排
      */
@@ -409,11 +408,11 @@ public:
      * @param [in] pChild 子孙级别的控件
      * @return 如果两个控件相等，或者存在父子或者子孙关系时返回true，否则返回false
      */
-    static bool IsControlRelated(const PlaceHolder* pAncestor, const PlaceHolder* pChild);
+    static bool IsControlRelated(const PlaceHolder *pAncestor, const PlaceHolder *pChild);
 
     /** 获取该窗口对应的DPI管理器
     */
-    const DpiManager& Dpi() const;
+    const DpiManager &Dpi() const;
 
     /** 设置是否支持变量展开(功能说明，参见ExpandVarStrings函数)
     * @param [in] bEnableVars true表示支持，false表示不支持
@@ -431,8 +430,8 @@ public:
      * @param [in,out] varValue 需要展开变量的字符串
      * @return 返回varValue
      */
-    DString& ExpandVarStrings(DString& varValue) const;
-    DString GetExpandVarStrings(const DString& varValue) const;
+    DString &ExpandVarStrings(DString &varValue) const;
+    DString GetExpandVarStrings(const DString &varValue) const;
 
 protected:
     /** 可见状态（供内部子类重写可见状态使用, 如果返回true代表可见，返回false表示不可见）
@@ -506,10 +505,10 @@ private:
     UiString m_sName;
 
     //关联的窗口对象
-    Window* m_pWindow;
+    Window *m_pWindow;
 
     //父控件对象
-    Box* m_pParent;
+    Box *m_pParent;
 
     //控件位置与大小
     UiRect m_uiRect;

@@ -1,25 +1,22 @@
 #include "render-skia/SkiaTextData.h"
-#include "render-skia/SkUTF.h"
 #include "duilib/Utils/StringConvert.h"
+#include "render-skia/SkUTF.h"
 
-namespace ui
-{
+namespace ui {
 
 SkiaTextData::SkiaTextData()
     : m_text(nullptr)
     , m_byteLength(0)
     , m_textEncoding(SkTextEncoding::kUTF8)
-{
-}
+{}
 
-SkiaTextData::SkiaTextData(const void* text, size_t byteLength, SkTextEncoding textEncoding)
+SkiaTextData::SkiaTextData(const void *text, size_t byteLength, SkTextEncoding textEncoding)
     : m_text(text)
     , m_byteLength(byteLength)
     , m_textEncoding(textEncoding)
-{
-}
+{}
 
-void SkiaTextData::SetText(const void* text, size_t byteLength, SkTextEncoding textEncoding)
+void SkiaTextData::SetText(const void *text, size_t byteLength, SkTextEncoding textEncoding)
 {
     m_text = text;
     m_byteLength = byteLength;
@@ -29,13 +26,13 @@ void SkiaTextData::SetText(const void* text, size_t byteLength, SkTextEncoding t
     if (byteLength > 0) {
         switch (textEncoding) {
         case SkTextEncoding::kUTF8:
-            ASSERT(SkUTF::CountUTF8((const char*)text, byteLength) != -1);
+            ASSERT(SkUTF::CountUTF8((const char *) text, byteLength) != -1);
             break;
         case SkTextEncoding::kUTF16:
-            ASSERT(SkUTF::CountUTF16((const uint16_t*)text, byteLength) != -1);
+            ASSERT(SkUTF::CountUTF16((const uint16_t *) text, byteLength) != -1);
             break;
         case SkTextEncoding::kUTF32:
-            ASSERT(SkUTF::CountUTF32((const int32_t*)text, byteLength) != -1);
+            ASSERT(SkUTF::CountUTF32((const int32_t *) text, byteLength) != -1);
             break;
         default:
             ASSERT(false);
@@ -62,10 +59,10 @@ bool SkiaTextData::IsEmpty() const
     return true;
 }
 
-size_t SkiaTextData::GetCharByteLength(const void* text, SkTextEncoding textEncoding)
+size_t SkiaTextData::GetCharByteLength(const void *text, SkTextEncoding textEncoding)
 {
     if (textEncoding == SkTextEncoding::kUTF8) {
-        int32_t type = SkUTF::SkUTF8_ByteType(*(const uint8_t*)text);
+        int32_t type = SkUTF::SkUTF8_ByteType(*(const uint8_t *) text);
         ASSERT((type >= 1) && (type <= 4));
         // type == -1   → 非法
         // type == 0    → 续流字节（不能在开头）
@@ -73,14 +70,17 @@ size_t SkiaTextData::GetCharByteLength(const void* text, SkTextEncoding textEnco
         // type == 2    → 2字节序列
         // type == 3    → 3字节序列
         // type == 4    → 4字节序列
-        if (type == 1) return 1;
-        if (type == 2) return 2;
-        if (type == 3) return 3;
-        if (type == 4) return 4;
+        if (type == 1)
+            return 1;
+        if (type == 2)
+            return 2;
+        if (type == 3)
+            return 3;
+        if (type == 4)
+            return 4;
         return 1;
-    }
-    else if (textEncoding == SkTextEncoding::kUTF16) {
-        uint16_t c = *(const uint16_t*)text;
+    } else if (textEncoding == SkTextEncoding::kUTF16) {
+        uint16_t c = *(const uint16_t *) text;
         if (SkUTF::IsLeadingSurrogateUTF16(c)) {
             return 4;
         }
@@ -91,7 +91,7 @@ size_t SkiaTextData::GetCharByteLength(const void* text, SkTextEncoding textEnco
 
 bool SkiaTextData::EnumChars(EnumTextCallback callback) const
 {
-    const void* text = m_text;
+    const void *text = m_text;
     size_t byteLength = m_byteLength;
     SkTextEncoding textEncoding = m_textEncoding;
     if ((text == nullptr) || (byteLength == 0)) {
@@ -102,8 +102,8 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
         int32_t charByteLen = 0;
         SkUnichar unichar = 0;
 
-        const uint8_t* utf8 = static_cast<const uint8_t*>(text);
-        const uint8_t* stop = utf8 + byteLength;
+        const uint8_t *utf8 = static_cast<const uint8_t *>(text);
+        const uint8_t *stop = utf8 + byteLength;
         while (utf8 < stop) {
             // type == -1   → 非法
             // type == 0    → 续流字节（不能在开头）
@@ -149,7 +149,8 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
                 break;
 
             case 4:
-                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | ((utf8[3] & 0x3F));
+                unichar = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12)
+                          | ((utf8[2] & 0x3F) << 6) | ((utf8[3] & 0x3F));
                 break;
 
             default:
@@ -169,10 +170,9 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
             }
             utf8 += charByteLen;
         }
-    }
-    else if (textEncoding == SkTextEncoding::kUTF16) {
-        const uint16_t* utf16 = static_cast<const uint16_t*>(text);
-        const uint16_t* stop = utf16 + (byteLength >> 1);
+    } else if (textEncoding == SkTextEncoding::kUTF16) {
+        const uint16_t *utf16 = static_cast<const uint16_t *>(text);
+        const uint16_t *stop = utf16 + (byteLength >> 1);
         uint16_t c = 0;
         size_t charByteLen = 0;
         SkUnichar unichar = 0;
@@ -197,19 +197,17 @@ bool SkiaTextData::EnumChars(EnumTextCallback callback) const
                 return true;
             }
         }
-    }
-    else if (textEncoding == SkTextEncoding::kUTF32) {
+    } else if (textEncoding == SkTextEncoding::kUTF32) {
         ASSERT(byteLength % sizeof(SkUnichar) == 0);
-        const SkUnichar* utf32 = static_cast<const SkUnichar*>(text);
-        const SkUnichar* stop = utf32 + (byteLength / sizeof(SkUnichar));
+        const SkUnichar *utf32 = static_cast<const SkUnichar *>(text);
+        const SkUnichar *stop = utf32 + (byteLength / sizeof(SkUnichar));
         while (utf32 < stop) {
             if (!callback(*utf32, sizeof(SkUnichar))) {
                 return true;
             }
             ++utf32;
         }
-    }
-    else {
+    } else {
         ASSERT(false);
         return false;
     }
@@ -222,15 +220,15 @@ UTF32String SkiaTextData::ToUTF32String() const
         return UTF32String();
     }
     if (m_textEncoding == SkTextEncoding::kUTF8) {
-        return StringConvert::UTF8ToUTF32((const DUTF8Char*)m_text, m_byteLength / sizeof(DUTF8Char));
-    }
-    else if (m_textEncoding == SkTextEncoding::kUTF16) {
+        return StringConvert::UTF8ToUTF32(
+            (const DUTF8Char *) m_text, m_byteLength / sizeof(DUTF8Char));
+    } else if (m_textEncoding == SkTextEncoding::kUTF16) {
         ASSERT(m_byteLength % sizeof(DUTF16Char) == 0);
-        return StringConvert::UTF16ToUTF32((const DUTF16Char*)m_text, m_byteLength / sizeof(DUTF16Char));
-    }
-    else if (m_textEncoding == SkTextEncoding::kUTF32) {
+        return StringConvert::UTF16ToUTF32(
+            (const DUTF16Char *) m_text, m_byteLength / sizeof(DUTF16Char));
+    } else if (m_textEncoding == SkTextEncoding::kUTF32) {
         ASSERT(m_byteLength % sizeof(DUTF32Char) == 0);
-        return UTF32String((const DUTF32Char*)m_text, m_byteLength / sizeof(DUTF32Char));
+        return UTF32String((const DUTF32Char *) m_text, m_byteLength / sizeof(DUTF32Char));
     }
     ASSERT(0);
     return UTF32String();

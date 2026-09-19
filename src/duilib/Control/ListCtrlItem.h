@@ -3,11 +3,10 @@
 
 #include "duilib/Box/ListBox.h"
 #include "duilib/Control/Label.h"
-#include "duilib/Core/ImageList.h"
 #include "duilib/Control/ListCtrlDefs.h"
+#include "duilib/Core/ImageList.h"
 
-namespace ui
-{
+namespace ui {
 /** ListCtrl列表数据项UI控件（行）
 *    基本结构: <ListCtrlItem> <ListCtrlSubItem/> ... <ListCtrlSubItem/>  </ListCtrlItem>
 *    附加说明:
@@ -26,9 +25,9 @@ class ListCtrlSubItem;
 class DUILIB_API ListCtrlItem : public ListCtrlItemBaseH
 {
     typedef ListCtrlItemBaseH BaseClass;
-    friend class ListCtrlReportView;//开放部分protect接口
+    friend class ListCtrlReportView; //开放部分protect接口
 public:
-    explicit ListCtrlItem(Window* pWindow);
+    explicit ListCtrlItem(Window *pWindow);
     virtual ~ListCtrlItem() override;
 
     /** 获取控件类型
@@ -37,7 +36,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -47,7 +46,7 @@ public:
 
     /** 事件处理函数
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 判断控件类型是否为可选择的
      * @return 默认返回false
@@ -61,11 +60,11 @@ public:
 public:
     /** 设置关联的ListCtrl接口
     */
-    void SetListCtrl(ListCtrl* pListCtrl);
+    void SetListCtrl(ListCtrl *pListCtrl);
 
     /** 获取关联的ListCtrl接口
     */
-    ListCtrl* GetListCtrl() const;
+    ListCtrl *GetListCtrl() const;
 
     /** 获取关联的数据项索引号, 代表关联哪一行的数据
     * @return 返回数据项的索引号, 有效范围：[0, ListCtrl::GetDataItemCount())
@@ -79,22 +78,22 @@ public:
     /** 获取第columnIndex个子控件
     * @param [in] columnIndex 列索引序号：[0, GetSubItemCount())
     */
-    ListCtrlSubItem* GetSubItem(size_t columnIndex) const;
+    ListCtrlSubItem *GetSubItem(size_t columnIndex) const;
 
     /** 获取鼠标所在位置的子控件
     * @param [in] ptMouse 鼠标所在的位置，屏幕坐标点
     */
-    ListCtrlSubItem* GetSubItem(const UiPoint& ptMouse) const;
+    ListCtrlSubItem *GetSubItem(const UiPoint &ptMouse) const;
 
     /** 获取鼠标所在位置的子控件的列索引序号(哪一列)
     * @param [in] ptMouse 鼠标所在的位置，屏幕坐标点
     */
-    size_t GetSubItemIndex(const UiPoint& ptMouse) const;
+    size_t GetSubItemIndex(const UiPoint &ptMouse) const;
 
     /** 获取子控件的列索引序号(哪一列)
     * @param [in] pSubItem 子控件的接口
     */
-    size_t GetSubItemIndex(ListCtrlSubItem* pSubItem) const;
+    size_t GetSubItemIndex(ListCtrlSubItem *pSubItem) const;
 
     /** 设置是否在行首显示CheckBox
     * @param [in] bShow true表示在行首显示CheckBox，false表示不显示
@@ -136,17 +135,16 @@ protected:
 
     /** 使得目标区域纵向对齐
     */
-    void VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageHeight);
+    void VAlignRect(UiRect &rc, uint32_t textStyle, int32_t nImageHeight);
 
     /** 获取CheckBox的图片宽度
     */
     int32_t GetCheckBoxImageWidth();
 
 protected:
-    
     /** 鼠标左键弹起事件
     */
-    virtual bool ButtonUp(const EventArgs& msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
 
     /** 是否支持勾选模式（目前是TreeView/ListCtrl在使用这个模式）
         勾选模式是指：
@@ -157,7 +155,7 @@ protected:
 
     /** 绘制函数
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
 
 private:
     /** 是否可以选择（影响方向键切换选择项）
@@ -166,7 +164,7 @@ private:
 
     /** 关联的ListCtrl接口
     */
-    ListCtrl* m_pListCtrl;
+    ListCtrl *m_pListCtrl;
 
     /** 关联图标Id, 如果为-1表示不显示图标，图标显示在文本前面
     */
@@ -177,6 +175,6 @@ private:
     int32_t m_nIconSpacing;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_ITEM_H_

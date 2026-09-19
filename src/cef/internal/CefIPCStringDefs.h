@@ -10,14 +10,13 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-namespace ui
-{
-    static const char kFocusedNodeChangedMessage[]      = "FocusedNodeChanged";     // web页面中获取焦点的元素改变
-    static const char kExecuteCppCallbackMessage[]      = "ExecuteCppCallback";     // 执行 C++ 的消息回调函数
-    static const char kCallCppFunctionMessage[]         = "CallCppFunction";        // web调用C++接口接口的通知
-    static const char kExecuteJsCallbackMessage[]       = "ExecuteJsCallback";      // web调用C++接口接口的通知
-    static const char kCallJsFunctionMessage[]          = "CallJsFunction";         // C++ 调用 JavaScript 通知
-}
+namespace ui {
+static const char kFocusedNodeChangedMessage[] = "FocusedNodeChanged"; // web页面中获取焦点的元素改变
+static const char kExecuteCppCallbackMessage[] = "ExecuteCppCallback"; // 执行 C++ 的消息回调函数
+static const char kCallCppFunctionMessage[] = "CallCppFunction";       // web调用C++接口接口的通知
+static const char kExecuteJsCallbackMessage[] = "ExecuteJsCallback";   // web调用C++接口接口的通知
+static const char kCallJsFunctionMessage[] = "CallJsFunction";         // C++ 调用 JavaScript 通知
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_CEF
 

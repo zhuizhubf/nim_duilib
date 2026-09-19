@@ -4,8 +4,7 @@
 
 #include "MessageLoop_SDL.h"
 
-namespace ui
-{
+namespace ui {
 class ThreadMessage::TImpl
 {
 public:
@@ -32,11 +31,9 @@ ThreadMessage::~ThreadMessage()
     }
 }
 
-void ThreadMessage::Initialize(void* /*platformData*/)
-{
-}
+void ThreadMessage::Initialize(void * /*platformData*/) {}
 
-bool ThreadMessage::PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t* nErrorCode)
+bool ThreadMessage::PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t *nErrorCode)
 {
     if (nErrorCode) {
         *nErrorCode = 0;
@@ -62,7 +59,7 @@ void ThreadMessage::RemoveDuplicateMsg(uint32_t msgId)
     }
 }
 
-void ThreadMessage::SetMessageCallback(uint32_t msgId, const ThreadMessageCallback& callback)
+void ThreadMessage::SetMessageCallback(uint32_t msgId, const ThreadMessageCallback &callback)
 {
     if (m_impl->m_msgId != 0) {
         MessageLoop_SDL::RemoveUserMessageCallback(m_impl->m_msgId);
@@ -77,14 +74,12 @@ void ThreadMessage::Clear()
 {
     if (m_impl->m_msgId != 0) {
         MessageLoop_SDL::RemoveUserMessageCallback(m_impl->m_msgId);
-    }    
+    }
     m_impl->m_bTerm = true;
     m_impl->m_msgId = 0;
 }
 
-void ThreadMessage::OnUserMessage(uint32_t /*msgId*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
-{
-}
+void ThreadMessage::OnUserMessage(uint32_t /*msgId*/, WPARAM /*wParam*/, LPARAM /*lParam*/) {}
 
 } // namespace ui
 

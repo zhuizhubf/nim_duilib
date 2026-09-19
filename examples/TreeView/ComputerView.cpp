@@ -1,10 +1,10 @@
 #include "ComputerView.h"
 #include "MainForm.h"
 
-ComputerView::ComputerView(MainForm* pMainForm, ui::ListCtrl* pListCtrl):
-    m_pMainForm(pMainForm),
-    m_pComputerListCtrl(pListCtrl),
-    m_nRemoveIconCallbackId(0)
+ComputerView::ComputerView(MainForm *pMainForm, ui::ListCtrl *pListCtrl)
+    : m_pMainForm(pMainForm)
+    , m_pComputerListCtrl(pListCtrl)
+    , m_nRemoveIconCallbackId(0)
 {
     Initialize();
 }
@@ -25,7 +25,8 @@ void ComputerView::Initialize()
     }
 
     //挂载图标删除事件
-    m_nRemoveIconCallbackId = ui::GlobalManager::Instance().Icon().AttachRemoveIconEvent(ui::UiBind(&ComputerView::OnRemoveIcon, this, std::placeholders::_1));
+    m_nRemoveIconCallbackId = ui::GlobalManager::Instance().Icon().AttachRemoveIconEvent(
+        ui::UiBind(&ComputerView::OnRemoveIcon, this, std::placeholders::_1));
 
     //初始化表头
     InitComputerViewHeader();
@@ -34,20 +35,22 @@ void ComputerView::Initialize()
         //关联图片列表
         ui::ImageListPtr pImageList = std::make_shared<ui::ImageList>();
         pImageList->SetImageSize(ui::UiSize(20, 20), m_pMainForm->Dpi(), true);
-        m_pComputerListCtrl->SetImageList(ui::ListCtrlType::Report, pImageList);//该指针的资源生命周期由ListCtrl内部管理
+        m_pComputerListCtrl->SetImageList(
+            ui::ListCtrlType::Report, pImageList); //该指针的资源生命周期由ListCtrl内部管理
 
         //挂载列表项鼠标双击事件
-        m_pComputerListCtrl->AttachDoubleClick(UiBind(&ComputerView::OnComuterViewDoubleClick, this, std::placeholders::_1));
+        m_pComputerListCtrl->AttachDoubleClick(
+            UiBind(&ComputerView::OnComuterViewDoubleClick, this, std::placeholders::_1));
     }
 }
 
-bool ComputerView::OnComuterViewDoubleClick(const ui::EventArgs& msg)
+bool ComputerView::OnComuterViewDoubleClick(const ui::EventArgs &msg)
 {
     if ((m_pComputerListCtrl != nullptr) && (msg.wParam != 0) && (m_pMainForm != nullptr)) {
         size_t nItemIndex = msg.lParam;
         size_t nIndex = m_pComputerListCtrl->GetDataItemUserData(nItemIndex);
         if (nIndex < m_diskInfoList.size()) {
-            const ui::DirectoryTree::DiskInfo& diskInfo = m_diskInfoList[nIndex];
+            const ui::DirectoryTree::DiskInfo &diskInfo = m_diskInfoList[nIndex];
             if (!diskInfo.m_filePath.IsEmpty() && diskInfo.m_filePath.IsExistsDirectory()) {
                 //进入所选的目录
                 m_pMainForm->SelectSubPath(diskInfo.m_filePath);
@@ -61,7 +64,9 @@ void ComputerView::OnRemoveIcon(uint32_t nIconId)
 {
     if (!ui::GlobalManager::Instance().IsInUIThread()) {
         //如果不是在主线程中执行，则转到主线程去执行
-        ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, this->ToWeakCallback([this, nIconId]() {
+        ui::GlobalManager::Instance()
+            .Thread()
+            .PostTask(ui::kThreadUI, this->ToWeakCallback([this, nIconId]() {
                 OnRemoveIcon(nIconId);
             }));
         return;
@@ -101,23 +106,19 @@ DString ComputerView::FormatDiskSpace(uint64_t nSpace) const
         //GB
         double total_gb = static_cast<double>(nSpace) / (1024 * 1024 * 1024);
         value = ui::StringUtil::Printf(_T("%.01lf GB"), total_gb);
-    }
-    else if (nSpace > 1 * 1024 * 1024) {
+    } else if (nSpace > 1 * 1024 * 1024) {
         //MB
         double total_mb = static_cast<double>(nSpace) / (1024 * 1024);
         value = ui::StringUtil::Printf(_T("%.01lf MB"), total_mb);
-    }
-    else if (nSpace > 1 * 1024) {
+    } else if (nSpace > 1 * 1024) {
         //KB
         double total_kb = static_cast<double>(nSpace) / (1024);
         value = ui::StringUtil::Printf(_T("%.01lf KB"), total_kb);
-    }
-    else if (nSpace == 0) {
+    } else if (nSpace == 0) {
         value = _T("0");
-    }
-    else {
+    } else {
         //B
-        value = ui::StringUtil::Printf(_T("%d B"), (int32_t)nSpace);
+        value = ui::StringUtil::Printf(_T("%d B"), (int32_t) nSpace);
     }
     return value;
 }
@@ -134,14 +135,15 @@ DString ComputerView::FormatUsedPercent(uint64_t nTotalSpace, uint64_t nFreeSpac
 
 void ComputerView::InitComputerViewHeader()
 {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     InitComputerViewHeader_Win();
-#elif defined (DUILIB_BUILD_FOR_LINUX)
+#elif defined(DUILIB_BUILD_FOR_LINUX)
     InitComputerViewHeader_Linux();
 #endif
 }
 
-void ComputerView::ShowMyComputerContents(const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList)
+void ComputerView::ShowMyComputerContents(
+    const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList)
 {
     ASSERT(m_pMainForm != nullptr);
     if (m_pMainForm == nullptr) {
@@ -161,65 +163,66 @@ void ComputerView::ShowMyComputerContents(const std::vector<ui::DirectoryTree::D
     if (pImageList != nullptr) {
         pImageList->Clear();
     }
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     ShowMyComputerContents_Win(pImageList, diskInfoList);
-#elif defined (DUILIB_BUILD_FOR_LINUX)
+#elif defined(DUILIB_BUILD_FOR_LINUX)
     ShowMyComputerContents_Linux(pImageList, diskInfoList);
 #endif
 }
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
 void ComputerView::InitComputerViewHeader_Win()
 {
     if (m_pComputerListCtrl == nullptr) {
         return;
     }
-    ui::ListCtrlHeaderItem* pHeaderItem = nullptr;
+    ui::ListCtrlHeaderItem *pHeaderItem = nullptr;
     ui::ListCtrlColumn columnInfo;
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_NAME");//名称
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_NAME"); //名称
     columnInfo.nColumnWidth = 200;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kName] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_DISK_TYPE");//磁盘类型
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_DISK_TYPE"); //磁盘类型
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kType] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_PARTITION_TYPE");//分区类型
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_PARTITION_TYPE"); //分区类型
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kPartitionType] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_TOTAL_SIZE");//总大小
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_TOTAL_SIZE"); //总大小
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kTotalSpace] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_FREE_SPACE");//可用空间
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_FREE_SPACE"); //可用空间
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kFreeSpace] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_WIN_USED_SPACE");//已用
+    columnInfo.textId = _T("STRID_TREEVIEW_WIN_USED_SPACE"); //已用
     columnInfo.nColumnWidth = 80;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kUsedPercent] = pHeaderItem->GetColumnId();
 }
 
-void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList)
+void ComputerView::ShowMyComputerContents_Win(
+    ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList)
 {
     ui::ListCtrlSubItemData itemData;
     size_t nItemIndex = 0;
     size_t nColumnId = 0;
     for (size_t nIndex = 0; nIndex < diskInfoList.size(); ++nIndex) {
-        const ui::DirectoryTree::DiskInfo& diskInfo = diskInfoList[nIndex];
+        const ui::DirectoryTree::DiskInfo &diskInfo = diskInfoList[nIndex];
         nItemIndex = m_pComputerListCtrl->AddDataItem(itemData);
         if (!ui::Box::IsValidItemIndex(nItemIndex)) {
             continue;
@@ -228,7 +231,8 @@ void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const
         m_pComputerListCtrl->SetDataItemUserData(nItemIndex, nIndex);
         //设置图标
         if (pImageList != nullptr) {
-            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(diskInfo.m_nIconID);
+            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(
+                diskInfo.m_nIconID);
             if (!iconString.empty()) {
                 int32_t nImageId = pImageList->AddImageString(iconString, m_pMainForm->Dpi());
                 m_iconToImageMap[diskInfo.m_nIconID] = nImageId;
@@ -237,17 +241,21 @@ void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const
         }
 
         ui::ListCtrlSubItemData subItemData;
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
 
         subItemData.text = diskInfo.m_displayName;
         nColumnId = GetColumnId(ComputerViewColumn::kName);
         m_pComputerListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //名称
         //设置"名称"列的排序方式
         m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, nIndex);
-        m_pComputerListCtrl->SetSubItemUserDataSById(nItemIndex, nColumnId, diskInfo.m_filePath.ToString());
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl
+            ->SetSubItemUserDataSById(nItemIndex, nColumnId, diskInfo.m_filePath.ToString());
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_HCENTER | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_HCENTER
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
 
         subItemData.text = diskInfo.m_volumeType;
         nColumnId = GetColumnId(ComputerViewColumn::kType);
@@ -263,7 +271,8 @@ void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const
 
         //设置"总大小"列的排序方式
         m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, diskInfo.m_totalBytes);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
         subItemData.text = FormatDiskSpace(diskInfo.m_freeBytes);
         nColumnId = GetColumnId(ComputerViewColumn::kFreeSpace);
@@ -271,7 +280,8 @@ void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const
 
         //设置"可用空间"列的排序方式
         m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, diskInfo.m_freeBytes);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
         subItemData.text = FormatUsedPercent(diskInfo.m_totalBytes, diskInfo.m_freeBytes);
         nColumnId = GetColumnId(ComputerViewColumn::kUsedPercent);
@@ -280,73 +290,76 @@ void ComputerView::ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const
         //设置"已用百分比"列的排序方式
         uint64_t nUsedPercent = 100 * 1000;
         if (diskInfo.m_totalBytes != 0) {
-            nUsedPercent = (diskInfo.m_totalBytes - diskInfo.m_freeBytes) * 1000 / diskInfo.m_totalBytes;
+            nUsedPercent = (diskInfo.m_totalBytes - diskInfo.m_freeBytes) * 1000
+                           / diskInfo.m_totalBytes;
         }
-        m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, (size_t)nUsedPercent);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, (size_t) nUsedPercent);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
     }
 }
 
 #endif //DUILIB_BUILD_FOR_WIN
 
-#if defined (DUILIB_BUILD_FOR_LINUX)
+#if defined(DUILIB_BUILD_FOR_LINUX)
 void ComputerView::InitComputerViewHeader_Linux()
 {
     if (m_pComputerListCtrl == nullptr) {
         return;
     }
-    ui::ListCtrlHeaderItem* pHeaderItem = nullptr;
+    ui::ListCtrlHeaderItem *pHeaderItem = nullptr;
     ui::ListCtrlColumn columnInfo;
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_FILE_SYSTEM");//文件系统
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_FILE_SYSTEM"); //文件系统
     columnInfo.nColumnWidth = 200;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kName] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_DEVICE_TYPE");//设备类型
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_DEVICE_TYPE"); //设备类型
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kType] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_PARTITION_TYPE");//分区类型
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_PARTITION_TYPE"); //分区类型
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kPartitionType] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_TOTAL_SIZE");//总大小
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_TOTAL_SIZE"); //总大小
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kTotalSpace] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_FREE_SPACE");//可用空间
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_FREE_SPACE"); //可用空间
     columnInfo.nColumnWidth = 120;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kFreeSpace] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_USED_SPACE");//已用
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_USED_SPACE"); //已用
     columnInfo.nColumnWidth = 80;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kUsedPercent] = pHeaderItem->GetColumnId();
 
-    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_MOUNT_POINT");//挂载点
+    columnInfo.textId = _T("STRID_TREEVIEW_LINUX_MOUNT_POINT"); //挂载点
     columnInfo.nColumnWidth = 200;
     pHeaderItem = m_pComputerListCtrl->InsertColumn(-1, columnInfo);
     ASSERT(pHeaderItem != nullptr);
     m_columnIdMap[ComputerViewColumn::kMountOn] = pHeaderItem->GetColumnId();
 }
 
-void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList)
+void ComputerView::ShowMyComputerContents_Linux(
+    ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList)
 {
     ui::ListCtrlSubItemData itemData;
     size_t nItemIndex = 0;
     size_t nColumnId = 0;
     for (size_t nIndex = 0; nIndex < diskInfoList.size(); ++nIndex) {
-        const ui::DirectoryTree::DiskInfo& diskInfo = diskInfoList[nIndex];
+        const ui::DirectoryTree::DiskInfo &diskInfo = diskInfoList[nIndex];
         nItemIndex = m_pComputerListCtrl->AddDataItem(itemData);
         if (!ui::Box::IsValidItemIndex(nItemIndex)) {
             continue;
@@ -356,7 +369,8 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
 
         //设置图标
         if (pImageList != nullptr) {
-            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(diskInfo.m_nIconID);
+            DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(
+                diskInfo.m_nIconID);
             if (!iconString.empty()) {
                 int32_t nImageId = pImageList->AddImageString(iconString, m_pMainForm->Dpi());
                 m_iconToImageMap[diskInfo.m_nIconID] = nImageId;
@@ -365,14 +379,17 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
         }
 
         ui::ListCtrlSubItemData subItemData;
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         subItemData.text = diskInfo.m_displayName;
         nColumnId = GetColumnId(ComputerViewColumn::kName);
         m_pComputerListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //文件系统
 
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_HCENTER | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_HCENTER
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
 
-        subItemData.text = ui::GlobalManager::GetTextById(GetDeviceTypeStringId(diskInfo.m_deviceType));
+        subItemData.text = ui::GlobalManager::GetTextById(
+            GetDeviceTypeStringId(diskInfo.m_deviceType));
         nColumnId = GetColumnId(ComputerViewColumn::kType);
         m_pComputerListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //设备类型
 
@@ -386,7 +403,8 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
 
         //设置"总大小"列的排序方式
         m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, diskInfo.m_totalBytes);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
         subItemData.text = FormatDiskSpace(diskInfo.m_freeBytes);
         nColumnId = GetColumnId(ComputerViewColumn::kFreeSpace);
@@ -394,7 +412,8 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
 
         //设置"可用空间"列的排序方式
         m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, diskInfo.m_freeBytes);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
         subItemData.text = FormatUsedPercent(diskInfo.m_totalBytes, diskInfo.m_freeBytes);
         nColumnId = GetColumnId(ComputerViewColumn::kUsedPercent);
@@ -403,13 +422,16 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
         //设置"已用百分比"列的排序方式
         uint64_t nUsedPercent = 100 * 1000;
         if (diskInfo.m_totalBytes != 0) {
-            nUsedPercent = (diskInfo.m_totalBytes - diskInfo.m_freeBytes) * 1000 / diskInfo.m_totalBytes;
+            nUsedPercent = (diskInfo.m_totalBytes - diskInfo.m_freeBytes) * 1000
+                           / diskInfo.m_totalBytes;
         }
-        m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, (size_t)nUsedPercent);
-        m_pComputerListCtrl->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
+        m_pComputerListCtrl->SetSubItemUserDataNById(nItemIndex, nColumnId, (size_t) nUsedPercent);
+        m_pComputerListCtrl
+            ->SetColumnSortFlagById(nColumnId, ui::ListCtrlSubItemSortFlag::kSortByUserDataN);
 
         subItemData.text = diskInfo.m_mountOn;
-        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT | ui::DrawStringFormat::TEXT_VCENTER;
+        subItemData.nTextFormat = ui::DrawStringFormat::TEXT_LEFT
+                                  | ui::DrawStringFormat::TEXT_VCENTER;
         nColumnId = GetColumnId(ComputerViewColumn::kMountOn);
         m_pComputerListCtrl->SetSubItemDataById(nItemIndex, nColumnId, subItemData); //挂载点
     }
@@ -417,40 +439,40 @@ void ComputerView::ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, con
 
 DString ComputerView::GetDeviceTypeStringId(ui::DirectoryTree::DeviceType deviceType) const
 {
-    DString deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_UNKNOWN");//未知
+    DString deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_UNKNOWN"); //未知
     switch (deviceType) {
     case ui::DirectoryTree::DeviceType::HDD:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_HDD");//机械硬盘
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_HDD"); //机械硬盘
         break;
     case ui::DirectoryTree::DeviceType::SSD:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SSD");//SATA固态硬盘
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SSD"); //SATA固态硬盘
         break;
     case ui::DirectoryTree::DeviceType::NVME:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_NVME");//NVMe固态硬盘
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_NVME"); //NVMe固态硬盘
         break;
     case ui::DirectoryTree::DeviceType::USB:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_USB");//USB存储
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_USB"); //USB存储
         break;
     case ui::DirectoryTree::DeviceType::SD_CARD:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SD_CARD");//SD卡
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SD_CARD"); //SD卡
         break;
     case ui::DirectoryTree::DeviceType::CDROM:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_CDROM");//CD/DVD
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_CDROM"); //CD/DVD
         break;
     case ui::DirectoryTree::DeviceType::LOOP:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_LOOP");//LOOP虚拟存储
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_LOOP"); //LOOP虚拟存储
         break;
     case ui::DirectoryTree::DeviceType::VIRT_DISK:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_VIRT_DISK");//虚拟存储
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_VIRT_DISK"); //虚拟存储
         break;
     case ui::DirectoryTree::DeviceType::RAMDISK:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_RAMDISK");//内存盘
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_RAMDISK"); //内存盘
         break;
     case ui::DirectoryTree::DeviceType::NFS:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_NFS");//NFS
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_NFS"); //NFS
         break;
     case ui::DirectoryTree::DeviceType::SHARE:
-        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SHARE");//共享文件夹
+        deviceTypeString = _T("STRID_TREEVIEW_LINUX_DEVICE_SHARE"); //共享文件夹
         break;
     default:
         break;

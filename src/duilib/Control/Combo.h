@@ -1,12 +1,11 @@
 #ifndef UI_CONTROL_COMBO_H_
 #define UI_CONTROL_COMBO_H_
 
-#include "duilib/Core/Box.h"
-#include "duilib/Control/TreeView.h"
 #include "duilib/Control/RichEdit.h"
+#include "duilib/Control/TreeView.h"
+#include "duilib/Core/Box.h"
 
-namespace ui 
-{
+namespace ui {
 class RichEdit;
 class CComboWnd;
 
@@ -16,23 +15,23 @@ class DUILIB_API Combo : public Box
 {
     typedef Box BaseClass;
     friend class CComboWnd;
+
 public:
-    explicit Combo(Window* pWindow);
-    Combo(const Combo& r) = delete;
-    Combo& operator=(const Combo& r) = delete;
+    explicit Combo(Window *pWindow);
+    Combo(const Combo &r) = delete;
+    Combo &operator=(const Combo &r) = delete;
     virtual ~Combo() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual bool CanPlaceCaptionBar() const override;
     virtual DString GetBorderColor(ControlStateType stateType) const override;
 
 public:
     /** Combo类型
     */
-    enum ComboType
-    {
+    enum ComboType {
         //下拉列表, 不可编辑输入
         kCombo_DropList = 0,
 
@@ -50,7 +49,7 @@ public:
 
     /** 获取下拉框列表大小(宽度和高度)
     */
-    const UiSize& GetDropBoxSize() const;
+    const UiSize &GetDropBoxSize() const;
 
     /** 设置下拉框列表大小(宽度和高度)
      * @param [in] szDropBox 要设置的大小信息
@@ -70,23 +69,23 @@ public:
 
     /** 设置下拉表TreeView的Class属性
     */
-    void SetComboTreeClass(const DString& classValue);
+    void SetComboTreeClass(const DString &classValue);
 
     /** 设置下拉表TreeView的节点Class属性
     */
-    void SetComboTreeNodeClass(const DString& classValue);
+    void SetComboTreeNodeClass(const DString &classValue);
 
     /** 设置显示图标的Class属性
     */
-    void SetIconControlClass(const DString& classValue);
+    void SetIconControlClass(const DString &classValue);
 
     /** 设置编辑控件的Class属性
     */
-    void SetEditControlClass(const DString& classValue);
+    void SetEditControlClass(const DString &classValue);
 
     /** 设置按钮控件的Class属性
     */
-    void SetButtonControlClass(const DString& classValue);
+    void SetButtonControlClass(const DString &classValue);
 
 public:
     /** 获取Combo列表中的子项个数
@@ -136,37 +135,37 @@ public:
     * @param [in] iIndex 子项索引号
     * @param [in] itemText 子项的文本内容
     */
-    bool SetItemText(size_t iIndex, const DString& itemText);
+    bool SetItemText(size_t iIndex, const DString &itemText);
 
     /** 设置子项的文本ID（支持多语言版）
     * @param [in] iIndex 子项索引号
     * @param [in] itemTextId 子项的文本内容ID
     */
-    bool SetItemTextId(size_t iIndex, const DString& itemTextId);
+    bool SetItemTextId(size_t iIndex, const DString &itemTextId);
 
     /** 添加一个子项字符串
     * @param [in] itemText 子项的文本内容
     * @return 返回新添加的子项索引号
     */
-    size_t AddTextItem(const DString& itemText);
+    size_t AddTextItem(const DString &itemText);
 
     /** 添加一个子项字符串ID
     * @param [in] itemTextId 子项的文本内容（支持多语言版）
     * @return 返回新添加的子项索引号
     */
-    size_t AddTextIdItem(const DString& itemTextId);
+    size_t AddTextIdItem(const DString &itemTextId);
 
     /** 在指定索引号位置, 插入一个子项字符串, 返回新添加的子项索引号
     * @param [in] iIndex 子项索引号
     * @param [in] itemText 子项的文本内容
     */
-    size_t InsertTextItem(size_t iIndex, const DString& itemText);
+    size_t InsertTextItem(size_t iIndex, const DString &itemText);
 
     /** 在指定索引号位置, 插入一个子项字符串, 返回新添加的子项索引号
     * @param [in] iIndex 子项索引号
     * @param [in] itemText 子项的文本内容ID（支持多语言版）
     */
-    size_t InsertTextIdItem(size_t iIndex, const DString& itemTextId);
+    size_t InsertTextIdItem(size_t iIndex, const DString &itemTextId);
 
     /** 删除一个子项
     * @param [in] iIndex 子项索引号
@@ -182,7 +181,7 @@ public:
     * @param [in] bTriggerEvent bTriggerEvent 是否触发选择事件, 如果为true，会触发一个kEventSelect事件
     * @return 返回该选中项的索引号，如果未能选中，则返回Box::InvalidIndex
     */
-    size_t SelectTextItem(const DString& itemText, bool bTriggerEvent = true);
+    size_t SelectTextItem(const DString &itemText, bool bTriggerEvent = true);
 
 public:
     /** 获取当前编辑框内的文本
@@ -191,7 +190,7 @@ public:
 
     /** 设置编辑框内的文本
     */
-    void SetText(const DString& text);
+    void SetText(const DString &text);
 
     /** 让控件获取焦点
      */
@@ -200,19 +199,19 @@ public:
 public:
     /** 获取下拉列表的树接口
     */
-    TreeView* GetTreeView();
+    TreeView *GetTreeView();
 
     /** 获取图标控件
     */
-    Control* GetIconControl() const;
+    Control *GetIconControl() const;
 
     /** 编辑框控件
     */
-    RichEdit* GetEditControl() const;
+    RichEdit *GetEditControl() const;
 
     /** 按钮控件
     */
-    Button* GetButtonContrl() const;
+    Button *GetButtonContrl() const;
 
     /** 更新下拉列表窗口的位置
     */
@@ -220,7 +219,7 @@ public:
 
     /** 下拉框的窗口接口(只有在显示时能获取到，隐藏时即失效)
     */
-    Window* GetComboWnd() const;
+    Window *GetComboWnd() const;
 
     /** 设置下拉窗口的阴影类型
     */
@@ -235,19 +234,28 @@ public:
      * @param [in] callback 子项被选择后触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSelect(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelect, callback, callbackID);}
+    void AttachSelect(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelect, callback, callbackID);
+    }
 
     /** 监听下拉窗创建事件
      * @param [in] callback 下拉窗关闭后触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowCreate(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowCreate, callback, callbackID); }
+    void AttachWindowCreate(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowCreate, callback, callbackID);
+    }
 
     /** 监听下拉窗关闭事件
      * @param [in] callback 下拉窗关闭后触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowClose(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowClose, callback, callbackID); }
+    void AttachWindowClose(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowClose, callback, callbackID);
+    }
 
 protected:
     /** 控件初始化
@@ -282,70 +290,68 @@ protected:
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnSelectItem(const EventArgs& args);
+    virtual bool OnSelectItem(const EventArgs &args);
 
     /** 下拉框窗口关闭
     * @param [in] bCanceled true表示取消，否则表示正常关闭
     * @param [in] needUpdateSelItem true表示需要更新选择项，否则不需要更新选择项
     * @param [in] oldEditText 下拉框显示时，编辑框的文本内容
     */
-    virtual void OnComboWndClosed(bool bCanceled, 
-                                  bool needUpdateSelItem,
-                                  const DString& oldEditText);
+    virtual void OnComboWndClosed(bool bCanceled, bool needUpdateSelItem, const DString &oldEditText);
 
     /** 鼠标按下按钮
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnButtonDown(const EventArgs& args);
+    virtual bool OnButtonDown(const EventArgs &args);
 
     /** 点击按钮
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnButtonClicked(const EventArgs& args);
+    virtual bool OnButtonClicked(const EventArgs &args);
 
     /** 鼠标在Edit上面按下按钮
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnEditButtonDown(const EventArgs& args);
+    virtual bool OnEditButtonDown(const EventArgs &args);
 
     /** 鼠标在Edit上面弹起按钮
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnEditButtonUp(const EventArgs& args);
+    virtual bool OnEditButtonUp(const EventArgs &args);
 
     /** 在Edit上按键
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnEditKeyDown(const EventArgs& args);
+    virtual bool OnEditKeyDown(const EventArgs &args);
 
     /** Edit控件获得焦点
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnEditSetFocus(const EventArgs& args);
+    virtual bool OnEditSetFocus(const EventArgs &args);
 
     /** Edit控件失去焦点
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnEditKillFocus(const EventArgs& args);
+    virtual bool OnEditKillFocus(const EventArgs &args);
 
     /** 窗口失去焦点
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnWindowKillFocus(const EventArgs& args) override;
+    virtual bool OnWindowKillFocus(const EventArgs &args) override;
 
     /** 窗口移动
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnWindowMove(const EventArgs& args);
+    virtual bool OnWindowMove(const EventArgs &args);
 
     /** 选择项变化，同步Edit控件的文本
     */
@@ -355,33 +361,33 @@ protected:
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnEditTextChanged(const ui::EventArgs& args);
+    virtual bool OnEditTextChanged(const ui::EventArgs &args);
 
 private:
     /** 设置控件的属性列表
     */
-    void SetAttributeList(Control* pControl, const DString& classValue);
+    void SetAttributeList(Control *pControl, const DString &classValue);
 
     /** 移除控件
     */
-    void RemoveControl(Control* pControl);
+    void RemoveControl(Control *pControl);
 
     /** 创建一个新的树节点
     * @param [in] itemText 子项的文本内容
     * @param [in] bTextId itemText的文本内容是否为文本ID（支持多语言版）
     */
-    TreeNode* CreateTreeNode(const DString& itemText, bool bTextId);
+    TreeNode *CreateTreeNode(const DString &itemText, bool bTextId);
 
     /** 挂载该控件的鼠标事件，设置焦点
     */
-    void AttachMouseEvents(Control* pControl);
+    void AttachMouseEvents(Control *pControl);
 
     /** 在指定索引号位置, 插入一个子项字符串, 返回新添加的子项索引号
     * @param [in] iIndex 子项索引号
     * @param [in] itemText 子项的文本内容
     * @param [in] bTextId itemText的文本内容是否为文本ID（支持多语言版）
     */
-    size_t PrivateInsertTextItem(size_t iIndex, const DString& itemText, bool bTextId);
+    size_t PrivateInsertTextItem(size_t iIndex, const DString &itemText, bool bTextId);
 
 private:
     /** Combo类型
@@ -394,7 +400,7 @@ private:
 
     /** 下拉列表的窗口接口
     */
-    CComboWnd* m_pWindow;
+    CComboWnd *m_pWindow;
 
     /** 阴影类型
     */

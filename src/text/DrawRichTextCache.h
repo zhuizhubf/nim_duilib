@@ -3,8 +3,7 @@
 
 #include "duilib/duilib_defs.h"
 
-namespace ui
-{
+namespace ui {
 
 /** RichText 绘制缓存基类
 *

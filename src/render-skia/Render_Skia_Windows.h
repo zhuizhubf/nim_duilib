@@ -7,11 +7,10 @@
 #include "duilib/duilib_config_windows.h"
 
 namespace skwindow {
-    class WindowContext;
+class WindowContext;
 }
 
-namespace ui 
-{
+namespace ui {
 /** 渲染引擎接口的Windows实现
 */
 class Render_Skia_Windows : public Render_Skia
@@ -22,8 +21,8 @@ public:
     * @param [in] backendType 后台绘制方式
     */
     Render_Skia_Windows(HWND hWnd, RenderBackendType backendType);
-    Render_Skia_Windows(const Render_Skia_Windows& r) = delete;
-    Render_Skia_Windows& operator = (const Render_Skia_Windows& r) = delete;
+    Render_Skia_Windows(const Render_Skia_Windows &r) = delete;
+    Render_Skia_Windows &operator=(const Render_Skia_Windows &r) = delete;
     virtual ~Render_Skia_Windows() override;
 
 public:
@@ -50,7 +49,7 @@ public:
     /** 绘制并刷新到屏幕（Render的实现已经与窗口关联）, 同步完成
     * @param [in] pRenderPaint 界面绘制所需的回调接口
     */
-    virtual bool PaintAndSwapBuffers(IRenderPaint* pRenderPaint) override;
+    virtual bool PaintAndSwapBuffers(IRenderPaint *pRenderPaint) override;
 
     /** 设置窗口的形状为圆角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
@@ -58,13 +57,14 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw) override;
+    virtual bool SetWindowRoundRectRgn(
+        const UiRect &rcWnd, float rx, float ry, bool bRedraw) override;
 
     /** 设置窗口的形状为直角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw) override;
+    virtual bool SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw) override;
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] bRedraw 是否重绘
@@ -73,11 +73,11 @@ public:
 
     /** 获取SkSurface接口
     */
-    virtual SkSurface* GetSkSurface() const override;
+    virtual SkSurface *GetSkSurface() const override;
 
     /** 获取SkCanvas接口
     */
-    virtual SkCanvas* GetSkCanvas() const override;
+    virtual SkCanvas *GetSkCanvas() const override;
 
 public:
     /** 获取DC句柄，当不使用后，需要调用ReleaseDC接口释放资源
@@ -88,7 +88,7 @@ public:
     * @param [in] hdc 需要释放的DC句柄
     */
     virtual void ReleaseRenderDC(HDC hdc) override;
-    
+
 private:
     /** 删除DC
     */

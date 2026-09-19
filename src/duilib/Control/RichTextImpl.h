@@ -4,8 +4,7 @@
 #include "duilib/Core/Control.h"
 #include "render/IRender.h"
 
-namespace ui 
-{
+namespace ui {
 /** RichText文本XML解析后的格式化文本片段
 */
 class DUILIB_API RichTextSlice
@@ -46,13 +45,13 @@ public:
 class DUILIB_API RichTextImpl
 {
 public:
-    explicit RichTextImpl(Control* pOwner);
-    RichTextImpl(const RichTextImpl& r) = delete;
-    RichTextImpl& operator=(const RichTextImpl& r) = delete;
+    explicit RichTextImpl(Control *pOwner);
+    RichTextImpl(const RichTextImpl &r) = delete;
+    RichTextImpl &operator=(const RichTextImpl &r) = delete;
     ~RichTextImpl();
 
-    bool SetAttribute(const DString& strName, const DString& strValue);
-    void PaintText(IRender* pRender);
+    bool SetAttribute(const DString &strName, const DString &strValue);
+    void PaintText(IRender *pRender);
 
     /** 绑定的窗口发生了变化
     */
@@ -89,7 +88,7 @@ public:
     /** 设置当前字体ID
      * @param [in] strFontId 要设置的字体ID，该ID可在 global.xml 中存在
      */
-    void SetFontId(const DString& strFontId);
+    void SetFontId(const DString &strFontId);
 
     /** 获取默认文本颜色
      */
@@ -97,7 +96,7 @@ public:
 
     /** 设置默认文本颜色
      */
-    void SetTextColor(const DString& sTextColor);
+    void SetTextColor(const DString &sTextColor);
 
     /** 获取行间距倍数
     */
@@ -146,13 +145,13 @@ public:
     * @param [in] richText 带有格式的文本内容
     * @param [in] bRedraw true表示触发重绘，false表示不触发重绘
     */
-    bool SetText(const DString& richText, bool bRedraw = true);
+    bool SetText(const DString &richText, bool bRedraw = true);
 
     /** 设置格式的文本ID
     * @param [in] richTextId 带有格式的文本内容ID
     * @param [in] bRedraw true表示触发重绘，false表示不触发重绘
     */
-    bool SetTextId(const DString& richTextId, bool bRedraw = true);
+    bool SetTextId(const DString &richTextId, bool bRedraw = true);
 
     /** 清空原来的格式文本
     */
@@ -160,23 +159,23 @@ public:
 
     /** 追加一个文本片段
     */
-    void AppendTextSlice(const RichTextSlice&& textSlice);
+    void AppendTextSlice(const RichTextSlice &&textSlice);
 
     /** 追加一个文本片段
     */
-    void AppendTextSlice(const RichTextSlice& textSlice);
+    void AppendTextSlice(const RichTextSlice &textSlice);
 
     /** 根据Trim方案，对文本进行Trim处理，去掉多余的空格
     * @param [in,out] text 传入需要处理的文本，传出处理完成后的文本
     * @return 返回text的引用
     */
-    const DString& TrimText(DString& text);
+    const DString &TrimText(DString &text);
 
     /** 根据Trim方案，对文本进行Trim处理，去掉多余的空格
     * @param [in] text 传入需要处理的文本
     * @return 返回处理好的字符串
     */
-    DString TrimText(const DString::value_type* text);
+    DString TrimText(const DString::value_type *text);
 
     /** 设置是否允许重绘
     * @param [in] bEnable true表示允许重绘，false表示禁止重绘
@@ -202,18 +201,17 @@ public:
     void Invalidate();
 
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    void ButtonDown(const EventArgs& msg);
-    void ButtonUp(const EventArgs& msg);
-    void MouseMove(const EventArgs& msg);
-    void MouseHover(const EventArgs& msg);
-    void MouseLeave(const EventArgs& msg);
-    bool OnSetCursor(const EventArgs& msg);
+    void ButtonDown(const EventArgs &msg);
+    void ButtonUp(const EventArgs &msg);
+    void MouseMove(const EventArgs &msg);
+    void MouseHover(const EventArgs &msg);
+    void MouseLeave(const EventArgs &msg);
+    bool OnSetCursor(const EventArgs &msg);
 
 private:
     /** 格式化文本，解析后的结构(内部使用)
     */
-    class RichTextDataEx :
-        public RichTextData
+    class RichTextDataEx : public RichTextData
     {
     public:
         /** 对象绘制区域(输出参数)
@@ -237,11 +235,11 @@ private:
     /** 设置格式的文本, 但不重绘
     * @param [in] richText 带有格式的文本内容
     */
-    bool DoSetText(const DString& richText);
+    bool DoSetText(const DString &richText);
 
     /** 解析格式化文本, 生成解析后的数据结构
     */
-    bool ParseText(std::vector<RichTextDataEx>& outTextData) const;
+    bool ParseText(std::vector<RichTextDataEx> &outTextData) const;
 
     /** 检查按需解析文本
     */
@@ -252,13 +250,14 @@ private:
     * @param [in] parentTextData 父对象信息
     * @param [out] textData 解析后的文本结构
     */
-    bool ParseTextSlice(const RichTextSlice& textSlice, 
-                        const RichTextDataEx& parentTextData,
-                        std::vector<RichTextDataEx>& textData) const;
+    bool ParseTextSlice(
+        const RichTextSlice &textSlice,
+        const RichTextDataEx &parentTextData,
+        std::vector<RichTextDataEx> &textData) const;
 
     /** 输出带格式化文本
     */
-    DString ToString(const RichTextSlice& textSlice, const DString& indent) const;
+    DString ToString(const RichTextSlice &textSlice, const DString &indent) const;
 
     /** 获取当前绘制文字的属性
     */
@@ -266,12 +265,12 @@ private:
 
     /** 计算绘制后的目标区域大小
     */
-    void CalcDestRect(IRender* pRender, const UiRect& rc, UiRect& rect);
+    void CalcDestRect(IRender *pRender, const UiRect &rc, UiRect &rect);
 
 private:
     /** 关联控件
     */
-    Control* m_pOwner;
+    Control *m_pOwner;
 
     /** 绘制缓存
     */
@@ -343,9 +342,9 @@ private:
 
     /** 文本的Trim策略
     */
-    enum class TrimPolicy: int8_t {
-        kNone    = 0, //不处理
-        kAll     = 1, //去掉所有空格
+    enum class TrimPolicy : int8_t {
+        kNone = 0,    //不处理
+        kAll = 1,     //去掉所有空格
         kKeepOne = 2, //去掉多余的空格，只保留一个空格
     };
 

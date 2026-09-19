@@ -6,19 +6,14 @@
 #include "NativeWindow_SDL.h"
 #include <SDL3/SDL.h>
 
-namespace ui
-{
+namespace ui {
 std::unordered_map<uint32_t, SDLUserMessageCallback> MessageLoop_SDL::s_userMsgCallbacks;
 
-MessageLoop_SDL::MessageLoop_SDL()
-{
-}
+MessageLoop_SDL::MessageLoop_SDL() {}
 
-MessageLoop_SDL::~MessageLoop_SDL()
-{
-}
+MessageLoop_SDL::~MessageLoop_SDL() {}
 
-bool MessageLoop_SDL::CheckInitSDL(const DString& videoDriverName)
+bool MessageLoop_SDL::CheckInitSDL(const DString &videoDriverName)
 {
     //Linux Wayland下支持DPI自适应
     SDL_SetHint(SDL_HINT_VIDEO_WAYLAND_SCALE_TO_DISPLAY, "true");
@@ -30,7 +25,7 @@ bool MessageLoop_SDL::CheckInitSDL(const DString& videoDriverName)
             DStringA videoDriverNameA = StringConvert::TToUTF8(videoDriverName);
             if (!videoDriverNameA.empty()) {
                 SDL_SetHint(SDL_HINT_VIDEO_DRIVER, videoDriverNameA.c_str());
-            }            
+            }
         }
         bRet = SDL_Init(SDL_INIT_VIDEO);
         ASSERT_UNUSED_VARIABLE(bRet);
@@ -53,7 +48,7 @@ DString MessageLoop_SDL::GetCurrentVideoDriverName()
 {
     CheckInitSDL();
     DString videoDriverName;
-    const char* videoDriver = SDL_GetCurrentVideoDriver();
+    const char *videoDriver = SDL_GetCurrentVideoDriver();
     if (videoDriver != nullptr) {
         videoDriverName = StringConvert::UTF8ToT(videoDriver);
     }
@@ -89,8 +84,7 @@ int32_t MessageLoop_SDL::Run(MessageLoopIdleCallback idleCallback)
                 ProcessSDLEvent(sdlEvent, bKeepGoing);
             }
         }
-    }
-    else {
+    } else {
         //需要支持Idle函数
         while (bKeepGoing) {
             while (bKeepGoing && SDL_PollEvent(&sdlEvent)) {
@@ -112,10 +106,10 @@ int32_t MessageLoop_SDL::Run(MessageLoopIdleCallback idleCallback)
     return 0;
 }
 
-void MessageLoop_SDL::ProcessSDLEvent(const SDL_Event& sdlEvent, bool& bKeepGoing)
+void MessageLoop_SDL::ProcessSDLEvent(const SDL_Event &sdlEvent, bool &bKeepGoing)
 {
     switch (sdlEvent.type) {
-    case SDL_EVENT_QUIT:  /* triggers on last window close and other things. End the program. */
+    case SDL_EVENT_QUIT: /* triggers on last window close and other things. End the program. */
         bKeepGoing = false;
         break;
     default:
@@ -125,13 +119,14 @@ void MessageLoop_SDL::ProcessSDLEvent(const SDL_Event& sdlEvent, bool& bKeepGoin
     }
 }
 
-void MessageLoop_SDL::RunDoModal(NativeWindow_SDL& nativeWindow, bool bCloseByEsc, bool bCloseByEnter)
+void MessageLoop_SDL::RunDoModal(NativeWindow_SDL &nativeWindow, bool bCloseByEsc, bool bCloseByEnter)
 {
     ASSERT(nativeWindow.IsWindow());
     if (!nativeWindow.IsWindow()) {
         return;
     }
-    const SDL_WindowID currentWindowId = SDL_GetWindowID((SDL_Window*)nativeWindow.GetWindowHandle());
+    const SDL_WindowID currentWindowId = SDL_GetWindowID(
+        (SDL_Window *) nativeWindow.GetWindowHandle());
     ASSERT(currentWindowId != 0);
     if (currentWindowId == 0) {
         return;
@@ -142,46 +137,43 @@ void MessageLoop_SDL::RunDoModal(NativeWindow_SDL& nativeWindow, bool bCloseByEs
     memset(&sdlEvent, 0, sizeof(sdlEvent));
     /* run the program until told to stop. */
     while (bKeepGoing) {
-
         /* run through all pending events until we run out. */
         while (bKeepGoing && SDL_WaitEvent(&sdlEvent)) {
             switch (sdlEvent.type) {
-            case SDL_EVENT_QUIT:  /* triggers on last window close and other things. End the program. */
+            case SDL_EVENT_QUIT: /* triggers on last window close and other things. End the program. */
                 bKeepGoing = false;
                 //重新放入一个Quit消息，让主消息循环也退出，避免该事件丢失
                 nativeWindow.PostQuitMsg(0);
                 break;
-            default:
-                {
-                    //将事件派发到窗口
-                    DispatchSDLEvent(sdlEvent);
+            default: {
+                //将事件派发到窗口
+                DispatchSDLEvent(sdlEvent);
 
-                    SDL_WindowID windowID = NativeWindow_SDL::GetWindowIdFromEvent(sdlEvent);
-                    if ((sdlEvent.type == SDL_EVENT_WINDOW_DESTROYED) && (windowID == currentWindowId)) {
-                        //窗口已经退出，退出消息循环
-                        bKeepGoing = false;
-                    }
-                    else if ((bCloseByEsc || bCloseByEnter) && (sdlEvent.type == SDL_EVENT_KEY_DOWN) && (windowID == currentWindowId)) {
-                        VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
-                        if (bCloseByEsc && (vkCode == VirtualKeyCode::kVK_ESCAPE)) {
-                            //模态对话框，按ESC键时，关闭
-                            if (!nativeWindow.IsClosingWnd()) {
-                                nativeWindow.CloseWnd(kWindowCloseCancel);
-                            }
+                SDL_WindowID windowID = NativeWindow_SDL::GetWindowIdFromEvent(sdlEvent);
+                if ((sdlEvent.type == SDL_EVENT_WINDOW_DESTROYED) && (windowID == currentWindowId)) {
+                    //窗口已经退出，退出消息循环
+                    bKeepGoing = false;
+                } else if (
+                    (bCloseByEsc || bCloseByEnter) && (sdlEvent.type == SDL_EVENT_KEY_DOWN)
+                    && (windowID == currentWindowId)) {
+                    VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
+                    if (bCloseByEsc && (vkCode == VirtualKeyCode::kVK_ESCAPE)) {
+                        //模态对话框，按ESC键时，关闭
+                        if (!nativeWindow.IsClosingWnd()) {
+                            nativeWindow.CloseWnd(kWindowCloseCancel);
                         }
-                        else if (bCloseByEnter && (vkCode == VirtualKeyCode::kVK_RETURN)) {
-                            //模态对话框，按Enter键时，关闭
-                            nativeWindow.CloseWnd(kWindowCloseOK);
-                        }
+                    } else if (bCloseByEnter && (vkCode == VirtualKeyCode::kVK_RETURN)) {
+                        //模态对话框，按Enter键时，关闭
+                        nativeWindow.CloseWnd(kWindowCloseOK);
                     }
                 }
-                break;
+            } break;
             }
         }
     }
 }
 
-void MessageLoop_SDL::RunUserLoop(bool& bTerminate)
+void MessageLoop_SDL::RunUserLoop(bool &bTerminate)
 {
     ASSERT(!bTerminate);
     if (bTerminate) {
@@ -192,11 +184,10 @@ void MessageLoop_SDL::RunUserLoop(bool& bTerminate)
     memset(&sdlEvent, 0, sizeof(sdlEvent));
     /* run the program until told to stop. */
     while (bKeepGoing) {
-
         /* run through all pending events until we run out. */
         while (bKeepGoing && SDL_WaitEvent(&sdlEvent)) {
             switch (sdlEvent.type) {
-            case SDL_EVENT_QUIT:  /* triggers on last window close and other things. End the program. */
+            case SDL_EVENT_QUIT: /* triggers on last window close and other things. End the program. */
                 bKeepGoing = false;
                 //重新放入一个Quit消息，让主消息循环也退出，避免该事件丢失
                 SDL_Event quitEvent;
@@ -204,17 +195,15 @@ void MessageLoop_SDL::RunUserLoop(bool& bTerminate)
                 quitEvent.common.timestamp = 0;
                 SDL_PushEvent(&quitEvent);
                 break;
-            default:
-                {
-                    //将事件派发到窗口
-                    DispatchSDLEvent(sdlEvent);
+            default: {
+                //将事件派发到窗口
+                DispatchSDLEvent(sdlEvent);
 
-                    if (bTerminate) {
-                        //已经标记退出，退出该消息循环
-                        bKeepGoing = false;
-                    }
+                if (bTerminate) {
+                    //已经标记退出，退出该消息循环
+                    bKeepGoing = false;
                 }
-                break;
+            } break;
             }
         }
     }
@@ -238,8 +227,8 @@ bool MessageLoop_SDL::PostUserEvent(uint32_t msgId, WPARAM wParam, LPARAM lParam
     sdlEvent.user.timestamp = 0;
     sdlEvent.user.type = msgId;
     sdlEvent.user.code = msgId;
-    sdlEvent.user.data1 = (void*)wParam;
-    sdlEvent.user.data2 = (void*)lParam;
+    sdlEvent.user.data1 = (void *) wParam;
+    sdlEvent.user.data2 = (void *) lParam;
     sdlEvent.user.windowID = 0;
     bool nRet = SDL_PushEvent(&sdlEvent);
     ASSERT(nRet);
@@ -262,7 +251,7 @@ void MessageLoop_SDL::PostNoneEvent()
     ASSERT_UNUSED_VARIABLE(nRet);
 }
 
-void MessageLoop_SDL::AddUserMessageCallback(uint32_t msgId, const SDLUserMessageCallback& callback)
+void MessageLoop_SDL::AddUserMessageCallback(uint32_t msgId, const SDLUserMessageCallback &callback)
 {
     ASSERT((msgId > SDL_EVENT_USER) && (msgId < SDL_EVENT_LAST));
     if ((msgId <= SDL_EVENT_USER) || (msgId >= SDL_EVENT_LAST)) {
@@ -283,17 +272,16 @@ void MessageLoop_SDL::RemoveUserMessageCallback(uint32_t msgId)
     }
 }
 
-void MessageLoop_SDL::DispatchSDLEvent(const SDL_Event& sdlEvent)
+void MessageLoop_SDL::DispatchSDLEvent(const SDL_Event &sdlEvent)
 {
-    NativeWindow_SDL* pWindow = nullptr;
+    NativeWindow_SDL *pWindow = nullptr;
     SDL_WindowID windowID = NativeWindow_SDL::GetWindowIdFromEvent(sdlEvent);
     if (windowID != 0) {
         pWindow = NativeWindow_SDL::GetWindowFromID(windowID);
     }
     if (pWindow != nullptr) {
         pWindow->OnSDLWindowEvent(sdlEvent);
-    }
-    else {
+    } else {
         //其他消息，除了注册的自定义消息，不处理
         if ((sdlEvent.type > SDL_EVENT_USER) && (sdlEvent.type < SDL_EVENT_LAST)) {
             //用户自定义消息
@@ -302,7 +290,7 @@ void MessageLoop_SDL::DispatchSDLEvent(const SDL_Event& sdlEvent)
     }
 }
 
-void MessageLoop_SDL::OnUserEvent(const SDL_Event& sdlEvent)
+void MessageLoop_SDL::OnUserEvent(const SDL_Event &sdlEvent)
 {
     if ((sdlEvent.type <= SDL_EVENT_USER) || (sdlEvent.type >= SDL_EVENT_LAST)) {
         return;
@@ -310,15 +298,15 @@ void MessageLoop_SDL::OnUserEvent(const SDL_Event& sdlEvent)
     if (sdlEvent.type != sdlEvent.user.type) {
         return;
     }
-    if (sdlEvent.type != (uint32_t)sdlEvent.user.code) {
+    if (sdlEvent.type != (uint32_t) sdlEvent.user.code) {
         return;
     }
     if (sdlEvent.user.windowID != 0) {
         return;
     }
     uint32_t msgId = sdlEvent.user.type;
-    WPARAM wParam = (WPARAM)sdlEvent.user.data1;
-    LPARAM lParam = (LPARAM)sdlEvent.user.data2;
+    WPARAM wParam = (WPARAM) sdlEvent.user.data1;
+    LPARAM lParam = (LPARAM) sdlEvent.user.data2;
 
     auto iter = s_userMsgCallbacks.find(msgId);
     if (iter != s_userMsgCallbacks.end()) {

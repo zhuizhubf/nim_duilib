@@ -1,14 +1,14 @@
 #include "duilib/Core/ColorConverter.h"
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
-namespace ui
-{
+namespace ui {
 
-bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b)
+bool ColorConverter::ParseHexColor(
+    const std::string &colorStr, uint8_t &alpha, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     if (colorStr.empty() || colorStr.length() != 9 || colorStr[0] != '#') {
         return false;
@@ -20,8 +20,7 @@ bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, 
         g = static_cast<uint8_t>(std::stoul(colorStr.substr(5, 2), nullptr, 16));
         b = static_cast<uint8_t>(std::stoul(colorStr.substr(7, 2), nullptr, 16));
         return true;
-    }
-    catch (...) {
+    } catch (...) {
         return false;
     }
 }
@@ -29,15 +28,13 @@ bool ColorConverter::ParseHexColor(const std::string& colorStr, uint8_t& alpha, 
 std::string ColorConverter::RGBToHex(uint8_t alpha, uint8_t r, uint8_t g, uint8_t b)
 {
     std::ostringstream oss;
-    oss << "#" << std::uppercase << std::hex << std::setfill('0')
-        << std::setw(2) << static_cast<int>(alpha)
-        << std::setw(2) << static_cast<int>(r)
-        << std::setw(2) << static_cast<int>(g)
-        << std::setw(2) << static_cast<int>(b);
+    oss << "#" << std::uppercase << std::hex << std::setfill('0') << std::setw(2)
+        << static_cast<int>(alpha) << std::setw(2) << static_cast<int>(r) << std::setw(2)
+        << static_cast<int>(g) << std::setw(2) << static_cast<int>(b);
     return oss.str();
 }
 
-void ColorConverter::RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double& s, double& l)
+void ColorConverter::RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double &h, double &s, double &l)
 {
     // 归一化到 0~1
     double rf = r / 255.0;
@@ -63,11 +60,9 @@ void ColorConverter::RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double
     // 色相
     if (maxVal == rf) {
         h = 60.0 * (fmod(((gf - bf) / delta), 6.0));
-    }
-    else if (maxVal == gf) {
+    } else if (maxVal == gf) {
         h = 60.0 * (((bf - rf) / delta) + 2.0);
-    }
-    else {
+    } else {
         h = 60.0 * (((rf - gf) / delta) + 4.0);
     }
 
@@ -76,7 +71,7 @@ void ColorConverter::RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double
     }
 }
 
-void ColorConverter::HSLToRGB(double h, double s, double l, uint8_t& r, uint8_t& g, uint8_t& b)
+void ColorConverter::HSLToRGB(double h, double s, double l, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     // 饱和度和明度限制在 [0, 1]
     s = std::max(0.0, std::min(1.0, s));
@@ -101,22 +96,29 @@ void ColorConverter::HSLToRGB(double h, double s, double l, uint8_t& r, uint8_t&
 
     double r1, g1, b1;
     if (h < 60.0) {
-        r1 = c; g1 = x; b1 = 0;
-    }
-    else if (h < 120.0) {
-        r1 = x; g1 = c; b1 = 0;
-    }
-    else if (h < 180.0) {
-        r1 = 0; g1 = c; b1 = x;
-    }
-    else if (h < 240.0) {
-        r1 = 0; g1 = x; b1 = c;
-    }
-    else if (h < 300.0) {
-        r1 = x; g1 = 0; b1 = c;
-    }
-    else {
-        r1 = c; g1 = 0; b1 = x;
+        r1 = c;
+        g1 = x;
+        b1 = 0;
+    } else if (h < 120.0) {
+        r1 = x;
+        g1 = c;
+        b1 = 0;
+    } else if (h < 180.0) {
+        r1 = 0;
+        g1 = c;
+        b1 = x;
+    } else if (h < 240.0) {
+        r1 = 0;
+        g1 = x;
+        b1 = c;
+    } else if (h < 300.0) {
+        r1 = x;
+        g1 = 0;
+        b1 = c;
+    } else {
+        r1 = c;
+        g1 = 0;
+        b1 = x;
     }
 
     r = static_cast<uint8_t>(std::round((r1 + m) * 255.0));
@@ -137,7 +139,7 @@ double ColorConverter::GetRelativeLuminance(uint8_t r, uint8_t g, uint8_t b)
     return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-double ColorConverter::CalculateContrastRatio(const std::string& color1, const std::string& color2)
+double ColorConverter::CalculateContrastRatio(const std::string &color1, const std::string &color2)
 {
     uint8_t a1, r1, g1, b1;
     uint8_t a2, r2, g2, b2;
@@ -155,7 +157,7 @@ double ColorConverter::CalculateContrastRatio(const std::string& color1, const s
     return (lighter + 0.05) / (darker + 0.05);
 }
 
-bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H)
+bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double &L, double &C, double &H)
 {
     double red = r / 255.0;
     double green = g / 255.0;
@@ -164,7 +166,7 @@ bool ColorConverter::RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, doub
     return RGBToOKLCH(red, green, blue, &L, &C, &H) == 0;
 }
 
-int ColorConverter::RGBToOKLCH(double red, double green, double blue, double* L, double* C, double* H)
+int ColorConverter::RGBToOKLCH(double red, double green, double blue, double *L, double *C, double *H)
 {
     if ((L == nullptr) || (C == nullptr) || (H == nullptr)) {
         return -1;
@@ -205,19 +207,24 @@ std::string ColorConverter::OKLCHToARGB(double L, double C, double H, uint8_t al
     return RGBToHex(alpha, r, g, b);
 }
 
-int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double* green, double* blue)
+int ColorConverter::OKLCHToRGB(double L, double C, double H, double *red, double *green, double *blue)
 {
     if ((red == nullptr) || (green == nullptr) || (blue == nullptr)) {
         return -1;
     }
     // Clamp L to valid range [0, 1]
-    if (L < 0.0) L = 0.0;
-    if (L > 1.0) L = 1.0;
+    if (L < 0.0)
+        L = 0.0;
+    if (L > 1.0)
+        L = 1.0;
     // C should be non-negative, use absolute value if negative
-    if (C < 0.0) C = 0.0;
+    if (C < 0.0)
+        C = 0.0;
     // Normalize H to [0, 360)
-    while (H < 0.0) H += 360.0;
-    while (H >= 360.0) H -= 360.0;
+    while (H < 0.0)
+        H += 360.0;
+    while (H >= 360.0)
+        H -= 360.0;
 
     double a = C * std::cos(H * PI / 180.0);
     double b = C * std::sin(H * PI / 180.0);
@@ -241,7 +248,8 @@ int ColorConverter::OKLCHToRGB(double L, double C, double H, double* red, double
     return 0;
 }
 
-int ColorConverter::OKLCHToRGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue)
+int ColorConverter::OKLCHToRGB(
+    double L, double C, double H, uint8_t &red, uint8_t &green, uint8_t &blue)
 {
     double r = 0, g = 0, b = 0;
     if (OKLCHToRGB(L, C, H, &r, &g, &b) != 0) {
@@ -274,4 +282,4 @@ double ColorConverter::Cbrt(double x)
     return std::pow(x, 1.0 / 3.0);
 }
 
-}  // namespace ui
+} // namespace ui

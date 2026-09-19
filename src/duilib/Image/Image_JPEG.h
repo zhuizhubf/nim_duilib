@@ -6,11 +6,10 @@
 
 #ifdef DUILIB_IMAGE_SUPPORT_JPEG_TURBO
 
-namespace ui
-{
+namespace ui {
 /** JPEG格式的图片数据(加载时不做图像数据解码，在获取位图时解码图像数据)
 */
-class Image_JPEG: public IBitmapImage
+class Image_JPEG : public IBitmapImage
 {
 public:
     /** 加载图片数据
@@ -21,12 +20,13 @@ public:
      * @param [in] rcMaxDestRectSize 目标区域大小，用于优化加载性能
      * @param [in] bAssertEnabled 当遇到图片数据错误时，是否允许断言
      */
-    bool LoadImageFile(std::vector<uint8_t>& fileData,
-                       const FilePath& imageFilePath,
-                       float fImageSizeScale,
-                       bool bAsyncDecode,
-                       const UiSize& rcMaxDestRectSize,
-                       bool bAssertEnabled);
+    bool LoadImageFile(
+        std::vector<uint8_t> &fileData,
+        const FilePath &imageFilePath,
+        float fImageSizeScale,
+        bool bAsyncDecode,
+        const UiSize &rcMaxDestRectSize,
+        bool bAssertEnabled);
 
 public:
     Image_JPEG();
@@ -49,7 +49,7 @@ public:
     * @return 返回位图的接口指针，如果返回nullptr并且bDecodeError为false表示图片尚未完成解码（多线程解码的情况下）
     *                          如果返回nullptr并且bDecodeError为true代表图片解码出现错误
     */
-    virtual std::shared_ptr<IBitmap> GetBitmap(bool* bDecodeError) override;
+    virtual std::shared_ptr<IBitmap> GetBitmap(bool *bDecodeError) override;
 
 public:
     /** 是否支持延迟解码数据
@@ -72,9 +72,8 @@ public:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool DelayDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override;
+    virtual bool DelayDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override;
 
     /** 合并延迟解码图片数据的结果
     */

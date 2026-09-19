@@ -1,16 +1,15 @@
 #ifndef UI_CONTROL_LIST_CTRL_H_
 #define UI_CONTROL_LIST_CTRL_H_
 
+#include "duilib/Control/ListCtrlData.h"
 #include "duilib/Control/ListCtrlDefs.h"
 #include "duilib/Control/ListCtrlHeader.h"
 #include "duilib/Control/ListCtrlHeaderItem.h"
 #include "duilib/Control/ListCtrlItem.h"
 #include "duilib/Control/ListCtrlSubItem.h"
-#include "duilib/Control/ListCtrlData.h"
 #include "duilib/Core/ImageList.h"
 
-namespace ui
-{
+namespace ui {
 class RichEdit;
 
 class ListCtrlData;
@@ -26,28 +25,29 @@ class ListCtrlListViewItem;
 
 /** ListCtrl控件
 */
-class DUILIB_API ListCtrl: public VBox
+class DUILIB_API ListCtrl : public VBox
 {
     typedef VBox BaseClass;
-    friend class ListCtrlData;          //列表数据管理容器
-    friend class ListCtrlReportView;    //列表数据显示UI控件
-    friend class ListCtrlIconView;      //列表数据显示UI控件
-    friend class ListCtrlListView;      //列表数据显示UI控件
+    friend class ListCtrlData;       //列表数据管理容器
+    friend class ListCtrlReportView; //列表数据显示UI控件
+    friend class ListCtrlIconView;   //列表数据显示UI控件
+    friend class ListCtrlListView;   //列表数据显示UI控件
     friend class ListCtrlHeader;
     friend class ListCtrlHeaderItem;
     friend class ListCtrlItem;
     friend class ListCtrlSubItem;
     friend class ListCtrlIconViewItem;
     friend class ListCtrlListViewItem;
+
 public:
-    explicit ListCtrl(Window* pWindow);
+    explicit ListCtrl(Window *pWindow);
     virtual ~ListCtrl() override;
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -68,7 +68,7 @@ public:
     * @param [in] type 视图类型
     * @param [in] spImageList 图片资源接口, 智能指针
     */
-    void SetImageList(ListCtrlType type, const ImageListPtr& spImageList);
+    void SetImageList(ListCtrlType type, const ImageListPtr &spImageList);
 
     /** 获取图片列表，可以添加图片资源，用于在列表中显示图标资源
     */
@@ -84,7 +84,7 @@ public:
     * @param [in] columnInfo 列的基本属性
     * @return 返回这一列的表头控件接口，使用ListCtrlHeaderItem::GetColumnId()函数可以获取列ID
     */
-    ListCtrlHeaderItem* InsertColumn(int32_t columnIndex, const ListCtrlColumn& columnInfo);
+    ListCtrlHeaderItem *InsertColumn(int32_t columnIndex, const ListCtrlColumn &columnInfo);
 
     /** 获取列的ID
     * @param [in] columnIndex 列索引序号：[0, GetColumnCount())
@@ -107,8 +107,8 @@ public:
     * @param [in] columnIndex 列索引序号：[0, GetColumnCount())
     * @param [in] columnId 列的ID值，通过ListCtrlHeaderItem::GetColumnId()函数获取
     */
-    ListCtrlHeaderItem* GetColumn(size_t columnIndex) const;
-    ListCtrlHeaderItem* GetColumnById(size_t columnId) const;
+    ListCtrlHeaderItem *GetColumn(size_t columnIndex) const;
+    ListCtrlHeaderItem *GetColumnById(size_t columnId) const;
 
     /** 删除一列
     * @param [in] columnIndex 列索引序号：[0, GetColumnCount())
@@ -157,8 +157,8 @@ public:
     *             （4）举例2：各列的宽度平均分配，可以直接设置拉伸值，不需要计算具体比例：columnWidthList里面有三个值：UiFixedInt::MakeStretch(),UiFixedInt::MakeStretch(),UiFixedInt::MakeStretch()
     * @param [in] bNeedDpiScale 是否需要对列宽值进行DPI自适应（仅当列宽度设置为固定数值时使用）
     */
-    bool SetColumnWidth(const std::vector<UiFixedInt>& columnWidthList, bool bNeedDpiScale);
-    
+    bool SetColumnWidth(const std::vector<UiFixedInt> &columnWidthList, bool bNeedDpiScale);
+
     /** 设置是否支持列表头拖动改变列的顺序
     */
     void SetEnableHeaderDragOrder(bool bEnable);
@@ -202,7 +202,7 @@ public:
 
     /** 获取表头控件接口, 在控件初始化以后才有值
     */
-    ListCtrlHeader* GetHeaderCtrl() const;
+    ListCtrlHeader *GetHeaderCtrl() const;
 
 public:
     /** 获取数据项总个数（数据行数）
@@ -218,13 +218,13 @@ public:
     * @param [in] dataItem 数据项的内容
     * @return 成功数据项的索引号，有效范围：[0, GetDataItemCount()); 失败则返回Box::InvalidIndex
     */
-    size_t AddDataItem(const ListCtrlSubItemData& dataItem);
+    size_t AddDataItem(const ListCtrlSubItemData &dataItem);
 
     /** 在指定行位置添加一个数据项(行数+1)
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] dataItem 数据项的内容
     */
-    bool InsertDataItem(size_t itemIndex, const ListCtrlSubItemData& dataItem);
+    bool InsertDataItem(size_t itemIndex, const ListCtrlSubItemData &dataItem);
 
     /** 删除指定行的数据项(行数-1)
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -250,13 +250,13 @@ public:
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] itemData 关联的数据
     */
-    bool SetDataItemData(size_t itemIndex, const ListCtrlItemData& itemData);
+    bool SetDataItemData(size_t itemIndex, const ListCtrlItemData &itemData);
 
     /** 获取数据项的行属性数据
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] itemData 关联的数据
     */
-    bool GetDataItemData(size_t itemIndex, ListCtrlItemData& itemData) const;
+    bool GetDataItemData(size_t itemIndex, ListCtrlItemData &itemData) const;
 
     /** 设置数据项的可见性
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -337,8 +337,9 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] subItemData 指定数据项的内容，列序号在dataItem.nColumnIndex中指定
     */
-    bool SetSubItemData(size_t itemIndex, size_t columnIndex, const ListCtrlSubItemData& subItemData);
-    bool SetSubItemDataById(size_t itemIndex, size_t columnId, const ListCtrlSubItemData& subItemData);
+    bool SetSubItemData(size_t itemIndex, size_t columnIndex, const ListCtrlSubItemData &subItemData);
+    bool SetSubItemDataById(
+        size_t itemIndex, size_t columnId, const ListCtrlSubItemData &subItemData);
 
     /** 获取指定<行,列>的数据项
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -346,8 +347,9 @@ public:
     * @param [in] columnId 列的ID
     * @param [out] subItemData 指定数据项的内容
     */
-    bool GetSubItemData(size_t itemIndex, size_t columnIndex, ListCtrlSubItemData& subItemData) const;
-    bool GetSubItemDataById(size_t itemIndex, size_t columnId, ListCtrlSubItemData& subItemData) const;
+    bool GetSubItemData(size_t itemIndex, size_t columnIndex, ListCtrlSubItemData &subItemData) const;
+    bool GetSubItemDataById(
+        size_t itemIndex, size_t columnId, ListCtrlSubItemData &subItemData) const;
 
 public:
     /** 设置指定数据项的文本
@@ -356,8 +358,8 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] text 需要设置的文本内容
     */
-    bool SetSubItemText(size_t itemIndex, size_t columnIndex, const DString& text);
-    bool SetSubItemTextById(size_t itemIndex, size_t columnId, const DString& text);
+    bool SetSubItemText(size_t itemIndex, size_t columnIndex, const DString &text);
+    bool SetSubItemTextById(size_t itemIndex, size_t columnId, const DString &text);
 
     /** 获取指定数据项的文本
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -410,8 +412,8 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] userDataS 需要设置的数据项关联的字符串数据
     */
-    bool SetSubItemUserDataS(size_t itemIndex, size_t columnIndex, const DString& userDataS);
-    bool SetSubItemUserDataSById(size_t itemIndex, size_t columnId, const DString& userDataS);
+    bool SetSubItemUserDataS(size_t itemIndex, size_t columnIndex, const DString &userDataS);
+    bool SetSubItemUserDataSById(size_t itemIndex, size_t columnId, const DString &userDataS);
 
     /** 获取指定数据项的关联用户数据（字符串）
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -429,8 +431,8 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] textColor 需要设置的文本颜色
     */
-    bool SetSubItemTextColor(size_t itemIndex, size_t columnIndex, const UiColor& textColor);
-    bool SetSubItemTextColorById(size_t itemIndex, size_t columnId, const UiColor& textColor);
+    bool SetSubItemTextColor(size_t itemIndex, size_t columnIndex, const UiColor &textColor);
+    bool SetSubItemTextColorById(size_t itemIndex, size_t columnId, const UiColor &textColor);
 
     /** 获取指定数据项的文本颜色
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -464,8 +466,8 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] bkColor 需要设置的背景颜色
     */
-    bool SetSubItemBkColor(size_t itemIndex, size_t columnIndex, const UiColor& bkColor);
-    bool SetSubItemBkColorById(size_t itemIndex, size_t columnId, const UiColor& bkColor);
+    bool SetSubItemBkColor(size_t itemIndex, size_t columnIndex, const UiColor &bkColor);
+    bool SetSubItemBkColorById(size_t itemIndex, size_t columnId, const UiColor &bkColor);
 
     /** 获取指定数据项的背景颜色
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -552,18 +554,24 @@ public:
     * @param [in] pfnCompareFunc 自定义的比较函数，如果为nullptr, 则使用默认的比较函数
     * @param [in] pUserData 用户自定义数据，调用比较函数的时候，通过参数传回给比较函数
     */
-    bool SortDataItems(size_t columnIndex, bool bSortedUp, uint8_t nSortFlag = ListCtrlSubItemSortFlag::kDefault,
-                       ListCtrlDataCompareFunc pfnCompareFunc = nullptr,
-                       void* pUserData = nullptr);
-    bool SortDataItemsById(size_t columnId, bool bSortedUp, uint8_t nSortFlag = ListCtrlSubItemSortFlag::kDefault,
-                           ListCtrlDataCompareFunc pfnCompareFunc = nullptr,
-                           void* pUserData = nullptr);
+    bool SortDataItems(
+        size_t columnIndex,
+        bool bSortedUp,
+        uint8_t nSortFlag = ListCtrlSubItemSortFlag::kDefault,
+        ListCtrlDataCompareFunc pfnCompareFunc = nullptr,
+        void *pUserData = nullptr);
+    bool SortDataItemsById(
+        size_t columnId,
+        bool bSortedUp,
+        uint8_t nSortFlag = ListCtrlSubItemSortFlag::kDefault,
+        ListCtrlDataCompareFunc pfnCompareFunc = nullptr,
+        void *pUserData = nullptr);
 
     /** 设置外部自定义的排序函数, 替换默认的排序函数
     * @param [in] pfnCompareFunc 数据比较函数
     * @param [in] pUserData 用户自定义数据，调用比较函数的时候，通过参数传回给比较函数
     */
-    void SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData);
+    void SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void *pUserData);
 
 public:
     /** 是否支持多选
@@ -578,12 +586,12 @@ public:
     * @param [in] selectedIndexs 需要设置选择的数据项索引号，有效范围：[0, GetDataItemCount())
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     */
-    void SetSelectedDataItems(const std::vector<size_t>& selectedIndexs, bool bClearOthers);
+    void SetSelectedDataItems(const std::vector<size_t> &selectedIndexs, bool bClearOthers);
 
     /** 获取选择的元素列表
     * @param [in] itemIndexs 返回当前选择的数据项索引号，有效范围：[0, GetDataItemCount())
     */
-    void GetSelectedDataItems(std::vector<size_t>& itemIndexs) const;
+    void GetSelectedDataItems(std::vector<size_t> &itemIndexs) const;
 
     /** 选择全部
     */
@@ -597,7 +605,7 @@ public:
     /** 获取当前显示的数据项列表，顺序是从上到下
     * @param [in] itemIndexList 当前显示的数据项索引号列表, 每一元素的的有效范围：[0, GetDataItemCount())
     */
-    void GetDisplayDataItems(std::vector<size_t>& itemIndexList) const;
+    void GetDisplayDataItems(std::vector<size_t> &itemIndexList) const;
 
     /** 得到可见范围内第一个数据项的索引号
     * @return 返回数据项的索引号， 有效范围：[0, GetDataItemCount())
@@ -623,7 +631,7 @@ public:
     /** 刷新指定数据项
     * @param [in] dataItemIndexs 需要刷新的数据项索引号, 有效范围：[0, GetDataItemCount())
     */
-    void RefreshDataItems(const std::vector<size_t>& dataItemIndexs);
+    void RefreshDataItems(const std::vector<size_t> &dataItemIndexs);
 
     /** 是否允许刷新界面
     * @param [in] bEnable 如果为true，允许通过Refresh()函数刷新界面; 如果为false，则允许通过Refresh()函数刷新界面
@@ -638,57 +646,57 @@ public:
 public:
     /** 获取列表数据展示接口(Report视图)
     */
-    ListCtrlReportView* GetReportView() const;
+    ListCtrlReportView *GetReportView() const;
 
     /** 获取列表数据展示接口(Icon视图)
     */
-    ListCtrlIconView* GetIconView() const;
+    ListCtrlIconView *GetIconView() const;
 
     /** 获取列表数据展示接口(List视图)
     */
-    ListCtrlListView* GetListView() const;
+    ListCtrlListView *GetListView() const;
 
 public:
     /** 获取第一个数据项的界面控件接口（Report视图）
     * @return 返回界面控件接口
               注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlItem* GetFirstDisplayItem() const;
+    ListCtrlItem *GetFirstDisplayItem() const;
 
     /** 获取下一个数据项的界面控件接口（Report视图）
     * @param [in] pItem 当前界面控件接口
     * @return 返回当前界面控件的下一个界面控件接口，如果当前已经是最后一个，返回nullptr
     *         注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlItem* GetNextDisplayItem(ListCtrlItem* pItem) const;
+    ListCtrlItem *GetNextDisplayItem(ListCtrlItem *pItem) const;
 
 public:
     /** 获取第一个数据项的界面控件接口（Icon视图）
     * @return 返回界面控件接口
               注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlIconViewItem* GetFirstDisplayIconItem() const;
+    ListCtrlIconViewItem *GetFirstDisplayIconItem() const;
 
     /** 获取下一个数据项的界面控件接口（Icon视图）
     * @param [in] pItem 当前界面控件接口
     * @return 返回当前界面控件的下一个界面控件接口，如果当前已经是最后一个，返回nullptr
     *         注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlIconViewItem* GetNextDisplayIconItem(ListCtrlIconViewItem* pItem) const;
+    ListCtrlIconViewItem *GetNextDisplayIconItem(ListCtrlIconViewItem *pItem) const;
 
 public:
     /** 获取第一个数据项的界面控件接口（Icon视图）
     * @return 返回界面控件接口
               注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlListViewItem* GetFirstDisplayListItem() const;
+    ListCtrlListViewItem *GetFirstDisplayListItem() const;
 
     /** 获取下一个数据项的界面控件接口（Icon视图）
     * @param [in] pItem 当前界面控件接口
     * @return 返回当前界面控件的下一个界面控件接口，如果当前已经是最后一个，返回nullptr
     *         注意事项：界面刷新后，界面控件与数据元素之间的关系会动态变化
     */
-    ListCtrlListViewItem* GetNextDisplayListItem(ListCtrlListViewItem* pItem) const;
+    ListCtrlListViewItem *GetNextDisplayListItem(ListCtrlListViewItem *pItem) const;
 
 public:
     /** 设置是否支持子项编辑
@@ -701,7 +709,7 @@ public:
 
     /** 获取编辑框控件的接口(只有执行编辑操作以后，才有值)
     */
-    RichEdit* GetRichEdit() const;
+    RichEdit *GetRichEdit() const;
 
 public:
     /** @name CheckBox（行级）关联函数
@@ -749,12 +757,12 @@ public:
     * @param [in] itemIndexs 需要设置勾选的数据项索引号，有效范围：[0, GetDataItemCount())
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     */
-    void SetCheckedDataItems(const std::vector<size_t>& itemIndexs, bool bClearOthers);
+    void SetCheckedDataItems(const std::vector<size_t> &itemIndexs, bool bClearOthers);
 
     /** 获取勾选的元素列表（行首的CheckBox打勾的数据）
     * @param [in] itemIndexs 返回当前勾选的数据项索引号，有效范围：[0, GetDataItemCount())
     */
-    void GetCheckedDataItems(std::vector<size_t>& itemIndexs) const;
+    void GetCheckedDataItems(std::vector<size_t> &itemIndexs) const;
 
     /** @} */
 
@@ -769,7 +777,7 @@ public:
     /** 横向网格线的颜色
     * @param [in] color 横向网格线的颜色
     */
-    void SetRowGridLineColor(const DString& color);
+    void SetRowGridLineColor(const DString &color);
     DString GetRowGridLineColor() const;
 
     /** 纵向网格线的宽度
@@ -782,7 +790,7 @@ public:
     /** 纵向网格线的颜色
     * @param [in] color 纵向网格线的颜色
     */
-    void SetColumnGridLineColor(const DString& color);
+    void SetColumnGridLineColor(const DString &color);
     DString GetColumnGridLineColor() const;
 
     /** 是否支持双击Header的分割条自动调整列宽
@@ -795,7 +803,7 @@ public:
     * @param [out] bSortUp 当前排序是否为升序排列，true表示升序，false表示降序
     * @return true表示有排序列，false表示无排序列
     */
-    bool GetSortColumn(size_t& nSortColumnId, bool& bSortUp) const;
+    bool GetSortColumn(size_t &nSortColumnId, bool &bSortUp) const;
 
 public:
     /** 监听选择子项的事件
@@ -809,13 +817,19 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachSelect(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelect, callback, callbackID); }
+    void AttachSelect(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelect, callback, callbackID);
+    }
 
     /** 监听选择项发生变化的事件
      * @param[in] callback 选择子项时的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelChanged, callback, callbackID); }
+    void AttachSelChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelChanged, callback, callbackID);
+    }
 
     /** 监听双击事件
      * @param [in] callback 事件处理的回调函数
@@ -828,7 +842,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachDoubleClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseDoubleClick, callback, callbackID); }
+    void AttachDoubleClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseDoubleClick, callback, callbackID);
+    }
 
     /** 绑定鼠标点击处理函数
      * @param [in] callback 事件处理的回调函数
@@ -841,7 +858,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventClick, callback, callbackID); }
+    void AttachClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventClick, callback, callbackID);
+    }
 
     /** 绑定鼠标右键点击处理函数
      * @param [in] callback 事件处理的回调函数
@@ -854,7 +874,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachRClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventRClick, callback, callbackID); }
+    void AttachRClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventRClick, callback, callbackID);
+    }
 
     /** 绑定鼠标进入ListCtrlItem/ListCtrlListViewItem/ListCtrlIconViewItem控件的处理函数
      * @param [in] callback 事件处理的回调函数
@@ -867,7 +890,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachItemMouseEnter(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventItemMouseEnter, callback, callbackID); }
+    void AttachItemMouseEnter(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventItemMouseEnter, callback, callbackID);
+    }
 
     /** 绑定鼠标离开ListCtrlItem/ListCtrlListViewItem/ListCtrlIconViewItem控件的处理函数
      * @param [in] callback 事件处理的回调函数
@@ -880,7 +906,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachItemMouseLeave(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventItemMouseLeave, callback, callbackID); }
+    void AttachItemMouseLeave(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventItemMouseLeave, callback, callbackID);
+    }
 
     /** 绑定鼠标进入ListCtrlSubItem控件的处理函数
      * @param [in] callback 事件处理的回调函数
@@ -891,7 +920,10 @@ public:
      *   listCtrlType: 列表类型，有效的取值应为: ListCtrlType::Report
      *   pEventData: 选择子项的界面控件接口指针，类型为：ListCtrlSubItem*指针
      */
-    void AttachSubItemMouseEnter(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSubItemMouseEnter, callback, callbackID); }
+    void AttachSubItemMouseEnter(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSubItemMouseEnter, callback, callbackID);
+    }
 
     /** 绑定鼠标离开ListCtrlSubItem控件的处理函数
      * @param [in] callback 事件处理的回调函数
@@ -902,7 +934,10 @@ public:
      *   listCtrlType: 列表类型，有效的取值应为: ListCtrlType::Report
      *   pEventData: 选择子项的界面控件接口指针，类型为：ListCtrlSubItem*指针
      */
-    void AttachSubItemMouseLeave(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSubItemMouseLeave, callback, callbackID); }
+    void AttachSubItemMouseLeave(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSubItemMouseLeave, callback, callbackID);
+    }
 
     /** 监听回车事件
      * @param [in] callback 事件处理的回调函数
@@ -915,7 +950,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachReturn(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReturn, callback, callbackID); }
+    void AttachReturn(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReturn, callback, callbackID);
+    }
 
     /** 监听键盘按下事件
      * @param [in] callback 事件处理的回调函数
@@ -928,7 +966,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachKeyDown(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventKeyDown, callback, callbackID); }
+    void AttachKeyDown(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventKeyDown, callback, callbackID);
+    }
 
     /** 监听键盘弹起事件
      * @param [in] callback 事件处理的回调函数
@@ -941,7 +982,10 @@ public:
      *   pEventData: 选择子项的界面控件接口指针，可能的类型为：ListCtrlItem*指针, ListCtrlIconViewItem*指针, ListCtrlListViewItem*指针
      *               可将listCtrlType的值转换为ListCtrlType，然后根据枚举值来判断具体应转换为哪种类型
      */
-    void AttachKeyUp(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventKeyUp, callback, callbackID); }
+    void AttachKeyUp(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventKeyUp, callback, callbackID);
+    }
 
     /** 监听开始编辑事件
      * @param [in] callback 要绑定的回调函数
@@ -949,7 +993,10 @@ public:
      * 参数说明:
      *   wParam: 是接口指针：ListCtrlEditParam*，可以通过设置bCancelled取消操作
      */
-    void AttachEnterEdit(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventEnterEdit, callback, callbackID); }
+    void AttachEnterEdit(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventEnterEdit, callback, callbackID);
+    }
 
     /** 监听结束编辑事件
      * @param [in] callback 要绑定的回调函数
@@ -957,7 +1004,10 @@ public:
      * 参数说明:
      *   wParam: 是接口指针：ListCtrlEditParam*，可以通过设置bCancelled取消操作
      */
-    void AttachLeaveEdit(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventLeaveEdit, callback, callbackID); }
+    void AttachLeaveEdit(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventLeaveEdit, callback, callbackID);
+    }
 
     /** 监听数据项总个数变化事件
      * @param [in] callback 要绑定的回调函数
@@ -966,7 +1016,10 @@ public:
      *   wParam: 是新的个数(size_t)
      *   lParam: 是旧的个数(size_t)
      */
-    void AttachDataItemCountChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventDataItemCountChanged, callback, callbackID); }
+    void AttachDataItemCountChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventDataItemCountChanged, callback, callbackID);
+    }
 
     /** 监听Report视图数据项UI元素填充事件（虚表，填充某行数据）
      * @param [in] callback 要绑定的回调函数
@@ -976,7 +1029,10 @@ public:
      *   lParam: 关联的UI容器子项索引号对应的数据项索引号，有效范围：[0, GetDataItemCount())，如果值为Box::InvalidIndex，表示无关联的数据项
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlItem*指针，数据按行填充
      */
-    void AttachReportViewItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReportViewItemFilled, callback, callbackID); }
+    void AttachReportViewItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReportViewItemFilled, callback, callbackID);
+    }
 
     /** 监听Report视图数据项UI元素填充事件（虚表，填充某行某列数据）
      * @param [in] callback 要绑定的回调函数
@@ -987,7 +1043,10 @@ public:
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlSubItem*指针，代表某行某列数据的UI元素控件
      *               通过该接口，可以获取数据项索引号、哪一列的数据
      */
-    void AttachReportViewSubItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReportViewSubItemFilled, callback, callbackID); }
+    void AttachReportViewSubItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReportViewSubItemFilled, callback, callbackID);
+    }
 
     /** 监听List视图数据项UI元素填充事件（虚表）
      * @param [in] callback 要绑定的回调函数
@@ -997,7 +1056,10 @@ public:
      *   lParam: 关联的UI容器子项索引号对应的数据项索引号，有效范围：[0, GetDataItemCount())，如果值为Box::InvalidIndex，表示无关联的数据项
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlListViewItem*指针
      */
-    void AttachListViewItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventListViewItemFilled, callback, callbackID); }
+    void AttachListViewItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventListViewItemFilled, callback, callbackID);
+    }
 
     /** 监听Icon视图数据项UI元素填充事件（虚表）
      * @param [in] callback 要绑定的回调函数
@@ -1007,7 +1069,10 @@ public:
      *   lParam: 关联的UI容器子项索引号对应的数据项索引号，有效范围：[0, GetDataItemCount())，如果值为Box::InvalidIndex，表示无关联的数据项
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlIconViewItem*指针
      */
-    void AttachIconViewItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventIconViewItemFilled, callback, callbackID); }
+    void AttachIconViewItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventIconViewItemFilled, callback, callbackID);
+    }
 
     /** 监听列表类型变化事件
      * @param [in] callback 要绑定的回调函数
@@ -1017,7 +1082,10 @@ public:
      *   lParam: 原来的列表视图类型，参见listCtrlType的枚举值
      *   pEventData: 当前列表视图的指针：ListCtrlReportView*, ListCtrlIconView*, ListCtrlListView*
      */
-    void AttachViewTypeChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventViewTypeChanged, callback, callbackID); }
+    void AttachViewTypeChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventViewTypeChanged, callback, callbackID);
+    }
 
     /** 监听列表位置变化事件
      * @param [in] callback 要绑定的回调函数
@@ -1026,7 +1094,10 @@ public:
      *   listCtrlType: 列表类型，有效的取值为: ListCtrlType::Report, ListCtrlType::Icon, ListCtrlType::List
      *   pEventData: 当前列表视图的指针：ListCtrlReportView*, ListCtrlIconView*, ListCtrlListView*
      */
-    void AttachViewPosChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventViewPosChanged, callback, callbackID); }
+    void AttachViewPosChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventViewPosChanged, callback, callbackID);
+    }
 
     /** 监听列表大小变化事件
      * @param [in] callback 要绑定的回调函数
@@ -1035,7 +1106,10 @@ public:
      *   listCtrlType: 列表类型，有效的取值为: ListCtrlType::Report, ListCtrlType::Icon, ListCtrlType::List
      *   pEventData: 当前列表视图的指针：ListCtrlReportView*, ListCtrlIconView*, ListCtrlListView*
      */
-    void AttachViewSizeChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventViewSizeChanged, callback, callbackID); }
+    void AttachViewSizeChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventViewSizeChanged, callback, callbackID);
+    }
 
 protected:
     /** 控件初始化
@@ -1056,86 +1130,86 @@ protected:
 
     /** 设置ListCtrlHeader的属性Class
     */
-    void SetHeaderClass(const DString& className);
+    void SetHeaderClass(const DString &className);
 
     /** ListCtrlHeaderItem的属性Class
     */
-    void SetHeaderItemClass(const DString& className);
+    void SetHeaderItemClass(const DString &className);
     DString GetHeaderItemClass() const;
 
     /** ListCtrlHeader/SplitBox的属性Class
     */
-    void SetHeaderSplitBoxClass(const DString& className);
+    void SetHeaderSplitBoxClass(const DString &className);
     DString GetHeaderSplitBoxClass() const;
 
     /** ListCtrlHeader/SplitBox/Control的属性Class
     */
-    void SetHeaderSplitControlClass(const DString& className);
+    void SetHeaderSplitControlClass(const DString &className);
     DString GetHeaderSplitControlClass() const;
 
     /** CheckBox的Class属性(应用于Header和ListCtrl数据)
     */
-    void SetCheckBoxClass(const DString& className);
+    void SetCheckBoxClass(const DString &className);
     DString GetCheckBoxClass() const;
 
     /** 数据Report视图中的ListBox的Class属性
     */
-    void SetReportViewClass(const DString& className);
+    void SetReportViewClass(const DString &className);
     DString GetReportViewClass() const;
 
     /** ListCtrlItem的Class属性
     */
-    void SetDataItemClass(const DString& className);
+    void SetDataItemClass(const DString &className);
     DString GetDataItemClass() const;
 
     /** ListCtrlItem/ListCtrlSubItem的Class属性
     */
-    void SetDataSubItemClass(const DString& className);
+    void SetDataSubItemClass(const DString &className);
     DString GetDataSubItemClass() const;
 
     /** 数据Icon视图中的ListBox的Class属性
     */
-    void SetIconViewClass(const DString& className);
+    void SetIconViewClass(const DString &className);
     DString GetIconViewClass() const;
 
     /** 数据Icon视图中的ListBox的子项Class属性
     */
-    void SetIconViewItemClass(const DString& className);
+    void SetIconViewItemClass(const DString &className);
     DString GetIconViewItemClass() const;
 
     /** 数据Icon视图中的ListBox的子项中图片的Class属性
     */
-    void SetIconViewItemImageClass(const DString& className);
+    void SetIconViewItemImageClass(const DString &className);
     DString GetIconViewItemImageClass() const;
 
     /** 数据Icon视图中的ListBox的子项中Label的Class属性
     */
-    void SetIconViewItemLabelClass(const DString& className);
+    void SetIconViewItemLabelClass(const DString &className);
     DString GetIconViewItemLabelClass() const;
 
     /** 数据List视图中的ListBox的Class属性
     */
-    void SetListViewClass(const DString& className);
+    void SetListViewClass(const DString &className);
     DString GetListViewClass() const;
 
     /** 数据List视图中的ListBox的子项Class属性
     */
-    void SetListViewItemClass(const DString& className);
+    void SetListViewItemClass(const DString &className);
     DString GetListViewItemClass() const;
 
     /** 数据List视图中的ListBox的子项的图片的Class属性
     */
-    void SetListViewItemImageClass(const DString& className);
+    void SetListViewItemImageClass(const DString &className);
     DString GetListViewItemImageClass() const;
 
     /** 数据List视图中的ListBox的子项的Label的Class属性
     */
-    void SetListViewItemLabelClass(const DString& className);
+    void SetListViewItemLabelClass(const DString &className);
     DString GetListViewItemLabelClass() const;
 
     /** 编辑框的Class属性
     */
-    void SetRichEditClass(const DString& richEditClass);
+    void SetRichEditClass(const DString &richEditClass);
     DString GetRichEditClass() const;
 
 protected:
@@ -1183,7 +1257,7 @@ protected:
     /** 列表头列的分割条双击事件
     * @param [in] pHeaderItem 列表头控件接口
     */
-    void OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem* pHeaderItem);
+    void OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem *pHeaderItem);
 
     /** 同步UI的Check状态(列级别的CheckBox)
     * @param [in] nColumnId 列ID, 如果为Box::InvalidIndex表示更新所有列
@@ -1197,7 +1271,7 @@ protected:
 private:
     /** 列表事件，转发给应用层
     */
-    void OnListCtrlViewEvent(ListCtrlType listCtrlType, const EventArgs& args);
+    void OnListCtrlViewEvent(ListCtrlType listCtrlType, const EventArgs &args);
 
     /** 进入编辑状态
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -1205,8 +1279,8 @@ private:
     * @param [in] pItem 列表项的接口
     * @param [in] pSubItem 列表项子项的接口
     */
-    void OnItemEnterEditMode(size_t itemIndex, size_t nColumnId,
-                             IListBoxItem* pItem, ListCtrlLabel* pSubItem);
+    void OnItemEnterEditMode(
+        size_t itemIndex, size_t nColumnId, IListBoxItem *pItem, ListCtrlLabel *pSubItem);
 
     /** 进入编辑状态的定时器取消机制
     */
@@ -1218,27 +1292,27 @@ private:
 
     /** 校验编辑状态的输入参数，是否有效
     */
-    bool IsValidItemEditParam(const ListCtrlEditParam& editParam) const;
+    bool IsValidItemEditParam(const ListCtrlEditParam &editParam) const;
 
     /** 校验是否满足可编辑状态
     */
-    bool IsValidItemEditState(const ListCtrlEditParam& editParam) const;
+    bool IsValidItemEditState(const ListCtrlEditParam &editParam) const;
 
     /** 更新RichEdit控件的位置和大小
     */
-    void UpdateRichEditSize(ListCtrlLabel* pSubItem);
+    void UpdateRichEditSize(ListCtrlLabel *pSubItem);
 
     /** 子项编辑事件
     */
-    void OnItemEdited(const ListCtrlEditParam& editParam, const DString& newItemText);
+    void OnItemEdited(const ListCtrlEditParam &editParam, const DString &newItemText);
 
     /** 视图接收到鼠标消息
     */
-    void OnViewMouseEvents(const EventArgs& msg);
+    void OnViewMouseEvents(const EventArgs &msg);
 
     /** 视图接收到鼠标消息
     */
-    void OnViewKeyboardEvents(const EventArgs& msg);
+    void OnViewKeyboardEvents(const EventArgs &msg);
 
     /** 结束编辑状态
     */
@@ -1257,23 +1331,23 @@ private:
 private:
     /** 表头控件
     */
-    ListCtrlHeader* m_pHeaderCtrl;
+    ListCtrlHeader *m_pHeaderCtrl;
 
     /** 列表数据展示(Report视图)
     */
-    ListCtrlReportView* m_pReportView;
+    ListCtrlReportView *m_pReportView;
 
     /** 列表数据展示(Icon视图)
     */
-    ListCtrlIconView* m_pIconView;
+    ListCtrlIconView *m_pIconView;
 
     /** 列表数据展示(List视图)
     */
-    ListCtrlListView* m_pListView;
+    ListCtrlListView *m_pListView;
 
     /** 列表数据管理
     */
-    ListCtrlData* m_pData;
+    ListCtrlData *m_pData;
 
     /** ListCtrlHeader的属性Class
     */
@@ -1349,7 +1423,7 @@ private:
 
     /** 编辑框控件
     */
-    RichEdit* m_pRichEdit;
+    RichEdit *m_pRichEdit;
 
     /** 表头的高度
     */
@@ -1412,6 +1486,6 @@ private:
     bool m_bEnableItemEdit;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_H_

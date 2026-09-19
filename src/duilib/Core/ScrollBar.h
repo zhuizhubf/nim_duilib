@@ -4,35 +4,35 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Image/StateImage.h"
 
-namespace ui
-{
-    class ScrollBox;
+namespace ui {
+class ScrollBox;
 
 /** 滚动条控件
 */
-class DUILIB_API ScrollBar: public Control
+class DUILIB_API ScrollBar : public Control
 {
     typedef Control BaseClass;
-public:
-    explicit ScrollBar(Window* pWindow);
-    ScrollBar(const ScrollBar& r) = delete;
-    ScrollBar& operator=(const ScrollBar& r) = delete;
 
-    ScrollBox* GetOwner() const;
-    void SetOwner(ScrollBox* pOwner);
+public:
+    explicit ScrollBar(Window *pWindow);
+    ScrollBar(const ScrollBar &r) = delete;
+    ScrollBar &operator=(const ScrollBar &r) = delete;
+
+    ScrollBox *GetOwner() const;
+    void SetOwner(ScrollBox *pOwner);
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
     virtual void SetFocus() override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
     virtual bool HasHoveredState() override;
-    virtual bool MouseEnter(const EventArgs& msg) override;
-    virtual bool MouseLeave(const EventArgs& msg) override;
+    virtual bool MouseEnter(const EventArgs &msg) override;
+    virtual bool MouseLeave(const EventArgs &msg) override;
 
     virtual void SetPos(UiRect rc) override;
-    virtual void HandleEvent(const EventArgs& msg) override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
     virtual void ClearImageCache() override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -136,7 +136,7 @@ public:
      * @param[in] pStrImage 图片位置
      * @return 无
      */
-    void SetButton1StateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetButton1StateImage(ControlStateType stateType, const DString &pStrImage);
 
     /**
      * @brief 是否显示右或下按钮
@@ -164,7 +164,7 @@ public:
      * @param[in] pStrImage 图片位置
      * @return 无
      */
-    void SetButton2StateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetButton2StateImage(ControlStateType stateType, const DString &pStrImage);
 
     /**
      * @brief 获取滑块指定状态下的图片
@@ -179,7 +179,7 @@ public:
      * @param[in] pStrImage 图片位置
      * @return 无
      */
-    void SetThumbStateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetThumbStateImage(ControlStateType stateType, const DString &pStrImage);
 
     /**
      * @brief 获取指定状态下滑块中间标识图片
@@ -194,7 +194,7 @@ public:
      * @param[in] pStrImage 图片位置
      * @return 无
      */
-    void SetRailStateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetRailStateImage(ControlStateType stateType, const DString &pStrImage);
 
     /**
      * @brief 获取指定状态下的背景图片
@@ -209,13 +209,13 @@ public:
      * @param[in] pStrImage 图片位置
      * @return 无
      */
-    void SetBkStateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetBkStateImage(ControlStateType stateType, const DString &pStrImage);
 
     /**
      * @brief 是否自动隐藏滚动条
      * @return 返回 true 为是，否则为 false
      */
-    bool IsAutoHideScroll(){return m_bAutoHide;}
+    bool IsAutoHideScroll() { return m_bAutoHide; }
 
     /**
      * @brief 设置是否自动隐藏滚动条
@@ -249,18 +249,18 @@ private:
     void ScrollTimeHandle();
 
     /// 绘制相关函数
-    void PaintBk(IRender* pRender);
-    void PaintButton1(IRender* pRender);
-    void PaintButton2(IRender* pRender);
-    void PaintThumb(IRender* pRender);
-    void PaintRail(IRender* pRender);
+    void PaintBk(IRender *pRender);
+    void PaintButton1(IRender *pRender);
+    void PaintButton2(IRender *pRender);
+    void PaintThumb(IRender *pRender);
+    void PaintRail(IRender *pRender);
 
     /** 获取一次快速滚动的偏移量
     */
     int64_t CalcFastScrollOffset(int32_t posOffset) const;
 
 private:
-    enum { 
+    enum {
         DEFAULT_SCROLLBAR_SIZE = 12,
     };
 
@@ -300,7 +300,7 @@ private:
     /** 纵向滚动条：关联横向滚动条的高度
     */
     int32_t m_nHScrollbarHeight;
-    
+
     //上次鼠标所在位置
     UiPoint m_ptLastMouse;
 
@@ -344,9 +344,9 @@ private:
     WeakCallbackFlag m_weakFlagOwner;
 
     //支持滚动条的容器接口
-    ScrollBox* m_pOwner;
+    ScrollBox *m_pOwner;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif // UI_CORE_SCROLLBAR_H_

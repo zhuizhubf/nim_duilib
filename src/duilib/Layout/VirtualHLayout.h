@@ -4,8 +4,7 @@
 #include "duilib/Layout/HLayout.h"
 #include "duilib/Layout/VirtualLayout.h"
 
-namespace ui 
-{
+namespace ui {
 /** 虚表实现的瓦片布局(只有1行的纵向布局)
  *  水平方向对齐方式：靠左对齐，按控件依次排列
  *  垂直方向对齐方式：默认居中对齐
@@ -15,6 +14,7 @@ class VirtualListBox;
 class DUILIB_API VirtualHLayout : public HLayout, public VirtualLayout
 {
     typedef HLayout BaseClass;
+
 public:
     VirtualHLayout();
 
@@ -28,14 +28,16 @@ public:
      * @param [in] bEstimateOnly true表示仅评估不调整控件的位置，false表示调整控件的位置
      * @return 返回排列后最终布局的宽度和高度信息，包含Box容器的内边距，但不包含Box容器本身的外边距(当容器支持滚动条时使用该返回值)
      */
-    virtual UiSize64 ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly = false) override;
+    virtual UiSize64 ArrangeChildren(
+        const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly = false) override;
 
     /** 根据内部子控件大小估算容器布局大小（用于评估宽度或者高度为"auto"类型的控件大小，拉伸类型的子控件不计入大小估算）
      * @param [in] items 子控件列表
      * @param [in] szAvailable 容器的可用宽度和高度，包含分配给该容器的内边距，但不包含分配给容器的外边距
      * @return 返回排列后最终布局的大小信息（宽度和高度），包含Box容器本身的内边距，但不包含Box容器本身的外边距；
      */
-    virtual UiSize64 EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable) override;
+    virtual UiSize64 EstimateLayoutSize(
+        const std::vector<Control *> &items, UiSize szAvailable) override;
 
     /** 设置布局属性
      * @param [in] strName 要设置的属性名
@@ -43,15 +45,14 @@ public:
      * @param [in] dpiManager DPI管理接口
      * @return true 设置成功，false 属性不存在
      */
-    virtual bool SetAttribute(const DString& strName, 
-                              const DString& strValue,
-                              const DpiManager& dpiManager) override;
+    virtual bool SetAttribute(
+        const DString &strName, const DString &strValue, const DpiManager &dpiManager) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
     * @param [in] dpiManager DPI缩放管理器
     */
-    virtual void ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale) override;
+    virtual void ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale) override;
 
 public:
     /** 延迟加载展示数据
@@ -85,7 +86,7 @@ public:
     * @param [in] rc 当前显示区域的矩形，不包含内边距
     * @param[out] collection 索引列表，范围是：[0, GetElementCount())
     */
-    virtual void GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const override;
+    virtual void GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const override;
 
     /** 让控件在可见范围内
     * @param [in] rc 当前显示区域的矩形，不包含内边距
@@ -103,7 +104,7 @@ public:
 
     /** 获取子项大小，该宽度和高度，是包含了控件的外边距和内边距的
      */
-    const UiSize& GetItemSize() const;
+    const UiSize &GetItemSize() const;
 
     /** 设置是否自动计算子项的高度（仅当设置为固定行时有效）
     */
@@ -124,7 +125,7 @@ private:
 private:
     /** 获取关联的Box接口
     */
-    VirtualListBox* GetOwnerBox() const;
+    VirtualListBox *GetOwnerBox() const;
 
 private:
     //子项大小, 该宽度和高度，是包含了控件的外边距和内边距的

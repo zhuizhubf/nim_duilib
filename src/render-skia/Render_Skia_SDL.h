@@ -6,26 +6,25 @@
 #ifdef DUILIB_BUILD_FOR_SDL
 
 namespace skwindow {
-    class WindowContext;
+class WindowContext;
 }
 
 //SDL的类型，提前声明
 struct SDL_Window;
 
-namespace ui 
-{
+namespace ui {
 /** 渲染引擎接口的SDL实现
 */
-class Render_Skia_SDL: public Render_Skia
+class Render_Skia_SDL : public Render_Skia
 {
 public:
     /** 构造函数
     * @param [in] sdlWindow 关联的窗口，可以为nullptr
     * @param [in] backendType 后台绘制方式
     */
-    Render_Skia_SDL(SDL_Window* sdlWindow, RenderBackendType backendType);
-    Render_Skia_SDL(const Render_Skia_SDL& r) = delete;
-    Render_Skia_SDL& operator = (const Render_Skia_SDL& r) = delete;
+    Render_Skia_SDL(SDL_Window *sdlWindow, RenderBackendType backendType);
+    Render_Skia_SDL(const Render_Skia_SDL &r) = delete;
+    Render_Skia_SDL &operator=(const Render_Skia_SDL &r) = delete;
     virtual ~Render_Skia_SDL() override;
 
 public:
@@ -52,7 +51,7 @@ public:
     /** 绘制并刷新到屏幕（Render的实现已经与窗口关联）, 同步完成
     * @param [in] pRenderPaint 界面绘制所需的回调接口
     */
-    virtual bool PaintAndSwapBuffers(IRenderPaint* pRenderPaint) override;
+    virtual bool PaintAndSwapBuffers(IRenderPaint *pRenderPaint) override;
 
     /** 设置窗口的形状为圆角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
@@ -60,13 +59,14 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw) override;
+    virtual bool SetWindowRoundRectRgn(
+        const UiRect &rcWnd, float rx, float ry, bool bRedraw) override;
 
     /** 设置窗口的形状为直角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw) override;
+    virtual bool SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw) override;
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] bRedraw 是否重绘
@@ -75,11 +75,11 @@ public:
 
     /** 获取SkSurface接口
     */
-    virtual SkSurface* GetSkSurface() const override;
+    virtual SkSurface *GetSkSurface() const override;
 
     /** 获取SkCanvas接口
     */
-    virtual SkCanvas* GetSkCanvas() const override;
+    virtual SkCanvas *GetSkCanvas() const override;
 
 private:
 #ifdef DUILIB_BUILD_FOR_WIN
@@ -92,7 +92,7 @@ private:
     */
     virtual void ReleaseRenderDC(HDC hdc) override;
 #endif
-   
+
 private:
     /** WindowContext对象
     */
@@ -104,7 +104,7 @@ private:
 
     /** 关联的窗口
     */
-    SDL_Window* m_sdlWindow;
+    SDL_Window *m_sdlWindow;
 };
 
 } // namespace ui

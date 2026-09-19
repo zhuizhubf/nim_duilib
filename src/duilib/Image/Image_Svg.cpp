@@ -1,23 +1,18 @@
 #include "Image_Svg.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
-Image_Svg::Image_Svg()
-{
-}
+namespace ui {
+Image_Svg::Image_Svg() {}
 
-Image_Svg::~Image_Svg()
-{
-}
+Image_Svg::~Image_Svg() {}
 
-std::unique_ptr<IImage> Image_Svg::MakeImage(const std::shared_ptr<ISvgImage>& pSvgImage)
+std::unique_ptr<IImage> Image_Svg::MakeImage(const std::shared_ptr<ISvgImage> &pSvgImage)
 {
     ASSERT(pSvgImage != nullptr);
     if (pSvgImage == nullptr) {
         return nullptr;
     }
-    Image_Svg* pImageObj = new Image_Svg;
+    Image_Svg *pImageObj = new Image_Svg;
     std::unique_ptr<IImage> pImage(pImageObj);
     pImageObj->m_pSvgImage = pSvgImage;
     return pImage;
@@ -73,16 +68,15 @@ uint32_t Image_Svg::GetDecodedFrameIndex() const
     return 0;
 }
 
-void Image_Svg::SetAsyncDecodeTaskId(size_t /*nTaskId*/)
-{
-}
+void Image_Svg::SetAsyncDecodeTaskId(size_t /*nTaskId*/) {}
 
 size_t Image_Svg::GetAsyncDecodeTaskId() const
 {
     return 0;
 }
 
-bool Image_Svg::AsyncDecode(uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool* /*bDecodeError*/)
+bool Image_Svg::AsyncDecode(
+    uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool * /*bDecodeError*/)
 {
     return false;
 }

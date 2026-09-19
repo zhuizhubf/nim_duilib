@@ -3,10 +3,10 @@
 
 #include "duilib/Core/ControlDropTarget.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_CEF)
 
 namespace client {
-    class DropTargetWin;
+class DropTargetWin;
 }
 
 namespace ui {
@@ -16,21 +16,23 @@ namespace ui {
 class DUILIB_API CefOsrDropTarget : public ControlDropTarget_Windows
 {
 public:
-    explicit CefOsrDropTarget(const std::shared_ptr<client::DropTargetWin>& pDropTargetWin);
+    explicit CefOsrDropTarget(const std::shared_ptr<client::DropTargetWin> &pDropTargetWin);
     virtual ~CefOsrDropTarget() override;
 
 public:
     //IDropTarget::DragEnter
-    virtual int32_t DragEnter(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t DragEnter(
+        void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
     //IDropTarget::DragOver
-    virtual int32_t DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t DragOver(uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
     //IDropTarget::DragLeave
     virtual int32_t DragLeave(void) override;
 
     //IDropTarget::Drop
-    virtual int32_t Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect) override;
+    virtual int32_t Drop(
+        void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect) override;
 
 private:
     std::shared_ptr<client::DropTargetWin> m_pDropTargetWin;

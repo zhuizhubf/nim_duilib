@@ -5,37 +5,35 @@
 #include "cef/CefControlNative.h"
 #include "cef/CefControlOffScreen.h"
 
-#include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Core/Box.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Core/Box.h"
+#include "duilib/Utils/FilePathUtil.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN)
-    #include "CefManager_Windows.h"
-#elif defined (DUILIB_BUILD_FOR_LINUX)
-    #include "CefManager_Linux.h"
-#elif defined (DUILIB_BUILD_FOR_MACOS)
-    #include "CefManager_MacOS.h"
+#if defined(DUILIB_BUILD_FOR_WIN)
+#include "CefManager_Windows.h"
+#elif defined(DUILIB_BUILD_FOR_LINUX)
+#include "CefManager_Linux.h"
+#elif defined(DUILIB_BUILD_FOR_MACOS)
+#include "CefManager_MacOS.h"
 #endif
 
-#pragma warning (push)
-#pragma warning (disable:4100 4324)
-    #include "include/base/cef_callback.h"
-    #include "include/base/cef_bind.h"
-    #include "include/wrapper/cef_closure_task.h"
-#pragma warning (pop)
+#pragma warning(push)
+#pragma warning(disable : 4100 4324)
+#include "include/base/cef_bind.h"
+#include "include/base/cef_callback.h"
+#include "include/wrapper/cef_closure_task.h"
+#pragma warning(pop)
 
-namespace ui
-{
+namespace ui {
 //创建CEF控件的回调函数
-static Control* DuilibCreateCefControl(const DString& className)
+static Control *DuilibCreateCefControl(const DString &className)
 {
-    Control* pControl = nullptr;
+    Control *pControl = nullptr;
     if (className == _T("CefControl")) {
         if (ui::CefManager::GetInstance()->IsEnableOffScreenRendering()) {
             pControl = new CefControlOffScreen(nullptr);
-        }
-        else {
+        } else {
             pControl = new CefControlNative(nullptr);
         }
     }
@@ -46,36 +44,34 @@ static Control* DuilibCreateCefControl(const DString& className)
 #define CEF_DO_MESSAGE_LOOP_WORK_DELAY_MS 60
 
 ///////////////////////////////////////////////////////////////////////////////////
-CefManager::CefManager():
-    m_logSeverity(LOGSEVERITY_DEFAULT),
-    m_browserCount(0),
-    m_nCefDoMessageLoopWorkDelayMs(CEF_DO_MESSAGE_LOOP_WORK_DELAY_MS),
-    m_nExitCode(0),
-    m_bHasCefCachePath(false),
-    m_bEnableOffScreenRendering(true),
-    m_bCefInit(false),
-    m_bCefMessageLoopEmpty(false),
-    m_bEnableF12(true),
-    m_bEnableF11(true)
+CefManager::CefManager()
+    : m_logSeverity(LOGSEVERITY_DEFAULT)
+    , m_browserCount(0)
+    , m_nCefDoMessageLoopWorkDelayMs(CEF_DO_MESSAGE_LOOP_WORK_DELAY_MS)
+    , m_nExitCode(0)
+    , m_bHasCefCachePath(false)
+    , m_bEnableOffScreenRendering(true)
+    , m_bCefInit(false)
+    , m_bCefMessageLoopEmpty(false)
+    , m_bEnableF12(true)
+    , m_bEnableF11(true)
 {
 #ifdef DUILIB_BUILD_FOR_MACOS
     m_bExiting = false;
 #endif
 }
 
-CefManager::~CefManager()
-{
-}
+CefManager::~CefManager() {}
 
-CefManager* CefManager::GetInstance()
+CefManager *CefManager::GetInstance()
 {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     static CefManager_Windows self;
     return &self;
-#elif defined (DUILIB_BUILD_FOR_LINUX)
+#elif defined(DUILIB_BUILD_FOR_LINUX)
     static CefManager_Linux self;
     return &self;
-#elif defined (DUILIB_BUILD_FOR_MACOS)
+#elif defined(DUILIB_BUILD_FOR_MACOS)
     static CefManager_MacOS self;
     return &self;
 #else
@@ -84,7 +80,7 @@ CefManager* CefManager::GetInstance()
 #endif
 }
 
-void CefManager::SetCefCachePath(const DString& cefCachePath)
+void CefManager::SetCefCachePath(const DString &cefCachePath)
 {
     ASSERT(!m_bCefInit);
     m_cefCachePath = cefCachePath;
@@ -103,7 +99,7 @@ DString CefManager::GetCefCachePath() const
     return defaultCachePath;
 }
 
-void CefManager::SetCefMoudlePath(const DString& cefMoudlePath)
+void CefManager::SetCefMoudlePath(const DString &cefMoudlePath)
 {
     ASSERT(!m_bCefInit);
     m_cefMoudlePath = cefMoudlePath;
@@ -114,7 +110,7 @@ DString CefManager::GetCefMoudlePath() const
     return m_cefMoudlePath;
 }
 
-void CefManager::SetCefLanguage(const DString& lang)
+void CefManager::SetCefLanguage(const DString &lang)
 {
     ASSERT(!m_bCefInit);
     m_lang = lang;
@@ -150,12 +146,13 @@ bool CefManager::InitEnv()
     return true;
 }
 
-bool CefManager::Initialize(bool bEnableOffScreenRendering,
-                            const DString& appName,
-                            int /*argc*/,
-                            char** /*argv*/,
-                            OnCefSettingsEvent callback,
-                            int32_t& /*nExitCode*/)
+bool CefManager::Initialize(
+    bool bEnableOffScreenRendering,
+    const DString &appName,
+    int /*argc*/,
+    char ** /*argv*/,
+    OnCefSettingsEvent callback,
+    int32_t & /*nExitCode*/)
 {
     ASSERT(!appName.empty());
     ASSERT(!m_bCefInit);
@@ -185,9 +182,8 @@ bool CefManager::IsCefInited() const
     return m_bCefInit;
 }
 
-void CefManager::SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent& /*callback*/)
-{
-}
+void CefManager::SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent & /*callback*/)
+{}
 
 OnAlreadyRunningAppRelaunchEvent CefManager::GetAlreadyRunningAppRelaunch() const
 {
@@ -215,43 +211,43 @@ int32_t CefManager::GetBrowserCount()
     return m_browserCount;
 }
 
-static void GetCefControlList(Box* pRoot, std::vector<Control*>& cefControlList)
+static void GetCefControlList(Box *pRoot, std::vector<Control *> &cefControlList)
 {
     if (pRoot == nullptr) {
         return;
     }
-    std::vector<Box*> boxList;
+    std::vector<Box *> boxList;
     size_t nItemCount = pRoot->GetItemCount();
     for (size_t nItem = 0; nItem < nItemCount; ++nItem) {
-        Control* pControl = pRoot->GetItemAt(nItem);
+        Control *pControl = pRoot->GetItemAt(nItem);
         if (pControl == nullptr) {
             continue;
         }
-        if (dynamic_cast<CefControl*>(pControl) != nullptr) {
+        if (dynamic_cast<CefControl *>(pControl) != nullptr) {
             cefControlList.push_back(pControl);
         }
-        Box* pBox = dynamic_cast<Box*>(pControl);
+        Box *pBox = dynamic_cast<Box *>(pControl);
         if (pBox != nullptr) {
             boxList.push_back(pBox);
         }
     }
 
-    for (Box* pBox : boxList) {
+    for (Box *pBox : boxList) {
         GetCefControlList(pBox, cefControlList);
     }
 }
 
-void CefManager::ProcessWindowCloseEvent(Window* pWindow)
+void CefManager::ProcessWindowCloseEvent(Window *pWindow)
 {
-    Box* pRoot = nullptr;
+    Box *pRoot = nullptr;
     if (pWindow != nullptr) {
         pRoot = pWindow->GetRoot();
     }
-    std::vector<Control*> cefControlList;
+    std::vector<Control *> cefControlList;
     GetCefControlList(pRoot, cefControlList);
 
-    for (Control* pControl : cefControlList) {
-        CefControl* pCefControl = dynamic_cast<CefControl*>(pControl);
+    for (Control *pControl : cefControlList) {
+        CefControl *pCefControl = dynamic_cast<CefControl *>(pControl);
         if (pCefControl != nullptr) {
             pCefControl->OnHostWindowClosed();
         }
@@ -267,9 +263,9 @@ void CefManager::PostQuitMessage(int32_t nExitCode)
     if (!m_bExiting) {
         m_bExiting = true;
         m_exitTime = std::chrono::steady_clock::now();
-    }
-    else {
-        auto waitSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_exitTime);
+    } else {
+        auto waitSeconds = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::steady_clock::now() - m_exitTime);
         if (waitSeconds.count() > 15) {
             //等待超过15秒，则强制退出
             bForceExit = true;
@@ -284,29 +280,25 @@ void CefManager::PostQuitMessage(int32_t nExitCode)
             if (m_bCefMessageLoopEmpty) {
                 //启用CEF消息循环：退出主线程的消息循环
                 GlobalManager::Instance().Thread().PostTask(kThreadUI, [nExitCode]() {
-                        NativeWindow::PostQuitMsg(nExitCode);
-                    });
-            }
-            CefPostTask(TID_UI, base::BindOnce([]() {
-                //响应后，标记消息队列为空(当CEF消息循环中有待处理的事项时，直接退出主线程消息循环会有偶发崩溃问题)
-                CefManager::GetInstance()->m_bCefMessageLoopEmpty = true;
-                //未启用CEF消息循环：直接退出主线程的消息循环
-                GlobalManager::Instance().Thread().PostTask(kThreadUI, []() {
-                    NativeWindow::PostQuitMsg(CefManager::GetInstance()->m_nExitCode);
-                    });
-                }));
-        }
-        else {
-            //未启用CEF消息循环：直接退出主线程的消息循环
-            GlobalManager::Instance().Thread().PostTask(kThreadUI, [nExitCode]() {
                     NativeWindow::PostQuitMsg(nExitCode);
                 });
+            }
+            CefPostTask(TID_UI, base::BindOnce([]() {
+                            //响应后，标记消息队列为空(当CEF消息循环中有待处理的事项时，直接退出主线程消息循环会有偶发崩溃问题)
+                            CefManager::GetInstance()->m_bCefMessageLoopEmpty = true;
+                            //未启用CEF消息循环：直接退出主线程的消息循环
+                            GlobalManager::Instance().Thread().PostTask(kThreadUI, []() {
+                                NativeWindow::PostQuitMsg(CefManager::GetInstance()->m_nExitCode);
+                            });
+                        }));
+        } else {
+            //未启用CEF消息循环：直接退出主线程的消息循环
+            GlobalManager::Instance().Thread().PostTask(kThreadUI, [nExitCode]() {
+                NativeWindow::PostQuitMsg(nExitCode);
+            });
         }
-    }
-    else {
-        auto cb = [nExitCode]()  {
-            CefManager::GetInstance()->PostQuitMessage(nExitCode);
-        };
+    } else {
+        auto cb = [nExitCode]() { CefManager::GetInstance()->PostQuitMessage(nExitCode); };
         GlobalManager::Instance().Thread().PostDelayedTask(kThreadUI, cb, 200);
     }
 }
@@ -316,13 +308,13 @@ bool CefManager::IsMultiThreadedMessageLoop() const
     return true;
 }
 
-void CefManager::GetCefSetting(CefSettings& settings)
+void CefManager::GetCefSetting(CefSettings &settings)
 {
     DString appDataRootDir = GetCefCachePath();
     if (!appDataRootDir.empty()) {
         FilePath filePath(appDataRootDir);
         filePath.NormalizeDirectoryPath();
-        if(!filePath.IsAbsolutePath()) {
+        if (!filePath.IsAbsolutePath()) {
             FilePath runPath = FilePathUtil::GetCurrentModuleDirectory();
             runPath /= filePath;
             filePath.Swap(runPath);
@@ -373,8 +365,7 @@ void CefManager::GetCefSetting(CefSettings& settings)
     if (!settings.multi_threaded_message_loop) {
         //需要启用外部调用CEF消息循环模式
         settings.external_message_pump = true;
-    }
-    else {
+    } else {
         settings.external_message_pump = false;
     }
 }
@@ -384,12 +375,15 @@ void CefManager::ScheduleCefDoMessageLoopWork()
     ASSERT(!IsMultiThreadedMessageLoop());
     if (!IsMultiThreadedMessageLoop()) {
         int32_t delayMs = GetCefDoMessageLoopWorkDelayMs();
-        GlobalManager::Instance().Thread().PostRepeatedTask(ui::kThreadUI, []() {
+        GlobalManager::Instance().Thread().PostRepeatedTask(
+            ui::kThreadUI,
+            []() {
                 // 执行单次 CEF 消息处理
                 if (ui::CefManager::GetInstance()->IsCefInited()) {
                     CefDoMessageLoopWork();
                 }
-            }, delayMs);
+            },
+            delayMs);
     }
 }
 
@@ -408,14 +402,14 @@ int32_t CefManager::GetCefDoMessageLoopWorkDelayMs() const
 
 namespace {
 
-    // These flags must match the Chromium values.
-    const char kProcessType[] = "type";
-    const char kRendererProcess[] = "renderer";
+// These flags must match the Chromium values.
+const char kProcessType[] = "type";
+const char kRendererProcess[] = "renderer";
 #if defined(DUILIB_BUILD_FOR_LINUX)
-    const char kZygoteProcess[] = "zygote";
+const char kZygoteProcess[] = "zygote";
 #endif
 
-}  // namespace
+} // namespace
 
 CefManager::ProcessType CefManager::GetProcessType(CefRefPtr<CefCommandLine> commandLine)
 {
@@ -424,7 +418,7 @@ CefManager::ProcessType CefManager::GetProcessType(CefRefPtr<CefCommandLine> com
         return BrowserProcess;
     }
 
-    const std::string& processType = commandLine->GetSwitchValue(kProcessType);
+    const std::string &processType = commandLine->GetSwitchValue(kProcessType);
     if (processType == kRendererProcess) {
         return RendererProcess;
     }
@@ -437,7 +431,7 @@ CefManager::ProcessType CefManager::GetProcessType(CefRefPtr<CefCommandLine> com
     return OtherProcess;
 }
 
-void CefManager::AppendSwitchWithValue(const DString& name, const DString& value)
+void CefManager::AppendSwitchWithValue(const DString &name, const DString &value)
 {
     ASSERT(!value.empty());
     if (!value.empty()) {
@@ -445,7 +439,7 @@ void CefManager::AppendSwitchWithValue(const DString& name, const DString& value
     }
 }
 
-const std::vector<std::pair<DString, DString>>& CefManager::GetSwitchWithValues() const
+const std::vector<std::pair<DString, DString>> &CefManager::GetSwitchWithValues() const
 {
     return m_cefSwitchWithValues;
 }

@@ -4,7 +4,7 @@
 // duilib
 #include "duilib/duilib.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 #include <shobjidl_core.h>
 
@@ -20,30 +20,31 @@ class TaskbarManager;
 class TaskbarTabItem final : public ui::Window
 {
     typedef ui::Window BaseClass;
+
 public:
     /**
     * @param[in] pBindControl 与TaskbarTabItem绑定在一起的提供缩略图和预览图的控件的指针
     * 构造函数
     */
-    explicit TaskbarTabItem(ui::Control* pBindControl);
+    explicit TaskbarTabItem(ui::Control *pBindControl);
 
     /**
     * 获取与TaskbarTabItem绑定在一起的控件指针
     * @return ui::Control* 控件指针
     */
-    ui::Control* GetBindControl();
+    ui::Control *GetBindControl();
 
     /**
     * 获取缩略图Tab的唯一id
     * @return std::string& id
     */
-    std::string& GetId();
+    std::string &GetId();
 
     /** 初始化函数，TaskbarTabItem被new后立即调用
     * @param [in] taskbarTitle 在任务栏缩略图上显示的标题
     * @param [in] id 缩略图Tab的唯一id
     */
-    void Init(const DString& taskbarTitle, const std::string& id);
+    void Init(const DString &taskbarTitle, const std::string &id);
 
     /** 反初始化函数
     */
@@ -52,7 +53,7 @@ public:
     /** 设置本Tab缩略图的标题
     * @param[in] title 标题
     */
-    void SetTaskbarTitle(const DString& title);
+    void SetTaskbarTitle(const DString &title);
 
     /** 设置本Tab缩略图的窗口图标
     * @param [in] title 标题
@@ -62,12 +63,12 @@ public:
     /** 设置本Tab所属的窗体对应的TaskbarManager
     * @param[in] pTaskbarManager TaskbarManager指针
     */
-    void SetTaskbarManager(TaskbarManager* pTaskbarManager);
+    void SetTaskbarManager(TaskbarManager *pTaskbarManager);
 
     /** 获取本Tab所属的窗体对应的TaskbarManager
     * @return TaskbarManager* TaskbarManager指针
     */
-    TaskbarManager* GetTaskbarManager();
+    TaskbarManager *GetTaskbarManager();
 
     /**
     * 把TaskbarTabItem在任务栏的缩略图设为无效状态，用于重绘缩略图
@@ -84,7 +85,7 @@ private:
     * @param[in out] bHandled 是否处理了消息，如果处理了不继续传递消息
     * @return LRESULT 处理结果
     */
-    virtual LRESULT OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) override;
+    virtual LRESULT OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled) override;
 
     /**
     * 响应WM_DWMSENDICONICTHUMBNAIL消息
@@ -102,9 +103,9 @@ private:
 
 private:
     bool m_bWin7orGreater;
-    ui::Control* m_pBindControl;
+    ui::Control *m_pBindControl;
     std::string m_id;
-    TaskbarManager* m_taskbarManager;
+    TaskbarManager *m_taskbarManager;
 };
 
 /** @class TaskbarManager
@@ -134,7 +135,7 @@ public:
         * 获取渲染接口
         * @return 渲染接口
         */
-        virtual ui::IRender* GetTaskbarRender() const = 0;
+        virtual ui::IRender *GetTaskbarRender() const = 0;
 
         /**
         * 关闭一个任务栏项
@@ -197,7 +198,7 @@ public:
     * @param[in] control 控件指针
     * @return HBITMAP    生成的位图
     */
-    ui::IBitmap* GenerateBindControlBitmapWithForm(ui::Control *control);
+    ui::IBitmap *GenerateBindControlBitmapWithForm(ui::Control *control);
 
     /**
     * 生成某个控件对应的位图
@@ -206,7 +207,8 @@ public:
     * @param[in] dest_height 目标高度
     * @return HBITMAP    生成的位图
     */
-    ui::IBitmap* GenerateBindControlBitmap(ui::Control *control, const int dest_width, const int dest_height);
+    ui::IBitmap *GenerateBindControlBitmap(
+        ui::Control *control, const int dest_width, const int dest_height);
 
     /**
     * 缩放一个内存位图
@@ -219,7 +221,14 @@ public:
     * @param[in] src_height 源高度
     * @return HBITMAP    生成的位图
     */
-    ui::IBitmap* ResizeBitmap(int dest_width, int dest_height, ui::IRender* pSrcRender, int src_x, int src_y, int src_width, int src_height);
+    ui::IBitmap *ResizeBitmap(
+        int dest_width,
+        int dest_height,
+        ui::IRender *pSrcRender,
+        int src_x,
+        int src_y,
+        int src_width,
+        int src_height);
 
     /**
     * 处理任务栏Tab的缩略图的WM_CLOSE消息
@@ -234,9 +243,10 @@ public:
     * @return void    无返回值
     */
     void OnTabItemClicked(TaskbarTabItem &pTabItem);
+
 private:
-    ITaskbarDelegate* m_pTaskbarDelegate;
-    ITaskbarList4* m_pTaskbarList;
+    ITaskbarDelegate *m_pTaskbarDelegate;
+    ITaskbarList4 *m_pTaskbarList;
 };
 
 #endif //(DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)

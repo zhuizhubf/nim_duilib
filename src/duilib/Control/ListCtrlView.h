@@ -3,20 +3,20 @@
 
 #include "duilib/Box/VirtualListBox.h"
 
-namespace ui
-{
+namespace ui {
 /** ListCtrl列表视图UI控件的基类（实现子项选择功能，包括方向键，快捷键，鼠标选择逻辑等）
 *   使用这个类的时候，需要用 ListCtrlItemTemplate 模板来形成子类作为ListBoxItem
 */
 class DUILIB_API ListCtrlView : public VirtualListBox
 {
     typedef VirtualListBox BaseClass;
+
 public:
-    ListCtrlView(Window* pWindow, Layout* pLayout);
+    ListCtrlView(Window *pWindow, Layout *pLayout);
     virtual ~ListCtrlView() override;
 
     virtual DString GetType() const override { return _T("ListCtrlView"); }
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 选择子项
     *  @param [in] iIndex 子项目的ID
@@ -24,15 +24,18 @@ public:
     *  @param [in] bTriggerEvent 是否触发选择事件, 如果为true，会触发一个kEventSelect事件
     *  @param [in] vkFlag 按键标志, 取值范围参见 enum VKFlag 的定义
     */
-    virtual bool SelectItem(size_t iIndex, bool bTakeFocus,
-                            bool bTriggerEvent, uint64_t vkFlag) override;
+    virtual bool SelectItem(
+        size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag) override;
 
 public:
     /** 监听选择项发生变化的事件
      * @param [in] callback 选择子项时的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelChanged, callback, callbackID); }
+    void AttachSelChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelChanged, callback, callbackID);
+    }
 
 public:
     /** 获取顶部元素的索引号
@@ -47,7 +50,7 @@ public:
     /** 获取当前显示的数据项列表，顺序是从上到下
     * @param [in] itemIndexList 当前显示的数据项索引号列表
     */
-    virtual void GetDisplayDataItems(std::vector<size_t>& itemIndexList) const;
+    virtual void GetDisplayDataItems(std::vector<size_t> &itemIndexList) const;
 
     /** 确保数据索引项可见
     * @param [in] itemIndex 数据项的索引号
@@ -71,12 +74,12 @@ public:
     /** 鼠标事件(来源于子控件的消息转发)
     * @param [in] msg 鼠标事件的内容
     */
-    virtual void OnChildItemMouseEvent(const EventArgs& msg) = 0;
+    virtual void OnChildItemMouseEvent(const EventArgs &msg) = 0;
 
     /** 触发鼠标相关回调事件(来源于子控件的消息转发)
     * @param [in] msg 鼠标事件的内容
     */
-    virtual void FireChildItemMouseEvent(const EventArgs& msg) = 0;
+    virtual void FireChildItemMouseEvent(const EventArgs &msg) = 0;
 };
 
 /** ListCtrl各个视图中数据项的基类模板
@@ -85,11 +88,11 @@ template<typename InheritType>
 class ListCtrlItemTemplate : public ListBoxItemTemplate<InheritType>, public IListCtrlViewItem
 {
     typedef ListBoxItemTemplate<InheritType> BaseClass;
+
 public:
-    explicit ListCtrlItemTemplate(Window* pWindow):
-        ListBoxItemTemplate<InheritType>(pWindow)
-    {
-    }
+    explicit ListCtrlItemTemplate(Window *pWindow)
+        : ListBoxItemTemplate<InheritType>(pWindow)
+    {}
     virtual ~ListCtrlItemTemplate() override = default;
 
     /** 设置控件是否选择状态
@@ -107,7 +110,7 @@ public:
 protected:
     /** 激活函数
     */
-    virtual void Activate(const EventArgs* pMsg) override
+    virtual void Activate(const EventArgs *pMsg) override
     {
         //重写基类的实现逻辑，这里只发出一个Click事件
         if (this->IsActivatable()) {
@@ -116,18 +119,18 @@ protected:
                 newMsg.eventData = pMsg->eventType;
                 newMsg.eventType = kEventNone;
                 this->SendEvent(kEventClick, newMsg);
-            }
-            else {
+            } else {
                 this->SendEvent(kEventClick);
-            }            
+            }
         }
     }
 
     /** 鼠标左键按下事件：触发选择子项事件
     */
-    virtual bool ButtonDown(const EventArgs& msg) override
+    virtual bool ButtonDown(const EventArgs &msg) override
     {
-        if (this->IsEnabled() && this->IsActivatable() && this->IsPointInWithScrollOffset(msg.ptMouse)) {
+        if (this->IsEnabled() && this->IsActivatable()
+            && this->IsPointInWithScrollOffset(msg.ptMouse)) {
             uint64_t vkFlag = kVkLButton;
             if (this->IsKeyDown(msg, ModifierKey::kControl)) {
                 vkFlag |= kVkControl;
@@ -143,10 +146,11 @@ protected:
 
     /** 鼠标右键按下事件：触发选择子项事件
     */
-    virtual bool RButtonDown(const EventArgs& msg) override
+    virtual bool RButtonDown(const EventArgs &msg) override
     {
-        if (this->IsEnabled() && this->IsActivatable() && this->IsPointInWithScrollOffset(msg.ptMouse)) {
-            uint64_t vkFlag = kVkRButton;            
+        if (this->IsEnabled() && this->IsActivatable()
+            && this->IsPointInWithScrollOffset(msg.ptMouse)) {
+            uint64_t vkFlag = kVkRButton;
             if (this->IsKeyDown(msg, ModifierKey::kControl)) {
                 vkFlag |= kVkControl;
             }
@@ -164,7 +168,7 @@ protected:
     */
     void SelectItem(uint64_t vkFlag)
     {
-        IListBoxOwner* pOwner = this->GetOwner();
+        IListBoxOwner *pOwner = this->GetOwner();
         ASSERT(pOwner != nullptr);
         if (pOwner != nullptr) {
             size_t nListBoxIndex = this->GetListBoxIndex();
@@ -175,9 +179,10 @@ protected:
     /** 鼠标事件(来源于子控件的消息转发)
     * @param [in] msg 鼠标事件的内容
     */
-    virtual void OnChildItemMouseEvent(const EventArgs& msg) override
+    virtual void OnChildItemMouseEvent(const EventArgs &msg) override
     {
-        if ((msg.eventType == EventType::kEventMouseEnter) || (msg.eventType == EventType::kEventMouseLeave)) {
+        if ((msg.eventType == EventType::kEventMouseEnter)
+            || (msg.eventType == EventType::kEventMouseLeave)) {
             //这两个事件不需要转发，子控件会自动转发给父控件
             return;
         }
@@ -187,14 +192,15 @@ protected:
     /** 触发鼠标相关回调事件(来源于子控件的消息转发)
     * @param [in] msg 鼠标事件的内容
     */
-    virtual void FireChildItemMouseEvent(const EventArgs& msg) override
+    virtual void FireChildItemMouseEvent(const EventArgs &msg) override
     {
-        if ((msg.eventType == EventType::kEventMouseEnter) || (msg.eventType == EventType::kEventMouseLeave)) {
+        if ((msg.eventType == EventType::kEventMouseEnter)
+            || (msg.eventType == EventType::kEventMouseLeave)) {
             //这两个事件不需要转发，子控件会自动转发给父控件，并触发该消息对应的事件
             return;
         }
         EventArgs newMsg = msg;
-        newMsg.SetSender(this);//按Item控件触发回调
+        newMsg.SetSender(this); //按Item控件触发回调
         this->FireAllEvents(newMsg);
     }
 };
@@ -203,6 +209,6 @@ typedef ListCtrlItemTemplate<Box> ListCtrlItemBase;   //基类为：ListBoxItem
 typedef ListCtrlItemTemplate<HBox> ListCtrlItemBaseH; //基类为：ListBoxItemH
 typedef ListCtrlItemTemplate<VBox> ListCtrlItemBaseV; //基类为：ListBoxItemV
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_VIEW_H_

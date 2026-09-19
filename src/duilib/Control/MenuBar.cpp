@@ -1,54 +1,55 @@
 #include "MenuBar.h"
 #include "duilib/Control/Button.h"
 
-namespace ui
-{
+namespace ui {
 class MenuBarButton : public ButtonBox
 {
     typedef ButtonBox BaseClass;
+
 public:
-    explicit MenuBarButton(MenuBar* pMenuBar);
+    explicit MenuBarButton(MenuBar *pMenuBar);
+
 public:
     //鼠标事件
-    virtual bool MouseEnter(const EventArgs& msg) override;
-    virtual bool MouseLeave(const EventArgs& msg) override;
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
+    virtual bool MouseEnter(const EventArgs &msg) override;
+    virtual bool MouseLeave(const EventArgs &msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
 
 private:
-    MenuBar* m_pMenuBar;
+    MenuBar *m_pMenuBar;
 };
 
-MenuBarButton::MenuBarButton(MenuBar* pMenuBar) :
-    ButtonBox(pMenuBar->GetWindow()),
-    m_pMenuBar(pMenuBar)
+MenuBarButton::MenuBarButton(MenuBar *pMenuBar)
+    : ButtonBox(pMenuBar->GetWindow())
+    , m_pMenuBar(pMenuBar)
 {
     //使用RichText模式
     //SetRichText(true);
 }
 
-bool MenuBarButton::MouseEnter(const EventArgs& msg)
+bool MenuBarButton::MouseEnter(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseEnter(msg);
     m_pMenuBar->OnMenuMouseEnter(this, msg);
     return bRet;
 }
 
-bool MenuBarButton::MouseLeave(const EventArgs& msg)
+bool MenuBarButton::MouseLeave(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseLeave(msg);
     m_pMenuBar->OnMenuMouseLeave(this, msg);
     return bRet;
 }
 
-bool MenuBarButton::ButtonDown(const EventArgs& msg)
+bool MenuBarButton::ButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     m_pMenuBar->OnMenuMouseButtonDown(this, msg);
     return bRet;
 }
 
-bool MenuBarButton::ButtonUp(const EventArgs& msg)
+bool MenuBarButton::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     m_pMenuBar->OnMenuMouseButtonUp(this, msg);
@@ -56,15 +57,17 @@ bool MenuBarButton::ButtonUp(const EventArgs& msg)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MenuBar::MenuBar(Window* pWindow):
-    HBox(pWindow),
-    m_nItemDataId(0),
-    m_bActiveState(false),
-    m_bEnableBtnActive(false)
-{
-}
+MenuBar::MenuBar(Window *pWindow)
+    : HBox(pWindow)
+    , m_nItemDataId(0)
+    , m_bActiveState(false)
+    , m_bEnableBtnActive(false)
+{}
 
-DString MenuBar::GetType() const { return DUI_CTR_MENU_BAR; }
+DString MenuBar::GetType() const
+{
+    return DUI_CTR_MENU_BAR;
+}
 
 void MenuBar::OnInit()
 {
@@ -74,19 +77,18 @@ void MenuBar::OnInit()
     BaseClass::OnInit();
 
     //初始化
-    for (TopMenuData& menuData : m_topMenuList) {
+    for (TopMenuData &menuData : m_topMenuList) {
         menuData.m_nItemDataId = ++m_nItemDataId;
         AddTopMenuToUI(menuData, GetItemCount());
     }
 }
 
-void MenuBar::AddTopMenuToUI(const TopMenuData& menuData, size_t nInsertItem)
+void MenuBar::AddTopMenuToUI(const TopMenuData &menuData, size_t nInsertItem)
 {
-    MenuBarButton* pNewItem = new MenuBarButton(this);
+    MenuBarButton *pNewItem = new MenuBarButton(this);
     if (!menuData.m_menuTextId.empty()) {
         pNewItem->SetTextId(menuData.m_menuTextId.c_str());
-    }
-    else {
+    } else {
         pNewItem->SetText(menuData.m_menuText.c_str());
     }
     bool bAdded = AddItemAt(pNewItem, nInsertItem);
@@ -95,8 +97,7 @@ void MenuBar::AddTopMenuToUI(const TopMenuData& menuData, size_t nInsertItem)
         pNewItem->SetUserDataID(menuData.m_nItemDataId);
         if (!menuData.m_menuTextButtonClass.empty()) {
             pNewItem->SetClass(menuData.m_menuTextButtonClass.c_str());
-        }
-        else {
+        } else {
             //使用默认值
             pNewItem->SetClass(_T("menu_bar_button"));
         }
@@ -105,20 +106,20 @@ void MenuBar::AddTopMenuToUI(const TopMenuData& menuData, size_t nInsertItem)
         }
     }
 
-    pNewItem->AttachClick([this, pNewItem](const EventArgs&) {
+    pNewItem->AttachClick([this, pNewItem](const EventArgs &) {
         //按钮点击时
         if (m_bEnableBtnActive) {
             ShowPopupMenu(pNewItem);
-        }        
+        }
         return true;
-        });
+    });
 }
 
-void MenuBar::RemoveTopMenuFromUI(const TopMenuData& menuData)
+void MenuBar::RemoveTopMenuFromUI(const TopMenuData &menuData)
 {
     const size_t nItemCount = GetItemCount();
     for (size_t nItem = 0; nItem < nItemCount; ++nItem) {
-        Control* pItem = GetItemAt(nItem);
+        Control *pItem = GetItemAt(nItem);
         if ((pItem != nullptr) && (pItem->GetUserDataID() == menuData.m_nItemDataId)) {
             RemoveItem(pItem);
             break;
@@ -126,46 +127,56 @@ void MenuBar::RemoveTopMenuFromUI(const TopMenuData& menuData)
     }
 }
 
-int32_t MenuBar::AddTopMenu(const DString& menuItemId,
-                            const DString& menuText,
-                            const DString& menuTextId,
-                            const DString& menuXmlPath,
-                            const DString& menuTextButtonClass,
-                            const DString& menuTextButtonAttributes)
+int32_t MenuBar::AddTopMenu(
+    const DString &menuItemId,
+    const DString &menuText,
+    const DString &menuTextId,
+    const DString &menuXmlPath,
+    const DString &menuTextButtonClass,
+    const DString &menuTextButtonAttributes)
 {
-    return InsertTopMenu((int32_t)m_topMenuList.size(), menuItemId, menuText, menuTextId, menuXmlPath, menuTextButtonClass, menuTextButtonAttributes);
+    return InsertTopMenu(
+        (int32_t) m_topMenuList.size(),
+        menuItemId,
+        menuText,
+        menuTextId,
+        menuXmlPath,
+        menuTextButtonClass,
+        menuTextButtonAttributes);
 }
 
-int32_t MenuBar::AddTopMenu(const MenuBarItem& menuBarItem)
+int32_t MenuBar::AddTopMenu(const MenuBarItem &menuBarItem)
 {
-    return InsertTopMenu((int32_t)m_topMenuList.size(), menuBarItem);
+    return InsertTopMenu((int32_t) m_topMenuList.size(), menuBarItem);
 }
 
-int32_t MenuBar::InsertTopMenu(int32_t nMenuIndex, const MenuBarItem& menuBarItem)
+int32_t MenuBar::InsertTopMenu(int32_t nMenuIndex, const MenuBarItem &menuBarItem)
 {
-    return InsertTopMenu(nMenuIndex,
-                         menuBarItem.m_menuItemId,
-                         menuBarItem.m_menuText,
-                         menuBarItem.m_menuTextId,
-                         menuBarItem.m_menuXmlPath,
-                         menuBarItem.m_menuTextButtonClass,
-                         menuBarItem.m_menuTextButtonAttributes);
+    return InsertTopMenu(
+        nMenuIndex,
+        menuBarItem.m_menuItemId,
+        menuBarItem.m_menuText,
+        menuBarItem.m_menuTextId,
+        menuBarItem.m_menuXmlPath,
+        menuBarItem.m_menuTextButtonClass,
+        menuBarItem.m_menuTextButtonAttributes);
 }
 
-int32_t MenuBar::InsertTopMenu(int32_t nMenuIndex,
-                               const DString& menuItemId,
-                               const DString& menuText,
-                               const DString& menuTextId,
-                               const DString& menuXmlPath,
-                               const DString& menuTextButtonClass,
-                               const DString& menuTextButtonAttributes)
+int32_t MenuBar::InsertTopMenu(
+    int32_t nMenuIndex,
+    const DString &menuItemId,
+    const DString &menuText,
+    const DString &menuTextId,
+    const DString &menuXmlPath,
+    const DString &menuTextButtonClass,
+    const DString &menuTextButtonAttributes)
 {
     ASSERT(!(menuText.empty() && menuTextId.empty()) && !menuXmlPath.empty());
     if ((menuText.empty() && menuTextId.empty()) || menuXmlPath.empty()) {
         return -1;
     }
-    if ((nMenuIndex < 0) || (nMenuIndex > (int32_t)m_topMenuList.size())) {
-        nMenuIndex = (int32_t)m_topMenuList.size();
+    if ((nMenuIndex < 0) || (nMenuIndex > (int32_t) m_topMenuList.size())) {
+        nMenuIndex = (int32_t) m_topMenuList.size();
     }
 
     TopMenuData menuData;
@@ -179,13 +190,12 @@ int32_t MenuBar::InsertTopMenu(int32_t nMenuIndex,
         menuData.m_nItemDataId = ++m_nItemDataId;
     }
     int32_t nRetIndex = 0;
-    if (nMenuIndex < (int32_t)m_topMenuList.size()) {
+    if (nMenuIndex < (int32_t) m_topMenuList.size()) {
         m_topMenuList.insert(m_topMenuList.begin() + nMenuIndex, menuData);
         nRetIndex = nMenuIndex;
-    }
-    else {
+    } else {
         m_topMenuList.push_back(menuData);
-        nRetIndex = (int32_t)m_topMenuList.size() - 1;
+        nRetIndex = (int32_t) m_topMenuList.size() - 1;
     }
     if (IsInited()) {
         //添加到界面
@@ -194,10 +204,10 @@ int32_t MenuBar::InsertTopMenu(int32_t nMenuIndex,
     return nRetIndex;
 }
 
-bool MenuBar::GetTopMenu(int32_t nMenuIndex, MenuBarItem& menuBarItem)
+bool MenuBar::GetTopMenu(int32_t nMenuIndex, MenuBarItem &menuBarItem)
 {
-    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t)m_topMenuList.size())) {
-        const TopMenuData& menuData = m_topMenuList[nMenuIndex];
+    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t) m_topMenuList.size())) {
+        const TopMenuData &menuData = m_topMenuList[nMenuIndex];
         menuBarItem.m_menuItemId = menuData.m_menuItemId.c_str();
         menuBarItem.m_menuText = menuData.m_menuText.c_str();
         menuBarItem.m_menuTextId = menuData.m_menuTextId.c_str();
@@ -211,8 +221,8 @@ bool MenuBar::GetTopMenu(int32_t nMenuIndex, MenuBarItem& menuBarItem)
 
 bool MenuBar::RemoveTopMenu(int32_t nMenuIndex)
 {
-    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t)m_topMenuList.size())) {
-        TopMenuData menuData = m_topMenuList[nMenuIndex];        
+    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t) m_topMenuList.size())) {
+        TopMenuData menuData = m_topMenuList[nMenuIndex];
         m_topMenuList.erase(m_topMenuList.begin() + nMenuIndex);
         //从界面中删除
         RemoveTopMenuFromUI(menuData);
@@ -223,11 +233,11 @@ bool MenuBar::RemoveTopMenu(int32_t nMenuIndex)
 
 bool MenuBar::SetActiveTopMenuIndex(int32_t nMenuIndex)
 {
-    ASSERT((nMenuIndex >= 0) && (nMenuIndex < (int32_t)m_topMenuList.size()));
-    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t)m_topMenuList.size())) {
-        const TopMenuData& menuData = m_topMenuList[nMenuIndex];
+    ASSERT((nMenuIndex >= 0) && (nMenuIndex < (int32_t) m_topMenuList.size()));
+    if ((nMenuIndex >= 0) && (nMenuIndex < (int32_t) m_topMenuList.size())) {
+        const TopMenuData &menuData = m_topMenuList[nMenuIndex];
         for (size_t nIndex = 0; nIndex < GetItemCount(); ++nIndex) {
-            MenuBarButton* pItem = dynamic_cast<MenuBarButton*>(GetItemAt(nIndex));
+            MenuBarButton *pItem = dynamic_cast<MenuBarButton *>(GetItemAt(nIndex));
             if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
                 if (menuData.m_nItemDataId == pItem->GetUserDataID()) {
                     m_bEnableBtnActive = true;
@@ -244,12 +254,13 @@ bool MenuBar::SetActiveTopMenuIndex(int32_t nMenuIndex)
 int32_t MenuBar::GetActiveTopMenuIndex() const
 {
     if ((m_pActiveMenu != nullptr) && m_pActiveMenu->IsWindow() && !m_pActiveMenu->IsClosingWnd()) {
-        Control* pRelatedControl = m_pActiveMenu->GetRelatedControl();
+        Control *pRelatedControl = m_pActiveMenu->GetRelatedControl();
         if (pRelatedControl != nullptr) {
-            MenuBarButton* pItem = dynamic_cast<MenuBarButton*>(pRelatedControl);
+            MenuBarButton *pItem = dynamic_cast<MenuBarButton *>(pRelatedControl);
             if (pItem != nullptr) {
-                for (int32_t nMenuIndex = 0; nMenuIndex < (int32_t)m_topMenuList.size(); ++nMenuIndex) {
-                    const TopMenuData& menuData = m_topMenuList[nMenuIndex];
+                for (int32_t nMenuIndex = 0; nMenuIndex < (int32_t) m_topMenuList.size();
+                     ++nMenuIndex) {
+                    const TopMenuData &menuData = m_topMenuList[nMenuIndex];
                     if (menuData.m_nItemDataId == pItem->GetUserDataID()) {
                         return nMenuIndex;
                     }
@@ -272,7 +283,7 @@ void MenuBar::ClearMenuBarItemActivated()
     m_callbackList.clear();
 }
 
-void MenuBar::CheckShowPopupMenu(MenuBarButton* pButton)
+void MenuBar::CheckShowPopupMenu(MenuBarButton *pButton)
 {
     if (HasActivePopupMenu()) {
         bool bPopup = true;
@@ -289,21 +300,20 @@ void MenuBar::CheckShowPopupMenu(MenuBarButton* pButton)
     }
 }
 
-void MenuBar::OnMenuMouseEnter(MenuBarButton* pButton, const EventArgs& /*msg*/)
+void MenuBar::OnMenuMouseEnter(MenuBarButton *pButton, const EventArgs & /*msg*/)
 {
     if (pButton == nullptr) {
         return;
     }
     size_t nItemDataId = pButton->GetUserDataID();
-    for (TopMenuData& menuData : m_topMenuList) {
+    for (TopMenuData &menuData : m_topMenuList) {
         if (menuData.m_nItemDataId == nItemDataId) {
             if (menuData.m_bMouseEnter) {
                 //已经执行过，不重复执行弹出菜单的操作
                 return;
             }
             menuData.m_bMouseEnter = true;
-        }
-        else {
+        } else {
             menuData.m_bMouseEnter = false;
         }
     }
@@ -312,7 +322,7 @@ void MenuBar::OnMenuMouseEnter(MenuBarButton* pButton, const EventArgs& /*msg*/)
     CheckShowPopupMenu(pButton);
 }
 
-void MenuBar::OnMenuMouseLeave(MenuBarButton* pButton, const EventArgs& /*msg*/)
+void MenuBar::OnMenuMouseLeave(MenuBarButton *pButton, const EventArgs & /*msg*/)
 {
     if (HasActivePopupMenu()) {
         if ((m_pActiveMenu != nullptr) && (m_pActiveMenu->GetRelatedControl() == pButton)) {
@@ -324,30 +334,27 @@ void MenuBar::OnMenuMouseLeave(MenuBarButton* pButton, const EventArgs& /*msg*/)
     }
 }
 
-void MenuBar::OnMenuMouseButtonDown(MenuBarButton* pButton, const EventArgs& /*msg*/)
+void MenuBar::OnMenuMouseButtonDown(MenuBarButton *pButton, const EventArgs & /*msg*/)
 {
-    m_bActiveState = !m_bActiveState;//鼠标按下时，开关效果
+    m_bActiveState = !m_bActiveState; //鼠标按下时，开关效果
     if (m_bActiveState) {
         //弹出菜单
         ShowPopupMenu(pButton);
-    }
-    else {
+    } else {
         //已经弹出，收起
         HidePopupMenu(pButton);
     }
 }
 
-void MenuBar::OnMenuMouseButtonUp(MenuBarButton* /*pButton*/, const EventArgs& /*msg*/)
-{
-}
+void MenuBar::OnMenuMouseButtonUp(MenuBarButton * /*pButton*/, const EventArgs & /*msg*/) {}
 
-void MenuBar::ShowPopupMenu(MenuBarButton* pButton)
+void MenuBar::ShowPopupMenu(MenuBarButton *pButton)
 {
     ASSERT(pButton != nullptr);
     if (pButton == nullptr) {
         return;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return;
@@ -355,7 +362,7 @@ void MenuBar::ShowPopupMenu(MenuBarButton* pButton)
     TopMenuData topMenuData;
     bool bFoundMenu = false;
     size_t nItemDataId = pButton->GetUserDataID();
-    for (const TopMenuData& menuData : m_topMenuList) {
+    for (const TopMenuData &menuData : m_topMenuList) {
         if (menuData.m_nItemDataId == nItemDataId) {
             bFoundMenu = true;
             topMenuData = menuData;
@@ -375,7 +382,8 @@ void MenuBar::ShowPopupMenu(MenuBarButton* pButton)
     //如果已经展开则关闭
     HidePopupMenu(pButton);
 
-    Menu* pMenu = new ui::Menu(pWindow, pButton, this);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    Menu *pMenu = new ui::Menu(
+        pWindow, pButton, this); //需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
     m_pActiveMenu = pMenu;
 
     pMenu->SetSkinFolder(pWindow->GetResourcePath().ToString());
@@ -385,39 +393,41 @@ void MenuBar::ShowPopupMenu(MenuBarButton* pButton)
     std::weak_ptr<WeakFlag> menuBarFlag = GetWeakFlag();
     //菜单命令事件响应
     DString menuItemId = topMenuData.m_menuItemId.c_str();
-    MenuItemActivatedEvent callback = [this, menuBarFlag, menuItemId](const DString& menuName, int32_t nMenuLevel,
-                                                                      const DString& itemName, size_t nItemIndex) {
-            //菜单命令激活，通知应用层
-            if (!menuBarFlag.expired()) {
-                DString activeMenuName = menuName;
-                int32_t activeMenuLevel = nMenuLevel;
-                DString activeItemName = itemName;
-                size_t activeItemIndex = nItemIndex;
-                std::vector<MenuBarItemActivatedEvent> callbackList(m_callbackList);
-                for (MenuBarItemActivatedEvent callback : callbackList) {
-                    if (callback) {
-                        callback(menuItemId,
-                            activeMenuName, activeMenuLevel,
-                            activeItemName, activeItemIndex);
-                    }
+    MenuItemActivatedEvent callback = [this, menuBarFlag, menuItemId](
+                                          const DString &menuName,
+                                          int32_t nMenuLevel,
+                                          const DString &itemName,
+                                          size_t nItemIndex) {
+        //菜单命令激活，通知应用层
+        if (!menuBarFlag.expired()) {
+            DString activeMenuName = menuName;
+            int32_t activeMenuLevel = nMenuLevel;
+            DString activeItemName = itemName;
+            size_t activeItemIndex = nItemIndex;
+            std::vector<MenuBarItemActivatedEvent> callbackList(m_callbackList);
+            for (MenuBarItemActivatedEvent callback : callbackList) {
+                if (callback) {
+                    callback(
+                        menuItemId, activeMenuName, activeMenuLevel, activeItemName, activeItemIndex);
                 }
             }
-        };
+        }
+    };
     pMenu->AttachMenuItemActivated(callback);
 
     //菜单关闭时，复位激活状态
-    pMenu->AttachWindowCloseMsg([this, pMenu, menuBarFlag](const EventArgs& /*args*/) {
-            if (!menuBarFlag.expired() && (m_pActiveMenu == pMenu)) {
-                m_bActiveState = false;
-            }
-            return true;
-        });
+    pMenu->AttachWindowCloseMsg([this, pMenu, menuBarFlag](const EventArgs & /*args*/) {
+        if (!menuBarFlag.expired() && (m_pActiveMenu == pMenu)) {
+            m_bActiveState = false;
+        }
+        return true;
+    });
 }
 
-void MenuBar::HidePopupMenu(MenuBarButton* /*pButton*/)
+void MenuBar::HidePopupMenu(MenuBarButton * /*pButton*/)
 {
     if ((m_pActiveMenu != nullptr) && m_pActiveMenu->IsWindow() && !m_pActiveMenu->IsClosingWnd()) {
-        m_pActiveMenu->CloseMenu();        
+        m_pActiveMenu->CloseMenu();
     }
     m_pActiveMenu = nullptr;
 }
@@ -430,7 +440,7 @@ bool MenuBar::HasActivePopupMenu() const
     return false;
 }
 
-void MenuBar::OnMenuKeyDownMsg(Menu* pMenu, VirtualKeyCode vkCode, uint32_t /*modifierKey*/)
+void MenuBar::OnMenuKeyDownMsg(Menu *pMenu, VirtualKeyCode vkCode, uint32_t /*modifierKey*/)
 {
     if ((pMenu == nullptr) || !HasActivePopupMenu()) {
         return;
@@ -438,7 +448,7 @@ void MenuBar::OnMenuKeyDownMsg(Menu* pMenu, VirtualKeyCode vkCode, uint32_t /*mo
     size_t nStartItemIndex = 0;
     std::vector<size_t> itemIndexList;
     for (size_t nIndex = 0; nIndex < GetItemCount(); ++nIndex) {
-        MenuBarButton* pItem = dynamic_cast<MenuBarButton*>(GetItemAt(nIndex));
+        MenuBarButton *pItem = dynamic_cast<MenuBarButton *>(GetItemAt(nIndex));
         if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
             itemIndexList.push_back(nIndex);
             if (pMenu->GetRelatedControl() == pItem) {
@@ -452,7 +462,7 @@ void MenuBar::OnMenuKeyDownMsg(Menu* pMenu, VirtualKeyCode vkCode, uint32_t /*mo
             nNextMenuIndex = 0;
         }
         if (nNextMenuIndex < itemIndexList.size()) {
-            MenuBarButton* pItem = dynamic_cast<MenuBarButton*>(GetItemAt(nNextMenuIndex));
+            MenuBarButton *pItem = dynamic_cast<MenuBarButton *>(GetItemAt(nNextMenuIndex));
             if (pItem != nullptr) {
                 HidePopupMenu(nullptr);
                 m_bEnableBtnActive = true;
@@ -460,8 +470,7 @@ void MenuBar::OnMenuKeyDownMsg(Menu* pMenu, VirtualKeyCode vkCode, uint32_t /*mo
                 m_bEnableBtnActive = false;
             }
         }
-    }
-    else if (vkCode == kVK_LEFT) {
+    } else if (vkCode == kVK_LEFT) {
         size_t nNextMenuIndex = nStartItemIndex - 1;
         if (nStartItemIndex == 0) {
             nNextMenuIndex = itemIndexList.size() - 1;
@@ -470,7 +479,7 @@ void MenuBar::OnMenuKeyDownMsg(Menu* pMenu, VirtualKeyCode vkCode, uint32_t /*mo
             nNextMenuIndex = 0;
         }
         if (nNextMenuIndex < itemIndexList.size()) {
-            MenuBarButton* pItem = dynamic_cast<MenuBarButton*>(GetItemAt(nNextMenuIndex));
+            MenuBarButton *pItem = dynamic_cast<MenuBarButton *>(GetItemAt(nNextMenuIndex));
             if (pItem != nullptr) {
                 HidePopupMenu(nullptr);
                 m_bEnableBtnActive = true;

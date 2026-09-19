@@ -3,57 +3,64 @@
 #include "duilib/Utils/StringUtil.h"
 #include <algorithm>
 
-namespace ui
-{
+namespace ui {
 FilePath::FilePath() = default;
 
-FilePath::FilePath(const std::string& filePath) :
+FilePath::FilePath(const std::string &filePath)
+    :
 #ifdef DUILIB_BUILD_FOR_WIN
-    m_filePath(StringConvert::UTF8ToWString(filePath)),
+    m_filePath(StringConvert::UTF8ToWString(filePath))
+    ,
 #else
-    m_filePath(filePath),
+    m_filePath(filePath)
+    ,
 #endif
     m_bLexicallyNormal(false)
-{
-}
+{}
 
-FilePath::FilePath(const FilePath&) = default;
-FilePath::FilePath(FilePath&&) = default;
+FilePath::FilePath(const FilePath &) = default;
+FilePath::FilePath(FilePath &&) = default;
 FilePath::~FilePath() = default;
-FilePath& FilePath::operator=(const FilePath&) = default;
-FilePath& FilePath::operator=(FilePath&&) noexcept = default;
+FilePath &FilePath::operator=(const FilePath &) = default;
+FilePath &FilePath::operator=(FilePath &&) noexcept = default;
 
-FilePath::FilePath(const std::wstring& filePath) :
+FilePath::FilePath(const std::wstring &filePath)
+    :
 #ifdef DUILIB_BUILD_FOR_WIN
-    m_filePath(filePath),
+    m_filePath(filePath)
+    ,
 #else
-    m_filePath(StringConvert::WStringToUTF8(filePath)),
+    m_filePath(StringConvert::WStringToUTF8(filePath))
+    ,
 #endif
     m_bLexicallyNormal(false)
-{
-}
+{}
 
-FilePath::FilePath(const std::string& filePath, bool bLexicallyNormal):
+FilePath::FilePath(const std::string &filePath, bool bLexicallyNormal)
+    :
 #ifdef DUILIB_BUILD_FOR_WIN
-    m_filePath(StringConvert::UTF8ToWString(filePath)),
+    m_filePath(StringConvert::UTF8ToWString(filePath))
+    ,
 #else
-    m_filePath(filePath),
+    m_filePath(filePath)
+    ,
 #endif
     m_bLexicallyNormal(bLexicallyNormal)
-{
-}
+{}
 
-FilePath::FilePath(const std::wstring& filePath, bool bLexicallyNormal) :
+FilePath::FilePath(const std::wstring &filePath, bool bLexicallyNormal)
+    :
 #ifdef DUILIB_BUILD_FOR_WIN
-    m_filePath(filePath),
+    m_filePath(filePath)
+    ,
 #else
-    m_filePath(StringConvert::WStringToUTF8(filePath)),
+    m_filePath(StringConvert::WStringToUTF8(filePath))
+    ,
 #endif
     m_bLexicallyNormal(bLexicallyNormal)
-{
-}
+{}
 
-void FilePath::Swap(FilePath& r)
+void FilePath::Swap(FilePath &r)
 {
     m_filePath.swap(r.m_filePath);
     std::swap(m_bLexicallyNormal, r.m_bLexicallyNormal);
@@ -81,7 +88,8 @@ bool FilePath::IsExistsPath() const noexcept
     if (errorCode.value() != 0) {
         return false;
     }
-    return std::filesystem::is_regular_file(fileStatus) || std::filesystem::is_directory(fileStatus);
+    return std::filesystem::is_regular_file(fileStatus)
+           || std::filesystem::is_directory(fileStatus);
 }
 
 bool FilePath::IsExistsFile() const noexcept
@@ -111,7 +119,7 @@ uint64_t FilePath::GetFileSize() const noexcept
     if (errorCode.value() != 0) {
         return 0;
     }
-    return (uint64_t)fileSize;
+    return (uint64_t) fileSize;
 }
 
 DString::value_type FilePath::GetPathSeparator()
@@ -133,25 +141,25 @@ DString FilePath::GetPathSeparatorStr()
 }
 
 #ifdef DUILIB_UNICODE
-    //Unicode版本
-    const DStringW& FilePath::NativePath() const
-    {
-        return m_filePath.native();
-    }
+//Unicode版本
+const DStringW &FilePath::NativePath() const
+{
+    return m_filePath.native();
+}
 #else
-    //非Unicode版本
-    DStringA FilePath::NativePath() const
-    {
-        if (m_filePath.empty()) {
-            return DStringA();
-        }
-        #ifdef DUILIB_BUILD_FOR_WIN
-            //转换为本机编码类型的字符串
-            return StringConvert::UnicodeToMBCS(m_filePath.native());
-        #else
-            return m_filePath.native();
-        #endif
+//非Unicode版本
+DStringA FilePath::NativePath() const
+{
+    if (m_filePath.empty()) {
+        return DStringA();
     }
+#ifdef DUILIB_BUILD_FOR_WIN
+    //转换为本机编码类型的字符串
+    return StringConvert::UnicodeToMBCS(m_filePath.native());
+#else
+    return m_filePath.native();
+#endif
+}
 #endif
 
 DStringA FilePath::NativePathA() const
@@ -168,7 +176,7 @@ DStringA FilePath::NativePathA() const
 }
 
 #ifdef DUILIB_UNICODE
-const DString& FilePath::ToString() const
+const DString &FilePath::ToString() const
 {
     return m_filePath.native();
 }
@@ -182,7 +190,7 @@ DString FilePath::ToString() const
     return StringConvert::WStringToUTF8(m_filePath.native());
 }
 #else
-const DString& FilePath::ToString() const
+const DString &FilePath::ToString() const
 {
     return m_filePath.native();
 }
@@ -197,7 +205,7 @@ DStringW FilePath::ToStringW() const
     return StringConvert::UTF8ToWString(m_filePath.native());
 #endif
 }
- 
+
 DStringA FilePath::ToStringA() const
 {
     if (m_filePath.empty()) {
@@ -218,11 +226,11 @@ DString FilePath::GetFileName() const
 #ifdef DUILIB_UNICODE
     return m_filePath.filename().native();
 #else
-    #ifdef DUILIB_BUILD_FOR_WIN
-        return StringConvert::WStringToUTF8(m_filePath.filename().native());
-    #else
-        return m_filePath.filename().native();
-    #endif
+#ifdef DUILIB_BUILD_FOR_WIN
+    return StringConvert::WStringToUTF8(m_filePath.filename().native());
+#else
+    return m_filePath.filename().native();
+#endif
 #endif
 }
 
@@ -234,11 +242,11 @@ DString FilePath::GetFileExtension() const
 #ifdef DUILIB_UNICODE
     return m_filePath.extension().native();
 #else
-    #ifdef DUILIB_BUILD_FOR_WIN
-        return StringConvert::WStringToUTF8(m_filePath.extension().native());
-    #else
-        return m_filePath.extension().native();
-    #endif
+#ifdef DUILIB_BUILD_FOR_WIN
+    return StringConvert::WStringToUTF8(m_filePath.extension().native());
+#else
+    return m_filePath.extension().native();
+#endif
 #endif
 }
 
@@ -256,13 +264,13 @@ FilePath FilePath::GetParentPath() const
 void FilePath::FormatPathAsDirectory()
 {
     //确保路径最后字符是分割字符
-    const std::filesystem::path::string_type& filePath = m_filePath.native();
+    const std::filesystem::path::string_type &filePath = m_filePath.native();
     if (!filePath.empty()) {
         if (filePath.back() != GetPathSeparator()) {
             //结尾不是路径分隔符的话，追加路径分隔符
             m_filePath += GetPathSeparatorStr();
         }
-    }    
+    }
 }
 
 void FilePath::TrimRightPathSeparator()
@@ -270,7 +278,7 @@ void FilePath::TrimRightPathSeparator()
     if (m_filePath.empty()) {
         return;
     }
-    const std::filesystem::path::string_type& str = m_filePath.native();
+    const std::filesystem::path::string_type &str = m_filePath.native();
 #ifdef DUILIB_BUILD_FOR_WIN
     if (str == L"/") {
 #else
@@ -309,14 +317,12 @@ void FilePath::NormalizeFilePath()
 #endif
             m_filePath = m_filePath.lexically_normal();
             m_bLexicallyNormal = true;
-        }
-        else {
+        } else {
             //将"/"替换成"\\"
             m_filePath.make_preferred();
             m_bLexicallyNormal = false;
         }
-    }
-    catch (...) {
+    } catch (...) {
     }
 }
 
@@ -325,7 +331,7 @@ void FilePath::RemoveFileName() noexcept
     m_filePath.remove_filename();
 }
 
-bool FilePath::IsSubDirectory(const FilePath& parentPath) const
+bool FilePath::IsSubDirectory(const FilePath &parentPath) const
 {
     if (IsEmpty() || parentPath.IsEmpty()) {
         return false;
@@ -341,7 +347,7 @@ bool FilePath::IsSubDirectory(const FilePath& parentPath) const
     if (childStr.size() <= parentStr.size()) {
         return false;
     }
-#if !defined (DUILIB_BUILD_FOR_LINUX) && !defined (DUILIB_BUILD_FOR_FREEBSD)
+#if !defined(DUILIB_BUILD_FOR_LINUX) && !defined(DUILIB_BUILD_FOR_FREEBSD)
     //Windows/MacOS文件名不区分大小写，Linux/FreeBSD区分大小写
     parentStr = StringUtil::MakeLowerString(parentStr);
     childStr = StringUtil::MakeLowerString(childStr);
@@ -349,9 +355,9 @@ bool FilePath::IsSubDirectory(const FilePath& parentPath) const
     return childStr.find(parentStr) == 0;
 }
 
-void FilePath::GetParentPathList(std::vector<FilePath>& parentPathList) const
+void FilePath::GetParentPathList(std::vector<FilePath> &parentPathList) const
 {
-    const std::filesystem::path& path = m_filePath;
+    const std::filesystem::path &path = m_filePath;
     if (path.empty()) {
         return;
     }
@@ -369,7 +375,7 @@ void FilePath::GetParentPathList(std::vector<FilePath>& parentPathList) const
         }
     }
     std::reverse(path_list.begin(), path_list.end());
-    for (const auto& pathP : path_list) {
+    for (const auto &pathP : path_list) {
         FilePath parentPath;
         parentPath.m_filePath = pathP;
         parentPath.m_bLexicallyNormal = m_bLexicallyNormal;
@@ -377,7 +383,7 @@ void FilePath::GetParentPathList(std::vector<FilePath>& parentPathList) const
     }
 }
 
-FilePath& FilePath::operator = (const DString& rightPath)
+FilePath &FilePath::operator=(const DString &rightPath)
 {
 #ifdef DUILIB_UNICODE
     m_filePath = rightPath;
@@ -393,7 +399,7 @@ FilePath& FilePath::operator = (const DString& rightPath)
     return *this;
 }
 
-FilePath& FilePath::JoinFilePath(const FilePath& rightPath)
+FilePath &FilePath::JoinFilePath(const FilePath &rightPath)
 {
     if (&rightPath == this) {
         return *this;
@@ -403,7 +409,7 @@ FilePath& FilePath::JoinFilePath(const FilePath& rightPath)
     return *this;
 }
 
-FilePath& FilePath::operator /= (const FilePath& rightPath)
+FilePath &FilePath::operator/=(const FilePath &rightPath)
 {
     if (&rightPath == this) {
         return *this;
@@ -413,14 +419,14 @@ FilePath& FilePath::operator /= (const FilePath& rightPath)
     return *this;
 }
 
-FilePath& FilePath::operator += (const FilePath& rightPath)
+FilePath &FilePath::operator+=(const FilePath &rightPath)
 {
     m_filePath += rightPath.m_filePath;
     m_bLexicallyNormal = false;
     return *this;
 }
 
-FilePath& FilePath::operator += (const DString& rightPath)
+FilePath &FilePath::operator+=(const DString &rightPath)
 {
 #ifdef DUILIB_UNICODE
     m_filePath += rightPath;
@@ -436,17 +442,17 @@ FilePath& FilePath::operator += (const DString& rightPath)
     return *this;
 }
 
-bool FilePath::operator != (const FilePath& otherPath) const noexcept
+bool FilePath::operator!=(const FilePath &otherPath) const noexcept
 {
     return m_filePath != otherPath.m_filePath;
 }
 
-bool FilePath::operator == (const FilePath& otherPath) const noexcept
+bool FilePath::operator==(const FilePath &otherPath) const noexcept
 {
     return m_filePath == otherPath.m_filePath;
 }
 
-bool FilePath::operator < (const FilePath& otherPath) const noexcept
+bool FilePath::operator<(const FilePath &otherPath) const noexcept
 {
 #ifdef _DEBUG
     //如果是绝对路径，应使用规范化的路径，避免不一致
@@ -464,8 +470,7 @@ size_t FilePath::HashValue() const noexcept
 {
     if (m_filePath.empty()) {
         return 0;
-    }
-    else {
+    } else {
         return std::filesystem::hash_value(m_filePath);
     }
 }
@@ -476,4 +481,4 @@ void FilePath::Clear() noexcept
     m_bLexicallyNormal = false;
 }
 
-}
+} // namespace ui

@@ -7,7 +7,7 @@
 class ChatForm : public ui::WindowImplBase
 {
 public:
-    ChatForm(const DString& class_name, const DString& theme_directory, const DString& layout_xml);
+    ChatForm(const DString &class_name, const DString &theme_directory, const DString &layout_xml);
     virtual ~ChatForm() override;
 
     /** 资源相关接口
@@ -22,7 +22,8 @@ public:
     virtual void OnInitWindow() override;
 
 public:
-    static void ShowCustomWindow(const DString& class_name, const DString& theme_directory, const DString& layout_xml);
+    static void ShowCustomWindow(
+        const DString &class_name, const DString &theme_directory, const DString &layout_xml);
 
 private:
     DString m_themeDirectory;

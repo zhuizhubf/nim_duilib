@@ -1,19 +1,19 @@
 #include "Image_WEBP.h"
 #include "duilib/Core/GlobalManager.h"
-#include "render/IRender.h"
 #include "duilib/Utils/FileUtil.h"
+#include "render/IRender.h"
 
 #include "third_party/libwebp/src/webp/decode.h"
 #include "third_party/libwebp/src/webp/demux.h"
 #include <atomic>
 
-namespace ui
-{
+namespace ui {
 //解码WebP图片数据, 一次解码一帧
-static AnimationFramePtr DecodeImage_WEBP(WebPAnimDecoder* pWebPAnimDecoder,
-                                          float fImageSizeScale,
-                                          size_t nFrameIndex,
-                                          int32_t& nPrevTimestamp)
+static AnimationFramePtr DecodeImage_WEBP(
+    WebPAnimDecoder *pWebPAnimDecoder,
+    float fImageSizeScale,
+    size_t nFrameIndex,
+    int32_t &nPrevTimestamp)
 {
     ASSERT(pWebPAnimDecoder != nullptr);
     if (pWebPAnimDecoder == nullptr) {
@@ -24,7 +24,7 @@ static AnimationFramePtr DecodeImage_WEBP(WebPAnimDecoder* pWebPAnimDecoder,
         return nullptr;
     }
 
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         return nullptr;
@@ -38,30 +38,31 @@ static AnimationFramePtr DecodeImage_WEBP(WebPAnimDecoder* pWebPAnimDecoder,
     AnimationFramePtr pFrameData;
     //WebPAnimDecoderReset(pWebPAnimDecoder);
     if (WebPAnimDecoderHasMoreFrames(pWebPAnimDecoder)) {
-        uint8_t* pImageData = nullptr;
+        uint8_t *pImageData = nullptr;
         int timestamp = 0;
         if (WebPAnimDecoderGetNext(pWebPAnimDecoder, &pImageData, &timestamp)) {
             // 根据时间戳控制帧显示时长(毫秒)
             int32_t duration = timestamp - nPrevTimestamp;
             pFrameData = std::make_shared<IAnimationImage::AnimationFrame>();
-            pFrameData->m_nFrameIndex = (int32_t)nFrameIndex;
+            pFrameData->m_nFrameIndex = (int32_t) nFrameIndex;
             pFrameData->SetDelayMs(duration);
-            pFrameData->m_nOffsetX = 0;//OffsetX和OffsetY均不需要处理
+            pFrameData->m_nOffsetX = 0; //OffsetX和OffsetY均不需要处理
             pFrameData->m_nOffsetY = 0;
             pFrameData->m_bDataPending = false;
             pFrameData->m_pBitmap.reset(pRenderFactory->CreateBitmap());
             ASSERT(pFrameData->m_pBitmap != nullptr);
             if (pFrameData->m_pBitmap == nullptr) {
                 pFrameData.reset();
-            }
-            else if (!pFrameData->m_pBitmap->Init(anim_info.canvas_width, anim_info.canvas_height, pImageData, fImageSizeScale)) {
+            } else if (!pFrameData->m_pBitmap->Init(
+                           anim_info.canvas_width,
+                           anim_info.canvas_height,
+                           pImageData,
+                           fImageSizeScale)) {
                 pFrameData.reset();
-            }
-            else {
+            } else {
                 nPrevTimestamp = timestamp;
             }
-        }
-        else {
+        } else {
             //图片数据解码失败
             //ASSERT(0);
         }
@@ -116,7 +117,7 @@ public:
     int32_t m_nPrevTimestamp = 0;
 
     //加载后的句柄
-    WebPAnimDecoder* m_pWebPAnimDecoder = nullptr;
+    WebPAnimDecoder *m_pWebPAnimDecoder = nullptr;
 
     //WebP依赖的数据
     WebPData m_webpData;
@@ -141,7 +142,7 @@ public:
     //解码是否完成
     bool IsDecodeFinished() const
     {
-        if (((int32_t)m_frames.size() == m_nFrameCount) || m_bDecodeError) {
+        if (((int32_t) m_frames.size() == m_nFrameCount) || m_bDecodeError) {
             return true;
         }
         return false;
@@ -158,13 +159,14 @@ Image_WEBP::~Image_WEBP()
     m_impl->ClearImageData();
 }
 
-bool Image_WEBP::LoadImageFile(std::vector<uint8_t>& fileData,
-                               const FilePath& imageFilePath,
-                               bool bLoadAllFrames,
-                               bool bAsyncDecode,
-                               float fImageSizeScale,
-                               const UiSize& rcMaxDestRectSize,
-                               bool bAssertEnabled)
+bool Image_WEBP::LoadImageFile(
+    std::vector<uint8_t> &fileData,
+    const FilePath &imageFilePath,
+    bool bLoadAllFrames,
+    bool bAsyncDecode,
+    float fImageSizeScale,
+    const UiSize &rcMaxDestRectSize,
+    bool bAssertEnabled)
 {
     ASSERT(!fileData.empty() || !imageFilePath.IsEmpty());
     if (fileData.empty() && imageFilePath.IsEmpty()) {
@@ -207,13 +209,13 @@ bool Image_WEBP::LoadImageFile(std::vector<uint8_t>& fileData,
     //开启多线程解码
     dec_options.use_threads = 1;
 
-    WebPAnimDecoder* dec = WebPAnimDecoderNew(&m_impl->m_webpData, &dec_options);
+    WebPAnimDecoder *dec = WebPAnimDecoderNew(&m_impl->m_webpData, &dec_options);
     if (dec == nullptr) {
         //加载失败时，需要恢复原文件数据
         if (bNeedRestoreData) {
             m_impl->m_fileData.swap(fileData);
         }
-        m_impl->m_webpData = { 0, 0 };
+        m_impl->m_webpData = {0, 0};
         return false;
     }
     WebPAnimInfo anim_info;
@@ -224,21 +226,21 @@ bool Image_WEBP::LoadImageFile(std::vector<uint8_t>& fileData,
         if (bNeedRestoreData) {
             m_impl->m_fileData.swap(fileData);
         }
-        m_impl->m_webpData = { 0, 0 };
+        m_impl->m_webpData = {0, 0};
         return false;
     }
 
     m_impl->m_nWidth = anim_info.canvas_width;
     m_impl->m_nHeight = anim_info.canvas_height;
-    m_impl->m_nFrameCount = (int32_t)anim_info.frame_count;
+    m_impl->m_nFrameCount = (int32_t) anim_info.frame_count;
 
     float fScale = fImageSizeScale;
-    if (ImageUtil::GetBestImageScale(rcMaxDestRectSize, m_impl->m_nWidth, m_impl->m_nHeight, fImageSizeScale, fScale)) {
+    if (ImageUtil::GetBestImageScale(
+            rcMaxDestRectSize, m_impl->m_nWidth, m_impl->m_nHeight, fImageSizeScale, fScale)) {
         m_impl->m_nWidth = ImageUtil::GetScaledImageSize(m_impl->m_nWidth, fScale);
         m_impl->m_nHeight = ImageUtil::GetScaledImageSize(m_impl->m_nHeight, fScale);
         m_impl->m_fImageSizeScale = fScale;
-    }
-    else {
+    } else {
         m_impl->m_nWidth = ImageUtil::GetScaledImageSize(m_impl->m_nWidth, fImageSizeScale);
         m_impl->m_nHeight = ImageUtil::GetScaledImageSize(m_impl->m_nHeight, fImageSizeScale);
     }
@@ -248,17 +250,18 @@ bool Image_WEBP::LoadImageFile(std::vector<uint8_t>& fileData,
         ASSERT(m_impl->m_nFrameCount > 0);
     }
 
-    if ((m_impl->m_nFrameCount <= 0) || ((int32_t)m_impl->m_nWidth <= 0) || ((int32_t)m_impl->m_nHeight <= 0)) {        
+    if ((m_impl->m_nFrameCount <= 0) || ((int32_t) m_impl->m_nWidth <= 0)
+        || ((int32_t) m_impl->m_nHeight <= 0)) {
         //加载失败时，需要恢复原文件数据
         WebPAnimDecoderDelete(dec);
         if (bNeedRestoreData) {
             m_impl->m_fileData.swap(fileData);
         }
-        m_impl->m_webpData = { 0, 0 };
+        m_impl->m_webpData = {0, 0};
         return false;
     }
 
-    m_impl->m_nLoops = (int32_t)anim_info.loop_count;
+    m_impl->m_nLoops = (int32_t) anim_info.loop_count;
     if (m_impl->m_nLoops <= 0) {
         m_impl->m_nLoops = -1;
     }
@@ -269,10 +272,8 @@ bool Image_WEBP::LoadImageFile(std::vector<uint8_t>& fileData,
 
 bool Image_WEBP::IsDelayDecodeEnabled() const
 {
-    if (m_impl->m_bAsyncDecode &&
-        !m_impl->m_fileData.empty() &&
-        (m_impl->m_pWebPAnimDecoder != nullptr) &&
-        !m_impl->m_bDecodeError) {
+    if (m_impl->m_bAsyncDecode && !m_impl->m_fileData.empty()
+        && (m_impl->m_pWebPAnimDecoder != nullptr) && !m_impl->m_bDecodeError) {
         return true;
     }
     return false;
@@ -286,20 +287,21 @@ bool Image_WEBP::IsDelayDecodeFinished() const
     if (m_impl->m_bDecodeError) {
         return true;
     }
-    return (int32_t)(m_impl->m_frames.size() + m_impl->m_delayFrames.size()) == m_impl->m_nFrameCount;
+    return (int32_t) (m_impl->m_frames.size() + m_impl->m_delayFrames.size())
+           == m_impl->m_nFrameCount;
 }
 
 uint32_t Image_WEBP::GetDecodedFrameIndex() const
 {
     if (m_impl->m_frames.empty()) {
         return 0;
-    }
-    else {
-        return (uint32_t)m_impl->m_frames.size() - 1;
+    } else {
+        return (uint32_t) m_impl->m_frames.size() - 1;
     }
 }
 
-bool Image_WEBP::DelayDecode(uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool* bDecodeError)
+bool Image_WEBP::DelayDecode(
+    uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError)
 {
     if (!IsDelayDecodeEnabled()) {
         return false;
@@ -318,24 +320,21 @@ bool Image_WEBP::DelayDecode(uint32_t nMinFrameIndex, std::function<bool(void)> 
         return false;
     }
     m_impl->m_bAsyncDecoding = true;
-    const size_t nFrameCount = (size_t)m_impl->m_nFrameCount;
+    const size_t nFrameCount = (size_t) m_impl->m_nFrameCount;
 
     bool bRet = true;
-    float fImageSizeScale = m_impl->m_fImageSizeScale;    
-    while (((IsAborted == nullptr) || !IsAborted()) &&
-           (nMinFrameIndex >= (m_impl->m_frames.size() + m_impl->m_delayFrames.size())) &&
-           ((m_impl->m_frames.size() + m_impl->m_delayFrames.size()) < nFrameCount)) {
+    float fImageSizeScale = m_impl->m_fImageSizeScale;
+    while (((IsAborted == nullptr) || !IsAborted())
+           && (nMinFrameIndex >= (m_impl->m_frames.size() + m_impl->m_delayFrames.size()))
+           && ((m_impl->m_frames.size() + m_impl->m_delayFrames.size()) < nFrameCount)) {
         //每次解码一帧图片
         const size_t nFrameIndex = m_impl->m_delayFrames.size() + m_impl->m_frames.size();
         AnimationFramePtr pNewAnimationFrame;
-        pNewAnimationFrame = DecodeImage_WEBP(m_impl->m_pWebPAnimDecoder,
-                                              fImageSizeScale,
-                                              nFrameIndex,
-                                              m_impl->m_nPrevTimestamp);
+        pNewAnimationFrame = DecodeImage_WEBP(
+            m_impl->m_pWebPAnimDecoder, fImageSizeScale, nFrameIndex, m_impl->m_nPrevTimestamp);
         if (pNewAnimationFrame != nullptr) {
             m_impl->m_delayFrames.push_back(pNewAnimationFrame);
-        }
-        else {
+        } else {
             bRet = false;
             m_impl->m_bDecodeError = true;
             if (bDecodeError != nullptr) {
@@ -403,8 +402,7 @@ bool Image_WEBP::IsFrameDataReady(uint32_t nFrameIndex)
             return true;
         }
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
@@ -418,8 +416,7 @@ int32_t Image_WEBP::GetFrameDelayMs(uint32_t nFrameIndex)
         if (pFrame != nullptr) {
             nDelayMs = pFrame->GetDelayMs();
         }
-    }
-    else if (!m_impl->m_frames.empty()) {
+    } else if (!m_impl->m_frames.empty()) {
         AnimationFramePtr pFrame = m_impl->m_frames.back();
         if (pFrame != nullptr) {
             nDelayMs = pFrame->GetDelayMs();
@@ -428,14 +425,15 @@ int32_t Image_WEBP::GetFrameDelayMs(uint32_t nFrameIndex)
     return nDelayMs;
 }
 
-bool Image_WEBP::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSize*/, AnimationFrame* pAnimationFrame)
+bool Image_WEBP::ReadFrameData(
+    int32_t nFrameIndex, const UiSize & /*szDestRectSize*/, AnimationFrame *pAnimationFrame)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pAnimationFrame != nullptr);
     if (pAnimationFrame == nullptr) {
         return false;
     }
-    
+
     ASSERT((nFrameIndex >= 0) && (nFrameIndex < m_impl->m_nFrameCount));
     if ((nFrameIndex < 0) || (nFrameIndex >= m_impl->m_nFrameCount)) {
         return false;
@@ -455,20 +453,20 @@ bool Image_WEBP::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSi
 
     if (!m_impl->m_bAsyncDecode) {
         //同步解码的情况, 解码所需要的帧
-        while ((nFrameIndex >= (int32_t)m_impl->m_frames.size()) &&
-               ((int32_t)m_impl->m_frames.size() < m_impl->m_nFrameCount)) {
+        while ((nFrameIndex >= (int32_t) m_impl->m_frames.size())
+               && ((int32_t) m_impl->m_frames.size() < m_impl->m_nFrameCount)) {
             ASSERT(m_impl->m_delayFrames.empty());
-            uint32_t nInitFrameIndex = (uint32_t)m_impl->m_frames.size();
+            uint32_t nInitFrameIndex = (uint32_t) m_impl->m_frames.size();
             float fImageSizeScale = m_impl->m_fImageSizeScale;
             AnimationFramePtr pNewAnimationFrame;
-            pNewAnimationFrame = DecodeImage_WEBP(m_impl->m_pWebPAnimDecoder,
-                                                  fImageSizeScale,
-                                                  nInitFrameIndex,
-                                                  m_impl->m_nPrevTimestamp);
+            pNewAnimationFrame = DecodeImage_WEBP(
+                m_impl->m_pWebPAnimDecoder,
+                fImageSizeScale,
+                nInitFrameIndex,
+                m_impl->m_nPrevTimestamp);
             if (pNewAnimationFrame != nullptr) {
                 m_impl->m_frames.push_back(pNewAnimationFrame);
-            }
-            else {
+            } else {
                 m_impl->m_bDecodeError = true;
                 pAnimationFrame->m_bDataError = true;
                 break;
@@ -478,21 +476,19 @@ bool Image_WEBP::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSi
         if (m_impl->IsDecodeFinished()) {
             //如果解码完成，则释放图片资源
             m_impl->ClearImageData();
-        }
-        else if (!m_impl->m_bDecodeError) {
-            ASSERT((nFrameIndex < (int32_t)m_impl->m_frames.size()));
-            if ((nFrameIndex >= (int32_t)m_impl->m_frames.size())) {
+        } else if (!m_impl->m_bDecodeError) {
+            ASSERT((nFrameIndex < (int32_t) m_impl->m_frames.size()));
+            if ((nFrameIndex >= (int32_t) m_impl->m_frames.size())) {
                 pAnimationFrame->m_bDataError = true;
                 return false;
             }
         }
-    }
-    else {
+    } else {
         //合并数据
         MergeDelayDecodeData();
     }
     bool bRet = false;
-    if (nFrameIndex < (int32_t)m_impl->m_frames.size()) {
+    if (nFrameIndex < (int32_t) m_impl->m_frames.size()) {
         AnimationFramePtr pFrameData = m_impl->m_frames[nFrameIndex];
         if (pFrameData != nullptr) {
             ASSERT(pFrameData->m_nFrameIndex == nFrameIndex);
@@ -501,26 +497,22 @@ bool Image_WEBP::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSi
             pAnimationFrame->m_bDataError = false;
             ASSERT(pAnimationFrame->m_pBitmap != nullptr);
             bRet = true;
-        }
-        else {
+        } else {
             m_impl->m_bDecodeError = true;
             pAnimationFrame->m_bDataError = true;
         }
-    }
-    else if (m_impl->m_bAsyncDecode) {
-        if ((int32_t)m_impl->m_frames.size() < m_impl->m_nFrameCount) {
+    } else if (m_impl->m_bAsyncDecode) {
+        if ((int32_t) m_impl->m_frames.size() < m_impl->m_nFrameCount) {
             //尚未完成多帧解码
             pAnimationFrame->m_bDataPending = true;
             pAnimationFrame->m_bDataError = false;
             pAnimationFrame->m_pBitmap.reset();
             bRet = true;
-        }
-        else {
+        } else {
             m_impl->m_bDecodeError = true;
             pAnimationFrame->m_bDataError = true;
         }
-    }
-    else {
+    } else {
         m_impl->m_bDecodeError = true;
         pAnimationFrame->m_bDataError = true;
     }

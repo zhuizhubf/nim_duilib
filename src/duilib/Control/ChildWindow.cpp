@@ -1,16 +1,15 @@
 #include "ChildWindow.h"
 #include "ChildWindowImpl.h"
-#include "duilib/Core/Window.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/Window.h"
 #include "duilib/Utils/AttributeUtil.h"
 
-namespace ui
-{
+namespace ui {
 
-ChildWindow::ChildWindow(Window* pWindow) :
-    Box(pWindow)
+ChildWindow::ChildWindow(Window *pWindow)
+    : Box(pWindow)
 {
-    m_callbackID = (EventCallbackID)(Control*)this;
+    m_callbackID = (EventCallbackID) (Control *) this;
 }
 
 ChildWindow::~ChildWindow()
@@ -22,17 +21,19 @@ ChildWindow::~ChildWindow()
     m_pChildWnd.reset();
 }
 
-DString ChildWindow::GetType() const { return DUI_CTR_CHILD_WINDOW; }
+DString ChildWindow::GetType() const
+{
+    return DUI_CTR_CHILD_WINDOW;
+}
 
-void ChildWindow::SetAttribute(const DString& strName, const DString& strValue2)
+void ChildWindow::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("child_window_margin")) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetChildWindowMargin(rcMargin, true);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -44,7 +45,9 @@ UiMargin ChildWindow::GetChildWindowMargin() const
 
 void ChildWindow::SetChildWindowMargin(UiMargin rcMargin, bool bNeedDpiScale)
 {
-    ASSERT((rcMargin.left >= 0) && (rcMargin.top >= 0) && (rcMargin.right >= 0) && (rcMargin.bottom >= 0));
+    ASSERT(
+        (rcMargin.left >= 0) && (rcMargin.top >= 0) && (rcMargin.right >= 0)
+        && (rcMargin.bottom >= 0));
     rcMargin.Validate();
     if (bNeedDpiScale) {
         Dpi().ScaleMargin(rcMargin);
@@ -74,9 +77,9 @@ void ChildWindow::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t /*nNewDpiScale*
     SetChildWindowMargin(rcMargin, false);
 }
 
-void ChildWindow::SetWindow(Window* pWindow)
+void ChildWindow::SetWindow(Window *pWindow)
 {
-    Window* pOldWindow = GetWindow();
+    Window *pOldWindow = GetWindow();
     BaseClass::SetWindow(pWindow);
     if (m_pChildWnd != nullptr) {
         m_pChildWnd->SetParentWindow(pWindow);
@@ -127,7 +130,7 @@ void ChildWindow::AdjustChildWindowPos()
         UiPoint pt;
         pt.x = rc.left;
         pt.y = rc.top;
-#if defined (DUILIB_BUILD_FOR_SDL) && !defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_SDL) && !defined(DUILIB_BUILD_FOR_WIN)
         //SDL使用的是屏幕坐标，Windows SDK使用的是客户区坐标
         UiRect rcWindow;
         if (GetWindow() != nullptr) {
@@ -145,13 +148,13 @@ void ChildWindow::AdjustChildWindowPos()
     }
 }
 
-bool ChildWindow::CreateChildWindow(ChildWindowEvents* pChildWindowEvents)
+bool ChildWindow::CreateChildWindow(ChildWindowEvents *pChildWindowEvents)
 {
     ASSERT(m_pChildWnd == nullptr);
     if (m_pChildWnd != nullptr) {
         return false;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT((pWindow != nullptr) && pWindow->IsWindow());
     if ((pWindow == nullptr) || !pWindow->IsWindow()) {
         return false;
@@ -170,28 +173,32 @@ bool ChildWindow::CreateChildWindow(ChildWindowEvents* pChildWindowEvents)
     return true;
 }
 
-void ChildWindow::RegisterWindowCallbacks(Window* pWindow)
+void ChildWindow::RegisterWindowCallbacks(Window *pWindow)
 {
     ASSERT((pWindow != nullptr) && pWindow->IsWindow());
     if ((pWindow == nullptr) || !pWindow->IsWindow()) {
         return;
     }
-    std::weak_ptr<WeakFlag> windowFlag = this->GetWeakFlag();//避免this失效，导致回调函数中出粗
-    pWindow->AttachWindowMoveMsg([this, pWindow, windowFlag](const EventArgs&) {
-        if (!windowFlag.expired() && GetWindow() == pWindow) {
-            AdjustChildWindowPos();
-        }
-        return true;
-        }, m_callbackID);
-    pWindow->AttachWindowPosChangedMsg([this, pWindow, windowFlag](const EventArgs&) {
-        if (!windowFlag.expired() && GetWindow() == pWindow) {
-            AdjustChildWindowPos();
-        }
-        return true;
-        }, m_callbackID);
+    std::weak_ptr<WeakFlag> windowFlag = this->GetWeakFlag(); //避免this失效，导致回调函数中出粗
+    pWindow->AttachWindowMoveMsg(
+        [this, pWindow, windowFlag](const EventArgs &) {
+            if (!windowFlag.expired() && GetWindow() == pWindow) {
+                AdjustChildWindowPos();
+            }
+            return true;
+        },
+        m_callbackID);
+    pWindow->AttachWindowPosChangedMsg(
+        [this, pWindow, windowFlag](const EventArgs &) {
+            if (!windowFlag.expired() && GetWindow() == pWindow) {
+                AdjustChildWindowPos();
+            }
+            return true;
+        },
+        m_callbackID);
 }
 
-void ChildWindow::UnregisterWindowCallbacks(Window* pWindow)
+void ChildWindow::UnregisterWindowCallbacks(Window *pWindow)
 {
     ASSERT((pWindow != nullptr) && pWindow->IsWindow());
     if ((pWindow == nullptr) || !pWindow->IsWindow()) {
@@ -207,7 +214,7 @@ void ChildWindow::CloseChildWindow()
     }
 }
 
-void ChildWindow::SetChildWindowEvents(ChildWindowEvents* pChildWindowEvents)
+void ChildWindow::SetChildWindowEvents(ChildWindowEvents *pChildWindowEvents)
 {
     ASSERT(m_pChildWnd != nullptr);
     if (m_pChildWnd == nullptr) {
@@ -216,7 +223,7 @@ void ChildWindow::SetChildWindowEvents(ChildWindowEvents* pChildWindowEvents)
     m_pChildWnd->SetChildWindowEvents(pChildWindowEvents);
 }
 
-void ChildWindow::InvalidateChildWindowRect(const UiRect& rect)
+void ChildWindow::InvalidateChildWindowRect(const UiRect &rect)
 {
     if (m_pChildWnd != nullptr) {
         m_pChildWnd->Invalidate(rect);
@@ -239,7 +246,7 @@ void ChildWindow::UpdateChildWindow() const
     }
 }
 
-void ChildWindow::GetChildWindowRect(UiRect& rect) const
+void ChildWindow::GetChildWindowRect(UiRect &rect) const
 {
     rect = UiRect();
     if (m_pChildWnd != nullptr) {
@@ -248,7 +255,7 @@ void ChildWindow::GetChildWindowRect(UiRect& rect) const
         rc.Deflate(GetChildWindowMargin());
         UiRect rcClient;
         m_pChildWnd->GetClientRect(rcClient);
-        rect.left = rc.left;        
+        rect.left = rc.left;
         rect.right = rect.left + rcClient.Width();
         rect.top = rc.top;
         rect.bottom = rect.top + rcClient.Height();
@@ -262,4 +269,4 @@ void ChildWindow::SetChildWindowLayered(bool bWindowLayered)
     }
 }
 
-}//namespace ui
+} //namespace ui

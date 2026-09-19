@@ -3,11 +3,11 @@
 
 #include "duilib/Core/INativeWindow.h"
 #include "duilib/Core/NativeWindowShadow.h"
-#include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Core/WindowCreateAttributes.h"
+#include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Utils/FilePath.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 #include "duilib/duilib_config_windows.h"
 #include <oleidl.h>
@@ -22,9 +22,9 @@ class Control;
 class DUILIB_API NativeWindow_Windows
 {
 public:
-    explicit NativeWindow_Windows(INativeWindow* pOwner);
-    NativeWindow_Windows(const NativeWindow_Windows& r) = delete;
-    NativeWindow_Windows& operator=(const NativeWindow_Windows& r) = delete;
+    explicit NativeWindow_Windows(INativeWindow *pOwner);
+    NativeWindow_Windows(const NativeWindow_Windows &r) = delete;
+    NativeWindow_Windows &operator=(const NativeWindow_Windows &r) = delete;
     ~NativeWindow_Windows();
 
 public:
@@ -33,9 +33,10 @@ public:
     * @param [in] createParam 创建窗口所需的参数
     * @param [in] createAttributes XML文件中Window的相关属性
     */
-    bool CreateWnd(NativeWindow_Windows* pParentWindow,
-                  const WindowCreateParam& createParam,
-                  const WindowCreateAttributes& createAttributes);
+    bool CreateWnd(
+        NativeWindow_Windows *pParentWindow,
+        const WindowCreateParam &createParam,
+        const WindowCreateAttributes &createAttributes);
 
     /** 显示模态窗口
     * @param [in] pParentWindow 父窗口
@@ -44,11 +45,12 @@ public:
     * @param [in] bCloseByEnter 按Enter键的时候，是否关闭窗口
     * @return 窗口退出时的返回值, 如果失败则返回-1
     */
-    int32_t DoModal(NativeWindow_Windows* pParentWindow,
-                    const WindowCreateParam& createParam,
-                    const WindowCreateAttributes& createAttributes,
-                    bool bCloseByEsc = true,
-                    bool bCloseByEnter = false);
+    int32_t DoModal(
+        NativeWindow_Windows *pParentWindow,
+        const WindowCreateParam &createParam,
+        const WindowCreateAttributes &createAttributes,
+        bool bCloseByEsc = true,
+        bool bCloseByEnter = false);
 
     /** 创建子窗口（非弹出式子窗口）
     * @param [in] pParentWindow 父窗口
@@ -57,7 +59,8 @@ public:
     * @param [in] nWidth 子窗口的宽度
     * @param [in] nHeight 子窗口的高度
     */
-    bool CreateChildWnd(NativeWindow_Windows* pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight);
+    bool CreateChildWnd(
+        NativeWindow_Windows *pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight);
 
     /** 获取窗口所属的 Windows 句柄
     */
@@ -65,7 +68,7 @@ public:
 
     /** 获取本地实现的窗口句柄
     */
-    void* GetWindowHandle() const;
+    void *GetWindowHandle() const;
 
     /** 是否含有有效的窗口句柄
     */
@@ -77,7 +80,7 @@ public:
 
     /** 设置或者修改父窗口
     */
-    bool SetParentWindow(NativeWindow_Windows* pParentWindow);
+    bool SetParentWindow(NativeWindow_Windows *pParentWindow);
 
     /** 获取资源的句柄
     * @return 默认返回当前进程exe的句柄
@@ -156,11 +159,11 @@ public:
 
     /** 显示模态对话框(父窗口在创建的时候指定)
     */
-    void ShowModalFake(NativeWindow_Windows* pParentWindow);
+    void ShowModalFake(NativeWindow_Windows *pParentWindow);
 
     /** 模态对话框关闭，同步状态
     */
-    void OnCloseModalFake(NativeWindow_Windows* pParentWindow);
+    void OnCloseModalFake(NativeWindow_Windows *pParentWindow);
 
     /** 是否是模拟的模态显示窗口（通过ShowModalFake函数显示的窗口）
     */
@@ -265,9 +268,14 @@ public:
     * @param [in] cy 窗口的高度
     * @param [in] uFlags 参考 enum WindowPosFlags 选项
     */
-    bool SetWindowPos(const NativeWindow_Windows* pInsertAfterWindow,
-                      InsertAfterFlag insertAfterFlag,
-                      int32_t X, int32_t Y, int32_t cx, int32_t cy, uint32_t uFlags);
+    bool SetWindowPos(
+        const NativeWindow_Windows *pInsertAfterWindow,
+        InsertAfterFlag insertAfterFlag,
+        int32_t X,
+        int32_t Y,
+        int32_t cx,
+        int32_t cy,
+        uint32_t uFlags);
 
     /** 设置窗口位置和大小
     * @param [in] X 窗口的X坐标
@@ -281,18 +289,18 @@ public:
     /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     *  @param [in] iconFilePath ico文件的路径（绝对路径）
     */
-    bool SetWindowIcon(const FilePath& iconFilePath);
+    bool SetWindowIcon(const FilePath &iconFilePath);
 
     /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     *  @param [in] iconFileData 图标文件的数据
     *  @param [in] iconFileName 包含扩展名的文件名，用于识别图片类型
     */
-    bool SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName);
+    bool SetWindowIcon(const std::vector<uint8_t> &iconFileData, const DString &iconFileName);
 
     /** 设置窗口标题栏文本
     * @param [in] strText 窗口标题栏文本
     */
-    void SetText(const DString& strText);
+    void SetText(const DString &strText);
 
     /** 获取窗口标题栏文本
     */
@@ -301,20 +309,20 @@ public:
     /** 设置窗口大小的最小值（宽度和高度，内部不按DPI调整大小，DPI自适应需要调用方来做）
     * @param [in] szMaxWindow 窗口的最大宽度和最小高度，如果值为0，表示不做限制
     */
-    void SetWindowMaximumSize(const UiSize& szMaxWindow);
+    void SetWindowMaximumSize(const UiSize &szMaxWindow);
 
     /** 获取窗口大小的最小值（宽度和高度）
     */
-    const UiSize& GetWindowMaximumSize() const;
+    const UiSize &GetWindowMaximumSize() const;
 
     /** 设置窗口大小的最大值（宽度和高度，内部不按DPI调整大小，DPI自适应需要调用方来做）
     * @param [in] szMinWindow 窗口的最小宽度和最小高度，如果值为0，表示不做限制
     */
-    void SetWindowMinimumSize(const UiSize& szMinWindow);
+    void SetWindowMinimumSize(const UiSize &szMinWindow);
 
     /** 获取窗口大小的最大值（宽度和高度）
     */
-    const UiSize& GetWindowMinimumSize() const;
+    const UiSize &GetWindowMinimumSize() const;
 
 public:
     /** 设置当要捕获的鼠标窗口句柄为当前绘制窗口
@@ -336,13 +344,13 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    bool SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw);
+    bool SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw);
 
     /** 设置窗口的形状为直角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    bool SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw);
+    bool SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw);
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] bRedraw 是否重绘
@@ -352,7 +360,7 @@ public:
     /** 发出重绘消息
     * @param [in] rcItem 重绘范围，为客户区坐标
     */
-    void Invalidate(const UiRect& rcItem);
+    void Invalidate(const UiRect &rcItem);
 
     /** 更新窗口，执行重绘
     */
@@ -365,64 +373,64 @@ public:
     /** 获取当前窗口的客户区矩形
     * @param [out] rcClient 返回窗口的客户区坐标
     */
-    void GetClientRect(UiRect& rcClient) const;
+    void GetClientRect(UiRect &rcClient) const;
 
     /** 获取当前窗口的窗口区矩形
     * @param [out] rcWindow 返回窗口左上角和右下角的屏幕坐标
     */
-    void GetWindowRect(UiRect& rcWindow) const;
+    void GetWindowRect(UiRect &rcWindow) const;
 
     /** 将屏幕坐标转换为当前窗口的客户区坐标
     * @param [out] pt 返回客户区坐标
     */
-    void ScreenToClient(UiPoint& pt) const;
+    void ScreenToClient(UiPoint &pt) const;
 
     /** 将当前窗口的客户区坐标转换为屏幕坐标
     * @param [out] pt 返回屏幕坐标
     */
-    void ClientToScreen(UiPoint& pt) const;
+    void ClientToScreen(UiPoint &pt) const;
 
     /** 获取当前鼠标所在坐标
     * @param [out] pt 返回屏幕坐标
     */
-    void GetCursorPos(UiPoint& pt) const;
+    void GetCursorPos(UiPoint &pt) const;
 
     /** 获取指定窗口所在显示器的显示器矩形
     * @param [out] rcMonitor 显示器的矩形区域
     */
-    bool GetMonitorRect(UiRect& rcMonitor) const;
+    bool GetMonitorRect(UiRect &rcMonitor) const;
 
     /** 获取当前主显示器的工作区矩形
     * @param [out] rcWork 返回主屏幕坐标
     */
-    static bool GetPrimaryMonitorWorkRect(UiRect& rcWork);
+    static bool GetPrimaryMonitorWorkRect(UiRect &rcWork);
 
     /** 获取当前窗口所在显示器的工作区矩形，以虚拟屏幕坐标表示。
         请注意，如果显示器不是主显示器，则一些矩形的坐标可能是负值。
     * @param [out] rcWork 返回屏幕坐标
     */
-    bool GetMonitorWorkRect(UiRect& rcWork) const;
+    bool GetMonitorWorkRect(UiRect &rcWork) const;
 
     /** 获取指定点所在显示器的工作区矩形，以虚拟屏幕坐标表示。
         请注意，如果显示器不是主显示器，则一些矩形的坐标可能是负值。
     * @param [out] pt 输入为屏幕坐标
     * @param [out] rcWork 返回屏幕坐标
     */
-    bool GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) const;
+    bool GetMonitorWorkRect(const UiPoint &pt, UiRect &rcWork) const;
 
     /** 获取鼠标最后的坐标
     */
-    const UiPoint& GetLastMousePos() const;
+    const UiPoint &GetLastMousePos() const;
 
     /** 设置鼠标最后的坐标
     */
-    void SetLastMousePos(const UiPoint& pt);
+    void SetLastMousePos(const UiPoint &pt);
 
     /** 获取一个点对应的窗口接口
     * @param [in] pt 屏幕坐标点
     * @param [in] bIgnoreChildWindow true表示忽略子窗口，false表示不忽略子窗口
     */
-    INativeWindow* WindowBaseFromPoint(const UiPoint& pt, bool bIgnoreChildWindow = false);
+    INativeWindow *WindowBaseFromPoint(const UiPoint &pt, bool bIgnoreChildWindow = false);
 
     /** 设置是否支持显示贴靠布局菜单（Windows 11新功能：通过将鼠标悬停在窗口的最大化按钮上或按 Win + Z，可以轻松访问对齐布局。）
     *   该功能默认是开启的。
@@ -461,7 +469,7 @@ public:
     * @param [out] wModifiers 热键组合键标志位，参见HotKeyModifiers枚举类型的值
     * @return 如果返回false表示没有注册窗口激活热键，否则表示有注册窗口激活热键
     */
-    bool GetWindowHotKey(uint8_t& wVirtualKeyCode, uint8_t& wModifiers) const;
+    bool GetWindowHotKey(uint8_t &wVirtualKeyCode, uint8_t &wModifiers) const;
 
     /** 注册系统全局热键，注册成功后，按此热键后，该窗口会收到WM_HOTKEY消息
     * @param [in] wVirtualKeyCode 虚拟键盘码，比如：kVK_DOWN等
@@ -498,7 +506,7 @@ public:
     * @param [in] rect 文本输入矩形区域
     * @param [in] nCursor 文本输入的位置(相对于rect.left的偏移)
     */
-    void SetTextInputArea(const UiRect* rect, int32_t nCursor);
+    void SetTextInputArea(const UiRect *rect, int32_t nCursor);
 
     /** 设置是否允许拖放操作
     * @param [in] bEnable true表示允许拖放操作，false表示禁止拖放操作
@@ -512,7 +520,7 @@ public:
     /** 获取指定坐标点的控件接口
     * @param [in] pt 客户区坐标点
     */
-    Control* FindControl(const UiPoint& pt) const;
+    Control *FindControl(const UiPoint &pt) const;
 
     /** 创建窗口时，是否需要居中窗口
     */
@@ -582,30 +590,30 @@ private:
      * @param[out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
      * @return 返回消息的处理结果
     */
-    LRESULT ProcessInternalMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT ProcessInternalMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
     //部分NC消息处理函数，以实现基本功能
-    LRESULT OnNcActivateMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnNcCalcSizeMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnNcHitTestMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnNcActivateMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnNcCalcSizeMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnNcHitTestMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
     //部分消息处理函数，以实现基本功能
-    LRESULT OnGetMinMaxInfoMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnEraseBkGndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnDisplayChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnDpiChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnDwmCompositionChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnWindowPosChangingMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnGetMinMaxInfoMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnEraseBkGndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnDisplayChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnDpiChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnDwmCompositionChangedMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnWindowPosChangingMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
-    LRESULT OnNotifyMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnCommandMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnCtlColorMsgs(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnNotifyMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnCommandMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnCtlColorMsgs(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
-    LRESULT OnPointerMsgs(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnTouchMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnPointerMsgs(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnTouchMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
-    LRESULT OnCreateMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
-    LRESULT OnInitDialogMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnCreateMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
+    LRESULT OnInitDialogMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
     /** 窗口消息的派发函数，将Window消息转换为内部格式，然后派发出去
     * @param [in] uMsg 消息体
@@ -614,7 +622,7 @@ private:
     * @param[out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果
     */
-    LRESULT ProcessWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT ProcessWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
 private:
     /** 初始化窗口资源
@@ -637,21 +645,21 @@ private:
     * @param [out] rcMonitor 显示器的矩形区域
     * @param [out] rcWork 显示器的工作区矩形
     */
-    bool GetMonitorRect(HWND hWnd, UiRect& rcMonitor, UiRect& rcWork) const;
+    bool GetMonitorRect(HWND hWnd, UiRect &rcMonitor, UiRect &rcWork) const;
 
     /** 获取当前窗口的窗口区矩形
     * @param [out] rcWindow 返回窗口左上角和右下角的屏幕坐标
     */
-    void GetWindowRect(HWND hWnd, UiRect& rcWindow) const;
+    void GetWindowRect(HWND hWnd, UiRect &rcWindow) const;
 
     /** 获取一个消息的按键标志位
     * @param [out] modifierKey 返回标志位，参见类型定义：ModifierKey
     */
-    bool GetModifiers(UINT message, WPARAM wParam, LPARAM lParam, uint32_t& modifierKey) const;
+    bool GetModifiers(UINT message, WPARAM wParam, LPARAM lParam, uint32_t &modifierKey) const;
 
     /** 设置是否为层窗口
     */
-    bool SetLayeredWindowStyle(bool bIsLayeredWindow, bool& bChanged) const;
+    bool SetLayeredWindowStyle(bool bIsLayeredWindow, bool &bChanged) const;
 
     /** 更新最大化/最小化按钮的窗口风格，与程序的逻辑保持一致
     */
@@ -659,7 +667,7 @@ private:
 
     /** 显示系统的窗口菜单
     */
-    bool ShowWindowSysMenu(HWND hWnd, const POINT& pt) const;
+    bool ShowWindowSysMenu(HWND hWnd, const POINT &pt) const;
 
     /** 停止系统的窗口菜单定时器
     */
@@ -667,15 +675,15 @@ private:
 
     /** 执行绘制操作
     */
-    LRESULT OnPaintMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT OnPaintMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
     /** 同步创建窗口的属性
     */
-    void SyncCreateWindowAttributes(const WindowCreateAttributes& createAttributes);
+    void SyncCreateWindowAttributes(const WindowCreateAttributes &createAttributes);
 
     /** 计算窗口居中的位置
     */
-    bool CalculateCenterWindowPos(HWND hCenterWindow, int32_t& xPos, int32_t& yPos) const;
+    bool CalculateCenterWindowPos(HWND hCenterWindow, int32_t &xPos, int32_t &yPos) const;
 
     /** 启用/禁用输入法
     */
@@ -688,9 +696,9 @@ private:
     /** 设置窗口图标（只支持*.ico格式）
     *  @param [in] iconFilePath ico文件的路径（绝对路径）
     */
-    bool SetWindowIconByIcoFile(const FilePath& iconFilePath);
+    bool SetWindowIconByIcoFile(const FilePath &iconFilePath);
 
-private:    
+private:
     /** @name 拖拽相关的接口
     * @{ */
     friend class WindowDropTarget;
@@ -698,16 +706,19 @@ private:
     /** 拖拽相关接口的方法（与IDropTarget接口基本相同）
     * @param [out] bHandled 如果返回true表示该事件已经处理，不再转发给界面中的其他UI控件处理
     */
-    HRESULT OnDragEnter(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect, bool& bHandled);
-    HRESULT OnDragOver(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect, bool& bHandled);
+    HRESULT OnDragEnter(
+        IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect, bool &bHandled);
+    HRESULT OnDragOver(
+        IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect, bool &bHandled);
     HRESULT OnDragLeave();
-    HRESULT OnDrop(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect, bool& bHandled);
+    HRESULT OnDrop(
+        IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect, bool &bHandled);
 
     /** @} */
 private:
     /** 接收窗口事件的接口
     */
-    INativeWindow* m_pOwner;
+    INativeWindow *m_pOwner;
 
     /** 窗口句柄
     */
@@ -825,7 +836,7 @@ private:
 
     /** 拖放功能的实现接口
     */
-    WindowDropTarget* m_pWindowDropTarget;
+    WindowDropTarget *m_pWindowDropTarget;
 
     /** 窗口的界面缩放比
     */
@@ -842,7 +853,7 @@ private:
 private:
     /** 拖拽操作关联的IDataObject对象
     */
-    IDataObject* m_pDataObj;
+    IDataObject *m_pDataObj;
 
     /** 拖拽关联的文本数据
     */
@@ -862,4 +873,3 @@ typedef NativeWindow_Windows NativeWindow;
 #endif //DUILIB_BUILD_FOR_WIN
 
 #endif // UI_CORE_NATIVE_WINDOW_WINDOWS_H_
-

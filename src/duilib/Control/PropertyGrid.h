@@ -2,36 +2,35 @@
 #define UI_CONTROL_PROPERTY_GRID_H_
 
 #include "duilib/Box/VBox.h"
-#include "duilib/Core/FontManager.h"
-#include "duilib/Core/ControlPtrT.h"
-#include "duilib/Control/Split.h"
-#include "duilib/Control/Label.h"
-#include "duilib/Control/RichText.h"
-#include "duilib/Control/RichEdit.h"
-#include "duilib/Control/TreeView.h"
 #include "duilib/Control/Combo.h"
 #include "duilib/Control/ComboButton.h"
 #include "duilib/Control/DateTime.h"
-#include "duilib/Control/IPAddress.h"
 #include "duilib/Control/HotKey.h"
+#include "duilib/Control/IPAddress.h"
+#include "duilib/Control/Label.h"
+#include "duilib/Control/RichEdit.h"
+#include "duilib/Control/RichText.h"
+#include "duilib/Control/Split.h"
+#include "duilib/Control/TreeView.h"
+#include "duilib/Core/ControlPtrT.h"
+#include "duilib/Core/FontManager.h"
 #include "duilib/Utils/FileDialog.h"
 
-namespace ui
-{
+namespace ui {
 /** 属性表控件的支持的属性
 */
 class PropertyGridGroup;
 class PropertyGridProperty;
-class PropertyGridTextProperty;         //文本和数字
-class PropertyGridComboProperty;        //下拉框
-class PropertyGridFontProperty;         //字体名称
-class PropertyGridFontSizeProperty;     //字体大小
-class PropertyGridColorProperty;        //颜色
-class PropertyGridDateTimeProperty;     //日期时间
-class PropertyGridIPAddressProperty;    //IP地址
-class PropertyGridHotKeyProperty;       //热键
-class PropertyGridFileProperty;         //文件路径
-class PropertyGridDirectoryProperty;    //文件夹
+class PropertyGridTextProperty;      //文本和数字
+class PropertyGridComboProperty;     //下拉框
+class PropertyGridFontProperty;      //字体名称
+class PropertyGridFontSizeProperty;  //字体大小
+class PropertyGridColorProperty;     //颜色
+class PropertyGridDateTimeProperty;  //日期时间
+class PropertyGridIPAddressProperty; //IP地址
+class PropertyGridHotKeyProperty;    //热键
+class PropertyGridFileProperty;      //文件路径
+class PropertyGridDirectoryProperty; //文件夹
 
 /** 属性的参数 (支持多语言版)
 */
@@ -51,13 +50,14 @@ struct PropertyGridParam
 class DUILIB_API PropertyGrid : public VBox
 {
     typedef VBox BaseClass;
+
 public:
-    explicit PropertyGrid(Window* pWindow);
+    explicit PropertyGrid(Window *pWindow);
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -72,29 +72,30 @@ public:
     * @param [in] sRightColumn 表头右侧一列的名称
     * @param [in] bTextId true表示上述名称为文本ID（支持多语言版），false为普通文本
     */
-    void SetEnableHeaderCtrl(bool bEnable,
-                             const DString& sLeftColumn = _T(""), 
-                             const DString& sRightColumn = _T(""),
-                             bool bTextId = false);
+    void SetEnableHeaderCtrl(
+        bool bEnable,
+        const DString &sLeftColumn = _T(""),
+        const DString &sRightColumn = _T(""),
+        bool bTextId = false);
     /** 判断当前是否显示表头
     */
     bool IsEnableHeaderCtrl() const { return m_bHeaderCtrl; }
 
     /** 获取Header接口
     */
-    Control* GetHeaderCtrl() const { return m_pHeaderCtrl; }
+    Control *GetHeaderCtrl() const { return m_pHeaderCtrl; }
 
     /** 获取Header中的左侧一列
     */
-    Label* GetHeaderLeft() const { return m_pHeaderLeft; }
+    Label *GetHeaderLeft() const { return m_pHeaderLeft; }
 
     /** 获取Header中的右侧一列
     */
-    Label* GetHeaderRight() const { return m_pHeaderRight; }
+    Label *GetHeaderRight() const { return m_pHeaderRight; }
 
     /** 获取Header中的分割条
     */
-    Split* GetHeaderSplit() const { return m_pHeaderSplit; }
+    Split *GetHeaderSplit() const { return m_pHeaderSplit; }
 
 public:
     /** 增加一个分组
@@ -103,9 +104,8 @@ public:
     * @param [in] nGroupData 用户自定义数据
     * @return 返回该分组的接口，可用于添加属性
     */
-    PropertyGridGroup* AddGroup(const DString& groupName, 
-                                const DString& description = _T(""),
-                                size_t nGroupData = 0);
+    PropertyGridGroup *AddGroup(
+        const DString &groupName, const DString &description = _T(""), size_t nGroupData = 0);
 
     /** 增加一个分组（支持多语言版）
     * @param [in] groupNameId 分组的名称ID
@@ -113,19 +113,18 @@ public:
     * @param [in] nGroupData 用户自定义数据
     * @return 返回该分组的接口，可用于添加属性
     */
-    PropertyGridGroup* AddGroupById(const DString& groupNameId, 
-                                    const DString& descriptionId = _T(""),
-                                    size_t nGroupData = 0);
+    PropertyGridGroup *AddGroupById(
+        const DString &groupNameId, const DString &descriptionId = _T(""), size_t nGroupData = 0);
 
     /** 获取所有的分组
     * @param [out] groups 返回当前所有的分组列表
     */
-    void GetGroups(std::vector<PropertyGridGroup*>& groups) const;
+    void GetGroups(std::vector<PropertyGridGroup *> &groups) const;
 
     /** 删除分组
     * @param [in] pGroup 待删除的分组
     */
-    bool RemoveGroup(PropertyGridGroup* pGroup);
+    bool RemoveGroup(PropertyGridGroup *pGroup);
 
     /** 删除所有分组
     */
@@ -135,7 +134,7 @@ public:
     * @param [in] pGroup 该属性所属的分组
     * @param [in] pProperty 属性接口
     */
-    bool AddProperty(PropertyGridGroup* pGroup, PropertyGridProperty* pProperty);
+    bool AddProperty(PropertyGridGroup *pGroup, PropertyGridProperty *pProperty);
 
     /** 增加一个属性(文本、数字类型)
     * @param [in] pGroup 该属性所属的分组
@@ -145,11 +144,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridTextProperty* AddTextProperty(PropertyGridGroup* pGroup,
-                                              const DString& propertyName, 
-                                              const DString& propertyValue,
-                                              const DString& description = _T(""),
-                                              size_t nPropertyData = 0);
+    PropertyGridTextProperty *AddTextProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(文本、数字类型)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -160,19 +160,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridTextProperty* AddTextPropertyById(PropertyGridGroup* pGroup,
-                                                  const DString& propertyNameId, 
-                                                  const DString& propertyValue,
-                                                  const DString& descriptionId = _T(""),
-                                                  size_t nPropertyData = 0,
-                                                  bool bPropertyValueId = true);
+    PropertyGridTextProperty *AddTextPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(文本、数字类型)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值
     */
-    PropertyGridTextProperty* AddTextProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
-    
+    PropertyGridTextProperty *AddTextProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(下拉框)
     * @param [in] pGroup 该属性所属的分组
@@ -182,11 +183,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridComboProperty* AddComboProperty(PropertyGridGroup* pGroup,
-                                                const DString& propertyName, 
-                                                const DString& propertyValue,
-                                                const DString& description = _T(""),
-                                                size_t nPropertyData = 0);
+    PropertyGridComboProperty *AddComboProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(下拉框)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -197,18 +199,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridComboProperty* AddComboPropertyById(PropertyGridGroup* pGroup,
-                                                    const DString& propertyNameId, 
-                                                    const DString& propertyValue,
-                                                    const DString& descriptionId = _T(""),
-                                                    size_t nPropertyData = 0,
-                                                    bool bPropertyValueId = true);
+    PropertyGridComboProperty *AddComboPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(下拉框)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridComboProperty* AddComboProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridComboProperty *AddComboProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(字体名称)
     * @param [in] pGroup 该属性所属的分组
@@ -218,11 +222,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridFontProperty* AddFontProperty(PropertyGridGroup* pGroup,
-                                              const DString& propertyName, 
-                                              const DString& propertyValue,
-                                              const DString& description = _T(""),
-                                              size_t nPropertyData = 0);
+    PropertyGridFontProperty *AddFontProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(字体名称)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -233,18 +238,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridFontProperty* AddFontPropertyById(PropertyGridGroup* pGroup,
-                                                  const DString& propertyNameId, 
-                                                  const DString& propertyValue,
-                                                  const DString& descriptionId = _T(""),
-                                                  size_t nPropertyData = 0,
-                                                  bool bPropertyValueId = true);
+    PropertyGridFontProperty *AddFontPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(字体名称)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridFontProperty* AddFontProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridFontProperty *AddFontProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(字体大小)
     * @param [in] pGroup 该属性所属的分组
@@ -254,11 +261,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridFontSizeProperty* AddFontSizeProperty(PropertyGridGroup* pGroup,
-                                                      const DString& propertyName, 
-                                                      const DString& propertyValue,
-                                                      const DString& description = _T(""),
-                                                      size_t nPropertyData = 0);
+    PropertyGridFontSizeProperty *AddFontSizeProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(字体大小)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -269,18 +277,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridFontSizeProperty* AddFontSizePropertyById(PropertyGridGroup* pGroup,
-                                                          const DString& propertyNameId, 
-                                                          const DString& propertyValue,
-                                                          const DString& descriptionId = _T(""),
-                                                          size_t nPropertyData = 0,
-                                                          bool bPropertyValueId = true);
+    PropertyGridFontSizeProperty *AddFontSizePropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(字体大小)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridFontSizeProperty* AddFontSizeProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridFontSizeProperty *AddFontSizeProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(颜色)
     * @param [in] pGroup 该属性所属的分组
@@ -290,11 +300,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridColorProperty* AddColorProperty(PropertyGridGroup* pGroup,
-                                                const DString& propertyName, 
-                                                const DString& propertyValue,
-                                                const DString& description = _T(""),
-                                                size_t nPropertyData = 0);
+    PropertyGridColorProperty *AddColorProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(颜色)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -305,18 +316,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridColorProperty* AddColorPropertyById(PropertyGridGroup* pGroup,
-                                                    const DString& propertyNameId, 
-                                                    const DString& propertyValue,
-                                                    const DString& descriptionId = _T(""),
-                                                    size_t nPropertyData = 0,
-                                                    bool bPropertyValueId = true);
+    PropertyGridColorProperty *AddColorPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(颜色)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridColorProperty* AddColorProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridColorProperty *AddColorProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(日期时间)
     * @param [in] pGroup 该属性所属的分组
@@ -327,12 +340,13 @@ public:
     * @param [in] editFormat 日期的编辑格式
     * @return 返回该属性的接口
     */
-    PropertyGridDateTimeProperty* AddDateTimeProperty(PropertyGridGroup* pGroup,
-                                                      const DString& propertyName, 
-                                                      const DString& dateTimeValue,
-                                                      const DString& description = _T(""),
-                                                      size_t nPropertyData = 0,
-                                                      DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
+    PropertyGridDateTimeProperty *AddDateTimeProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &dateTimeValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0,
+        DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
 
     /** 增加一个属性(日期时间)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -344,21 +358,24 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridDateTimeProperty* AddDateTimePropertyById(PropertyGridGroup* pGroup,
-                                                          const DString& propertyNameId, 
-                                                          const DString& dateTimeValue,
-                                                          const DString& descriptionId = _T(""),
-                                                          size_t nPropertyData = 0,
-                                                          bool bPropertyValueId = true,
-                                                          ui::DateTime::EditFormat editFormat = ui::DateTime::EditFormat::kDateCalendar);
+    PropertyGridDateTimeProperty *AddDateTimePropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &dateTimeValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true,
+        ui::DateTime::EditFormat editFormat = ui::DateTime::EditFormat::kDateCalendar);
 
     /** 增加一个属性(日期时间)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridDateTimeProperty* AddDateTimeProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param,
-                                                      ui::DateTime::EditFormat editFormat = ui::DateTime::EditFormat::kDateCalendar);
-   
+    PropertyGridDateTimeProperty *AddDateTimeProperty(
+        PropertyGridGroup *pGroup,
+        const PropertyGridParam &param,
+        ui::DateTime::EditFormat editFormat = ui::DateTime::EditFormat::kDateCalendar);
+
     /** 增加一个属性(IP地址)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] propertyName 属性的名称
@@ -367,11 +384,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridIPAddressProperty* AddIPAddressProperty(PropertyGridGroup* pGroup,
-                                                        const DString& propertyName, 
-                                                        const DString& propertyValue,
-                                                        const DString& description = _T(""),
-                                                        size_t nPropertyData = 0);
+    PropertyGridIPAddressProperty *AddIPAddressProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(IP地址)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -382,18 +400,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridIPAddressProperty* AddIPAddressPropertyById(PropertyGridGroup* pGroup,
-                                                            const DString& propertyNameId, 
-                                                            const DString& propertyValue,
-                                                            const DString& descriptionId = _T(""),
-                                                            size_t nPropertyData = 0,
-                                                            bool bPropertyValueId = true);
+    PropertyGridIPAddressProperty *AddIPAddressPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(IP地址)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridIPAddressProperty* AddIPAddressProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridIPAddressProperty *AddIPAddressProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(热键)
     * @param [in] pGroup 该属性所属的分组
@@ -403,11 +423,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridHotKeyProperty* AddHotKeyProperty(PropertyGridGroup* pGroup,
-                                                  const DString& propertyName, 
-                                                  const DString& propertyValue,
-                                                  const DString& description = _T(""),
-                                                  size_t nPropertyData = 0);
+    PropertyGridHotKeyProperty *AddHotKeyProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(热键)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -418,18 +439,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridHotKeyProperty* AddHotKeyPropertyById(PropertyGridGroup* pGroup,
-                                                      const DString& propertyNameId, 
-                                                      const DString& propertyValue,
-                                                      const DString& descriptionId = _T(""),
-                                                      size_t nPropertyData = 0,
-                                                      bool bPropertyValueId = true);
+    PropertyGridHotKeyProperty *AddHotKeyPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(热键)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridHotKeyProperty* AddHotKeyProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridHotKeyProperty *AddHotKeyProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 增加一个属性(文件路径)
     * @param [in] pGroup 该属性所属的分组
@@ -443,15 +466,16 @@ public:
     * @param [in] defaultExt 默认的文件类型, 举例："doc;docx"
     * @return 返回该属性的接口
     */
-    PropertyGridFileProperty* AddFileProperty(PropertyGridGroup* pGroup,
-                                              const DString& propertyName, 
-                                              const DString& propertyValue,                                              
-                                              const DString& description = _T(""),
-                                              size_t nPropertyData = 0,
-                                              bool bOpenFileDialog = true,
-                                              const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                                              int32_t nFileTypeIndex = -1,
-                                              const DString& defaultExt = _T(""));
+    PropertyGridFileProperty *AddFileProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
     /** 增加一个属性(文件路径)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -466,26 +490,29 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridFileProperty* AddFilePropertyById(PropertyGridGroup* pGroup,
-                                                  const DString& propertyNameId, 
-                                                  const DString& propertyValue,
-                                                  const DString& descriptionId = _T(""),
-                                                  size_t nPropertyData = 0,
-                                                  bool bPropertyValueId = true,
-                                                  bool bOpenFileDialog = true,
-                                                  const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                                                  int32_t nFileTypeIndex = -1,
-                                                  const DString& defaultExt = _T(""));
+    PropertyGridFileProperty *AddFilePropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
     /** 增加一个属性(文件路径)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridFileProperty* AddFileProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param,
-                                              bool bOpenFileDialog = true,
-                                              const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                                              int32_t nFileTypeIndex = -1,
-                                              const DString& defaultExt = _T(""));
+    PropertyGridFileProperty *AddFileProperty(
+        PropertyGridGroup *pGroup,
+        const PropertyGridParam &param,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
     /** 增加一个属性(文件夹)
     * @param [in] pGroup 该属性所属的分组
@@ -495,11 +522,12 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @return 返回该属性的接口
     */
-    PropertyGridDirectoryProperty* AddDirectoryProperty(PropertyGridGroup* pGroup,
-                                                        const DString& propertyName, 
-                                                        const DString& propertyValue,
-                                                        const DString& description = _T(""),
-                                                        size_t nPropertyData = 0);
+    PropertyGridDirectoryProperty *AddDirectoryProperty(
+        PropertyGridGroup *pGroup,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 增加一个属性(文件夹)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
@@ -510,18 +538,20 @@ public:
     * @param [in] bPropertyValueId true表示propertyValue的值时属性值的资源ID（支持多语言版），false表示为普通文本值
     * @return 返回该属性的接口
     */
-    PropertyGridDirectoryProperty* AddDirectoryPropertyById(PropertyGridGroup* pGroup,
-                                                            const DString& propertyNameId,
-                                                            const DString& propertyValue,
-                                                            const DString& descriptionId = _T(""),
-                                                            size_t nPropertyData = 0,
-                                                            bool bPropertyValueId = true);
+    PropertyGridDirectoryProperty *AddDirectoryPropertyById(
+        PropertyGridGroup *pGroup,
+        const DString &propertyNameId,
+        const DString &propertyValue,
+        const DString &descriptionId = _T(""),
+        size_t nPropertyData = 0,
+        bool bPropertyValueId = true);
 
     /** 增加一个属性(文件夹)(支持多语言版)
     * @param [in] pGroup 该属性所属的分组
     * @param [in] param 该属性的取值设置参数
     */
-    PropertyGridDirectoryProperty* AddDirectoryProperty(PropertyGridGroup* pGroup, const PropertyGridParam& param);
+    PropertyGridDirectoryProperty *AddDirectoryProperty(
+        PropertyGridGroup *pGroup, const PropertyGridParam &param);
 
     /** 设置左侧一列的宽度
     * @param [in] nLeftColumnWidth 左侧一列的宽度
@@ -535,7 +565,7 @@ public:
 
     /** 设置属性值的字体Id（正常状态）
     */
-    void SetPropertyNormalFontId(const DString& fontId);
+    void SetPropertyNormalFontId(const DString &fontId);
 
     /** 获取属性值的字体ID（正常状态）
     */
@@ -543,7 +573,7 @@ public:
 
     /** 设置属性值的字体Id（已修改状态）
     */
-    void SetPropertyModifiedFontId(const DString& fontId);
+    void SetPropertyModifiedFontId(const DString &fontId);
 
     /** 获取属性值的字体ID（已修改状态）
     */
@@ -570,12 +600,12 @@ public:
 
     /** 获取描述控件的接口
     */
-    RichText* GetDescriptionArea() const { return m_pDescriptionArea; }
+    RichText *GetDescriptionArea() const { return m_pDescriptionArea; }
 
     /** 描述控件的分割条接口
     *   @return 返回描述区域下方的分割条指针，若 XML 中未声明 `duilib_property_grid_description_area_split` 子控件则返回 nullptr
     */
-    Split* GetDescriptionAreaSplit() const { return m_pDescriptionAreaSplit; }
+    Split *GetDescriptionAreaSplit() const { return m_pDescriptionAreaSplit; }
 
     /** 描述区是否可用（XML 中声明了 duilib_property_grid_description_area 子控件）
     */
@@ -584,7 +614,7 @@ public:
 public:
     /** 获取属性表的树控件接口（用于管理数据）
     */
-    TreeView* GetTreeView() const { return m_pTreeView; }
+    TreeView *GetTreeView() const { return m_pTreeView; }
 
     /** 横向网格线的宽度
     * @param [in] nLineWidth 网格线的宽度，如果为0表示不显示横向网格线
@@ -596,7 +626,7 @@ public:
     /** 横向网格线的颜色
     * @param [in] color 横向网格线的颜色
     */
-    void SetRowGridLineColor(const DString& color);
+    void SetRowGridLineColor(const DString &color);
     DString GetRowGridLineColor() const;
 
     /** 纵向网格线的宽度
@@ -609,37 +639,37 @@ public:
     /** 纵向网格线的颜色
     * @param [in] color 纵向网格线的颜色
     */
-    void SetColumnGridLineColor(const DString& color);
+    void SetColumnGridLineColor(const DString &color);
     DString GetColumnGridLineColor() const;
 
     /** 表头的Class
     */
-    void SetHeaderClass(const DString& headerClass);
+    void SetHeaderClass(const DString &headerClass);
     DString GetHeaderClass() const;
 
     /** 分组的Class
     */
-    void SetGroupClass(const DString& groupClass);
+    void SetGroupClass(const DString &groupClass);
     DString GetGroupClass() const;
 
     /** 分组的文本控件Class
     */
-    void SetGroupLabelClass(const DString& groupLabelClass);
+    void SetGroupLabelClass(const DString &groupLabelClass);
     DString GetGroupLabelClass() const;
 
     /** 属性的Class
     */
-    void SetPropertyClass(const DString& propertyClass);
+    void SetPropertyClass(const DString &propertyClass);
     DString GetPropertyClass() const;
 
     /** 属性的名称文本控件Class
     */
-    void SetPropertyNameLabelClass(const DString& propertyNameLabelClass);
+    void SetPropertyNameLabelClass(const DString &propertyNameLabelClass);
     DString GetPropertyNameLabelClass() const;
 
     /** 属性的值文本控件Class
     */
-    void SetPropertyValueLabelClass(const DString& propertyValueLabelClass);
+    void SetPropertyValueLabelClass(const DString &propertyValueLabelClass);
     DString GetPropertyValueLabelClass() const;
 
 protected:
@@ -649,11 +679,11 @@ protected:
 
     /** 绘制子控件
     */
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
 
     /** 绘制网格线
     */
-    void PaintGridLines(IRender* pRender);
+    void PaintGridLines(IRender *pRender);
 
     /** 拖动列表头改变列宽的事件响应函数
     */
@@ -661,7 +691,7 @@ protected:
 
     /** 调整一个属性节点的列宽
     */
-    void ResizePropertyColumn(TreeNode* pPropertyNode, int32_t nLeftColumnWidth);
+    void ResizePropertyColumn(TreeNode *pPropertyNode, int32_t nLeftColumnWidth);
 
 private:
     /** 获取左侧列宽的值
@@ -680,19 +710,19 @@ private:
 
     /** Header接口
     */
-    Control* m_pHeaderCtrl;
+    Control *m_pHeaderCtrl;
 
     /** Header中的左侧一列
     */
-    Label* m_pHeaderLeft;
+    Label *m_pHeaderLeft;
 
     /** Header中的右侧一列
     */
-    Label* m_pHeaderRight;
+    Label *m_pHeaderRight;
 
     /** Header中的分割条
     */
-    Split* m_pHeaderSplit;
+    Split *m_pHeaderSplit;
 
     /** 左侧一列的宽度
     */
@@ -701,11 +731,11 @@ private:
 private:
     /** 描述控件的分割条
     */
-    Split* m_pDescriptionAreaSplit;
+    Split *m_pDescriptionAreaSplit;
 
     /** 描述控件
     */
-    RichText* m_pDescriptionArea;
+    RichText *m_pDescriptionArea;
 
     /** 是否显示描述区域
     */
@@ -714,7 +744,7 @@ private:
 private:
     /** 属性表的树控件接口
     */
-    TreeView* m_pTreeView;
+    TreeView *m_pTreeView;
 
     /** 表头的Class
     */
@@ -777,21 +807,23 @@ private:
 class DUILIB_API PropertyGridGroup : public TreeNode
 {
     typedef TreeNode BaseClass;
+
 public:
     /** 构造一个组
     * @param [in] pWindow 关联的窗口
     */
-    explicit PropertyGridGroup(Window* pWindow);
+    explicit PropertyGridGroup(Window *pWindow);
 
     /** 构造一个组（不支持多语言版）
     * @param [in] groupName 组的名称
     * @param [in] description 组的描述信息
     * @param [in] nGroupData 用户自定义数据
     */
-    PropertyGridGroup(Window* pWindow,
-                      const DString& groupName,
-                      const DString& description = _T(""),
-                      size_t nGroupData = 0);
+    PropertyGridGroup(
+        Window *pWindow,
+        const DString &groupName,
+        const DString &description = _T(""),
+        size_t nGroupData = 0);
 
     /** 构造一个组（支持多语言版）
     * @param [in] bGroupNameId true表示groupName为语言ID（支持多语言版），false表示为普通文本
@@ -800,12 +832,13 @@ public:
     * @param [in] description 组的描述信息    
     * @param [in] nGroupData 用户自定义数据
     */
-    PropertyGridGroup(Window* pWindow,
-                      bool bGroupNameId,
-                      const DString& groupName,
-                      bool bDescriptionId,
-                      const DString& description,
-                      size_t nGroupData = 0);
+    PropertyGridGroup(
+        Window *pWindow,
+        bool bGroupNameId,
+        const DString &groupName,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nGroupData = 0);
 
 public:
     /** 获取属性名称
@@ -814,7 +847,7 @@ public:
 
     /** 设置属性名称文本
     */
-    void SetGroupName(const DString& groupName);
+    void SetGroupName(const DString &groupName);
 
     /** 获取属性名称ID
     */
@@ -822,7 +855,7 @@ public:
 
     /** 设置属性名称文本ID
     */
-    void SetGroupNameId(const DString& groupNameId);
+    void SetGroupNameId(const DString &groupNameId);
 
     /** 获取组的描述信息
     */
@@ -830,7 +863,7 @@ public:
 
     /** 设置组的描述属性
     */
-    void SetDescription(const DString& description);
+    void SetDescription(const DString &description);
 
     /** 获取组的描述信息ID
     */
@@ -838,7 +871,7 @@ public:
 
     /** 设置组的描述属性ID
     */
-    void SetDescriptionId(const DString& descriptionId);
+    void SetDescriptionId(const DString &descriptionId);
 
     /** 获取用户自定义数据
     */
@@ -850,17 +883,17 @@ public:
 
     /** 获取属性名称的显示控件
     */
-    LabelBox* GetLabelBox() const { return m_pLabelBox.get(); }
+    LabelBox *GetLabelBox() const { return m_pLabelBox.get(); }
 
     /** 获取分组下的所有属性
     * @param [out] properties 返回当前所有的分组列表
     */
-    void GetProperties(std::vector<PropertyGridProperty*>& properties) const;
+    void GetProperties(std::vector<PropertyGridProperty *> &properties) const;
 
     /** 删除该分组下的属性
     * @param [in] pProperty 需要删除的属性接口
     */
-    bool RemoveProperty(PropertyGridProperty* pProperty);
+    bool RemoveProperty(PropertyGridProperty *pProperty);
 
     /** 删除该分组下的所有属性
     */
@@ -868,11 +901,11 @@ public:
 
     /** 设置关联的属性页接口
     */
-    void SetPropertyGrid(PropertyGrid* pPropertyGrid);
+    void SetPropertyGrid(PropertyGrid *pPropertyGrid);
 
     /** 获取关联的属性页接口
     */
-    PropertyGrid* GetPropertyGrid() const;
+    PropertyGrid *GetPropertyGrid() const;
 
 protected:
     /** 初始化函数
@@ -911,20 +944,19 @@ private:
 
 /** 属性的类型
 */
-enum class PropertyGridPropertyType
-{
-    kNone,        //无具体类型，基类
-    kText,        //普通文本
-    kCombo,        //下拉框
-    kFont,        //字体名称
+enum class PropertyGridPropertyType {
+    kNone,      //无具体类型，基类
+    kText,      //普通文本
+    kCombo,     //下拉框
+    kFont,      //字体名称
     kFontSize,  //字体大小
-    kColor,        //颜色
-    kDateTime,    //日期时间
-    kIPAddress,    //IP地址
+    kColor,     //颜色
+    kDateTime,  //日期时间
+    kIPAddress, //IP地址
     kHotKey,    //热键
-    kFile,        //文件路径
-    kDirectory,    //文件夹
-    kCustom        //用户自定义的类型，比如自己实现一个子类
+    kFile,      //文件路径
+    kDirectory, //文件夹
+    kCustom     //用户自定义的类型，比如自己实现一个子类
 };
 
 /** 属性表的属性, 基本结构
@@ -935,14 +967,15 @@ enum class PropertyGridPropertyType
 *        </HBox>
 *   </PropertyGridProperty>
 */
-class DUILIB_API PropertyGridProperty: public TreeNode
+class DUILIB_API PropertyGridProperty : public TreeNode
 {
     typedef TreeNode BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] pWindow 关联的窗口
     */
-    explicit PropertyGridProperty(Window* pWindow);
+    explicit PropertyGridProperty(Window *pWindow);
 
     /** 构造一个属性(不支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -951,11 +984,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridProperty(Window* pWindow, 
-                         const DString& propertyName,
-                         const DString& propertyValue,
-                         const DString& description = _T(""),
-                         size_t nPropertyData = 0);
+    PropertyGridProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -967,27 +1001,28 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridProperty(Window* pWindow,
-                         bool bPropertyNameId,
-                         const DString& propertyName,
-                         bool bPropertyValueId,
-                         const DString& propertyValue,
-                         bool bDescriptionId,
-                         const DString& description,
-                         size_t nPropertyData = 0);
+    PropertyGridProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
     */
-    virtual PropertyGridPropertyType GetPropertyType() const 
-    { 
-        return PropertyGridPropertyType::kNone; 
+    virtual PropertyGridPropertyType GetPropertyType() const
+    {
+        return PropertyGridPropertyType::kNone;
     }
 
     /** 获取属性名称
@@ -996,7 +1031,7 @@ public:
 
     /** 设置属性名称 
     */
-    void SetPropertyName(const DString& propertyName);
+    void SetPropertyName(const DString &propertyName);
 
     /** 获取属性名称ID(支持多语言版)
     */
@@ -1004,7 +1039,7 @@ public:
 
     /** 设置属性名称ID(支持多语言版)
     */
-    void SetPropertyNameId(const DString& propertyNameId);
+    void SetPropertyNameId(const DString &propertyNameId);
 
     /** 获取属性值(原值)
     */
@@ -1012,7 +1047,7 @@ public:
 
     /** 设置属性值(原值)
     */
-    void SetPropertyValue(const DString& propertyValue);
+    void SetPropertyValue(const DString &propertyValue);
 
     /** 获取属性值ID(原值)(支持多语言版)
     */
@@ -1020,7 +1055,7 @@ public:
 
     /** 设置属性值ID(原值)(支持多语言版)
     */
-    void SetPropertyValueId(const DString& propertyValueId);
+    void SetPropertyValueId(const DString &propertyValueId);
 
     /** 当前是否正在使用属性值ID
     */
@@ -1032,7 +1067,7 @@ public:
 
     /** 设置属性的描述信息
     */
-    void SetDescription(const DString& description);
+    void SetDescription(const DString &description);
 
     /** 获取属性的描述信息ID(支持多语言版)
     */
@@ -1040,7 +1075,7 @@ public:
 
     /** 设置属性的描述信息ID(支持多语言版)
     */
-    void SetDescriptionId(const DString& descriptionId);
+    void SetDescriptionId(const DString &descriptionId);
 
     /** 获取用户自定义数据
     */
@@ -1052,15 +1087,15 @@ public:
 
     /** 获取属性名称和属性值所在容器控件，可用于设置背景色等
     */
-    HBox* GetHBox() const { return m_pHBox.get(); }
+    HBox *GetHBox() const { return m_pHBox.get(); }
 
     /** 获取属性名称的显示控件, 父控件是GetHBox()
     */
-    LabelBox* GetLabelBoxLeft() const { return m_pLabelBoxLeft.get(); }
+    LabelBox *GetLabelBoxLeft() const { return m_pLabelBoxLeft.get(); }
 
     /** 获取属性值的显示控件, 父控件是GetHBox()
     */
-    LabelBox* GetLabelBoxRight() const { return m_pLabelBoxRight.get(); }
+    LabelBox *GetLabelBoxRight() const { return m_pLabelBoxRight.get(); }
 
     /** 设置只读模式
     */
@@ -1076,17 +1111,20 @@ public:
 
     /** 设置关联的属性页接口
     */
-    void SetPropertyGrid(PropertyGrid* pPropertyGrid);
+    void SetPropertyGrid(PropertyGrid *pPropertyGrid);
 
     /** 获取关联的属性页接口
     */
-    PropertyGrid* GetPropertyGrid() const;
+    PropertyGrid *GetPropertyGrid() const;
 
     /** 监听属性值变化事件（以文本形式通知属性值的变化）
     * @param [in] callback 要绑定的回调函数，wParam是(WPARAM)&oldText，lParam是(LPARAM)&newText，oldText和newText变量类型都是DString
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachValueChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventValueChanged, callback, callbackID); }
+    void AttachValueChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventValueChanged, callback, callbackID);
+    }
 
 protected:
     /** 初始化函数
@@ -1103,7 +1141,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool /*bShow*/, bool /*bCancel*/) { return nullptr; }
+    virtual Control *ShowEditControl(bool /*bShow*/, bool /*bCancel*/) { return nullptr; }
 
     /** 旧的属性值发生了变化
     */
@@ -1114,7 +1152,10 @@ protected:
     * @param [in] newText 新的文本内容
     * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
     */
-    virtual bool OnPropertyTextChanged(const DString& /*oldText*/, const DString& /*newText*/) { return true; }
+    virtual bool OnPropertyTextChanged(const DString & /*oldText*/, const DString & /*newText*/)
+    {
+        return true;
+    }
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1130,7 +1171,7 @@ protected:
     * @param [in] bChanged 是否标记为变化
     * @param [in] bTriggerEvent 是否触发变化事件（回调函数）
     */
-    void SetPropertyText(const DString& text, bool bChanged, bool bTriggerEvent = true);
+    void SetPropertyText(const DString &text, bool bChanged, bool bTriggerEvent = true);
 
     /** 获取属性值文本(显示控件)
     */
@@ -1139,7 +1180,7 @@ protected:
     /** 设置属性值的文字颜色(显示控件)
     * @param [in] text 文本内容
     */
-    void SetPropertyTextColor(const DString& textColor);
+    void SetPropertyTextColor(const DString &textColor);
 
     /** 将焦点设置到属性值文本显示控件
     */
@@ -1147,15 +1188,15 @@ protected:
 
     /** 在属性值的LabelBox中添加控件
     */
-    bool AddPropertySubItem(Control* pControl);
+    bool AddPropertySubItem(Control *pControl);
 
     /** 在属性值的LabelBox中移除控件
     */
-    bool RemovePropertySubItem(Control* pControl);
+    bool RemovePropertySubItem(Control *pControl);
 
     /** 判断属性值的LabelBox中是否包含控件
     */
-    bool HasPropertySubItem(Control* pControl) const;
+    bool HasPropertySubItem(Control *pControl) const;
 
 private:
     /** 关联的属性页接口
@@ -1212,6 +1253,7 @@ private:
 class DUILIB_API PropertyGridTextProperty : public PropertyGridProperty
 {
     typedef PropertyGridProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -1219,11 +1261,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridTextProperty(Window* pWindow,
-                             const DString& propertyName,
-                             const DString& propertyValue,
-                             const DString& description = _T(""),
-                             size_t nPropertyData = 0);
+    PropertyGridTextProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1235,20 +1278,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridTextProperty(Window* pWindow,
-                             bool bPropertyNameId,
-                             const DString& propertyName,
-                             bool bPropertyValueId,
-                             const DString& propertyValue,
-                             bool bDescriptionId,
-                             const DString& description,
-                             size_t nPropertyData = 0);
+    PropertyGridTextProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridTextProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridTextProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1264,12 +1308,12 @@ public:
 
     /** 获取编辑框控件
     */
-    RichEdit* GetRichEdit() const { return m_pRichEdit.get(); }
+    RichEdit *GetRichEdit() const { return m_pRichEdit.get(); }
 
     /** 设置新的文本
     * @param [in] newText 新的文本内容
     */
-    void SetNewTextValue(const DString& newText);
+    void SetNewTextValue(const DString &newText);
 
     /** 设置密码模式（显示 ***）
      * @param[in] bPasswordMode 设置为 true 让控件显示内容为 ***，false 为显示正常内容
@@ -1298,7 +1342,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 语言发生变化，刷新界面文字显示相关的内容
     * @param [in] bRedraw true表示需要内部实现重绘，否则控件内部不需要重绘，由外部调用重绘
@@ -1332,6 +1376,7 @@ private:
 class DUILIB_API PropertyGridComboProperty : public PropertyGridProperty
 {
     typedef PropertyGridProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -1339,11 +1384,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridComboProperty(Window* pWindow, 
-                              const DString& propertyName,
-                              const DString& propertyValue,
-                              const DString& description = _T(""),
-                              size_t nPropertyData = 0);
+    PropertyGridComboProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1355,20 +1401,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridComboProperty(Window* pWindow,
-                              bool bPropertyNameId,
-                              const DString& propertyName,
-                              bool bPropertyValueId,
-                              const DString& propertyValue,
-                              bool bDescriptionId,
-                              const DString& description,
-                              size_t nPropertyData = 0);
+    PropertyGridComboProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridComboProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridComboProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1386,13 +1433,13 @@ public:
     * @param [in] optionText 下拉框列表项的内容
     * @return 返回该子项的下标值
     */
-    size_t AddOption(const DString& optionText);
+    size_t AddOption(const DString &optionText);
 
     /** 增加一个下拉框选项(支持多语言版)
     * @param [in] optionTextId 下拉框列表项的内容ID
     * @return 返回该子项的下标值
     */
-    size_t AddOptionById(const DString& optionTextId);
+    size_t AddOptionById(const DString &optionTextId);
 
     /** 获取下拉框选项的格式
     */
@@ -1456,7 +1503,7 @@ public:
 
     /** 获取下拉框接口
     */
-    Combo* GetCombo() const { return m_pCombo.get(); }
+    Combo *GetCombo() const { return m_pCombo.get(); }
 
 protected:
     /** 设置是否允许存在编辑框控件
@@ -1469,7 +1516,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1511,6 +1558,7 @@ private:
 class DUILIB_API PropertyGridFontProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -1518,11 +1566,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridFontProperty(Window* pWindow,
-                             const DString& propertyName,
-                             const DString& propertyValue,
-                             const DString& description = _T(""),
-                             size_t nPropertyData = 0);
+    PropertyGridFontProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1534,20 +1583,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridFontProperty(Window* pWindow,
-                             bool bPropertyNameId,
-                             const DString& propertyName,
-                             bool bPropertyValueId,
-                             const DString& propertyValue,
-                             bool bDescriptionId,
-                             const DString& description,
-                             size_t nPropertyData = 0);
+    PropertyGridFontProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridFontProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridFontProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1567,7 +1617,6 @@ public:
     void SetFontNameValidation(bool bValidation);
 
 protected:
-
     /** 初始化函数
      */
     virtual void OnInit() override;
@@ -1577,7 +1626,7 @@ protected:
     * @param [in] newText 新的文本内容
     * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
     */
-    virtual bool OnPropertyTextChanged(const DString& oldText, const DString& newText) override;
+    virtual bool OnPropertyTextChanged(const DString &oldText, const DString &newText) override;
 
 private:
     /** 字体列表
@@ -1598,6 +1647,7 @@ private:
 class DUILIB_API PropertyGridFontSizeProperty : public PropertyGridComboProperty
 {
     typedef PropertyGridComboProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -1605,11 +1655,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridFontSizeProperty(Window* pWindow, 
-                                 const DString& propertyName,
-                                 const DString& propertyValue,
-                                 const DString& description = _T(""),
-                                 size_t nPropertyData = 0);
+    PropertyGridFontSizeProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1621,20 +1672,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridFontSizeProperty(Window* pWindow,
-                                 bool bPropertyNameId,
-                                 const DString& propertyName,
-                                 bool bPropertyValueId,
-                                 const DString& propertyValue,
-                                 bool bDescriptionId,
-                                 const DString& description,
-                                 size_t nPropertyData = 0);
+    PropertyGridFontSizeProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridFontSizeProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridFontSizeProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1652,17 +1704,17 @@ public:
     /** 设置字体大小列表（可以覆盖内置的默认列表），字体大小值未进行DPI缩放
     * @param [in] fontSizeList 字体大小列表
     */
-    void SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList);
+    void SetFontSizeList(const std::vector<FontSizeInfo> &fontSizeList);
 
     /** 获取字体大小列表，字体大小值未进行DPI缩放
     * @param [out] fontSizeList 字体大小列表
     */
-    void GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const;
+    void GetFontSizeList(std::vector<FontSizeInfo> &fontSizeList) const;
 
     /** 获取字体大小列表，字体大小值已经完成进行DPI缩放
     * @param [out] fontSizeList 字体大小列表
     */
-    void GetDpiFontSizeList(std::vector<FontSizeInfo>& dpiFontSizeList) const;
+    void GetDpiFontSizeList(std::vector<FontSizeInfo> &dpiFontSizeList) const;
 
     /** 重新填充字体列表（删除原有的值，填充新的值）
     */
@@ -1687,25 +1739,24 @@ public:
     /** 获取字体大小显示名称对应的字体大小值，浮点数，未做DPI自适应值
     * @param [in] fontSizeName 比如："五号"
     */
-    DString GetFontSize(const DString& fontSizeName) const;
+    DString GetFontSize(const DString &fontSizeName) const;
 
     /** 获取字体大小显示名称对应的字体大小值，浮点数，未做DPI自适应值
     * @param [in] fontSizeNameId 字体名称的语言ID
     */
-    DString GetFontSizeById(const DString& fontSizeNameId) const;
+    DString GetFontSizeById(const DString &fontSizeNameId) const;
 
     /** 获取字体大小显示名称对应的字体大小值，浮点数，已做DPI自适应值
     * @param [in] fontSizeName 比如："五号"
     */
-    DString GetDpiFontSize(const DString& fontSizeName) const;
+    DString GetDpiFontSize(const DString &fontSizeName) const;
 
     /** 获取字体大小显示名称对应的字体大小值，浮点数，已做DPI自适应值
     * @param [in] fontSizeNameId 字体名称的语言ID
     */
-    DString GetDpiFontSizeById(const DString& fontSizeNameId) const;
+    DString GetDpiFontSizeById(const DString &fontSizeNameId) const;
 
 protected:
-
     /** 初始化函数
      */
     virtual void OnInit() override;
@@ -1726,7 +1777,7 @@ protected:
     * @param [in] newText 新的文本内容
     * @return 返回true表示继续触发属性值变化事件，返回false表示拦截属性值变化事件
     */
-    virtual bool OnPropertyTextChanged(const DString& oldText, const DString& newText) override;
+    virtual bool OnPropertyTextChanged(const DString &oldText, const DString &newText) override;
 
 private:
     /** 字体大小(填充到List)
@@ -1757,11 +1808,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridColorProperty(Window* pWindow, 
-                              const DString& propertyName,
-                              const DString& propertyValue,
-                              const DString& description = _T(""),
-                              size_t nPropertyData = 0);
+    PropertyGridColorProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1773,20 +1825,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridColorProperty(Window* pWindow,
-                              bool bPropertyNameId,
-                              const DString& propertyName,
-                              bool bPropertyValueId,
-                              const DString& propertyValue,
-                              bool bDescriptionId,
-                              const DString& description,
-                              size_t nPropertyData = 0);
+    PropertyGridColorProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridColorProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridColorProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1798,7 +1851,7 @@ public:
 
     /** 获取颜色选择控件接口
     */
-    ComboButton* GetComboButton() const { return m_pComboButton.get(); }
+    ComboButton *GetComboButton() const { return m_pComboButton.get(); }
 
 protected:
     /** 设置是否允许存在编辑框控件
@@ -1811,7 +1864,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1828,7 +1881,7 @@ private:
 
     /** 设置选择颜色
     */
-    void OnSelectColor(const DString& color);
+    void OnSelectColor(const DString &color);
 
 private:
     /** 颜色选择控件
@@ -1852,13 +1905,13 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @param [in] editFormat 日期时间的格式
     */
-    PropertyGridDateTimeProperty(Window* pWindow, 
-                                 const DString& propertyName,
-                                 const DString& dateTimeValue,
-                                 const DString& description = _T(""),
-                                 size_t nPropertyData = 0,
-                                 DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
-
+    PropertyGridDateTimeProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &dateTimeValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0,
+        DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1871,23 +1924,26 @@ public:
     * @param [in] nPropertyData 用户自定义数据
     * @param [in] editFormat 日期时间的格式
     */
-    PropertyGridDateTimeProperty(Window* pWindow,
-                                 bool bPropertyNameId,
-                                 const DString& propertyName,
-                                 bool bDateTimeValueId,
-                                 const DString& dateTimeValue,
-                                 bool bDescriptionId,
-                                 const DString& description,
-                                 size_t nPropertyData = 0,
-                                 DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
+    PropertyGridDateTimeProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bDateTimeValueId,
+        const DString &dateTimeValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0,
+        DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     * @param [in] editFormat 日期时间的格式
     */
-    PropertyGridDateTimeProperty(Window* pWindow, const PropertyGridParam& param,
-                                 DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
+    PropertyGridDateTimeProperty(
+        Window *pWindow,
+        const PropertyGridParam &param,
+        DateTime::EditFormat editFormat = DateTime::EditFormat::kDateCalendar);
 
 public:
     /** 获取属性类型
@@ -1899,7 +1955,7 @@ public:
 
     /** 获取日期时间控件接口
     */
-    DateTime* GetDateTime() const { return m_pDateTime.get(); }
+    DateTime *GetDateTime() const { return m_pDateTime.get(); }
 
 protected:
     /** 设置是否允许存在编辑框控件
@@ -1912,7 +1968,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
     /** 滚动条发生了滚动(用于处理弹出式子窗口的位置问题)
     */
@@ -1939,11 +1995,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridIPAddressProperty(Window* pWindow, 
-                                  const DString& propertyName,
-                                  const DString& propertyValue,
-                                  const DString& description = _T(""),
-                                  size_t nPropertyData = 0);
+    PropertyGridIPAddressProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -1955,20 +2012,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridIPAddressProperty(Window* pWindow,
-                                  bool bPropertyNameId,
-                                  const DString& propertyName,
-                                  bool bPropertyValueId,
-                                  const DString& propertyValue,
-                                  bool bDescriptionId,
-                                  const DString& description,
-                                  size_t nPropertyData = 0);
+    PropertyGridIPAddressProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridIPAddressProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridIPAddressProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -1980,12 +2038,12 @@ public:
 
     /** 获取IP地址控件接口
     */
-    IPAddress* GetIPAddress() const { return m_pIPAddress.get(); }
+    IPAddress *GetIPAddress() const { return m_pIPAddress.get(); }
 
     /** 设置新的IP地址
     * @param [in] newIP 新的IP地址
     */
-    void SetNewIPAddressValue(const DString& newIP);
+    void SetNewIPAddressValue(const DString &newIP);
 
 protected:
     /** 设置是否允许存在编辑框控件
@@ -1998,7 +2056,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
 private:
     /** IP地址控件
@@ -2017,11 +2075,12 @@ public:
     @param [in] description 属性的描述信息
     @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridHotKeyProperty(Window* pWindow, 
-                               const DString& propertyName,
-                               const DString& propertyValue,
-                               const DString& description = _T(""),
-                               size_t nPropertyData = 0);
+    PropertyGridHotKeyProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -2033,20 +2092,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridHotKeyProperty(Window* pWindow,
-                               bool bPropertyNameId,
-                               const DString& propertyName,
-                               bool bPropertyValueId,
-                               const DString& propertyValue,
-                               bool bDescriptionId,
-                               const DString& description,
-                               size_t nPropertyData = 0);
+    PropertyGridHotKeyProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridHotKeyProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridHotKeyProperty(Window *pWindow, const PropertyGridParam &param);
 
 public:
     /** 获取属性类型
@@ -2058,7 +2118,7 @@ public:
 
     /** 获取热键控件接口
     */
-    HotKey* GetHotKey() const { return m_pHotKey.get(); }
+    HotKey *GetHotKey() const { return m_pHotKey.get(); }
 
 protected:
     /** 设置是否允许存在编辑框控件
@@ -2071,7 +2131,7 @@ protected:
     * @param [in] bCancel true表示取消编辑，false表示应用编辑
     * @return 返回编辑控件的接口
     */
-    virtual Control* ShowEditControl(bool bShow, bool bCancel) override;
+    virtual Control *ShowEditControl(bool bShow, bool bCancel) override;
 
 private:
     /** 热键控件
@@ -2084,6 +2144,7 @@ private:
 class DUILIB_API PropertyGridFileProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -2095,16 +2156,16 @@ public:
     * @param [in] nFileTypeIndex 选择的文件类型，有效范围：[0, fileTypes.size())
     * @param [in] defaultExt 默认的文件类型, 举例："doc;docx"
     */
-    PropertyGridFileProperty(Window* pWindow, 
-                             const DString& propertyName,
-                             const DString& propertyValue,
-                             const DString& description = _T(""),
-                             size_t nPropertyData = 0,
-                             bool bOpenFileDialog = true,
-                             const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                             int32_t nFileTypeIndex = -1,
-                             const DString& defaultExt = _T(""));
-
+    PropertyGridFileProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -2120,18 +2181,19 @@ public:
     * @param [in] nFileTypeIndex 选择的文件类型，有效范围：[0, fileTypes.size())
     * @param [in] defaultExt 默认的文件类型, 举例："doc;docx"
     */
-    PropertyGridFileProperty(Window* pWindow,
-                            bool bPropertyNameId,
-                            const DString& propertyName,
-                            bool bPropertyValueId,
-                            const DString& propertyValue,
-                            bool bDescriptionId,
-                            const DString& description,
-                            size_t nPropertyData = 0,
-                            bool bOpenFileDialog = true,
-                            const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                            int32_t nFileTypeIndex = -1,
-                            const DString& defaultExt = _T(""));
+    PropertyGridFileProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -2141,11 +2203,13 @@ public:
     * @param [in] nFileTypeIndex 选择的文件类型，有效范围：[0, fileTypes.size())
     * @param [in] defaultExt 默认的文件类型, 举例："doc;docx"
     */
-    PropertyGridFileProperty(Window* pWindow, const PropertyGridParam& param,
-                             bool bOpenFileDialog = true,
-                             const std::vector<FileDialog::FileType>& fileTypes = std::vector<FileDialog::FileType>(),
-                             int32_t nFileTypeIndex = -1,
-                             const DString& defaultExt = _T(""));
+    PropertyGridFileProperty(
+        Window *pWindow,
+        const PropertyGridParam &param,
+        bool bOpenFileDialog = true,
+        const std::vector<FileDialog::FileType> &fileTypes = std::vector<FileDialog::FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""));
 
 protected:
     /** 获取属性类型
@@ -2191,6 +2255,7 @@ private:
 class DUILIB_API PropertyGridDirectoryProperty : public PropertyGridTextProperty
 {
     typedef PropertyGridTextProperty BaseClass;
+
 public:
     /** 构造一个属性
     * @param [in] propertyName 属性的名称
@@ -2198,11 +2263,12 @@ public:
     * @param [in] description 属性的描述信息
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridDirectoryProperty(Window* pWindow, 
-                                  const DString& propertyName,
-                                  const DString& propertyValue,
-                                  const DString& description = _T(""),
-                                  size_t nPropertyData = 0);
+    PropertyGridDirectoryProperty(
+        Window *pWindow,
+        const DString &propertyName,
+        const DString &propertyValue,
+        const DString &description = _T(""),
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
@@ -2214,20 +2280,21 @@ public:
     * @param [in] bDescriptionId true表示description为文本ID, false表示为普通文本
     * @param [in] nPropertyData 用户自定义数据
     */
-    PropertyGridDirectoryProperty(Window* pWindow,
-                                  bool bPropertyNameId,
-                                  const DString& propertyName,
-                                  bool bPropertyValueId,
-                                  const DString& propertyValue,
-                                  bool bDescriptionId,
-                                  const DString& description,
-                                  size_t nPropertyData = 0);
+    PropertyGridDirectoryProperty(
+        Window *pWindow,
+        bool bPropertyNameId,
+        const DString &propertyName,
+        bool bPropertyValueId,
+        const DString &propertyValue,
+        bool bDescriptionId,
+        const DString &description,
+        size_t nPropertyData = 0);
 
     /** 构造一个属性(支持多语言版)
     * @param [in] pWindow 关联的窗口
     * @param [in] param 关联的参数
     */
-    PropertyGridDirectoryProperty(Window* pWindow, const PropertyGridParam& param);
+    PropertyGridDirectoryProperty(Window *pWindow, const PropertyGridParam &param);
 
 protected:
     /** 获取属性类型
@@ -2252,6 +2319,6 @@ private:
     ControlPtrT<Button> m_pBrowseBtn;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_PROPERTY_GRID_H_

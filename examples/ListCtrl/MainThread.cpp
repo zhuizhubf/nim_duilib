@@ -1,14 +1,11 @@
 #include "MainThread.h"
 #include "MainForm.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -17,7 +14,7 @@ bool MainThread::OnInit()
     ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
 
     //创建主窗口
-    MainForm* pWindow = new MainForm();
+    MainForm *pWindow = new MainForm();
     pWindow->CreateWnd(nullptr, ui::WindowCreateParam(_T("ListCtrl"), true));
     pWindow->PostQuitMsgWhenClosed(true);
     pWindow->ShowWindow(ui::kSW_SHOW_NORMAL);

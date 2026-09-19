@@ -2,29 +2,29 @@
 #define UI_CONTROL_TABCTRL_H_
 
 #include "duilib/Box/ListBox.h"
-#include "duilib/Core/ControlDragable.h"
 #include "duilib/Control/IconControl.h"
+#include "duilib/Core/ControlDragable.h"
 
-namespace ui
-{
+namespace ui {
 /** 多标签控件（类似浏览器的多标签）
 */
 class TabBox;
-class DUILIB_API TabCtrl: public ListBox
+class DUILIB_API TabCtrl : public ListBox
 {
     typedef ListBox BaseClass;
+
 public:
-    explicit TabCtrl(Window* pWindow);
+    explicit TabCtrl(Window *pWindow);
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
 public:
     /** 设置绑定的TabBox控件名称
     */
-    void SetTabBoxName(const DString& tabBoxName);
+    void SetTabBoxName(const DString &tabBoxName);
 
     /** 获取绑定的TabBox控件名称
     */
@@ -32,11 +32,11 @@ public:
 
     /** 设置绑定的TabBox接口
     */
-    void SetTabBox(TabBox* pTabBox);
+    void SetTabBox(TabBox *pTabBox);
 
     /** 获取绑定的TabBox接口
     */
-    TabBox* GetTabBox() const;
+    TabBox *GetTabBox() const;
 
     /** 设置是否支持拖动改变控件的顺序
     */
@@ -64,11 +64,11 @@ public:
     /** 设置选择标签项的外部轮廓边线的颜色
     * @param [in] outlineColor 轮廓边线的颜色
     */
-    void SetSelectedTabItemOutlineColor(const DString& outlineColor);
+    void SetSelectedTabItemOutlineColor(const DString &outlineColor);
 
     /** 获取选择标签项的外部轮廓边线的颜色
     */
-    const DString& GetSelectedTabItemOutlineColor() const;
+    const DString &GetSelectedTabItemOutlineColor() const;
 
     /** 设置标签栏底部的边线高度（这个边线，选择标签的区域不绘制，其他区域绘制）
     * @param [in] fLineHeight 标签栏底部的边线高度, 高度值未进行DPI缩放
@@ -83,34 +83,34 @@ public:
     /** 设置标签栏底部的边线颜色(该底部边线，不包括选择标签项的区域)
     * @param [in] lineColor 标签栏底部的边线颜色
     */
-    void SetTabCtrlBottomLineColor(const DString& lineColor);
+    void SetTabCtrlBottomLineColor(const DString &lineColor);
 
     /** 设置标签栏底部的边线颜色
     */
-    const DString& GetTabCtrlBottomLineColor() const;
+    const DString &GetTabCtrlBottomLineColor() const;
 
 public:
     /** 设置子项的位置索引
      * @param [in] pControl 子项指针
      * @param [in] iIndex 索引号，范围是：[0, GetItemCount())
      */
-    virtual bool SetItemIndex(Control* pControl, size_t iIndex) override;
+    virtual bool SetItemIndex(Control *pControl, size_t iIndex) override;
 
     /** 追加一个子项到末尾
      * @param [in] pControl 子项指针
      */
-    virtual bool AddItem(Control* pControl) override;
+    virtual bool AddItem(Control *pControl) override;
 
     /** 在指定位置之后插入一个子项
      * @param [in] pControl 子项指针
      * @param[in] iIndex 要插入的位置索引，范围是：[0, GetItemCount())
      */
-    virtual bool AddItemAt(Control* pControl, size_t  iIndex) override;
+    virtual bool AddItemAt(Control *pControl, size_t iIndex) override;
 
     /** 根据子项指针
      * @param [in] pControl 子项指针
      */
-    virtual bool RemoveItem(Control* pControl) override;
+    virtual bool RemoveItem(Control *pControl) override;
 
     /** 根据索引移除一个子项
      * @param [in] iIndex 子项索引，范围是：[0, GetItemCount())
@@ -129,11 +129,11 @@ protected:
     /** 消息处理函数
     * @param [in] msg 消息内容
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 绘制控件状态颜色的函数
     */
-    virtual void PaintStateColors(IRender* pRender) override;
+    virtual void PaintStateColors(IRender *pRender) override;
 
 private:
     /** 默认选择的子项
@@ -146,7 +146,7 @@ private:
 
     /** 绑定的TabBox接口
     */
-    TabBox* m_pTabBox;
+    TabBox *m_pTabBox;
 
     /** 是否支持拖动改变列的顺序(功能开关)
     */
@@ -174,20 +174,21 @@ private:
 class DUILIB_API TabCtrlItem : public ControlDragableT<ListBoxItemH>
 {
     typedef ControlDragableT<ListBoxItemH> BaseClass;
+
 public:
-    explicit TabCtrlItem(Window* pWindow);
+    explicit TabCtrlItem(Window *pWindow);
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual DString GetToolTipText() const override;
 
 public:
     /** 设置图标
     * @param [in] iconImageString 图标资源字符串
     */
-    void SetIcon(const DString& iconImageString);
+    void SetIcon(const DString &iconImageString);
 
     /** 获取图标
     * @return 返回图标资源字符串
@@ -200,7 +201,8 @@ public:
     * @param [in] pPixelBits 位图数据
     * @param [in] nPixelBitsSize 位图数据的长度（按字节）
     */
-    bool SetIconData(int32_t nWidth, int32_t nHeight, const uint8_t* pPixelBits, int32_t nPixelBitsSize);
+    bool SetIconData(
+        int32_t nWidth, int32_t nHeight, const uint8_t *pPixelBits, int32_t nPixelBitsSize);
 
     /** 清除图标数据
     */
@@ -208,7 +210,7 @@ public:
 
     /** 设置文字内容
     */
-    void SetTitle(const DString& title);
+    void SetTitle(const DString &title);
 
     /** 获取文字内容
     */
@@ -216,7 +218,7 @@ public:
 
     /** 设置文字内容ID（支持多语版）
     */
-    void SetTitleId(const DString& titleId);
+    void SetTitleId(const DString &titleId);
 
     /** 获取文字内容（支持多语版）
     */
@@ -234,39 +236,39 @@ public:
 public:
     /** 获取图标控件
     */
-    IconControl* GetIconControl() const { return m_pIcon; }
+    IconControl *GetIconControl() const { return m_pIcon; }
 
     /** 获取文本控件
     */
-    Label* GetTextLabel() const { return m_pLabel; }
+    Label *GetTextLabel() const { return m_pLabel; }
 
     /** 获取关闭按钮
     */
-    Button* GetCloseButton() const { return m_pCloseBtn; }
+    Button *GetCloseButton() const { return m_pCloseBtn; }
 
     /** 获取标签之间的分割线的控件
     */
-    Control* GetLineControl() const { return m_pLine; }
+    Control *GetLineControl() const { return m_pLine; }
 
 public:
     /** 图标控件的Class
     */
-    void SetIconClass(const DString& iconClass);
+    void SetIconClass(const DString &iconClass);
     DString GetIconClass() const;
 
     /** 文本控件的Class
     */
-    void SetTitleClass(const DString& titleClass);
+    void SetTitleClass(const DString &titleClass);
     DString GetTitleClass() const;
 
     /** 关闭按钮控件的Class
     */
-    void SetCloseButtonClass(const DString& closeButtonClass);
+    void SetCloseButtonClass(const DString &closeButtonClass);
     DString GetCloseButtonClass() const;
 
     /** 分割线控件的Class
     */
-    void SetLineClass(const DString& lineClass);
+    void SetLineClass(const DString &lineClass);
     DString GetLineClass() const;
 
 public:
@@ -334,23 +336,23 @@ protected:
     /** 消息处理函数
     * @param [in] msg 消息内容
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 处理鼠标移入消息
     */
-    virtual bool MouseEnter(const EventArgs& msg) override;
+    virtual bool MouseEnter(const EventArgs &msg) override;
 
     /** 处理鼠标移出消息
     */
-    virtual bool MouseLeave(const EventArgs& msg) override;
+    virtual bool MouseLeave(const EventArgs &msg) override;
 
     /** 鼠标左键按下消息
     */
-    virtual bool ButtonDown(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
 
     /** 绘制控件状态颜色的函数
     */
-    virtual void PaintStateColors(IRender* pRender) override;
+    virtual void PaintStateColors(IRender *pRender) override;
 
     /** 选择状态变化事件(m_bSelected变量发生变化)
     */
@@ -358,11 +360,11 @@ protected:
 
     /** 绘制标签页(选择状态)
     */
-    virtual void PaintTabItemSelected(IRender* pRender) ;
+    virtual void PaintTabItemSelected(IRender *pRender);
 
     /** 绘制标签页(悬停状态)
     */
-    virtual void PaintTabItemHovered(IRender* pRender);
+    virtual void PaintTabItemHovered(IRender *pRender);
 
     /** 设置可见状态事件
     * @param [in] bChanged true表示状态发生变化，false表示状态未发生变化
@@ -372,7 +374,7 @@ protected:
 protected:
     /** 填充路径, 形成圆角矩形
     */
-    void AddTabItemPath(IPath* path, const UiRect& rect, UiSize roundSize) const;
+    void AddTabItemPath(IPath *path, const UiRect &rect, UiSize roundSize) const;
 
     /** 调整子控件的顺序
     */
@@ -380,7 +382,7 @@ protected:
 
     /** 获取TabCtrl接口
     */
-    TabCtrl* GetTabCtrl() const;
+    TabCtrl *GetTabCtrl() const;
 
     /** 检查并设置图标的可见性
     */
@@ -423,19 +425,19 @@ private:
 
     /** 图标控件
     */
-    IconControl* m_pIcon;
+    IconControl *m_pIcon;
 
     /** 文本控件
     */
-    Label* m_pLabel;
+    Label *m_pLabel;
 
     /** 关闭按钮
     */
-    Button* m_pCloseBtn;
+    Button *m_pCloseBtn;
 
     /** 标签之间的分割线
     */
-    Control* m_pLine;
+    Control *m_pLine;
 
     /** 图标控件的Class
     */
@@ -471,6 +473,6 @@ private:
     size_t m_nTabBoxItemIndex;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_TABCTRL_H_

@@ -3,10 +3,9 @@
 
 #include "duilib/Core/ControlDropTarget.h"
 
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
 
-namespace ui 
-{
+namespace ui {
 class NativeWindow_SDL;
 
 /** 窗口的拖放支持
@@ -14,9 +13,9 @@ class NativeWindow_SDL;
 class DUILIB_API WindowDropTarget
 {
 public:
-    explicit WindowDropTarget(NativeWindow_SDL* pNativeWindow);
-    WindowDropTarget(const WindowDropTarget& r) = delete;
-    WindowDropTarget& operator=(const WindowDropTarget& r) = delete;
+    explicit WindowDropTarget(NativeWindow_SDL *pNativeWindow);
+    WindowDropTarget(const WindowDropTarget &r) = delete;
+    WindowDropTarget &operator=(const WindowDropTarget &r) = delete;
     virtual ~WindowDropTarget();
 
 public:
@@ -26,27 +25,27 @@ public:
     /** SDL_EVENT_DROP_POSITION
     *@param [in] pt 客户区坐标
     */
-    void OnDropPosition(const UiPoint& pt);
+    void OnDropPosition(const UiPoint &pt);
 
     /** SDL_EVENT_DROP_TEXT
     *@param [in] utf8Text 文本内容，每次调用为一行文本
     */
-    void OnDropText(const DStringA& utf8Text);
+    void OnDropText(const DStringA &utf8Text);
 
     /** SDL_EVENT_DROP_FILE
     *@param [in] utf8Source 拖放源
     *@param [in] utf8File 文件路径，每次调用为一个文件
     */
-    void OnDropFile(const DStringA& utf8Source, const DStringA& utf8File);
-    
+    void OnDropFile(const DStringA &utf8Source, const DStringA &utf8File);
+
     // SDL_EVENT_DROP_COMPLETE
     void OnDropComplete();
 
-protected: 
+protected:
     /** 找到某个点坐标对应的控件接口
     * @param [in] clientPt 客户区坐标点
     */
-    ControlPtrT<ControlDropTarget_SDL> GetControlDropTarget(const UiPoint& clientPt) const;
+    ControlPtrT<ControlDropTarget_SDL> GetControlDropTarget(const UiPoint &clientPt) const;
 
     /** 拖动操作完成清理状态
     */
@@ -59,7 +58,7 @@ private:
 
     /** 关联的Native窗口实现
     */
-    NativeWindow_SDL* m_pNativeWindow;
+    NativeWindow_SDL *m_pNativeWindow;
 
     /** 拖动操作的客户区坐标
     */

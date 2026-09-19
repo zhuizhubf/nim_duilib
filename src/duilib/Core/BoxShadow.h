@@ -17,12 +17,12 @@ public:
     /** 构造函数
     * @param [in] pControl 关联的控件接口
     */
-    explicit BoxShadow(Control* pControl);
+    explicit BoxShadow(Control *pControl);
 
     /** 设置阴影属性
      * @param[in] strBoxShadow 要设置的属性,如 "color='black' offset='1,1' blur_radius='2' spread_radius='2'"
      */
-    void SetBoxShadowString(const DString& strBoxShadow);
+    void SetBoxShadowString(const DString &strBoxShadow);
 
     /** 是否有box-shadow阴影
      */
@@ -32,7 +32,7 @@ public:
     * @param [in] controlRect 控件自身的矩形范围
     * @return 返回包含box-shadow阴影后的矩形范围（该范围内均需要绘制）
     */
-    UiRect GetExpandedRect(const UiRect& controlRect) const;
+    UiRect GetExpandedRect(const UiRect &controlRect) const;
 
 public:
     // 阴影属性
@@ -59,10 +59,9 @@ public:
 
     /** 关联的控件接口
     */
-    Control* m_pControl;
+    Control *m_pControl;
 };
 
 } // namespace ui
 
 #endif // UI_CORE_BOX_SHADOW_H_
-

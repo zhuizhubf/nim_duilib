@@ -3,21 +3,21 @@
 
 #include "duilib/Box/HBox.h"
 
-namespace ui
-{
+namespace ui {
 /** IP地址控件
 */
 class RichEdit;
-class DUILIB_API IPAddress: public HBox
+class DUILIB_API IPAddress : public HBox
 {
     typedef HBox BaseClass;
+
 public:
-    explicit IPAddress(Window* pWindow);
+    explicit IPAddress(Window *pWindow);
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** 让控件获取焦点
      */
@@ -25,14 +25,13 @@ public:
 
     /** 设置IP地址
     */
-    void SetIPAddress(const DString& ipAddress);
+    void SetIPAddress(const DString &ipAddress);
 
     /** 获取IP地址
     */
     DString GetIPAddress() const;
 
 protected:
-
     /** 初始化接口
     */
     virtual void OnInit() override;
@@ -40,26 +39,26 @@ protected:
     /** 将消息派发到消息处理函数
      * @param[in] msg 消息内容
      */
-    virtual void SendEventMsg(const EventArgs& msg) override;
+    virtual void SendEventMsg(const EventArgs &msg) override;
 
     /** 编辑框的焦点转移事件
     */
-    void OnKillFocusEvent(RichEdit* pRichEdit, Control* pNewFocus);
+    void OnKillFocusEvent(RichEdit *pRichEdit, Control *pNewFocus);
 
 private:
     /** 编辑框列表
     */
-    std::vector<RichEdit*> m_editList;
+    std::vector<RichEdit *> m_editList;
 
     /** 上次焦点在哪个控件上
     */
-    RichEdit* m_pLastFocus;
+    RichEdit *m_pLastFocus;
 
     /** IP地址
     */
     UiString m_ipAddress;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_IPADDRESS_H_

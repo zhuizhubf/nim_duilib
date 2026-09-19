@@ -4,9 +4,8 @@
 #ifdef DUILIB_BUILD_FOR_SDL
 #include <SDL3/SDL.h>
 
-namespace ui
-{
-bool Clipboard::GetClipboardText(DStringW& text)
+namespace ui {
+bool Clipboard::GetClipboardText(DStringW &text)
 {
     DStringA textA;
     bool bRet = GetClipboardText(textA);
@@ -14,11 +13,11 @@ bool Clipboard::GetClipboardText(DStringW& text)
     return bRet;
 }
 
-bool Clipboard::GetClipboardText(DStringA& text)
+bool Clipboard::GetClipboardText(DStringA &text)
 {
     text.clear();
     if (SDL_HasClipboardText()) {
-        char* szTemp = SDL_GetClipboardText();
+        char *szTemp = SDL_GetClipboardText();
         if (szTemp != nullptr) {
             text = szTemp;
             SDL_free(szTemp);
@@ -28,12 +27,12 @@ bool Clipboard::GetClipboardText(DStringA& text)
     return true;
 }
 
-bool Clipboard::SetClipboardText(const DStringW& text)
+bool Clipboard::SetClipboardText(const DStringW &text)
 {
     return SetClipboardText(StringConvert::WStringToUTF8(text));
 }
 
-bool Clipboard::SetClipboardText(const DStringA& text)
+bool Clipboard::SetClipboardText(const DStringA &text)
 {
     return SDL_SetClipboardText(text.c_str());
 }

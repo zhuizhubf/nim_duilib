@@ -9,6 +9,7 @@
 class MainForm : public ui::WindowImplBase
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
     MainForm();
     virtual ~MainForm() override;
@@ -31,33 +32,33 @@ protected:
     virtual bool OnLanguageChanged() override;
 
 private:
-    bool OnClicked(const ui::EventArgs& args);
+    bool OnClicked(const ui::EventArgs &args);
 
     /** 测试虚表的事件
     */
-    void TestVirtualListBoxEvents(ui::VirtualListBox* pListBox);
+    void TestVirtualListBoxEvents(ui::VirtualListBox *pListBox);
 
     /** 获取消息的基本信息（用于显示日志）
     */
-    DString GetEventDisplayInfo(const ui::EventArgs& args, ui::VirtualListBox* pListBox);
+    DString GetEventDisplayInfo(const ui::EventArgs &args, ui::VirtualListBox *pListBox);
 
     /** 输出测试日志
     */
-    void OutputDebugLog(const DString& logMsg);
+    void OutputDebugLog(const DString &logMsg);
 
 private:
-    ui::VirtualListBox* m_pTileList;
-    DataProvider* m_pDataProvider;
+    ui::VirtualListBox *m_pTileList;
+    DataProvider *m_pDataProvider;
 
 private:
-    ui::RichEdit* m_pEditColumn;
-    ui::RichEdit* m_pEditTotal;
-    ui::Option* m_pOptionColumnFix;
-    ui::RichEdit* m_pEditUpdate;
-    ui::RichEdit* m_pEditTaskName;
-    ui::RichEdit* m_pEditDelete;
-    ui::RichEdit* m_pEditChildMarginX;
-    ui::RichEdit* m_pEditChildMarginY;
+    ui::RichEdit *m_pEditColumn;
+    ui::RichEdit *m_pEditTotal;
+    ui::Option *m_pOptionColumnFix;
+    ui::RichEdit *m_pEditUpdate;
+    ui::RichEdit *m_pEditTaskName;
+    ui::RichEdit *m_pEditDelete;
+    ui::RichEdit *m_pEditChildMarginX;
+    ui::RichEdit *m_pEditChildMarginY;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

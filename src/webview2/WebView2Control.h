@@ -3,11 +3,11 @@
 
 #include "duilib/Core/Control.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 #include "ComPtr.h"
 
-#include <combaseapi.h>
 #include "third_party/prebuilt/Microsoft.Web.WebView2/build/native/include/WebView2.h"
+#include <combaseapi.h>
 
 #include <functional>
 #include <memory>
@@ -19,17 +19,17 @@ class IBitmap;
 
 /** WebView2控件的C++封装类
  */
-class DUILIB_API WebView2Control: public Control
+class DUILIB_API WebView2Control : public Control
 {
     typedef Control BaseClass;
+
 public:
     /** 导航状态枚举, 表示WebView2的导航状态
      */
-    enum class NavigationState
-    {
-        Started,    /**< 导航开始 */
-        Completed,  /**< 导航完成 */
-        Failed      /**< 导航失败 */
+    enum class NavigationState {
+        Started,   /**< 导航开始 */
+        Completed, /**< 导航完成 */
+        Failed     /**< 导航失败 */
     };
 
     /** 初始化完成回调函数类型
@@ -40,25 +40,25 @@ public:
     /** Web消息接收回调函数类型
      * @param message 接收到的消息内容
      */
-    using WebMessageReceivedCallback = std::function<void(const DString& url,
-                                                          const DString& webMessageAsJson, 
-                                                          const DString& webMessageAsString)>;
+    using WebMessageReceivedCallback = std::function<
+        void(const DString &url, const DString &webMessageAsJson, const DString &webMessageAsString)>;
 
     /** 导航状态变化回调函数类型
      * @param state 新的导航状态
      * @param errorCode 错误码（如果导航失败）
      */
-    using NavigationStateChangedCallback = std::function<void(NavigationState state, HRESULT errorCode)>;
+    using NavigationStateChangedCallback
+        = std::function<void(NavigationState state, HRESULT errorCode)>;
 
     /** 文档标题变化回调函数类型
      * @param title 新的文档标题
      */
-    using DocumentTitleChangedCallback = std::function<void(const DString& title)>;
+    using DocumentTitleChangedCallback = std::function<void(const DString &title)>;
 
     /** 源URL变化回调函数类型
      * @param uri 新的源URL
      */
-    using SourceChangedCallback = std::function<void(const DString& uri)>;
+    using SourceChangedCallback = std::function<void(const DString &uri)>;
 
     /** 新窗口请求回调函数类型
      * @param sourceUrl 源的URL
@@ -68,9 +68,12 @@ public:
      * @param bUserInitiated 是否由用户触发的弹窗
      * @return 返回true表示允许创建弹窗页面，但新的页面在当前页面中导航，不会弹出新窗口；返回false表示拦截页面弹窗页面，由回调函数内托管新页面的显示逻辑
      */
-    using NewWindowRequestedCallback = std::function<bool(const DString& sourceUrl, const DString& sourceFrame,
-                                                          const DString& targetUrl, const DString& targetFrame,
-                                                          bool bUserInitiated)>;
+    using NewWindowRequestedCallback = std::function<bool(
+        const DString &sourceUrl,
+        const DString &sourceFrame,
+        const DString &targetUrl,
+        const DString &targetFrame,
+        bool bUserInitiated)>;
 
     /** 导航历史变化事件回调函数类型
      */
@@ -86,12 +89,13 @@ public:
     * @param [in] nHeight 图片高度
     * @param [in] imageData 网站图标的图片数据
     */
-    using FavIconChangedCallback = std::function<void(int32_t nWidth, int32_t nHeight, const std::vector<uint8_t>& imageData)>;
+    using FavIconChangedCallback
+        = std::function<void(int32_t nWidth, int32_t nHeight, const std::vector<uint8_t> &imageData)>;
 
 public:
     /** 构造函数
      */
-    explicit WebView2Control(Window* pWindow);
+    explicit WebView2Control(Window *pWindow);
 
     /** 析构函数
      */
@@ -101,8 +105,8 @@ public:
      * @param userDataFolder 用户数据文件夹路径（可选）
      * @param callback 初始化完成回调函数（可选）
      */
-    bool InitializeAsync(const DString& userDataFolder = _T(""),
-                         InitializeCompletedCallback callback = nullptr);
+    bool InitializeAsync(
+        const DString &userDataFolder = _T(""), InitializeCompletedCallback callback = nullptr);
 
     /** 检查WebView是否正在初始化
      * @return 是否正在初始化
@@ -113,54 +117,56 @@ public:
      * @return 是否已初始化
      */
     bool IsInitialized() const;
-    
+
     /** 导航到指定URL（可能是异步完成）
      * @param url 要导航的URL
      */
-    bool Navigate(const DString& url);
-    
+    bool Navigate(const DString &url);
+
     /** 导航到上一页
      */
     bool NavigateBack();
-    
+
     /** 导航到下一页
      */
     bool NavigateForward();
-    
+
     /** 刷新当前页面
      */
     bool Refresh();
-    
+
     /** 停止加载
      * @return HRESULT错误码
      */
     bool Stop();
-    
+
     /** 执行JavaScript脚本
      * @param script 要执行的JavaScript脚本
      * @param callback 执行完成后的回调函数（可选）
      */
-    bool ExecuteScript(const DString& script, std::function<void(const DString& result, HRESULT hr)> callback = nullptr);
-    
+    bool ExecuteScript(
+        const DString &script,
+        std::function<void(const DString &result, HRESULT hr)> callback = nullptr);
+
     /** 以JSON格式发送Web消息
      * @param json 要发送的JSON字符串
      */
-    bool PostWebMessageAsJson(const DString& json);
-    
+    bool PostWebMessageAsJson(const DString &json);
+
     /** 以字符串格式发送Web消息
      * @param message 要发送的消息字符串
      */
-    bool PostWebMessageAsString(const DString& message);
-    
+    bool PostWebMessageAsString(const DString &message);
+
     /** 设置User-Agent
      * @param userAgent 要设置的User-Agent字符串
      */
-    bool SetUserAgent(const DString& userAgent);
+    bool SetUserAgent(const DString &userAgent);
 
     /** 获取User-Agent
     */
     DString GetUserAgent() const;
-    
+
     /** 设置缩放因子
      * @param zoomFactor 缩放因子
      */
@@ -169,12 +175,12 @@ public:
     /** 获取缩放因子
     */
     double GetZoomFactor() const;
-    
+
     /** 设置JavaScript是否启用
     */
     bool SetScriptEnabled(bool enabled);
     bool IsScriptEnabled() const;
-    
+
     /** 设置Web消息是否启用
     */
     bool SetWebMessageEnabled(bool enabled);
@@ -194,27 +200,27 @@ public:
     */
     bool SetZoomControlEnabled(bool enabled);
     bool IsZoomControlEnabled() const;
-    
+
     /** 设置Web消息接收回调函数
      * @param callback 回调函数
      */
     bool SetWebMessageReceivedCallback(WebMessageReceivedCallback callback);
-    
+
     /** 设置导航状态变化回调函数
      * @param callback 回调函数
      */
     bool SetNavigationStateChangedCallback(NavigationStateChangedCallback callback);
-    
+
     /** 设置文档标题变化回调函数
      * @param callback 回调函数
      */
     bool SetDocumentTitleChangedCallback(DocumentTitleChangedCallback callback);
-    
+
     /** 设置源URL变化回调函数
      * @param callback 回调函数
      */
-    bool SetSourceChangedCallback(SourceChangedCallback callback);   
-  
+    bool SetSourceChangedCallback(SourceChangedCallback callback);
+
     /** 设置新窗口请求回调函数
      * @param callback 回调函数
      */
@@ -232,19 +238,20 @@ public:
     /** 设置网站图标变化事件回调函数类型
     */
     void SetFavIconChangedCallback(FavIconChangedCallback callback);
-       
+
     /** 捕获当前页面的预览图(异步完成)，保存为PNG或者JPG格式
      * @param filePath 保存预览图的文件路径，根据保存的图片文件名后缀自动判断保存的格式
      * @param callback 操作完成回调函数（可选）
      */
-    bool CapturePreview(const DString& filePath,
-                        std::function<void(const DString& filePath, HRESULT hr)> callback = nullptr);
-    
+    bool CapturePreview(
+        const DString &filePath,
+        std::function<void(const DString &filePath, HRESULT hr)> callback = nullptr);
+
     /** 获取当前URL
      * @return 当前URL
      */
     DString GetUrl() const;
-    
+
     /** 获取当前文档标题
      * @return 当前文档标题
      */
@@ -253,12 +260,12 @@ public:
     /** 是否正在导航中
     */
     bool IsNavigating() const;
-    
+
     /** 检查是否可以导航到上一页
      * @return 是否可以导航到上一页
      */
     bool CanGoBack() const;
-    
+
     /** 检查是否可以导航到下一页
      * @return 是否可以导航到下一页
      */
@@ -297,12 +304,12 @@ public:
 public:
     // 控件类型相关的属性
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual void OnInit() override;
     virtual void SetPos(UiRect rc) override;
-    virtual bool OnSetFocus(const EventArgs& msg) override;
-    virtual bool OnKillFocus(const EventArgs& msg) override;
-    virtual void SetWindow(Window* pWindow) override;
+    virtual bool OnSetFocus(const EventArgs &msg) override;
+    virtual bool OnKillFocus(const EventArgs &msg) override;
+    virtual void SetWindow(Window *pWindow) override;
 
     /** 设置是否允许F12快捷键(开发者工具)
     */
@@ -322,7 +329,7 @@ public:
 
     /** 设置初始加载的URL(仅在控件初始化前调用有效)
     */
-    void SetInitURL(const DString& url);
+    void SetInitURL(const DString &url);
 
     /** 获取初始加载的URL
     */

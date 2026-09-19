@@ -4,10 +4,9 @@
 #include "duilib/Core/UiTypes.h"
 #include <ctime>
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-namespace ui
-{
+namespace ui {
 class DateTime;
 class WindowBase;
 
@@ -16,12 +15,12 @@ class WindowBase;
 class DateTimeWnd
 {
 public:
-    explicit DateTimeWnd(DateTime* pOwner);
+    explicit DateTimeWnd(DateTime *pOwner);
     ~DateTimeWnd();
 
 public:
     //初始化
-    bool Init(DateTime* pOwner);
+    bool Init(DateTime *pOwner);
 
     //更新窗口的位置
     void UpdateWndPos();
@@ -47,13 +46,13 @@ private:
 
     UiRect CalPos();
     HFONT CreateHFont() const;
-    struct tm SystemTimeToStdTime(const SYSTEMTIME& sysTime) const;
-    SYSTEMTIME StdTimeToSystemTime(const struct tm& tmTime) const;
+    struct tm SystemTimeToStdTime(const SYSTEMTIME &sysTime) const;
+    SYSTEMTIME StdTimeToSystemTime(const struct tm &tmTime) const;
 
 private:
     HWND m_hDateTimeWnd;
     WNDPROC m_OldWndProc; //原来的窗口过程函数
-    DateTime* m_pOwner;
+    DateTime *m_pOwner;
     bool m_bInit;
     bool m_bDropOpen;
     SYSTEMTIME m_oldSysTime;

@@ -13,14 +13,18 @@
 
 #include "cef/internal/CefJSBridge.h"
 
-namespace ui
-{
-    
+namespace ui {
+
 class CefJSHandler : public CefV8Handler
 {
 public:
     CefJSHandler() {}
-    virtual bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) override;
+    virtual bool Execute(
+        const CefString &name,
+        CefRefPtr<CefV8Value> object,
+        const CefV8ValueList &arguments,
+        CefRefPtr<CefV8Value> &retval,
+        CefString &exception) override;
     void AttachJSBridge(std::shared_ptr<CefJSBridge> js_bridge) { m_jsBridge = js_bridge; }
 
     IMPLEMENT_REFCOUNTING(CefJSHandler);
@@ -28,7 +32,7 @@ public:
 private:
     std::shared_ptr<CefJSBridge> m_jsBridge;
 };
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_CEF
 

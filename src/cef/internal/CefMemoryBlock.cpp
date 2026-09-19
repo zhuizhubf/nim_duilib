@@ -6,19 +6,19 @@
 
 namespace ui {
 
-CefMemoryBlock::CefMemoryBlock():
-    m_pBits(nullptr),
-    m_nWidth(0),
-    m_nHeight(0)
-{
-}
+CefMemoryBlock::CefMemoryBlock()
+    : m_pBits(nullptr)
+    , m_nWidth(0)
+    , m_nHeight(0)
+{}
 
 CefMemoryBlock::~CefMemoryBlock()
 {
     Clear();
 }
 
-bool CefMemoryBlock::Init(const void* buffer, const std::vector<UiRect>& dirtyRectList, int32_t width, int32_t height)
+bool CefMemoryBlock::Init(
+    const void *buffer, const std::vector<UiRect> &dirtyRectList, int32_t width, int32_t height)
 {
     std::lock_guard<std::mutex> threadGuard(m_memMutex);
     ASSERT((width > 0) && (height > 0) && (buffer != nullptr));
@@ -27,10 +27,9 @@ bool CefMemoryBlock::Init(const void* buffer, const std::vector<UiRect>& dirtyRe
     }
 
     bool bDirtyRectValid = !dirtyRectList.empty();
-    for (const UiRect& rect : dirtyRectList) {
-        if ((rect.left < 0) || (rect.right > width) ||
-            (rect.top < 0) || (rect.bottom > height) ||
-            (rect.right <= rect.left) || (rect.bottom <= rect.top)) {
+    for (const UiRect &rect : dirtyRectList) {
+        if ((rect.left < 0) || (rect.right > width) || (rect.top < 0) || (rect.bottom > height)
+            || (rect.right <= rect.left) || (rect.bottom <= rect.top)) {
             bDirtyRectValid = false;
             break;
         }
@@ -49,19 +48,22 @@ bool CefMemoryBlock::Init(const void* buffer, const std::vector<UiRect>& dirtyRe
     }
     //复制数据
     if (m_pBits != nullptr) {
-        if (!bDirtyRectValid || dirtyRectList.empty() || dirtyRectList[0] == UiRect(0, 0, width, height)) {
+        if (!bDirtyRectValid || dirtyRectList.empty()
+            || dirtyRectList[0] == UiRect(0, 0, width, height)) {
             //完整绘制
             memcpy(m_pBits, buffer, width * height * sizeof(uint32_t));
-        }
-        else {
+        } else {
             //增量绘制：只绘制脏区域
-            uint32_t* pBmpBits = (uint32_t*)m_pBits;
+            uint32_t *pBmpBits = (uint32_t *) m_pBits;
             int32_t offset = 0;
-            for (const UiRect& rect : dirtyRectList) {
+            for (const UiRect &rect : dirtyRectList) {
                 for (int32_t i = rect.top; i < rect.bottom; ++i) {
                     //按行复制数据
                     offset = i * width + rect.left;
-                    memcpy(pBmpBits + offset, (uint32_t*)buffer + offset, rect.Width() * sizeof (uint32_t));
+                    memcpy(
+                        pBmpBits + offset,
+                        (uint32_t *) buffer + offset,
+                        rect.Width() * sizeof(uint32_t));
                 }
             }
         }
@@ -81,7 +83,7 @@ void CefMemoryBlock::Clear()
     m_nHeight = 0;
 }
 
-void CefMemoryBlock::PaintData(IRender* pRender,const UiRect& rc)
+void CefMemoryBlock::PaintData(IRender *pRender, const UiRect &rc)
 {
     std::lock_guard<std::mutex> threadGuard(m_memMutex);
     //通过直接写入数据的接口，性能最佳
@@ -98,23 +100,25 @@ void CefMemoryBlock::PaintData(IRender* pRender,const UiRect& rc)
         if ((rc.Width() == GetWidth()) && (rc.Height() == GetHeight())) {
             //目标区域与图像数据的大小相同，直接写入
             //注意：GetWidth() * GetHeight() * sizeof(uint32_t) 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
-            bRet = pRender->WritePixels(GetBits(), (size_t)GetWidth() * GetHeight() * sizeof(uint32_t), rcMemory);
-        }
-        else {
-            const UiRect& rcPaint = rc;//实际的脏区域（避免绘制越界，因为WritePixels函数会忽略Clip，导致越界绘制，覆盖其他控件）
+            bRet = pRender->WritePixels(
+                GetBits(), (size_t) GetWidth() * GetHeight() * sizeof(uint32_t), rcMemory);
+        } else {
+            const UiRect &rcPaint
+                = rc; //实际的脏区域（避免绘制越界，因为WritePixels函数会忽略Clip，导致越界绘制，覆盖其他控件）
             //注意：GetWidth() * GetHeight() * sizeof(uint32_t) 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
-            bRet = pRender->WritePixels(GetBits(), (size_t)GetWidth() * GetHeight() * sizeof(uint32_t), rcMemory, rcPaint);
+            bRet = pRender->WritePixels(
+                GetBits(), (size_t) GetWidth() * GetHeight() * sizeof(uint32_t), rcMemory, rcPaint);
         }
         ASSERT_UNUSED_VARIABLE(bRet);
     }
 }
 
-bool CefMemoryBlock::MakeImageSnapshot(IRender* pRender)
+bool CefMemoryBlock::MakeImageSnapshot(IRender *pRender)
 {
     std::lock_guard<std::mutex> threadGuard(m_memMutex);
     int32_t nWidth = GetWidth();
     int32_t nHeight = GetHeight();
-    uint8_t* pBits = GetBits();
+    uint8_t *pBits = GetBits();
     if ((nWidth < 1) || (nHeight < 1) || (pBits == nullptr) || (pRender == nullptr)) {
         return false;
     }
@@ -127,7 +131,7 @@ bool CefMemoryBlock::MakeImageSnapshot(IRender* pRender)
     if (pRender->Resize(nWidth, nHeight)) {
         return pRender->WritePixels(pBits, nWidth * nHeight * sizeof(uint32_t), dcPaint);
     }
-    return false;    
+    return false;
 }
 
 bool CefMemoryBlock::IsValid() const
@@ -135,7 +139,7 @@ bool CefMemoryBlock::IsValid() const
     return (m_pBits != nullptr);
 }
 
-uint8_t* CefMemoryBlock::GetBits() const
+uint8_t *CefMemoryBlock::GetBits() const
 {
     return m_pBits;
 }

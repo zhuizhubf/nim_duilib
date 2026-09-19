@@ -1,26 +1,21 @@
 #include "ImageDecoder_GIF.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Image/Image_Animation.h"
 #include "duilib/Image/Image_Bitmap.h"
 #include "duilib/Image/Image_GIF.h"
-#include "duilib/Image/Image_Animation.h"
 #include "duilib/Utils/FilePathUtil.h"
 
-namespace ui
-{
-ImageDecoder_GIF::ImageDecoder_GIF()
-{
-}
+namespace ui {
+ImageDecoder_GIF::ImageDecoder_GIF() {}
 
-ImageDecoder_GIF::~ImageDecoder_GIF()
-{
-}
+ImageDecoder_GIF::~ImageDecoder_GIF() {}
 
 DString ImageDecoder_GIF::GetFormatName() const
 {
     return _T("GIF");
 }
 
-bool ImageDecoder_GIF::CanDecode(const DString& imageFilePath) const
+bool ImageDecoder_GIF::CanDecode(const DString &imageFilePath) const
 {
     DString fileExt = FilePathUtil::GetFileExtension(imageFilePath);
     StringUtil::MakeUpperString(fileExt);
@@ -30,10 +25,10 @@ bool ImageDecoder_GIF::CanDecode(const DString& imageFilePath) const
     return false;
 }
 
-bool ImageDecoder_GIF::CanDecode(const uint8_t* data, size_t dataLen) const
+bool ImageDecoder_GIF::CanDecode(const uint8_t *data, size_t dataLen) const
 {
-    std::vector<uint8_t> gifSignature1 = { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 }; // GIF87a
-    std::vector<uint8_t> gifSignature2 = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 }; // GIF89a
+    std::vector<uint8_t> gifSignature1 = {0x47, 0x49, 0x46, 0x38, 0x37, 0x61}; // GIF87a
+    std::vector<uint8_t> gifSignature2 = {0x47, 0x49, 0x46, 0x38, 0x39, 0x61}; // GIF89a
     //GIF格式签名
     bool bGIF87a = false;
     bool bGIF89a = false;
@@ -60,34 +55,35 @@ bool ImageDecoder_GIF::CanDecode(const uint8_t* data, size_t dataLen) const
     return bGIF87a || bGIF89a;
 }
 
-std::unique_ptr<IImage> ImageDecoder_GIF::LoadImageData(const ImageDecodeParam& decodeParam)
+std::unique_ptr<IImage> ImageDecoder_GIF::LoadImageData(const ImageDecodeParam &decodeParam)
 {
     bool bLoadAllFrames = decodeParam.m_bLoadAllFrames;
     bool bAsyncDecode = decodeParam.m_bAsyncDecode;
     float fImageSizeScale = decodeParam.m_fImageSizeScale;
-    const UiSize& rcMaxDestRectSize = decodeParam.m_rcMaxDestRectSize;
+    const UiSize &rcMaxDestRectSize = decodeParam.m_rcMaxDestRectSize;
     bool bAssertEnabled = decodeParam.m_bAssertEnabled;
     std::vector<uint8_t> emptyFileData;
-    std::vector<uint8_t>& fileData = (decodeParam.m_pFileData != nullptr) ? *decodeParam.m_pFileData : emptyFileData;
-    const FilePath& imageFilePath = decodeParam.m_imageFilePath;
+    std::vector<uint8_t> &fileData = (decodeParam.m_pFileData != nullptr) ? *decodeParam.m_pFileData
+                                                                          : emptyFileData;
+    const FilePath &imageFilePath = decodeParam.m_imageFilePath;
 
-    Image_GIF* pImageGIF = new Image_GIF;
+    Image_GIF *pImageGIF = new Image_GIF;
     std::shared_ptr<IAnimationImage> pAnimationImage(pImageGIF);
 
-    if (!pImageGIF->LoadImageFile(fileData,
-                                  imageFilePath,
-                                  bLoadAllFrames,
-                                  bAsyncDecode,
-                                  fImageSizeScale,
-                                  rcMaxDestRectSize,
-                                  bAssertEnabled)) {
-            return nullptr;
-    }    
+    if (!pImageGIF->LoadImageFile(
+            fileData,
+            imageFilePath,
+            bLoadAllFrames,
+            bAsyncDecode,
+            fImageSizeScale,
+            rcMaxDestRectSize,
+            bAssertEnabled)) {
+        return nullptr;
+    }
     if (!bLoadAllFrames || (pImageGIF->GetFrameCount() == 1)) {
         //单帧，加载位图图片
         return Image_Bitmap::MakeImage(pAnimationImage);
-    }
-    else {
+    } else {
         //多帧图片
         std::unique_ptr<IImage> pImage(new Image_Animation(pAnimationImage));
         return pImage;

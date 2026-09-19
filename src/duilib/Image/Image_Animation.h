@@ -3,14 +3,13 @@
 
 #include "duilib/Image/ImageDecoder.h"
 
-namespace ui
-{
+namespace ui {
 /** 动画格式的图片数据
 */
-class DUILIB_API Image_Animation: public IImage
+class DUILIB_API Image_Animation : public IImage
 {
 public:
-    Image_Animation(const std::shared_ptr<IAnimationImage>& pAnimationImage);
+    Image_Animation(const std::shared_ptr<IAnimationImage> &pAnimationImage);
     virtual ~Image_Animation() override;
 
     /** 获取图片宽度
@@ -64,9 +63,8 @@ private:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool AsyncDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override;
+    virtual bool AsyncDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override;
 
     /** 合并异步解码图片数据的结果
     */

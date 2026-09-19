@@ -1,20 +1,19 @@
 #ifndef UI_CONTROL_LIST_CTRL_SUB_ITEM_H_
 #define UI_CONTROL_LIST_CTRL_SUB_ITEM_H_
 
-#include "duilib/Core/ImageList.h"
 #include "duilib/Control/ListCtrlDefs.h"
+#include "duilib/Core/ImageList.h"
 
-namespace ui
-{
+namespace ui {
 /** Report视图中，列表项的子项
 */
 class ListCtrlItem;
 class DUILIB_API ListCtrlSubItem : public ListCtrlLabel
 {
     typedef ListCtrlLabel BaseClass;
-    friend class ListCtrlReportView;//允许调用SetDataColumnId函数
+    friend class ListCtrlReportView; //允许调用SetDataColumnId函数
 public:
-    explicit ListCtrlSubItem(Window* pWindow);
+    explicit ListCtrlSubItem(Window *pWindow);
 
     /** 获取控件类型
     */
@@ -22,7 +21,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -40,11 +39,11 @@ public:
 public:
     /** 设置关联的Item接口
     */
-    void SetListCtrlItem(ListCtrlItem* pItem);
+    void SetListCtrlItem(ListCtrlItem *pItem);
 
     /** 获取关联的Item接口
     */
-    ListCtrlItem* GetListCtrlItem() const;
+    ListCtrlItem *GetListCtrlItem() const;
 
     /** 获取关联的数据项索引号, 代表关联哪一行的数据
     * @return 返回数据项的索引号, 有效范围：[0, ListCtrl::GetDataItemCount())
@@ -95,7 +94,7 @@ public:
 protected:
     /** 绘制文字
     */
-    virtual void PaintText(IRender* pRender) override;
+    virtual void PaintText(IRender *pRender) override;
 
     /** 计算文本区域大小（宽和高）
      *  @param [in] szAvailable 可用大小，不包含内边距，不包含外边距
@@ -109,7 +108,7 @@ protected:
 
     /** 使得目标区域纵向对齐
     */
-    void VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageHeight);
+    void VAlignRect(UiRect &rc, uint32_t textStyle, int32_t nImageHeight);
 
     /** 获取CheckBox的图片宽度
     */
@@ -122,7 +121,7 @@ protected:
 private:
     /** 关联的Item接口
     */
-    ListCtrlItem* m_pItem;
+    ListCtrlItem *m_pItem;
 
     /** 关联图标Id, 如果为-1表示不显示图标，图标显示在文本前面
     */
@@ -137,6 +136,6 @@ private:
     size_t m_nColumnId;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_SUB_ITEM_H_

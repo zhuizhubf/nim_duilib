@@ -1,39 +1,38 @@
 #include "ControlDropTargetImpl_Windows.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 #include "duilib/Core/Control.h"
 #include "duilib/Core/ControlDropTargetUtils.h"
-#include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/StringCharset.h"
-#include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/FilePath.h"
+#include "duilib/Utils/StringCharset.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 #include <oleidl.h>
 #include <shellapi.h>
 
-namespace ui 
-{
-ControlDropTargetImpl_Windows::ControlDropTargetImpl_Windows(Control* pControl):
-    m_pControl(pControl),
-    m_pDataObj(nullptr)
-{
-}
+namespace ui {
+ControlDropTargetImpl_Windows::ControlDropTargetImpl_Windows(Control *pControl)
+    : m_pControl(pControl)
+    , m_pDataObj(nullptr)
+{}
 
 ControlDropTargetImpl_Windows::~ControlDropTargetImpl_Windows()
 {
     if (m_pDataObj != nullptr) {
-        ((IDataObject*)m_pDataObj)->Release();
+        ((IDataObject *) m_pDataObj)->Release();
         m_pDataObj = nullptr;
     }
 }
 
-void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::vector<DString>& textList, std::vector<DString>& fileList)
+void ControlDropTargetImpl_Windows::ParseWindowsDataObject(
+    void *pDataObj, std::vector<DString> &textList, std::vector<DString> &fileList)
 {
     if (pDataObj == nullptr) {
         return;
     }
-    IDataObject* data_object = (IDataObject*)pDataObj;
-    IEnumFORMATETC* enumFormats = nullptr;
+    IDataObject *data_object = (IDataObject *) pDataObj;
+    IEnumFORMATETC *enumFormats = nullptr;
     HRESULT res = data_object->EnumFormatEtc(DATADIR_GET, &enumFormats);
     if (res != S_OK) {
         return;
@@ -51,8 +50,8 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
         res = enumFormats->Next(kCelt, rgelt, &celtFetched);
         for (unsigned i = 0; i < celtFetched; i++) {
             CLIPFORMAT format = rgelt[i].cfFormat;
-            if (!(format == CF_UNICODETEXT || format == CF_TEXT || format == CF_HDROP) ||
-                (rgelt[i].tymed != TYMED_HGLOBAL)) {
+            if (!(format == CF_UNICODETEXT || format == CF_TEXT || format == CF_HDROP)
+                || (rgelt[i].tymed != TYMED_HGLOBAL)) {
                 continue;
             }
             STGMEDIUM medium;
@@ -61,49 +60,47 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
                     ::ReleaseStgMedium(&medium);
                     continue;
                 }
-                void* hGlobal = GlobalLock(medium.hGlobal);
+                void *hGlobal = GlobalLock(medium.hGlobal);
                 if (!hGlobal) {
                     ::ReleaseStgMedium(&medium);
                     continue;
                 }
                 if (format == CF_UNICODETEXT) {
                     unicodeTextList.clear();
-                    DStringW text = (std::wstring::value_type*)hGlobal;
+                    DStringW text = (std::wstring::value_type *) hGlobal;
                     if (!text.empty()) {
                         if (!text.empty()) {
                             std::list<std::wstring> lines = StringUtil::Split(text, L"\r\n");
-                            for (const std::wstring& line : lines) {
+                            for (const std::wstring &line : lines) {
                                 if (!line.empty()) {
                                     unicodeTextList.push_back(StringConvert::WStringToT(line));
                                 }
                             }
                         }
                     }
-                }
-                else if (format == CF_TEXT) {
+                } else if (format == CF_TEXT) {
                     //编码类型：可能是Ansi或者UTF8等（Edge网页拖出的文本类型是UTF8的,NotePad拖出的文本类型是Ansi的）
-                    ansiTextList.clear();                    
-                    DStringA rawText = (std::string::value_type*)hGlobal;
-                    CharsetType charset = StringCharset::GetDataCharset(rawText.data(), (uint32_t)rawText.size());
+                    ansiTextList.clear();
+                    DStringA rawText = (std::string::value_type *) hGlobal;
+                    CharsetType charset
+                        = StringCharset::GetDataCharset(rawText.data(), (uint32_t) rawText.size());
                     DString text;
                     if (charset == CharsetType::ANSI) {
                         text = StringConvert::MBCSToT(rawText);
-                    }
-                    else if (charset == CharsetType::UTF8) {
+                    } else if (charset == CharsetType::UTF8) {
                         text = StringConvert::UTF8ToT(rawText);
                     }
                     if (!text.empty()) {
                         std::list<DString> lines = StringUtil::Split(text, _T("\r\n"));
-                        for (const DString& line : lines) {
+                        for (const DString &line : lines) {
                             if (!line.empty()) {
                                 ansiTextList.push_back(line);
                             }
                         }
                     }
-                }
-                else if (format == CF_HDROP) {
+                } else if (format == CF_HDROP) {
                     fileList.clear();
-                    HDROP hdrop = (HDROP)hGlobal;
+                    HDROP hdrop = (HDROP) hGlobal;
                     const int kMaxFilenameLen = 4096;
                     const unsigned num_files = ::DragQueryFileW(hdrop, 0xffffffff, nullptr, 0);
                     for (unsigned int x = 0; x < num_files; ++x) {
@@ -114,7 +111,8 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
                         DStringW fileNameW = fileName;
                         if (!fileNameW.empty()) {
                             //如果返回的是短文件路径，则转换为长文件路径
-                            DWORD ret = ::GetLongPathNameW(fileNameW.c_str(), fileName, kMaxFilenameLen);
+                            DWORD ret
+                                = ::GetLongPathNameW(fileNameW.c_str(), fileName, kMaxFilenameLen);
                             // 校验转换结果：ret>0且<=缓冲区长度表示成功
                             if (ret > 0 && ret < kMaxFilenameLen) {
                                 fileNameW = fileName;
@@ -129,9 +127,8 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
                     ::GlobalUnlock(medium.hGlobal);
                 }
                 if (format == CF_HDROP) {
-                    ::DragFinish((HDROP)hGlobal);
-                }
-                else {
+                    ::DragFinish((HDROP) hGlobal);
+                } else {
                     ::ReleaseStgMedium(&medium);
                 }
             }
@@ -141,8 +138,7 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
 
     if (!unicodeTextList.empty()) {
         textList.swap(unicodeTextList);
-    }
-    else if (!ansiTextList.empty()) {
+    } else if (!ansiTextList.empty()) {
         textList.swap(ansiTextList);
     }
 }
@@ -150,16 +146,17 @@ void ControlDropTargetImpl_Windows::ParseWindowsDataObject(void* pDataObj, std::
 void ControlDropTargetImpl_Windows::ClearDragStatus()
 {
     if (m_pDataObj != nullptr) {
-        ((IDataObject*)m_pDataObj)->Release();
+        ((IDataObject *) m_pDataObj)->Release();
         m_pDataObj = nullptr;
     }
     m_textList.clear();
     m_fileList.clear();
 }
 
-int32_t ControlDropTargetImpl_Windows::DragEnter(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t ControlDropTargetImpl_Windows::DragEnter(
+    void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
-    IDataObject* pDataObject = (IDataObject*)pDataObj;
+    IDataObject *pDataObject = (IDataObject *) pDataObj;
     if (pDataObject != nullptr) {
         pDataObject->AddRef();
     }
@@ -189,7 +186,7 @@ int32_t ControlDropTargetImpl_Windows::DragEnter(void* pDataObj, uint32_t grfKey
         msg.eventType = EventType::kEventDropEnter;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeWindows;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         m_pControl->ScreenToClient(msg.ptMouse);
         msg.modifierKey = 0;
@@ -204,7 +201,8 @@ int32_t ControlDropTargetImpl_Windows::DragEnter(void* pDataObj, uint32_t grfKey
     return S_OK;
 }
 
-int32_t ControlDropTargetImpl_Windows::DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t ControlDropTargetImpl_Windows::DragOver(
+    uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     if (m_pControl != nullptr) {
         if (!m_fileList.empty()) {
@@ -240,7 +238,7 @@ int32_t ControlDropTargetImpl_Windows::DragOver(uint32_t grfKeyState, const UiPo
         msg.eventType = EventType::kEventDropOver;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeWindows;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         m_pControl->ScreenToClient(msg.ptMouse);
         msg.modifierKey = 0;
@@ -264,7 +262,8 @@ int32_t ControlDropTargetImpl_Windows::DragLeave(void)
     return S_OK;
 }
 
-int32_t ControlDropTargetImpl_Windows::Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t ControlDropTargetImpl_Windows::Drop(
+    void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     ASSERT(m_pDataObj == pDataObj);
     if (m_pDataObj != pDataObj) {
@@ -307,7 +306,7 @@ int32_t ControlDropTargetImpl_Windows::Drop(void* pDataObj, uint32_t grfKeyState
         msg.eventType = EventType::kEventDropData;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeWindows;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.ptMouse = pt;
         m_pControl->ScreenToClient(msg.ptMouse);
         msg.modifierKey = 0;
@@ -320,8 +319,7 @@ int32_t ControlDropTargetImpl_Windows::Drop(void* pDataObj, uint32_t grfKeyState
 
         ClearDragStatus();
         return data.m_hResult;
-    }
-    else {
+    } else {
         ClearDragStatus();
         return S_OK;
     }

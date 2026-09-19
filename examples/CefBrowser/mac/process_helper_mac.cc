@@ -3,9 +3,9 @@
 // be found in the LICENSE file.
 
 // duilib
+#include "cef/internal/CefClientApp.h"
 #include "duilib/duilib.h"
 #include "duilib/duilib_cef.h"
-#include "cef/internal/CefClientApp.h"
 
 #include "include/cef_app.h"
 #include "include/wrapper/cef_library_loader.h"
@@ -17,11 +17,10 @@
 #include "include/cef_sandbox_mac.h"
 #endif
 
-namespace ui
-{
+namespace ui {
 /** CEF模块子进程的入口函数（macOS平台）
 */
-int RunMain(int argc, char* argv[])
+int RunMain(int argc, char *argv[])
 {
 #if defined(CEF_USE_SANDBOX)
     // Initialize the macOS sandbox for this helper process.
@@ -39,16 +38,16 @@ int RunMain(int argc, char* argv[])
     }
 
     CefMainArgs main_args(argc, argv);
-    CefRefPtr<CefClientApp> app(new CefClientApp);    
+    CefRefPtr<CefClientApp> app(new CefClientApp);
 
     // Execute the secondary process.
     return CefExecuteProcess(main_args, app.get(), nullptr);
 }
 
-}  // namespace ui
+} // namespace ui
 
 // Entry point function for sub-processes.
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     return ui::RunMain(argc, argv);
 }

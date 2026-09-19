@@ -16,20 +16,20 @@ class MainForm;
 class SimpleFileView : public ui::VirtualListBoxElement
 {
 public:
-    SimpleFileView(MainForm* pMainForm, ui::VirtualListBox* pListBox);
+    SimpleFileView(MainForm *pMainForm, ui::VirtualListBox *pListBox);
     virtual ~SimpleFileView() override;
 
     /** 创建一个数据项
     * @param [in] pVirtualListBox 关联的虚表的接口
     * @return 返回创建后的数据项指针
     */
-    virtual ui::Control* CreateElement(ui::VirtualListBox* pVirtualListBox) override;
+    virtual ui::Control *CreateElement(ui::VirtualListBox *pVirtualListBox) override;
 
     /** 填充指定数据项
     * @param [in] pControl 数据项控件指针
     * @param [in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
     */
-    virtual bool FillElement(ui::Control* pControl, size_t nElementIndex) override;
+    virtual bool FillElement(ui::Control *pControl, size_t nElementIndex) override;
 
     /** 获取数据项总数
     * @return 返回数据项总数
@@ -51,7 +51,7 @@ public:
     /** 获取选择的元素列表
     * @param [in] selectedIndexs 返回当前选择的元素列表，有效范围：[0, GetElementCount())
     */
-    virtual void GetSelectedElements(std::vector<size_t>& selectedIndexs) const override;
+    virtual void GetSelectedElements(std::vector<size_t> &selectedIndexs) const override;
 
     /** 是否支持多选
     */
@@ -68,25 +68,28 @@ public:
     * @param [in] pathList 文件列表
     * @param [in] selectedPath 需要选择的路径
     */
-    void SetFileList(const ui::FilePath& currentPath, const std::vector<PathInfo>& pathList, const ui::FilePath& selectedPath);
+    void SetFileList(
+        const ui::FilePath &currentPath,
+        const std::vector<PathInfo> &pathList,
+        const ui::FilePath &selectedPath);
 
     /** 获取当前显示内容所在路径和所选择的路径
     * @param [out] currentPath 当前显示内容所在路径
     * @param [out] selectedPath 当前视图中选择的路径
     */
-    void GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selectedPath) const;
+    void GetCurrentPath(ui::FilePath &currentPath, ui::FilePath &selectedPath) const;
 
 private:
     /** 子项被双击时触发
      * @param[in] args 消息体
      * @return 始终返回 true
      */
-    bool OnDoubleClickItem(const ui::EventArgs& args);
+    bool OnDoubleClickItem(const ui::EventArgs &args);
 
 private:
     /** 关联的MainForm
     */
-    MainForm* m_pMainForm;
+    MainForm *m_pMainForm;
 
     /** 文件列表的接口（右侧虚表显示的界面）
     */

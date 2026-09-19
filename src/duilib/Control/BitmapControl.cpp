@@ -1,111 +1,102 @@
 #include "BitmapControl.h"
-#include "render/IRender.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Utils/AttributeUtil.h"
-#include "duilib/Utils/PerformanceUtil.h"
-#include "duilib/Utils/FileUtil.h"
 #include "duilib/Image/ImageAttribute.h"
+#include "duilib/Utils/AttributeUtil.h"
+#include "duilib/Utils/FileUtil.h"
+#include "duilib/Utils/PerformanceUtil.h"
+#include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 
-BitmapControl::BitmapControl(Window* pWindow):
-    Box(pWindow),
-    m_hAlignType(HorAlignType::kAlignLeft),
-    m_vAlignType(VerAlignType::kAlignTop),
-    m_nBitmapAlpha(255),
-    m_bAdaptiveDestRect(false),
-    m_bStretchedDrawing(false),
-    m_bSupportMultiThread(true)
-{
-}
+BitmapControl::BitmapControl(Window *pWindow)
+    : Box(pWindow)
+    , m_hAlignType(HorAlignType::kAlignLeft)
+    , m_vAlignType(VerAlignType::kAlignTop)
+    , m_nBitmapAlpha(255)
+    , m_bAdaptiveDestRect(false)
+    , m_bStretchedDrawing(false)
+    , m_bSupportMultiThread(true)
+{}
 
 BitmapControl::~BitmapControl()
 {
     m_pBitmap.reset();
 }
 
-DString BitmapControl::GetType() const { return DUI_CTR_BITMAP_CONTROL; }
+DString BitmapControl::GetType() const
+{
+    return DUI_CTR_BITMAP_CONTROL;
+}
 
-void BitmapControl::SetAttribute(const DString& strName, const DString& strValue2)
+void BitmapControl::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("bitmap_halign")) {
         ASSERT((strValue == _T("left")) || (strValue == _T("center")) || (strValue == _T("right")));
         if (strValue == _T("center")) {
             SetBitmapHAlignType(HorAlignType::kAlignCenter);
-        }
-        else if (strValue == _T("right")) {
+        } else if (strValue == _T("right")) {
             SetBitmapHAlignType(HorAlignType::kAlignRight);
-        }
-        else {
+        } else {
             SetBitmapHAlignType(HorAlignType::kAlignLeft);
         }
-    }
-    else if (strName == _T("bitmap_valign")) {
+    } else if (strName == _T("bitmap_valign")) {
         ASSERT((strValue == _T("top")) || (strValue == _T("center")) || (strValue == _T("bottom")));
         if (strValue == _T("center")) {
             SetBitmapVAlignType(VerAlignType::kAlignCenter);
-        }
-        else if (strValue == _T("bottom")) {
+        } else if (strValue == _T("bottom")) {
             SetBitmapVAlignType(VerAlignType::kAlignBottom);
-        }
-        else {
+        } else {
             SetBitmapVAlignType(VerAlignType::kAlignTop);
         }
-    }
-    else if (strName == _T("bitmap_alpha")) {
-        SetBitmapAlpha((uint8_t)StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("bitmap_dest")) {
+    } else if (strName == _T("bitmap_alpha")) {
+        SetBitmapAlpha((uint8_t) StringUtil::StringToInt32(strValue));
+    } else if (strName == _T("bitmap_dest")) {
         UiRect rcDest;
-        DString::value_type* pstr = nullptr;
-        rcDest.left = StringUtil::StringToInt32(strValue.c_str(), &pstr, 10); ASSERT(pstr);
+        DString::value_type *pstr = nullptr;
+        rcDest.left = StringUtil::StringToInt32(strValue.c_str(), &pstr, 10);
+        ASSERT(pstr);
         AttributeUtil::SkipSepChar(pstr);
         if (*pstr != _T('\0')) {
-            rcDest.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+            rcDest.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+            ASSERT(pstr);
             AttributeUtil::SkipSepChar(pstr);
         }
         if (*pstr != _T('\0')) {
-            rcDest.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+            rcDest.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+            ASSERT(pstr);
             AttributeUtil::SkipSepChar(pstr);
         }
         if (*pstr != _T('\0')) {
-            rcDest.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+            rcDest.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+            ASSERT(pstr);
         }
         SetBitmapDest(rcDest, true);
-    }
-    else if (strName == _T("bitmap_src")) {
+    } else if (strName == _T("bitmap_src")) {
         UiRect rcSource;
         AttributeUtil::ParseRectValue(strValue.c_str(), rcSource);
         rcSource.left = std::max(rcSource.left, 0);
         rcSource.top = std::max(rcSource.top, 0);
         SetBitmapSource(rcSource, true);
-    }
-    else if (strName == _T("bitmap_margin")) {
+    } else if (strName == _T("bitmap_margin")) {
         UiMargin rcMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcMargin);
         SetBitmapMargin(rcMargin, true);
-    }
-    else if (strName == _T("bitmap_adaptive_dest_rect")) {
+    } else if (strName == _T("bitmap_adaptive_dest_rect")) {
         SetAdaptiveDestRect(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("bitmap_stretch")) {
+    } else if (strName == _T("bitmap_stretch")) {
         SetStretchedDrawing(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("bitmap_multi_thread")) {
+    } else if (strName == _T("bitmap_multi_thread")) {
         SetSupportMultiThread(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("bitmap_file")) {
+    } else if (strName == _T("bitmap_file")) {
         //设置关联的图片文件：主要用于测试
         m_bitmapFile = strValue;
         if (m_pBitmap != nullptr) {
             m_pBitmap.reset();
             CheckLoadBitmapFile();
         }
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -150,33 +141,29 @@ UiSize BitmapControl::EstimateImage(UiSize szAvailable, EstimateImageType estIma
     if (m_rcSource != nullptr) {
         rcSource = *m_rcSource;
     }
-    if (rcSource.right > (int32_t)nImageInfoWidth) {
-        rcSource.right = (int32_t)nImageInfoWidth;
+    if (rcSource.right > (int32_t) nImageInfoWidth) {
+        rcSource.right = (int32_t) nImageInfoWidth;
     }
-    if (rcSource.bottom > (int32_t)nImageInfoHeight) {
-        rcSource.bottom = (int32_t)nImageInfoHeight;
+    if (rcSource.bottom > (int32_t) nImageInfoHeight) {
+        rcSource.bottom = (int32_t) nImageInfoHeight;
     }
 
     UiSize imageSize;
     if (rcDest.Width() > 0) {
         //以0为基点，right为边界
         imageSize.cx = rcDest.right;
-    }
-    else if (rcSource.Width() > 0) {
+    } else if (rcSource.Width() > 0) {
         imageSize.cx = rcSource.Width();
-    }
-    else {
+    } else {
         imageSize.cx = nImageInfoWidth;
     }
 
     if (rcDest.Height() > 0) {
         //以0为基点，bottom为边界
         imageSize.cy = rcDest.bottom;
-    }
-    else if (rcSource.Height() > 0) {
+    } else if (rcSource.Height() > 0) {
         imageSize.cy = rcSource.Height();
-    }
-    else {
+    } else {
         imageSize.cy = nImageInfoHeight;
     }
 
@@ -193,26 +180,27 @@ UiSize BitmapControl::EstimateImage(UiSize szAvailable, EstimateImageType estIma
         //自动适应目标区域（等比例缩放图片）：根据图片大小，调整绘制区域
         const int32_t nImageWidth = rcSource.Width();
         const int32_t nImageHeight = rcSource.Height();
-        UiRect rcControlDest = UiRect(0, 0,
-                                      szAvailable.cx - rcControlPadding.left - rcControlPadding.right,
-                                      szAvailable.cy - rcControlPadding.top - rcControlPadding.bottom);
+        UiRect rcControlDest = UiRect(
+            0,
+            0,
+            szAvailable.cx - rcControlPadding.left - rcControlPadding.right,
+            szAvailable.cy - rcControlPadding.top - rcControlPadding.bottom);
         rcControlDest.Validate();
         if (rcControlDest.Width() > 0 && rcControlDest.Height() > 0) {
             DString hAlign = _T("left");
             if (m_hAlignType == HorAlignType::kAlignCenter) {
                 hAlign = _T("center");
-            }
-            else if (m_hAlignType == HorAlignType::kAlignRight) {
+            } else if (m_hAlignType == HorAlignType::kAlignRight) {
                 hAlign = _T("right");
             }
             DString vAlign = _T("top");
             if (m_vAlignType == VerAlignType::kAlignCenter) {
                 vAlign = _T("center");
-            }
-            else if (m_vAlignType == VerAlignType::kAlignBottom) {
+            } else if (m_vAlignType == VerAlignType::kAlignBottom) {
                 vAlign = _T("bottom");
             }
-            rcControlDest = ImageAttribute::CalculateAdaptiveRect(nImageWidth, nImageHeight, rcControlDest, hAlign, vAlign);
+            rcControlDest = ImageAttribute::CalculateAdaptiveRect(
+                nImageWidth, nImageHeight, rcControlDest, hAlign, vAlign);
             imageSize.cx = rcControlDest.Width();
             imageSize.cy = rcControlDest.Height();
         }
@@ -225,11 +213,13 @@ UiSize BitmapControl::EstimateImage(UiSize szAvailable, EstimateImageType estIma
     if (imageSize.cy > 0) {
         imageSize.cy += (rcControlPadding.top + rcControlPadding.bottom);
     }
-    if ((estImageType == EstimateImageType::kBoth) || (estImageType == EstimateImageType::kWidthOnly)) {
+    if ((estImageType == EstimateImageType::kBoth)
+        || (estImageType == EstimateImageType::kWidthOnly)) {
         //宽度为自动计算
         estSize.cx = std::max(estSize.cx, imageSize.cx);
     }
-    if ((estImageType == EstimateImageType::kBoth) || (estImageType == EstimateImageType::kHeightOnly)) {
+    if ((estImageType == EstimateImageType::kBoth)
+        || (estImageType == EstimateImageType::kHeightOnly)) {
         //高度为自动计算
         estSize.cy = std::max(estSize.cy, imageSize.cy);
     }
@@ -311,8 +301,7 @@ void BitmapControl::SetBitmapDest(UiRect rcDest, bool bNeedDpiScale)
         m_rcDest = std::make_unique<UiRect>(rcDest);
         //重绘图片
         Invalidate();
-    }
-    else {
+    } else {
         if (*m_rcDest != rcDest) {
             *m_rcDest = rcDest;
             //重绘图片
@@ -344,8 +333,7 @@ void BitmapControl::SetBitmapSource(UiRect rcSource, bool bNeedDpiScale)
         m_rcSource = std::make_unique<UiRect>(rcSource);
         //重绘图片
         Invalidate();
-    }
-    else {
+    } else {
         if (*m_rcSource != rcSource) {
             *m_rcSource = rcSource;
             //重绘图片
@@ -376,8 +364,7 @@ void BitmapControl::SetBitmapMargin(UiMargin rcMargin, bool bNeedDpiScale)
         m_rcMargin = std::make_unique<UiMargin>(rcMargin);
         //重绘图片
         Invalidate();
-    }
-    else {
+    } else {
         if (*m_rcMargin != rcMargin) {
             *m_rcMargin = rcMargin;
             //重绘图片
@@ -437,7 +424,7 @@ bool BitmapControl::IsSupportMultiThread() const
     return m_bSupportMultiThread;
 }
 
-void BitmapControl::Paint(IRender* pRender, const UiRect& rcPaint)
+void BitmapControl::Paint(IRender *pRender, const UiRect &rcPaint)
 {
     BaseClass::Paint(pRender, rcPaint);
 
@@ -451,25 +438,25 @@ void BitmapControl::CheckLoadBitmapFile()
         //加载指定的图片: 加载图片数据时无优化，仅供测试功能时使用
         FilePath bitmapFileFullPath;
         std::vector<uint8_t> bitmapFileData;
-        const ThemeManager& themeMgr = GlobalManager::Instance().Theme();
+        const ThemeManager &themeMgr = GlobalManager::Instance().Theme();
         FilePath windowResPath;
         if (GetWindow() != nullptr) {
             windowResPath = GetWindow()->GetResourcePath();
         }
         std::shared_ptr<IBitmap> pBitmap;
-        if (themeMgr.GetResFile(FilePath(m_bitmapFile.c_str()), windowResPath, bitmapFileFullPath, bitmapFileData)) {
+        if (themeMgr.GetResFile(
+                FilePath(m_bitmapFile.c_str()), windowResPath, bitmapFileFullPath, bitmapFileData)) {
             ImageDecodeParam decodeParam;
             decodeParam.m_imageFilePath = bitmapFileFullPath;
             decodeParam.m_pFileData = std::make_shared<std::vector<uint8_t>>();
             decodeParam.m_fImageSizeScale = Dpi().GetDisplayScale();
             if (bitmapFileData.empty()) {
                 FileUtil::ReadFileData(decodeParam.m_imageFilePath, *decodeParam.m_pFileData);
-            }
-            else {
+            } else {
                 decodeParam.m_pFileData->swap(bitmapFileData);
-            }            
+            }
             pBitmap = GlobalManager::Instance().ImageDecoders().DecodeImageData(decodeParam);
-        }        
+        }
         ASSERT(pBitmap != nullptr);
         if (pBitmap != nullptr) {
             SetBitmapDataWithCopy(pBitmap.get());
@@ -477,14 +464,15 @@ void BitmapControl::CheckLoadBitmapFile()
     }
 }
 
-bool BitmapControl::SetBitmapData(int32_t nWidth, int32_t nHeight, const uint8_t* pPixelBits, int32_t nPixelBitsSize)
+bool BitmapControl::SetBitmapData(
+    int32_t nWidth, int32_t nHeight, const uint8_t *pPixelBits, int32_t nPixelBitsSize)
 {
     ASSERT((pPixelBits != nullptr) && (nPixelBitsSize > 0) && (nWidth > 0) && (nHeight > 0));
     if ((pPixelBits == nullptr) || (nPixelBitsSize <= 0) || (nWidth <= 0) || (nHeight <= 0)) {
         return false;
     }
-    ASSERT(nPixelBitsSize == nHeight * nWidth * (int32_t)sizeof(uint32_t));
-    if (nPixelBitsSize != nHeight * nWidth * (int32_t)sizeof(uint32_t)) {
+    ASSERT(nPixelBitsSize == nHeight * nWidth * (int32_t) sizeof(uint32_t));
+    if (nPixelBitsSize != nHeight * nWidth * (int32_t) sizeof(uint32_t)) {
         return false;
     }
 
@@ -495,7 +483,7 @@ bool BitmapControl::SetBitmapData(int32_t nWidth, int32_t nHeight, const uint8_t
     }
 
     if (m_pBitmap == nullptr) {
-        IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+        IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
         ASSERT(pRenderFactory != nullptr);
         if (pRenderFactory != nullptr) {
             m_pBitmap.reset(pRenderFactory->CreateBitmap());
@@ -506,16 +494,16 @@ bool BitmapControl::SetBitmapData(int32_t nWidth, int32_t nHeight, const uint8_t
         return false;
     }
     bool bRet = false;
-    if (((int32_t)m_pBitmap->GetWidth() == nWidth) && ((int32_t)m_pBitmap->GetHeight() == nHeight)) {
-        void* pBits = m_pBitmap->LockPixelBits();
+    if (((int32_t) m_pBitmap->GetWidth() == nWidth)
+        && ((int32_t) m_pBitmap->GetHeight() == nHeight)) {
+        void *pBits = m_pBitmap->LockPixelBits();
         if (pBits != nullptr) {
             //复制图片数据到位图
             ::memcpy(pBits, pPixelBits, nWidth * nHeight * sizeof(uint32_t));
             m_pBitmap->UnLockPixelBits();
             bRet = true;
         }
-    }
-    else {
+    } else {
         bRet = m_pBitmap->Init(nWidth, nHeight, pPixelBits);
     }
     if (bRet) {
@@ -525,14 +513,14 @@ bool BitmapControl::SetBitmapData(int32_t nWidth, int32_t nHeight, const uint8_t
     return bRet;
 }
 
-bool BitmapControl::SetBitmapDataWithCopy(IBitmap* pBitmap)
+bool BitmapControl::SetBitmapDataWithCopy(IBitmap *pBitmap)
 {
     if (pBitmap == nullptr) {
         return false;
     }
     int32_t nWidth = pBitmap->GetWidth();
     int32_t nHeight = pBitmap->GetHeight();
-    const uint8_t* pPixelBits = (const uint8_t*)pBitmap->LockPixelBits();
+    const uint8_t *pPixelBits = (const uint8_t *) pBitmap->LockPixelBits();
     int32_t nPixelBitsSize = nHeight * nWidth * sizeof(uint32_t);
     return SetBitmapData(nWidth, nHeight, pPixelBits, nPixelBitsSize);
 }
@@ -548,7 +536,7 @@ void BitmapControl::ClearBitmapData()
         m_pBitmap.reset();
         //重绘图片
         Invalidate();
-    }    
+    }
 }
 
 bool BitmapControl::HasBitmapData()
@@ -561,7 +549,7 @@ bool BitmapControl::HasBitmapData()
     return (m_pBitmap != nullptr) && (m_pBitmap->GetWidth() > 0) && (m_pBitmap->GetHeight() > 0);
 }
 
-void BitmapControl::GetBitmapSize(int32_t& nImageWidth, int32_t& nImageHeight)
+void BitmapControl::GetBitmapSize(int32_t &nImageWidth, int32_t &nImageHeight)
 {
     //支持多线程时，对m_pBitmap操作前先加锁
     std::unique_ptr<std::unique_lock<std::mutex>> spMutexLock;
@@ -570,14 +558,14 @@ void BitmapControl::GetBitmapSize(int32_t& nImageWidth, int32_t& nImageHeight)
     }
     nImageWidth = 0;
     nImageHeight = 0;
-    IBitmap* pBitmap = m_pBitmap.get();
+    IBitmap *pBitmap = m_pBitmap.get();
     if (pBitmap != nullptr) {
         nImageWidth = pBitmap->GetWidth();
         nImageHeight = pBitmap->GetHeight();
     }
 }
 
-void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
+void BitmapControl::PaintBitmap(IRender *pRender, const UiRect &rcPaint)
 {
     GlobalManager::Instance().AssertUIThread();
 
@@ -603,7 +591,7 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
 
     int32_t nImageInfoWidth = 0;
     int32_t nImageInfoHeight = 0;
-    IBitmap* pBitmap = m_pBitmap.get();
+    IBitmap *pBitmap = m_pBitmap.get();
     if (pBitmap != nullptr) {
         nImageInfoWidth = pBitmap->GetWidth();
         nImageInfoHeight = pBitmap->GetHeight();
@@ -630,8 +618,7 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
             rcDest.bottom = rcDest.top + nImageInfoHeight;
         }
         rcDest.Offset(GetRect().left, GetRect().top);
-    }
-    else {
+    } else {
         rcDest = GetRect();
         rcDest.Deflate(GetControlPadding());
     }
@@ -643,20 +630,19 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
 
     UiRect rcTemp;
     if (!UiRect::Intersect(rcTemp, rcDest, GetRect())) {
-        return;//rcDest与目标区域无交集，无法绘制
+        return; //rcDest与目标区域无交集，无法绘制
     }
 
     UiRect rcSource;
     if (m_rcSource != nullptr) {
-        rcSource = *m_rcSource;        
-        if (rcSource.right > (int32_t)m_pBitmap->GetWidth()) {
-            rcSource.right = (int32_t)m_pBitmap->GetWidth();
+        rcSource = *m_rcSource;
+        if (rcSource.right > (int32_t) m_pBitmap->GetWidth()) {
+            rcSource.right = (int32_t) m_pBitmap->GetWidth();
         }
-        if (rcSource.bottom > (int32_t)m_pBitmap->GetHeight()) {
-            rcSource.bottom = (int32_t)m_pBitmap->GetHeight();
+        if (rcSource.bottom > (int32_t) m_pBitmap->GetHeight()) {
+            rcSource.bottom = (int32_t) m_pBitmap->GetHeight();
         }
-    }
-    else {
+    } else {
         rcSource.left = 0;
         rcSource.top = 0;
         rcSource.right = rcSource.left + m_pBitmap->GetWidth();
@@ -665,13 +651,14 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
 
     rcSource.Validate();
     if (rcSource.IsEmpty()) {
-        return;//无有效数据区域
+        return; //无有效数据区域
     }
 
     const int32_t nImageWidth = rcSource.Width();
     const int32_t nImageHeight = rcSource.Height();
 
-    bool bAdaptiveDestRect = m_bAdaptiveDestRect; //自动适应目标区域（等比例缩放后，按指定对齐方式绘制）
+    bool bAdaptiveDestRect
+        = m_bAdaptiveDestRect; //自动适应目标区域（等比例缩放后，按指定对齐方式绘制）
     bool bStretchedDrawing = m_bStretchedDrawing; //拉伸绘制，其优先级低于bAdaptiveDestRect这个选项
     if (!bAdaptiveDestRect && !bStretchedDrawing) {
         //当图片的大小，大于目标区域大小时，固定设置为自动适应目标区域
@@ -684,44 +671,38 @@ void BitmapControl::PaintBitmap(IRender* pRender, const UiRect& rcPaint)
         DString hAlign = _T("left");
         if (m_hAlignType == HorAlignType::kAlignCenter) {
             hAlign = _T("center");
-        }
-        else if (m_hAlignType == HorAlignType::kAlignRight) {
+        } else if (m_hAlignType == HorAlignType::kAlignRight) {
             hAlign = _T("right");
         }
         DString vAlign = _T("top");
         if (m_vAlignType == VerAlignType::kAlignCenter) {
             vAlign = _T("center");
-        }
-        else if (m_vAlignType == VerAlignType::kAlignBottom) {
+        } else if (m_vAlignType == VerAlignType::kAlignBottom) {
             vAlign = _T("bottom");
         }
-        rcDest = ImageAttribute::CalculateAdaptiveRect(nImageWidth, nImageHeight, rcDest, hAlign, vAlign);
-    }
-    else if (!bStretchedDrawing) {
+        rcDest = ImageAttribute::CalculateAdaptiveRect(
+            nImageWidth, nImageHeight, rcDest, hAlign, vAlign);
+    } else if (!bStretchedDrawing) {
         //不是拉伸绘制，处理对齐方式
         if (m_hAlignType == HorAlignType::kAlignLeft) {
             rcDest.right = rcDest.left + nImageWidth;
-        }
-        else if (m_hAlignType == HorAlignType::kAlignCenter) {
+        } else if (m_hAlignType == HorAlignType::kAlignCenter) {
             rcDest.left = rcDest.CenterX() - nImageWidth / 2;
             rcDest.right = rcDest.left + nImageWidth;
-        }
-        else if (m_hAlignType == HorAlignType::kAlignRight) {
+        } else if (m_hAlignType == HorAlignType::kAlignRight) {
             rcDest.left = rcDest.right - nImageWidth;
         }
 
         if (m_vAlignType == VerAlignType::kAlignTop) {
             rcDest.bottom = rcDest.top + nImageHeight;
-        }
-        else if (m_vAlignType == VerAlignType::kAlignCenter) {
+        } else if (m_vAlignType == VerAlignType::kAlignCenter) {
             rcDest.top = rcDest.CenterY() - nImageHeight / 2;
             rcDest.bottom = rcDest.top + nImageHeight;
-        }
-        else if (m_vAlignType == VerAlignType::kAlignBottom) {
+        } else if (m_vAlignType == VerAlignType::kAlignBottom) {
             rcDest.top = rcDest.bottom - nImageHeight;
         }
     }
     pRender->DrawImage(rcPaint, m_pBitmap.get(), rcDest, rcSource, m_nBitmapAlpha);
 }
 
-}//namespace ui
+} //namespace ui

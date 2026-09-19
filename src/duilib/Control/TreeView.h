@@ -4,16 +4,14 @@
 #include "duilib/Box/ListBox.h"
 #include <map>
 
-namespace ui
-{
+namespace ui {
 
 /** 节点勾选状态
 */
-enum class TreeNodeCheck
-{
-    UnCheck,     //没有打勾
-    CheckedAll,     //全部打勾
-    CheckedPart  //部分打勾
+enum class TreeNodeCheck {
+    UnCheck,    //没有打勾
+    CheckedAll, //全部打勾
+    CheckedPart //部分打勾
 };
 
 class TreeView;
@@ -21,15 +19,16 @@ class DUILIB_API TreeNode : public ListBoxItem
 {
     typedef ListBoxItem BaseClass;
     friend class TreeView;
+
 public:
-    explicit TreeNode(Window* pWindow);
-    TreeNode(const TreeNode& r) = delete;
-    TreeNode& operator=(const TreeNode& r) = delete;
+    explicit TreeNode(Window *pWindow);
+    TreeNode(const TreeNode &r) = delete;
+    TreeNode &operator=(const TreeNode &r) = delete;
     virtual ~TreeNode() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual bool SupportCheckMode() const override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -44,43 +43,43 @@ protected:
     virtual bool IsVisibleInternal() const override;
 
 private:
-    virtual void PaintStateImages(IRender* pRender) override;
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool OnDoubleClickItem(const EventArgs& msg);
-    virtual bool OnReturnKeyDown(const EventArgs& msg);
+    virtual void PaintStateImages(IRender *pRender) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool OnDoubleClickItem(const EventArgs &msg);
+    virtual bool OnReturnKeyDown(const EventArgs &msg);
 
 public:
     /** 设置子项所属的树容器
      * @param[in] pTreeView 容器指针
      */
-    void SetTreeView(TreeView* pTreeView);
+    void SetTreeView(TreeView *pTreeView);
 
     /** 获取子项所属的树容器
      */
-    TreeView* GetTreeView() const;
+    TreeView *GetTreeView() const;
 
     /** 获取父节点指针
      * @return 返回父节点指针
      */
-    TreeNode* GetParentNode() const;
+    TreeNode *GetParentNode() const;
 
     /** 设置父节点
      * @param[in] pParentTreeNode 父节点指针
      */
-    void SetParentNode(TreeNode* pParentTreeNode);
+    void SetParentNode(TreeNode *pParentTreeNode);
 
     /** 在最后面添加一个新的子节点
      * @param[in] pTreeNode 子节点指针
      * @return 成功返回 true，失败返回 false
      */
-    bool AddChildNode(TreeNode* pTreeNode);
+    bool AddChildNode(TreeNode *pTreeNode);
 
     /** 在指定位置添加子节点
      * @param[in] pTreeNode 子节点指针
      * @param[in] iIndex 要插入哪个位置之后
      * @return 成功返回 true，失败返回 false
      */
-    bool AddChildNodeAt(TreeNode* pTreeNode, const size_t iIndex);
+    bool AddChildNodeAt(TreeNode *pTreeNode, const size_t iIndex);
 
     /** 从指定位置移除一个子节点
      * @param[in] iIndex 要移除的子节点索引
@@ -92,7 +91,7 @@ public:
      * @param[in] pTreeNode 子节点指针
      * @return 成功返回 true，失败返回 false
      */
-    bool RemoveChildNode(TreeNode* pTreeNode);
+    bool RemoveChildNode(TreeNode *pTreeNode);
 
     /** 移除所有子节点
      */
@@ -112,37 +111,37 @@ public:
      * @param[in] iIndex 要获取的子节点索引
      * @return 返回子节点指针
      */
-    TreeNode* GetChildNode(size_t iIndex) const;
+    TreeNode *GetChildNode(size_t iIndex) const;
 
     /** 根据子节点指针获取子节点位置索引
      * @param[in] pTreeNode 子节点指针
      * @return 返回位置索引
      */
-    size_t GetChildNodeIndex(TreeNode* pTreeNode) const;
+    size_t GetChildNodeIndex(TreeNode *pTreeNode) const;
 
     /** 获取子节点列表（只获取一级子节点，不递归获取孙节点）
     * @param [out] childNodes 返回当前树节点的所有子节点列表
     */
-    void GetChildNodes(std::vector<TreeNode*>& childNodes) const;
+    void GetChildNodes(std::vector<TreeNode *> &childNodes) const;
 
     /** 根据子节点的控件名称(Name)，查找子节点
     * @param [in] name 被查找的子节点的控件名称（即Control::GetName()的值）
     * @param [in] bRecursive true表示递归查找，false表示不递归查找，只在当前节点的一级子节点查找
     * @return 返回匹配的树节点指针，如果名称有重复的，只返回第一个
     */
-    TreeNode* FindChildNodeByName(const DString& name, bool bRecursive) const;
+    TreeNode *FindChildNodeByName(const DString &name, bool bRecursive) const;
 
     /** 根据子节点的显示文本(Text)，查找子节点
     * @param [in] name 被查找的子节点的显示文本（即LabelTemplate::GetText()的值）
     * @return 返回匹配的树节点指针，如果显示文本有重复的，只返回第一个
     * @param [in] bRecursive true表示递归查找，false表示不递归查找，只在当前节点的一级子节点查找
     */
-    TreeNode* FindChildNodeByText(const DString& text, bool bRecursive) const;
+    TreeNode *FindChildNodeByText(const DString &text, bool bRecursive) const;
 
     /** 判断是否展开状态
      * @return 返回 true 为展开状态，否则为 false
      */
-    bool IsExpand() const; 
+    bool IsExpand() const;
 
     /** 设置是否展开显示子节点
      * @param[in] bExpand 为 true 时展开，为 false 是不展开
@@ -193,20 +192,26 @@ public:
      * @param [in] callback 子项展开时触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachExpand(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventExpand, callback, callbackID); }
+    void AttachExpand(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventExpand, callback, callbackID);
+    }
 
     /** 监听子项收缩事件
      * @param [in] callback 子项收缩时触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachCollapse(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventCollapse, callback, callbackID); }
+    void AttachCollapse(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventCollapse, callback, callbackID);
+    }
 
 private:
     /** 设置[未展开/展开]标志图片关联的Class，如果不为空表示开启展开标志功能，为空则关闭展开标志功能
     *   应用范围：该节点本身
     * @param [in] expandClass 展开标志图片的Class属性
     */
-    void SetExpandImageClass(const DString& expandClass);
+    void SetExpandImageClass(const DString &expandClass);
 
     /** 设置CheckBox关联的Class，如果不为空表示开启CheckBox功能，为空则关闭CheckBox功能
     *   应用范围：该节点本身
@@ -214,7 +219,7 @@ private:
                   normal_image：正常状态的图片，必选属性(即不打勾时的图片)
                   selected_normal_image：选择时，正常状态的图片，必选属性(即打勾时的图片)
     */
-    bool SetCheckBoxClass(const DString& checkBoxClass);
+    bool SetCheckBoxClass(const DString &checkBoxClass);
 
     /** 更改所有子节点的勾选状态，但不触发选择变化事件
     * @param [in] bChecked 勾选状态（打勾或者不打勾）
@@ -249,7 +254,7 @@ private:
      * @param [in] stateType 要设置哪中状态下的图片
      * @param [in] strImage 图片路径和属性
      */
-    void SetExpandStateImage(ControlStateType stateType, const DString& strImage);
+    void SetExpandStateImage(ControlStateType stateType, const DString &strImage);
 
     /** 获取未展开状态的图片
      * @param [in] stateType 要获取何种状态下的图片，参考 ControlStateType 枚举
@@ -261,7 +266,7 @@ private:
      * @param [in] stateType 要设置哪中状态下的图片
      * @param [in] strImage 图片路径和属性
      */
-    void SetCollapseStateImage(ControlStateType stateType, const DString& strImage);
+    void SetCollapseStateImage(ControlStateType stateType, const DString &strImage);
 
 private:
     /** 删除自身
@@ -292,7 +297,7 @@ private:
      * @param[in] args 消息体
      * @return 始终返回 true
      */
-    bool OnNodeCheckStatusChanged(const EventArgs& args);
+    bool OnNodeCheckStatusChanged(const EventArgs &args);
 
     /** 获取展开状态图标占用的内边距宽度
     */
@@ -327,7 +332,7 @@ private:
     /** 获取 icon 图标后面的间隔
     */
     uint16_t GetIconIndent() const;
-    
+
 private:
     //子项层级
     uint16_t m_uDepth;
@@ -336,18 +341,18 @@ private:
     bool m_bExpand;
 
     //子项所属的树容器
-    TreeView* m_pTreeView;
+    TreeView *m_pTreeView;
 
     //父节点
-    TreeNode* m_pParentTreeNode;
+    TreeNode *m_pParentTreeNode;
 
     //子节点列表
-    std::vector<TreeNode*> m_aTreeNodes;
+    std::vector<TreeNode *> m_aTreeNodes;
 
     //图片/文字元素之间的固定间隔（DPI相关）
-    uint16_t m_expandIndent;    //[展开/收起]按钮后面的间隔
-    uint16_t m_checkBoxIndent;    //CheckBox 后面的间隔
-    uint16_t m_iconIndent;        //icon 图标后面的间隔
+    uint16_t m_expandIndent;   //[展开/收起]按钮后面的间隔
+    uint16_t m_checkBoxIndent; //CheckBox 后面的间隔
+    uint16_t m_iconIndent;     //icon 图标后面的间隔
 
     //Expand图标关联的图标/文字内边距：3个（DPI相关）
     uint16_t m_expandCheckBoxPadding;
@@ -364,27 +369,28 @@ private:
     /** 控件展开状态的图片类型与状态图片的MAP, 绘制的目标矩形
     */
     std::unique_ptr<StateImage> m_expandImage;
-    std::unique_ptr<UiRect> m_pExpandImageRect;//DPI无关，每次绘制后会更新此值
+    std::unique_ptr<UiRect> m_pExpandImageRect; //DPI无关，每次绘制后会更新此值
 
     /** 控件未展开状态的图片类型与状态图片的MAP, 绘制的目标矩形
     */
     std::unique_ptr<StateImage> m_collapseImage;
-    std::unique_ptr<UiRect> m_pCollapseImageRect;//DPI无关，每次绘制后会更新此值
+    std::unique_ptr<UiRect> m_pCollapseImageRect; //DPI无关，每次绘制后会更新此值
 };
 
 class DUILIB_API TreeView : public ListBox
 {
     typedef ListBox BaseClass;
     friend class TreeNode;
+
 public:
-    explicit TreeView(Window* pWindow);
+    explicit TreeView(Window *pWindow);
     virtual ~TreeView() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void SetParent(Box* pParent) override;
-    virtual void SetWindow(Window* pWindow) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void SetParent(Box *pParent) override;
+    virtual void SetWindow(Window *pWindow) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -395,12 +401,12 @@ public:
     /** 获取根节点
      * @return 返回根节点指针
      */
-    TreeNode* GetRootNode() const{ return m_rootNode.get(); }
+    TreeNode *GetRootNode() const { return m_rootNode.get(); }
 
     /** 获取子节点缩进值
      * @return 返回子节点缩进值
      */
-    int32_t GetIndent() const { return m_iIndent;    }
+    int32_t GetIndent() const { return m_iIndent; }
 
     /** 设置子节点缩进值
      * @param [in] indent 要设置的缩进值, 单位为像素
@@ -412,7 +418,7 @@ public:
     *   应用范围：该树的所有节点
     * @param [in] className 展开标志图片的Class属性
     */
-    void SetExpandImageClass(const DString& className);
+    void SetExpandImageClass(const DString &className);
 
     /** 获取[未展开/展开]标志图片关联的Class
     */
@@ -424,7 +430,7 @@ public:
                   normal_image：正常状态的图片，必选属性(即不打勾时的图片)
                   selected_normal_image：选择时，正常状态的图片，必选属性(即打勾时的图片)
     */
-    void SetCheckBoxClass(const DString& className);
+    void SetCheckBoxClass(const DString &className);
 
     /** 获取CheckBox关联的Class
     */
@@ -442,17 +448,17 @@ public:
     * @param [in] pTreeNode 树的节点接口，不允许为空
     * @param [in] pControl 需要添加的普通控件接口，不允许为空
     */
-    bool InsertControlBeforeNode(TreeNode* pTreeNode, Control* pControl);
+    bool InsertControlBeforeNode(TreeNode *pTreeNode, Control *pControl);
 
     /** 删除树节点中的普通控件
     * @param [in] pControl 需要删除的普通控件接口，不允许为空
     */
-    bool RemoveControl(Control* pControl);
+    bool RemoveControl(Control *pControl);
 
     /** 从树上移除一个节点
     * @param [in] pTreeNode 树的节点接口，不允许为空
     */
-    bool RemoveTreeNode(TreeNode* pTreeNode);
+    bool RemoveTreeNode(TreeNode *pTreeNode);
 
     /** 移除所有节点
      */
@@ -461,21 +467,21 @@ public:
     /** 选择一个树节点（如果父节点未展开，则级联展开）
     * @param [in] pTreeNode 树的节点
     */
-    virtual bool SelectTreeNode(TreeNode* pTreeNode);
+    virtual bool SelectTreeNode(TreeNode *pTreeNode);
 
     /** 展开一个树节点（如果父节点未展开，则级联展开）
     * @param [in] pTreeNode 树的节点
     */
-    bool ExpandTreeNode(TreeNode* pTreeNode);
+    bool ExpandTreeNode(TreeNode *pTreeNode);
 
     /** 确保树的节点可见（如果父节点未展开，则级联展开）
     * @param [in] pTreeNode 树的节点
     */
-    bool EnsureTreeNodeVisible(TreeNode* pTreeNode);
+    bool EnsureTreeNodeVisible(TreeNode *pTreeNode);
 
     /** 判断一个树节点是否有效
     */
-    bool IsValidTreeNode(TreeNode* pTreeNode) const;
+    bool IsValidTreeNode(TreeNode *pTreeNode) const;
 
 public:
     /** 是否允许多选
@@ -500,13 +506,14 @@ protected:
     * @param [out] nRows 返回行数
     * @return 返回可视区域显示的记录数
     */
-    virtual size_t GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t& nRows) const override;
+    virtual size_t GetDisplayItemCount(
+        bool bIsHorizontal, size_t &nColumns, size_t &nRows) const override;
 
 private:
     /** 树节点勾选状态变化
      * @param [in] pTreeNode 树节点接口
      */
-    void OnNodeCheckStatusChanged(TreeNode* pTreeNode);
+    void OnNodeCheckStatusChanged(TreeNode *pTreeNode);
 
     /** 是否绘制选择状态下的背景色，提供虚函数作为可选项
        （比如ListBox/TreeView节点在多选时，由于有勾选项，并不需要绘制选择状态的背景色）
@@ -516,9 +523,9 @@ private:
 
 private:
     //以下函数故意私有化，表明禁止使用；应该使用TreeNode中的相关函数
-    bool AddItem(Control* pControl) override;
-    bool AddItemAt(Control* pControl, size_t iIndex) override;
-    bool RemoveItem(Control* pControl) override;
+    bool AddItem(Control *pControl) override;
+    bool AddItemAt(Control *pControl, size_t iIndex) override;
+    bool RemoveItem(Control *pControl) override;
     bool RemoveItemAt(size_t iIndex) override;
     void RemoveAllItems() override;
 
@@ -566,6 +573,6 @@ private:
     bool m_bMultiCheckMode;
 };
 
-}
+} // namespace ui
 
 #endif // UI_CONTROL_TREEVIEW_H_

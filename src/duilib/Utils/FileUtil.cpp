@@ -1,20 +1,19 @@
 #include "FileUtil.h"
 #include <stdio.h>
 
-namespace ui
-{
+namespace ui {
 
-bool FileUtil::ReadFileData(const FilePath& filePath, std::vector<uint8_t>& fileData)
+bool FileUtil::ReadFileData(const FilePath &filePath, std::vector<uint8_t> &fileData)
 {
     bool isReadOk = false;
-    FILE* f = nullptr;
+    FILE *f = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
-    //Windows平台
-    #ifdef DUILIB_UNICODE
-        ::_wfopen_s(&f, filePath.NativePath().c_str(), _T("rb"));
-    #else
-        ::fopen_s(&f, filePath.NativePath().c_str(), _T("rb"));
-    #endif
+//Windows平台
+#ifdef DUILIB_UNICODE
+    ::_wfopen_s(&f, filePath.NativePath().c_str(), _T("rb"));
+#else
+    ::fopen_s(&f, filePath.NativePath().c_str(), _T("rb"));
+#endif
 #else
     //Linux平台
     f = fopen(filePath.NativePath().c_str(), _T("rb"));
@@ -26,7 +25,7 @@ bool FileUtil::ReadFileData(const FilePath& filePath, std::vector<uint8_t>& file
         long fileSize = ::ftell(f);
         ::fseek(f, 0, SEEK_SET);
         if (fileSize > 0) {
-            fileData.resize((size_t)fileSize);
+            fileData.resize((size_t) fileSize);
             size_t readLen = ::fread(fileData.data(), 1, fileData.size(), f);
             ASSERT_UNUSED_VARIABLE(readLen == fileData.size());
             if (readLen != fileData.size()) {
@@ -39,14 +38,15 @@ bool FileUtil::ReadFileData(const FilePath& filePath, std::vector<uint8_t>& file
     return isReadOk;
 }
 
-bool FileUtil::ReadFileHeaderData(const FilePath& filePath, uint32_t nReadSize, std::vector<uint8_t>& fileHeaderData)
+bool FileUtil::ReadFileHeaderData(
+    const FilePath &filePath, uint32_t nReadSize, std::vector<uint8_t> &fileHeaderData)
 {
     ASSERT(nReadSize > 0);
     if (nReadSize == 0) {
         return false;
     }
     bool isReadOk = false;
-    FILE* f = nullptr;
+    FILE *f = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows平台
 #ifdef DUILIB_UNICODE
@@ -65,10 +65,10 @@ bool FileUtil::ReadFileHeaderData(const FilePath& filePath, uint32_t nReadSize, 
         long fileSize = ::ftell(f);
         ::fseek(f, 0, SEEK_SET);
         if (fileSize > 0) {
-            if (nReadSize > (uint32_t)fileSize) {
+            if (nReadSize > (uint32_t) fileSize) {
                 nReadSize = fileSize;
             }
-            fileHeaderData.resize((size_t)nReadSize);
+            fileHeaderData.resize((size_t) nReadSize);
             size_t readLen = ::fread(fileHeaderData.data(), 1, fileHeaderData.size(), f);
             ASSERT_UNUSED_VARIABLE(readLen == fileHeaderData.size());
             if (readLen != fileHeaderData.size()) {
@@ -81,17 +81,17 @@ bool FileUtil::ReadFileHeaderData(const FilePath& filePath, uint32_t nReadSize, 
     return isReadOk;
 }
 
-bool FileUtil::WriteFileData(const FilePath& filePath, const std::vector<uint8_t>& fileData)
+bool FileUtil::WriteFileData(const FilePath &filePath, const std::vector<uint8_t> &fileData)
 {
     bool isWriteOk = false;
-    FILE* f = nullptr;
+    FILE *f = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
-    //Windows平台
-    #ifdef DUILIB_UNICODE
-        ::_wfopen_s(&f, filePath.NativePath().c_str(), _T("w+b"));
-    #else
-        ::fopen_s(&f, filePath.NativePath().c_str(), _T("w+b"));
-    #endif
+//Windows平台
+#ifdef DUILIB_UNICODE
+    ::_wfopen_s(&f, filePath.NativePath().c_str(), _T("w+b"));
+#else
+    ::fopen_s(&f, filePath.NativePath().c_str(), _T("w+b"));
+#endif
 #else
     //Linux平台
     f = fopen(filePath.NativePath().c_str(), _T("w+b"));
@@ -110,10 +110,10 @@ bool FileUtil::WriteFileData(const FilePath& filePath, const std::vector<uint8_t
     return isWriteOk;
 }
 
-bool FileUtil::WriteFileData(const FilePath& filePath, const DStringW& fileData)
+bool FileUtil::WriteFileData(const FilePath &filePath, const DStringW &fileData)
 {
     bool isWriteOk = false;
-    FILE* f = nullptr;
+    FILE *f = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows平台
 #ifdef DUILIB_UNICODE
@@ -139,10 +139,10 @@ bool FileUtil::WriteFileData(const FilePath& filePath, const DStringW& fileData)
     return isWriteOk;
 }
 
-bool FileUtil::WriteFileData(const FilePath& filePath, const DStringA& fileData)
+bool FileUtil::WriteFileData(const FilePath &filePath, const DStringA &fileData)
 {
     bool isWriteOk = false;
-    FILE* f = nullptr;
+    FILE *f = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows平台
 #ifdef DUILIB_UNICODE
@@ -168,4 +168,4 @@ bool FileUtil::WriteFileData(const FilePath& filePath, const DStringA& fileData)
     return isWriteOk;
 }
 
-}//namespace ui
+} //namespace ui

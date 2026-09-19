@@ -1,21 +1,20 @@
 #include "CefWindowUtils.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_CEF)
 
 #include "duilib/Core/Window.h"
 
-namespace ui
-{
-void SetCefWindowPos(CefWindowHandle cefWindow, CefControl* pCefControl)
+namespace ui {
+void SetCefWindowPos(CefWindowHandle cefWindow, CefControl *pCefControl)
 {
     if ((cefWindow == 0) || (pCefControl == nullptr)) {
         return;
     }
-    Window* pWindow = pCefControl->GetWindow();
+    Window *pWindow = pCefControl->GetWindow();
     if (pWindow == nullptr) {
         return;
     }
-    HWND hwnd = (HWND)cefWindow;
+    HWND hwnd = (HWND) cefWindow;
     if (::IsWindow(hwnd)) {
         UiRect rc = pCefControl->GetPos();
         pCefControl->Dpi().ClientSizeToWindowSize(rc);
@@ -23,35 +22,34 @@ void SetCefWindowPos(CefWindowHandle cefWindow, CefControl* pCefControl)
     }
 }
 
-void SetCefWindowVisible(CefWindowHandle cefWindow, CefControl* pCefControl)
+void SetCefWindowVisible(CefWindowHandle cefWindow, CefControl *pCefControl)
 {
     if ((cefWindow == 0) || (pCefControl == nullptr)) {
         return;
     }
-    Window* pWindow = pCefControl->GetWindow();
+    Window *pWindow = pCefControl->GetWindow();
     if (pWindow == nullptr) {
         return;
     }
-    HWND hwnd = (HWND)cefWindow;
+    HWND hwnd = (HWND) cefWindow;
     if (hwnd) {
         if (pCefControl->IsVisible()) {
             ShowWindow(hwnd, SW_SHOW);
-        }
-        else {
+        } else {
             ::SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
         }
     }
 }
 
-void SetCefWindowParent(CefWindowHandle cefWindow, CefControl* pCefControl)
+void SetCefWindowParent(CefWindowHandle cefWindow, CefControl *pCefControl)
 {
     if ((cefWindow == 0) || (pCefControl == nullptr)) {
         return;
     }
-    if (!::IsWindow((HWND)cefWindow)) {
+    if (!::IsWindow((HWND) cefWindow)) {
         return;
     }
-    Window* pWindow = pCefControl->GetWindow();
+    Window *pWindow = pCefControl->GetWindow();
     if (pWindow == nullptr) {
         return;
     }
@@ -59,21 +57,22 @@ void SetCefWindowParent(CefWindowHandle cefWindow, CefControl* pCefControl)
     if (!::IsWindow(hParent)) {
         return;
     }
-    ::SetParent((HWND)cefWindow, hParent);
+    ::SetParent((HWND) cefWindow, hParent);
 
     // 为新的主窗口重新设置WS_CLIPSIBLINGS、WS_CLIPCHILDREN样式，否则Cef窗口刷新会出问题
     LONG style = ::GetWindowLong(hParent, GWL_STYLE);
     ::SetWindowLong(hParent, GWL_STYLE, style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 }
 
-bool CaptureCefWindowBitmap(CefWindowHandle cefWindow, std::vector<uint8_t>& bitmap, int32_t& width, int32_t& height)
+bool CaptureCefWindowBitmap(
+    CefWindowHandle cefWindow, std::vector<uint8_t> &bitmap, int32_t &width, int32_t &height)
 {
     HWND hwnd = cefWindow;
     if (!::IsWindow(hwnd)) {
         return false;
     }
     // 获取窗口尺寸
-    RECT rect = { 0, 0, 0, 0 };
+    RECT rect = {0, 0, 0, 0};
     if (!GetClientRect(hwnd, &rect)) {
         return false;
     }
@@ -121,7 +120,7 @@ bool CaptureCefWindowBitmap(CefWindowHandle cefWindow, std::vector<uint8_t>& bit
     BITMAPINFOHEADER bi;
     bi.biSize = sizeof(BITMAPINFOHEADER);
     bi.biWidth = width;
-    bi.biHeight = -height;  // 正数表示从下到上，负数表示从上到下
+    bi.biHeight = -height; // 正数表示从下到上，负数表示从上到下
     bi.biPlanes = 1;
     bi.biBitCount = 32;
     bi.biCompression = BI_RGB;
@@ -133,8 +132,8 @@ bool CaptureCefWindowBitmap(CefWindowHandle cefWindow, std::vector<uint8_t>& bit
 
     // 分配内存并获取位图数据
     //注意：width * height * 4 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
-    bitmap.resize((size_t)width * height * 4);
-    ::GetDIBits(hdcMemDC, hBitmap, 0, height, bitmap.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+    bitmap.resize((size_t) width * height * 4);
+    ::GetDIBits(hdcMemDC, hBitmap, 0, height, bitmap.data(), (BITMAPINFO *) &bi, DIB_RGB_COLORS);
 
     // 清理资源
     ::SelectObject(hdcMemDC, hOldObj);
@@ -151,13 +150,13 @@ void SetCefWindowCursor(CefWindowHandle cefWindow, CefCursorHandle cursor)
     if ((cefWindow == nullptr) || (cursor == nullptr)) {
         return;
     }
-    ::SetClassLongPtr((HWND)cefWindow, GCLP_HCURSOR, reinterpret_cast<LONG_PTR>(cursor));
+    ::SetClassLongPtr((HWND) cefWindow, GCLP_HCURSOR, reinterpret_cast<LONG_PTR>(cursor));
     ::SetCursor(cursor);
 }
 
 void RemoveCefWindowFromParent(CefWindowHandle cefWindow)
 {
-    HWND hWnd = (HWND)cefWindow;
+    HWND hWnd = (HWND) cefWindow;
     if (::IsWindow(hWnd)) {
         ::SetParent(hWnd, nullptr);
     }

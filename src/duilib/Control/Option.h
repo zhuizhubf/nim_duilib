@@ -4,8 +4,7 @@
 #include "duilib/Control/CheckBox.h"
 #include "duilib/duilib_defs.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 单选按钮控件
 */
@@ -13,16 +12,17 @@ template<typename InheritType = Control>
 class OptionTemplate : public CheckBoxTemplate<InheritType>
 {
     typedef CheckBoxTemplate<InheritType> BaseClass;
+
 public:
-    explicit OptionTemplate(Window* pWindow);
+    explicit OptionTemplate(Window *pWindow);
     virtual ~OptionTemplate() override;
-        
+
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetWindow(Window* pWindow) override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetWindow(Window *pWindow) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual void Selected(bool bSelected, bool bTriggerEvent = false, uint64_t vkFlag = 0) override;
-    virtual void Activate(const EventArgs* pMsg) override;
+    virtual void Activate(const EventArgs *pMsg) override;
 
     /**
      * @brief 获取所属组名称
@@ -35,20 +35,18 @@ public:
      * @param[in] strGroupName 组名称
      * @return 无
      */
-    virtual void SetGroup(const DString& strGroupName);
+    virtual void SetGroup(const DString &strGroupName);
 
 private:
-
     //所属组名称(同一个组内的控件，进行单选状态控制)
     UiString m_sGroupName;
 };
 
 template<typename InheritType>
-OptionTemplate<InheritType>::OptionTemplate(Window* pWindow) :
-    CheckBoxTemplate<InheritType>(pWindow),
-    m_sGroupName()
-{
-}
+OptionTemplate<InheritType>::OptionTemplate(Window *pWindow)
+    : CheckBoxTemplate<InheritType>(pWindow)
+    , m_sGroupName()
+{}
 
 template<typename InheritType>
 OptionTemplate<InheritType>::~OptionTemplate()
@@ -59,19 +57,31 @@ OptionTemplate<InheritType>::~OptionTemplate()
 }
 
 template<typename InheritType>
-inline DString OptionTemplate<InheritType>::GetType() const { return DUI_CTR_OPTION; }
+inline DString OptionTemplate<InheritType>::GetType() const
+{
+    return DUI_CTR_OPTION;
+}
 
 template<>
-inline DString OptionTemplate<Box>::GetType() const { return DUI_CTR_OPTIONBOX; }
+inline DString OptionTemplate<Box>::GetType() const
+{
+    return DUI_CTR_OPTIONBOX;
+}
 
 template<>
-inline DString OptionTemplate<HBox>::GetType() const { return DUI_CTR_OPTIONHBOX; }
+inline DString OptionTemplate<HBox>::GetType() const
+{
+    return DUI_CTR_OPTIONHBOX;
+}
 
 template<>
-inline DString OptionTemplate<VBox>::GetType() const { return DUI_CTR_OPTIONVBOX; }
+inline DString OptionTemplate<VBox>::GetType() const
+{
+    return DUI_CTR_OPTIONVBOX;
+}
 
 template<typename InheritType>
-void OptionTemplate<InheritType>::SetWindow(Window* pWindow)
+void OptionTemplate<InheritType>::SetWindow(Window *pWindow)
 {
     BaseClass::SetWindow(pWindow);
     if (!m_sGroupName.empty()) {
@@ -82,13 +92,12 @@ void OptionTemplate<InheritType>::SetWindow(Window* pWindow)
 }
 
 template<typename InheritType>
-void OptionTemplate<InheritType>::SetAttribute(const DString& strName, const DString& strValue2)
+void OptionTemplate<InheritType>::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("group")) {
         SetGroup(strValue);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -102,11 +111,12 @@ void OptionTemplate<InheritType>::Selected(bool bSelected, bool bTriggerEvent, u
     if (this->GetWindow() != nullptr) {
         if (this->IsSelected()) {
             if (!m_sGroupName.empty()) {
-                std::vector<Control*>* aOptionGroup = this->GetWindow()->GetOptionGroup(m_sGroupName.c_str());
+                std::vector<Control *> *aOptionGroup = this->GetWindow()->GetOptionGroup(
+                    m_sGroupName.c_str());
                 ASSERT(aOptionGroup);
                 if (aOptionGroup) {
                     for (auto it = aOptionGroup->begin(); it != aOptionGroup->end(); ++it) {
-                        auto pControl = static_cast<OptionTemplate<InheritType>*>(*it);
+                        auto pControl = static_cast<OptionTemplate<InheritType> *>(*it);
                         if ((pControl != nullptr) && pControl != this) {
                             pControl->Selected(false, bTriggerEvent);
                         }
@@ -117,8 +127,7 @@ void OptionTemplate<InheritType>::Selected(bool bSelected, bool bTriggerEvent, u
             if (isChanged && bTriggerEvent) {
                 this->SendEvent(kEventSelect);
             }
-        }
-        else {
+        } else {
             if (isChanged && bTriggerEvent) {
                 this->SendEvent(kEventUnSelect);
             }
@@ -129,7 +138,7 @@ void OptionTemplate<InheritType>::Selected(bool bSelected, bool bTriggerEvent, u
 }
 
 template<typename InheritType>
-void OptionTemplate<InheritType>::Activate(const EventArgs* pMsg)
+void OptionTemplate<InheritType>::Activate(const EventArgs *pMsg)
 {
     if (!this->IsActivatable()) {
         return;
@@ -139,7 +148,8 @@ void OptionTemplate<InheritType>::Activate(const EventArgs* pMsg)
         if ((pMsg->eventType == kEventMouseButtonDown) || (pMsg->eventType == kEventMouseButtonUp)) {
             vkFlag |= kVkLButton;
         }
-        if ((pMsg->eventType == kEventMouseRButtonDown) || (pMsg->eventType == kEventMouseRButtonUp)) {
+        if ((pMsg->eventType == kEventMouseRButtonDown)
+            || (pMsg->eventType == kEventMouseRButtonUp)) {
             vkFlag |= kVkRButton;
         }
         if (this->IsKeyDown(*pMsg, ModifierKey::kControl)) {
@@ -148,7 +158,7 @@ void OptionTemplate<InheritType>::Activate(const EventArgs* pMsg)
         if (this->IsKeyDown(*pMsg, ModifierKey::kShift)) {
             vkFlag |= kVkShift;
         }
-    }    
+    }
     Selected(true, true, vkFlag);
     ButtonTemplate<InheritType>::Activate(pMsg);
 }
@@ -160,7 +170,7 @@ DString OptionTemplate<InheritType>::GetGroup() const
 }
 
 template<typename InheritType>
-void OptionTemplate<InheritType>::SetGroup(const DString& strGroupName)
+void OptionTemplate<InheritType>::SetGroup(const DString &strGroupName)
 {
     if (strGroupName.empty()) {
         if (m_sGroupName.empty()) {
@@ -170,8 +180,7 @@ void OptionTemplate<InheritType>::SetGroup(const DString& strGroupName)
             this->GetWindow()->RemoveOptionGroup(m_sGroupName.c_str(), this);
         }
         m_sGroupName.clear();
-    }
-    else {
+    } else {
         if (m_sGroupName == strGroupName) {
             return;
         }
@@ -192,6 +201,6 @@ typedef OptionTemplate<Box> OptionBox;
 typedef OptionTemplate<HBox> OptionHBox;
 typedef OptionTemplate<VBox> OptionVBox;
 
-}
+} // namespace ui
 
 #endif // UI_CONTROL_OPTION_H_

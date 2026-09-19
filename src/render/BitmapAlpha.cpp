@@ -1,13 +1,12 @@
 #include "BitmapAlpha.h"
 
-namespace ui
-{
+namespace ui {
 
-BitmapAlpha::BitmapAlpha(uint8_t* pPiexl, int32_t nWidth, int32_t nHeight, int32_t nChannels):
-    m_pPiexl(pPiexl),
-    m_nWidth(nWidth),
-    m_nHeight(nHeight),
-    m_nChannels(nChannels)
+BitmapAlpha::BitmapAlpha(uint8_t *pPiexl, int32_t nWidth, int32_t nHeight, int32_t nChannels)
+    : m_pPiexl(pPiexl)
+    , m_nWidth(nWidth)
+    , m_nHeight(nHeight)
+    , m_nChannels(nChannels)
 {
     ASSERT(nChannels == 4);
     ASSERT(nWidth > 0);
@@ -15,21 +14,20 @@ BitmapAlpha::BitmapAlpha(uint8_t* pPiexl, int32_t nWidth, int32_t nHeight, int32
     ASSERT(pPiexl != nullptr);
 }
 
-BitmapAlpha::~BitmapAlpha()
-{
-}
+BitmapAlpha::~BitmapAlpha() {}
 
 //这个函数是必须执行的，否则半透明的界面会出现异常，目前调用的情况，alpha值传入的都是0
-void BitmapAlpha::ClearAlpha(const UiRect& rcDirty, uint8_t alpha) const
+void BitmapAlpha::ClearAlpha(const UiRect &rcDirty, uint8_t alpha) const
 {
     ASSERT((m_pPiexl != nullptr) && (m_nChannels == 4) && (m_nWidth > 0) && (m_nHeight > 0));
-    if ((m_pPiexl == nullptr) || (m_nChannels != 4) || (m_nWidth <= 0) ||(m_nHeight <= 0)){
+    if ((m_pPiexl == nullptr) || (m_nChannels != 4) || (m_nWidth <= 0) || (m_nHeight <= 0)) {
         return;
     }
-    if ((rcDirty.left == 0) && (rcDirty.top == 0) && (rcDirty.Width() == m_nWidth) && (rcDirty.Height() == m_nHeight)) {
+    if ((rcDirty.left == 0) && (rcDirty.top == 0) && (rcDirty.Width() == m_nWidth)
+        && (rcDirty.Height() == m_nHeight)) {
         //全部清除：单次 memset 已是最优，无需再优化
         //注意：m_nHeight * m_nWidth * m_nChannels 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
-        ::memset(m_pPiexl, alpha, (size_t)m_nHeight * m_nWidth * m_nChannels);
+        ::memset(m_pPiexl, alpha, (size_t) m_nHeight * m_nWidth * m_nChannels);
         return;
     }
 
@@ -41,15 +39,15 @@ void BitmapAlpha::ClearAlpha(const UiRect& rcDirty, uint8_t alpha) const
         //空区域，无需处理
         return;
     }
-    const size_t nBytes = (size_t)(nRight - nLeft) * 4;
+    const size_t nBytes = (size_t) (nRight - nLeft) * 4;
     //性能优化：
     //1. 缓存行宽（m_nWidth）到 size_t，避免每行乘法都先 int 再隐式转换；
     //2. 预计算 "每行的字节跨度" (rowStrideBytes)；
     //3. 循环内直接指针递增，替代 "i * m_nWidth"（编译器通常会做，但显式写出更稳）
-    const size_t rowStride = (size_t)m_nWidth;
+    const size_t rowStride = (size_t) m_nWidth;
     const size_t rowStrideBytes = rowStride * 4;
     //起始位置：第 nTop 行、第 nLeft 像素
-    uint8_t* pRowStart = m_pPiexl + (size_t)nTop * rowStrideBytes + (size_t)nLeft * 4;
+    uint8_t *pRowStart = m_pPiexl + (size_t) nTop * rowStrideBytes + (size_t) nLeft * 4;
     for (int32_t i = nTop; i < nBottom; ++i) {
         //每行从 pRowStart 开始清零 nBytes 字节；行末下移 rowStrideBytes
         ::memset(pRowStart, alpha, nBytes);
@@ -58,7 +56,8 @@ void BitmapAlpha::ClearAlpha(const UiRect& rcDirty, uint8_t alpha) const
 }
 
 //这个函数目前影响：RichEdit控件，若不调用，其他的控件均不受影响。
-void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding, uint8_t alpha) const
+void BitmapAlpha::RestoreAlpha(
+    const UiRect &rcDirty, const UiPadding &rcShadowPadding, uint8_t alpha) const
 {
     // 此函数适用于GDI等API渲染位图，导致丢失alpha通道的情况，可以把alpha通道补回来
     // 但是渲染位图时，还有GDI+、AlphaBlend等API给位图设置了半透明的alpha通道时，可能导致没法正确的修正alpha通道
@@ -67,7 +66,7 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
         return;
     }
 
-    uint32_t * pBmpBits = (uint32_t*)m_pPiexl;
+    uint32_t *pBmpBits = (uint32_t *) m_pPiexl;
     int32_t nTop = std::max(rcDirty.top, 0);
     int32_t nBottom = std::min(rcDirty.bottom, m_nHeight);
     int32_t nLeft = std::max(rcDirty.left, 0);
@@ -96,9 +95,9 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
         //   2. 预计算下一行的偏移（避免每行重复 "i * m_nWidth" 乘法）；
         //   3. 用 const 提升 alpha 局部常量。
         for (int32_t i = nTop; i < nBottom; ++i) {
-            uint32_t* pRow = pBmpBits + (size_t)i * m_nWidth;
+            uint32_t *pRow = pBmpBits + (size_t) i * m_nWidth;
             for (int32_t j = nLeft; j < nRight; ++j) {
-                uint8_t* a = (uint8_t*)(pRow + j) + 3;
+                uint8_t *a = (uint8_t *) (pRow + j) + 3;
                 if (*a == 0) {
                     *a = 255;
                 }
@@ -112,13 +111,12 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
     //   if (alpha != 0 && *a == alpha) *a = 0;
     //   else if (*a == 0)            *a = 255;
     for (int32_t i = nTop; i < nBottom; ++i) {
-        uint32_t* pRow = pBmpBits + (size_t)i * m_nWidth;
+        uint32_t *pRow = pBmpBits + (size_t) i * m_nWidth;
         for (int32_t j = nLeft; j < nRight; ++j) {
-            uint8_t* a = (uint8_t*)(pRow + j) + 3;
+            uint8_t *a = (uint8_t *) (pRow + j) + 3;
             if (*a == alpha) {
                 *a = 0;
-            }
-            else if (*a == 0) {
+            } else if (*a == 0) {
                 *a = 255;
             }
         }
@@ -126,7 +124,7 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
 }
 
 //这个函数目前影响：RichEdit控件，若不调用，其他的控件均不受影响。
-void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding) const
+void BitmapAlpha::RestoreAlpha(const UiRect &rcDirty, const UiPadding &rcShadowPadding) const
 {
     // 无论什么情况，都把此区域的alpha通道设置为255
     ASSERT((m_pPiexl != nullptr) && (m_nChannels == 4) && (m_nWidth > 0) && (m_nHeight > 0));
@@ -134,7 +132,7 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
         return;
     }
 
-    uint32_t* pBmpBits = (uint32_t*)m_pPiexl;
+    uint32_t *pBmpBits = (uint32_t *) m_pPiexl;
     int32_t nTop = std::max(rcDirty.top, 0);
     int32_t nBottom = std::min(rcDirty.bottom, m_nHeight);
     int32_t nLeft = std::max(rcDirty.left, 0);
@@ -156,10 +154,10 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
     //     内存带宽微小代价换掉分支预测失败 + 读依赖，大幅提速；
     //   - 单条 SIMD 友好的 OR 指令，编译器可自动向量化（AVX2 可一次处理 8 像素）；
     //   - 跨平台等价（不依赖 x86/SSE/AVX 指令集）。
-    const uint32_t alphaMask = (uint32_t)0xFF000000;
+    const uint32_t alphaMask = (uint32_t) 0xFF000000;
     for (int32_t i = nTop; i < nBottom; ++i) {
         //注意：i * m_nWidth 转为 size_t 防止 int 溢出（之前 BitmapAlpha::ClearAlpha 修复的同源问题）
-        uint32_t* pRow = pBmpBits + (size_t)i * m_nWidth;
+        uint32_t *pRow = pBmpBits + (size_t) i * m_nWidth;
         for (int32_t j = nLeft; j < nRight; ++j) {
             //单条 OR 指令：将 ARGB 像素的最高字节（Alpha）置为 0xFF，RGB 保持不变
             pRow[j] |= alphaMask;
@@ -167,4 +165,4 @@ void BitmapAlpha::RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowP
     }
 }
 
-}
+} // namespace ui

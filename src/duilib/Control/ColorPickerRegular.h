@@ -3,16 +3,16 @@
 
 #include "duilib/Box/VirtualListBox.h"
 
-namespace ui
-{
+namespace ui {
 /** 颜色选择器：常用颜色
 */
 class ColorPickerRegularProvider;
 class DUILIB_API ColorPickerRegular : public VirtualVTileListBox
 {
     typedef VirtualVTileListBox BaseClass;
+
 public:
-    explicit ColorPickerRegular(Window* pWindow);
+    explicit ColorPickerRegular(Window *pWindow);
     virtual ~ColorPickerRegular() override;
 
     /** 获取控件类型
@@ -21,7 +21,7 @@ public:
 
     /** 选择一个颜色
     */
-    void SelectColor(const UiColor& color);
+    void SelectColor(const UiColor &color);
 
     /** 获取当前选择的颜色
     */
@@ -34,7 +34,10 @@ public:
     *    wParam: 当前新选择的颜色值，可以用UiColor((uint32_t)wParam)生成颜色
     *    lParam: 原来旧选择的颜色值，可以用UiColor((uint32_t)lParam)生成颜色
     */
-    void AttachSelectColor(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelectColor, callback, callbackID); }
+    void AttachSelectColor(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelectColor, callback, callbackID);
+    }
 
     /** 设置控件位置
     */
@@ -46,7 +49,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
 private:
     /** 常用颜色数据提供者
@@ -58,6 +61,6 @@ private:
     UiSize m_szItem;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_COLORPICKER_REGULAR_H_

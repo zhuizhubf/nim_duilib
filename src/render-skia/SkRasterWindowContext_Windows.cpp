@@ -1,15 +1,16 @@
 #include "SkRasterWindowContext_Windows.h"
-#include "render/IRender.h"
 #include "duilib/Utils/PerformanceUtil.h"
+#include "render/IRender.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
 namespace ui {
 
-SkRasterWindowContext_Windows::SkRasterWindowContext_Windows(HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params):
-    skwindow::internal::RasterWindowContext(std::move(params)),
-    m_hWnd(hWnd),
-    m_hBitmap(nullptr)
+SkRasterWindowContext_Windows::SkRasterWindowContext_Windows(
+    HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
+    : skwindow::internal::RasterWindowContext(std::move(params))
+    , m_hWnd(hWnd)
+    , m_hBitmap(nullptr)
 {
     fWidth = 0;
     fHeight = 0;
@@ -20,7 +21,9 @@ SkRasterWindowContext_Windows::SkRasterWindowContext_Windows(HWND hWnd, std::uni
         }
     }
     if (m_hWnd != nullptr) {
-        RECT rect{ 0, };
+        RECT rect{
+            0,
+        };
         ::GetClientRect(m_hWnd, &rect);
         this->resize(rect.right - rect.left, rect.bottom - rect.top);
     }
@@ -34,7 +37,8 @@ SkRasterWindowContext_Windows::~SkRasterWindowContext_Windows()
     }
 }
 
-void SkRasterWindowContext_Windows::setDisplayParams(std::unique_ptr<const skwindow::DisplayParams> params)
+void SkRasterWindowContext_Windows::setDisplayParams(
+    std::unique_ptr<const skwindow::DisplayParams> params)
 {
     fDisplayParams = std::move(params);
     RECT rect;
@@ -51,13 +55,13 @@ void SkRasterWindowContext_Windows::resize(int nWidth, int nHeight)
         nHeight = 0;
     }
     if ((fWidth == nWidth) && (fHeight == nHeight)) {
-        if ((fWidth > 0) && (fHeight > 0)){
+        if ((fWidth > 0) && (fHeight > 0)) {
             ASSERT(m_fBackbufferSurface != nullptr);
             ASSERT(m_hBitmap != nullptr);
         }
         return;
     }
-    const skwindow::DisplayParams* pDisplayParams = getDisplayParams();
+    const skwindow::DisplayParams *pDisplayParams = getDisplayParams();
     ASSERT(pDisplayParams != nullptr);
     if (pDisplayParams == nullptr) {
         return;
@@ -92,7 +96,12 @@ void SkRasterWindowContext_Windows::resize(int nWidth, int nHeight)
         return;
     }
     m_hBitmap = hBitmap;
-    SkImageInfo info = SkImageInfo::Make(nWidth, nHeight, pDisplayParams->colorType(), SkAlphaType::kPremul_SkAlphaType, pDisplayParams->colorSpace());
+    SkImageInfo info = SkImageInfo::Make(
+        nWidth,
+        nHeight,
+        pDisplayParams->colorType(),
+        SkAlphaType::kPremul_SkAlphaType,
+        pDisplayParams->colorSpace());
     m_fBackbufferSurface = SkSurfaces::WrapPixels(info, pixels, sizeof(uint32_t) * nWidth);
     ASSERT(m_fBackbufferSurface != nullptr);
     if (m_fBackbufferSurface == nullptr) {
@@ -111,11 +120,9 @@ sk_sp<SkSurface> SkRasterWindowContext_Windows::getBackbufferSurface()
     return m_fBackbufferSurface;
 }
 
-void SkRasterWindowContext_Windows::onSwapBuffers()
-{
-}
+void SkRasterWindowContext_Windows::onSwapBuffers() {}
 
-bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRenderPaint* pRenderPaint)
+bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender *pRender, IRenderPaint *pRenderPaint)
 {
     HWND hWnd = m_hWnd;
     ASSERT(::IsWindow(hWnd));
@@ -132,7 +139,9 @@ bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRende
     }
 
     //获取需要绘制的区域
-    RECT rectUpdate = { 0, };
+    RECT rectUpdate = {
+        0,
+    };
     if (!::GetUpdateRect(hWnd, &rectUpdate, FALSE)) {
         //无需绘制
         return false;
@@ -143,7 +152,9 @@ bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRende
 
     //开始绘制
     bool bRet = false;
-    PAINTSTRUCT ps = { 0, };
+    PAINTSTRUCT ps = {
+        0,
+    };
     HDC hPaintDC = ::BeginPaint(hWnd, &ps);
     UiRect rcPaint;
     rcPaint.left = ps.rcPaint.left;
@@ -160,8 +171,7 @@ bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRende
         //结束本次绘制
         ::EndPaint(hWnd, &ps);
         hPaintDC = nullptr;
-    }
-    else {
+    } else {
         //开始绘制返回值无效，结束绘制，使用另外一种绘制方法
         ::EndPaint(hWnd, &ps);
         hPaintDC = nullptr;
@@ -187,7 +197,8 @@ bool SkRasterWindowContext_Windows::PaintAndSwapBuffers(IRender* pRender, IRende
     return bRet;
 }
 
-bool SkRasterWindowContext_Windows::SwapPaintBuffers(HDC hPaintDC, const UiRect& rcPaint, IRender* pRender, uint8_t nLayeredWindowAlpha) const
+bool SkRasterWindowContext_Windows::SwapPaintBuffers(
+    HDC hPaintDC, const UiRect &rcPaint, IRender *pRender, uint8_t nLayeredWindowAlpha) const
 {
 #if DUILIB_PERFORMANCE_STAT_ENABLED
     //性能统计
@@ -227,7 +238,8 @@ bool SkRasterWindowContext_Windows::SwapPaintBuffers(HDC hPaintDC, const UiRect&
         BYTE bAlpha = 255;
         DWORD dwFlags = 0;
         //当返回true的时候，不能按分层窗口绘制，必须按普通的窗口模式绘制
-        bool bLayeredWindowAttributes = ::GetLayeredWindowAttributes(m_hWnd, &crKey, &bAlpha, &dwFlags) != FALSE;
+        bool bLayeredWindowAttributes
+            = ::GetLayeredWindowAttributes(m_hWnd, &crKey, &bAlpha, &dwFlags) != FALSE;
         if (bLayeredWindowAttributes) {
             if ((bAlpha == 255) || (crKey == 0)) {
                 //这种情况下，需要按照分层窗口绘制（当切换分层窗口后，会出现这个现象）
@@ -239,18 +251,29 @@ bool SkRasterWindowContext_Windows::SwapPaintBuffers(HDC hPaintDC, const UiRect&
             GetWindowRect(rcWindow);
             UiRect rcClient;
             GetClientRect(rcClient);
-            POINT pt = { rcWindow.left, rcWindow.top };
-            SIZE szWindow = { rcClient.Width(), rcClient.Height() };
-            POINT ptSrc = { 0, 0 };
-            BLENDFUNCTION bf = { AC_SRC_OVER, 0, nLayeredWindowAlpha, AC_SRC_ALPHA };
+            POINT pt = {rcWindow.left, rcWindow.top};
+            SIZE szWindow = {rcClient.Width(), rcClient.Height()};
+            POINT ptSrc = {0, 0};
+            BLENDFUNCTION bf = {AC_SRC_OVER, 0, nLayeredWindowAlpha, AC_SRC_ALPHA};
             //按分层窗口模式绘制
-            bPainted = ::UpdateLayeredWindow(m_hWnd, nullptr, &pt, &szWindow, hRenderDC, &ptSrc, 0, &bf, ULW_ALPHA) != FALSE;
-        }        
+            bPainted = ::UpdateLayeredWindow(
+                           m_hWnd, nullptr, &pt, &szWindow, hRenderDC, &ptSrc, 0, &bf, ULW_ALPHA)
+                       != FALSE;
+        }
     }
     if (!bPainted) {
         //按普通窗口模式绘制
-        bPainted = ::BitBlt(hPaintDC, rcPaint.left, rcPaint.top, rcPaint.Width(), rcPaint.Height(),
-                            hRenderDC, rcPaint.left, rcPaint.top, SRCCOPY) != FALSE;
+        bPainted = ::BitBlt(
+                       hPaintDC,
+                       rcPaint.left,
+                       rcPaint.top,
+                       rcPaint.Width(),
+                       rcPaint.Height(),
+                       hRenderDC,
+                       rcPaint.left,
+                       rcPaint.top,
+                       SRCCOPY)
+                   != FALSE;
     }
     pRender->ReleaseRenderDC(hRenderDC);
     ASSERT(bPainted);
@@ -263,21 +286,22 @@ HBITMAP SkRasterWindowContext_Windows::GetHBitmap() const
     return m_hBitmap;
 }
 
-void SkRasterWindowContext_Windows::GetWindowRect(UiRect& rcWindow) const
+void SkRasterWindowContext_Windows::GetWindowRect(UiRect &rcWindow) const
 {
-    RECT rc = { 0, 0, 0, 0 };
+    RECT rc = {0, 0, 0, 0};
     ::GetWindowRect(m_hWnd, &rc);
     rcWindow = UiRect(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-void SkRasterWindowContext_Windows::GetClientRect(UiRect& rcClient) const
+void SkRasterWindowContext_Windows::GetClientRect(UiRect &rcClient) const
 {
-    RECT rc = { 0, 0, 0, 0 };
+    RECT rc = {0, 0, 0, 0};
     ::GetClientRect(m_hWnd, &rc);
     rcClient = UiRect(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-HBITMAP SkRasterWindowContext_Windows::CreateHBitmap(int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID* pBits) const
+HBITMAP SkRasterWindowContext_Windows::CreateHBitmap(
+    int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID *pBits) const
 {
     ASSERT((nWidth > 0) && (nHeight > 0));
     if (nWidth <= 0 || nHeight <= 0) {
@@ -289,9 +313,8 @@ HBITMAP SkRasterWindowContext_Windows::CreateHBitmap(int32_t nWidth, int32_t nHe
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = nWidth;
     if (flipHeight) {
-        bmi.bmiHeader.biHeight = -nHeight;//负数表示位图方向：从上到下，左上角为圆点
-    }
-    else {
+        bmi.bmiHeader.biHeight = -nHeight; //负数表示位图方向：从上到下，左上角为圆点
+    } else {
         bmi.bmiHeader.biHeight = nHeight; //正数表示位图方向：从下到上，左下角为圆点
     }
     bmi.bmiHeader.biPlanes = 1;

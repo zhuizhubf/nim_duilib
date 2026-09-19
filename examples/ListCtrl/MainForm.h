@@ -7,6 +7,7 @@
 class MainForm : public ui::WindowImplBase
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
     MainForm();
     virtual ~MainForm() override;
@@ -38,7 +39,7 @@ private:
 
     /** 初始化本程序的测试功能相关UI事件
     */
-    void InitListCtrlEvents(ui::ListCtrl* pListCtrl);
+    void InitListCtrlEvents(ui::ListCtrl *pListCtrl);
 
     /** 执行一些功能测试
     */
@@ -50,7 +51,7 @@ private:
 
     /** 测试ListCtrl的loading功能
     */
-    void TestListCtrlLoading(ui::ListCtrl* pListCtrl);
+    void TestListCtrlLoading(ui::ListCtrl *pListCtrl);
 
     /** 测试Loading功能
     */
@@ -58,25 +59,25 @@ private:
 
     /** 测试ListCtrl的事件回调接口
     */
-    void TestListCtrlEvents(ui::ListCtrl* pListCtrl);
+    void TestListCtrlEvents(ui::ListCtrl *pListCtrl);
 
     /** 获取消息的基本信息（用于显示日志）
     */
-    DString GetEventDisplayInfo(const ui::EventArgs& args);
+    DString GetEventDisplayInfo(const ui::EventArgs &args);
 
     /** 获取消息的基本信息（用于显示日志）
     */
-    DString GetItemFilledEventDisplayInfo(const ui::EventArgs& args);
+    DString GetItemFilledEventDisplayInfo(const ui::EventArgs &args);
 
     /** 输出测试日志
     */
-    void OutputDebugLog(const DString& logMsg);
+    void OutputDebugLog(const DString &logMsg);
 
 private:
     //测试功能: 鼠标划入时显示子控件，鼠标移出时隐藏子控件
-    void OnReportViewSubItemFilled(const ui::EventArgs& args);
-    void OnReportViewSubItemMouseEnter(const ui::EventArgs& args);
-    void OnReportViewSubItemMouseLeave(const ui::EventArgs& args);
+    void OnReportViewSubItemFilled(const ui::EventArgs &args);
+    void OnReportViewSubItemMouseEnter(const ui::EventArgs &args);
+    void OnReportViewSubItemMouseLeave(const ui::EventArgs &args);
 
 private:
     /** loading状态的加载进度（模拟值，实际应用可用按情况计算进度）

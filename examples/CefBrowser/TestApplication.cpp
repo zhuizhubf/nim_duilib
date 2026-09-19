@@ -4,21 +4,17 @@
 // duilib
 #include "duilib/duilib_cef.h"
 
-TestApplication::TestApplication()
-{
-}
+TestApplication::TestApplication() {}
 
-TestApplication::~TestApplication()
-{
-}
+TestApplication::~TestApplication() {}
 
-TestApplication& TestApplication::Instance()
+TestApplication &TestApplication::Instance()
 {
     static TestApplication self;
     return self;
 }
 
-int TestApplication::Run(int argc, char** argv)
+int TestApplication::Run(int argc, char **argv)
 {
     //CEF模块功能预初始化(准备加载CEF模块的基本环境)
     ui::CefManager::GetInstance()->InitEnv();
@@ -36,7 +32,8 @@ int TestApplication::Run(int argc, char** argv)
     if (processType != ui::CefManager::BrowserProcess) {
         //非Browser进程：不应带入Browser进程的代码
         int32_t nExitCode = 1;
-        if (!ui::CefManager::GetInstance()->Initialize(bEnableOSR, _T("cef_browser"), argc, argv, nullptr, nExitCode)) {
+        if (!ui::CefManager::GetInstance()
+                 ->Initialize(bEnableOSR, _T("cef_browser"), argc, argv, nullptr, nExitCode)) {
             return nExitCode;
         }
         return 0;
@@ -48,11 +45,13 @@ int TestApplication::Run(int argc, char** argv)
     //必须在CefManager::Initialize前调用，设置DPI自适应属性，否则会导致显示不正常
     //初始化全局资源, 使用本地文件夹作为资源
     ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(true);
-    ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath), thread.GetDpiInitParam());
+    ui::GlobalManager::Instance()
+        .Startup(ui::LocalFilesResParam(resourcePath), thread.GetDpiInitParam());
 
     //初始化CEF: 必须在GlobalManager初始化完成之后，因为初始化CEF过程中，会用到GlobalManager
     int32_t nExitCode = 1;
-    if (!ui::CefManager::GetInstance()->Initialize(bEnableOSR, _T("cef_browser"), argc, argv, nullptr, nExitCode)) {
+    if (!ui::CefManager::GetInstance()
+             ->Initialize(bEnableOSR, _T("cef_browser"), argc, argv, nullptr, nExitCode)) {
         return nExitCode;
     }
 
@@ -69,7 +68,7 @@ int TestApplication::Run(int argc, char** argv)
     return 0;
 }
 
-void TestApplication::AddMainWindow(ui::Window* pWindow)
+void TestApplication::AddMainWindow(ui::Window *pWindow)
 {
     if (pWindow != nullptr) {
         ui::ControlPtrT<ui::Window> pMainWindow(pWindow);
@@ -77,20 +76,19 @@ void TestApplication::AddMainWindow(ui::Window* pWindow)
     }
 }
 
-void TestApplication::RemoveMainWindow(ui::Window* pWindow)
+void TestApplication::RemoveMainWindow(ui::Window *pWindow)
 {
     auto iter = m_pMainWindows.begin();
     while (iter != m_pMainWindows.end()) {
         if (*iter == pWindow) {
             iter = m_pMainWindows.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
 }
 
-void TestApplication::SetActiveMainWindow(ui::Window* pWindow)
+void TestApplication::SetActiveMainWindow(ui::Window *pWindow)
 {
     m_pActiveWindow = pWindow;
 }
@@ -99,8 +97,7 @@ void TestApplication::ActiveMainWindow()
 {
     if (m_pActiveWindow != nullptr) {
         m_pActiveWindow->ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);
-    }
-    else {
+    } else {
         for (ui::ControlPtrT<ui::Window> pWindow : m_pMainWindows) {
             if ((pWindow != nullptr) && !pWindow->IsClosingWnd()) {
                 pWindow->ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);

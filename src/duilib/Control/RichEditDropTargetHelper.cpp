@@ -2,15 +2,14 @@
 #include "duilib/Control/RichEdit2.h"
 #include "duilib/Core/DpiManager.h"
 
-namespace ui 
-{
-RichEditDropTargetHelper::RichEditDropTargetHelper(RichEdit2* pRichEdit, const std::vector<DString>& dropTextList):
-    m_pRichEdit(pRichEdit),
-    m_dropTextList(dropTextList)
-{
-}
+namespace ui {
+RichEditDropTargetHelper::RichEditDropTargetHelper(
+    RichEdit2 *pRichEdit, const std::vector<DString> &dropTextList)
+    : m_pRichEdit(pRichEdit)
+    , m_dropTextList(dropTextList)
+{}
 
-bool RichEditDropTargetHelper::CheckDropText(const UiPoint& clientPt) const
+bool RichEditDropTargetHelper::CheckDropText(const UiPoint &clientPt) const
 {
     if (m_dropTextList.empty() || (m_pRichEdit == nullptr)) {
         return false;
@@ -47,7 +46,7 @@ bool RichEditDropTargetHelper::CheckDropText(const UiPoint& clientPt) const
     DString limitChars = m_pRichEdit->GetLimitChars();
     if (!limitChars.empty()) {
         //有设置限制字符
-        for (const DString& dropText : m_dropTextList) {
+        for (const DString &dropText : m_dropTextList) {
             size_t count = dropText.size();
             for (size_t index = 0; index < count; ++index) {
                 if (dropText[index] == L'\0') {
@@ -70,7 +69,7 @@ bool RichEditDropTargetHelper::CheckDropText(const UiPoint& clientPt) const
     return m_pRichEdit->CanDropTextOnMousePosition(clientPt);
 }
 
-void RichEditDropTargetHelper::CheckTextScroll(const UiPoint& clientPt)
+void RichEditDropTargetHelper::CheckTextScroll(const UiPoint &clientPt)
 {
     if (m_pRichEdit == nullptr) {
         return;
@@ -85,23 +84,21 @@ void RichEditDropTargetHelper::CheckTextScroll(const UiPoint& clientPt)
     UiRect rcRichEdit = m_pRichEdit->GetPos();
 
     const int32_t nScrollSize = m_pRichEdit->Dpi().GetScaleInt(18); //距离边缘多少像素时开始滚动
-    ScrollBar* pVScrollBar = m_pRichEdit->GetVScrollBar();
-    ScrollBar* pHScrollBar = m_pRichEdit->GetHScrollBar();
+    ScrollBar *pVScrollBar = m_pRichEdit->GetVScrollBar();
+    ScrollBar *pHScrollBar = m_pRichEdit->GetHScrollBar();
     if ((pHScrollBar != nullptr) && pHScrollBar->IsValid()) {
         int32_t nScrollSizeRight = nScrollSize;
         int32_t nScrollSizeLeft = nScrollSize;
         if ((pVScrollBar != nullptr) && pVScrollBar->IsValid() && pVScrollBar->IsVisible()) {
             if (m_pRichEdit->IsVScrollBarAtLeft()) {
                 nScrollSizeLeft += pVScrollBar->GetFixedWidth().GetInt32();
-            }
-            else {
+            } else {
                 nScrollSizeRight += pVScrollBar->GetFixedWidth().GetInt32();
             }
         }
         if ((pt.x < rcRichEdit.right) && ((rcRichEdit.right - pt.x) < nScrollSizeRight)) {
             m_pRichEdit->LineRight();
-        }
-        else if ((pt.x > rcRichEdit.left) && ((pt.x - rcRichEdit.left) < nScrollSizeLeft)) {
+        } else if ((pt.x > rcRichEdit.left) && ((pt.x - rcRichEdit.left) < nScrollSizeLeft)) {
             m_pRichEdit->LineLeft();
         }
     }
@@ -113,8 +110,7 @@ void RichEditDropTargetHelper::CheckTextScroll(const UiPoint& clientPt)
         }
         if ((pt.y < rcRichEdit.bottom) && ((rcRichEdit.bottom - pt.y) < nScrollSizeBottom)) {
             m_pRichEdit->LineDown();
-        }
-        else if ((pt.y > rcRichEdit.top) && ((pt.y - rcRichEdit.top) < nScrollSizeTop)) {
+        } else if ((pt.y > rcRichEdit.top) && ((pt.y - rcRichEdit.top) < nScrollSizeTop)) {
             m_pRichEdit->LineUp();
         }
     }

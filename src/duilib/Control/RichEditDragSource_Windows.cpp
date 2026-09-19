@@ -4,35 +4,31 @@
 
 #include <shellapi.h>
 
-namespace ui 
-{
+namespace ui {
 
 ////////////////////////////////////////////////////////////////////////////////
 // RichEditDragSource_Windows
 
-RichEditDragSource_Windows* RichEditDragSource_Windows::Create()
+RichEditDragSource_Windows *RichEditDragSource_Windows::Create()
 {
     return new RichEditDragSource_Windows(nullptr);
 }
 
-RichEditDragSource_Windows::RichEditDragSource_Windows(RichEdit2* pRichEdit)
+RichEditDragSource_Windows::RichEditDragSource_Windows(RichEdit2 *pRichEdit)
     : m_pRichEdit(pRichEdit)
     , m_refCount(0)
-{
-}
+{}
 
-HRESULT RichEditDragSource_Windows::QueryInterface(REFIID iid, void** object)
+HRESULT RichEditDragSource_Windows::QueryInterface(REFIID iid, void **object)
 {
     *object = nullptr;
     if (IsEqualIID(iid, IID_IUnknown)) {
-        IUnknown* obj = this;
+        IUnknown *obj = this;
         *object = obj;
-    }
-    else if (IsEqualIID(iid, IID_IDropSource)) {
-        IDropSource* obj = this;
+    } else if (IsEqualIID(iid, IID_IDropSource)) {
+        IDropSource *obj = this;
         *object = obj;
-    }
-    else {
+    } else {
         return E_NOINTERFACE;
     }
     AddRef();
@@ -74,12 +70,12 @@ HRESULT RichEditDragSource_Windows::QueryContinueDrag(BOOL fEscapePressed, DWORD
 ////////////////////////////////////////////////////////////////////////////////
 // RichEditDataObject_Windows
 
-RichEditDataObject_Windows* RichEditDataObject_Windows::Create(const DStringW& text)
+RichEditDataObject_Windows *RichEditDataObject_Windows::Create(const DStringW &text)
 {
     return new RichEditDataObject_Windows(text);
 }
 
-RichEditDataObject_Windows::RichEditDataObject_Windows(const DStringW& text)
+RichEditDataObject_Windows::RichEditDataObject_Windows(const DStringW &text)
     : m_refCount(0)
     , m_nNumFormats(0)
     , m_pFormatEtc(nullptr)
@@ -91,7 +87,7 @@ RichEditDataObject_Windows::RichEditDataObject_Windows(const DStringW& text)
     m_pFormatEtc = new FORMATETC[m_nNumFormats];
     m_pStgMedium = new STGMEDIUM[m_nNumFormats];
 
-    FORMATETC fmtetc = { 0, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+    FORMATETC fmtetc = {0, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
     fmtetc.cfFormat = CF_UNICODETEXT;
     m_pFormatEtc[0] = fmtetc;
 
@@ -129,18 +125,16 @@ RichEditDataObject_Windows::~RichEditDataObject_Windows()
     }
 }
 
-HRESULT RichEditDataObject_Windows::QueryInterface(REFIID iid, void** object)
+HRESULT RichEditDataObject_Windows::QueryInterface(REFIID iid, void **object)
 {
     *object = nullptr;
     if (IsEqualIID(iid, IID_IUnknown)) {
-        IUnknown* obj = this;
+        IUnknown *obj = this;
         *object = obj;
-    }
-    else if (IsEqualIID(iid, IID_IDataObject)) {
-        IDataObject* obj = this;
+    } else if (IsEqualIID(iid, IID_IDataObject)) {
+        IDataObject *obj = this;
         *object = obj;
-    }
-    else {
+    } else {
         return E_NOINTERFACE;
     }
     AddRef();
@@ -161,12 +155,12 @@ ULONG RichEditDataObject_Windows::Release()
     return m_refCount;
 }
 
-int RichEditDataObject_Windows::LookupFormatEtc(FORMATETC* pFormatEtc)
+int RichEditDataObject_Windows::LookupFormatEtc(FORMATETC *pFormatEtc)
 {
     for (int i = 0; i < m_nNumFormats; i++) {
-        if ((m_pFormatEtc[i].tymed & pFormatEtc->tymed) &&
-            m_pFormatEtc[i].cfFormat == pFormatEtc->cfFormat &&
-            m_pFormatEtc[i].dwAspect == pFormatEtc->dwAspect) {
+        if ((m_pFormatEtc[i].tymed & pFormatEtc->tymed)
+            && m_pFormatEtc[i].cfFormat == pFormatEtc->cfFormat
+            && m_pFormatEtc[i].dwAspect == pFormatEtc->dwAspect) {
             return i;
         }
     }
@@ -181,10 +175,10 @@ HGLOBAL RichEditDataObject_Windows::DupGlobalMem(HGLOBAL hMem)
 
     memcpy(dest, source, len);
     GlobalUnlock(hMem);
-    return (HGLOBAL)dest;
+    return (HGLOBAL) dest;
 }
 
-HRESULT RichEditDataObject_Windows::GetData(FORMATETC* pFormatEtc, STGMEDIUM* pMedium)
+HRESULT RichEditDataObject_Windows::GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium)
 {
     int idx = LookupFormatEtc(pFormatEtc);
     if (idx == -1) {
@@ -204,33 +198,41 @@ HRESULT RichEditDataObject_Windows::GetData(FORMATETC* pFormatEtc, STGMEDIUM* pM
     return S_OK;
 }
 
-HRESULT RichEditDataObject_Windows::GetDataHere(FORMATETC* /*pFormatEtc*/, STGMEDIUM* /*pMedium*/)
+HRESULT RichEditDataObject_Windows::GetDataHere(FORMATETC * /*pFormatEtc*/, STGMEDIUM * /*pMedium*/)
 {
     return E_NOTIMPL;
 }
 
-HRESULT RichEditDataObject_Windows::QueryGetData(FORMATETC* pFormatEtc)
+HRESULT RichEditDataObject_Windows::QueryGetData(FORMATETC *pFormatEtc)
 {
     return (LookupFormatEtc(pFormatEtc) == -1) ? DV_E_FORMATETC : S_OK;
 }
 
-HRESULT RichEditDataObject_Windows::GetCanonicalFormatEtc(FORMATETC* /*pFormatEtcIn*/, FORMATETC* pFormatEtcOut)
+HRESULT RichEditDataObject_Windows::GetCanonicalFormatEtc(
+    FORMATETC * /*pFormatEtcIn*/, FORMATETC *pFormatEtcOut)
 {
     pFormatEtcOut->ptd = nullptr;
     return E_NOTIMPL;
 }
 
-HRESULT RichEditDataObject_Windows::SetData(FORMATETC* /*pFormatEtc*/, STGMEDIUM* /*pMedium*/, BOOL /*fRelease*/)
+HRESULT RichEditDataObject_Windows::SetData(
+    FORMATETC * /*pFormatEtc*/, STGMEDIUM * /*pMedium*/, BOOL /*fRelease*/)
 {
     return E_NOTIMPL;
 }
 
-HRESULT RichEditDataObject_Windows::EnumFormatEtc(DWORD /*dwDirection*/, IEnumFORMATETC** ppEnumFormatEtc)
+HRESULT RichEditDataObject_Windows::EnumFormatEtc(
+    DWORD /*dwDirection*/, IEnumFORMATETC **ppEnumFormatEtc)
 {
-    return RichEditEnumFormatEtc_Windows::CreateEnumFormatEtc(m_nNumFormats, m_pFormatEtc, ppEnumFormatEtc);
+    return RichEditEnumFormatEtc_Windows::CreateEnumFormatEtc(
+        m_nNumFormats, m_pFormatEtc, ppEnumFormatEtc);
 }
 
-HRESULT RichEditDataObject_Windows::DAdvise(FORMATETC* /*pFormatEtc*/, DWORD /*advf*/, IAdviseSink* /*pAdvSink*/, DWORD* /*pdwConnection*/)
+HRESULT RichEditDataObject_Windows::DAdvise(
+    FORMATETC * /*pFormatEtc*/,
+    DWORD /*advf*/,
+    IAdviseSink * /*pAdvSink*/,
+    DWORD * /*pdwConnection*/)
 {
     return E_NOTIMPL;
 }
@@ -240,7 +242,7 @@ HRESULT RichEditDataObject_Windows::DUnadvise(DWORD /*dwConnection*/)
     return E_NOTIMPL;
 }
 
-HRESULT RichEditDataObject_Windows::EnumDAdvise(IEnumSTATDATA** /*ppEnumAdvise*/)
+HRESULT RichEditDataObject_Windows::EnumDAdvise(IEnumSTATDATA ** /*ppEnumAdvise*/)
 {
     return E_NOTIMPL;
 }
@@ -248,7 +250,8 @@ HRESULT RichEditDataObject_Windows::EnumDAdvise(IEnumSTATDATA** /*ppEnumAdvise*/
 ////////////////////////////////////////////////////////////////////////////////
 // RichEditEnumFormatEtc_Windows
 
-HRESULT RichEditEnumFormatEtc_Windows::CreateEnumFormatEtc(UINT cfmt, FORMATETC* afmt, IEnumFORMATETC** ppEnumFormatEtc)
+HRESULT RichEditEnumFormatEtc_Windows::CreateEnumFormatEtc(
+    UINT cfmt, FORMATETC *afmt, IEnumFORMATETC **ppEnumFormatEtc)
 {
     if (cfmt == 0 || afmt == nullptr || ppEnumFormatEtc == nullptr) {
         return E_INVALIDARG;
@@ -258,7 +261,7 @@ HRESULT RichEditEnumFormatEtc_Windows::CreateEnumFormatEtc(UINT cfmt, FORMATETC*
     return (*ppEnumFormatEtc) ? S_OK : E_OUTOFMEMORY;
 }
 
-RichEditEnumFormatEtc_Windows::RichEditEnumFormatEtc_Windows(FORMATETC* pFormatEtc, int nNumFormats)
+RichEditEnumFormatEtc_Windows::RichEditEnumFormatEtc_Windows(FORMATETC *pFormatEtc, int nNumFormats)
     : m_refCount(0)
     , m_nIndex(0)
     , m_nNumFormats(nNumFormats)
@@ -285,18 +288,16 @@ RichEditEnumFormatEtc_Windows::~RichEditEnumFormatEtc_Windows()
     }
 }
 
-HRESULT RichEditEnumFormatEtc_Windows::QueryInterface(REFIID iid, void** object)
+HRESULT RichEditEnumFormatEtc_Windows::QueryInterface(REFIID iid, void **object)
 {
     *object = nullptr;
     if (IsEqualIID(iid, IID_IUnknown)) {
-        IUnknown* obj = this;
+        IUnknown *obj = this;
         *object = obj;
-    }
-    else if (IsEqualIID(iid, IID_IEnumFORMATETC)) {
-        IEnumFORMATETC* obj = this;
+    } else if (IsEqualIID(iid, IID_IEnumFORMATETC)) {
+        IEnumFORMATETC *obj = this;
         *object = obj;
-    }
-    else {
+    } else {
         return E_NOINTERFACE;
     }
     AddRef();
@@ -317,7 +318,7 @@ ULONG RichEditEnumFormatEtc_Windows::Release()
     return m_refCount;
 }
 
-HRESULT RichEditEnumFormatEtc_Windows::Next(ULONG celt, FORMATETC* pFormatEtc, ULONG* pceltFetched)
+HRESULT RichEditEnumFormatEtc_Windows::Next(ULONG celt, FORMATETC *pFormatEtc, ULONG *pceltFetched)
 {
     ULONG copied = 0;
 
@@ -346,20 +347,21 @@ HRESULT RichEditEnumFormatEtc_Windows::Reset()
     return S_OK;
 }
 
-HRESULT RichEditEnumFormatEtc_Windows::Clone(IEnumFORMATETC** ppEnumFormatEtc)
+HRESULT RichEditEnumFormatEtc_Windows::Clone(IEnumFORMATETC **ppEnumFormatEtc)
 {
-    HRESULT hResult = CreateEnumFormatEtc(static_cast<UINT>(m_nNumFormats), m_pFormatEtc, ppEnumFormatEtc);
+    HRESULT hResult
+        = CreateEnumFormatEtc(static_cast<UINT>(m_nNumFormats), m_pFormatEtc, ppEnumFormatEtc);
     if (hResult == S_OK) {
-        reinterpret_cast<RichEditEnumFormatEtc_Windows*>(*ppEnumFormatEtc)->m_nIndex = m_nIndex;
+        reinterpret_cast<RichEditEnumFormatEtc_Windows *>(*ppEnumFormatEtc)->m_nIndex = m_nIndex;
     }
     return hResult;
 }
 
-void RichEditEnumFormatEtc_Windows::DeepCopyFormatEtc(FORMATETC* dest, FORMATETC* source)
+void RichEditEnumFormatEtc_Windows::DeepCopyFormatEtc(FORMATETC *dest, FORMATETC *source)
 {
     *dest = *source;
     if (source->ptd != nullptr) {
-        dest->ptd = reinterpret_cast<DVTARGETDEVICE*>(CoTaskMemAlloc(sizeof(DVTARGETDEVICE)));
+        dest->ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(sizeof(DVTARGETDEVICE)));
         if (dest->ptd != nullptr) {
             *(dest->ptd) = *(source->ptd);
         }

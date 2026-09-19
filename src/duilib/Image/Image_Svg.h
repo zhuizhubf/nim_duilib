@@ -4,11 +4,10 @@
 #include "duilib/Image/ImageDecoder.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 /** Svg格式的图片数据(支持矢量缩放)
 */
-class Image_Svg: public IImage
+class Image_Svg : public IImage
 {
 public:
     /** 创建一个位图的图片数据（ARGB格式）
@@ -17,7 +16,7 @@ public:
     @param [in] pPixelBits 位图数据, 如果为nullptr表示窗口空位图，如果不为nullptr，其数据长度为：nWidth*4*nHeight
     @param [in] alphaType 位图的Alpha类型    
     */
-    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<ISvgImage>& pSvgImage);
+    static std::unique_ptr<IImage> MakeImage(const std::shared_ptr<ISvgImage> &pSvgImage);
 
 public:
     Image_Svg();
@@ -74,9 +73,8 @@ private:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool AsyncDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override;
+    virtual bool AsyncDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override;
 
     /** 合并异步解码图片数据的结果
     */

@@ -1,24 +1,23 @@
 #include "Image_PAG.h"
 #include "duilib/Core/GlobalManager.h"
-#include "render/IRender.h"
 #include "duilib/Image/ImageDecoder.h"
 #include "duilib/Utils/FileUtil.h"
+#include "render/IRender.h"
 
 #ifdef DUILIB_IMAGE_SUPPORT_LIB_PAG
 
-#if defined (_MSC_VER)
-    #pragma warning (push)
-    #pragma warning (disable: 4068)
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4068)
 #endif
 
 #include "pag/pag.h"
 
-#if defined (_MSC_VER)
-    #pragma warning (pop)
+#if defined(_MSC_VER)
+#pragma warning(pop)
 #endif
 
-namespace ui
-{
+namespace ui {
 
 struct Image_PAG::TImpl
 {
@@ -62,17 +61,18 @@ public:
 
 public:
     //从已经打开的文件初始化数据
-    bool InitImageData(bool bLoadAllFrames,
-                       float fPagMaxFrameRate,
-                       float fImageSizeScale,
-                       const UiSize& rcMaxDestRectSize)
+    bool InitImageData(
+        bool bLoadAllFrames,
+        float fPagMaxFrameRate,
+        float fImageSizeScale,
+        const UiSize &rcMaxDestRectSize)
     {
-        if (m_pagComposition == nullptr) {            
+        if (m_pagComposition == nullptr) {
             return false;
         }
 
         m_fImageSizeScale = fImageSizeScale;
-        m_bLoadAllFrames = bLoadAllFrames;        
+        m_bLoadAllFrames = bLoadAllFrames;
         m_pagDecoder = pag::PAGDecoder::MakeFrom(m_pagComposition, fPagMaxFrameRate, 1.0f);
         if (m_pagDecoder == nullptr) {
             return false;
@@ -88,25 +88,26 @@ public:
             return false;
         }
         float fRealScale = fImageSizeScale;
-        if (ImageUtil::GetBestImageScale(rcMaxDestRectSize, nWidth, nHeight, fImageSizeScale, fRealScale)) {
+        if (ImageUtil::GetBestImageScale(
+                rcMaxDestRectSize, nWidth, nHeight, fImageSizeScale, fRealScale)) {
             m_fImageSizeScale = fRealScale;
             m_pagDecoder = pag::PAGDecoder::MakeFrom(m_pagComposition, fPagMaxFrameRate, fRealScale);
             if (m_pagDecoder == nullptr) {
                 return false;
             }
-        }
-        else {
+        } else {
             m_fImageSizeScale = fImageSizeScale;
         }
 
-        pag::PAGDecoder& pagDecoder = *m_pagDecoder;
-        if ((pagDecoder.width() <= 0) || (pagDecoder.height() <= 0) || (pagDecoder.numFrames() <= 0)) {
+        pag::PAGDecoder &pagDecoder = *m_pagDecoder;
+        if ((pagDecoder.width() <= 0) || (pagDecoder.height() <= 0)
+            || (pagDecoder.numFrames() <= 0)) {
             return false;
         }
 
-        m_nWidth = (uint32_t)pagDecoder.width();
-        m_nHeight = (uint32_t)pagDecoder.height();
-        m_nFrameCount = (int32_t)pagDecoder.numFrames();
+        m_nWidth = (uint32_t) pagDecoder.width();
+        m_nHeight = (uint32_t) pagDecoder.height();
+        m_nFrameCount = (int32_t) pagDecoder.numFrames();
 
         if (m_bAssertEnabled) {
             ASSERT(m_nWidth > 0);
@@ -114,7 +115,7 @@ public:
             ASSERT(m_nFrameCount > 0);
         }
 
-        if ((m_nFrameCount <= 0) || ((int32_t)m_nWidth <= 0) || ((int32_t)m_nHeight <= 0)) {
+        if ((m_nFrameCount <= 0) || ((int32_t) m_nWidth <= 0) || ((int32_t) m_nHeight <= 0)) {
             //加载失败时，需要恢复原文件数据
             return false;
         }
@@ -129,9 +130,8 @@ public:
         //这里先检查 frameRate > 0 才计算，否则使用默认帧延迟，避免 UB
         const float frameRate = pagDecoder.frameRate();
         if (frameRate > 0.0f) {
-            m_frameDelayMs = (int32_t)(1000.0f / frameRate);
-        }
-        else {
+            m_frameDelayMs = (int32_t) (1000.0f / frameRate);
+        } else {
             m_frameDelayMs = IMAGE_ANIMATION_DELAY_MS;
         }
         return true;
@@ -143,18 +143,16 @@ Image_PAG::Image_PAG()
     m_impl = std::make_unique<TImpl>();
 }
 
-Image_PAG::~Image_PAG()
-{
-    
-}
+Image_PAG::~Image_PAG() {}
 
-bool Image_PAG::LoadImageFile(std::vector<uint8_t>& fileData,
-                              const FilePath& imageFilePath,
-                              bool bLoadAllFrames,
-                              float fPagMaxFrameRate,
-                              float fImageSizeScale,
-                              const UiSize& rcMaxDestRectSize,
-                              bool bAssertEnabled)
+bool Image_PAG::LoadImageFile(
+    std::vector<uint8_t> &fileData,
+    const FilePath &imageFilePath,
+    bool bLoadAllFrames,
+    float fPagMaxFrameRate,
+    float fImageSizeScale,
+    const UiSize &rcMaxDestRectSize,
+    bool bAssertEnabled)
 {
     ASSERT(!fileData.empty() || !imageFilePath.IsEmpty());
     if (fileData.empty() && imageFilePath.IsEmpty()) {
@@ -173,7 +171,8 @@ bool Image_PAG::LoadImageFile(std::vector<uint8_t>& fileData,
     m_impl->m_fileData.clear();
     m_impl->m_fileData.swap(fileData);
     //备注：libpag内部实际没实现支持密码的功能，只是接口支持了这个参数
-    m_impl->m_pagComposition = pag::PAGFile::Load(m_impl->m_fileData.data(), m_impl->m_fileData.size(), "");
+    m_impl->m_pagComposition
+        = pag::PAGFile::Load(m_impl->m_fileData.data(), m_impl->m_fileData.size(), "");
     if (m_impl->m_pagComposition == nullptr) {
         //加载失败时，还原数据
         if (bNeedRestoreData) {
@@ -181,12 +180,13 @@ bool Image_PAG::LoadImageFile(std::vector<uint8_t>& fileData,
         }
         return false;
     }
-    bool bRet = m_impl->InitImageData(bLoadAllFrames, fPagMaxFrameRate, fImageSizeScale, rcMaxDestRectSize);
+    bool bRet
+        = m_impl->InitImageData(bLoadAllFrames, fPagMaxFrameRate, fImageSizeScale, rcMaxDestRectSize);
     if (!bRet) {
         //加载失败时，还原数据
         if (bNeedRestoreData) {
             m_impl->m_fileData.swap(fileData);
-        }        
+        }
     }
     return bRet;
 }
@@ -206,7 +206,8 @@ uint32_t Image_PAG::GetDecodedFrameIndex() const
     return 0;
 }
 
-bool Image_PAG::DelayDecode(uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool* /*bDecodeError*/)
+bool Image_PAG::DelayDecode(
+    uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool * /*bDecodeError*/)
 {
     return false;
 }
@@ -251,7 +252,8 @@ int32_t Image_PAG::GetFrameDelayMs(uint32_t /*nFrameIndex*/)
     return m_impl->m_frameDelayMs;
 }
 
-bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSize*/, AnimationFrame* pAnimationFrame)
+bool Image_PAG::ReadFrameData(
+    int32_t nFrameIndex, const UiSize & /*szDestRectSize*/, AnimationFrame *pAnimationFrame)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pAnimationFrame != nullptr);
@@ -281,7 +283,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         return false;
     }
 
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         m_impl->m_bDecodeError = true;
@@ -296,16 +298,16 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         return false;
     }
 
-    pag::PAGDecoder& pagDecoder = *m_impl->m_pagDecoder;
-    const uint32_t nImageWidth = (uint32_t)pagDecoder.width();
-    const uint32_t nImageHeight = (uint32_t)pagDecoder.height();
+    pag::PAGDecoder &pagDecoder = *m_impl->m_pagDecoder;
+    const uint32_t nImageWidth = (uint32_t) pagDecoder.width();
+    const uint32_t nImageHeight = (uint32_t) pagDecoder.height();
     if (!pBitmap->Init(nImageWidth, nImageHeight, nullptr)) {
         m_impl->m_bDecodeError = true;
         pAnimationFrame->m_bDataError = true;
         return false;
     }
     int32_t index = nFrameIndex;
-    void* pixels = pBitmap->LockPixelBits();
+    void *pixels = pBitmap->LockPixelBits();
     ASSERT(pixels != nullptr);
     if (pixels == nullptr) {
         m_impl->m_bDecodeError = true;
@@ -315,7 +317,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
     //RAII 风格的像素位解锁包装
     struct TAutoUnlockPixels
     {
-        std::shared_ptr<IBitmap>& bitmap;
+        std::shared_ptr<IBitmap> &bitmap;
         bool locked;
         ~TAutoUnlockPixels()
         {
@@ -324,9 +326,9 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
             }
         }
     };
-    TAutoUnlockPixels autoUnlock{ pBitmap, true };
+    TAutoUnlockPixels autoUnlock{pBitmap, true};
 
-    size_t rowBytes = (size_t)pBitmap->GetWidth() * 4;
+    size_t rowBytes = (size_t) pBitmap->GetWidth() * 4;
 #ifdef DUILIB_BUILD_FOR_WIN
     pag::ColorType colorType = pag::ColorType::BGRA_8888;
 #else
@@ -336,7 +338,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
     bool bRet = pagDecoder.readFrame(index, pixels, rowBytes, colorType, alphaType);
     if (bRet) {
         pBitmap->UnLockPixelBits();
-        autoUnlock.locked = false;  // 已解锁，防止析构中重复解锁
+        autoUnlock.locked = false; // 已解锁，防止析构中重复解锁
         pAnimationFrame->m_pBitmap = pBitmap;
         pAnimationFrame->m_nOffsetX = 0;
         pAnimationFrame->m_nOffsetY = 0;
@@ -344,8 +346,7 @@ bool Image_PAG::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
         pAnimationFrame->m_nFrameIndex = nFrameIndex;
         pAnimationFrame->SetDelayMs(m_impl->m_frameDelayMs);
         pAnimationFrame->m_bDataError = false;
-    }
-    else {
+    } else {
         m_impl->m_bDecodeError = true;
         pAnimationFrame->m_bDataError = true;
         pAnimationFrame->m_pBitmap.reset();

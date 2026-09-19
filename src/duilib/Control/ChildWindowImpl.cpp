@@ -1,18 +1,14 @@
 #include "ChildWindowImpl.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Core/Control.h"
 
-namespace ui
-{
-ChildWindowImpl::ChildWindowImpl(ChildWindowEvents* pChildWindowEvents):
-    m_pChildWindowEvents(pChildWindowEvents)
-{
-}
+namespace ui {
+ChildWindowImpl::ChildWindowImpl(ChildWindowEvents *pChildWindowEvents)
+    : m_pChildWindowEvents(pChildWindowEvents)
+{}
 
-ChildWindowImpl::~ChildWindowImpl()
-{
-}
+ChildWindowImpl::~ChildWindowImpl() {}
 
 void ChildWindowImpl::SetChildWindowVisible(bool bVisible)
 {
@@ -28,7 +24,7 @@ void ChildWindowImpl::SetChildWindowEnabled(bool bEnabled)
     }
 }
 
-void ChildWindowImpl::SetChildWindowEvents(ChildWindowEvents* pChildWindowEvents)
+void ChildWindowImpl::SetChildWindowEvents(ChildWindowEvents *pChildWindowEvents)
 {
     m_pChildWindowEvents = pChildWindowEvents;
 }
@@ -121,25 +117,25 @@ void ChildWindowImpl::OnWindowDisplayScaleChanged(uint32_t nOldScaleFactor, uint
     }
 }
 
-void ChildWindowImpl::GetShadowCorner(UiPadding& rcShadow) const
+void ChildWindowImpl::GetShadowCorner(UiPadding &rcShadow) const
 {
     // 空实现，清空输出参数
     rcShadow = UiPadding();
 }
 
-void ChildWindowImpl::GetCurrentShadowCorner(UiPadding& rcShadow) const
+void ChildWindowImpl::GetCurrentShadowCorner(UiPadding &rcShadow) const
 {
     // 空实现，清空输出参数
     rcShadow = UiPadding();
 }
 
-bool ChildWindowImpl::IsPtInCaptionBarControl(const UiPoint& /*pt*/) const
+bool ChildWindowImpl::IsPtInCaptionBarControl(const UiPoint & /*pt*/) const
 {
     // 空实现，默认返回false
     return false;
 }
 
-bool ChildWindowImpl::HasMinMaxBox(bool& bMinimizeBox, bool& bMaximizeBox) const
+bool ChildWindowImpl::HasMinMaxBox(bool &bMinimizeBox, bool &bMaximizeBox) const
 {
     // 空实现，默认设置为false
     bMinimizeBox = false;
@@ -147,52 +143,54 @@ bool ChildWindowImpl::HasMinMaxBox(bool& bMinimizeBox, bool& bMaximizeBox) const
     return false;
 }
 
-bool ChildWindowImpl::IsPtInMaximizeRestoreButton(const UiPoint& /*pt*/) const
+bool ChildWindowImpl::IsPtInMaximizeRestoreButton(const UiPoint & /*pt*/) const
 {
     // 空实现，默认返回false
     return false;
 }
 
-void ChildWindowImpl::GetCreateWindowAttributes(WindowCreateAttributes& createAttributes)
+void ChildWindowImpl::GetCreateWindowAttributes(WindowCreateAttributes &createAttributes)
 {
     // 空实现，清空输出参数
     createAttributes = WindowCreateAttributes();
 }
 
 // 非纯虚函数的实现
-void ChildWindowImpl::OnDisplayScaleChanged(uint32_t /*nOldScaleFactor*/, uint32_t /*nNewScaleFactor*/)
+void ChildWindowImpl::OnDisplayScaleChanged(
+    uint32_t /*nOldScaleFactor*/, uint32_t /*nNewScaleFactor*/)
 {
     // 空实现
 }
 
-IRender* ChildWindowImpl::GetRender() const
+IRender *ChildWindowImpl::GetRender() const
 {
     // 空实现，默认返回nullptr
     return nullptr;
 }
 
-Control* ChildWindowImpl::OnFindControl(const UiPoint& /*pt*/) const
+Control *ChildWindowImpl::OnFindControl(const UiPoint & /*pt*/) const
 {
     // 空实现
     return nullptr;
 }
 
 // ------------------------------ 窗口消息处理相关纯虚函数 ------------------------------
-LRESULT ChildWindowImpl::OnWindowMessage(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnWindowMessage(
+    UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, bool &bHandled)
 {
     // 空实现，默认标记为未处理，返回0
     bHandled = false;
     return 0;
 }
 
-void ChildWindowImpl::OnWindowCreateMsg(bool /*bDoModal*/, const NativeMsg& nativeMsg, bool& bHandled)
+void ChildWindowImpl::OnWindowCreateMsg(bool /*bDoModal*/, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         m_pChildWindowEvents->OnWindowCreateMsg(nativeMsg, bHandled);
     }
 }
 
-LRESULT ChildWindowImpl::OnWindowCloseMsg(uint32_t wParam, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnWindowCloseMsg(uint32_t wParam, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnWindowCloseMsg(wParam, nativeMsg, bHandled);
@@ -200,7 +198,7 @@ LRESULT ChildWindowImpl::OnWindowCloseMsg(uint32_t wParam, const NativeMsg& nati
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnShowWindowMsg(bool bShow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnShowWindowMsg(bool bShow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnShowWindowMsg(bShow, nativeMsg, bHandled);
@@ -208,7 +206,7 @@ LRESULT ChildWindowImpl::OnShowWindowMsg(bool bShow, const NativeMsg& nativeMsg,
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnPaintMsg(const UiRect &rcPaint, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnPaintMsg(rcPaint, nativeMsg, bHandled);
@@ -216,7 +214,7 @@ LRESULT ChildWindowImpl::OnPaintMsg(const UiRect& rcPaint, const NativeMsg& nati
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnWindowPosChangedMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnWindowPosChangedMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnWindowPosChangedMsg(nativeMsg, bHandled);
@@ -224,7 +222,8 @@ LRESULT ChildWindowImpl::OnWindowPosChangedMsg(const NativeMsg& nativeMsg, bool&
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnSizeMsg(WindowSizeType sizeType, const UiSize& newWindowSize, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnSizeMsg(
+    WindowSizeType sizeType, const UiSize &newWindowSize, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnSizeMsg(sizeType, newWindowSize, nativeMsg, bHandled);
@@ -232,7 +231,8 @@ LRESULT ChildWindowImpl::OnSizeMsg(WindowSizeType sizeType, const UiSize& newWin
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMoveMsg(const UiPoint& ptTopLeft, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMoveMsg(
+    const UiPoint &ptTopLeft, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMoveMsg(ptTopLeft, nativeMsg, bHandled);
@@ -240,7 +240,8 @@ LRESULT ChildWindowImpl::OnMoveMsg(const UiPoint& ptTopLeft, const NativeMsg& na
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnSetFocusMsg(WindowBase* pLostFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnSetFocusMsg(
+    WindowBase *pLostFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnSetFocusMsg(pLostFocusWindow, nativeMsg, bHandled);
@@ -248,7 +249,8 @@ LRESULT ChildWindowImpl::OnSetFocusMsg(WindowBase* pLostFocusWindow, const Nativ
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnKillFocusMsg(
+    WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnKillFocusMsg(pSetFocusWindow, nativeMsg, bHandled);
@@ -256,31 +258,31 @@ LRESULT ChildWindowImpl::OnKillFocusMsg(WindowBase* pSetFocusWindow, const Nativ
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnImeSetContextMsg(const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnImeSetContextMsg(const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnImeStartCompositionMsg(const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnImeStartCompositionMsg(const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnImeCompositionMsg(const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnImeCompositionMsg(const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnImeEndCompositionMsg(const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnImeEndCompositionMsg(const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnSetCursorMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnSetCursorMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnSetCursorMsg(nativeMsg, bHandled);
@@ -288,13 +290,15 @@ LRESULT ChildWindowImpl::OnSetCursorMsg(const NativeMsg& nativeMsg, bool& bHandl
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnContextMenuMsg(const UiPoint& /*pt*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnContextMenuMsg(
+    const UiPoint & /*pt*/, const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnKeyDownMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnKeyDownMsg(vkCode, modifierKey, nativeMsg, bHandled);
@@ -302,7 +306,8 @@ LRESULT ChildWindowImpl::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKe
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnKeyUpMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnKeyUpMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnKeyUpMsg(vkCode, modifierKey, nativeMsg, bHandled);
@@ -310,27 +315,47 @@ LRESULT ChildWindowImpl::OnKeyUpMsg(VirtualKeyCode vkCode, uint32_t modifierKey,
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnCharMsg(VirtualKeyCode /*vkCode*/, uint32_t /*modifierKey*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnCharMsg(
+    VirtualKeyCode /*vkCode*/,
+    uint32_t /*modifierKey*/,
+    const NativeMsg & /*nativeMsg*/,
+    bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnHotKeyMsg(int32_t /*hotkeyId*/, VirtualKeyCode /*vkCode*/, uint32_t /*modifierKey*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT ChildWindowImpl::OnHotKeyMsg(
+    int32_t /*hotkeyId*/,
+    VirtualKeyCode /*vkCode*/,
+    uint32_t /*modifierKey*/,
+    const NativeMsg & /*nativeMsg*/,
+    bool &bHandled)
 {
     bHandled = false;
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseWheelMsg(int32_t wheelDelta, const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseWheelMsg(
+    int32_t wheelDelta,
+    const UiPoint &pt,
+    uint32_t modifierKey,
+    const NativeMsg &nativeMsg,
+    bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
-        return m_pChildWindowEvents->OnMouseWheelMsg(wheelDelta, pt, modifierKey, nativeMsg, bHandled);
+        return m_pChildWindowEvents
+            ->OnMouseWheelMsg(wheelDelta, pt, modifierKey, nativeMsg, bHandled);
     }
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseMoveMsg(const UiPoint& pt, uint32_t modifierKey, bool /*bFromNC*/, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseMoveMsg(
+    const UiPoint &pt,
+    uint32_t modifierKey,
+    bool /*bFromNC*/,
+    const NativeMsg &nativeMsg,
+    bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseMoveMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -338,7 +363,8 @@ LRESULT ChildWindowImpl::OnMouseMoveMsg(const UiPoint& pt, uint32_t modifierKey,
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseHoverMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseHoverMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseHoverMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -346,7 +372,7 @@ LRESULT ChildWindowImpl::OnMouseHoverMsg(const UiPoint& pt, uint32_t modifierKey
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseLeaveMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseLeaveMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseLeaveMsg(nativeMsg, bHandled);
@@ -354,7 +380,8 @@ LRESULT ChildWindowImpl::OnMouseLeaveMsg(const NativeMsg& nativeMsg, bool& bHand
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseLButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseLButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseLButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -362,7 +389,8 @@ LRESULT ChildWindowImpl::OnMouseLButtonDownMsg(const UiPoint& pt, uint32_t modif
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseLButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseLButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseLButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -370,7 +398,8 @@ LRESULT ChildWindowImpl::OnMouseLButtonUpMsg(const UiPoint& pt, uint32_t modifie
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseLButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseLButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseLButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -378,7 +407,8 @@ LRESULT ChildWindowImpl::OnMouseLButtonDbClickMsg(const UiPoint& pt, uint32_t mo
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseRButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseRButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseRButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -386,7 +416,8 @@ LRESULT ChildWindowImpl::OnMouseRButtonDownMsg(const UiPoint& pt, uint32_t modif
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseRButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseRButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseRButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -394,7 +425,8 @@ LRESULT ChildWindowImpl::OnMouseRButtonUpMsg(const UiPoint& pt, uint32_t modifie
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseRButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseRButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseRButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -402,7 +434,8 @@ LRESULT ChildWindowImpl::OnMouseRButtonDbClickMsg(const UiPoint& pt, uint32_t mo
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseMButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseMButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseMButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -410,7 +443,8 @@ LRESULT ChildWindowImpl::OnMouseMButtonDownMsg(const UiPoint& pt, uint32_t modif
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseMButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseMButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseMButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -418,7 +452,8 @@ LRESULT ChildWindowImpl::OnMouseMButtonUpMsg(const UiPoint& pt, uint32_t modifie
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnMouseMButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnMouseMButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnMouseMButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -426,7 +461,7 @@ LRESULT ChildWindowImpl::OnMouseMButtonDbClickMsg(const UiPoint& pt, uint32_t mo
     return 0;
 }
 
-LRESULT ChildWindowImpl::OnCaptureChangedMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ChildWindowImpl::OnCaptureChangedMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (m_pChildWindowEvents != nullptr) {
         return m_pChildWindowEvents->OnCaptureChangedMsg(nativeMsg, bHandled);
@@ -434,22 +469,23 @@ LRESULT ChildWindowImpl::OnCaptureChangedMsg(const NativeMsg& nativeMsg, bool& b
     return 0;
 }
 
-void ChildWindowImpl::OnWindowPosSnapped(bool /*bLeftSnap*/, bool /*bRightSnap*/, bool /*bTopSnap*/, bool /*bBottomSnap*/)
+void ChildWindowImpl::OnWindowPosSnapped(
+    bool /*bLeftSnap*/, bool /*bRightSnap*/, bool /*bTopSnap*/, bool /*bBottomSnap*/)
 {
     // 空实现
 }
 
-void ChildWindowImpl::OnDropEnterMsg(ControlDropType /*dropType*/, void* /*pDropData*/)
+void ChildWindowImpl::OnDropEnterMsg(ControlDropType /*dropType*/, void * /*pDropData*/)
 {
     // 空实现
 }
 
-void ChildWindowImpl::OnDropOverMsg(ControlDropType /*dropType*/, void* /*pDropData*/)
+void ChildWindowImpl::OnDropOverMsg(ControlDropType /*dropType*/, void * /*pDropData*/)
 {
     // 空实现
 }
 
-void ChildWindowImpl::OnDropMsg(ControlDropType /*dropType*/, void* /*pDropData*/)
+void ChildWindowImpl::OnDropMsg(ControlDropType /*dropType*/, void * /*pDropData*/)
 {
     // 空实现
 }
@@ -459,7 +495,8 @@ void ChildWindowImpl::OnDropLeaveMsg()
     // 空实现
 }
 
-void ChildWindowImpl::OnDisplayResolutionChangedMsg(int32_t /*nColorDepth*/, int32_t /*nScreenWidth*/, int32_t /*nScreenHeight*/)
+void ChildWindowImpl::OnDisplayResolutionChangedMsg(
+    int32_t /*nColorDepth*/, int32_t /*nScreenWidth*/, int32_t /*nScreenHeight*/)
 {
     // 空实现
 }
@@ -474,4 +511,4 @@ void ChildWindowImpl::OnDwmCompositionChangedMsg(bool /*bDwmCompositionEnabled*/
     // 空实现
 }
 
-}//namespace ui
+} //namespace ui

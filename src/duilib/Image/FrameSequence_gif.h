@@ -20,63 +20,55 @@
 #include "third_party/giflib/gif_lib.h"
 #include <cstdint>
 
-namespace ui
-{
+namespace ui {
 
 typedef uint32_t Color8888;
 
-class FrameSequence_gif{
+class FrameSequence_gif
+{
 public:
     FrameSequence_gif();
     ~FrameSequence_gif();
 
-    bool Init(GifFileType* gif);
+    bool Init(GifFileType *gif);
 
     void Clear();
 
-    int GetWidth() const {
-        return mGif ? mGif->SWidth : 0;
-    }
+    int GetWidth() const { return mGif ? mGif->SWidth : 0; }
 
-    int GetHeight() const {
-        return mGif ? mGif->SHeight : 0;
-    }
+    int GetHeight() const { return mGif ? mGif->SHeight : 0; }
 
     bool IsOpaque() const;
 
-    int GetFrameCount() const {
-        return mGif ? mGif->ImageCount : 0;
-    }
+    int GetFrameCount() const { return mGif ? mGif->ImageCount : 0; }
 
-    int GetDefaultLoopCount() const {
-        return mLoopCount;
-    }
+    int GetDefaultLoopCount() const { return mLoopCount; }
 
-    bool DrawFrame(int frameNr, Color8888* outputPtr, int outputPixelStride, int previousFrameNr);
+    bool DrawFrame(int frameNr, Color8888 *outputPtr, int outputPixelStride, int previousFrameNr);
 
 private:
-    GifFileType* getGif() const { return mGif; }
+    GifFileType *getGif() const { return mGif; }
     Color8888 getBackgroundColor() const { return mBgColor; }
     bool getPreservedFrame(int frameIndex) const { return mPreservedFrames[frameIndex]; }
     int getRestoringFrame(int frameIndex) const { return mRestoringFrames[frameIndex]; }
 
 private:
-    void savePreserveBuffer(Color8888* outputPtr, int outputPixelStride, int frameNr);
-    void restorePreserveBuffer(Color8888* outputPtr, int outputPixelStride);
+    void savePreserveBuffer(Color8888 *outputPtr, int outputPixelStride, int frameNr);
+    void restorePreserveBuffer(Color8888 *outputPtr, int outputPixelStride);
 
 private:
-    GifFileType* mGif;
+    GifFileType *mGif;
     int mLoopCount;
     Color8888 mBgColor;
 
     // array of bool per frame - if true, frame data is used by a later DISPOSE_PREVIOUS frame
-    bool* mPreservedFrames;
+    bool *mPreservedFrames;
 
     // array of ints per frame - if >= 0, points to the index of the preserve that frame needs
-    int* mRestoringFrames;
+    int *mRestoringFrames;
 
 private:
-    Color8888* mPreserveBuffer;
+    Color8888 *mPreserveBuffer;
     int mPreserveBufferFrame;
 };
 

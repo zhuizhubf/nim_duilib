@@ -3,19 +3,18 @@
 
 #include "duilib/Box/ListBox.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 用在菜单中的ListBox控件
 */
 class DUILIB_API MenuListBox : public VListBox
 {
     typedef VListBox BaseClass;
+
 public:
-    explicit MenuListBox(Window* pWindow) :
-        VListBox(pWindow)
-    {
-    }
+    explicit MenuListBox(Window *pWindow)
+        : VListBox(pWindow)
+    {}
 
     virtual DString GetType() const override { return DUI_CTR_MENU_LISTBOX; }
 
@@ -25,7 +24,8 @@ public:
     * @param [out] nRows 返回行数
     * @return 返回可视区域显示的记录数
     */
-    virtual size_t GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t& nRows) const override
+    virtual size_t GetDisplayItemCount(
+        bool bIsHorizontal, size_t &nColumns, size_t &nRows) const override
     {
         size_t nCount = 0;
         nRows = 0;
@@ -34,11 +34,10 @@ public:
             //目前没有这种情况: 已经固定纵向布局
             nCount = BaseClass::GetDisplayItemCount(bIsHorizontal, nColumns, nRows);
             ASSERT(0);
-        }
-        else {
+        } else {
             const size_t nItemCount = GetItemCount();
             for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-                Control* pControl = GetItemAt(nItemIndex);
+                Control *pControl = GetItemAt(nItemIndex);
                 if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
                     continue;
                 }
@@ -52,11 +51,12 @@ public:
     /** 响应KeyDown消息
     * @return 返回true表示成功处理，返回false表示未处理此消息
     */
-    virtual bool OnListBoxKeyDown(const EventArgs& msg) override
+    virtual bool OnListBoxKeyDown(const EventArgs &msg) override
     {
         ASSERT(msg.eventType == kEventKeyDown);
         bool bHandled = false;
-        bool bArrowKeyDown = (msg.eventType == kEventKeyDown) && ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN));
+        bool bArrowKeyDown = (msg.eventType == kEventKeyDown)
+                             && ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN));
         if (!bArrowKeyDown || (GetItemCount() == 0) || IsMultiSelect() || IsHorizontalScrollBar()) {
             return BaseClass::OnListBoxKeyDown(msg);
         }
@@ -73,12 +73,12 @@ public:
                 if (nCurSel >= GetItemCount()) {
                     //无选中时，选中最后一条
                     SelectItem(GetItemCount() - 1);
-                }
-                else if (nCurSel == 0) {
+                } else if (nCurSel == 0) {
                     //选中第一条时，选中最后一条，循环选择
                     SelectItem(GetItemCount() - 1);
-                }
-                else if ((nCurSel < GetItemCount()) && IsSelectableItem(nCurSel) && (GetItemCountBefore(nCurSel) >= nColumns)) {
+                } else if (
+                    (nCurSel < GetItemCount()) && IsSelectableItem(nCurSel)
+                    && (GetItemCountBefore(nCurSel) >= nColumns)) {
                     //可以向上滚动1行
                     SelectItemCountN(true, true, false, nColumns);
                 }
@@ -94,12 +94,12 @@ public:
                 if (nCurSel >= GetItemCount()) {
                     //无选中时，选中第一条
                     SelectItem(0);
-                }
-                else if (nCurSel == (GetItemCount() - 1)) {
+                } else if (nCurSel == (GetItemCount() - 1)) {
                     //选中最后一条时，选中第一条，循环选择
                     SelectItem(0);
-                }
-                else if ((nCurSel < GetItemCount()) && IsSelectableItem(nCurSel) && (GetItemCountAfter(nCurSel) >= nColumns)) {
+                } else if (
+                    (nCurSel < GetItemCount()) && IsSelectableItem(nCurSel)
+                    && (GetItemCountAfter(nCurSel) >= nColumns)) {
                     SelectItemCountN(true, true, true, nColumns);
                 }
             }
@@ -111,5 +111,5 @@ public:
     }
 };
 
-}
+} // namespace ui
 #endif // UI_BOX_MENU_LIST_BOX_H_

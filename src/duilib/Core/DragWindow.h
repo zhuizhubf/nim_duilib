@@ -1,13 +1,12 @@
 #ifndef UI_CORE_DRAG_WINDOW_H_
 #define UI_CORE_DRAG_WINDOW_H_
 
-#include "duilib/Core/Control.h"
 #include "duilib/Core/Box.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Utils/WinImplBase.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 /** 拖动过程中显示的窗口
 */
 class DUILIB_API DragWindow : public WindowImplBase
@@ -41,7 +40,7 @@ public:
     /** 设置显示的图片
     * @param [in] pBitmap 图片资源的接口
     */
-    virtual void SetDragImage(const std::shared_ptr<IBitmap>& pBitmap);
+    virtual void SetDragImage(const std::shared_ptr<IBitmap> &pBitmap);
 
     /** 调整窗口位置，跟随鼠标
     */
@@ -61,6 +60,6 @@ private:
     */
     int32_t m_nRefCount;
 };
-}
+} // namespace ui
 
 #endif // UI_CORE_DRAG_WINDOW_H_

@@ -4,8 +4,7 @@
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Utils/FilePath.h"
 
-namespace ui 
-{
+namespace ui {
 class DUILIB_API ImageDecoderUtil
 {
 public:
@@ -17,21 +16,19 @@ public:
     * @param [in] data 数据的起始地址
     * @param [in] dataLen 数据的长度
     */
-    static bool CanDecode(const uint8_t* data, size_t dataLen);
+    static bool CanDecode(const uint8_t *data, size_t dataLen);
 
     /** 加载图片(通用，支持多种文件格式, 但不支持加载多帧)
     * @param [in] filePath 文件路径
     * @param [out] imageData 返回加载的位图数据
     */
-    static bool LoadImageFromFile(const FilePath& filePath,
-                                  UiImageData& imageData);
+    static bool LoadImageFromFile(const FilePath &filePath, UiImageData &imageData);
 
     /** 加载图片(通用，支持多种文件格式, 但不支持加载多帧)
     * @param [in] fileData 文件数据
     * @param [out] imageData 返回加载的位图数据
     */
-    static bool LoadImageFromMemory(const std::vector<uint8_t>& fileData,
-                                    UiImageData& imageData);
+    static bool LoadImageFromMemory(const std::vector<uint8_t> &fileData, UiImageData &imageData);
 
 public:
     /** 加载ICO图片（该函数只支持ICO格式）
@@ -41,10 +38,11 @@ public:
     *                      因ICO文件中包含了各种大小的图标，加载的时候，只加载其中一个图标
     * @param [out] imageData 返回加载的位图数据
     */
-    static bool LoadIcoFromFile(const FilePath& filePath,
-                                bool bLoadAllFrames,
-                                uint32_t iconSize /*仅当bLoadAllFrames为false时有效*/,
-                                std::vector<UiImageData>& imageData);
+    static bool LoadIcoFromFile(
+        const FilePath &filePath,
+        bool bLoadAllFrames,
+        uint32_t iconSize /*仅当bLoadAllFrames为false时有效*/,
+        std::vector<UiImageData> &imageData);
 
     /** 加载ICO图片（该函数只支持ICO格式）
     * @param [in] fileData ICO文件数据
@@ -53,10 +51,11 @@ public:
     *                      因ICO文件中包含了各种大小的图标，加载的时候，只加载其中一个图标
     * @param [out] imageData 返回加载的位图数据
     */
-    static bool LoadIcoFromMemory(const std::vector<uint8_t>& fileData,
-                                  bool bLoadAllFrames,
-                                  uint32_t iconSize /*仅当bLoadAllFrames为false时有效*/,
-                                  std::vector<UiImageData>& imageData);
+    static bool LoadIcoFromMemory(
+        const std::vector<uint8_t> &fileData,
+        bool bLoadAllFrames,
+        uint32_t iconSize /*仅当bLoadAllFrames为false时有效*/,
+        std::vector<UiImageData> &imageData);
 };
 
 } // namespace ui

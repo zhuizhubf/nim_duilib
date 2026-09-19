@@ -6,16 +6,16 @@
 
 #include <cmath>
 
-namespace ui
-{
+namespace ui {
 
-bool WindowRgn::SetWindowRoundRectRgn(HWND hWnd, const UiRect& rcWnd, float rx, float ry, bool bRedraw)
+bool WindowRgn::SetWindowRoundRectRgn(
+    HWND hWnd, const UiRect &rcWnd, float rx, float ry, bool bRedraw)
 {
     if (!::IsWindow(hWnd)) {
         return false;
     }
-    const int nRx = (int)std::max(1.0f, std::round(rx * 2.0f));
-    const int nRy = (int)std::max(1.0f, std::round(ry * 2.0f));
+    const int nRx = (int) std::max(1.0f, std::round(rx * 2.0f));
+    const int nRy = (int) std::max(1.0f, std::round(ry * 2.0f));
     HRGN hRgn = ::CreateRoundRectRgn(rcWnd.left, rcWnd.top, rcWnd.right, rcWnd.bottom, nRx, nRy);
     if (hRgn == nullptr) {
         return false;
@@ -23,7 +23,7 @@ bool WindowRgn::SetWindowRoundRectRgn(HWND hWnd, const UiRect& rcWnd, float rx, 
     return ::SetWindowRgn(hWnd, hRgn, bRedraw ? TRUE : FALSE) != FALSE;
 }
 
-bool WindowRgn::SetWindowRectRgn(HWND hWnd, const UiRect& rcWnd, bool bRedraw)
+bool WindowRgn::SetWindowRectRgn(HWND hWnd, const UiRect &rcWnd, bool bRedraw)
 {
     if (!::IsWindow(hWnd)) {
         return false;

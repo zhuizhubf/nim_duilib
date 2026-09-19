@@ -1,28 +1,25 @@
 #include "MainForm.h"
-#include "MainThread.h"
 #include "ComputerView.h"
-#include "SimpleFileView.h"
 #include "ExplorerView.h"
+#include "MainThread.h"
+#include "SimpleFileView.h"
 
-MainForm::MainForm():
-    m_pTree(nullptr),
-    m_pAddressBar(nullptr),
-    m_pBtnUp(nullptr),
-    m_pBtnForward(nullptr),
-    m_pBtnBack(nullptr),
-    m_bCanAddBackForward(true),
-    m_pTreeNode(nullptr),
-    m_pTabBox(nullptr),
-    m_pBtnViewListType(nullptr),
-    m_pBtnViewSort(nullptr),
-    m_dataViewType(DataViewType::kReprortView),
-    m_tabBoxViewType(TabBoxViewType::kComputerView)
-{
-}
+MainForm::MainForm()
+    : m_pTree(nullptr)
+    , m_pAddressBar(nullptr)
+    , m_pBtnUp(nullptr)
+    , m_pBtnForward(nullptr)
+    , m_pBtnBack(nullptr)
+    , m_bCanAddBackForward(true)
+    , m_pTreeNode(nullptr)
+    , m_pTabBox(nullptr)
+    , m_pBtnViewListType(nullptr)
+    , m_pBtnViewSort(nullptr)
+    , m_dataViewType(DataViewType::kReprortView)
+    , m_tabBoxViewType(TabBoxViewType::kComputerView)
+{}
 
-MainForm::~MainForm()
-{
-}
+MainForm::~MainForm() {}
 
 DString MainForm::GetSkinFolder()
 {
@@ -36,64 +33,67 @@ DString MainForm::GetSkinFile()
 
 void MainForm::OnInitWindow()
 {
-    m_pTree = dynamic_cast<ui::DirectoryTree*>(FindControl(_T("tree")));
+    m_pTree = dynamic_cast<ui::DirectoryTree *>(FindControl(_T("tree")));
     ASSERT(m_pTree != nullptr);
     if (m_pTree == nullptr) {
         return;
     }
-    m_pAddressBar = dynamic_cast<ui::AddressBar*>(FindControl(_T("file_path")));
+    m_pAddressBar = dynamic_cast<ui::AddressBar *>(FindControl(_T("file_path")));
     if (m_pAddressBar != nullptr) {
-        m_pAddressBar->AttachPathChanged(UiBind(&MainForm::OnAddressBarPathChanged, this, std::placeholders::_1));
-        m_pAddressBar->AttachPathClick(UiBind(&MainForm::OnAddressBarPathClick, this, std::placeholders::_1));
+        m_pAddressBar->AttachPathChanged(
+            UiBind(&MainForm::OnAddressBarPathChanged, this, std::placeholders::_1));
+        m_pAddressBar->AttachPathClick(
+            UiBind(&MainForm::OnAddressBarPathClick, this, std::placeholders::_1));
     }
-    m_pTabBox = dynamic_cast<ui::TabBox*>(FindControl(_T("main_view_tab_box")));
-    ui::ListCtrl* pComputerListCtrl = dynamic_cast<ui::ListCtrl*>(FindControl(_T("computer_view")));
+    m_pTabBox = dynamic_cast<ui::TabBox *>(FindControl(_T("main_view_tab_box")));
+    ui::ListCtrl *pComputerListCtrl = dynamic_cast<ui::ListCtrl *>(FindControl(_T("computer_view")));
     m_pComputerView = std::make_unique<ComputerView>(this, pComputerListCtrl);
-    ui::VirtualListBox* pListBox = dynamic_cast<ui::VirtualListBox*>(FindControl(_T("simple_file_view")));
+    ui::VirtualListBox *pListBox = dynamic_cast<ui::VirtualListBox *>(
+        FindControl(_T("simple_file_view")));
     m_pSimpleFileView = std::make_unique<SimpleFileView>(this, pListBox);
-    ui::ListCtrl* pExplorerListCtrl = dynamic_cast<ui::ListCtrl*>(FindControl(_T("explorer_view")));
+    ui::ListCtrl *pExplorerListCtrl = dynamic_cast<ui::ListCtrl *>(FindControl(_T("explorer_view")));
     m_pExplorerView = std::make_unique<ExplorerView>(this, pExplorerListCtrl);
 
     //刷新按钮
-    ui::Button* pRefreshBtn = dynamic_cast<ui::Button*>(FindControl(_T("btn_view_refresh")));
+    ui::Button *pRefreshBtn = dynamic_cast<ui::Button *>(FindControl(_T("btn_view_refresh")));
     if (pRefreshBtn != nullptr) {
-        pRefreshBtn->AttachClick([this](const ui::EventArgs&) {
+        pRefreshBtn->AttachClick([this](const ui::EventArgs &) {
             Refresh();
             return true;
-            });
+        });
     }
 
     //向上按钮
-    m_pBtnUp = dynamic_cast<ui::Button*>(FindControl(_T("btn_view_up")));
+    m_pBtnUp = dynamic_cast<ui::Button *>(FindControl(_T("btn_view_up")));
     if (m_pBtnUp != nullptr) {
-        m_pBtnUp->AttachClick([this](const ui::EventArgs&) {
+        m_pBtnUp->AttachClick([this](const ui::EventArgs &) {
             ShowUp();
             return true;
-            });
+        });
     }
 
     //后退按钮
-    m_pBtnBack = dynamic_cast<ui::Button*>(FindControl(_T("btn_view_left")));
+    m_pBtnBack = dynamic_cast<ui::Button *>(FindControl(_T("btn_view_left")));
     if (m_pBtnBack != nullptr) {
-        m_pBtnBack->AttachClick([this](const ui::EventArgs&) {
+        m_pBtnBack->AttachClick([this](const ui::EventArgs &) {
             ShowBack();
             return true;
-            });
+        });
     }
 
     //前进按钮
-    m_pBtnForward = dynamic_cast<ui::Button*>(FindControl(_T("btn_view_right")));
+    m_pBtnForward = dynamic_cast<ui::Button *>(FindControl(_T("btn_view_right")));
     if (m_pBtnForward != nullptr) {
-        m_pBtnForward->AttachClick([this](const ui::EventArgs&) {
+        m_pBtnForward->AttachClick([this](const ui::EventArgs &) {
             ShowForward();
             return true;
-            });
+        });
     }
 
     //切换视图模式
-    m_pBtnViewListType = dynamic_cast<ui::ButtonHBox*>(FindControl(_T("btn_view_list_type")));
+    m_pBtnViewListType = dynamic_cast<ui::ButtonHBox *>(FindControl(_T("btn_view_list_type")));
     if (m_pBtnViewListType != nullptr) {
-        m_pBtnViewListType->AttachClick([this](const ui::EventArgs& args) {
+        m_pBtnViewListType->AttachClick([this](const ui::EventArgs &args) {
             ui::UiRect rect = args.GetSender()->GetPos();
             ui::UiPoint point;
             point.x = rect.left;
@@ -102,13 +102,13 @@ void MainForm::OnInitWindow()
             point.y += Dpi().GetScaleInt(4);
             SwithListType(point, m_pBtnViewListType);
             return true;
-            });
+        });
     }
 
     //切换排序模式
-    m_pBtnViewSort = dynamic_cast<ui::ButtonHBox*>(FindControl(_T("btn_view_sort")));
+    m_pBtnViewSort = dynamic_cast<ui::ButtonHBox *>(FindControl(_T("btn_view_sort")));
     if (m_pBtnViewSort != nullptr) {
-        m_pBtnViewSort->AttachClick([this](const ui::EventArgs& args) {
+        m_pBtnViewSort->AttachClick([this](const ui::EventArgs &args) {
             ui::UiRect rect = args.GetSender()->GetPos();
             ui::UiPoint point;
             point.x = rect.left;
@@ -117,30 +117,45 @@ void MainForm::OnInitWindow()
             point.y += Dpi().GetScaleInt(4);
             SwithSortMode(point, m_pBtnViewSort);
             return true;
-            });
+        });
     }
 
     UpdateCommandUI();
 
     //挂载事件
-    m_pTree->AttachShowMyComputerContents(ui::UiBind(&MainForm::OnShowMyComputerContents, this, std::placeholders::_1, std::placeholders::_2));
-    m_pTree->AttachShowFolderContents(ui::UiBind(&MainForm::OnShowFolderContents, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-    ui::StdClosure finishCallback = ToWeakCallback([this]() {
-        OnRefresh();
-        });
+    m_pTree->AttachShowMyComputerContents(
+        ui::UiBind(
+            &MainForm::OnShowMyComputerContents, this, std::placeholders::_1, std::placeholders::_2));
+    m_pTree->AttachShowFolderContents(
+        ui::UiBind(
+            &MainForm::OnShowFolderContents,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            std::placeholders::_3,
+            std::placeholders::_4));
+    ui::StdClosure finishCallback = ToWeakCallback([this]() { OnRefresh(); });
     m_pTree->SetRefreshFinishCallback(finishCallback);
 
     //显示虚拟路径
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kUserHome, _T("STRID_TREEVIEW_NODE_USER_HOME"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDesktop, _T("STRID_TREEVIEW_NODE_DESKTOP"), true);
-    ui::TreeNode* pDocumentsNode = m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDocuments, _T("STRID_TREEVIEW_NODE_DOCUMENTS"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kPictures, _T("STRID_TREEVIEW_NODE_PICTURES"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kMusic, _T("STRID_TREEVIEW_NODE_MUSIC"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kVideos, _T("STRID_TREEVIEW_NODE_VIDEOS"), true);
-    m_pTree->ShowVirtualDirectoryNode(ui::VirtualDirectoryType::kDownloads, _T("STRID_TREEVIEW_NODE_DOWNLOADS"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kUserHome, _T("STRID_TREEVIEW_NODE_USER_HOME"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kDesktop, _T("STRID_TREEVIEW_NODE_DESKTOP"), true);
+    ui::TreeNode *pDocumentsNode = m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kDocuments, _T("STRID_TREEVIEW_NODE_DOCUMENTS"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kPictures, _T("STRID_TREEVIEW_NODE_PICTURES"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kMusic, _T("STRID_TREEVIEW_NODE_MUSIC"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kVideos, _T("STRID_TREEVIEW_NODE_VIDEOS"), true);
+    m_pTree->ShowVirtualDirectoryNode(
+        ui::VirtualDirectoryType::kDownloads, _T("STRID_TREEVIEW_NODE_DOWNLOADS"), true);
 
     //显示磁盘
-    ui::TreeNode* pComputerNode = m_pTree->ShowAllDiskNodes(_T("STRID_TREEVIEW_NODE_MYCOMPUTER"), _T("STRID_TREEVIEW_NODE_FILESYSTEM"), true);
+    ui::TreeNode *pComputerNode = m_pTree->ShowAllDiskNodes(
+        _T("STRID_TREEVIEW_NODE_MYCOMPUTER"), _T("STRID_TREEVIEW_NODE_FILESYSTEM"), true);
     if (pComputerNode != nullptr) {
         //在磁盘前面，放一个横线分隔符
         m_pTree->InsertLineBeforeNode(pComputerNode);
@@ -157,25 +172,23 @@ void MainForm::Refresh()
     if (m_pTree == nullptr) {
         return;
     }
-    ui::StdClosure finishCallback = ToWeakCallback([this]() {
-            OnRefresh();
-        });
+    ui::StdClosure finishCallback = ToWeakCallback([this]() { OnRefresh(); });
     m_pTree->RefreshTree(finishCallback);
 }
 
-void MainForm::SetShowTreeNode(ui::TreeNode* pTreeNode)
+void MainForm::SetShowTreeNode(ui::TreeNode *pTreeNode)
 {
     if (!m_pTree->IsValidTreeNode(pTreeNode)) {
         return;
     }
     if (m_bCanAddBackForward && m_pTree->IsValidTreeNode(m_pTreeNode)) {
         m_backStack.push(m_pTreeNode);
-        m_forwardStack = std::stack<ui::TreeNode*>();
+        m_forwardStack = std::stack<ui::TreeNode *>();
     }
     m_pTreeNode = pTreeNode;
     m_parentTreeNodes.clear();
     if (pTreeNode != nullptr) {
-        ui::TreeNode* p = pTreeNode->GetParentNode();
+        ui::TreeNode *p = pTreeNode->GetParentNode();
         while (p != nullptr) {
             m_parentTreeNodes.push_back(p);
             p = p->GetParentNode();
@@ -186,13 +199,15 @@ void MainForm::SetShowTreeNode(ui::TreeNode* pTreeNode)
     }
     if (!m_parentTreeNodes.empty()) {
         std::reverse(m_parentTreeNodes.begin(), m_parentTreeNodes.end());
-    }    
+    }
     m_bCanAddBackForward = true;
 }
 
-void MainForm::OnShowFolderContents(ui::TreeNode* pTreeNode, const ui::FilePath& currentPath,
-                                    const std::shared_ptr<std::vector<ui::DirectoryTree::PathInfo>>& folderList,
-                                    const std::shared_ptr<std::vector<ui::DirectoryTree::PathInfo>>& fileList)
+void MainForm::OnShowFolderContents(
+    ui::TreeNode *pTreeNode,
+    const ui::FilePath &currentPath,
+    const std::shared_ptr<std::vector<ui::DirectoryTree::PathInfo>> &folderList,
+    const std::shared_ptr<std::vector<ui::DirectoryTree::PathInfo>> &fileList)
 {
     ui::GlobalManager::Instance().AssertUIThread();
     if ((pTreeNode == nullptr) || (m_pTree == nullptr) || !m_pTree->IsValidTreeNode(pTreeNode)) {
@@ -219,8 +234,7 @@ void MainForm::OnShowFolderContents(ui::TreeNode* pTreeNode, const ui::FilePath&
         if (pTreeNode->IsSelected()) {
             SetShowTreeNode(pTreeNode);
         }
-    }
-    else {
+    } else {
         //多选，不校验
         SetShowTreeNode(pTreeNode);
     }
@@ -242,8 +256,7 @@ void MainForm::OnShowFolderContents(ui::TreeNode* pTreeNode, const ui::FilePath&
             }
             m_pSimpleFileView->SetFileList(currentPath, pathList, selectedPath);
         }
-    }
-    else {
+    } else {
         SwitchToTabBoxViewType(TabBoxViewType::kExplorerView);
         if (m_pExplorerView != nullptr) {
             //保持当前视图的路径和所选择的路径
@@ -265,8 +278,8 @@ void MainForm::OnShowFolderContents(ui::TreeNode* pTreeNode, const ui::FilePath&
     UpdateCommandUI();
 }
 
-void MainForm::OnShowMyComputerContents(ui::TreeNode* pTreeNode,
-                                        const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList)
+void MainForm::OnShowMyComputerContents(
+    ui::TreeNode *pTreeNode, const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList)
 {
     ui::GlobalManager::Instance().AssertUIThread();
     if ((pTreeNode == nullptr) || (m_pTree == nullptr) || !m_pTree->IsValidTreeNode(pTreeNode)) {
@@ -282,16 +295,16 @@ void MainForm::OnShowMyComputerContents(ui::TreeNode* pTreeNode,
     //显示计算机视图的内容
     if (m_pComputerView != nullptr) {
         m_pComputerView->ShowMyComputerContents(diskInfoList);
-    }   
+    }
 
     //保存显示的树节点
-    SetShowTreeNode(pTreeNode);   
+    SetShowTreeNode(pTreeNode);
 
     //更新界面状态
     UpdateCommandUI();
 }
 
-void MainForm::SelectSubPath(const ui::FilePath& filePath)
+void MainForm::SelectSubPath(const ui::FilePath &filePath)
 {
     if (!filePath.IsExistsDirectory()) {
         //如果文件夹不存在，报错
@@ -306,7 +319,7 @@ void MainForm::SelectSubPath(const ui::FilePath& filePath)
     }
 }
 
-bool MainForm::OnAddressBarPathChanged(const ui::EventArgs& msg)
+bool MainForm::OnAddressBarPathChanged(const ui::EventArgs &msg)
 {
     if (m_pAddressBar != nullptr) {
         DString text = m_pAddressBar->GetAddressPath();
@@ -317,7 +330,7 @@ bool MainForm::OnAddressBarPathChanged(const ui::EventArgs& msg)
     return true;
 }
 
-bool MainForm::OnAddressBarPathClick(const ui::EventArgs& msg)
+bool MainForm::OnAddressBarPathClick(const ui::EventArgs &msg)
 {
     if (m_pAddressBar != nullptr) {
         DString text = m_pAddressBar->GetClickedAddressPath();
@@ -326,28 +339,27 @@ bool MainForm::OnAddressBarPathClick(const ui::EventArgs& msg)
     return true;
 }
 
-bool MainForm::OnShowAddressPath(const DString& newFilePath)
+bool MainForm::OnShowAddressPath(const DString &newFilePath)
 {
     DString text = newFilePath;
     ui::StringUtil::Trim(text);
     if (text.empty()) {
         return false;
     }
-    ui::FilePath curFilePath;//当前树节点对应的目录
-    ui::TreeNode* pTreeNode = m_pTreeNode;
+    ui::FilePath curFilePath; //当前树节点对应的目录
+    ui::TreeNode *pTreeNode = m_pTreeNode;
     if (pTreeNode != nullptr) {
         curFilePath = m_pTree->FindTreeNodePath(pTreeNode);
     }
     ui::FilePath inputFilePath(text); //当前输入的目录
-    ui::TreeNode* pParentTreeNode = nullptr;
+    ui::TreeNode *pParentTreeNode = nullptr;
     if (!inputFilePath.IsAbsolutePath()) {
         //如果是相对路径，与当前树节点的路径拼接
         if (!curFilePath.IsEmpty()) {
             inputFilePath = curFilePath.JoinFilePath(inputFilePath);
             pParentTreeNode = m_pTreeNode;
         }
-    }
-    else if(!curFilePath.IsEmpty() && inputFilePath.IsSubDirectory(curFilePath)) {
+    } else if (!curFilePath.IsEmpty() && inputFilePath.IsSubDirectory(curFilePath)) {
         //新输入的目录，在当前树节点目录下
         pParentTreeNode = m_pTreeNode;
     }
@@ -356,14 +368,12 @@ bool MainForm::OnShowAddressPath(const DString& newFilePath)
         if (m_pTree != nullptr) {
             if (pParentTreeNode != nullptr) {
                 m_pTree->SelectSubPath(pParentTreeNode, inputFilePath, nullptr);
-            }
-            else {
+            } else {
                 m_pTree->SelectPath(inputFilePath, nullptr);
             }
         }
         return true;
-    }
-    else {
+    } else {
         //如果文件夹不存在，报错
         DString errMsg = _T("Path not exists:");
         errMsg += text;
@@ -377,22 +387,21 @@ void MainForm::OnRefresh()
     if (m_pTree == nullptr) {
         return;
     }
-    ui::TreeNode* pTreeNode = m_pTreeNode;
+    ui::TreeNode *pTreeNode = m_pTreeNode;
     if (!m_pTree->IsValidTreeNode(pTreeNode)) {
         //树节点已经被删除
         pTreeNode = nullptr;
     }
     if (pTreeNode == nullptr) {
         //如果当前显示的节点被删除，那么查找父节点
-        int32_t nCount = (int32_t)m_parentTreeNodes.size();
+        int32_t nCount = (int32_t) m_parentTreeNodes.size();
         for (int32_t nIndex = nCount - 1; nIndex >= 0; --nIndex) {
-            ui::TreeNode* pParentTreeNode = m_parentTreeNodes[nIndex];
+            ui::TreeNode *pParentTreeNode = m_parentTreeNodes[nIndex];
             if (m_pTree->IsValidTreeNode(pParentTreeNode)) {
                 if (m_pTree->IsMyComputerNode(pParentTreeNode)) {
                     pTreeNode = pParentTreeNode;
                     break;
-                }
-                else {
+                } else {
                     ui::FilePath filePath = m_pTree->FindTreeNodePath(pParentTreeNode);
                     if (filePath.IsExistsDirectory()) {
                         pTreeNode = pParentTreeNode;
@@ -412,7 +421,7 @@ void MainForm::OnRefresh()
 void MainForm::ShowUp()
 {
     if (m_pTreeNode != nullptr) {
-        ui::TreeNode* pTreeNode = m_pTreeNode->GetParentNode();
+        ui::TreeNode *pTreeNode = m_pTreeNode->GetParentNode();
         if ((m_pTree != nullptr) && (pTreeNode != nullptr)) {
             m_bCanAddBackForward = true;
             m_pTree->SelectTreeNode(pTreeNode);
@@ -431,7 +440,7 @@ void MainForm::ShowBack()
     }
 
     while (!m_backStack.empty()) {
-        ui::TreeNode* pTreeNode = m_backStack.top();
+        ui::TreeNode *pTreeNode = m_backStack.top();
         m_backStack.pop();
         if (m_pTree->IsValidTreeNode(pTreeNode)) {
             m_bCanAddBackForward = false;
@@ -451,7 +460,7 @@ void MainForm::ShowForward()
     }
 
     while (!m_forwardStack.empty()) {
-        ui::TreeNode* pTreeNode = m_forwardStack.top();
+        ui::TreeNode *pTreeNode = m_forwardStack.top();
         m_forwardStack.pop();
         if (m_pTree->IsValidTreeNode(pTreeNode)) {
             m_bCanAddBackForward = false;
@@ -461,9 +470,10 @@ void MainForm::ShowForward()
     }
 }
 
-void MainForm::SwithListType(const ui::UiPoint& point, ui::Control* pRelatedControl)
+void MainForm::SwithListType(const ui::UiPoint &point, ui::Control *pRelatedControl)
 {
-    ui::Menu* menu = new ui::Menu(this, pRelatedControl);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    ui::Menu *menu = new ui::Menu(
+        this, pRelatedControl); //需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
     menu->SetSkinFolder(GetResourcePath().ToString());
     DString xml(_T("menu/list_type_menu.xml"));
     menu->ShowMenu(xml, point);
@@ -479,40 +489,44 @@ void MainForm::SwithListType(const ui::UiPoint& point, ui::Control* pRelatedCont
     btnNameMap[DataViewType::kPictureView] = _T("btn_menu_item_picture");
 
     DString selectBtnName = btnNameMap[GetDataViewType()];
-    ui::Button* pSelectBtn = dynamic_cast<ui::Button*>(menu->FindControl(selectBtnName));
+    ui::Button *pSelectBtn = dynamic_cast<ui::Button *>(menu->FindControl(selectBtnName));
     if (pSelectBtn != nullptr) {
         pSelectBtn->SetBkImage(_T("ui-item-symbolic.svg"));
     }
 
     //挂载选择菜单项事件
-    menu->AttachMenuItemActivated([this](const DString& /*menuName*/, int32_t /*nMenuLevel*/,
-                                         const DString& itemName, size_t /*nItemIndex*/) {
-            //与XML中的菜单项名字匹配
-            std::map<DataViewType, DString> itemNameMap;
-            itemNameMap[DataViewType::kIconViewBig] = _T("menu_item_icon_big");
-            itemNameMap[DataViewType::kIconViewMedium] = _T("menu_item_icon_medium");
-            itemNameMap[DataViewType::kIconViewSmall] = _T("menu_item_icon_small");
-            itemNameMap[DataViewType::kListViewBig] = _T("menu_item_list_big");
-            itemNameMap[DataViewType::kListViewMedium] = _T("menu_item_list_medium");
-            itemNameMap[DataViewType::kListViewSmall] = _T("menu_item_list_small");
-            itemNameMap[DataViewType::kReprortView] = _T("menu_item_report");
-            itemNameMap[DataViewType::kPictureView] = _T("menu_item_picture");
-            for (auto iter : itemNameMap) {
-                if (iter.second == itemName) {
-                    DataViewType dataViewType = iter.first;
-                    SwitchToDataViewType(dataViewType);
-                    break;
-                }
+    menu->AttachMenuItemActivated([this](
+                                      const DString & /*menuName*/,
+                                      int32_t /*nMenuLevel*/,
+                                      const DString &itemName,
+                                      size_t /*nItemIndex*/) {
+        //与XML中的菜单项名字匹配
+        std::map<DataViewType, DString> itemNameMap;
+        itemNameMap[DataViewType::kIconViewBig] = _T("menu_item_icon_big");
+        itemNameMap[DataViewType::kIconViewMedium] = _T("menu_item_icon_medium");
+        itemNameMap[DataViewType::kIconViewSmall] = _T("menu_item_icon_small");
+        itemNameMap[DataViewType::kListViewBig] = _T("menu_item_list_big");
+        itemNameMap[DataViewType::kListViewMedium] = _T("menu_item_list_medium");
+        itemNameMap[DataViewType::kListViewSmall] = _T("menu_item_list_small");
+        itemNameMap[DataViewType::kReprortView] = _T("menu_item_report");
+        itemNameMap[DataViewType::kPictureView] = _T("menu_item_picture");
+        for (auto iter : itemNameMap) {
+            if (iter.second == itemName) {
+                DataViewType dataViewType = iter.first;
+                SwitchToDataViewType(dataViewType);
+                break;
             }
-        });
+        }
+    });
 }
 
-void MainForm::SwithSortMode(const ui::UiPoint& point, ui::Control* pRelatedControl)
+void MainForm::SwithSortMode(const ui::UiPoint &point, ui::Control *pRelatedControl)
 {
     if (m_pExplorerView == nullptr) {
         return;
     }
-    ui::Menu* menu = new ui::Menu(this, pRelatedControl);//需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
+    ui::Menu *menu = new ui::Menu(
+        this, pRelatedControl); //需要设置父窗口，否在菜单弹出的时候，程序状态栏编程非激活状态
     menu->SetSkinFolder(GetResourcePath().ToString());
     DString xml(_T("menu/sort_mode_menu.xml"));
     menu->ShowMenu(xml, point);
@@ -522,28 +536,25 @@ void MainForm::SwithSortMode(const ui::UiPoint& point, ui::Control* pRelatedCont
     bool bSortUp = false;
     bool bSorted = m_pExplorerView->GetSortColumnInfo(sortColumn, bSortUp);
     if (bSorted) {
-        ui::Button* pSortColumnBtn = nullptr;
+        ui::Button *pSortColumnBtn = nullptr;
         if (sortColumn == ExplorerView::ExplorerViewColumn::kName) {
-            pSortColumnBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_file_name")));
-        }
-        else if (sortColumn == ExplorerView::ExplorerViewColumn::kModifyDateTime) {
-            pSortColumnBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_file_modify_time")));
-        }
-        else if (sortColumn == ExplorerView::ExplorerViewColumn::kType) {
-            pSortColumnBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_file_type")));
-        }
-        else if (sortColumn == ExplorerView::ExplorerViewColumn::kSize) {
-            pSortColumnBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_file_size")));
+            pSortColumnBtn = dynamic_cast<ui::Button *>(menu->FindControl(_T("btn_file_name")));
+        } else if (sortColumn == ExplorerView::ExplorerViewColumn::kModifyDateTime) {
+            pSortColumnBtn = dynamic_cast<ui::Button *>(
+                menu->FindControl(_T("btn_file_modify_time")));
+        } else if (sortColumn == ExplorerView::ExplorerViewColumn::kType) {
+            pSortColumnBtn = dynamic_cast<ui::Button *>(menu->FindControl(_T("btn_file_type")));
+        } else if (sortColumn == ExplorerView::ExplorerViewColumn::kSize) {
+            pSortColumnBtn = dynamic_cast<ui::Button *>(menu->FindControl(_T("btn_file_size")));
         }
 
-        ui::Button* pSortBtn = nullptr;
+        ui::Button *pSortBtn = nullptr;
         if (bSortUp) {
             //升序
-            pSortBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_sort_ascending")));
-        }
-        else {
+            pSortBtn = dynamic_cast<ui::Button *>(menu->FindControl(_T("btn_sort_ascending")));
+        } else {
             //降序
-            pSortBtn = dynamic_cast<ui::Button*>(menu->FindControl(_T("btn_sort_descending")));
+            pSortBtn = dynamic_cast<ui::Button *>(menu->FindControl(_T("btn_sort_descending")));
         }
         if (pSortBtn != nullptr) {
             pSortBtn->SetBkImage(_T("ui-item-symbolic.svg"));
@@ -551,49 +562,45 @@ void MainForm::SwithSortMode(const ui::UiPoint& point, ui::Control* pRelatedCont
         if (pSortColumnBtn != nullptr) {
             pSortColumnBtn->SetBkImage(_T("ui-item-symbolic.svg"));
         }
-    }
-    else {
+    } else {
         sortColumn = ExplorerView::ExplorerViewColumn::kName;
         bSortUp = false;
     }
 
     //挂载选择菜单项事件
-    menu->AttachMenuItemActivated([this, bSorted, bSortUp, sortColumn](const DString& menuName, int32_t nMenuLevel,
-                                                                       const DString& itemName, size_t nItemIndex) {
+    menu->AttachMenuItemActivated(
+        [this, bSorted, bSortUp, sortColumn](
+            const DString &menuName, int32_t nMenuLevel, const DString &itemName, size_t nItemIndex) {
             //与XML中的菜单项名字匹配
             if (itemName == _T("menu_item_file_name")) {
                 //文件名称
                 if (m_pExplorerView != nullptr) {
                     m_pExplorerView->SortByColumn(ExplorerView::ExplorerViewColumn::kName, bSortUp);
                 }
-            }
-            else if (itemName == _T("menu_item_file_modify_time")) {
+            } else if (itemName == _T("menu_item_file_modify_time")) {
                 //修改日期
                 if (m_pExplorerView != nullptr) {
-                    m_pExplorerView->SortByColumn(ExplorerView::ExplorerViewColumn::kModifyDateTime, bSortUp);
+                    m_pExplorerView
+                        ->SortByColumn(ExplorerView::ExplorerViewColumn::kModifyDateTime, bSortUp);
                 }
-            }
-            else if (itemName == _T("menu_item_file_type")) {
+            } else if (itemName == _T("menu_item_file_type")) {
                 //文件类型
                 if (m_pExplorerView != nullptr) {
                     m_pExplorerView->SortByColumn(ExplorerView::ExplorerViewColumn::kType, bSortUp);
                 }
-            }
-            else if (itemName == _T("menu_item_file_size")) {
+            } else if (itemName == _T("menu_item_file_size")) {
                 //文件大小
                 if (m_pExplorerView != nullptr) {
                     m_pExplorerView->SortByColumn(ExplorerView::ExplorerViewColumn::kSize, bSortUp);
                 }
-            }
-            else if (itemName == _T("menu_item_sort_ascending")) {
+            } else if (itemName == _T("menu_item_sort_ascending")) {
                 //递增排序
                 if (!bSorted || !bSortUp) {
                     if (m_pExplorerView != nullptr) {
                         m_pExplorerView->SortByColumn(sortColumn, true);
                     }
                 }
-            }
-            else if (itemName == _T("menu_item_sort_descending")) {
+            } else if (itemName == _T("menu_item_sort_descending")) {
                 //递减排序
                 if (!bSorted || bSortUp) {
                     if (m_pExplorerView != nullptr) {
@@ -610,7 +617,7 @@ void MainForm::UpdateCommandUI()
     bool bEnableBack = !m_backStack.empty();
     bool bEnableForward = !m_forwardStack.empty();
     if ((m_pTreeNode != nullptr) && (m_pTree != nullptr)) {
-        ui::TreeNode* pParentNode = m_pTreeNode->GetParentNode();
+        ui::TreeNode *pParentNode = m_pTreeNode->GetParentNode();
         if ((pParentNode != nullptr) && (pParentNode != m_pTree->GetRootNode())) {
             bEnableUp = true;
         }
@@ -644,7 +651,7 @@ void MainForm::SwitchToTabBoxViewType(TabBoxViewType tabBoxViewType)
 {
     m_tabBoxViewType = tabBoxViewType;
     if (m_pTabBox != nullptr) {
-        m_pTabBox->SelectItem((size_t)tabBoxViewType);
+        m_pTabBox->SelectItem((size_t) tabBoxViewType);
     }
 }
 
@@ -656,7 +663,7 @@ void MainForm::SwitchToDataViewType(DataViewType dataViewType)
     m_dataViewType = dataViewType;
     //更新图片列表和视图样式
     ui::ImageListPtr spImageList;
-    ui::ListCtrl* pListCtrl = nullptr;
+    ui::ListCtrl *pListCtrl = nullptr;
     if (m_pExplorerView != nullptr) {
         pListCtrl = m_pExplorerView->GetListCtrl();
     }

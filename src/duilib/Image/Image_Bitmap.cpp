@@ -1,18 +1,16 @@
 #include "Image_Bitmap.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 单帧位图图片接口的实现
 */
 class Image_Bitmap::BitmapImageImpl : public IBitmapImage
 {
 public:
-    BitmapImageImpl():
-        m_fImageSizeScale(IMAGE_SIZE_SCALE_NONE)
-    {
-    }
+    BitmapImageImpl()
+        : m_fImageSizeScale(IMAGE_SIZE_SCALE_NONE)
+    {}
 
     virtual ~BitmapImageImpl() = default;
 
@@ -22,8 +20,7 @@ public:
     {
         if (m_pBitmap != nullptr) {
             return m_pBitmap->GetWidth();
-        }
-        else if (m_pAnimationImage != nullptr) {
+        } else if (m_pAnimationImage != nullptr) {
             return m_pAnimationImage->GetWidth();
         }
         return 0;
@@ -35,8 +32,7 @@ public:
     {
         if (m_pBitmap != nullptr) {
             return m_pBitmap->GetHeight();
-        }
-        else if (m_pAnimationImage != nullptr) {
+        } else if (m_pAnimationImage != nullptr) {
             return m_pAnimationImage->GetHeight();
         }
         return 0;
@@ -44,17 +40,14 @@ public:
 
     /** 原图加载的宽度和高度缩放比例(1.0f表示无缩放)
     */
-    virtual float GetImageSizeScale() const override
-    {
-        return m_fImageSizeScale;
-    }
+    virtual float GetImageSizeScale() const override { return m_fImageSizeScale; }
 
     /** 获取位图
     * @param [out] bDecodeError 返回值代表是否遇到图片解码错误
     * @return 返回位图的接口指针，如果返回nullptr并且bDecodeError为false表示图片尚未完成解码（多线程解码的情况下）
     *                          如果返回nullptr并且bDecodeError为true代表图片解码出现错误
     */
-    virtual std::shared_ptr<IBitmap> GetBitmap(bool* bDecodeError) override
+    virtual std::shared_ptr<IBitmap> GetBitmap(bool *bDecodeError) override
     {
         if (m_pBitmap != nullptr) {
             return m_pBitmap;
@@ -72,8 +65,7 @@ public:
                     //读取完成后，释放资源
                     m_pAnimationImage.reset();
                 }
-            }
-            else {
+            } else {
                 if (bDecodeError != nullptr) {
                     *bDecodeError = true;
                 }
@@ -122,9 +114,8 @@ public:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool DelayDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override
+    virtual bool DelayDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override
     {
         if (m_pAnimationImage != nullptr) {
             return m_pAnimationImage->DelayDecode(nMinFrameIndex, IsAborted, bDecodeError);
@@ -156,27 +147,25 @@ public:
     float m_fImageSizeScale;
 };
 
-Image_Bitmap::Image_Bitmap():
-    m_nAsyncDecodeTaskId(0)
-{
-}
+Image_Bitmap::Image_Bitmap()
+    : m_nAsyncDecodeTaskId(0)
+{}
 
-Image_Bitmap::~Image_Bitmap()
-{
-}
+Image_Bitmap::~Image_Bitmap() {}
 
-std::unique_ptr<IImage> Image_Bitmap::MakeImage(uint32_t nWidth, uint32_t nHeight,
-                                                const void* pPixelBits,
-                                                float fImageSizeScale,
-                                                BitmapAlphaType alphaType)
+std::unique_ptr<IImage> Image_Bitmap::MakeImage(
+    uint32_t nWidth,
+    uint32_t nHeight,
+    const void *pPixelBits,
+    float fImageSizeScale,
+    BitmapAlphaType alphaType)
 {
-    
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         return nullptr;
     }
-    IBitmap* pBitmap = pRenderFactory->CreateBitmap();
+    IBitmap *pBitmap = pRenderFactory->CreateBitmap();
     ASSERT(pBitmap != nullptr);
     if (pBitmap == nullptr) {
         return nullptr;
@@ -185,9 +174,9 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(uint32_t nWidth, uint32_t nHeigh
         delete pBitmap;
         return nullptr;
     }
-    Image_Bitmap* pImageBitmap = new Image_Bitmap;
+    Image_Bitmap *pImageBitmap = new Image_Bitmap;
     std::unique_ptr<IImage> pImage(pImageBitmap);
-    BitmapImageImpl* pImageBitmapImpl = new BitmapImageImpl;
+    BitmapImageImpl *pImageBitmapImpl = new BitmapImageImpl;
     pImageBitmap->m_pBitmapImage.reset(pImageBitmapImpl);
 
     pImageBitmapImpl->m_pBitmap.reset(pBitmap);
@@ -195,7 +184,8 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(uint32_t nWidth, uint32_t nHeigh
     return pImage;
 }
 
-std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmap>& pBitmap, float fImageSizeScale)
+std::unique_ptr<IImage> Image_Bitmap::MakeImage(
+    const std::shared_ptr<IBitmap> &pBitmap, float fImageSizeScale)
 {
     ASSERT(pBitmap != nullptr);
     if (pBitmap == nullptr) {
@@ -205,9 +195,9 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmap>& 
     if ((pBitmap->GetWidth() == 0) || (pBitmap->GetHeight() == 0)) {
         return nullptr;
     }
-    Image_Bitmap* pImageBitmap = new Image_Bitmap;
+    Image_Bitmap *pImageBitmap = new Image_Bitmap;
     std::unique_ptr<IImage> pImage(pImageBitmap);
-    BitmapImageImpl* pImageBitmapImpl = new BitmapImageImpl;
+    BitmapImageImpl *pImageBitmapImpl = new BitmapImageImpl;
     pImageBitmap->m_pBitmapImage.reset(pImageBitmapImpl);
 
     pImageBitmapImpl->m_pBitmap = pBitmap;
@@ -215,7 +205,7 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmap>& 
     return pImage;
 }
 
-std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmapImage>& pBitmap)
+std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmapImage> &pBitmap)
 {
     ASSERT(pBitmap != nullptr);
     if (pBitmap == nullptr) {
@@ -226,13 +216,14 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IBitmapIma
         return nullptr;
     }
 
-    Image_Bitmap* pImageBitmap = new Image_Bitmap;
+    Image_Bitmap *pImageBitmap = new Image_Bitmap;
     std::unique_ptr<IImage> pImage(pImageBitmap);
     pImageBitmap->m_pBitmapImage = pBitmap;
     return pImage;
 }
 
-std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IAnimationImage>& pAnimationImage)
+std::unique_ptr<IImage> Image_Bitmap::MakeImage(
+    const std::shared_ptr<IAnimationImage> &pAnimationImage)
 {
     ASSERT(pAnimationImage != nullptr);
     if (pAnimationImage == nullptr) {
@@ -243,9 +234,9 @@ std::unique_ptr<IImage> Image_Bitmap::MakeImage(const std::shared_ptr<IAnimation
         return nullptr;
     }
 
-    Image_Bitmap* pImageBitmap = new Image_Bitmap;
+    Image_Bitmap *pImageBitmap = new Image_Bitmap;
     std::unique_ptr<IImage> pImage(pImageBitmap);
-    BitmapImageImpl* pImageBitmapImpl = new BitmapImageImpl;
+    BitmapImageImpl *pImageBitmapImpl = new BitmapImageImpl;
     pImageBitmap->m_pBitmapImage.reset(pImageBitmapImpl);
 
     pImageBitmapImpl->m_pAnimationImage = pAnimationImage;
@@ -325,7 +316,8 @@ size_t Image_Bitmap::GetAsyncDecodeTaskId() const
     return m_nAsyncDecodeTaskId;
 }
 
-bool Image_Bitmap::AsyncDecode(uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool* bDecodeError)
+bool Image_Bitmap::AsyncDecode(
+    uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError)
 {
     ASSERT(m_pBitmapImage != nullptr);
     if (m_pBitmapImage != nullptr) {

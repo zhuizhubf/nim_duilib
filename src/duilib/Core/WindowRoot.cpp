@@ -1,24 +1,22 @@
 #include "duilib/Core/WindowRoot.h"
-#include "duilib/Core/Window.h"
-#include "duilib/Core/FullscreenBox.h"
-#include "duilib/Core/Shadow.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/ControlFinder.h"
 #include "duilib/Core/DpiManager.h"
+#include "duilib/Core/FullscreenBox.h"
+#include "duilib/Core/Shadow.h"
+#include "duilib/Core/Window.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
-    #include "duilib/Utils/ApiWrapper_Windows.h"
+#include "duilib/Utils/ApiWrapper_Windows.h"
 #endif
 
-namespace ui
-{
+namespace ui {
 
-WindowRoot::WindowRoot(Window* pWindow):
-    m_pWindow(pWindow),
-    m_bControlFullscreen(false),
-    m_pControlFinder(nullptr)
-{
-}
+WindowRoot::WindowRoot(Window *pWindow)
+    : m_pWindow(pWindow)
+    , m_bControlFullscreen(false)
+    , m_pControlFinder(nullptr)
+{}
 
 WindowRoot::~WindowRoot()
 {
@@ -33,7 +31,7 @@ void WindowRoot::Clear()
 
 void WindowRoot::ClearRoot()
 {
-    Box* pRoot = m_pRoot.get();
+    Box *pRoot = m_pRoot.get();
     m_pRoot.reset();
     if (pRoot != nullptr) {
         delete pRoot;
@@ -46,15 +44,15 @@ void WindowRoot::ClearShadow()
     m_shadow.reset();
 }
 
-Box* WindowRoot::GetRoot() const
+Box *WindowRoot::GetRoot() const
 {
     return m_pRoot.get();
 }
 
-Box* WindowRoot::GetXmlRoot() const
+Box *WindowRoot::GetXmlRoot() const
 {
-    Box* pXmlRoot = nullptr;
-    Shadow* pShadow = GetShadow();
+    Box *pXmlRoot = nullptr;
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pXmlRoot = pShadow->GetAttachedXmlRoot();
     }
@@ -72,11 +70,11 @@ void WindowRoot::CreateShadow(bool bLayeredWindow)
     m_shadow = std::make_unique<Shadow>(m_pWindow, bLayeredWindow);
 }
 
-Shadow* WindowRoot::GetShadow() const
+Shadow *WindowRoot::GetShadow() const
 {
     ASSERT(m_shadow != nullptr);
     if (m_bControlFullscreen) {
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+        FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
         if (pFullscreenBox != nullptr) {
             return nullptr;
         }
@@ -89,12 +87,12 @@ bool WindowRoot::IsControlFullscreen() const
     return m_bControlFullscreen;
 }
 
-void WindowRoot::SetControlFinder(ControlFinder* pControlFinder)
+void WindowRoot::SetControlFinder(ControlFinder *pControlFinder)
 {
     m_pControlFinder = pControlFinder;
 }
 
-bool WindowRoot::AttachBox(Box* pRoot)
+bool WindowRoot::AttachBox(Box *pRoot)
 {
     if ((m_pRoot != nullptr) && (pRoot != m_pRoot)) {
         ClearRoot();
@@ -102,45 +100,43 @@ bool WindowRoot::AttachBox(Box* pRoot)
     m_pRoot = pRoot;
     if (m_pControlFinder != nullptr) {
         m_pControlFinder->SetRoot(pRoot);
-    }   
+    }
     return true;
 }
 
-Box* WindowRoot::AttachShadow(Box* pRoot)
+Box *WindowRoot::AttachShadow(Box *pRoot)
 {
     if (pRoot != nullptr) {
         //保存其Margin值
         m_rcXmlRootMargin = pRoot->GetMargin();
-    }
-    else {
+    } else {
         m_rcXmlRootMargin.Clear();
     }
     m_rcXmlRootMargin.Validate();
 
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     ASSERT(pShadow != nullptr);
     if (pShadow != nullptr) {
         return pShadow->AttachShadow(pRoot);
-    }
-    else {
+    } else {
         return pRoot;
     }
 }
 
 void WindowRoot::ProcessWindowShadowTypeChanged()
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow == nullptr) {
         return;
     }
     if (m_pRoot == nullptr) {
-        return;//尚未绑定
+        return; //尚未绑定
     }
     //控件全屏时，禁止访问阴影相关操作
     if (m_bControlFullscreen) {
         return;
     }
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
     if (pFullscreenBox != nullptr) {
         return;
     }
@@ -148,19 +144,17 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
     if (pShadow->IsShadowAttached() && !pShadow->IsSystemShadowEnabled()) {
         //需要绑定
         if (!pShadow->HasShadowBox()) {
-            Box* pNewRoot = pShadow->AttachShadow(m_pRoot.get());
+            Box *pNewRoot = pShadow->AttachShadow(m_pRoot.get());
             if (pNewRoot != nullptr) {
                 m_pRoot.reset(); //先清空，避免被释放
                 AttachBox(pNewRoot);
             }
         }
-    }
-    else {
+    } else {
         //不需要绑定
-        if ( pShadow->HasShadowBox() &&
-             (pShadow->GetShadowBox() == m_pRoot.get()) &&
-             (pShadow->GetAttachedXmlRoot() != nullptr)) {
-            Box* pNewRoot = pShadow->DettachShadow();
+        if (pShadow->HasShadowBox() && (pShadow->GetShadowBox() == m_pRoot.get())
+            && (pShadow->GetAttachedXmlRoot() != nullptr)) {
+            Box *pNewRoot = pShadow->DettachShadow();
             if (pNewRoot != nullptr) {
                 m_pRoot.reset(); //先清空，避免被释放
                 AttachBox(pNewRoot);
@@ -177,7 +171,7 @@ void WindowRoot::ProcessWindowShadowTypeChanged()
 
 void WindowRoot::SetShadowAttached(bool bShadowAttached)
 {
-    ASSERT(!IsControlFullscreen());    
+    ASSERT(!IsControlFullscreen());
     if (IsControlFullscreen()) {
         return;
     }
@@ -187,7 +181,7 @@ void WindowRoot::SetShadowAttached(bool bShadowAttached)
             return;
         }
     }
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowAttached(bShadowAttached);
         ProcessWindowShadowTypeChanged();
@@ -196,11 +190,10 @@ void WindowRoot::SetShadowAttached(bool bShadowAttached)
 
 bool WindowRoot::IsShadowAttached() const
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         return pShadow->IsShadowAttached();
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -211,7 +204,7 @@ void WindowRoot::SetShadowType(ShadowType nShadowType)
     if (IsControlFullscreen()) {
         return;
     }
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowType(nShadowType);
         ProcessWindowShadowTypeChanged();
@@ -221,7 +214,7 @@ void WindowRoot::SetShadowType(ShadowType nShadowType)
 ShadowType WindowRoot::GetShadowType() const
 {
     ShadowType nShadowType = ShadowType::kShadowDefault;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         nShadowType = pShadow->GetShadowType();
     }
@@ -230,18 +223,17 @@ ShadowType WindowRoot::GetShadowType() const
 
 DString WindowRoot::GetShadowImage() const
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         return pShadow->GetShadowImage();
-    }
-    else {
+    } else {
         return DString();
     }
 }
 
-void WindowRoot::SetShadowImage(const DString& shadowImage)
+void WindowRoot::SetShadowImage(const DString &shadowImage)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowImage(shadowImage);
     }
@@ -249,7 +241,7 @@ void WindowRoot::SetShadowImage(const DString& shadowImage)
 
 void WindowRoot::SetShadowBorderSize(int32_t nShadowBorderSize)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowBorderSize(nShadowBorderSize);
     }
@@ -258,16 +250,16 @@ void WindowRoot::SetShadowBorderSize(int32_t nShadowBorderSize)
 int32_t WindowRoot::GetShadowBorderSize() const
 {
     int32_t nShadowBorderSize = 0;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         nShadowBorderSize = pShadow->GetShadowBorderSize();
     }
     return nShadowBorderSize;
 }
 
-void WindowRoot::SetShadowBorderColor(const DString& shadowBorderColor)
+void WindowRoot::SetShadowBorderColor(const DString &shadowBorderColor)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowBorderColor(shadowBorderColor);
     }
@@ -276,7 +268,7 @@ void WindowRoot::SetShadowBorderColor(const DString& shadowBorderColor)
 DString WindowRoot::GetShadowBorderColor() const
 {
     DString shadowBorderColor;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         shadowBorderColor = pShadow->GetShadowBorderColor();
     }
@@ -285,11 +277,10 @@ DString WindowRoot::GetShadowBorderColor() const
 
 UiPadding WindowRoot::GetCurrentShadowCorner() const
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         return pShadow->GetCurrentShadowCorner();
-    }
-    else {
+    } else {
         return UiPadding();
     }
 }
@@ -297,16 +288,16 @@ UiPadding WindowRoot::GetCurrentShadowCorner() const
 UiPadding WindowRoot::GetShadowCorner() const
 {
     UiPadding rcShadowCorner;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         rcShadowCorner = pShadow->GetShadowCorner();
     }
     return rcShadowCorner;
 }
 
-void WindowRoot::SetShadowCorner(const UiPadding& rcShadowCorner)
+void WindowRoot::SetShadowCorner(const UiPadding &rcShadowCorner)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowCorner(rcShadowCorner);
     }
@@ -314,7 +305,7 @@ void WindowRoot::SetShadowCorner(const UiPadding& rcShadowCorner)
 
 void WindowRoot::SetShadowBorderRound(UiSize szBorderRound)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetShadowBorderRound(szBorderRound);
     }
@@ -323,7 +314,7 @@ void WindowRoot::SetShadowBorderRound(UiSize szBorderRound)
 UiSize WindowRoot::GetShadowBorderRound() const
 {
     UiSize szBorderRound;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         szBorderRound = pShadow->GetShadowBorderRound();
     }
@@ -332,7 +323,7 @@ UiSize WindowRoot::GetShadowBorderRound() const
 
 void WindowRoot::SetEnableShadowSnap(bool bEnable)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetEnableShadowSnap(bEnable);
     }
@@ -341,7 +332,7 @@ void WindowRoot::SetEnableShadowSnap(bool bEnable)
 bool WindowRoot::IsEnableShadowSnap() const
 {
     bool bRet = false;
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         bRet = pShadow->IsEnableShadowSnap();
     }
@@ -350,7 +341,7 @@ bool WindowRoot::IsEnableShadowSnap() const
 
 void WindowRoot::SetWindowPosSnap(bool bLeftSnap, bool bRightSnap, bool bTopSnap, bool bBottomSnap)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->SetWindowPosSnap(bLeftSnap, bRightSnap, bTopSnap, bBottomSnap);
     }
@@ -358,8 +349,8 @@ void WindowRoot::SetWindowPosSnap(bool bLeftSnap, bool bRightSnap, bool bTopSnap
 
 void WindowRoot::ClearImageCache()
 {
-    Control* pRoot = nullptr;
-    Shadow* pShadow = GetShadow();
+    Control *pRoot = nullptr;
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pRoot = pShadow->GetShadowBox();
     }
@@ -371,9 +362,10 @@ void WindowRoot::ClearImageCache()
     }
 }
 
-void WindowRoot::ChangeDpiScale(const DpiManager& dpi, uint32_t nOldScaleFactor, uint32_t nNewScaleFactor)
+void WindowRoot::ChangeDpiScale(
+    const DpiManager &dpi, uint32_t nOldScaleFactor, uint32_t nNewScaleFactor)
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->ChangeDpiScale(dpi, nOldScaleFactor, nNewScaleFactor);
     }
@@ -381,7 +373,8 @@ void WindowRoot::ChangeDpiScale(const DpiManager& dpi, uint32_t nOldScaleFactor,
 
 UiMargin WindowRoot::GetWindowMaximizedMargin() const
 {
-    if (m_pWindow->IsUseSystemCaption() || !m_pWindow->IsWindowMaximized() || m_pWindow->IsWindowFullscreen()) {
+    if (m_pWindow->IsUseSystemCaption() || !m_pWindow->IsWindowMaximized()
+        || m_pWindow->IsWindowFullscreen()) {
         //使用系统标题栏，全屏或者不是最大化时，均不需要设置
         return UiMargin();
     }
@@ -391,7 +384,7 @@ UiMargin WindowRoot::GetWindowMaximizedMargin() const
     m_pWindow->GetClientRect(rcClientRect);
     int32_t cxClient = rcClientRect.Width();
     int32_t cyClient = rcClientRect.Height();
-    const DpiManager& dpi = m_pWindow->Dpi();
+    const DpiManager &dpi = m_pWindow->Dpi();
     if (dpi.HasPixelDensity()) {
         dpi.UnscaleInt(cxClient);
         dpi.UnscaleInt(cyClient);
@@ -399,7 +392,8 @@ UiMargin WindowRoot::GetWindowMaximizedMargin() const
         dpi.ScaleWindowSize(cyClient);
     }
     UiMargin rcFullscreenMargin;
-    if ((cxClient == rcWindow.Width()) && (cyClient == rcWindow.Height())) { //只有客户区大小和窗口大小一致时需要处理
+    if ((cxClient == rcWindow.Width())
+        && (cyClient == rcWindow.Height())) { //只有客户区大小和窗口大小一致时需要处理
         //最大化时，设置外边距，避免客户区的内容溢出屏幕
         UiRect rcWork;
         m_pWindow->GetMonitorWorkRect(rcWork);
@@ -416,11 +410,15 @@ UiMargin WindowRoot::GetWindowMaximizedMargin() const
             rcFullscreenMargin.bottom = rcWindow.bottom - rcWork.bottom;
         }
         if (dpi.HasPixelDensity()) {
-            rcFullscreenMargin.left = (int32_t)std::round(rcFullscreenMargin.left * dpi.GetPixelDensity());
-            rcFullscreenMargin.top = (int32_t)std::round(rcFullscreenMargin.top * dpi.GetPixelDensity());
-            rcFullscreenMargin.right = (int32_t)std::round(rcFullscreenMargin.right * dpi.GetPixelDensity());
-            rcFullscreenMargin.bottom = (int32_t)std::round(rcFullscreenMargin.bottom * dpi.GetPixelDensity());
-        }        
+            rcFullscreenMargin.left = (int32_t) std::round(
+                rcFullscreenMargin.left * dpi.GetPixelDensity());
+            rcFullscreenMargin.top = (int32_t) std::round(
+                rcFullscreenMargin.top * dpi.GetPixelDensity());
+            rcFullscreenMargin.right = (int32_t) std::round(
+                rcFullscreenMargin.right * dpi.GetPixelDensity());
+            rcFullscreenMargin.bottom = (int32_t) std::round(
+                rcFullscreenMargin.bottom * dpi.GetPixelDensity());
+        }
     }
     rcFullscreenMargin.Validate();
     return rcFullscreenMargin;
@@ -428,7 +426,7 @@ UiMargin WindowRoot::GetWindowMaximizedMargin() const
 
 void WindowRoot::UpdateXmlRootMargin()
 {
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
     if (pFullscreenBox != nullptr) {
         return;
     }
@@ -436,36 +434,38 @@ void WindowRoot::UpdateXmlRootMargin()
         //窗口最小化，不需要更新
         return;
     }
-    Box* pXmlRoot = GetXmlRoot();
+    Box *pXmlRoot = GetXmlRoot();
     if (pXmlRoot == nullptr) {
         return;
     }
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow == nullptr) {
         return;
     }
     UiMargin rcWindowBorderMargin; //根容器的外边距
-    if (pShadow->IsShadowAttached()      &&
-        m_pWindow->IsUseSystemShadow()   &&
-        !m_pWindow->IsChildWindow()      &&
-        !m_pWindow->IsUseSystemCaption() &&
-        !m_pWindow->IsWindowMaximized()  &&
-        !m_pWindow->IsWindowFullscreen()) {
+    if (pShadow->IsShadowAttached() && m_pWindow->IsUseSystemShadow() && !m_pWindow->IsChildWindow()
+        && !m_pWindow->IsUseSystemCaption() && !m_pWindow->IsWindowMaximized()
+        && !m_pWindow->IsWindowFullscreen()) {
         //非最大化时，窗口边缘存在视觉边线，占用客户区，会覆盖客户区的内容（比如根容器设置边线时，会被覆盖掉）
-        const int32_t nShadowFrameBorderSize = m_pWindow->NativeWnd()->GetSystemShadowFrameBorderSize();
+        const int32_t nShadowFrameBorderSize
+            = m_pWindow->NativeWnd()->GetSystemShadowFrameBorderSize();
         rcWindowBorderMargin.left = nShadowFrameBorderSize;
         rcWindowBorderMargin.top = nShadowFrameBorderSize;
         rcWindowBorderMargin.right = nShadowFrameBorderSize;
         rcWindowBorderMargin.bottom = nShadowFrameBorderSize;
     }
-    rcWindowBorderMargin.Validate(); //窗口边线的占用所需的Margin
-    UiMargin originXmlRootMargin = m_rcXmlRootMargin;       //XML Root Box原来的Margin
-    UiMargin maximizedMargin = GetWindowMaximizedMargin();  //窗口最大化或者全屏时所需要设置的Margin（此时窗口边缘溢出可视区域）
+    rcWindowBorderMargin.Validate();                  //窗口边线的占用所需的Margin
+    UiMargin originXmlRootMargin = m_rcXmlRootMargin; //XML Root Box原来的Margin
+    UiMargin maximizedMargin
+        = GetWindowMaximizedMargin(); //窗口最大化或者全屏时所需要设置的Margin（此时窗口边缘溢出可视区域）
     UiMargin rcRootBoxMargin;
-    rcRootBoxMargin.left = originXmlRootMargin.left + maximizedMargin.left + rcWindowBorderMargin.left;
-    rcRootBoxMargin.right = originXmlRootMargin.right + maximizedMargin.right + rcWindowBorderMargin.right;
+    rcRootBoxMargin.left = originXmlRootMargin.left + maximizedMargin.left
+                           + rcWindowBorderMargin.left;
+    rcRootBoxMargin.right = originXmlRootMargin.right + maximizedMargin.right
+                            + rcWindowBorderMargin.right;
     rcRootBoxMargin.top = originXmlRootMargin.top + maximizedMargin.top + rcWindowBorderMargin.top;
-    rcRootBoxMargin.bottom = originXmlRootMargin.bottom + maximizedMargin.bottom + rcWindowBorderMargin.bottom;
+    rcRootBoxMargin.bottom = originXmlRootMargin.bottom + maximizedMargin.bottom
+                             + rcWindowBorderMargin.bottom;
 
     UiMargin rcMargin = pXmlRoot->GetMargin();
     if (rcRootBoxMargin != rcMargin) {
@@ -475,7 +475,7 @@ void WindowRoot::UpdateXmlRootMargin()
 
 void WindowRoot::ProcessWindowMaximized()
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->MaximizedOrRestored(true);
     }
@@ -484,7 +484,7 @@ void WindowRoot::ProcessWindowMaximized()
 
 void WindowRoot::ProcessWindowRestored()
 {
-    Shadow* pShadow = GetShadow();
+    Shadow *pShadow = GetShadow();
     if (pShadow != nullptr) {
         pShadow->MaximizedOrRestored(false);
     }
@@ -503,7 +503,7 @@ void WindowRoot::ProcessWindowEnterFullscreen()
 
 void WindowRoot::ProcessWindowExitFullscreen()
 {
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
     if (pFullscreenBox != nullptr) {
         //退出控件全屏状态
         m_pRoot = pFullscreenBox->GetOldRoot();
@@ -522,17 +522,17 @@ void WindowRoot::ProcessWindowExitFullscreen()
     ProcessWindowResized();
 }
 
-void WindowRoot::ProcessFullscreenButtonMouseMove(const UiPoint& pt)
+void WindowRoot::ProcessFullscreenButtonMouseMove(const UiPoint &pt)
 {
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
     if (pFullscreenBox != nullptr) {
         pFullscreenBox->ProcessFullscreenButtonMouseMove(pt);
     }
 }
 
-bool WindowRoot::EnterControlFullscreen(Control* pFullscreenControl, const DString& exitButtonClass)
+bool WindowRoot::EnterControlFullscreen(Control *pFullscreenControl, const DString &exitButtonClass)
 {
-    FullscreenBox* pFullscreenBox = new FullscreenBox(m_pWindow);
+    FullscreenBox *pFullscreenBox = new FullscreenBox(m_pWindow);
     if (pFullscreenBox->EnterControlFullscreen(m_pRoot.get(), pFullscreenControl, exitButtonClass)) {
         //成功进入控件全屏状态
         if (m_pControlFinder != nullptr) {
@@ -541,8 +541,7 @@ bool WindowRoot::EnterControlFullscreen(Control* pFullscreenControl, const DStri
         m_pRoot = pFullscreenBox;
         m_bControlFullscreen = true;
         return true;
-    }
-    else {
+    } else {
         m_bControlFullscreen = false;
         delete pFullscreenBox;
         pFullscreenBox = nullptr;
@@ -550,7 +549,7 @@ bool WindowRoot::EnterControlFullscreen(Control* pFullscreenControl, const DStri
     }
 }
 
-bool WindowRoot::SetFullscreenControl(Control* pFullscreenControl, const DString& exitButtonClass)
+bool WindowRoot::SetFullscreenControl(Control *pFullscreenControl, const DString &exitButtonClass)
 {
     ASSERT(pFullscreenControl != nullptr);
     if (pFullscreenControl == nullptr) {
@@ -566,7 +565,7 @@ bool WindowRoot::SetFullscreenControl(Control* pFullscreenControl, const DString
     }
 
     bool bRet = false;
-    FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+    FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
     if (pFullscreenBox != nullptr) {
         //当前已经是控件全屏状态
         if (pFullscreenBox->GetFullscreenControl() == pFullscreenControl) {
@@ -576,8 +575,8 @@ bool WindowRoot::SetFullscreenControl(Control* pFullscreenControl, const DString
         ASSERT(m_pWindow->IsWindowFullscreen());
         ASSERT(m_pRoot == pFullscreenBox);
         ASSERT(m_pControlFinder->GetRoot() == pFullscreenBox);
-        if (m_bControlFullscreen && m_pWindow->IsWindowFullscreen() &&
-            (m_pRoot == pFullscreenBox) && (m_pControlFinder->GetRoot() == pFullscreenBox)) {
+        if (m_bControlFullscreen && m_pWindow->IsWindowFullscreen() && (m_pRoot == pFullscreenBox)
+            && (m_pControlFinder->GetRoot() == pFullscreenBox)) {
             //仅切换全屏控件，不改变全屏状态
             if (pFullscreenBox->UpdateControlFullscreen(pFullscreenControl, exitButtonClass)) {
                 //复位控件的状态
@@ -587,8 +586,7 @@ bool WindowRoot::SetFullscreenControl(Control* pFullscreenControl, const DString
                 bRet = true;
             }
         }
-    }
-    else {
+    } else {
         //原来不是控件全屏状态
         if (EnterControlFullscreen(pFullscreenControl, exitButtonClass)) {
             //窗口进入全屏状态
@@ -603,10 +601,10 @@ bool WindowRoot::SetFullscreenControl(Control* pFullscreenControl, const DString
     return bRet;
 }
 
-Control* WindowRoot::GetFullscreenControl() const
+Control *WindowRoot::GetFullscreenControl() const
 {
     if (m_bControlFullscreen) {
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+        FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
         if (pFullscreenBox != nullptr) {
             return pFullscreenBox->GetFullscreenControl();
         }
@@ -617,7 +615,7 @@ Control* WindowRoot::GetFullscreenControl() const
 void WindowRoot::ExitControlFullscreen()
 {
     if (m_bControlFullscreen) {
-        FullscreenBox* pFullscreenBox = dynamic_cast<FullscreenBox*>(m_pRoot.get());
+        FullscreenBox *pFullscreenBox = dynamic_cast<FullscreenBox *>(m_pRoot.get());
         if (pFullscreenBox != nullptr) {
             //退出控件全屏
             bool bWindowOldFullscreen = pFullscreenBox->IsWindowOldFullscreen();

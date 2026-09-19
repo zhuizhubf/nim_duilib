@@ -5,8 +5,8 @@
 
 //lib CEF 控件的头文件包含
 
-#include "cef/CefManager.h"
-#include "cef/CefControlEvent.h"
 #include "cef/CefControl.h"
+#include "cef/CefControlEvent.h"
+#include "cef/CefManager.h"
 
 #endif //DUILIB_CEF_H_

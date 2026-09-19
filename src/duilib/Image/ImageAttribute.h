@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui 
-{
+namespace ui {
 class DpiManager;
 
 /** 图片属性
@@ -14,8 +13,8 @@ class DUILIB_API ImageAttribute
 public:
     ImageAttribute();
     ~ImageAttribute();
-    ImageAttribute(const ImageAttribute&);
-    ImageAttribute& operator=(const ImageAttribute&);
+    ImageAttribute(const ImageAttribute &);
+    ImageAttribute &operator=(const ImageAttribute &);
 
     /** 对数据成员进行初始化
     */
@@ -25,19 +24,19 @@ public:
     * @param [in] strImageString 图片参数字符串
     * @param [in] dpi DPI缩放接口
     */
-    void InitByImageString(const DString& strImageString, const DpiManager& dpi);
+    void InitByImageString(const DString &strImageString, const DpiManager &dpi);
 
     /** 根据图片参数修改属性值（仅更新新设置的图片属性, 未包含的属性不进行更新）
     * @param [in] strImageString 图片参数字符串
     * @param [in] dpi DPI缩放接口
     */
-    void ModifyAttribute(const DString& strImageString, const DpiManager& dpi);
+    void ModifyAttribute(const DString &strImageString, const DpiManager &dpi);
 
 public:
     /** 判断rcDest区域是否含有有效值
     * @param [in] rcDest 需要判断的区域
     */
-    static bool HasValidImageRect(const UiRect& rcDest);
+    static bool HasValidImageRect(const UiRect &rcDest);
 
     /** 计算保持比例的自适应绘制区域
      * @param nImageWidth 原始图片宽度
@@ -47,10 +46,12 @@ public:
      * @param vAlign 纵向对齐方式 (top, center, bottom)
      * @return 自适应后的绘制区域(left, top, right, bottom)
      */
-    static UiRect CalculateAdaptiveRect(int32_t nImageWidth, int32_t nImageHeight,
-                                        const UiRect& targetRect,
-                                        const DString& hAlign,
-                                        const DString& vAlign);
+    static UiRect CalculateAdaptiveRect(
+        int32_t nImageWidth,
+        int32_t nImageHeight,
+        const UiRect &targetRect,
+        const DString &hAlign,
+        const DString &vAlign);
 
 public:
     /** 获取rcSource(未进行DPI缩放)
@@ -70,7 +71,7 @@ public:
     * @param [in] imageHeight 图像的高度
     * @param [in] dpi DPI缩放接口
     */
-    UiRect GetImageDestRect(int32_t imageWidth, int32_t imageHeight, const DpiManager& dpi) const;
+    UiRect GetImageDestRect(int32_t imageWidth, int32_t imageHeight, const DpiManager &dpi) const;
 
     /** 是否含有rcDest属性
     */
@@ -80,14 +81,14 @@ public:
     * @param [in] dpi DPI缩放管理器
     * @return 返回按照传入DPI缩放管理器适应的内边距数据
     */
-    UiMargin GetImageMargin(const DpiManager& dpi) const;
+    UiMargin GetImageMargin(const DpiManager &dpi) const;
 
     /** 设置图片属性的外边距
     * @param [in] newMargin 需要设置的内边距
     * @param [in] bNeedDpiScale 是否需要对newMargin进行DPI缩放
     * @param [in] dpi 与newPadding数据关联的DPI管理器
     */
-    void SetImageMargin(const UiMargin& neMargin, bool bNeedDpiScale, const DpiManager& dpi);
+    void SetImageMargin(const UiMargin &neMargin, bool bNeedDpiScale, const DpiManager &dpi);
 
     /** 判断图片是否平铺绘制
     */
@@ -95,7 +96,7 @@ public:
 
     /** 获取图片平铺绘制的属性
     */
-    TiledDrawParam GetTiledDrawParam(const DpiManager& dpi) const;
+    TiledDrawParam GetTiledDrawParam(const DpiManager &dpi) const;
 
     /** 是否启用图片加载失败时的断言错误
     */
@@ -184,16 +185,16 @@ private:
     uint16_t m_rcMarginScale;
 
     //绘制目标区域位置和大小(相对于控件区域的位置, 未进行DPI缩放)
-    UiRect* m_rcDest;
+    UiRect *m_rcDest;
 
     //在绘制目标区域中的外边距(如果指定了rcDest值，则此选项无效)
-    UiMargin16* m_rcMargin;
+    UiMargin16 *m_rcMargin;
 
     //图片源区域位置和大小(未进行DPI缩放)
-    UiRect* m_rcSource;
+    UiRect *m_rcSource;
 
     //圆角属性(未进行DPI缩放)
-    UiRect* m_rcCorner;
+    UiRect *m_rcCorner;
 };
 
 } // namespace ui

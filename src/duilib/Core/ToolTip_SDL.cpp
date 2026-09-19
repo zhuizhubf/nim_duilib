@@ -1,15 +1,14 @@
 #include "ToolTip.h"
-#include "duilib/Core/Window.h"
+#include "duilib/Control/Label.h"
 #include "duilib/Core/ControlPtrT.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
 #include "duilib/Core/WindowBuilder.h"
-#include "duilib/Control/Label.h"
 
 #ifdef DUILIB_BUILD_FOR_SDL
 
-namespace ui
-{
-class ToolTipWindow: public Window
+namespace ui {
+class ToolTipWindow : public Window
 {
 public:
     ToolTipWindow()
@@ -21,7 +20,7 @@ public:
     */
     virtual void OnInitWindow() override
     {
-        m_pToolTipText = dynamic_cast<Label*>(FindControl(_T("tooltip_text")));
+        m_pToolTipText = dynamic_cast<Label *>(FindControl(_T("tooltip_text")));
         if (!m_text.empty() && (m_pToolTipText != nullptr)) {
             m_pToolTipText->SetText(m_text);
         }
@@ -32,7 +31,7 @@ public:
 
     /** 设置文本
     */
-    void SetToolTipText(const DString& text)
+    void SetToolTipText(const DString &text)
     {
         m_text = text;
         if (m_pToolTipText != nullptr) {
@@ -46,8 +45,7 @@ public:
     {
         if (nMaxWidth <= 0) {
             m_nMaxWidth = INT32_MAX;
-        }
-        else {
+        } else {
             m_nMaxWidth = nMaxWidth;
         }
         if (m_pToolTipText != nullptr) {
@@ -80,7 +78,7 @@ public:
     * @param [in] pParentWnd 父窗口
     * @param [in] bTracking 是否跟踪鼠标状态
     */
-    void SetMouseTracking(WindowBase* pParentWnd, bool bTracking);
+    void SetMouseTracking(WindowBase *pParentWnd, bool bTracking);
 
     /**@brief 显示ToolTip信息
     * @param [in] pParentWnd 父窗口
@@ -89,11 +87,12 @@ public:
     * @param [in] trackPos 跟踪的位置
     * @param [in] text Tooltip显示内容
     */
-    void ShowToolTip(WindowBase* pParentWnd,
-                     const UiRect& rect, 
-                     uint32_t maxWidth,
-                     const UiPoint& trackPos,
-                     const DString& text);
+    void ShowToolTip(
+        WindowBase *pParentWnd,
+        const UiRect &rect,
+        uint32_t maxWidth,
+        const UiPoint &trackPos,
+        const DString &text);
 
     /**@brief 隐藏ToolTip信息
     */
@@ -130,11 +129,10 @@ public:
     const uint32_t m_hoveredMillSeconds = 320;
 };
 
-ToolTip::TImpl::TImpl():
-    m_nTimerId(0),
-    m_bMouseTracking(false)
-{
-}
+ToolTip::TImpl::TImpl()
+    : m_nTimerId(0)
+    , m_bMouseTracking(false)
+{}
 
 ToolTip::TImpl::~TImpl()
 {
@@ -144,14 +142,14 @@ ToolTip::TImpl::~TImpl()
 void ToolTip::TImpl::StopHoverTimer()
 {
     m_hoveredFlag.reset();
-    if (m_nTimerId != 0) {        
+    if (m_nTimerId != 0) {
         GlobalManager::Instance().Timer().RemoveTimer(m_nTimerId);
-        m_nTimerId = 0;        
+        m_nTimerId = 0;
     }
     m_bMouseTracking = false;
 }
 
-void ToolTip::TImpl::SetMouseTracking(WindowBase* pParentWnd, bool bTracking)
+void ToolTip::TImpl::SetMouseTracking(WindowBase *pParentWnd, bool bTracking)
 {
     ASSERT(pParentWnd != nullptr);
     if (pParentWnd == nullptr) {
@@ -162,14 +160,16 @@ void ToolTip::TImpl::SetMouseTracking(WindowBase* pParentWnd, bool bTracking)
         m_hoveredFlag = pParentWnd->GetWeakFlag();
         ControlPtrT<WindowBase> spParentWnd(pParentWnd);
         auto hoveredCallback = [this, pParentWnd]() {
-                if (pParentWnd != nullptr) {
-                    pParentWnd->PostMsg(NativeWindow_SDL::GetHoverMsgId());
-                    m_nTimerId = 0;
-                    m_bMouseTracking = false;
-                    m_hoveredFlag.reset();
-                }                
-            };
-        m_nTimerId = GlobalManager::Instance().Timer().AddTimer(m_hoveredFlag, hoveredCallback, m_hoveredMillSeconds, 1);
+            if (pParentWnd != nullptr) {
+                pParentWnd->PostMsg(NativeWindow_SDL::GetHoverMsgId());
+                m_nTimerId = 0;
+                m_bMouseTracking = false;
+                m_hoveredFlag.reset();
+            }
+        };
+        m_nTimerId = GlobalManager::Instance()
+                         .Timer()
+                         .AddTimer(m_hoveredFlag, hoveredCallback, m_hoveredMillSeconds, 1);
     }
     m_pParentWnd = pParentWnd;
     m_bMouseTracking = bTracking;
@@ -179,11 +179,12 @@ void ToolTip::TImpl::SetMouseTracking(WindowBase* pParentWnd, bool bTracking)
     }
 }
 
-void ToolTip::TImpl::ShowToolTip(WindowBase* pParentWnd,
-                                 const UiRect& /*rect*/,
-                                 uint32_t maxWidth,
-                                 const UiPoint& trackPos,
-                                 const DString& text)
+void ToolTip::TImpl::ShowToolTip(
+    WindowBase *pParentWnd,
+    const UiRect & /*rect*/,
+    uint32_t maxWidth,
+    const UiPoint &trackPos,
+    const DString &text)
 {
     ASSERT(pParentWnd != nullptr);
     if (pParentWnd == nullptr) {
@@ -195,12 +196,12 @@ void ToolTip::TImpl::ShowToolTip(WindowBase* pParentWnd,
     if (text.empty()) {
         return;
     }
-    
+
     //窗口的初始位置(客户区坐标)
     UiPoint windowPos = trackPos;
     if ((m_pTooltipWnd == nullptr) || m_pTooltipWnd->IsClosingWnd()) {
         m_pTooltipWnd = new ToolTipWindow;
-    }    
+    }
     DString skinFolder = m_pTooltipWnd->GetSkinFolder();
     DString skinFile = m_pTooltipWnd->GetSkinFile();
     FilePath xmlPath(skinFolder);
@@ -224,7 +225,7 @@ void ToolTip::TImpl::ShowToolTip(WindowBase* pParentWnd,
     pParentWnd->Dpi().ScaleInt(rcShadowCorner.top);
     createParam.m_nX -= rcShadowCorner.left;
     createParam.m_nY -= rcShadowCorner.top;
-    
+
     //SDL内部，对Popup窗口的坐标，调整窗口位置时，使用的是客户区坐标，但其偏移值用的是窗口大小值(主要影响macOS, 高分屏的逻辑)
     pParentWnd->Dpi().UnscaleInt(createParam.m_nX);
     pParentWnd->Dpi().UnscaleInt(createParam.m_nY);
@@ -232,17 +233,20 @@ void ToolTip::TImpl::ShowToolTip(WindowBase* pParentWnd,
     pParentWnd->Dpi().ScaleWindowSize(createParam.m_nY);
 
     if (!m_pTooltipWnd->IsWindow()) {
-        createParam.m_nWidth = pParentWnd->Dpi().GetScaleWindowSize(200); //窗口创建或者显示后，会自动设置宽度和高度
+        createParam.m_nWidth = pParentWnd->Dpi().GetScaleWindowSize(
+            200); //窗口创建或者显示后，会自动设置宽度和高度
         createParam.m_nHeight = pParentWnd->Dpi().GetScaleWindowSize(80);
         createParam.m_dwStyle = kWS_POPUPWINDOW;
-        createParam.m_dwExStyle = kWS_EX_NOACTIVATE | kWS_EX_TRANSPARENT | kWS_EX_LAYERED | kWS_EX_TOOLTIP_WINDOW;
+        createParam.m_dwExStyle = kWS_EX_NOACTIVATE | kWS_EX_TRANSPARENT | kWS_EX_LAYERED
+                                  | kWS_EX_TOOLTIP_WINDOW;
         m_pTooltipWnd->CreateWnd(pParentWnd, createParam);
     }
 
     //设置窗口位置
-    m_pTooltipWnd->SetWindowPos(InsertAfterWnd(), createParam.m_nX, createParam.m_nY, 0, 0, kSWP_NOSIZE | kSWP_NOZORDER);
+    m_pTooltipWnd->SetWindowPos(
+        InsertAfterWnd(), createParam.m_nX, createParam.m_nY, 0, 0, kSWP_NOSIZE | kSWP_NOZORDER);
 
-    m_pTooltipWnd->SetToolTipMaxWidth((int32_t)maxWidth);
+    m_pTooltipWnd->SetToolTipMaxWidth((int32_t) maxWidth);
     m_pTooltipWnd->SetToolTipText(text);
     m_pTooltipWnd->ShowWindow(kSW_SHOW_NOACTIVATE);
 }
@@ -261,7 +265,7 @@ void ToolTip::TImpl::ClearMouseTracking()
 {
     //停止定时器
     StopHoverTimer();
-    m_pParentWnd = nullptr;    
+    m_pParentWnd = nullptr;
 }
 
 void ToolTip::TImpl::DestroyToolTip()
@@ -284,16 +288,17 @@ ToolTip::~ToolTip()
     }
 }
 
-void ToolTip::SetMouseTracking(WindowBase* pParentWnd, bool bTracking)
+void ToolTip::SetMouseTracking(WindowBase *pParentWnd, bool bTracking)
 {
     m_impl->SetMouseTracking(pParentWnd, bTracking);
 }
 
-void ToolTip::ShowToolTip(WindowBase* pParentWnd,
-                          const UiRect& rect,
-                          uint32_t maxWidth,
-                          const UiPoint& trackPos,
-                          const DString& text)
+void ToolTip::ShowToolTip(
+    WindowBase *pParentWnd,
+    const UiRect &rect,
+    uint32_t maxWidth,
+    const UiPoint &trackPos,
+    const DString &text)
 {
     m_impl->ShowToolTip(pParentWnd, rect, maxWidth, trackPos, text);
 }

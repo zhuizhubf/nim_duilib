@@ -1,12 +1,11 @@
 #ifndef UI_IMAGE_IMAGE_DECODER_H_
 #define UI_IMAGE_IMAGE_DECODER_H_
 
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Core/Callback.h"
+#include "duilib/Core/UiTypes.h"
 #include "duilib/Utils/FilePath.h"
 
-namespace ui
-{
+namespace ui {
 /** 位图接口
 */
 class IBitmap;
@@ -38,9 +37,8 @@ public:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool DelayDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) = 0;
+    virtual bool DelayDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) = 0;
 
     /** 合并延迟解码图片数据的结果
     */
@@ -83,9 +81,8 @@ public:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool AsyncDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) = 0;
+    virtual bool AsyncDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) = 0;
 
     /** 合并异步解码图片数据的结果
     */
@@ -94,7 +91,7 @@ public:
 
 /** SVG格式替换颜色实现的回调函数
 */
-typedef std::function<UiColor(const DString& strColor)> SvgReplaceColorCallbackFunction;
+typedef std::function<UiColor(const DString &strColor)> SvgReplaceColorCallbackFunction;
 
 /** SVG矢量图片接口
 */
@@ -119,7 +116,8 @@ public:
     * @param [in] szImageSize 代表获取图片的宽度(cx)和高度(cy)
     * @param [in] svgReplaceColorCallback SVG格式替换颜色实现的回调函数
     */
-    virtual std::shared_ptr<IBitmap> GetBitmap(const UiSize& szImageSize, SvgReplaceColorCallbackFunction svgReplaceColorCallback) = 0;
+    virtual std::shared_ptr<IBitmap> GetBitmap(
+        const UiSize &szImageSize, SvgReplaceColorCallbackFunction svgReplaceColorCallback) = 0;
 };
 
 /** 单帧位图图片接口
@@ -146,20 +144,20 @@ public:
     * @return 返回位图的接口指针，如果返回nullptr并且bDecodeError为false表示图片尚未完成解码（多线程解码的情况下）
     *                          如果返回nullptr并且bDecodeError为true代表图片解码出现错误
     */
-    virtual std::shared_ptr<IBitmap> GetBitmap(bool* bDecodeError) = 0;
+    virtual std::shared_ptr<IBitmap> GetBitmap(bool *bDecodeError) = 0;
 };
 
 /** 动画图片默认的播放时间间隔（毫秒）
 */
-#define IMAGE_ANIMATION_DELAY_MS        (100)
+#define IMAGE_ANIMATION_DELAY_MS (100)
 
 /** 动画图片默认的播放时间间隔最小值（毫秒）
 */
-#define IMAGE_ANIMATION_DELAY_MS_MIN    (20) 
+#define IMAGE_ANIMATION_DELAY_MS_MIN (20)
 
 /** 动画图片接口
 */
-class DUILIB_API IAnimationImage: public IImageDelayDecode
+class DUILIB_API IAnimationImage : public IImageDelayDecode
 {
 public:
     virtual ~IAnimationImage() = default;
@@ -169,9 +167,10 @@ public:
     class DUILIB_API AnimationFrame
     {
     public:
-        bool m_bDataPending = false;        //数据是否处于待解码状态：true表示待解码，需要等待解码完成后再使用
+        bool m_bDataPending
+            = false; //数据是否处于待解码状态：true表示待解码，需要等待解码完成后再使用
         bool m_bDataError = false;          //数据是否出现解码错误
-        int32_t m_nFrameIndex = -1;         //图片帧的索引号        
+        int32_t m_nFrameIndex = -1;         //图片帧的索引号
         int32_t m_nOffsetX = 0;             //该帧图片在绘制区域的X轴偏移值，单位为像素
         int32_t m_nOffsetY = 0;             //该帧图片在绘制区域的Y轴偏移值，单位为像素
         std::shared_ptr<IBitmap> m_pBitmap; //该帧图片的位图数据，用于绘制
@@ -183,8 +182,7 @@ public:
             if (nDelayMs <= 0) {
                 //未设置时，设置为默认值
                 nDelayMs = IMAGE_ANIMATION_DELAY_MS;
-            }
-            else if (nDelayMs < IMAGE_ANIMATION_DELAY_MS_MIN) {
+            } else if (nDelayMs < IMAGE_ANIMATION_DELAY_MS_MIN) {
                 //低于最小值时，设置为最小值
                 nDelayMs = IMAGE_ANIMATION_DELAY_MS_MIN;
             }
@@ -193,14 +191,12 @@ public:
 
         /** 获取帧播放持续时间，毫秒
         */
-        int32_t GetDelayMs() const
-        {
-            return m_nDelayMs;
-        }
+        int32_t GetDelayMs() const { return m_nDelayMs; }
 
     private:
-        int32_t m_nDelayMs = IMAGE_ANIMATION_DELAY_MS;  //图片帧的播放持续时间，单位为毫秒
+        int32_t m_nDelayMs = IMAGE_ANIMATION_DELAY_MS; //图片帧的播放持续时间，单位为毫秒
     };
+
 public:
     /** 获取图片宽度
     */
@@ -239,7 +235,8 @@ public:
     * @param [out] pAnimationFrame 返回该帧的图片位图数据
     * @return 成功返回true，失败则返回false
     */
-    virtual bool ReadFrameData(int32_t nFrameIndex, const UiSize& szDestRectSize, AnimationFrame* pAnimationFrame) = 0;
+    virtual bool ReadFrameData(
+        int32_t nFrameIndex, const UiSize &szDestRectSize, AnimationFrame *pAnimationFrame) = 0;
 };
 
 /** AnimationFrame 的智能指针
@@ -248,20 +245,19 @@ typedef std::shared_ptr<IAnimationImage::AnimationFrame> AnimationFramePtr;
 
 /** 图片类型
 */
-enum class DUILIB_API ImageType
-{
-    kImageBitmap,       //位图类型，单帧，图片尺寸缩放时是有损缩放，显示效果会变差
-    kImageSvg,          //SVG矢量图，单帧，图片尺寸缩放时是矢量缩放，显示效果较好
-    kImageAnimation     //动画图片，多帧
+enum class DUILIB_API ImageType {
+    kImageBitmap,   //位图类型，单帧，图片尺寸缩放时是有损缩放，显示效果会变差
+    kImageSvg,      //SVG矢量图，单帧，图片尺寸缩放时是矢量缩放，显示效果较好
+    kImageAnimation //动画图片，多帧
 };
 
 /** 原图加载的宽度和高度缩放比例：无缩放的值
 */
-#define IMAGE_SIZE_SCALE_NONE (1.0f) 
+#define IMAGE_SIZE_SCALE_NONE (1.0f)
 
 /** 图片接口
 */
-class DUILIB_API IImage: public IImageAsyncDecode
+class DUILIB_API IImage : public IImageAsyncDecode
 {
 public:
     virtual ~IImage() = default;
@@ -354,7 +350,7 @@ class DUILIB_API IImageDecoder
 {
 public:
     virtual ~IImageDecoder() = default;
-        
+
     /** 获取该解码器支持的格式名称
     */
     virtual DString GetFormatName() const = 0;
@@ -362,18 +358,18 @@ public:
     /** 检查该解码器是否支持给定的文件名
     * @param [in] imageFilePath 实体文件名(比如："File.jpg"，可以带路径), 或者虚拟文件名（比如： "icon:1"）
     */
-    virtual bool CanDecode(const DString& imageFilePath) const = 0;
-         
+    virtual bool CanDecode(const DString &imageFilePath) const = 0;
+
     /** 检查该解码器是否支持给定的数据流
     * @param [in] data 数据的起始地址
     * @param [in] dataLen 数据的长度
     */
-    virtual bool CanDecode(const uint8_t* data, size_t dataLen) const = 0;
+    virtual bool CanDecode(const uint8_t *data, size_t dataLen) const = 0;
 
     /** 加载解码图片数据，返回解码后的图像数据
     @param [in] decodeParam 图片解码的相关参数
     */
-    virtual std::unique_ptr<IImage> LoadImageData(const ImageDecodeParam& decodeParam) = 0;
+    virtual std::unique_ptr<IImage> LoadImageData(const ImageDecodeParam &decodeParam) = 0;
 };
 
 } //namespace ui

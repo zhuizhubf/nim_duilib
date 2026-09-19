@@ -2,15 +2,15 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include "SkRasterWindowContext_Windows.h"
 #include "SkGLWindowContext_Windows.h"
+#include "SkRasterWindowContext_Windows.h"
 #include "render/WindowRgn_Windows.h"
 
 #include "SkiaHeaderBegin.h"
 
 #include "include/core/SkCanvas.h"
-#include "include/core/SkSurface.h"
 #include "include/core/SkRegion.h"
+#include "include/core/SkSurface.h"
 
 #include "SkiaHeaderEnd.h"
 
@@ -20,9 +20,11 @@ namespace ui {
 * @param [in] hWnd 关联的窗口句柄，可以为nullptr
 * @param [in] params 显示相关的参数
 */
-std::unique_ptr<skwindow::WindowContext> MakeRasterForWin(HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
+std::unique_ptr<skwindow::WindowContext> MakeRasterForWin(
+    HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
 {
-    std::unique_ptr<skwindow::WindowContext> ctx(new SkRasterWindowContext_Windows(hWnd, std::move(params)));
+    std::unique_ptr<skwindow::WindowContext> ctx(
+        new SkRasterWindowContext_Windows(hWnd, std::move(params)));
     return ctx;
 }
 
@@ -30,20 +32,22 @@ std::unique_ptr<skwindow::WindowContext> MakeRasterForWin(HWND hWnd, std::unique
 * @param [in] hWnd 关联的窗口句柄，可以为nullptr
 * @param [in] params 显示相关的参数
 */
-std::unique_ptr<skwindow::WindowContext> MakeGLForWin(HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
+std::unique_ptr<skwindow::WindowContext> MakeGLForWin(
+    HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
 {
-    std::unique_ptr<skwindow::WindowContext> ctx(new SkGLWindowContext_Windows(hWnd, std::move(params)));
+    std::unique_ptr<skwindow::WindowContext> ctx(
+        new SkGLWindowContext_Windows(hWnd, std::move(params)));
     if (!ctx->isValid()) {
         return nullptr;
     }
     return ctx;
 }
 
-Render_Skia_Windows::Render_Skia_Windows(HWND hWnd, RenderBackendType backendType):
-    m_hWnd(hWnd),
-    m_backendType(backendType),
-    m_hDC(nullptr),
-    m_hOldObj(nullptr)
+Render_Skia_Windows::Render_Skia_Windows(HWND hWnd, RenderBackendType backendType)
+    : m_hWnd(hWnd)
+    , m_backendType(backendType)
+    , m_hDC(nullptr)
+    , m_hOldObj(nullptr)
 {
     if (backendType == RenderBackendType::kNativeGL_BackendType) {
         //GPU的绘制，必须绑定窗口
@@ -59,16 +63,16 @@ Render_Skia_Windows::Render_Skia_Windows(HWND hWnd, RenderBackendType backendTyp
         ASSERT(m_pWindowContext != nullptr);
         if (m_pWindowContext != nullptr) {
             m_backendType = RenderBackendType::kNativeGL_BackendType;
-        }        
+        }
     }
     //如果GL不成功，则创建CPU绘制的上下文
     if (m_pWindowContext == nullptr) {
         //CPU绘制
-        m_pWindowContext = MakeRasterForWin(hWnd, std::make_unique <skwindow::DisplayParams>());
+        m_pWindowContext = MakeRasterForWin(hWnd, std::make_unique<skwindow::DisplayParams>());
         ASSERT(m_pWindowContext != nullptr);
         if (m_pWindowContext != nullptr) {
             m_backendType = RenderBackendType::kRaster_BackendType;
-        }        
+        }
     }
 }
 
@@ -121,40 +125,41 @@ int32_t Render_Skia_Windows::GetHeight() const
 
 std::unique_ptr<ui::IRender> Render_Skia_Windows::Clone()
 {
-    std::unique_ptr<ui::IRender> pClone = std::make_unique<ui::Render_Skia_Windows>(m_hWnd, m_backendType);
+    std::unique_ptr<ui::IRender> pClone
+        = std::make_unique<ui::Render_Skia_Windows>(m_hWnd, m_backendType);
     pClone->Resize(GetWidth(), GetHeight());
     pClone->SetRenderDpi(GetRenderDpi());
     pClone->BitBlt(0, 0, GetWidth(), GetHeight(), this, 0, 0, RopMode::kSrcCopy);
     return pClone;
 }
 
-bool Render_Skia_Windows::PaintAndSwapBuffers(IRenderPaint* pRenderPaint)
+bool Render_Skia_Windows::PaintAndSwapBuffers(IRenderPaint *pRenderPaint)
 {
     ASSERT(pRenderPaint != nullptr);
     ASSERT(m_pWindowContext != nullptr);
     if ((m_pWindowContext != nullptr) && (pRenderPaint != nullptr)) {
         if (m_backendType == RenderBackendType::kNativeGL_BackendType) {
-            SkGLWindowContext_Windows* pWindowContext = dynamic_cast<SkGLWindowContext_Windows*>(m_pWindowContext.get());
+            SkGLWindowContext_Windows *pWindowContext = dynamic_cast<SkGLWindowContext_Windows *>(
+                m_pWindowContext.get());
             ASSERT(pWindowContext != nullptr);
             if (pWindowContext != nullptr) {
                 return pWindowContext->PaintAndSwapBuffers(this, pRenderPaint);
             }
-        }
-        else if (m_backendType == RenderBackendType::kRaster_BackendType) {
-            SkRasterWindowContext_Windows* pWindowContext = dynamic_cast<SkRasterWindowContext_Windows*>(m_pWindowContext.get());
+        } else if (m_backendType == RenderBackendType::kRaster_BackendType) {
+            SkRasterWindowContext_Windows *pWindowContext
+                = dynamic_cast<SkRasterWindowContext_Windows *>(m_pWindowContext.get());
             ASSERT(pWindowContext != nullptr);
             if (pWindowContext != nullptr) {
                 return pWindowContext->PaintAndSwapBuffers(this, pRenderPaint);
             }
-        }
-        else {
+        } else {
             ASSERT(false);
         }
     }
     return false;
 }
 
-SkSurface* Render_Skia_Windows::GetSkSurface() const
+SkSurface *Render_Skia_Windows::GetSkSurface() const
 {
     ASSERT(m_pWindowContext != nullptr);
     if (m_pWindowContext == nullptr) {
@@ -166,7 +171,7 @@ SkSurface* Render_Skia_Windows::GetSkSurface() const
     return backbuffer.get();
 }
 
-SkCanvas* Render_Skia_Windows::GetSkCanvas() const
+SkCanvas *Render_Skia_Windows::GetSkCanvas() const
 {
     ASSERT(m_pWindowContext != nullptr);
     if (m_pWindowContext == nullptr) {
@@ -186,7 +191,7 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
     if (m_hDC != nullptr) {
         return m_hDC;
     }
-    SkCanvas* skCanvas = GetSkCanvas();
+    SkCanvas *skCanvas = GetSkCanvas();
     ASSERT(skCanvas != nullptr);
     if (skCanvas == nullptr) {
         return nullptr;
@@ -195,7 +200,8 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
     if (m_pWindowContext == nullptr) {
         return nullptr;
     }
-    SkRasterWindowContext_Windows* pWindowContext = dynamic_cast<SkRasterWindowContext_Windows*>(m_pWindowContext.get());
+    SkRasterWindowContext_Windows *pWindowContext = dynamic_cast<SkRasterWindowContext_Windows *>(
+        m_pWindowContext.get());
     if (pWindowContext == nullptr) {
         //如果不是CPU渲染的，不提供DC，该GetRenderDC函数，目前只有RichEdit在用，这里返回nullptr让RichEdit采取另外一种绘制方法
         ASSERT(GetRenderBackendType() != RenderBackendType::kRaster_BackendType);
@@ -216,17 +222,18 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
 
     if (skCanvas->isClipEmpty()) {
         ::IntersectClipRect(hGetDC, 0, 0, 0, 0);
-    }
-    else if (skCanvas->isClipRect()) {
+    } else if (skCanvas->isClipRect()) {
         SkRect rcClip;
         if (skCanvas->getLocalClipBounds(&rcClip)) {
-            RECT rc = { (int)rcClip.left(),(int)rcClip.top(),(int)rcClip.right(),(int)rcClip.bottom() };
+            RECT rc
+                = {(int) rcClip.left(),
+                   (int) rcClip.top(),
+                   (int) rcClip.right(),
+                   (int) rcClip.bottom()};
             ::InflateRect(&rc, -1, -1); //注意需要向内缩小一个象素
             ::IntersectClipRect(hGetDC, rc.left, rc.top, rc.right, rc.bottom);
         }
-    }
-    else
-    {
+    } else {
         SkRegion rgn;
         skCanvas->temporary_internal_getRgnClip(&rgn);
         SkRegion::Iterator it(rgn);
@@ -237,7 +244,7 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
         it.rewind();
 
         int nSize = sizeof(RGNDATAHEADER) + nCount * sizeof(RECT);
-        RGNDATA* rgnData = (RGNDATA*)::malloc(nSize);
+        RGNDATA *rgnData = (RGNDATA *) ::malloc(nSize);
         ASSERT(rgnData != nullptr);
         if (rgnData != nullptr) {
             memset(rgnData, 0, nSize);
@@ -248,10 +255,10 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
             rgnData->rdh.rcBound.bottom = GetHeight();
 
             nCount = 0;
-            LPRECT pRc = (LPRECT)rgnData->Buffer;
+            LPRECT pRc = (LPRECT) rgnData->Buffer;
             for (; !it.done(); it.next()) {
                 SkIRect skrc = it.rect();
-                RECT rc = { skrc.fLeft,skrc.fTop,skrc.fRight,skrc.fBottom };
+                RECT rc = {skrc.fLeft, skrc.fTop, skrc.fRight, skrc.fBottom};
                 pRc[nCount++] = rc;
             }
 
@@ -263,8 +270,8 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
     }
 
     ::SetGraphicsMode(hGetDC, GM_ADVANCED);
-    const SkPoint& ptOrg = GetPointOrg();
-    ::SetViewportOrgEx(hGetDC, (int)ptOrg.x(), (int)ptOrg.y(), nullptr);
+    const SkPoint &ptOrg = GetPointOrg();
+    ::SetViewportOrgEx(hGetDC, (int) ptOrg.x(), (int) ptOrg.y(), nullptr);
 
     struct IxForm
     {
@@ -281,9 +288,13 @@ HDC Render_Skia_Windows::GetRenderDC(HWND hWnd)
         };
     };
     SkMatrix mtx = skCanvas->getTotalMatrix();
-    XFORM xForm = { mtx.get(IxForm::kMScaleX),mtx.get(IxForm::kMSkewY),
-                    mtx.get(IxForm::kMSkewX),mtx.get(IxForm::kMScaleY),
-                    mtx.get(IxForm::kMTransX),mtx.get(IxForm::kMTransY) };
+    XFORM xForm
+        = {mtx.get(IxForm::kMScaleX),
+           mtx.get(IxForm::kMSkewY),
+           mtx.get(IxForm::kMSkewX),
+           mtx.get(IxForm::kMScaleY),
+           mtx.get(IxForm::kMTransX),
+           mtx.get(IxForm::kMTransY)};
     ::SetWorldTransform(hGetDC, &xForm);
     m_hDC = hGetDC;
     return hGetDC;
@@ -308,12 +319,12 @@ void Render_Skia_Windows::DeleteDC()
     }
 }
 
-bool Render_Skia_Windows::SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw)
+bool Render_Skia_Windows::SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw)
 {
     return WindowRgn::SetWindowRoundRectRgn(m_hWnd, rcWnd, rx, ry, bRedraw);
 }
 
-bool Render_Skia_Windows::SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw)
+bool Render_Skia_Windows::SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw)
 {
     return WindowRgn::SetWindowRectRgn(m_hWnd, rcWnd, bRedraw);
 }

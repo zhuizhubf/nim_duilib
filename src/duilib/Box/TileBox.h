@@ -2,21 +2,19 @@
 #define UI_BOX_TILEBOX_H_
 
 #include "duilib/Core/Box.h"
-#include "duilib/Layout/VTileLayout.h"
 #include "duilib/Layout/HTileLayout.h"
+#include "duilib/Layout/VTileLayout.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 瓦片布局的Box(纵向布局)
 */
 class DUILIB_API VTileBox : public Box
 {
 public:
-    explicit VTileBox(Window* pWindow) :
-        Box(pWindow, new VTileLayout())
-    {
-    }
+    explicit VTileBox(Window *pWindow)
+        : Box(pWindow, new VTileLayout())
+    {}
 
     virtual DString GetType() const override { return DUI_CTR_VTILE_BOX; }
 };
@@ -26,13 +24,12 @@ public:
 class DUILIB_API HTileBox : public Box
 {
 public:
-    explicit HTileBox(Window* pWindow) :
-        Box(pWindow, new HTileLayout())
-    {
-    }
+    explicit HTileBox(Window *pWindow)
+        : Box(pWindow, new HTileLayout())
+    {}
 
     virtual DString GetType() const override { return DUI_CTR_HTILE_BOX; }
 };
 
-}
+} // namespace ui
 #endif // UI_BOX_TILEBOX_H_

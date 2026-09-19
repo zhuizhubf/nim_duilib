@@ -5,8 +5,7 @@
 
 class SkMatrix;
 
-namespace ui 
-{
+namespace ui {
 
 class Matrix_Skia : public IMatrix
 {
@@ -25,7 +24,7 @@ public:
     virtual void Skew(float kx, float ky) override;
     virtual void Skew(float kx, float ky, float px, float py) override;
 
-    SkMatrix* GetMatrix() { return m_matrix.get(); }
+    SkMatrix *GetMatrix() { return m_matrix.get(); }
 
 private:
     std::unique_ptr<SkMatrix> m_matrix;

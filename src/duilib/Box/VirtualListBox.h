@@ -2,11 +2,11 @@
 #define UI_BOX_VIRTUAL_LISTBOX_H_
 
 #include "duilib/Box/ListBox.h"
-#include "duilib/Layout/VirtualHLayout.h"
-#include "duilib/Layout/VirtualVLayout.h"
-#include "duilib/Layout/VirtualHTileLayout.h"
-#include "duilib/Layout/VirtualVTileLayout.h"
 #include "duilib/Core/Callback.h"
+#include "duilib/Layout/VirtualHLayout.h"
+#include "duilib/Layout/VirtualHTileLayout.h"
+#include "duilib/Layout/VirtualVLayout.h"
+#include "duilib/Layout/VirtualVTileLayout.h"
 
 namespace ui {
 
@@ -23,13 +23,13 @@ public:
     * @param [in] pVirtualListBox 关联的虚表的接口
     * @return 返回创建后的数据项指针
     */
-    virtual ui::Control* CreateElement(ui::VirtualListBox* pVirtualListBox) = 0;
+    virtual ui::Control *CreateElement(ui::VirtualListBox *pVirtualListBox) = 0;
 
     /** 填充指定数据项
     * @param [in] pControl 数据项控件指针
     * @param [in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
     */
-    virtual bool FillElement(ui::Control* pControl, size_t nElementIndex) = 0;
+    virtual bool FillElement(ui::Control *pControl, size_t nElementIndex) = 0;
 
     /** 获取数据项总数
     * @return 返回数据项总数
@@ -51,7 +51,7 @@ public:
     /** 获取选择的元素列表
     * @param [in] selectedIndexs 返回当前选择的元素列表，有效范围：[0, GetElementCount())
     */
-    virtual void GetSelectedElements(std::vector<size_t>& selectedIndexs) const = 0;
+    virtual void GetSelectedElements(std::vector<size_t> &selectedIndexs) const = 0;
 
     /** 是否支持多选
     */
@@ -68,17 +68,17 @@ public:
     * @param [in] dcNotify 数据内容变化通知回调函数
     * @param [in] ccNotify 数据项个数变化通知回调函数
     */
-    void RegNotifys(VirtualListBox* pVirtualListBox,
-                    const DataChangedNotify& dcNotify,
-                    const CountChangedNotify& ccNotify);
+    void RegNotifys(
+        VirtualListBox *pVirtualListBox,
+        const DataChangedNotify &dcNotify,
+        const CountChangedNotify &ccNotify);
 
     /** 注销事件通知回调
     * @param [in] pVirtualListBox 关联的VirtualListBox对象
     */
-    void UnRegNotifys(VirtualListBox* pVirtualListBox);
+    void UnRegNotifys(VirtualListBox *pVirtualListBox);
 
 protected:
-
     /** 发送通知：数据内容发生变化
     * @param [in] nStartElementIndex 数据的开始下标
     * @param [in] nEndElementIndex 数据的结束下标
@@ -92,7 +92,7 @@ protected:
 private:
     /** 回调函数关联的VirtualListBox对象
     */
-    VirtualListBox* m_pVirtualListBox;
+    VirtualListBox *m_pVirtualListBox;
 
     /** 数据内容发生变化的回调函数
     */
@@ -109,20 +109,21 @@ class DUILIB_API VirtualListBox : public ListBox
 {
     typedef ListBox BaseClass;
     friend class VirtualHLayout;
-    friend class VirtualVLayout;    
+    friend class VirtualVLayout;
     friend class VirtualHTileLayout;
     friend class VirtualVTileLayout;
+
 public:
-    VirtualListBox(Window* pWindow, Layout* pLayout);
+    VirtualListBox(Window *pWindow, Layout *pLayout);
 
     /** 设置数据代理对象
     * @param[in] pProvider 开发者需要重写 VirtualListBoxElement 的接口来作为数据代理对象
     */
-    virtual void SetDataProvider(VirtualListBoxElement* pProvider);
+    virtual void SetDataProvider(VirtualListBoxElement *pProvider);
 
     /** 获取数据代理对象
     */
-    VirtualListBoxElement* GetDataProvider() const;
+    VirtualListBoxElement *GetDataProvider() const;
 
     /** 是否含有数据代理对象接口
     */
@@ -159,16 +160,17 @@ public:
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     * @return 如果有数据变化返回true，否则返回false
     */
-    bool SetSelectedElements(const std::vector<size_t>& selectedIndexs, bool bClearOthers);
+    bool SetSelectedElements(const std::vector<size_t> &selectedIndexs, bool bClearOthers);
 
     /** 批量设置选择元素, 不更新界面显示
     * @param [in] selectedIndexs 需要设置选择的元素列表，有效范围：[0, GetElementCount())
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SetSelectedElements(const std::vector<size_t>& selectedIndexs, 
-                             bool bClearOthers,
-                             std::vector<size_t>& refreshIndexs);
+    void SetSelectedElements(
+        const std::vector<size_t> &selectedIndexs,
+        bool bClearOthers,
+        std::vector<size_t> &refreshIndexs);
 
     /** 获取选择状态
     * @param [in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
@@ -179,7 +181,7 @@ public:
     /** 获取选择的元素列表
     * @param [in] selectedIndexs 返回当前选择的元素列表，有效范围：[0, GetElementCount())
     */
-    void GetSelectedElements(std::vector<size_t>& selectedIndexs) const;
+    void GetSelectedElements(std::vector<size_t> &selectedIndexs) const;
 
     /** 选择全部, 同时按需更新界面显示
     * @return 如果有数据变化返回true，否则返回false
@@ -194,19 +196,19 @@ public:
     /** 取消所有选择, 不更新界面显示，可以由外部刷新界面显示
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SetSelectNone(std::vector<size_t>& refreshIndexs);
+    void SetSelectNone(std::vector<size_t> &refreshIndexs);
 
     /** 取消所有选择(但排除部分元素), 不更新界面显示，可以由外部刷新界面显示
     * @param [in] excludeIndexs 需要排除的元素索引号，这部分元素的选择状态保持原状
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SetSelectNoneExclude(const std::vector<size_t>& excludeIndexs, 
-                              std::vector<size_t>& refreshIndexs);
+    void SetSelectNoneExclude(
+        const std::vector<size_t> &excludeIndexs, std::vector<size_t> &refreshIndexs);
 
     /** 获取当前所有可见控件的数据元素索引
     * @param [out] collection 索引列表，有效范围：[0, GetElementCount())
     */
-    void GetDisplayElements(std::vector<size_t>& collection) const;
+    void GetDisplayElements(std::vector<size_t> &collection) const;
 
     /** 获取一个元素对应显示控件的索引号
     * @param [in] nElementIndex 元素索引号，有效范围：[0, GetElementCount())
@@ -235,7 +237,7 @@ public:
     /** 刷新指定的数据，保持数据与界面显示同步
     * @param [elementIndexs] 列表中为元素索引号，有效范围：[0, GetElementCount())
     */
-    void RefreshElements(const std::vector<size_t>& elementIndexs);
+    void RefreshElements(const std::vector<size_t> &elementIndexs);
 
     /** 刷新界面，保持数据与显示同步
     * @param [in] bSync true表示同步刷新，立即重绘当前视图; false表示异步刷新，刷新动作为异步重绘，标记为脏区域，交给系统重绘界面
@@ -247,9 +249,10 @@ public:
     * @param [in] vVisibleType 垂直方向可见的附加标志
     * @param [in] hVisibleType 水平方向可见的附加标志
     */
-    virtual void EnsureVisible(const UiRect& rcItem,
-                               ListBoxVerVisible vVisibleType,
-                               ListBoxHorVisible hVisibleType) override;
+    virtual void EnsureVisible(
+        const UiRect &rcItem,
+        ListBoxVerVisible vVisibleType,
+        ListBoxHorVisible hVisibleType) override;
 
     /** 确保子项可见
     * @param [in] iIndex 子项索引，范围是：[0, GetItemCount())
@@ -257,9 +260,10 @@ public:
     * @param [in] hVisibleType 水平方向可见的附加标志
     * @return 如果是虚表实现，返回该元素对应的新的控件索引号，范围是：[0, GetItemCount())
     */
-    virtual size_t EnsureVisible(size_t iIndex,
-                                 ListBoxVerVisible vVisibleType = ListBoxVerVisible::kVisible,
-                                 ListBoxHorVisible hVisibleType = ListBoxHorVisible::kVisible) override;
+    virtual size_t EnsureVisible(
+        size_t iIndex,
+        ListBoxVerVisible vVisibleType = ListBoxVerVisible::kVisible,
+        ListBoxHorVisible hVisibleType = ListBoxHorVisible::kVisible) override;
 
     /** 选择子项
     *  @param [in] iIndex 子项目的ID
@@ -267,8 +271,8 @@ public:
     *  @param [in] bTriggerEvent 是否触发选择事件, 如果为true，会触发一个kEventSelect事件
     *  @param [in] vkFlag 按键标志, 取值范围参见 enum VKFlag 的定义
     */
-    virtual bool SelectItem(size_t iIndex, bool bTakeFocus,
-                            bool bTriggerEvent, uint64_t vkFlag) override;
+    virtual bool SelectItem(
+        size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag) override;
 
 public:
     /** 监听选择子项的事件
@@ -279,13 +283,19 @@ public:
     *   lParam: 原来旧选择的子项索引号，有效范围：[0, GetItemCount())，可能为无效值Box::InvalidIndex
     *   可以通过 GetDisplayItemElementIndex 函数得到关联的数据元素索引号
     */
-    void AttachSelect(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelect, callback, callbackID); }
+    void AttachSelect(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelect, callback, callbackID);
+    }
 
     /** 监听选择项发生变化的事件
      * @param [in] callback 要绑定的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelChanged, callback, callbackID); }
+    void AttachSelChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelChanged, callback, callbackID);
+    }
 
     /** 监听鼠标进入ListBoxItem控件的事件
      * @param [in] callback 要绑定的回调函数
@@ -294,7 +304,10 @@ public:
      *    wParam: 关联的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachItemMouseEnter(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventItemMouseEnter, callback, callbackID); }
+    void AttachItemMouseEnter(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventItemMouseEnter, callback, callbackID);
+    }
 
     /** 监听鼠标离开ListBoxItem控件的事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
@@ -303,7 +316,10 @@ public:
      *    wParam: 关联的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachItemMouseLeave(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventItemMouseLeave, callback, callbackID); }
+    void AttachItemMouseLeave(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventItemMouseLeave, callback, callbackID);
+    }
 
     /** 监听双击事件
      * @param [in] callback 要绑定的回调函数
@@ -312,7 +328,10 @@ public:
      *    wParam: 双击的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachDoubleClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseDoubleClick, callback, callbackID); }
+    void AttachDoubleClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseDoubleClick, callback, callbackID);
+    }
 
     /** 绑定鼠标点击处理函数
     * @param [in] callback 要绑定的回调函数
@@ -321,7 +340,10 @@ public:
     *    wParam: 点击的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
     *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
     */
-    void AttachClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventClick, callback, callbackID); }
+    void AttachClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventClick, callback, callbackID);
+    }
 
     /** 绑定鼠标右键点击处理函数
     * @param [in] callback 要绑定的回调函数
@@ -330,7 +352,10 @@ public:
     *    wParam: 点击的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
     *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
     */
-    void AttachRClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventRClick, callback, callbackID); }
+    void AttachRClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventRClick, callback, callbackID);
+    }
 
     /** 监听回车事件
      * @param [in] callback 要绑定的回调函数
@@ -339,7 +364,10 @@ public:
      *    wParam: 关联的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachReturn(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReturn, callback, callbackID); }
+    void AttachReturn(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReturn, callback, callbackID);
+    }
 
     /** 监听键盘按下事件
      * @param [in] callback 要绑定的回调函数
@@ -348,7 +376,10 @@ public:
      *    wParam: 关联的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachKeyDown(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventKeyDown, callback, callbackID); }
+    void AttachKeyDown(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventKeyDown, callback, callbackID);
+    }
 
     /** 监听键盘弹起事件
      * @param [in] callback 要绑定的回调函数
@@ -357,7 +388,10 @@ public:
      *    wParam: 关联的子项索引号，有效范围：[0, GetItemCount())，如果值为Box::InvalidIndex，表示未关联任何子项
      *    lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      */
-    void AttachKeyUp(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventKeyUp, callback, callbackID); }
+    void AttachKeyUp(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventKeyUp, callback, callbackID);
+    }
 
     /** 监听数据项UI元素填充事件（虚表，填充元素数据）
      * @param [in] callback 要绑定的回调函数
@@ -367,18 +401,21 @@ public:
      *   lParam: 关联的子项索引号对应的数据元素索引号，有效范围：[0, GetElementCount())，如果值为Box::InvalidIndex，表示无关联的数据元素
      *   pEventData: 关联的子项的界面控件接口指针，类型为：Control*指针，控件为IListBoxItem/ListBoxItem/ListBoxItemH/ListBoxItemV的子类
      */
-    void AttachElementFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventElementFilled, callback, callbackID); }
+    void AttachElementFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventElementFilled, callback, callbackID);
+    }
 
 public:
     /// 重写父类接口，提供个性化功能
     virtual void SetScrollPos(UiSize64 szPos) override;
     virtual void SetPos(UiRect rc) override;
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) override;
-    virtual void SendEventMsg(const EventArgs& msg) override;
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
+    virtual void SendEventMsg(const EventArgs &msg) override;
 
 protected:
     //重载删除函数，禁止外部调用
-    virtual bool RemoveItem(Control* pControl) override;
+    virtual bool RemoveItem(Control *pControl) override;
     virtual bool RemoveItemAt(size_t iIndex) override;
     virtual void RemoveAllItems() override;
 
@@ -389,8 +426,8 @@ protected:
     * @param [out] nDestItemIndex 返回加载后的目标控件索引号，有效范围: [0, GetItemCount())
     * @return 返回true表示有数据加载行为，false表示无任何动作
     */
-    virtual bool OnFindSelectable(size_t nCurSel, SelectableMode mode, 
-                                  size_t nCount, size_t& nDestItemIndex) override;
+    virtual bool OnFindSelectable(
+        size_t nCurSel, SelectableMode mode, size_t nCount, size_t &nDestItemIndex) override;
 
     /** 查询本条数据前面还有几条数据（支持虚表数据）
     * @param [in] nCurSel 当前选择的显示控件索引号
@@ -417,13 +454,13 @@ protected:
      * @param [in] pfnCompare 自定义排序函数
      * @param [in] pCompareContext 传递给比较函数的用户自定义数据
      */
-    virtual bool SortItems(PFNCompareFunc pfnCompare, void* pCompareContext) override;
+    virtual bool SortItems(PFNCompareFunc pfnCompare, void *pCompareContext) override;
 
     /** 子项的选择状态变化事件，用于状态同步
     * @param [in] iIndex 子项目的ID，范围是：[0, GetItemCount())
     * @param [in] pListBoxItem 关联的列表项接口
     */
-    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem* pListBoxItem) override;
+    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem *pListBoxItem) override;
 
     /** 执行了鼠标框选操作
     * @param [in] left 框选的X坐标left值
@@ -441,52 +478,51 @@ protected:
     *  @param [in] vkFlag 按键标志, 取值范围参见 enum VKFlag 的定义
     *  @return 返回true代表内部选择状态发生变化，返回false代表内部状态无变化
     */
-    virtual bool ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
-                                    bool bTriggerEvent, uint64_t vkFlag) override;
+    virtual bool ListCtrlSelectItem(
+        size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag) override;
 
     /** 响应KeyDown消息（实现ListCtrl类似的快捷键逻辑）
     * @return 返回true表示成功处理，返回false表示未处理此消息
     */
-    virtual bool OnListCtrlKeyDown(const EventArgs& msg) override;
+    virtual bool OnListCtrlKeyDown(const EventArgs &msg) override;
 
 protected:
-
     /** 设置虚表布局接口
     */
-    void SetVirtualLayout(VirtualLayout* pVirtualLayout);
+    void SetVirtualLayout(VirtualLayout *pVirtualLayout);
 
     /** 获取虚表布局接口
     */
-    VirtualLayout* GetVirtualLayout() const;
+    VirtualLayout *GetVirtualLayout() const;
 
 public:
     struct RefreshData
     {
-        size_t nItemIndex = Box::InvalidIndex;      //界面控件的索引号
-        Control* pControl = nullptr;                //界面控件的接口
-        size_t nElementIndex = Box::InvalidIndex;   //数据元素的索引号
+        size_t nItemIndex = Box::InvalidIndex;    //界面控件的索引号
+        Control *pControl = nullptr;              //界面控件的接口
+        size_t nElementIndex = Box::InvalidIndex; //数据元素的索引号
     };
     typedef std::vector<RefreshData> RefreshDataList;
 
     /** 执行了界面刷新操作, 界面的UI控件个数可能会发生变化
     */
-    virtual void OnRefreshElements(const RefreshDataList& /*refreshDataList*/) {}
+    virtual void OnRefreshElements(const RefreshDataList & /*refreshDataList*/) {}
 
     /** 执行了界面控件填充操作, 触发界面控件填充事件
     */
-    virtual void OnFilledElements(const RefreshDataList& refreshDataList);
+    virtual void OnFilledElements(const RefreshDataList &refreshDataList);
 
 protected:
     /** 创建一个子项
     * @return 返回创建后的子项指针
     */
-    Control* CreateElement();
+    Control *CreateElement();
 
     /** 填充指定数据项: 调用方负责触发kEventElementFilled事件
     * @param[in] pControl 数据项控件指针
     * @param[in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
     */
-    void FillElementData(Control* pControl, size_t nElementIndex);
+    void FillElementData(Control *pControl, size_t nElementIndex);
 
     /** 重新布局子项
     * @param[in] bForce 是否强制重新布局
@@ -507,15 +543,29 @@ protected:
 
     /** 计算一个元素的矩形区域
     */
-    void CalcTileElementRectV(size_t nElemenetIndex, const UiSize& szItem,
-                             int32_t nColumns, int32_t childMarginX, int32_t childMarginY,
-                             int64_t& iLeft, int64_t& iTop, int64_t& iRight, int64_t& iBottom) const;
+    void CalcTileElementRectV(
+        size_t nElemenetIndex,
+        const UiSize &szItem,
+        int32_t nColumns,
+        int32_t childMarginX,
+        int32_t childMarginY,
+        int64_t &iLeft,
+        int64_t &iTop,
+        int64_t &iRight,
+        int64_t &iBottom) const;
 
     /** 计算一个元素的矩形区域
     */
-    void CalcTileElementRectH(size_t nElemenetIndex, const UiSize& szItem,
-                             int32_t nRows, int32_t childMarginX, int32_t childMarginY,
-                             int64_t& iLeft, int64_t& iTop, int64_t& iRight, int64_t& iBottom) const;
+    void CalcTileElementRectH(
+        size_t nElemenetIndex,
+        const UiSize &szItem,
+        int32_t nRows,
+        int32_t childMarginX,
+        int32_t childMarginY,
+        int64_t &iLeft,
+        int64_t &iTop,
+        int64_t &iRight,
+        int64_t &iBottom) const;
 
     /** 设置没按Shift键时的最后一次选中项的索引号，界面控件的索引号（用于按Shift键选择的逻辑）
     */
@@ -532,12 +582,12 @@ protected:
     /** 新的子项添加到容器，可在此函数中挂载事件等操作
     * @param [in] pControl 新添加的子项接口
     */
-    virtual void OnListBoxItemAdded(Control* pControl) override;
+    virtual void OnListBoxItemAdded(Control *pControl) override;
 
     /** 子项从容器中删除，可在此函数中移除已经挂载的事件等操作
     * @param [in] pControl 子项接口
     */
-    virtual void OnListBoxItemRemoved(Control* pControl) override;
+    virtual void OnListBoxItemRemoved(Control *pControl) override;
 
 private:
     /** 横向布局，计算行数
@@ -553,21 +603,21 @@ private:
     * @param [in] bFromItem true表示来自子控件，false表示来自自身
     * @param [in] bFireEventOnly 如果为true表示只派发事件，不处理事件
     */
-    void VSendEvent(const EventArgs& msg, bool bFromItem, bool bFireEventOnly = false);
+    void VSendEvent(const EventArgs &msg, bool bFromItem, bool bFireEventOnly = false);
 
     /** 发送事件的函数（鼠标进入和离开事件）
     * @param [in] msg 事件内容
     */
-    void VFireMouseEnterLeaveEvent(const EventArgs& msg);
+    void VFireMouseEnterLeaveEvent(const EventArgs &msg);
 
 private:
     /** 数据代理对象接口，提供展示数据
     */
-    VirtualListBoxElement* m_pDataProvider;
+    VirtualListBoxElement *m_pDataProvider;
 
     /** 虚表布局接口
     */
-    VirtualLayout* m_pVirtualLayout;
+    VirtualLayout *m_pVirtualLayout;
 
     /** 没按Shift键时的最后一次选中项的数据索引号（不是界面控件的索引号，用于按Shift键选择的逻辑）
     */
@@ -583,10 +633,10 @@ private:
 class DUILIB_API VirtualHListBox : public VirtualListBox
 {
 public:
-    explicit VirtualHListBox(Window* pWindow) :
-        VirtualListBox(pWindow, new VirtualHLayout)
+    explicit VirtualHListBox(Window *pWindow)
+        : VirtualListBox(pWindow, new VirtualHLayout)
     {
-        VirtualLayout* pVirtualLayout = dynamic_cast<VirtualHLayout*>(GetLayout());
+        VirtualLayout *pVirtualLayout = dynamic_cast<VirtualHLayout *>(GetLayout());
         SetVirtualLayout(pVirtualLayout);
     }
 
@@ -598,10 +648,10 @@ public:
 class DUILIB_API VirtualVListBox : public VirtualListBox
 {
 public:
-    explicit VirtualVListBox(Window* pWindow) :
-        VirtualListBox(pWindow, new VirtualVLayout)
+    explicit VirtualVListBox(Window *pWindow)
+        : VirtualListBox(pWindow, new VirtualVLayout)
     {
-        VirtualLayout* pVirtualLayout = dynamic_cast<VirtualVLayout*>(GetLayout());
+        VirtualLayout *pVirtualLayout = dynamic_cast<VirtualVLayout *>(GetLayout());
         SetVirtualLayout(pVirtualLayout);
     }
 
@@ -613,10 +663,10 @@ public:
 class DUILIB_API VirtualHTileListBox : public VirtualListBox
 {
 public:
-    explicit VirtualHTileListBox(Window* pWindow) :
-        VirtualListBox(pWindow, new VirtualHTileLayout)
+    explicit VirtualHTileListBox(Window *pWindow)
+        : VirtualListBox(pWindow, new VirtualHTileLayout)
     {
-        VirtualLayout* pVirtualLayout = dynamic_cast<VirtualHTileLayout*>(GetLayout());
+        VirtualLayout *pVirtualLayout = dynamic_cast<VirtualHTileLayout *>(GetLayout());
         SetVirtualLayout(pVirtualLayout);
     }
 
@@ -628,16 +678,16 @@ public:
 class DUILIB_API VirtualVTileListBox : public VirtualListBox
 {
 public:
-    explicit VirtualVTileListBox(Window* pWindow) :
-        VirtualListBox(pWindow, new VirtualVTileLayout)
+    explicit VirtualVTileListBox(Window *pWindow)
+        : VirtualListBox(pWindow, new VirtualVTileLayout)
     {
-        VirtualLayout* pVirtualLayout = dynamic_cast<VirtualVTileLayout*>(GetLayout());
+        VirtualLayout *pVirtualLayout = dynamic_cast<VirtualVTileLayout *>(GetLayout());
         SetVirtualLayout(pVirtualLayout);
     }
 
     virtual DString GetType() const override { return DUI_CTR_VIRTUAL_VTILE_LISTBOX; }
 };
 
-}
+} // namespace ui
 
 #endif //UI_BOX_VIRTUAL_LISTBOX_H_

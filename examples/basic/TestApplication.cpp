@@ -1,13 +1,9 @@
 #include "TestApplication.h"
 #include "MainThread.h"
 
-TestApplication::TestApplication()
-{
-}
+TestApplication::TestApplication() {}
 
-TestApplication::~TestApplication()
-{
-}
+TestApplication::~TestApplication() {}
 
 void TestApplication::Run()
 {

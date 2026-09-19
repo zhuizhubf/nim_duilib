@@ -9,7 +9,7 @@
 class ChildWindowPaint
 {
 public:
-    explicit ChildWindowPaint(ui::ChildWindow* pChildWindow);
+    explicit ChildWindowPaint(ui::ChildWindow *pChildWindow);
     ~ChildWindowPaint();
 
 public:
@@ -20,15 +20,15 @@ public:
      *             Windows实现：nativeMsg.uMsg值为WM_PAINT，nativeMsg.wParam的值为窗口的HWND句柄
      * @param [in] bPaintFps 当前是否处于动态绘制状态中(用于演示子窗口绘制功能)
      */
-    void PaintChildWindow(const ui::UiRect& rcPaint, const ui::NativeMsg& nativeMsg, bool bPaintFps);
+    void PaintChildWindow(const ui::UiRect &rcPaint, const ui::NativeMsg &nativeMsg, bool bPaintFps);
 
 private:
     //关联的子窗口
-    ui::ChildWindow* m_pChildWindow;
+    ui::ChildWindow *m_pChildWindow;
 
     //内部实现类
     struct TImpl;
-    TImpl* m_impl;
+    TImpl *m_impl;
 };
 
 #endif // EXAMPLES_CHILD_WINDOW_PAINT_H_

@@ -9,35 +9,34 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#pragma warning (push)
-#pragma warning (disable:4100)
-    #include "include/cef_render_handler.h"
-#pragma warning (pop)
+#pragma warning(push)
+#pragma warning(disable : 4100)
+#include "include/cef_render_handler.h"
+#pragma warning(pop)
 
 namespace client {
 
-class OsrDragEvents {
- public:
-  virtual CefBrowserHost::DragOperationsMask OnDragEnter(
-      CefRefPtr<CefDragData> drag_data,
-      CefMouseEvent ev,
-      CefBrowserHost::DragOperationsMask effect) = 0;
+class OsrDragEvents
+{
+public:
+    virtual CefBrowserHost::DragOperationsMask OnDragEnter(
+        CefRefPtr<CefDragData> drag_data,
+        CefMouseEvent ev,
+        CefBrowserHost::DragOperationsMask effect) = 0;
 
-  virtual CefBrowserHost::DragOperationsMask OnDragOver(
-      CefMouseEvent ev,
-      CefBrowserHost::DragOperationsMask effect) = 0;
+    virtual CefBrowserHost::DragOperationsMask OnDragOver(
+        CefMouseEvent ev, CefBrowserHost::DragOperationsMask effect) = 0;
 
-  virtual void OnDragLeave() = 0;
+    virtual void OnDragLeave() = 0;
 
-  virtual CefBrowserHost::DragOperationsMask OnDrop(
-      CefMouseEvent ev,
-      CefBrowserHost::DragOperationsMask effect) = 0;
+    virtual CefBrowserHost::DragOperationsMask OnDrop(
+        CefMouseEvent ev, CefBrowserHost::DragOperationsMask effect) = 0;
 
- protected:
-  virtual ~OsrDragEvents() = default;
+protected:
+    virtual ~OsrDragEvents() = default;
 };
 
-}  // namespace client
+} // namespace client
 
 #endif //DUILIB_BUILD_FOR_CEF
-#endif  // CEF_TESTS_CEFCLIENT_BROWSER_OSR_DRAGDROP_EVENTS_H_
+#endif // CEF_TESTS_CEFCLIENT_BROWSER_OSR_DRAGDROP_EVENTS_H_

@@ -4,25 +4,25 @@
 #include "duilib/Box/ScrollBox.h"
 #include "duilib/Core/Window.h"
 
-namespace ui
-{
+namespace ui {
 
 class CCheckComboWnd;
 class DUILIB_API CheckCombo : public Box
 {
     typedef Box BaseClass;
     friend class CCheckComboWnd;
+
 public:
-    explicit CheckCombo(Window* pWindow);
-    CheckCombo(const CheckCombo& r) = delete;
-    CheckCombo& operator=(const CheckCombo& r) = delete;
+    explicit CheckCombo(Window *pWindow);
+    CheckCombo(const CheckCombo &r) = delete;
+    CheckCombo &operator=(const CheckCombo &r) = delete;
     virtual ~CheckCombo() override;
 
 public:
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void Activate(const EventArgs* pMsg) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void Activate(const EventArgs *pMsg) override;
     virtual void SetPos(UiRect rc) override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -33,41 +33,41 @@ public:
 
 public:
     /// 重写父类方法，提供个性化功能，请参考父类声明
-    virtual bool AddItem(Control* pControl) override;
-    virtual bool AddItemAt(Control* pControl, size_t iIndex) override;
-    virtual bool RemoveItem(Control* pControl) override;
+    virtual bool AddItem(Control *pControl) override;
+    virtual bool AddItemAt(Control *pControl, size_t iIndex) override;
+    virtual bool RemoveItem(Control *pControl) override;
     virtual bool RemoveItemAt(size_t iIndex) override;
     virtual void RemoveAllItems() override;
-    virtual Control* GetItemAt(size_t iIndex) const override;
-    virtual size_t GetItemIndex(Control* pControl) const override;
-    virtual bool SetItemIndex(Control* pControl, size_t iIndex) override;
+    virtual Control *GetItemAt(size_t iIndex) const override;
+    virtual size_t GetItemIndex(Control *pControl) const override;
+    virtual bool SetItemIndex(Control *pControl, size_t iIndex) override;
     virtual size_t GetItemCount() const override;
 
     /** 添加一个下拉框的列表项
     * @param [in] itemText 文本内容
     */
-    bool AddTextItem(const DString& itemText);
+    bool AddTextItem(const DString &itemText);
 
     /** 添加一个下拉框的列表项
     * @param [in] itemTextId 文本内容ID（支持多语言版）
     */
-    bool AddTextIdItem(const DString& itemTextId);
+    bool AddTextIdItem(const DString &itemTextId);
 
     /** 选择列表项
     * @param [in] itemText 文本内容
     * @param [in] bSelect true表示选择，false表示取消选择
     */
-    bool SelectTextItem(const DString& itemText, bool bSelect);
+    bool SelectTextItem(const DString &itemText, bool bSelect);
 
     /** 选择列表项
     * @param [in] itemTextId 文本内容ID（支持多语言版）
     * @param [in] bSelect true表示选择，false表示取消选择
     */
-    bool SelectTextIdItem(const DString& itemTextId, bool bSelect);
+    bool SelectTextIdItem(const DString &itemTextId, bool bSelect);
 
     /** 获取选择的文本列表
     */
-    void GetSelectedText(std::vector<DString>& selectedText) const;
+    void GetSelectedText(std::vector<DString> &selectedText) const;
 
     /** 清除所有列表项和选择项
     */
@@ -76,16 +76,16 @@ public:
 public:
     /** 获取当前所属的 List 对象
     */
-    ScrollBox* GetListBox() { return m_pDropList.get(); }
+    ScrollBox *GetListBox() { return m_pDropList.get(); }
 
     /** 设置下拉框的属性信息
     * @param [in] pstrList 转义后的 XML 格式属性列表
     */
-    void SetDropBoxAttributeList(const DString& pstrList);
+    void SetDropBoxAttributeList(const DString &pstrList);
 
     /** 获取下拉框容器大小
     */
-    const UiSize& GetDropBoxSize() const;
+    const UiSize &GetDropBoxSize() const;
 
     /** 设置下拉框列表大小(宽度和高度)
      * @param [in] szDropBox 要设置的大小信息
@@ -104,11 +104,11 @@ public:
 
     /** 设置下拉列表中每一个列表项的属性
     */
-    void SetDropboxItemClass(const DString& classValue);
+    void SetDropboxItemClass(const DString &classValue);
 
     /** 设置选择项中每一个子项的属性
     */
-    void SetSelectedItemClass(const DString& classValue);
+    void SetSelectedItemClass(const DString &classValue);
 
     /** 更新下拉列表窗口的位置
     */
@@ -116,7 +116,7 @@ public:
 
     /** 下拉框的窗口接口(只有在显示时能获取到，隐藏时即失效)
     */
-    Window* GetCheckComboWnd() const;
+    Window *GetCheckComboWnd() const;
 
     /** 设置下拉窗口的阴影类型
     */
@@ -131,27 +131,33 @@ public:
      * @param [in] callback 下拉窗关闭后触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowCreate(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowCreate, callback, callbackID); }
+    void AttachWindowCreate(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowCreate, callback, callbackID);
+    }
 
     /** 监听下拉窗关闭事件
     * @param [in] callback 下拉窗关闭后触发的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachWindowClose(const ui::EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(ui::kEventWindowClose, callback, callbackID); }
+    void AttachWindowClose(const ui::EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(ui::kEventWindowClose, callback, callbackID);
+    }
 
 private:
     /** 默认的子项被选择处理函数
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    bool OnSelectItem(const ui::EventArgs& args);
-    bool OnUnSelectItem(const ui::EventArgs& args);
-    bool OnListButtonDown(const ui::EventArgs& args);
+    bool OnSelectItem(const ui::EventArgs &args);
+    bool OnUnSelectItem(const ui::EventArgs &args);
+    bool OnListButtonDown(const ui::EventArgs &args);
 
 private:
     /** 设置控件的属性列表
     */
-    void SetAttributeList(Control* pControl, const DString& classValue);
+    void SetAttributeList(Control *pControl, const DString &classValue);
 
     /** 更新选择列表的高度
     */
@@ -160,7 +166,7 @@ private:
 private:
     /** 下拉框的窗口接口
     */
-    CCheckComboWnd* m_pCheckComboWnd;
+    CCheckComboWnd *m_pCheckComboWnd;
 
     /** 阴影类型
     */
@@ -173,7 +179,7 @@ private:
     /** 选择的列表项容器
     */
     std::unique_ptr<ui::ScrollBox> m_pList;
-    
+
     /** 下拉框的宽度和高度
     */
     ui::UiSize m_szDropBox;

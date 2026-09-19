@@ -11,8 +11,7 @@ class SkFont;
 struct SkPoint;
 enum class SkTextEncoding;
 
-namespace ui 
-{
+namespace ui {
 class IRender;
 
 /** RichText格式文本的绘制实现
@@ -20,33 +19,34 @@ class IRender;
 class DrawRichText
 {
 public:
-    DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);
-    DrawRichText(const DrawRichText& r) = delete;
-    DrawRichText& operator = (const DrawRichText& r) = delete;
+    DrawRichText(IRender *pRender, SkCanvas *pSkCanvas, SkPaint *pSkPaint, SkPoint *pSkPointOrg);
+    DrawRichText(const DrawRichText &r) = delete;
+    DrawRichText &operator=(const DrawRichText &r) = delete;
     ~DrawRichText() = default;
 
 public:
-
     /** 绘制格式文本
     */
-    void InternalDrawRichText(const UiRect& rcTextRect,
-                              const UiSize& szScrollOffset,
-                              IRenderFactory* pRenderFactory, 
-                              const std::vector<RichTextData>& richTextData,                   
-                              uint8_t uFade,
-                              bool bMeasureOnly,
-                              RichTextLineInfoParam* pLineInfoParam,
-                              std::shared_ptr<DrawRichTextCache>* pDrawRichTextCache,
-                              std::vector<std::vector<UiRect>>* pRichTextRects);
+    void InternalDrawRichText(
+        const UiRect &rcTextRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        uint8_t uFade,
+        bool bMeasureOnly,
+        RichTextLineInfoParam *pLineInfoParam,
+        std::shared_ptr<DrawRichTextCache> *pDrawRichTextCache,
+        std::vector<std::vector<UiRect>> *pRichTextRects);
 
     /** 判断RichText的绘制缓存是否有效
     * @param [in] textRect 绘制文本的矩形区域
     * @param [in] richTextData 格式化文字内容，返回文字绘制的区域
     * @param [out] spDrawRichTextCache 返回绘制缓存
     */
-    bool IsValidDrawRichTextCache(const UiRect& textRect,
-                                  const std::vector<RichTextData>& richTextData,
-                                  const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache);
+    bool IsValidDrawRichTextCache(
+        const UiRect &textRect,
+        const std::vector<RichTextData> &richTextData,
+        const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache);
 
     /** 更新RichText的绘制缓存(增量计算)
     * @param [in] spOldDrawRichTextCache 需要更新的缓存
@@ -59,19 +59,21 @@ public:
     * @param [in] nDeletedRows 删除了几个逻辑行
     * @param [in] rowRectTopList 每个逻辑行的top坐标，用于更新行的坐标(下标值为逻辑行，从0开始编号)
     */
-    bool UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& spOldDrawRichTextCache,
-                                 const std::shared_ptr<DrawRichTextCache>& spUpdateDrawRichTextCache,
-                                 std::vector<RichTextData>& richTextDataNew,
-                                 size_t nStartLine,
-                                 const std::vector<size_t>& modifiedLines,
-                                 size_t nModifiedRows,
-                                 const std::vector<size_t>& deletedLines,
-                                 size_t nDeletedRows,
-                                 const std::vector<int32_t>& rowRectTopList);
+    bool UpdateDrawRichTextCache(
+        std::shared_ptr<DrawRichTextCache> &spOldDrawRichTextCache,
+        const std::shared_ptr<DrawRichTextCache> &spUpdateDrawRichTextCache,
+        std::vector<RichTextData> &richTextDataNew,
+        size_t nStartLine,
+        const std::vector<size_t> &modifiedLines,
+        size_t nModifiedRows,
+        const std::vector<size_t> &deletedLines,
+        size_t nDeletedRows,
+        const std::vector<int32_t> &rowRectTopList);
 
     /** 比较两个绘制缓存的数据是否一致
     */
-    bool IsDrawRichTextCacheEqual(const DrawRichTextCache& first, const DrawRichTextCache& second) const;
+    bool IsDrawRichTextCacheEqual(
+        const DrawRichTextCache &first, const DrawRichTextCache &second) const;
 
     /** 绘制RichText的缓存中的内容（绘制前，需要使用IsValidDrawRichTextCache判断缓存是否失效）
     * @param [in] spDrawRichTextCache 缓存的数据
@@ -81,17 +83,21 @@ public:
     * @param [in] uFade 透明度（0 - 255）
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    void DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
-                               const UiRect& textRect,
-                               const UiSize& szNewScrollOffset,
-                               const std::vector<int32_t>& rowXOffset,
-                               uint8_t uFade,
-                               std::vector<std::vector<UiRect>>* pRichTextRects = nullptr);
+    void DrawRichTextCacheData(
+        const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache,
+        const UiRect &textRect,
+        const UiSize &szNewScrollOffset,
+        const std::vector<int32_t> &rowXOffset,
+        uint8_t uFade,
+        std::vector<std::vector<UiRect>> *pRichTextRects = nullptr);
 
 private:
     /** 将文本按照换行符（'\r'或者'\n'）切分为多行
     */
-    void SplitLines(const std::wstring_view& lineText, std::vector<uint32_t>& lineSeprators, std::vector<std::wstring_view>& lineTextViewList);
+    void SplitLines(
+        const std::wstring_view &lineText,
+        std::vector<uint32_t> &lineSeprators,
+        std::vector<std::wstring_view> &lineTextViewList);
 
     /** 绘制一个字符，记录字符属性
     * @param [in] pLineInfoParam 字符属性记录表
@@ -105,19 +111,37 @@ private:
     * @param [in] glyphWidth 当前字符的绘制宽度
     * @param [in] nRowHeight 当前行高
     */
-    void OnDrawUnicodeChar(RichTextLineInfoParam* pLineInfoParam, DStringW::value_type ch, uint8_t glyphChars, size_t glyphCount,
-                           size_t nLineTextIndex, uint32_t nLineTextRowIndex, float xPos, int32_t yPos, float glyphWidth, int32_t nRowHeight);
+    void OnDrawUnicodeChar(
+        RichTextLineInfoParam *pLineInfoParam,
+        DStringW::value_type ch,
+        uint8_t glyphChars,
+        size_t glyphCount,
+        size_t nLineTextIndex,
+        uint32_t nLineTextRowIndex,
+        float xPos,
+        int32_t yPos,
+        float glyphWidth,
+        int32_t nRowHeight);
 
     /** 按设置的属性，绘制文字，由外部指定字符编码
     */
-    void DrawTextString(const UiRect& textRect,
-                        const char* text, size_t len, SkTextEncoding textEncoding,
-                        uint32_t uFormat, const SkPaint& skPaint, IFont* pFont) const;
+    void DrawTextString(
+        const UiRect &textRect,
+        const char *text,
+        size_t len,
+        SkTextEncoding textEncoding,
+        uint32_t uFormat,
+        const SkPaint &skPaint,
+        IFont *pFont) const;
 
     /** 按设置的属性，绘制文字
     */
-    void DrawTextString(const UiRect& textRect, const DString& strText, uint32_t uFormat,
-                        const SkPaint& skPaint, IFont* pFont) const;
+    void DrawTextString(
+        const UiRect &textRect,
+        const DString &strText,
+        uint32_t uFormat,
+        const SkPaint &skPaint,
+        IFont *pFont) const;
 
     /** 获取文本编码
     */
@@ -126,19 +150,19 @@ private:
 private:
     /** 关联的渲染接口
     */
-    IRender* m_pRender;
+    IRender *m_pRender;
 
     /** 绘制的画布
     */
-    SkCanvas* m_pSkCanvas;
+    SkCanvas *m_pSkCanvas;
 
     /** 绘制属性
     */
-    SkPaint* m_pSkPaint;
+    SkPaint *m_pSkPaint;
 
     /** 视图的原点坐标
     */
-    SkPoint* m_pSkPointOrg;
+    SkPoint *m_pSkPointOrg;
 };
 
 } // namespace ui

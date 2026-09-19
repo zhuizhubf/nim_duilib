@@ -4,19 +4,17 @@
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Utils/FilePath.h"
 
-namespace ui 
-{
+namespace ui {
 class Control;
 
 /** 图片加载的路径信息
 */
-enum class DUILIB_API ImageLoadPathType
-{
-    kUnknownPath,   //未知类型路径
-    kLocalPath,     //本地绝对路径(非资源路径)
-    kLocalResPath,  //本地绝对路径(资源路径内)
-    kZipResPath,    //压缩包内相对路径
-    kVirtualPath    //虚拟路径，比如:"icon:1"这种
+enum class DUILIB_API ImageLoadPathType {
+    kUnknownPath,  //未知类型路径
+    kLocalPath,    //本地绝对路径(非资源路径)
+    kLocalResPath, //本地绝对路径(资源路径内)
+    kZipResPath,   //压缩包内相对路径
+    kVirtualPath   //虚拟路径，比如:"icon:1"这种
 };
 
 /** 图片加载的路径信息
@@ -33,7 +31,7 @@ struct DUILIB_API ImageLoadPath
 /** 图片加载参数，用于加载一个图片
 */
 class DUILIB_API ImageLoadParam
-{   
+{
 public:
     /** 默认构造函数
     */
@@ -51,31 +49,32 @@ public:
     * @param [in] fPagMaxFrameRate PAG格式默认播放的最大帧率（仅限PAG格式）
     * @param [in] bAssertEnabled 图片加载失败时是否允许断言
     */
-    ImageLoadParam(DString srcWidth,
-                   DString srcHeight,
-                   bool bImageDpiScaleEnabled,
-                   uint32_t nLoadDpiScale /*= 100*/,
-                   bool bAsyncDecode /*= false*/,
-                   bool bIconAsAnimation /*= false*/,
-                   int32_t nIconFrameDelayMs /*= 1000*/,
-                   uint32_t nIconSize /*= 0*/,
-                   float fPagMaxFrameRate /*= 30.0f*/,
-                   bool bAssertEnabled /*= true*/,
-                   const DString& svgReplaceColors /*= _T("")*/);
+    ImageLoadParam(
+        DString srcWidth,
+        DString srcHeight,
+        bool bImageDpiScaleEnabled,
+        uint32_t nLoadDpiScale /*= 100*/,
+        bool bAsyncDecode /*= false*/,
+        bool bIconAsAnimation /*= false*/,
+        int32_t nIconFrameDelayMs /*= 1000*/,
+        uint32_t nIconSize /*= 0*/,
+        float fPagMaxFrameRate /*= 30.0f*/,
+        bool bAssertEnabled /*= true*/,
+        const DString &svgReplaceColors /*= _T("")*/);
 
     /** 拷贝构造和复制
     */
-    ImageLoadParam(const ImageLoadParam& r) = default;
-    ImageLoadParam& operator= (const ImageLoadParam& r) = default;
+    ImageLoadParam(const ImageLoadParam &r) = default;
+    ImageLoadParam &operator=(const ImageLoadParam &r) = default;
 
 public:
     /** 设置图片路径（本地绝对路径或者压缩包内的相对路径）
     */
-    void SetImageLoadPath(const ImageLoadPath& imageLoadPath);
+    void SetImageLoadPath(const ImageLoadPath &imageLoadPath);
 
     /** 获取图片路径（UTF8或者UTF16编码，本地绝对路径或者压缩包内的相对路径）
     */
-    const ImageLoadPath& GetImageLoadPath() const;
+    const ImageLoadPath &GetImageLoadPath() const;
 
     /** 判断是否为svg图片（svg支持矢量缩放，需要做些特殊处理）
     */
@@ -143,7 +142,7 @@ public:
     * @param [out] nImageWidth 图片设置的宽度，如果返回0则无数据，比如：width='300'
     * @param [out] nImageHeight 图片设置的高度，如果返回0则无数据，比如：height='300'
     */
-    bool GetImageFixedSize(uint32_t& nImageWidth, uint32_t& nImageHeight) const;
+    bool GetImageFixedSize(uint32_t &nImageWidth, uint32_t &nImageHeight) const;
 
     /** 获取图片加载是否包含固定百分比设置大小的选项
     */
@@ -153,12 +152,12 @@ public:
     * @param [out] fImageWidthPercent 图片设置的宽度，如果返回1.0f则无数据，比如：width='300%'
     * @param [out] fImageHeightPercent 图片设置的高度，如果返回1.0f则无数据，比如：height='300%'
     */
-    bool GetImageFixedPercent(float& fImageWidthPercent, float& fImageHeightPercent) const;
+    bool GetImageFixedPercent(float &fImageWidthPercent, float &fImageHeightPercent) const;
 
     /** 设置该图片绘制目标区域大小(已做过DPI缩放)，用于优化加载性能
     * @param [in] rcMaxDestRectSize 区域的宽度和高度
     */
-    void SetMaxDestRectSize(const UiSize& rcMaxDestRectSize);
+    void SetMaxDestRectSize(const UiSize &rcMaxDestRectSize);
 
     /** 获取该图片绘制目标区域大小(已做过DPI缩放)，用于优化加载性能
     */
@@ -167,11 +166,11 @@ public:
 private:
     /** 获取图片加载的固定设置大小
     */
-    bool GetScaledFixedSize(const DString& srcSize, uint32_t& nScaledSize) const;
+    bool GetScaledFixedSize(const DString &srcSize, uint32_t &nScaledSize) const;
 
     /** 获取图片加载的百分比设置大小
     */
-    bool GetScaledFixedPercent(const DString& srcSize, float& fScaledPercent) const;
+    bool GetScaledFixedPercent(const DString &srcSize, float &fScaledPercent) const;
 
 private:
     //(属性名称："file")本地绝对路径或者压缩包内的相对路径，不包含属性

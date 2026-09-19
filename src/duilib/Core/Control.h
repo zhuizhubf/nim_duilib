@@ -1,43 +1,43 @@
 #ifndef UI_CORE_CONTROL_H_
 #define UI_CORE_CONTROL_H_
 
-#include "duilib/Core/PlaceHolder.h"
-#include "duilib/Core/BoxShadow.h"
-#include "duilib/Core/Keyboard.h"
-#include "duilib/Core/EventArgs.h"
 #include "duilib/Animation/EasingFunctions.h"
+#include "duilib/Core/BoxShadow.h"
+#include "duilib/Core/EventArgs.h"
+#include "duilib/Core/Keyboard.h"
+#include "duilib/Core/PlaceHolder.h"
 
-namespace ui 
-{
-    class Control;
-    class ControlLoading;
-    class Image;
-    class IMatrix;
-    class StateColorMap;
-    class StateColorMap2;
-    class StateImageMap;
-    class AnimationManager;
-    class AnimationPlayer;
-    class IRender;
-    class IPath;
-    class IFont;
-    class AutoClip;
-    class ControlDropTarget_Windows;
-    class ControlDropTarget_SDL;
-    class ControlDropTargetImpl_Windows;
-    class ControlDropTargetImpl_SDL;
+namespace ui {
+class Control;
+class ControlLoading;
+class Image;
+class IMatrix;
+class StateColorMap;
+class StateColorMap2;
+class StateImageMap;
+class AnimationManager;
+class AnimationPlayer;
+class IRender;
+class IPath;
+class IFont;
+class AutoClip;
+class ControlDropTarget_Windows;
+class ControlDropTarget_SDL;
+class ControlDropTargetImpl_Windows;
+class ControlDropTargetImpl_SDL;
 
-    typedef Control* (* FINDCONTROLPROC)(Control*, void*);
+typedef Control *(*FINDCONTROLPROC)(Control *, void *);
 
 /** 控件基类(相当于Widget)
 */
-class DUILIB_API Control: public PlaceHolder
+class DUILIB_API Control : public PlaceHolder
 {
     typedef PlaceHolder BaseClass;
+
 public:
-    explicit Control(Window* pWindow);
-    Control(const Control& r) = delete;
-    Control& operator=(const Control& r) = delete;
+    explicit Control(Window *pWindow);
+    Control(const Control &r) = delete;
+    Control &operator=(const Control &r) = delete;
     virtual ~Control() override;
 
     /** 获取控件类型
@@ -53,22 +53,22 @@ public:
     /** 设置背景颜色
      * @param [in] strColor 要设置的背景颜色值，该值必须在 global.xml 中存在
      */
-    void SetBkColor(const DString& strColor);
+    void SetBkColor(const DString &strColor);
 
     /** 设置背景颜色
      * @param [in] color 要设置的背景颜色值
      */
-    void SetBkColor(const UiColor& color);
+    void SetBkColor(const UiColor &color);
 
     /** 设置第二背景色（实现渐变背景色）
      * @param [in] strColor 要设置的背景颜色值，该值必须在 global.xml 中存在
      */
-    void SetBkColor2(const DString& strColor);
+    void SetBkColor2(const DString &strColor);
 
     /** 设置第二背景色（实现渐变背景色）
      * @param [in] color 要设置的背景颜色值
      */
-    void SetBkColor2(const UiColor& color);
+    void SetBkColor2(const UiColor &color);
 
     /** 获取第二背景色（实现渐变背景色）
      */
@@ -77,7 +77,7 @@ public:
     /** 设置第二背景色的方向
      * @param [in] direction 第二背景色的方向："1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
      */
-    void SetBkColor2Direction(const DString& direction);
+    void SetBkColor2Direction(const DString &direction);
 
     /** 获取第二背景色的方向
     * @return 返回第二背景色的方向："1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
@@ -92,12 +92,12 @@ public:
     /** 设置前景颜色(前景色一般设置半透明的颜色)
      * @param [in] strColor 要设置的前景颜色值，该值必须在 global.xml 中存在
      */
-    void SetForeColor(const DString& strColor);
+    void SetForeColor(const DString &strColor);
 
     /** 设置前景颜色(前景色一般设置半透明的颜色)
      * @param [in] color 要设置的前景颜色值
      */
-    void SetForeColor(const UiColor& color);
+    void SetForeColor(const UiColor &color);
 
     /** 获取某个状态下的控件颜色
      * @param [in] stateType 要获取何种状态下的颜色值，参考 ControlStateType 枚举
@@ -124,7 +124,7 @@ public:
      * @param [in] colorRound 要设置的颜色矩形圆角大小，如果不设置，则颜色矩形跟随控件矩形的形状
      * @param [in] bNeedDpiScale 是否需要做DPI自适应
      */
-    void SetStateColor(ControlStateType stateType, const DString& strColor);
+    void SetStateColor(ControlStateType stateType, const DString &strColor);
     void SetStateColorMargin(ControlStateType stateType, UiMargin colorMargin, bool bNeedDpiScale);
     void SetStateColorRound(ControlStateType stateType, UiSize colorRound, bool bNeedDpiScale);
 
@@ -157,14 +157,14 @@ public:
      * @param[in] strImage 要设置的图片路径
      * @return 无
      */
-    void SetBkImage(const DString& strImage);
+    void SetBkImage(const DString &strImage);
 
     /**
      * @brief 设置背景图片（UTF8 格式字符串）
      * @param[in] strImage 要设置的图片路径
      * @return 无
      */
-    void SetUTF8BkImage(const std::string& strImage);
+    void SetUTF8BkImage(const std::string &strImage);
 
 public:
     /**
@@ -180,7 +180,7 @@ public:
      * @param[in] strImage 要设置的图片路径
      * @return 无
      */
-    void SetStateImage(ControlStateType stateType, const DString& strImage);
+    void SetStateImage(ControlStateType stateType, const DString &strImage);
 
     /**
      * @brief 获取指定状态下的前景图片
@@ -195,7 +195,7 @@ public:
      * @param[in] strImage 要设置的前景图片路径
      * @return 无
      */
-    void SetForeStateImage(ControlStateType stateType, const DString& strImage);
+    void SetForeStateImage(ControlStateType stateType, const DString &strImage);
 
     /**@brief 获取控件状态
      * @return 控件的状态，请参考 `ControlStateType` 枚举
@@ -213,7 +213,7 @@ public:
 
     /** 获取用于估算控件大小（宽和高）图片接口
      */
-    virtual Image* GetEstimateImage();
+    virtual Image *GetEstimateImage();
 
     /// 边框相关
     /** 获取指定状态下的边框颜色
@@ -225,17 +225,17 @@ public:
     /** 设置边框颜色，应用于所有状态
      * @param [in] strBorderColor 设置边框的颜色字符串值，该值必须在 global.xml 中存在
      */
-    void SetBorderColor(const DString& strBorderColor);
+    void SetBorderColor(const DString &strBorderColor);
 
     /** 设置指定状态下的边框颜色
      * @param [in] stateType 控件状态
      * @param [in] strBorderColor 设置边框的颜色字符串值，该值必须在 global.xml 中存在
      */
-    void SetBorderColor(ControlStateType stateType, const DString& strBorderColor);
+    void SetBorderColor(ControlStateType stateType, const DString &strBorderColor);
 
     /** 设置焦点状态下的边框颜色
     */
-    void SetFocusedBorderColor(const DString& strBorderColor);
+    void SetFocusedBorderColor(const DString &strBorderColor);
 
     /** 获取焦点状态下的边框颜色
     */
@@ -297,7 +297,7 @@ public:
     /** 设置控件四周边框的线条类型（四个边的边线的线形只能一致，不支持分开设置）
     * @param [in] borderDashStyle 线条类型, 取值范围参见 IPen::DashStyle枚举定义
     */
-    void SetBorderDashStyle(int8_t borderDashStyle); 
+    void SetBorderDashStyle(int8_t borderDashStyle);
 
     /** 控件四周边框的线条类型, 取值范围参见 IPen::DashStyle枚举定义
     */
@@ -317,7 +317,7 @@ public:
      * @param [out] fRoundHeight 圆角高度，DPI缩放之后的结果
      * @return 如果未设置圆角，返回false，如果设置了圆角，返回true
      */
-    bool GetBorderRound(float& fRoundWidth, float& fRoundHeight) const;
+    bool GetBorderRound(float &fRoundWidth, float &fRoundHeight) const;
 
     /** 是否设置了圆角大小
      */
@@ -331,7 +331,7 @@ public:
     /** 设置边框阴影
      * @param[in] 要设置的阴影属性
      */
-    void SetBoxShadow(const DString& strShadow);
+    void SetBoxShadow(const DString &strShadow);
 
     /// 鼠标相关
     /**
@@ -361,28 +361,28 @@ public:
      * @param[in] strText 要设置的文本
      * @return 无
      */
-    virtual void SetToolTipText(const DString& strText);
+    virtual void SetToolTipText(const DString &strText);
 
     /**
      * @brief 设置鼠标悬浮到控件显示的提示文本（UTF8 格式）
      * @param[in] strText 要设置的文本
      * @return 无
      */
-    virtual void SetUTF8ToolTipText(const std::string& strText);
+    virtual void SetUTF8ToolTipText(const std::string &strText);
 
     /**
      * @brief 设置鼠标悬浮到控件显示的提示文本在语言文件中对应的文字
      * @param[in] strTextId 在语言文件中对应的提示文字 ID
      * @return 无
      */
-    virtual void SetToolTipTextId(const DString& strTextId);
+    virtual void SetToolTipTextId(const DString &strTextId);
 
     /**
      * @brief 设置鼠标悬浮到控件显示的提示文本在语言文件中对应的文字（UTF8 格式）
      * @param[in] strTextId 在语言文件中对应的提示文字 ID
      * @return 无
      */
-    virtual void SetUTF8ToolTipTextId(const std::string& strTextId);
+    virtual void SetUTF8ToolTipTextId(const std::string &strTextId);
 
     /** 设置鼠标悬浮到控件上提示的文本单行最大宽度
      * @param [in] nWidth 要设置的宽度值
@@ -425,12 +425,12 @@ public:
     /** 绑定一个字符串数据到控件
      * @param[in] strText 要绑定的字符串数据
      */
-    void SetDataID(const DString& strText);
+    void SetDataID(const DString &strText);
 
     /** 绑定一个字符串数据到控件（UTF8 格式）
      * @param[in] strText 要绑定的字符串数据
      */
-    void SetUTF8DataID(const std::string& strText);
+    void SetUTF8DataID(const std::string &strText);
 
     /** 绑定一个整型值数据到控件
      * @param[in] dataID 要绑定的整型数据
@@ -481,7 +481,7 @@ public:
 
     /** 设置焦点状态虚线矩形的颜色(线条的颜色)
     */
-    void SetFocusedRectColor(const DString& focusRectColor);
+    void SetFocusedRectColor(const DString &focusRectColor);
 
     /** 获取焦点状态虚线矩形的颜色(线条的颜色)
     */
@@ -490,7 +490,7 @@ public:
     /** 判断当前鼠标焦点是否在控件上
      * @return 返回鼠标焦点是否在控件上，true 鼠标焦点在控件上，false 鼠标焦点不在控件上
      */
-    virtual bool IsMouseFocused() const { return m_bMouseFocused;}
+    virtual bool IsMouseFocused() const { return m_bMouseFocused; }
 
     /**
      * @brief 设置是否将鼠标焦点到控件上
@@ -508,7 +508,7 @@ public:
     /** 激活控件，如点击、选中、展开等操作
      * @param [in] pMsg 激活时对应的消息，可能为nullptr
      */
-    virtual void Activate(const EventArgs* pMsg);
+    virtual void Activate(const EventArgs *pMsg);
 
     /** 根据坐标查找指定控件
      * @param [in] Proc 查找的匹配函数
@@ -518,14 +518,17 @@ public:
      * @param [in] scrollPos 滚动条的滚动位置
      * @return 返回控件的指针
      */
-    virtual Control* FindControl(FINDCONTROLPROC Proc, void* pProcData, uint32_t uFlags,
-                                 const UiPoint& ptMouse = UiPoint(),
-                                 const UiPoint& scrollPos = UiPoint());
+    virtual Control *FindControl(
+        FINDCONTROLPROC Proc,
+        void *pProcData,
+        uint32_t uFlags,
+        const UiPoint &ptMouse = UiPoint(),
+        const UiPoint &scrollPos = UiPoint());
 
     /** 根据名字查找控件, 查找范围：当前控件/容器，如果本身是容器，则在容器自身和子控件内查找
     * @param [in] name 控件的名称（区分大小写）
     */
-    Control* FindControl(const DString& name);
+    Control *FindControl(const DString &name);
 
     /// 位置相关
     /** 获取控件位置（子类可改变行为）
@@ -541,7 +544,7 @@ public:
     /** 获取本控件包含box-shadow的绘制扩展区域
     * @return 返回rc + box-shadow 扩展后的总区域，如果无box-shadow则返回rc
     */
-    virtual UiRect GetBoxShadowExpandedRect(const UiRect& rc) const override;
+    virtual UiRect GetBoxShadowExpandedRect(const UiRect &rc) const override;
 
     /** 计算控件大小(宽和高)
         如果设置了图片并设置 width 或 height 任意一项为 auto，将根据图片大小和文本大小来计算最终大小
@@ -568,7 +571,7 @@ public:
      * @param[in] point 具体坐标
      * @return 返回是否在范围内，true 在滚动条当前滚动位置范围内，false 不在滚动条当前滚动位置范围内
      */
-    virtual bool IsPointInWithScrollOffset(const UiPoint& point) const;
+    virtual bool IsPointInWithScrollOffset(const UiPoint &point) const;
 
     /** 控件的消息处理入口，将消息转换为自定义格式的消息
      * @param [in] eventType 消息类型
@@ -583,7 +586,7 @@ public:
      * @param [in] lParam 产生事件时的参数2
      * @param [in] pEventData 产生事件时的指针参数
      */
-    void SendEvent(EventType eventType, WPARAM wParam, LPARAM lParam, void* pEventData);
+    void SendEvent(EventType eventType, WPARAM wParam, LPARAM lParam, void *pEventData);
 
     /** 控件的消息处理入口，将消息转换为自定义格式的消息
      * @param [in] eventType 消息类型
@@ -594,7 +597,7 @@ public:
     /** 将消息派发到消息处理函数
      * @param [in] msg 消息内容
      */
-    virtual void SendEventMsg(const EventArgs& msg);
+    virtual void SendEventMsg(const EventArgs &msg);
 
     /**
      * @brief 判断控件是否有 HOT 状态
@@ -609,28 +612,29 @@ public:
      * @param[in] strValue 要设置的属性值（如 100）
      * @return 无
      */
-    virtual void SetAttribute(const DString& strName, const DString& strValue);
+    virtual void SetAttribute(const DString &strName, const DString &strValue);
 
     /**
      * @brief 设置控件的 class 全局属性
      * @param[in] strClass 要设置的 class 名称，该名称必须在 global.xml 中存在
      * @return 无
      */
-    void SetClass(const DString& strClass);
+    void SetClass(const DString &strClass);
 
     /**
      * @brief 应用一套属性列表
      * @param[in] strList 属性列表的字符串表示，如 `width="100" height="30"`
      * @return 无
      */
-    void ApplyAttributeList(const DString& strList);
+    void ApplyAttributeList(const DString &strList);
 
     /**
      * @brief 待补充
      * @param[in] 待补充
      * @return 待补充
      */
-    bool OnApplyAttributeList(const DString& strReceiver, const DString& strList, const EventArgs& eventArgs);
+    bool OnApplyAttributeList(
+        const DString &strReceiver, const DString &strList, const EventArgs &eventArgs);
 
     /// 绘制操作
     /** 绘制图片
@@ -643,31 +647,36 @@ public:
      * @param [out] pPaintedRect 返回图片绘制的最终目标矩形区域
      * @return 成功返回 true，失败返回 false
      */
-    bool PaintImage(IRender* pRender,
-                    Image* pImage,
-                    const DString& strModify = _T(""),
-                    int32_t nFade = DUI_NOSET_VALUE,
-                    IMatrix* pMatrix = nullptr,
-                    const UiRect* pDestRect = nullptr,
-                    UiRect* pPaintedRect = nullptr) const;
+    bool PaintImage(
+        IRender *pRender,
+        Image *pImage,
+        const DString &strModify = _T(""),
+        int32_t nFade = DUI_NOSET_VALUE,
+        IMatrix *pMatrix = nullptr,
+        const UiRect *pDestRect = nullptr,
+        UiRect *pPaintedRect = nullptr) const;
 
     /** 绘制控件自身及子控件
      * @param[in] pRender 渲染接口
      * @param[in] rcPaint 指定绘制区域
      */
-    virtual void AlphaPaint(IRender* pRender, const UiRect& rcPaint);
-    
+    virtual void AlphaPaint(IRender *pRender, const UiRect &rcPaint);
+
     /** 绘制控件自身
     * @param[in] pRender 渲染接口
     * @param[in] rcPaint 指定绘制区域
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint);
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint);
 
     /** 绘制控件的子控件
     * @param[in] pRender 渲染接口
     * @param[in] rcPaint 指定绘制区域
     */
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) { (void)pRender; (void)rcPaint; };
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint)
+    {
+        (void) pRender;
+        (void) rcPaint;
+    };
 
     /** 设置控件透明度
      * @param [in] nAlpha 0 ~ 255 的透明度值，255 为不透明
@@ -733,7 +742,7 @@ public:
     /** 设置loading的属性，根据属性中指定的XML文件创建显示界面，并设置界面属性
     * @param [in] loadingAttribute loading的属性字符串
     */
-    bool SetLoadingAttribute(const DString& loadingAttribute);
+    bool SetLoadingAttribute(const DString &loadingAttribute);
 
     /** 开启loading状态
     * @param [in] nIntervalMs 回调的时间间隔（毫秒），最小值为10毫秒
@@ -751,25 +760,34 @@ public:
 
     /** 获取loading界面的根容器接口（在StartLoading成功以后才能够获取到, 在StopLoading结束以后也获取不到）
     */
-    Box* GetLoadingUiRootBox() const;
+    Box *GetLoadingUiRootBox() const;
 
     /** 监听loading开始的通知
      * @param [in] callback 监听事件的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLoadingStart(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventLoadingStart, callback, callbackID); }
+    void AttachLoadingStart(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventLoadingStart, callback, callbackID);
+    }
 
     /** 监听loading回调的通知
      * @param[in] callback 监听事件的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLoading(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventLoading, callback, callbackID); }
+    void AttachLoading(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventLoading, callback, callbackID);
+    }
 
     /** 监听loading结束的通知
      * @param [in] callback 监听事件的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLoadingStop(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventLoadingStop, callback, callbackID); }
+    void AttachLoadingStop(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventLoadingStop, callback, callbackID);
+    }
 
 public:
     /// 动画图片
@@ -781,60 +799,71 @@ public:
                     0: 表示无有效的播放次数，使用图片的默认值(或者预设值)
                    >0: 具体的播放次数，达到播放次数后，停止播放
      */
-    bool StartImageAnimation(const DString& imageName = _T(""),
-                             AnimationImagePos nStartFrame = AnimationImagePos::kFrameCurrent,
-                             int32_t nPlayCount = 0);
+    bool StartImageAnimation(
+        const DString &imageName = _T(""),
+        AnimationImagePos nStartFrame = AnimationImagePos::kFrameCurrent,
+        int32_t nPlayCount = 0);
 
     /** 停止播放动画
      * @param [in] imageName 图片资源名称，即XML中配置图片资源中的name字段名称，如果为空串则表示是背景图片
      * @param [in] nStopFrame 播放结束停止在哪一帧，可设置第一帧、当前帧和最后一帧。请参考 AnimationImagePos 枚举
      * @param [in] bTriggerEvent 是否将停止事件通知给订阅者，参考 AttachImageAnimationStop 方法
      */
-    bool StopImageAnimation(const DString& imageName = _T(""),
-                            AnimationImagePos nStopFrame = AnimationImagePos::kFrameCurrent,
-                            bool bTriggerEvent = true);
+    bool StopImageAnimation(
+        const DString &imageName = _T(""),
+        AnimationImagePos nStopFrame = AnimationImagePos::kFrameCurrent,
+        bool bTriggerEvent = true);
 
     /** 播放动画的当前帧
      * @param [in] imageName 图片资源名称，即XML中配置图片资源中的name字段名称，如果为空串则表示是背景图片
      * @param [in] nFrameIndex 从0开始的图片帧索引号
      */
-    bool SetImageAnimationFrame(int32_t nFrameIndex);//背景图片
-    bool SetImageAnimationFrame(const DString& imageName, int32_t nFrameIndex);
+    bool SetImageAnimationFrame(int32_t nFrameIndex); //背景图片
+    bool SetImageAnimationFrame(const DString &imageName, int32_t nFrameIndex);
 
     /** 获取动画的当前帧的索引号
     * @param [in] imageName 图片资源名称，即XML中配置图片资源中的name字段名称，如果为空串则表示是背景图片
     */
-    uint32_t GetImageAnimationFrameIndex() const;//背景图片
-    uint32_t GetImageAnimationFrameIndex(const DString& imageName) const;
+    uint32_t GetImageAnimationFrameIndex() const; //背景图片
+    uint32_t GetImageAnimationFrameIndex(const DString &imageName) const;
 
     /** 获取动画的总帧数
     * @param [in] imageName 图片资源名称，即XML中配置图片资源中的name字段名称，如果为空串则表示是背景图片
     */
-    uint32_t GetImageAnimationFrameCount();//背景图片
-    uint32_t GetImageAnimationFrameCount(const DString& imageName);
+    uint32_t GetImageAnimationFrameCount(); //背景图片
+    uint32_t GetImageAnimationFrameCount(const DString &imageName);
 
     /** 动画图片是否已经完成加载
     */
-    bool IsImageAnimationLoaded() const;//背景图片
-    bool IsImageAnimationLoaded(const DString& imageName) const;
+    bool IsImageAnimationLoaded() const; //背景图片
+    bool IsImageAnimationLoaded(const DString &imageName) const;
 
     /** 监听动画播放开始通知(所有图片动画)
      * @param [in] callback 要监听动画停止播放的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachImageAnimationStart(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventImageAnimationStart, callback, callbackID); }
+    void AttachImageAnimationStart(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventImageAnimationStart, callback, callbackID);
+    }
 
     /** 监听动画播放图片帧的通知(所有图片动画)
      * @param [in] callback 要监听动画停止播放的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachImageAnimationPlayFrame(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventImageAnimationPlayFrame, callback, callbackID); }
+    void AttachImageAnimationPlayFrame(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventImageAnimationPlayFrame, callback, callbackID);
+    }
 
     /** 监听动画播放停止通知(所有图片动画)
      * @param [in] callback 要监听动画停止播放的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachImageAnimationStop(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventImageAnimationStop, callback, callbackID); }
+    void AttachImageAnimationStop(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventImageAnimationStop, callback, callbackID);
+    }
 
 public:
     /// 控件动画相关接口
@@ -880,7 +909,7 @@ public:
 
     /** 获取控件动画管理器接口(控件动画)
      */
-    AnimationManager& GetAnimationManager();
+    AnimationManager &GetAnimationManager();
 
 public:
     /// 图片资源
@@ -888,11 +917,11 @@ public:
      * @param [in,out] duiImage 传入时标注图片的路径信息，如果成功则会缓存图片并记录到该参数的成员中
      * @param [out] bPaintImage true表示在绘制时加载图片，false表示其他情况下加载图片
      */
-    bool LoadImageInfo(Image& duiImage, bool bPaintImage = false) const;
+    bool LoadImageInfo(Image &duiImage, bool bPaintImage = false) const;
 
     /** 获取指定名称的图片资源接口
     */
-    Image* FindImageByName(const DString& imageName) const;
+    Image *FindImageByName(const DString &imageName) const;
 
     /** 清理图片缓存, 清理后，如果使用则会重新加载
      */
@@ -904,15 +933,15 @@ public:
      * @param [out] ptLayoutPos 返回鼠标在客户区内的相对坐标，相对于当前控件的左上角坐标值
      * @return true表示鼠标在控件范围内，false表示鼠标不在控件范围内
      */
-    bool MousePosToLayoutPos(const UiPoint& ptMouse, UiPoint& ptLayoutPos);
+    bool MousePosToLayoutPos(const UiPoint &ptMouse, UiPoint &ptLayoutPos);
 
     /** 屏幕坐标转换为客户区坐标
     */
-    virtual bool ScreenToClient(UiPoint& pt);
+    virtual bool ScreenToClient(UiPoint &pt);
 
     /** 客户区坐标转换为屏幕坐标
     */
-    virtual bool ClientToScreen(UiPoint& pt);
+    virtual bool ClientToScreen(UiPoint &pt);
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -935,163 +964,244 @@ public:
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachAllEvents(const EventCallback& callback, EventCallbackID callbackID = 0)    { AttachEvent(kEventAll, callback, callbackID); }
+    void AttachAllEvents(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventAll, callback, callbackID);
+    }
 
     /** 监听鼠标进入事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachMouseEnter(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseEnter, callback, callbackID); }
+    void AttachMouseEnter(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseEnter, callback, callbackID);
+    }
 
     /** 监听鼠标离开事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachMouseLeave(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseLeave, callback, callbackID); }
+    void AttachMouseLeave(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseLeave, callback, callbackID);
+    }
 
     /** 监听鼠标悬浮事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachMouseHover(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseHover, callback, callbackID); }
+    void AttachMouseHover(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseHover, callback, callbackID);
+    }
 
     /** 监听鼠标移动事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachMouseMove(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseMove, callback, callbackID); }
+    void AttachMouseMove(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseMove, callback, callbackID);
+    }
 
     /** 监听鼠标按下事件(左键)
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachButtonDown(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseButtonDown, callback, callbackID); }
+    void AttachButtonDown(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseButtonDown, callback, callbackID);
+    }
 
     /** 监听鼠标弹起事件(左键)
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachButtonUp(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseButtonUp, callback, callbackID); }
+    void AttachButtonUp(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseButtonUp, callback, callbackID);
+    }
 
     /** 监听鼠标按下事件(右键)
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachRButtonDown(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseRButtonDown, callback, callbackID); }
+    void AttachRButtonDown(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseRButtonDown, callback, callbackID);
+    }
 
     /** 监听鼠标弹起事件(右键)
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachRButtonUp(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseRButtonUp, callback, callbackID); }
+    void AttachRButtonUp(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseRButtonUp, callback, callbackID);
+    }
 
     /** 监听获得焦点事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSetFocus(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSetFocus, callback, callbackID); }
+    void AttachSetFocus(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSetFocus, callback, callbackID);
+    }
 
     /** 监听失去焦点事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachKillFocus(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventKillFocus, callback, callbackID); }
+    void AttachKillFocus(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventKillFocus, callback, callbackID);
+    }
 
     /** 监听窗口失去焦点事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowKillFocus(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowKillFocus, callback, callbackID); }
+    void AttachWindowKillFocus(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowKillFocus, callback, callbackID);
+    }
 
     /** 监听右键菜单事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachContextMenu(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventContextMenu, callback, callbackID); }
+    void AttachContextMenu(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventContextMenu, callback, callbackID);
+    }
 
     /** 监听控件位置改变事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachPosChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventPosChanged, callback, callbackID); }
+    void AttachPosChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventPosChanged, callback, callbackID);
+    }
 
     /** 监听控件大小改变事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSizeChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSizeChanged, callback, callbackID); }
+    void AttachSizeChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSizeChanged, callback, callbackID);
+    }
 
     /** 监听双击事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachDoubleClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventMouseDoubleClick, callback, callbackID); }
+    void AttachDoubleClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventMouseDoubleClick, callback, callbackID);
+    }
 
     /** 绑定鼠标点击处理函数
     * @param [in] callback 要绑定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventClick, callback, callbackID); }
+    void AttachClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventClick, callback, callbackID);
+    }
 
     /** 绑定鼠标右键点击处理函数
     * @param [in] callback 要绑定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachRClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventRClick, callback, callbackID); }
+    void AttachRClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventRClick, callback, callbackID);
+    }
 
     /** 监听控件显示或隐藏事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachVisibleChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventVisibleChanged, callback, callbackID); }
+    void AttachVisibleChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventVisibleChanged, callback, callbackID);
+    }
 
     /** 监听控件状态变化事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachStateChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventStateChanged, callback, callbackID); }
+    void AttachStateChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventStateChanged, callback, callbackID);
+    }
 
     /** 监听控件拖放进入事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachDropEnter(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventDropEnter, callback, callbackID); }
+    void AttachDropEnter(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventDropEnter, callback, callbackID);
+    }
 
     /** 监听控件拖放移动事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachDropOver(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventDropOver, callback, callbackID); }
+    void AttachDropOver(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventDropOver, callback, callbackID);
+    }
 
     /** 监听控件拖放离开事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachDropLeave(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventDropLeave, callback, callbackID); }
+    void AttachDropLeave(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventDropLeave, callback, callbackID);
+    }
 
     /** 监听控件拖放数据事件
     * @param[in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachDropData(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventDropData, callback, callbackID); }
+    void AttachDropData(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventDropData, callback, callbackID);
+    }
 
     /** 监听控件图片加载完成事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachImageLoad(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventImageLoad, callback, callbackID); }
+    void AttachImageLoad(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventImageLoad, callback, callbackID);
+    }
 
     /** 监听控件图片解码完成事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachImageDecode(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventImageDecode, callback, callbackID); }
+    void AttachImageDecode(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventImageDecode, callback, callbackID);
+    }
 
     /** 监听控件销毁事件
     * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachDestroy(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventDestroy, callback, callbackID); }
+    void AttachDestroy(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventDestroy, callback, callbackID);
+    }
     bool HasDestroyEventCallback() const;
 
 public:
@@ -1102,7 +1212,7 @@ public:
     *           (3) 优先级3：在global.xml中的<Global>节点中定义子节点，举例：<ThemeColor name="white" value="#FFFFFFFF"/>                    
     *           (4) 优先级4：参见ui::UiColors::UiColorConsts函数中的定义
     */
-    bool HasUiColor(const DString& colorName) const;
+    bool HasUiColor(const DString &colorName) const;
 
     /** 获取某个颜色对应的值
     * @param [in] colorName 颜色的名称，有效的颜色名称可以是以下定义（按获取优先级顺序）：
@@ -1112,13 +1222,13 @@ public:
     *           (4) 优先级4：直接指定预定义的颜色别名，参见ui::UiColors::UiColorConsts函数中的定义
     * @return ARGB颜色值
     */
-    UiColor GetUiColor(const DString& colorName) const;
+    UiColor GetUiColor(const DString &colorName) const;
 
     /** 获取颜色值对应的字符串, 返回该颜色对应的字符串
     * @param [in] color 颜色值
     * @return 返回颜色值对应的字符串，比如"#FF123456"
     */
-    DString GetColorString(const UiColor& color) const;
+    DString GetColorString(const UiColor &color) const;
 
     /** 判断控件类型是否为可选择的
      * @return 默认返回false
@@ -1145,7 +1255,7 @@ public:
     * @param [in] msg 当前处理的消息
     * @param [in] modifierKey 需要判断的键盘状态
     */
-    bool IsKeyDown(const EventArgs& msg, ModifierKey modifierKey) const;
+    bool IsKeyDown(const EventArgs &msg, ModifierKey modifierKey) const;
 
     /** 是否为CEF的子窗口模式控件
     */
@@ -1170,12 +1280,12 @@ public:
     /** 获取拖放接口（Windows）
     * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
     */
-    virtual ControlDropTarget_Windows* GetControlDropTarget();
+    virtual ControlDropTarget_Windows *GetControlDropTarget();
 
     /** 获取拖放接口（SDL）
     * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
     */
-    virtual ControlDropTarget_SDL* GetControlDropTarget_SDL();
+    virtual ControlDropTarget_SDL *GetControlDropTarget_SDL();
 
     /** 设置是否允许拖放文件
     */
@@ -1188,7 +1298,7 @@ public:
     /** 设置文件拖放的文件后缀名列表
     * @param [in] fileTypes 文件后缀名列表，比如:".txt;.csv"，表示仅支持txt和csv文件；如果为空，表示支持所有文件
     */
-    void SetDropFileTypes(const DString& fileTypes);
+    void SetDropFileTypes(const DString &fileTypes);
 
     /** 获取文件拖放的过滤器
     */
@@ -1204,7 +1314,7 @@ public:
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachEvent(EventType eventType, const EventCallback& callback, EventCallbackID callbackID);
+    void AttachEvent(EventType eventType, const EventCallback &callback, EventCallbackID callbackID);
 
     /** (m_pOnEvent)取消监听指定事件
      * @param [in] eventType 事件类型，见 EventType 枚举
@@ -1228,7 +1338,8 @@ public:
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachXmlEvent(EventType eventType, const EventCallback& callback, EventCallbackID callbackID);
+    void AttachXmlEvent(
+        EventType eventType, const EventCallback &callback, EventCallbackID callbackID);
 
     /** (m_pOnXmlEvent)取消监听指定事件
      * @param [in] eventType 事件类型，见 EventType 枚举
@@ -1252,7 +1363,8 @@ public:
      * @param [in] callback 指定回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachBubbledEvent(EventType eventType, const EventCallback& callback, EventCallbackID callbackID);
+    void AttachBubbledEvent(
+        EventType eventType, const EventCallback &callback, EventCallbackID callbackID);
 
     /** (m_pOnBubbledEvent)解绑事件处理函数
      * @param [in] eventType 事件类型
@@ -1276,7 +1388,8 @@ public:
      * @param [in] callback 指定回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachXmlBubbledEvent(EventType eventType, const EventCallback& callback, EventCallbackID callbackID);
+    void AttachXmlBubbledEvent(
+        EventType eventType, const EventCallback &callback, EventCallbackID callbackID);
 
     /** 解绑XML事件处理函数
      * @param [in] eventType 事件类型
@@ -1301,21 +1414,21 @@ public:
      * @param [in] msg 消息内容
      * @return 如果所有监听者回调函数返回true，则该函数返回true；否则返回false
      */
-    bool FireAllEvents(const EventArgs& msg);
+    bool FireAllEvents(const EventArgs &msg);
 
     /** 触发普通事件，向以下容器的监听者发送事件（m_pOnEvent, m_pOnXmlEventt）
      *  对于m_pOnEvent，m_pOnXmlEvent容器中注册的事件：需要校验GetSender()是否为this, 如果不是this，则不触发事件
      * @param [in] msg 消息内容
      * @return 如果所有监听者回调函数返回true，则该函数返回true；否则返回false
      */
-    bool FireNormalEvents(const EventArgs& msg);
+    bool FireNormalEvents(const EventArgs &msg);
 
     /** 触发Bubbled事件，向以下容器的监听者发送事件（m_pOnBubbledEvent, m_pOnXmlBubbledEvent）
      *   对于m_pOnBubbledEvent, m_pOnXmlBubbledEvent容器中注册的事件：不校验GetSender()是否为this, 直接触发事件
      * @param [in] msg 消息内容
      * @return 如果所有监听者回调函数返回true，则该函数返回true；否则返回false
      */
-    bool FireBubbledEvents(const EventArgs& msg);
+    bool FireBubbledEvents(const EventArgs &msg);
 
     /** 判断是否含有某个类型的事件回调函数(包含所有类型的事件，只要Attach过eventType这个类型就返回true)
     */
@@ -1324,39 +1437,38 @@ public:
     /** @} */
 
 protected:
-
-    //处理放弃控件焦点相关逻辑 
+    //处理放弃控件焦点相关逻辑
     void EnsureNoFocus();
 
     /** 判断消息是否为应过滤掉的消息, 辅助函数
     *   如果当前控件是 !IsEnabled() || !IsMouseEnabled() || !IsKeyboardEnabled() 状态，
         并且消息是鼠标、键盘消息，返回true，否则返回false
     */
-    bool IsDisabledEvents(const EventArgs& msg) const;
+    bool IsDisabledEvents(const EventArgs &msg) const;
 
     //消息处理的保护成员函数，不允许外部直接调用
 
     /** 消息处理函数
     * @param [in] msg 消息内容
     */
-    virtual void HandleEvent(const EventArgs& msg);
+    virtual void HandleEvent(const EventArgs &msg);
 
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    virtual bool MouseEnter(const EventArgs& msg);
-    virtual bool MouseLeave(const EventArgs& msg);
-    virtual bool ButtonDown(const EventArgs& msg);
-    virtual bool ButtonUp(const EventArgs& msg);
-    virtual bool ButtonDoubleClick(const EventArgs& msg);
-    virtual bool RButtonDown(const EventArgs& msg);
-    virtual bool RButtonUp(const EventArgs& msg);
-    virtual bool RButtonDoubleClick(const EventArgs& msg);
-    virtual bool MButtonDown(const EventArgs& msg);
-    virtual bool MButtonUp(const EventArgs& msg);
-    virtual bool MButtonDoubleClick(const EventArgs& msg);
-    virtual bool MouseMove(const EventArgs& msg);
-    virtual bool MouseHover(const EventArgs& msg);
-    virtual bool MouseWheel(const EventArgs& msg);
-    virtual bool MouseMenu(const EventArgs& msg);
+    virtual bool MouseEnter(const EventArgs &msg);
+    virtual bool MouseLeave(const EventArgs &msg);
+    virtual bool ButtonDown(const EventArgs &msg);
+    virtual bool ButtonUp(const EventArgs &msg);
+    virtual bool ButtonDoubleClick(const EventArgs &msg);
+    virtual bool RButtonDown(const EventArgs &msg);
+    virtual bool RButtonUp(const EventArgs &msg);
+    virtual bool RButtonDoubleClick(const EventArgs &msg);
+    virtual bool MButtonDown(const EventArgs &msg);
+    virtual bool MButtonUp(const EventArgs &msg);
+    virtual bool MButtonDoubleClick(const EventArgs &msg);
+    virtual bool MouseMove(const EventArgs &msg);
+    virtual bool MouseHover(const EventArgs &msg);
+    virtual bool MouseWheel(const EventArgs &msg);
+    virtual bool MouseMenu(const EventArgs &msg);
 
     //键盘消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
 
@@ -1372,33 +1484,33 @@ protected:
     *                   text = (DStringW::value_type*)msg.wParam;
     *               }
     */
-    virtual bool OnChar(const EventArgs& msg);
-    virtual bool OnKeyDown(const EventArgs& msg);
-    virtual bool OnKeyUp(const EventArgs& msg);
+    virtual bool OnChar(const EventArgs &msg);
+    virtual bool OnKeyDown(const EventArgs &msg);
+    virtual bool OnKeyUp(const EventArgs &msg);
 
     //光标与焦点相关消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    virtual bool OnSetCursor(const EventArgs& msg);
-    virtual bool OnSetFocus(const EventArgs& msg);
-    virtual bool OnKillFocus(const EventArgs& msg); //控件失去焦点
-    virtual bool OnWindowSetFocus(const EventArgs& msg);//控件所属的窗口获得焦点
-    virtual bool OnWindowKillFocus(const EventArgs& msg);//控件所属的窗口失去焦点
-    virtual bool OnCaptureChanged(const EventArgs& msg);//控件所属窗口的鼠标捕获丢失
-    virtual bool OnImeSetContext(const EventArgs& msg);
-    virtual bool OnImeStartComposition(const EventArgs& msg);
-    virtual bool OnImeComposition(const EventArgs& msg);
-    virtual bool OnImeEndComposition(const EventArgs& msg);
+    virtual bool OnSetCursor(const EventArgs &msg);
+    virtual bool OnSetFocus(const EventArgs &msg);
+    virtual bool OnKillFocus(const EventArgs &msg);       //控件失去焦点
+    virtual bool OnWindowSetFocus(const EventArgs &msg);  //控件所属的窗口获得焦点
+    virtual bool OnWindowKillFocus(const EventArgs &msg); //控件所属的窗口失去焦点
+    virtual bool OnCaptureChanged(const EventArgs &msg);  //控件所属窗口的鼠标捕获丢失
+    virtual bool OnImeSetContext(const EventArgs &msg);
+    virtual bool OnImeStartComposition(const EventArgs &msg);
+    virtual bool OnImeComposition(const EventArgs &msg);
+    virtual bool OnImeEndComposition(const EventArgs &msg);
 
     /// 绘制相关保护成员函数，不允许外部直接调用
-    virtual void PaintShadow(IRender* pRender);         //绘制BoxShadow
-    virtual void PaintBkColor(IRender* pRender);        //绘制背景色
-    virtual void PaintForeColor(IRender* pRender);      //绘制前景色
-    virtual void PaintBkImage(IRender* pRender);        //绘制背景图片
-    virtual void PaintStateColors(IRender* pRender);    //绘制状态颜色
-    virtual void PaintStateImages(IRender* pRender);    //绘制状态图片
-    virtual void PaintText(IRender* pRender);           //绘制文本
-    virtual void PaintBorder(IRender* pRender);         //绘制边框
-    virtual void PaintFocusRect(IRender* pRender);      //绘制焦点状态下的虚框
-    virtual void PaintLoading(IRender* pRender, const UiRect& rcPaint);//绘制控件loading状态
+    virtual void PaintShadow(IRender *pRender);                         //绘制BoxShadow
+    virtual void PaintBkColor(IRender *pRender);                        //绘制背景色
+    virtual void PaintForeColor(IRender *pRender);                      //绘制前景色
+    virtual void PaintBkImage(IRender *pRender);                        //绘制背景图片
+    virtual void PaintStateColors(IRender *pRender);                    //绘制状态颜色
+    virtual void PaintStateImages(IRender *pRender);                    //绘制状态图片
+    virtual void PaintText(IRender *pRender);                           //绘制文本
+    virtual void PaintBorder(IRender *pRender);                         //绘制边框
+    virtual void PaintFocusRect(IRender *pRender);                      //绘制焦点状态下的虚框
+    virtual void PaintLoading(IRender *pRender, const UiRect &rcPaint); //绘制控件loading状态
 
 protected:
     /** 是否状态图片, 只要含有任意状态图片，即返回true
@@ -1415,7 +1527,7 @@ protected:
 
     /** 设置某个状态下的图片
      */
-    void SetStateImage(StateImageType imageType, ControlStateType stateType, const DString& strImage);
+    void SetStateImage(StateImageType imageType, ControlStateType stateType, const DString &strImage);
 
     /** 绘制指定类型、指定状态的图片
     * @param [in] pRender 绘制接口
@@ -1425,11 +1537,12 @@ protected:
     * @param [out] pDestRect 返回图片绘制的最终目标矩形区域
     * @return 绘制成功返回true, 否则返回false
     */
-    bool PaintStateImage(IRender* pRender, 
-                         StateImageType stateImageType, 
-                         ControlStateType stateType, 
-                         const DString& sImageModify = _T(""),
-                         UiRect* pDestRect = nullptr);
+    bool PaintStateImage(
+        IRender *pRender,
+        StateImageType stateImageType,
+        ControlStateType stateType,
+        const DString &sImageModify = _T(""),
+        UiRect *pDestRect = nullptr);
 
     /** 清除所有状态图片属性
     */
@@ -1455,7 +1568,7 @@ protected:
     /** 判断是否禁用背景图片绘制
     */
     bool IsBkImagePaintEnabled() const;
- 
+
     /** 设置是否禁止背景图片绘制
     */
     void SetBkImagePaintEnabled(bool bEnable);
@@ -1470,7 +1583,7 @@ protected:
 
     /** 背景图片的接口
     */
-    Image* GetBkImagePtr() const;
+    Image *GetBkImagePtr() const;
 
     /** 检查控件估算结果(含是否有缓存结果)，并对估算条件进行预处理
     * @param [in,out] szAvailable 估算输入的可用宽度和高度值，函数内部会对其约束和调整
@@ -1478,24 +1591,24 @@ protected:
     * @param [out] returnEstSize 返回估算结果，当本函数返回false时，需要作为EstimateSize的返回值
     * @return 如果返回false，需要终止估算，如果返回true表示需要继续估算
     */
-    bool PreEstimateSize(UiSize& szAvailable, UiFixedSize& fixedSize, UiEstSize& returnEstSize) const;
+    bool PreEstimateSize(UiSize &szAvailable, UiFixedSize &fixedSize, UiEstSize &returnEstSize) const;
 
 protected:
     /** 绘制指定状态的颜色
     */
-    void PaintStateColor(IRender* pRender, ControlStateType stateType) const;
+    void PaintStateColor(IRender *pRender, ControlStateType stateType) const;
 
     /** @brief 获取控件的绘制区域
     */
-    const UiRect& GetPaintRect() const { return m_rcPaint; }
+    const UiRect &GetPaintRect() const { return m_rcPaint; }
 
     /** @brief 设置控件的绘制区域
     */
-    void SetPaintRect(const UiRect& rect);
+    void SetPaintRect(const UiRect &rect);
 
     /** 绘制焦点状态的矩形（虚线组成的矩形）
     */
-    void DoPaintFocusRect(IRender* pRender);
+    void DoPaintFocusRect(IRender *pRender);
 
     /** 暂停该控件内的所有动画播放(背景图片的动画等)
     */
@@ -1511,36 +1624,55 @@ protected:
 
     /** 画边框线
     */
-    void DrawBorderLine(IRender* pRender, const UiPointF& pt1, const UiPointF& pt2,
-                        float fBorderSize, UiColor dwBorderColor, int8_t borderDashStyle);
+    void DrawBorderLine(
+        IRender *pRender,
+        const UiPointF &pt1,
+        const UiPointF &pt2,
+        float fBorderSize,
+        UiColor dwBorderColor,
+        int8_t borderDashStyle);
 
     /** 设置直角的剪辑区域
     */
-    std::unique_ptr<AutoClip> CreateRectClip(IRender* pRender, const UiRect& rc, bool bClip) const;
+    std::unique_ptr<AutoClip> CreateRectClip(IRender *pRender, const UiRect &rc, bool bClip) const;
 
     /** 设置圆角的剪辑区域
     */
-    std::unique_ptr<AutoClip> CreateRoundClip(IRender* pRender, const UiRect& rc, bool bRoundClip) const;
+    std::unique_ptr<AutoClip> CreateRoundClip(
+        IRender *pRender, const UiRect &rc, bool bRoundClip) const;
 
 private:
     /** 绘制边框：根据条件判断绘制圆角矩形边框还是普通矩形边框
     */
-    void PaintBorders(IRender* pRender, UiRect rcDraw, 
-                      float fBorderSize, UiColor dwBorderColor,
-                      int8_t borderDashStyle) const;
+    void PaintBorders(
+        IRender *pRender,
+        UiRect rcDraw,
+        float fBorderSize,
+        UiColor dwBorderColor,
+        int8_t borderDashStyle) const;
 
     /** 绘制圆角矩形
     */
-    void DrawRoundRect(IRender* pRender, const UiRect& rc, float rx, float ry,
-                       UiColor dwBorderColor, float fBorderSize,
-                       int8_t borderDashStyle) const;
-    void DrawRoundRect(IRender* pRender, const UiRectF& rc, float rx, float ry,
-                       UiColor dwBorderColor, float fBorderSize,
-                       int8_t borderDashStyle) const;
+    void DrawRoundRect(
+        IRender *pRender,
+        const UiRect &rc,
+        float rx,
+        float ry,
+        UiColor dwBorderColor,
+        float fBorderSize,
+        int8_t borderDashStyle) const;
+    void DrawRoundRect(
+        IRender *pRender,
+        const UiRectF &rc,
+        float rx,
+        float ry,
+        UiColor dwBorderColor,
+        float fBorderSize,
+        int8_t borderDashStyle) const;
 
     /** 填充圆角矩形
     */
-    void FillRoundRect(IRender* pRender, const UiRect& rc, float rx, float ry, UiColor dwColor) const;
+    void FillRoundRect(IRender *pRender, const UiRect &rc, float rx, float ry, UiColor dwColor) const;
 
     /** 当前控件是否为窗口的Root节点
     */
@@ -1581,7 +1713,7 @@ public:
     * @param[in] strFontId 要设置的字体ID，该字体ID必须在 global.xml 中存在
     * @return 成功返回字体接口，外部调用不需要释放资源；如果失败则返回nullptr
     */
-    IFont* GetIFontById(const DString& strFontId) const;
+    IFont *GetIFontById(const DString &strFontId) const;
 
     /** 设置为动画模式(该模式下，可减少不必要的绘制)
     * @param [in] 
@@ -1615,23 +1747,28 @@ private:
 
     /** 获取渐变颜色的方向
     */
-    int8_t GetColor2Direction(const UiString& bkColor2Direction) const;
+    int8_t GetColor2Direction(const UiString &bkColor2Direction) const;
 
     /** 解析并处理动画播放属性
     */
-    void ParseStartImageAnimation(const DString& value);
+    void ParseStartImageAnimation(const DString &value);
 
     /** 解析并处理动画停止属性
     */
-    void ParseStopImageAnimation(const DString& value);
+    void ParseStopImageAnimation(const DString &value);
 
     /** 解析并处理动画设置当前帧属性
     */
-    void ParseSetImageAnimationFrame(const DString& value);
+    void ParseSetImageAnimationFrame(const DString &value);
 
     /** 触发图片加载完成和解码完成事件
     */
-    void FireImageEvent(Image* pImagePtr, const DString& imageFilePath, bool bLoadImage, bool bLoadError, bool bDecodeError) const;
+    void FireImageEvent(
+        Image *pImagePtr,
+        const DString &imageFilePath,
+        bool bLoadImage,
+        bool bLoadError,
+        bool bDecodeError) const;
 
     /** 创建一个临时的Render对象
     */
@@ -1640,33 +1777,33 @@ private:
     /** 校验事件类型是否有效、是否匹配
     * @return 返回true表示校验通过，返回false表示校验未通过
     */
-    bool CheckEventType(const EventArgs& msg, EventType eventType) const;
+    bool CheckEventType(const EventArgs &msg, EventType eventType) const;
 
 private:
     /** 获取AttachXXX接口的监听事件管理器
     */
-    EventMap& GetAttachEventMap();
+    EventMap &GetAttachEventMap();
     bool HasAttachEventMap() const;
 
     /** 获取通过XML中，配置<Event>标签添加的响应事件管理接口
     */
-    EventMap& GetXmlEventMap();
+    EventMap &GetXmlEventMap();
     bool HasXmlEventMap() const;
 
     /** 获取通过AttachBubbledEvent接口添加的事件管理接口
     */
-    EventMap& GetBubbledEventMap();
+    EventMap &GetBubbledEventMap();
     bool HasBubbledEventMap() const;
 
     /** 获取通过XML中，配置<BubbledEvent>标签添加的响应事件管理接口
     */
-    EventMap& GetXmlBubbledEventMap();
+    EventMap &GetXmlBubbledEventMap();
     bool HasXmlBubbledEventMap() const;
 
 private:
     /** 获取Hovered动画的播放接口
     */
-    AnimationPlayer* GetHoveredAnimationPlayer() const;
+    AnimationPlayer *GetHoveredAnimationPlayer() const;
 
 private:
     /** 图片异步解码的实现函数
@@ -1676,7 +1813,7 @@ private:
 
     /** 颜色转换函数的实现
     */
-    static UiColor PrivateGetUiColor(const DString& colorName, Window* pWindow);
+    static UiColor PrivateGetUiColor(const DString &colorName, Window *pWindow);
 
 private:
     //回调事件管理
@@ -1686,13 +1823,13 @@ private:
         EventMap m_attachEvent;
 
         //通过XML中，配置<Event标签添加的响应事件，最终由Control::OnApplyAttributeList函数响应具体操作
-        EventMap* m_pXmlEvent = nullptr;
+        EventMap *m_pXmlEvent = nullptr;
 
         //通过AttachBubbledEvent接口添加的事件
-        EventMap* m_pBubbledEvent = nullptr;
+        EventMap *m_pBubbledEvent = nullptr;
 
         //通过XML中，配置<BubbledEvent标签添加的响应事件，最终由Control::OnApplyAttributeList函数响应具体操作
-        EventMap* m_pXmlBubbledEvent = nullptr;
+        EventMap *m_pXmlBubbledEvent = nullptr;
 
         //析构函数中释放资源
         ~TEventMapData()
@@ -1868,7 +2005,7 @@ private:
     /** 控件的绘制区域
     */
     UiRect m_rcPaint;
-   
+
     /** 用户数据ID(字符串)
     */
     UiString m_sUserDataID;

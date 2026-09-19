@@ -1,12 +1,11 @@
 #ifndef UI_CONTROL_TEXT_DRAWER_H_
 #define UI_CONTROL_TEXT_DRAWER_H_
 
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Control/RichText.h"
+#include "duilib/Core/UiTypes.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 /** 文本绘制的实现类，支持普通文本绘制和RichText文本绘制
 */
 class DUILIB_API TextDrawer
@@ -25,12 +24,13 @@ public:
      * @param [in] pOwner 关联的控件接口
      * @return 返回文本字符串的宽度和高度，以矩形表示结果
      */
-    UiRect MeasureString(IRender* pRender,
-                         const DString& strText,
-                         const MeasureStringParam& measureParam,
-                         const DString& fontId,
-                         bool bRichText,
-                         Control* pOwner);
+    UiRect MeasureString(
+        IRender *pRender,
+        const DString &strText,
+        const MeasureStringParam &measureParam,
+        const DString &fontId,
+        bool bRichText,
+        Control *pOwner);
 
     /** 绘制文字
      * @param [in] pRender 绘制引擎对象 
@@ -40,12 +40,13 @@ public:
      * @param [in] bRichText true表示文本内容为RichText，false表示文本内容为普通文本
      * @param [in] pOwner 关联的控件接口
      */
-    void DrawString(IRender* pRender,
-                    const DString& strText,
-                    const DrawStringParam& drawParam,
-                    const DString& fontId,
-                    bool bRichText,
-                    Control* pOwner);
+    void DrawString(
+        IRender *pRender,
+        const DString &strText,
+        const DrawStringParam &drawParam,
+        const DString &fontId,
+        bool bRichText,
+        Control *pOwner);
 
     /** 设置原文本内容发生变化（当文本内容变化时，需要重新解析）
     */
@@ -58,7 +59,8 @@ private:
     * @param [in] fSpacingAdd 行间距附加量: 是固定的附加像素值（默认值通常为 0）
     * @param [in] fontId 默认的字体ID
     */
-    void UpdateTextDrawProps(uint32_t uFormat, float fSpacingMul, float fSpacingAdd, const DString& fontId);
+    void UpdateTextDrawProps(
+        uint32_t uFormat, float fSpacingMul, float fSpacingAdd, const DString &fontId);
 
 private:
     /** RichText实现接口
@@ -70,6 +72,6 @@ private:
     bool m_bRichTextChanged;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_TEXT_DRAWER_H_

@@ -11,21 +11,21 @@ class TestApplication
 private:
     TestApplication();
     ~TestApplication();
-    TestApplication(const TestApplication&) = delete;
-    TestApplication& operator = (const TestApplication&) = delete;
+    TestApplication(const TestApplication &) = delete;
+    TestApplication &operator=(const TestApplication &) = delete;
 
 public:
     /** 获取单例对象
     */
-    static TestApplication& Instance();
+    static TestApplication &Instance();
 
     /** 运行程序功能
     */
-    int Run(int argc, char** argv);
+    int Run(int argc, char **argv);
 
     /** 设置主窗口接口
     */
-    void SetMainWindow(ui::Window* pWindow);
+    void SetMainWindow(ui::Window *pWindow);
 
     /** 激活主窗口
     */

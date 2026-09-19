@@ -1,23 +1,22 @@
 #ifndef UI_BOX_GRIDBOX_H_
 #define UI_BOX_GRIDBOX_H_
 
-#include "duilib/Core/Box.h"
 #include "duilib/Box/ScrollBox.h"
+#include "duilib/Core/Box.h"
 #include "duilib/Layout/GridLayout.h"
 
-namespace ui
-{
+namespace ui {
 /** 网格布局的容器(模板类)
 */
 template<typename InheritType = Box>
 class GridBoxT : public InheritType
 {
     typedef GridBoxT<InheritType> BaseClass;
+
 public:
-    explicit GridBoxT(Window* pWindow) :
-        InheritType(pWindow, new GridLayout())
-    {
-    }
+    explicit GridBoxT(Window *pWindow)
+        : InheritType(pWindow, new GridLayout())
+    {}
 
     /** 获取控件类型
     */
@@ -29,7 +28,7 @@ public:
     int32_t GetRows() const
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             return pGridLayout->GetRows();
         }
@@ -42,7 +41,7 @@ public:
     void SetRows(int32_t nRows)
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             pGridLayout->SetRows(nRows);
         }
@@ -53,7 +52,7 @@ public:
     int32_t GetColumns() const
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             return pGridLayout->GetColumns();
         }
@@ -66,7 +65,7 @@ public:
     void SetColumns(int32_t nCols)
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             pGridLayout->SetColumns(nCols);
         }
@@ -77,7 +76,7 @@ public:
     void SetGridWidth(int32_t nGridWidth, bool bNeedDpiScale)
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             pGridLayout->SetGridWidth(nGridWidth, bNeedDpiScale);
         }
@@ -89,7 +88,7 @@ public:
     int32_t GetGridWidth() const
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             return pGridLayout->GetGridWidth();
         }
@@ -101,7 +100,7 @@ public:
     void SetGridHeight(int32_t nGridHeight, bool bNeedDpiScale)
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             pGridLayout->SetGridHeight(nGridHeight, bNeedDpiScale);
         }
@@ -113,7 +112,7 @@ public:
     int32_t GetGridHeight() const
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             return pGridLayout->GetGridHeight();
         }
@@ -127,7 +126,7 @@ public:
     void SetScaleDown(bool bScaleDown)
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             pGridLayout->SetScaleDown(bScaleDown);
         }
@@ -140,7 +139,7 @@ public:
     bool IsScaleDown() const
     {
         ASSERT(this->GetLayout()->GetLayoutType() == LayoutType::GridLayout);
-        GridLayout* pGridLayout = dynamic_cast<GridLayout*>(this->GetLayout());
+        GridLayout *pGridLayout = dynamic_cast<GridLayout *>(this->GetLayout());
         if (pGridLayout != nullptr) {
             return pGridLayout->IsScaleDown();
         }
@@ -153,11 +152,11 @@ public:
 class DUILIB_API GridBox : public GridBoxT<Box>
 {
     typedef GridBoxT<Box> BaseClass;
+
 public:
-    explicit GridBox(Window* pWindow) :
-        GridBoxT<Box>(pWindow)
-    {
-    }
+    explicit GridBox(Window *pWindow)
+        : GridBoxT<Box>(pWindow)
+    {}
 
     /** 获取控件类型
     */
@@ -169,11 +168,11 @@ public:
 class DUILIB_API GridScrollBox : public GridBoxT<ScrollBox>
 {
     typedef GridBoxT<ScrollBox> BaseClass;
+
 public:
-    explicit GridScrollBox(Window* pWindow) :
-        GridBoxT<ScrollBox>(pWindow)
-    {
-    }
+    explicit GridScrollBox(Window *pWindow)
+        : GridBoxT<ScrollBox>(pWindow)
+    {}
 
     /** 获取控件类型
     */

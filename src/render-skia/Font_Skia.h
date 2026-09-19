@@ -6,23 +6,22 @@
 class SkFont;
 class SkFontMgr;
 
-namespace ui 
-{
+namespace ui {
 
 /** Skia字体接口的实现
 */
-class Font_Skia: public IFont
+class Font_Skia : public IFont
 {
 public:
-    explicit Font_Skia(std::shared_ptr<IFontMgr>& spFontMgr);
-    Font_Skia(const Font_Skia&) = delete;
-    Font_Skia& operator=(const Font_Skia&) = delete;
+    explicit Font_Skia(std::shared_ptr<IFontMgr> &spFontMgr);
+    Font_Skia(const Font_Skia &) = delete;
+    Font_Skia &operator=(const Font_Skia &) = delete;
     virtual ~Font_Skia() override;
 
     /** 设置字体信息(内部未对字体大小做DPI自适应)
     * @note 该方法只保存 UiFont 并清理旧的 SkFont，实际 SkFont 的创建延迟到首次调用 GetFontHandle()
     */
-    virtual bool InitFont(const UiFont& fontInfo) override;
+    virtual bool InitFont(const UiFont &fontInfo) override;
 
     /**@brief 获取字体名
      */
@@ -52,16 +51,16 @@ public:
     * @param [in] unicodeChar UTF32字符
     * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     */
-    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId) override;
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t *glyphId) override;
 
 public:
     /** 获取字体句柄
     */
-    const SkFont* GetFontHandle();
+    const SkFont *GetFontHandle();
 
     /** 获取字体管理器接口
     */
-    IFontMgr* GetFontMgr() const;
+    IFontMgr *GetFontMgr() const;
 
 private:
     /** 删除Skia字体
@@ -73,7 +72,7 @@ private:
     UiFont m_uiFont;
 
     //字体句柄
-    SkFont* m_skFont;
+    SkFont *m_skFont;
 
     //字体管理器
     std::shared_ptr<IFontMgr> m_spFontMgr;

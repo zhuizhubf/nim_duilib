@@ -4,8 +4,7 @@
 #include "duilib/duilib_defs.h"
 #include <cstdint>
 
-namespace ui
-{
+namespace ui {
 
 /** 控件设置长度（或宽度）数值
 */
@@ -13,11 +12,10 @@ class DUILIB_API UiFixedInt
 {
 public:
     //数值类型定义
-    enum class Type
-    {
-        Int32   = 0,    //正常32位整型值，固定数值
-        Stretch = 1,    //拉伸（由外部的容器负责设置具体数值）
-        Auto    = 2     //自动（由控件自己的内容决定具体数值，比如背景图片的大小，文字区域的大小等）
+    enum class Type {
+        Int32 = 0,   //正常32位整型值，固定数值
+        Stretch = 1, //拉伸（由外部的容器负责设置具体数值）
+        Auto = 2     //自动（由控件自己的内容决定具体数值，比如背景图片的大小，文字区域的大小等）
     };
 
     //数值类型
@@ -68,17 +66,21 @@ public:
 public:
     /** 构造函数, 默认为整型值0
     */
-    UiFixedInt(): type(Type::Int32), value(0)
-    { }
+    UiFixedInt()
+        : type(Type::Int32)
+        , value(0)
+    {}
 
     /** 构造函数, 设置为整型值
     */
-    explicit UiFixedInt(int32_t iValue) : type(Type::Int32), value(iValue)
-    { }
+    explicit UiFixedInt(int32_t iValue)
+        : type(Type::Int32)
+        , value(iValue)
+    {}
 
     /** 判断是否为拉伸类型
     */
-    bool IsStretch() const { return type == Type::Stretch;}
+    bool IsStretch() const { return type == Type::Stretch; }
 
     /** 判断是否为自动类型
     */
@@ -109,12 +111,12 @@ public:
 
     /** 获取32位整型值
     */
-    int32_t GetInt32() const 
-    { 
+    int32_t GetInt32() const
+    {
         if (type != Type::Int32) {
             return 0;
         }
-        return value >= 0 ? value : 0; 
+        return value >= 0 ? value : 0;
     }
 
     /** 获取拉伸类型值，有效值(0, 100], 代表百分之几
@@ -132,9 +134,9 @@ public:
 
     /** 赋值为拉伸类型
     */
-    void SetStretch() 
-    { 
-        type = Type::Stretch; 
+    void SetStretch()
+    {
+        type = Type::Stretch;
         value = 100;
     }
 
@@ -145,31 +147,28 @@ public:
         type = Type::Stretch;
         if ((iValue > 0) && (iValue <= 100)) {
             value = iValue;
-        }
-        else {
+        } else {
             value = 100;
         }
     }
 
     /** 赋值为自动类型
     */
-    void SetAuto() 
-    { 
-        type = Type::Auto; 
+    void SetAuto()
+    {
+        type = Type::Auto;
         value = 0;
     }
 
     /** 判断是否与另外一个Size相同
     */
-    bool Equals(const UiFixedInt& dst) const
+    bool Equals(const UiFixedInt &dst) const
     {
         if (IsStretch() && dst.IsStretch()) {
             return value == dst.value;
-        }
-        else if (IsAuto() && dst.IsAuto()) {
+        } else if (IsAuto() && dst.IsAuto()) {
             return true;
-        }
-        else if (IsInt32() && dst.IsInt32()) {
+        } else if (IsInt32() && dst.IsInt32()) {
             return value == dst.value;
         }
         return false;
@@ -177,19 +176,13 @@ public:
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiFixedInt& a, const UiFixedInt& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiFixedInt &a, const UiFixedInt &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiFixedInt& a, const UiFixedInt& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiFixedInt &a, const UiFixedInt &b) { return !a.Equals(b); }
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif // UI_CORE_UIFIXEDINT_H_

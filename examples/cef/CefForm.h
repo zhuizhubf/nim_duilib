@@ -14,10 +14,10 @@ const bool kEnableOffScreenRendering = false;
 
 /** CEF控件的窗口
 */
-class CefForm : public ui::WindowImplBase,
-                public ui::CefControlEvent
+class CefForm : public ui::WindowImplBase, public ui::CefControlEvent
 {
     typedef WindowImplBase BaseClass;
+
 public:
     CefForm();
     virtual ~CefForm() override;
@@ -49,15 +49,19 @@ protected:
     * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
-    virtual LRESULT OnKeyDownMsg(ui::VirtualKeyCode vkCode, uint32_t modifierKey, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnKeyDownMsg(
+        ui::VirtualKeyCode vkCode,
+        uint32_t modifierKey,
+        const ui::NativeMsg &nativeMsg,
+        bool &bHandled) override;
 
 private:
-    bool OnClicked(const ui::EventArgs& msg);
-    bool OnNavigate(const ui::EventArgs& msg);
+    bool OnClicked(const ui::EventArgs &msg);
+    bool OnNavigate(const ui::EventArgs &msg);
 
     /** 控制主进程单例的回调函数
     */
-    void OnAlreadyRunningAppRelaunch(const std::vector<DString>& argumentList);
+    void OnAlreadyRunningAppRelaunch(const std::vector<DString> &argumentList);
 
 private:
     /** Browser对象创建完成（回调函数的调用线程：主进程的UI线程）
@@ -70,79 +74,91 @@ private:
 
     /** 菜单弹出（回调函数的调用线程：CEF的UI线程）
     */
-    virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
-                                     CefRefPtr<CefFrame> frame,
-                                     CefRefPtr<CefContextMenuParams> params,
-                                     CefRefPtr<CefMenuModel> model) override;
+    virtual void OnBeforeContextMenu(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefContextMenuParams> params,
+        CefRefPtr<CefMenuModel> model) override;
 
     /** 执行了菜单命令（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
-                                      CefRefPtr<CefFrame> frame,
-                                      CefRefPtr<CefContextMenuParams> params,
-                                      int command_id,
-                                      cef_event_flags_t event_flags) override;
-    
+    virtual bool OnContextMenuCommand(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefContextMenuParams> params,
+        int command_id,
+        cef_event_flags_t event_flags) override;
+
     /** 菜单消失（回调函数的调用线程：CEF的UI线程）
     */
-    virtual void OnContextMenuDismissed(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) override;
+    virtual void OnContextMenuDismissed(
+        CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) override;
 
     /** 标题变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const DString& title) override;
-    
+    virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const DString &title) override;
+
     /** URL变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnUrlChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const DString& url) override;
-    
+    virtual void OnUrlChange(
+        CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const DString &url) override;
+
     /** 主Frame的URL变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnMainUrlChange(const DString& oldUrl, const DString& newUrl) override;
-    
+    virtual void OnMainUrlChange(const DString &oldUrl, const DString &newUrl) override;
+
     /** FaviconURL变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnFaviconURLChange(CefRefPtr<CefBrowser> browser, const std::vector<CefString>& icon_urls) override;
-        
+    virtual void OnFaviconURLChange(
+        CefRefPtr<CefBrowser> browser, const std::vector<CefString> &icon_urls) override;
+
     /** 全屏状态变化（回调函数的调用线程：主进程的UI线程）
     */
     virtual void OnFullscreenModeChange(CefRefPtr<CefBrowser> browser, bool bFullscreen) override;
-    
+
     /** 状态信息变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnStatusMessage(CefRefPtr<CefBrowser> browser, const DString& value) override;
-    
+    virtual void OnStatusMessage(CefRefPtr<CefBrowser> browser, const DString &value) override;
+
     /** 加载进度变化（回调函数的调用线程：主进程的UI线程）
     */
     virtual void OnLoadingProgressChange(CefRefPtr<CefBrowser> browser, double progress) override;
-    
+
     /** 多媒体访问情况变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnMediaAccessChange(CefRefPtr<CefBrowser> browser, bool has_video_access, bool has_audio_access) override;
+    virtual void OnMediaAccessChange(
+        CefRefPtr<CefBrowser> browser, bool has_video_access, bool has_audio_access) override;
 
     /** CefDragHandler接口的事件：开始拖动（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDragData> dragData, CefDragHandler::DragOperationsMask mask) override;
+    virtual bool OnDragEnter(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefDragData> dragData,
+        CefDragHandler::DragOperationsMask mask) override;
 
     /** CefDragHandler接口的事件：可拖动区域发生变化（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnDraggableRegionsChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const std::vector<CefDraggableRegion>& regions) override;
-
+    virtual void OnDraggableRegionsChanged(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        const std::vector<CefDraggableRegion> &regions) override;
 
     /** 点击了超级链接，即将弹出新窗口（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
-                               CefRefPtr<CefFrame> frame,
-                               int popup_id,
-                               const CefString& target_url,
-                               const CefString& target_frame_name,
-                               CefLifeSpanHandler::WindowOpenDisposition target_disposition,
-                               bool user_gesture,
-                               const CefPopupFeatures& popupFeatures,
-                               CefWindowInfo& windowInfo,
-                               CefRefPtr<CefClient>& client,
-                               CefBrowserSettings& settings,
-                               CefRefPtr<CefDictionaryValue>& extra_info,
-                               bool* no_javascript_access) override;
+    virtual bool OnBeforePopup(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        int popup_id,
+        const CefString &target_url,
+        const CefString &target_frame_name,
+        CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+        bool user_gesture,
+        const CefPopupFeatures &popupFeatures,
+        CefWindowInfo &windowInfo,
+        CefRefPtr<CefClient> &client,
+        CefBrowserSettings &settings,
+        CefRefPtr<CefDictionaryValue> &extra_info,
+        bool *no_javascript_access) override;
 
     /** 弹出新窗口失败的通知（回调函数的调用线程：主进程的UI线程）
     */
@@ -150,68 +166,81 @@ private:
 
     /** 导航前回调函数（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefFrame> frame,
-                                CefRefPtr<CefRequest> request,
-                                bool user_gesture,
-                                bool is_redirect) override;
+    virtual bool OnBeforeBrowse(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        bool user_gesture,
+        bool is_redirect) override;
 
     /** 资源加载前回调函数（回调函数的调用线程：CEF的IO线程）
     */
-    virtual cef_return_value_t OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser,
-                                                    CefRefPtr<CefFrame> frame,
-                                                    CefRefPtr<CefRequest> request,
-                                                    CefRefPtr<CefCallback> callback) override;
+    virtual cef_return_value_t OnBeforeResourceLoad(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        CefRefPtr<CefCallback> callback) override;
 
     /** 资源重定向回调函数（回调函数的调用线程：CEF的IO线程）
     */
-    virtual void OnResourceRedirect(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    CefRefPtr<CefRequest> request,
-                                    CefRefPtr<CefResponse> response,
-                                    CefString& new_url) override;
-    
+    virtual void OnResourceRedirect(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        CefRefPtr<CefResponse> response,
+        CefString &new_url) override;
+
     /** 资源收到回应回调函数（回调函数的调用线程：CEF的IO线程）
     */
-    virtual bool OnResourceResponse(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    CefRefPtr<CefRequest> request,
-                                    CefRefPtr<CefResponse> response) override;
+    virtual bool OnResourceResponse(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        CefRefPtr<CefResponse> response) override;
 
     /** 资源加载完成回调函数（回调函数的调用线程：CEF的IO线程）
     */
-    virtual void OnResourceLoadComplete(CefRefPtr<CefBrowser> browser,
-                                        CefRefPtr<CefFrame> frame,
-                                        CefRefPtr<CefRequest> request,
-                                        CefRefPtr<CefResponse> response,
-                                        cef_urlrequest_status_t status,
-                                        int64_t received_content_length) override;
+    virtual void OnResourceLoadComplete(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        CefRefPtr<CefResponse> response,
+        cef_urlrequest_status_t status,
+        int64_t received_content_length) override;
 
     /** 资源执行协议回调函数（回调函数的调用线程：CEF的IO线程）
     */
-    virtual void OnProtocolExecution(CefRefPtr<CefBrowser> browser,
-                                     CefRefPtr<CefFrame> frame,
-                                     CefRefPtr<CefRequest> request,
-                                     bool& allow_os_execution) override;
+    virtual void OnProtocolExecution(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefRefPtr<CefRequest> request,
+        bool &allow_os_execution) override;
 
     /** 页面加载状态发生变化的回调函数（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
-    
+    virtual void OnLoadingStateChange(
+        CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
+
     /** 页面开始加载的回调函数（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, cef_transition_type_t transition_type) override;
-    
+    virtual void OnLoadStart(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        cef_transition_type_t transition_type) override;
+
     /** 页面加载完成的回调函数（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override;
-    
+    virtual void OnLoadEnd(
+        CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override;
+
     /** 页面加载发生错误的回调函数（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnLoadError(CefRefPtr<CefBrowser> browser,
-                             CefRefPtr<CefFrame> frame,
-                             cef_errorcode_t errorCode,
-                             const DString& errorText, const DString& failedUrl) override;
+    virtual void OnLoadError(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        cef_errorcode_t errorCode,
+        const DString &errorText,
+        const DString &failedUrl) override;
 
     /** 开发者工具的显示属性发生变化（回调函数的调用线程：主进程的UI线程）
     */
@@ -219,33 +248,37 @@ private:
 
     /** 是否可以下载文件（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnCanDownload(CefRefPtr<CefBrowser> browser,
-                               const CefString& url,
-                               const CefString& request_method) override;
+    virtual bool OnCanDownload(
+        CefRefPtr<CefBrowser> browser,
+        const CefString &url,
+        const CefString &request_method) override;
 
     /** 下载文件之前事件的回调函数，CEF109版本忽略返回值（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnBeforeDownload(CefRefPtr<CefBrowser> browser,
-                                  CefRefPtr<CefDownloadItem> download_item,
-                                  const CefString& suggested_name,
-                                  CefRefPtr<CefBeforeDownloadCallback> callback) override;
+    virtual bool OnBeforeDownload(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefDownloadItem> download_item,
+        const CefString &suggested_name,
+        CefRefPtr<CefBeforeDownloadCallback> callback) override;
 
     /** 下载文件信息更新事件的回调函数（回调函数的调用线程：CEF的UI线程）
     */
-    virtual void OnDownloadUpdated(CefRefPtr<CefBrowser> browser,
-                                   CefRefPtr<CefDownloadItem> download_item,
-                                   CefRefPtr<CefDownloadItemCallback> callback) override;
+    virtual void OnDownloadUpdated(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefDownloadItem> download_item,
+        CefRefPtr<CefDownloadItemCallback> callback) override;
 
     /** 打开文件/保存文件/选择文件夹对话框的回调函数（回调函数的调用线程：CEF的UI线程）
     */
-    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser,
-                              cef_file_dialog_mode_t mode,
-                              const CefString& title,
-                              const CefString& default_file_path,
-                              const std::vector<CefString>& accept_filters,
-                              const std::vector<CefString>& accept_extensions,
-                              const std::vector<CefString>& accept_descriptions,
-                              CefRefPtr<CefFileDialogCallback> callback) override;
+    virtual bool OnFileDialog(
+        CefRefPtr<CefBrowser> browser,
+        cef_file_dialog_mode_t mode,
+        const CefString &title,
+        const CefString &default_file_path,
+        const std::vector<CefString> &accept_filters,
+        const std::vector<CefString> &accept_extensions,
+        const std::vector<CefString> &accept_descriptions,
+        CefRefPtr<CefFileDialogCallback> callback) override;
 
     /** 主框架的文档加载完成的回调函数（回调函数的调用线程：主进程的UI线程）
     */
@@ -253,10 +286,11 @@ private:
 
     /** 网站图标下载完成事件（回调函数的调用线程：主进程的UI线程）
     */
-    virtual void OnDownloadFavIconFinished(CefRefPtr<CefBrowser> browser,
-                                           const CefString& image_url,
-                                           int http_status_code,
-                                           CefRefPtr<CefImage> image) override;
+    virtual void OnDownloadFavIconFinished(
+        CefRefPtr<CefBrowser> browser,
+        const CefString &image_url,
+        int http_status_code,
+        CefRefPtr<CefImage> image) override;
 
 private:
     /** 开发者工具的状态发生变化
@@ -265,17 +299,17 @@ private:
 
     /** 拖入文件操作业务处理
     */
-    void OnDropFiles(const DString& jsonDropFileList);
+    void OnDropFiles(const DString &jsonDropFileList);
 
     /** 显示或者隐藏开发者工具
     */
     void SwitchShowDevTools();
 
 private:
-    ui::CefControl* m_pCefControl;
-    ui::CefControl* m_pCefControlDev;
-    ui::Button* m_pDevToolBtn;
-    ui::RichEdit* m_pEditUrl;
+    ui::CefControl *m_pCefControl;
+    ui::CefControl *m_pCefControlDev;
+    ui::Button *m_pDevToolBtn;
+    ui::RichEdit *m_pEditUrl;
 
     /** 拖入文件操作: 记录文件列表
     */

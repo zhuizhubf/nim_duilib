@@ -2,15 +2,14 @@
 #include "duilib/Box/ScrollBox.h"
 #include "duilib/Core/DpiManager.h"
 
-namespace ui 
-{
+namespace ui {
 
-GridLayout::GridLayout():
-    m_nRows(0),
-    m_nColumns(0),
-    m_nGridWidth(0),
-    m_nGridHeight(0),
-    m_bScaleDown(false)
+GridLayout::GridLayout()
+    : m_nRows(0)
+    , m_nColumns(0)
+    , m_nGridWidth(0)
+    , m_nGridHeight(0)
+    , m_bScaleDown(false)
 {
     //默认水平居中
     SetChildHAlignType(HorAlignType::kAlignCenter);
@@ -19,59 +18,51 @@ GridLayout::GridLayout():
     SetChildVAlignType(VerAlignType::kAlignTop);
 }
 
-bool GridLayout::SetAttribute(const DString& strName, const DString& strValue, const DpiManager& dpiManager)
+bool GridLayout::SetAttribute(
+    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
     if (strName == _T("rows")) {
         if (strValue == _T("auto")) {
             //自动计算
             SetRows(0);
-        }
-        else {
+        } else {
             SetRows(StringUtil::StringToInt32(strValue));
         }
-    }
-    else if (strName == _T("columns")) {
+    } else if (strName == _T("columns")) {
         if (strValue == _T("auto")) {
             //自动计算
             SetColumns(0);
-        }
-        else {
+        } else {
             SetColumns(StringUtil::StringToInt32(strValue));
         }
-    }
-    else if (strName == _T("grid_width")) {
+    } else if (strName == _T("grid_width")) {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridWidth(0, false);
-        }
-        else {
+        } else {
             int32_t nGridWidth = StringUtil::StringToInt32(strValue);
             dpiManager.ScaleInt(nGridWidth);
             SetGridWidth(nGridWidth, false);
         }
-    }
-    else if (strName == _T("grid_height")) {
+    } else if (strName == _T("grid_height")) {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridHeight(0, false);
-        }
-        else {
+        } else {
             int32_t nGridHeight = StringUtil::StringToInt32(strValue);
             dpiManager.ScaleInt(nGridHeight);
             SetGridHeight(nGridHeight, false);
         }
-    }
-    else if (strName == _T("scale_down")) {
+    } else if (strName == _T("scale_down")) {
         SetScaleDown(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
     }
     return hasAttribute;
 }
 
-void GridLayout::ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale)
+void GridLayout::ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale)
 {
     int32_t nGridWidth = GetGridWidth();
     nGridWidth = dpiManager.GetScaleInt(nGridWidth, nOldDpiScale);
@@ -179,13 +170,14 @@ bool GridLayout::IsScaleDown() const
     return m_bScaleDown;
 }
 
-UiSize64 GridLayout::ArrangeChildInternal(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly) const
+UiSize64 GridLayout::ArrangeChildInternal(
+    const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly) const
 {
     if (items.empty()) {
         return UiSize64();
     }
     // 预处理：筛选所有可见、非浮动的控件
-    std::vector<Control*> visibleControls;
+    std::vector<Control *> visibleControls;
     for (auto pControl : items) {
         if ((pControl != nullptr) && pControl->IsVisible() && !pControl->IsFloat()) {
             visibleControls.push_back(pControl);
@@ -220,7 +212,7 @@ UiSize64 GridLayout::ArrangeChildInternal(const std::vector<Control*>& items, Ui
         ASSERT(colSpan > 0);
         gridCount += rowSpan * colSpan;
     }
-    gridCount = std::max(gridCount, (int32_t)visibleControls.size());
+    gridCount = std::max(gridCount, (int32_t) visibleControls.size());
 
     CalcActualGridSize(gridCount, actualRows, actualCols);
 
@@ -230,8 +222,15 @@ UiSize64 GridLayout::ArrangeChildInternal(const std::vector<Control*>& items, Ui
 
     // 标记已占用的单元格（处理合并）
     std::vector<std::vector<bool>> cellOccupied(actualRows, std::vector<bool>(actualCols, false));
-    std::unordered_map<Control*, UiRect> ctrlCellRects; // 控件对应的合并后单元格区域
-    if (!CalcMergedCellRects(visibleControls, actualRows, actualCols, colWidths, rowHeights, cellOccupied, ctrlCellRects)) {
+    std::unordered_map<Control *, UiRect> ctrlCellRects; // 控件对应的合并后单元格区域
+    if (!CalcMergedCellRects(
+            visibleControls,
+            actualRows,
+            actualCols,
+            colWidths,
+            rowHeights,
+            cellOccupied,
+            ctrlCellRects)) {
         ASSERT(!"CalcMergedCellRects failed!");
         return UiSize64(); // 单元格合并冲突，返回无效尺寸
     }
@@ -257,12 +256,11 @@ UiSize64 GridLayout::ArrangeChildInternal(const std::vector<Control*>& items, Ui
     //计算最终所需尺寸（含内边距）
     UiPadding rcPadding = GetOwner() != nullptr ? GetOwner()->GetPadding() : UiPadding();
     return UiSize64(
-            gridTotalSize.cx + rcPadding.left + rcPadding.right,
-            gridTotalSize.cy + rcPadding.top + rcPadding.bottom
-        );
+        gridTotalSize.cx + rcPadding.left + rcPadding.right,
+        gridTotalSize.cy + rcPadding.top + rcPadding.bottom);
 }
 
-void GridLayout::CalcActualGridSize(int32_t gridCount, int32_t& rows, int32_t& cols) const
+void GridLayout::CalcActualGridSize(int32_t gridCount, int32_t &rows, int32_t &cols) const
 {
     rows = std::max(rows, 0);
     cols = std::max(cols, 0);
@@ -270,11 +268,9 @@ void GridLayout::CalcActualGridSize(int32_t gridCount, int32_t& rows, int32_t& c
         if (rows == 0 && cols == 0) {
             cols = static_cast<int32_t>(std::sqrt(gridCount)) + 1;
             rows = (gridCount + cols - 1) / cols;
-        }
-        else if (rows == 0) {
+        } else if (rows == 0) {
             rows = (gridCount + cols - 1) / cols;
-        }
-        else if (cols == 0) {
+        } else if (cols == 0) {
             cols = (gridCount + rows - 1) / rows;
         }
     }
@@ -282,7 +278,7 @@ void GridLayout::CalcActualGridSize(int32_t gridCount, int32_t& rows, int32_t& c
     cols = std::max(cols, 1);
 }
 
-std::vector<int32_t> GridLayout::CalcColumnWidths(const UiRect& contentRect, int32_t cols) const
+std::vector<int32_t> GridLayout::CalcColumnWidths(const UiRect &contentRect, int32_t cols) const
 {
     ASSERT(cols > 0);
     if (cols <= 0) {
@@ -294,8 +290,7 @@ std::vector<int32_t> GridLayout::CalcColumnWidths(const UiRect& contentRect, int
         // 已经设置了网格的固定宽度，直接使用
         std::vector<int32_t> widths(cols, nGridWidth);
         return widths;
-    }
-    else {
+    } else {
         // 根据内容显示区域的总宽度，计算每列的宽度
         int32_t availableWidth = contentRect.Width() - (cols - 1) * GetChildMarginX();
         int32_t baseWidth = std::max(0, availableWidth / cols);
@@ -310,7 +305,7 @@ std::vector<int32_t> GridLayout::CalcColumnWidths(const UiRect& contentRect, int
     }
 }
 
-std::vector<int32_t> GridLayout::CalcRowHeights(const UiRect& contentRect, int32_t rows) const
+std::vector<int32_t> GridLayout::CalcRowHeights(const UiRect &contentRect, int32_t rows) const
 {
     ASSERT(rows > 0);
     if (rows <= 0) {
@@ -322,8 +317,7 @@ std::vector<int32_t> GridLayout::CalcRowHeights(const UiRect& contentRect, int32
         // 已经设置了网格的固定宽度，直接使用
         std::vector<int32_t> heights(rows, nGridHeight);
         return heights;
-    }
-    else {
+    } else {
         // 根据内容显示区域的总高度，计算每列的高度
         int32_t availableHeight = contentRect.Height() - (rows - 1) * GetChildMarginY();
         int32_t baseHeight = std::max(0, availableHeight / rows);
@@ -338,28 +332,31 @@ std::vector<int32_t> GridLayout::CalcRowHeights(const UiRect& contentRect, int32
     }
 }
 
-bool GridLayout::CalcMergedCellRects(const std::vector<Control*>& controls,
-                                     int32_t rows, int32_t cols,
-                                     const std::vector<int32_t>& colWidths,
-                                     const std::vector<int32_t>& rowHeights,
-                                     std::vector<std::vector<bool>>& cellOccupied,
-                                     std::unordered_map<Control*, UiRect>& ctrlCellRects) const
+bool GridLayout::CalcMergedCellRects(
+    const std::vector<Control *> &controls,
+    int32_t rows,
+    int32_t cols,
+    const std::vector<int32_t> &colWidths,
+    const std::vector<int32_t> &rowHeights,
+    std::vector<std::vector<bool>> &cellOccupied,
+    std::unordered_map<Control *, UiRect> &ctrlCellRects) const
 {
-    ASSERT((rows > 0) && (cols > 0) && !controls.empty() && ((int32_t)colWidths.size() == cols) && ((int32_t)rowHeights.size() == rows));
-    if ((rows <= 0) || (cols <= 0) || controls.empty() ||
-        ((int32_t)colWidths.size() != cols) ||
-        ((int32_t)rowHeights.size() != rows)) {
+    ASSERT(
+        (rows > 0) && (cols > 0) && !controls.empty() && ((int32_t) colWidths.size() == cols)
+        && ((int32_t) rowHeights.size() == rows));
+    if ((rows <= 0) || (cols <= 0) || controls.empty() || ((int32_t) colWidths.size() != cols)
+        || ((int32_t) rowHeights.size() != rows)) {
         return false;
     }
     int32_t ctrlIndex = 0;
-    for (int32_t row = 0; row < rows && ctrlIndex < (int32_t)controls.size(); ++row) {
-        for (int32_t col = 0; col < cols && ctrlIndex < (int32_t)controls.size(); ++col) {
+    for (int32_t row = 0; row < rows && ctrlIndex < (int32_t) controls.size(); ++row) {
+        for (int32_t col = 0; col < cols && ctrlIndex < (int32_t) controls.size(); ++col) {
             if (cellOccupied[row][col]) {
                 continue; // 跳过已占用单元格
             }
 
-            Control* ctrl = controls[ctrlIndex++];
-            int32_t rowSpan = std::min(ctrl->GetRowSpan(), rows - row); // 限制最大行合并
+            Control *ctrl = controls[ctrlIndex++];
+            int32_t rowSpan = std::min(ctrl->GetRowSpan(), rows - row);    // 限制最大行合并
             int32_t colSpan = std::min(ctrl->GetColumnSpan(), cols - col); // 限制最大列合并
 
             // 标记合并范围内的单元格为已占用
@@ -389,7 +386,8 @@ bool GridLayout::CalcMergedCellRects(const std::vector<Control*>& controls,
             }
             cellRect.bottom = cellRect.top;
             for (int32_t r = row; r < row + rowSpan; ++r) {
-                cellRect.bottom += rowHeights[r] + (r == (row + rowSpan - 1) ? 0 : GetChildMarginY());
+                cellRect.bottom += rowHeights[r]
+                                   + (r == (row + rowSpan - 1) ? 0 : GetChildMarginY());
             }
 
             ctrlCellRects[ctrl] = cellRect;
@@ -398,7 +396,8 @@ bool GridLayout::CalcMergedCellRects(const std::vector<Control*>& controls,
     return true;
 }
 
-UiSize GridLayout::CalcGridTotalSize(const std::vector<int32_t>& colWidths, const std::vector<int32_t>& rowHeights) const
+UiSize GridLayout::CalcGridTotalSize(
+    const std::vector<int32_t> &colWidths, const std::vector<int32_t> &rowHeights) const
 {
     int32_t totalWidth = 0;
     for (size_t i = 0; i < colWidths.size(); ++i) {
@@ -411,7 +410,7 @@ UiSize GridLayout::CalcGridTotalSize(const std::vector<int32_t>& colWidths, cons
     return UiSize(totalWidth, totalHeight);
 }
 
-UiRect GridLayout::CalcGridPosition(const UiRect& contentRect, const UiSize& gridSize) const
+UiRect GridLayout::CalcGridPosition(const UiRect &contentRect, const UiSize &gridSize) const
 {
     UiRect gridRect;
     gridRect.left = contentRect.left;
@@ -445,24 +444,25 @@ UiRect GridLayout::CalcGridPosition(const UiRect& contentRect, const UiSize& gri
     return gridRect;
 }
 
-void GridLayout::AdjustMergedCellPositions(std::unordered_map<Control*, UiRect>& ctrlCellRects,
-                                           const UiRect& gridRect) const
+void GridLayout::AdjustMergedCellPositions(
+    std::unordered_map<Control *, UiRect> &ctrlCellRects, const UiRect &gridRect) const
 {
-    for (auto& [ctrl, rect] : ctrlCellRects) {
+    for (auto &[ctrl, rect] : ctrlCellRects) {
         rect.Offset(gridRect.left, gridRect.top);
     }
 }
 
-void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& controls,
-                                              const std::unordered_map<Control*, UiRect>& ctrlCellRects) const
+void GridLayout::ArrangeControlsInMergedCells(
+    const std::vector<Control *> &controls,
+    const std::unordered_map<Control *, UiRect> &ctrlCellRects) const
 {
-    for (Control* pControl : controls) {
+    for (Control *pControl : controls) {
         auto it = ctrlCellRects.find(pControl);
         if (it == ctrlCellRects.end()) {
             continue;
         }
 
-        const UiRect& cellRect = it->second;
+        const UiRect &cellRect = it->second;
         UiMargin margin = pControl->GetMargin();
 
         // 控件在单元格内的位置
@@ -479,8 +479,7 @@ void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& contr
             rcChild = contentRect;
             rcChild.right = rcChild.left;
             rcChild.bottom = rcChild.top;
-        }
-        else {
+        } else {
             // 单元格内空间充足: 计算控件尺寸（受限于自身min/max）
             UiSize childSize;
             if (IsScaleDown()) {
@@ -493,12 +492,15 @@ void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& contr
                 if (estSize.cy.IsStretch()) {
                     childSize.cy = CalcStretchValue(estSize.cy, szAvailable.cy);
                 }
-                childSize.cx = std::clamp(childSize.cx, pControl->GetMinWidth(), pControl->GetMaxWidth());
-                childSize.cy = std::clamp(childSize.cy, pControl->GetMinHeight(), pControl->GetMaxHeight());
+                childSize.cx
+                    = std::clamp(childSize.cx, pControl->GetMinWidth(), pControl->GetMaxWidth());
+                childSize.cy
+                    = std::clamp(childSize.cy, pControl->GetMinHeight(), pControl->GetMaxHeight());
 
                 // 如果子控件大小超出格子范围，则等比例缩小到格子以内，避免超出边界
                 if ((childSize.cx > 0) && (childSize.cy > 0)) {
-                    if ((childSize.cx > contentRect.Width()) || (childSize.cy > contentRect.Height())) {
+                    if ((childSize.cx > contentRect.Width())
+                        || (childSize.cy > contentRect.Height())) {
                         //满足缩放条件，进行等比缩放
                         double cx = childSize.cx;
                         double cy = childSize.cy;
@@ -509,8 +511,7 @@ void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& contr
                             double ratio = cx / childSize.cy;
                             childSize.cx = contentRect.Width();
                             childSize.cy = static_cast<int32_t>(childSize.cx / ratio + 0.5);
-                        }
-                        else {
+                        } else {
                             ASSERT(childSize.cy > contentRect.Height());
                             double ratio = cy / childSize.cx;
                             childSize.cy = contentRect.Height();
@@ -518,8 +519,7 @@ void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& contr
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 childSize = UiSize(contentRect.Width(), contentRect.Height());
             }
 
@@ -530,7 +530,8 @@ void GridLayout::ArrangeControlsInMergedCells(const std::vector<Control*>& contr
     }
 }
 
-UiRect GridLayout::CalcControlPosition(const UiRect& contentRect, const UiSize& ctrlSize, Control* ctrl) const
+UiRect GridLayout::CalcControlPosition(
+    const UiRect &contentRect, const UiSize &ctrlSize, Control *ctrl) const
 {
     UiRect ctrlRect;
     ctrlRect.left = contentRect.left;
@@ -564,12 +565,13 @@ UiRect GridLayout::CalcControlPosition(const UiRect& contentRect, const UiSize& 
     return ctrlRect;
 }
 
-UiSize64 GridLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly)
+UiSize64 GridLayout::ArrangeChildren(
+    const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly)
 {
     return ArrangeChildInternal(items, rc, bEstimateOnly);
 }
 
-UiSize64 GridLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable)
+UiSize64 GridLayout::EstimateLayoutSize(const std::vector<Control *> &items, UiSize szAvailable)
 {
     UiRect rc(0, 0, szAvailable.cx, szAvailable.cy);
     return ArrangeChildInternal(items, rc, true);

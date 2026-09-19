@@ -2,23 +2,26 @@
 #include "duilib/Control/ListCtrlView.h"
 #include "duilib/Core/Window.h"
 
-namespace ui
-{
-ListCtrlIcon::ListCtrlIcon(Window* pWindow) :
-    CheckBoxTemplate<HBox>(pWindow),
-    m_pListBoxItem(nullptr)
+namespace ui {
+ListCtrlIcon::ListCtrlIcon(Window *pWindow)
+    : CheckBoxTemplate<HBox>(pWindow)
+    , m_pListBoxItem(nullptr)
 {
     //默认不获取焦点，无键盘消息
     SetNoFocus();
     SetKeyboardEnabled(false);
 }
 
-DString ListCtrlIcon::GetType() const { return _T("ListCtrlIcon"); }
-
-void ListCtrlIcon::HandleEvent(const EventArgs& msg)
+DString ListCtrlIcon::GetType() const
 {
-    if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd) &&
-        (msg.eventType != EventType::kEventMouseEnter) && (msg.eventType != EventType::kEventMouseLeave)) {
+    return _T("ListCtrlIcon");
+}
+
+void ListCtrlIcon::HandleEvent(const EventArgs &msg)
+{
+    if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)
+        && (msg.eventType != EventType::kEventMouseEnter)
+        && (msg.eventType != EventType::kEventMouseLeave)) {
         //鼠标消息
         if (!IsDisabledEvents(msg) && (m_pListBoxItem != nullptr)) {
             //可处理鼠标消息
@@ -31,14 +34,14 @@ void ListCtrlIcon::HandleEvent(const EventArgs& msg)
     BaseClass::HandleEvent(msg);
 }
 
-bool ListCtrlIcon::OnMouseEvent(const EventArgs& msg)
+bool ListCtrlIcon::OnMouseEvent(const EventArgs &msg)
 {
     //业务处理依赖的基本条件校验
     ASSERT((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd));
     if ((msg.eventType <= kEventMouseBegin) || (msg.eventType >= kEventMouseEnd)) {
         return false;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return false;
@@ -51,7 +54,7 @@ bool ListCtrlIcon::OnMouseEvent(const EventArgs& msg)
     if (m_pListBoxItem == nullptr) {
         return false;
     }
-    IListCtrlViewItem* pViewItem = dynamic_cast<IListCtrlViewItem*>(m_pListBoxItem);
+    IListCtrlViewItem *pViewItem = dynamic_cast<IListCtrlViewItem *>(m_pListBoxItem);
     ASSERT(pViewItem != nullptr);
     if (pViewItem == nullptr) {
         return false;
@@ -94,9 +97,9 @@ void ListCtrlIcon::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-void ListCtrlIcon::SetListBoxItem(Control* pListBoxItem)
+void ListCtrlIcon::SetListBoxItem(Control *pListBoxItem)
 {
     m_pListBoxItem = pListBoxItem;
 }
 
-}//namespace ui
+} //namespace ui

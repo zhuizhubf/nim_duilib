@@ -2,15 +2,14 @@
 #include "render-skia/FontMgr_Skia.h"
 
 #include "SkiaHeaderBegin.h"
-#include "include/core/SkFont.h"
 #include "SkiaHeaderEnd.h"
+#include "include/core/SkFont.h"
 
-namespace ui 
-{
+namespace ui {
 
-Font_Skia::Font_Skia(std::shared_ptr<IFontMgr>& spFontMgr):
-    m_skFont(nullptr),
-    m_spFontMgr(spFontMgr)
+Font_Skia::Font_Skia(std::shared_ptr<IFontMgr> &spFontMgr)
+    : m_skFont(nullptr)
+    , m_spFontMgr(spFontMgr)
 {
     ASSERT(m_spFontMgr != nullptr);
 }
@@ -24,7 +23,7 @@ Font_Skia::~Font_Skia()
 void Font_Skia::ClearSkFont()
 {
     if (m_skFont != nullptr) {
-        FontMgr_Skia* pSkiaFontMgr = dynamic_cast<FontMgr_Skia*>(m_spFontMgr.get());
+        FontMgr_Skia *pSkiaFontMgr = dynamic_cast<FontMgr_Skia *>(m_spFontMgr.get());
         ASSERT(pSkiaFontMgr != nullptr);
         if (pSkiaFontMgr != nullptr) {
             pSkiaFontMgr->DeleteSkFont(m_skFont);
@@ -33,7 +32,7 @@ void Font_Skia::ClearSkFont()
     }
 }
 
-bool Font_Skia::InitFont(const UiFont& fontInfo)
+bool Font_Skia::InitFont(const UiFont &fontInfo)
 {
     ASSERT(!fontInfo.m_fontName.empty());
     if (fontInfo.m_fontName.empty()) {
@@ -46,12 +45,12 @@ bool Font_Skia::InitFont(const UiFont& fontInfo)
     return true;
 }
 
-const SkFont* Font_Skia::GetFontHandle()
+const SkFont *Font_Skia::GetFontHandle()
 {
     if (m_skFont != nullptr) {
         return m_skFont;
     }
-    FontMgr_Skia* pSkiaFontMgr = dynamic_cast<FontMgr_Skia*>(m_spFontMgr.get());
+    FontMgr_Skia *pSkiaFontMgr = dynamic_cast<FontMgr_Skia *>(m_spFontMgr.get());
     ASSERT(pSkiaFontMgr != nullptr);
     if (pSkiaFontMgr != nullptr) {
         m_skFont = pSkiaFontMgr->CreateSkFont(m_uiFont);
@@ -59,14 +58,14 @@ const SkFont* Font_Skia::GetFontHandle()
     return m_skFont;
 }
 
-bool Font_Skia::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId)
+bool Font_Skia::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t *glyphId)
 {
     if (unicodeChar != 0) {
-        const SkFont* pSkFont = GetFontHandle();
+        const SkFont *pSkFont = GetFontHandle();
         if (pSkFont != nullptr) {
             ASSERT(sizeof(SkGlyphID) == sizeof(uint16_t));
             ASSERT(sizeof(SkUnichar) == sizeof(uint32_t));
-            SkGlyphID glyph = pSkFont->unicharToGlyph((SkUnichar)unicodeChar);
+            SkGlyphID glyph = pSkFont->unicharToGlyph((SkUnichar) unicodeChar);
             if (glyph != 0) {
                 if (glyphId) {
                     *glyphId = glyph;
@@ -78,10 +77,9 @@ bool Font_Skia::IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId)
     return false;
 }
 
-IFontMgr* Font_Skia::GetFontMgr() const
+IFontMgr *Font_Skia::GetFontMgr() const
 {
     return m_spFontMgr.get();
 }
 
 } // namespace ui
-

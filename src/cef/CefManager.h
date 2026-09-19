@@ -5,29 +5,29 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#pragma warning (push)
-#pragma warning (disable:4100)
-    #include "include/cef_app.h"
-    #include "include/cef_version.h"
-#pragma warning (pop)
+#pragma warning(push)
+#pragma warning(disable : 4100)
+#include "include/cef_app.h"
+#include "include/cef_version.h"
+#pragma warning(pop)
 
-#include <vector>
 #include <atomic>
 #include <chrono>
+#include <vector>
 
-namespace ui
-{
+namespace ui {
 /** Browser进程单例控制的回调函数（仅在Windows平台 + CEF 109版本使用，其他情况下不使用）
  * (1) 由于一个Browser进程，需要启动好多个Render子进程，资源开销比较大，所以有必要控制保证只有一个Browser进程)
  * (2) CEF 133版本及以上版本，自身有单例控制功能，只要实现接口就可以了；但CEF 109版本无此功能，允许同时存在多个Browser进程
  * @param [in] argumentList 重新启动的Browser进程的启动参数列表
  */
-typedef std::function<void (const std::vector<DString>& argumentList)> OnAlreadyRunningAppRelaunchEvent;
+typedef std::function<void(const std::vector<DString> &argumentList)>
+    OnAlreadyRunningAppRelaunchEvent;
 
 /** 设置CEF的初始化参数的回调，可以在回调函数中修改参数
  * @param [in] settings CEF模块的初始化参数
  */
-typedef std::function<void (CefSettings& settings)> OnCefSettingsEvent;
+typedef std::function<void(CefSettings &settings)> OnCefSettingsEvent;
 
 //窗口类型
 class Window;
@@ -41,22 +41,23 @@ class DUILIB_API CefManager : public ui::SupportWeakCallback
 {
 public:
     CefManager();
-    CefManager(const CefManager&) = delete;
-    CefManager& operator=(const CefManager&) = delete;
+    CefManager(const CefManager &) = delete;
+    CefManager &operator=(const CefManager &) = delete;
+
 protected:
     virtual ~CefManager();
 
 public:
     /** 单例对象
     */
-    static CefManager* GetInstance();
+    static CefManager *GetInstance();
 
 public:
     /** 设置CEF的网页缓存目录(如果不设置，则使用默认规则的缓存目录)
     *   可以是相对路径，如果设置了相对目录，则会在当前程序所在路径创建相应的相对目录
     *   默认规则："${程序目录}/cef_cache/${程序名称}"
     */
-    virtual void SetCefCachePath(const DString& cefCachePath);
+    virtual void SetCefCachePath(const DString &cefCachePath);
 
     /** 获取当前的CEF的网页缓存目录
     */
@@ -70,7 +71,7 @@ public:
     *       Windows x64: "libcef_win_109\\x64" (CEF 109)
     *       Windows x86: "libcef_win_109\\Win32" (CEF 109)
     */
-    virtual void SetCefMoudlePath(const DString& cefMoudlePath);
+    virtual void SetCefMoudlePath(const DString &cefMoudlePath);
 
     /** 获取CEF模块运行库文件所在路径
     */
@@ -79,7 +80,7 @@ public:
     /** 设置默认语言，如果不设置的话，默认为简体中文（"zh-CN"）
     * @param [in] lang 语言字符串，比如"en-US"代表英文
     */
-    virtual void SetCefLanguage(const DString& lang);
+    virtual void SetCefLanguage(const DString &lang);
 
     /** 获取默认语言
     */
@@ -106,12 +107,13 @@ public:
     * @param [in] nExitCode 当函数返回false时，进程的退出码
     * @return bool true 继续运行，false 应该结束程序
     */
-    virtual bool Initialize(bool bEnableOffScreenRendering,
-                            const DString& appName,
-                            int argc,
-                            char** argv,
-                            OnCefSettingsEvent callback,
-                            int32_t& nExitCode);
+    virtual bool Initialize(
+        bool bEnableOffScreenRendering,
+        const DString &appName,
+        int argc,
+        char **argv,
+        OnCefSettingsEvent callback,
+        int32_t &nExitCode);
 
     /** 清理cef组件
     */
@@ -142,7 +144,7 @@ public:
     /** 绑定一个回调函数用于监听Browser进程启动事件（仅在Windows + CEF109使用，其他情况不需要设置）
     * @param [in] callback 一个回调函数，参考 OnAlreadyRunningAppRelaunchEvent 声明
     */
-    virtual void SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent& callback);
+    virtual void SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent &callback);
 
     /** 获取监听Browser进程启动事件的回调函数
     */
@@ -168,7 +170,7 @@ public:
 
     /** 窗口关闭时，处理该窗口下的所有Browser控件，在窗口关闭前退出
     */
-    void ProcessWindowCloseEvent(Window* pWindow);
+    void ProcessWindowCloseEvent(Window *pWindow);
 
     /** 在Cef浏览器对象销毁后发送QUIT消息，退出主进程的消息循环
     */
@@ -180,16 +182,15 @@ public:
     * @param [in] name 参数的名称
     * @param [in] value 参数的取值
     */
-    void AppendSwitchWithValue(const DString& name, const DString& value);
+    void AppendSwitchWithValue(const DString &name, const DString &value);
 
     /** 获取CEF模块额外的启动参数
     */
-    const std::vector<std::pair<DString, DString>>& GetSwitchWithValues() const;
+    const std::vector<std::pair<DString, DString>> &GetSwitchWithValues() const;
 
 public:
     // CEF进程类型
-    enum ProcessType
-    {
+    enum ProcessType {
         BrowserProcess,
         RendererProcess,
         ZygoteProcess,
@@ -220,7 +221,7 @@ public:
 protected:
     /** 生成CEF配置数据
     */
-    virtual void GetCefSetting(CefSettings& settings);
+    virtual void GetCefSetting(CefSettings &settings);
 
 private:
     /** CEF的网页缓存目录(如果不设置，则使用默认规则的缓存目录)

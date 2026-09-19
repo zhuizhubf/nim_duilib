@@ -1,11 +1,10 @@
 #ifndef UI_CORE_STATE_COLOR_MAP2_H_
 #define UI_CORE_STATE_COLOR_MAP2_H_
 
-#include "render/IRender.h"
 #include "duilib/Core/UiTypes.h"
+#include "render/IRender.h"
 
-namespace ui 
-{
+namespace ui {
 /** 控件状态与颜色值的映射，支持更多属性的实现
 */
 class Control;
@@ -13,7 +12,7 @@ class IRender;
 class DUILIB_API StateColorMap2
 {
 public:
-    explicit StateColorMap2(Control* pControl);
+    explicit StateColorMap2(Control *pControl);
 
     /** 获取颜色值，如果不包含此颜色，则返回空
     * @param [in] stateType 要获取何种状态下的颜色值，参考 ControlStateType 枚举
@@ -39,9 +38,9 @@ public:
      * @param [in] colorMargin 要设置的颜色矩形外边距，如果不设置，则颜色矩形与控件矩形重合
      * @param [in] colorRound 要设置的颜色矩形圆角大小，如果不设置，则颜色矩形跟随控件矩形的形状
      */
-    void SetStateColor(ControlStateType stateType, const DString& color);
-    void SetStateColorMargin(ControlStateType stateType, const UiMargin& colorMargin);
-    void SetStateColorRound(ControlStateType stateType, const UiSize& colorRound);
+    void SetStateColor(ControlStateType stateType, const DString &color);
+    void SetStateColorMargin(ControlStateType stateType, const UiMargin &colorMargin);
+    void SetStateColorRound(ControlStateType stateType, const UiSize &colorRound);
 
     /** 设置状态颜色区域的最小宽度或者最小高度（解决DPI缩放后的运算精度损失导致线条宽度失真问题）
     * @param [in] fMinWidth 设置状态颜色区域的最小宽度，未经DPI缩放
@@ -71,12 +70,17 @@ public:
 public:
     /** 绘制指定状态的颜色
     */
-    void PaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType) const;
+    void PaintStateColor(IRender *pRender, const UiRect &rcPaint, ControlStateType stateType) const;
 
 private:
     /** 绘制指定状态的颜色(使用预先获取的颜色值)
     */
-    void DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType, UiColor colorValue, uint8_t nAlpha = 255) const;
+    void DoPaintStateColor(
+        IRender *pRender,
+        const UiRect &rcPaint,
+        ControlStateType stateType,
+        UiColor colorValue,
+        uint8_t nAlpha = 255) const;
 
 private:
     /** 每个颜色的基本属性
@@ -96,7 +100,7 @@ private:
 private:
     /** 关联的控件接口
     */
-    Control* m_pControl;
+    Control *m_pControl;
 
     /** 状态颜色区域的最小宽度（未经DPI缩放）
     */

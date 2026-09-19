@@ -4,62 +4,63 @@
 
 using namespace ui;
 
-BrowserBox::BrowserBox(ui::Window* pWindow, std::string browserId):
-    ui::VBox(pWindow)
+BrowserBox::BrowserBox(ui::Window *pWindow, std::string browserId)
+    : ui::VBox(pWindow)
 {
     m_pBrowserForm = nullptr;
     m_pWebView2Control = nullptr;
     m_browserId = browserId;
 }
 
-BrowserForm* BrowserBox::GetBrowserForm() const
+BrowserForm *BrowserBox::GetBrowserForm() const
 {
     ASSERT(nullptr != m_pBrowserForm);
     ASSERT(m_pBrowserForm->IsWindow());
     return m_pBrowserForm;
 }
 
-ui::WebView2Control* BrowserBox::GetWebView2Control()
+ui::WebView2Control *BrowserBox::GetWebView2Control()
 {
     return m_pWebView2Control;
 }
 
-const DString& BrowserBox::GetTitle() const
+const DString &BrowserBox::GetTitle() const
 {
     return m_title;
 }
 
-void BrowserBox::InitBrowserBox(const DString& url)
+void BrowserBox::InitBrowserBox(const DString &url)
 {
-    m_pWebView2Control = static_cast<ui::WebView2Control*>(FindSubControl(_T("webview2_control")));
+    m_pWebView2Control = static_cast<ui::WebView2Control *>(FindSubControl(_T("webview2_control")));
     ASSERT(m_pWebView2Control != nullptr);
     if (m_pWebView2Control == nullptr) {
         return;
     }
     //挂载事件
-    m_pWebView2Control->SetSourceChangedCallback([this](const DString& url) {
+    m_pWebView2Control->SetSourceChangedCallback([this](const DString &url) {
         ui::GlobalManager::Instance().AssertUIThread();
         m_url = url;
         m_pBrowserForm->SetURL(m_browserId, url);
-        });
+    });
 
-    m_pWebView2Control->SetDocumentTitleChangedCallback([this](const DString& title) {
+    m_pWebView2Control->SetDocumentTitleChangedCallback([this](const DString &title) {
         ui::GlobalManager::Instance().AssertUIThread();
         m_title = title;
         m_pBrowserForm->SetTabItemName(ui::StringConvert::UTF8ToT(m_browserId), title);
-        });
+    });
 
-    m_pWebView2Control->SetNavigationStateChangedCallback([this](WebView2Control::NavigationState state, HRESULT /*errorCode*/) {
-        ui::GlobalManager::Instance().AssertUIThread();
-        if (m_pBrowserForm != nullptr) {
-            m_pBrowserForm->OnLoadingStateChange(this);
-        }
-        if (m_pWebView2Control != nullptr) {
-            //测试代码
-            if (state == WebView2Control::NavigationState::Completed) {
-               // m_pWebView2Control->PostWebMessageAsString(_T("hello world!"));               
+    m_pWebView2Control->SetNavigationStateChangedCallback(
+        [this](WebView2Control::NavigationState state, HRESULT /*errorCode*/) {
+            ui::GlobalManager::Instance().AssertUIThread();
+            if (m_pBrowserForm != nullptr) {
+                m_pBrowserForm->OnLoadingStateChange(this);
             }
-        }
+            if (m_pWebView2Control != nullptr) {
+                //测试代码
+                if (state == WebView2Control::NavigationState::Completed) {
+                    // m_pWebView2Control->PostWebMessageAsString(_T("hello world!"));
+                }
+            }
         });
 
     m_pWebView2Control->SetHistoryChangedCallback([this]() {
@@ -67,61 +68,65 @@ void BrowserBox::InitBrowserBox(const DString& url)
         if (m_pBrowserForm != nullptr) {
             m_pBrowserForm->OnLoadingStateChange(this);
         }
-        });
+    });
 
-    m_pWebView2Control->SetFavIconChangedCallback([this](int32_t nWidth, int32_t nHeight, const std::vector<uint8_t>& imageData) {
-        ui::GlobalManager::Instance().AssertUIThread();
-        if (m_pBrowserForm != nullptr) {
-            m_pBrowserForm->NotifyFavicon(this, nWidth, nHeight, imageData);
-        }
+    m_pWebView2Control->SetFavIconChangedCallback(
+        [this](int32_t nWidth, int32_t nHeight, const std::vector<uint8_t> &imageData) {
+            ui::GlobalManager::Instance().AssertUIThread();
+            if (m_pBrowserForm != nullptr) {
+                m_pBrowserForm->NotifyFavicon(this, nWidth, nHeight, imageData);
+            }
         });
     m_pWebView2Control->SetZoomFactorChangedCallback([this](double zoomFactor) {
         //测试代码
         ui::GlobalManager::Instance().AssertUIThread();
-        });
-    m_pWebView2Control->SetWebMessageReceivedCallback([this](const DString& url,
-                                                             const DString& webMessageAsJson,
-                                                             const DString& webMessageAsString) {
-        //测试代码
-        ui::GlobalManager::Instance().AssertUIThread();
-        //发送回复给HTML页面
-        m_pWebView2Control->PostWebMessageAsString(_T("Hello from C++!"));
+    });
+    m_pWebView2Control->SetWebMessageReceivedCallback(
+        [this](const DString &url, const DString &webMessageAsJson, const DString &webMessageAsString) {
+            //测试代码
+            ui::GlobalManager::Instance().AssertUIThread();
+            //发送回复给HTML页面
+            m_pWebView2Control->PostWebMessageAsString(_T("Hello from C++!"));
         });
 
     //新窗口请求回调函数
-    m_pWebView2Control->SetNewWindowRequestedCallback([this](const DString& sourceUrl, const DString& sourceFrame,
-                                                             const DString& targetUrl, const DString& targetFrame,
-                                                             bool bUserInitiated) {
-            // 返回true表示允许创建弹窗页面，但新的页面在当前页面中导航，不会弹出新窗口；
-            // 返回false表示拦截页面弹窗页面，由回调函数内托管新页面的显示逻辑
-            ui::GlobalManager::Instance().AssertUIThread();
-            if (!bUserInitiated) {
-                //如果不是手工触发的弹窗页面，直接拦截
-                return false;
-            }
-            if (targetUrl.empty()) {
-                //目标URL为空，直接拦截
-                return false;
-            }
-            //创建新标签
-            if (m_pBrowserForm != nullptr) {
-                if (m_pBrowserForm->IsWindowFullscreen() &&
-                    (m_pBrowserForm->GetFullscreenControl() != nullptr) &&
-                    (dynamic_cast<ui::WebView2Control*>(m_pBrowserForm->GetFullscreenControl()) != nullptr)) {
-                    //页面全屏状态，不开启多标签，直接在当前页面打开
-                    return true;
-                }
-
-                //在新标签中打开
-                m_pBrowserForm->OpenLinkUrl(targetUrl, false);
-            }
+    m_pWebView2Control->SetNewWindowRequestedCallback([this](
+                                                          const DString &sourceUrl,
+                                                          const DString &sourceFrame,
+                                                          const DString &targetUrl,
+                                                          const DString &targetFrame,
+                                                          bool bUserInitiated) {
+        // 返回true表示允许创建弹窗页面，但新的页面在当前页面中导航，不会弹出新窗口；
+        // 返回false表示拦截页面弹窗页面，由回调函数内托管新页面的显示逻辑
+        ui::GlobalManager::Instance().AssertUIThread();
+        if (!bUserInitiated) {
+            //如果不是手工触发的弹窗页面，直接拦截
             return false;
-        });
+        }
+        if (targetUrl.empty()) {
+            //目标URL为空，直接拦截
+            return false;
+        }
+        //创建新标签
+        if (m_pBrowserForm != nullptr) {
+            if (m_pBrowserForm->IsWindowFullscreen()
+                && (m_pBrowserForm->GetFullscreenControl() != nullptr)
+                && (dynamic_cast<ui::WebView2Control *>(m_pBrowserForm->GetFullscreenControl())
+                    != nullptr)) {
+                //页面全屏状态，不开启多标签，直接在当前页面打开
+                return true;
+            }
+
+            //在新标签中打开
+            m_pBrowserForm->OpenLinkUrl(targetUrl, false);
+        }
+        return false;
+    });
 
     m_pWebView2Control->InitializeAsync(_T(""), [this](HRESULT result) {
         //测试代码
         ui::GlobalManager::Instance().AssertUIThread();
-        });
+    });
 
     //导航到该网址
     DString navigateUrl = url;
@@ -145,15 +150,15 @@ void BrowserBox::UninitBrowserBox()
     BrowserManager::GetInstance()->RemoveBorwserBox(m_browserId, this);
 }
 
-void BrowserBox::SetWindow(Window* pWindow)
+void BrowserBox::SetWindow(Window *pWindow)
 {
-    m_pBrowserForm = dynamic_cast<BrowserForm*>(pWindow);
+    m_pBrowserForm = dynamic_cast<BrowserForm *>(pWindow);
     ASSERT(m_pBrowserForm != nullptr);
 
     BaseClass::SetWindow(pWindow);
 }
 
-bool BrowserBox::OnSetFocus(const ui::EventArgs& msg)
+bool BrowserBox::OnSetFocus(const ui::EventArgs &msg)
 {
     // Box获取焦点时把焦点转移给网页控件
     if (m_pWebView2Control) {

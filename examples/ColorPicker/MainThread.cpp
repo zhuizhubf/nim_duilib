@@ -1,13 +1,10 @@
 #include "MainThread.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -15,7 +12,7 @@ bool MainThread::OnInit()
     ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
     ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
 
-    ui::ColorPicker* pColorPicker = new ui::ColorPicker;
+    ui::ColorPicker *pColorPicker = new ui::ColorPicker;
     pColorPicker->CreateWnd(nullptr, ui::WindowCreateParam(_T("ColorPicker"), true));
     pColorPicker->ShowWindow(ui::kSW_SHOW_NORMAL);
 
@@ -23,8 +20,7 @@ bool MainThread::OnInit()
     if (ui::GlobalManager::Instance().Theme().GetCurrentThemeStyle() == ui::ThemeStyle::kDark) {
         //深色主题
         pColorPicker->SetSelectedColor(ui::UiColor(ui::UiColors::Black));
-    }
-    else {
+    } else {
         //浅色主题
         pColorPicker->SetSelectedColor(ui::UiColor(ui::UiColors::White));
     }

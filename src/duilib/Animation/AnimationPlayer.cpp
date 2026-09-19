@@ -4,19 +4,16 @@
 
 #define AP_NO_VALUE -1
 
-namespace ui 
-{
-AnimationPlayer::AnimationPlayer():
-    m_animationType(AnimationType::kAnimationNone),
-    m_playCallback(nullptr),
-    m_completeCallback(nullptr)
+namespace ui {
+AnimationPlayer::AnimationPlayer()
+    : m_animationType(AnimationType::kAnimationNone)
+    , m_playCallback(nullptr)
+    , m_completeCallback(nullptr)
 {
     Init();
 }
 
-AnimationPlayer::~AnimationPlayer()
-{
-}
+AnimationPlayer::~AnimationPlayer() {}
 
 void AnimationPlayer::Clear()
 {
@@ -72,7 +69,7 @@ void AnimationPlayer::Continue()
     if (m_bReversePlay) {
         ReverseAllValue();
         m_bReversePlay = false;
-    }    
+    }
     StartTimer(bContinueMode, bOldReversePlay);
 }
 
@@ -94,7 +91,7 @@ void AnimationPlayer::ReverseContinue()
     if (!m_bReversePlay) {
         ReverseAllValue();
         m_bReversePlay = true;
-    }    
+    }
     StartTimer(bContinueMode, bOldReversePlay);
 }
 
@@ -107,7 +104,7 @@ void AnimationPlayer::StartTimer(bool bContinueMode, bool bOldReversePlay)
 
     int32_t timerIntervalMs = m_frameIntervalMillSeconds;
     if (timerIntervalMs <= 0) {
-        timerIntervalMs = 1000 / 60;//默认按每秒60帧播放
+        timerIntervalMs = 1000 / 60; //默认按每秒60帧播放
     }
 
     int32_t totalMillSeconds = m_totalMillSeconds;
@@ -131,29 +128,31 @@ void AnimationPlayer::StartTimer(bool bContinueMode, bool bOldReversePlay)
         if (bOldReversePlay != m_bReversePlay) {
             std::swap(nStartValue, nEndValue);
         }
-        if ((m_pEasingFunctions->GetFrameCount() != frameCount) ||
-            (m_pEasingFunctions->GetStartValue() != nStartValue) ||
-            (m_pEasingFunctions->GetEndValue() != nEndValue)) {
+        if ((m_pEasingFunctions->GetFrameCount() != frameCount)
+            || (m_pEasingFunctions->GetStartValue() != nStartValue)
+            || (m_pEasingFunctions->GetEndValue() != nEndValue)) {
             //重要的参数已经变化，重新开始
             bContinueMode = false;
         }
     }
     m_bPlaying = true;
-    m_pEasingFunctions = std::make_unique<EasingFunctions>(m_startValue, m_endValue, frameCount, m_easingFunctionType);
+    m_pEasingFunctions = std::make_unique<EasingFunctions>(
+        m_startValue, m_endValue, frameCount, m_easingFunctionType);
     if (bContinueMode && (m_frameIndex >= 0) && (m_frameIndex <= frameCount)) {
         //继续上次的开始播放
         if (bOldReversePlay != m_bReversePlay) {
             m_frameIndex = frameCount - m_frameIndex;
         }
         m_currentValue = m_pEasingFunctions->GetEasingValue(m_frameIndex);
-    }
-    else {
+    } else {
         //重新开始
         m_frameIndex = 0;
         m_currentValue = m_startValue;
     }
     auto playCallback = UiBind(&AnimationPlayer::Play, this);
-    GlobalManager::Instance().Timer().AddTimer(m_weakFlagOwner.GetWeakFlag(), playCallback, (uint32_t)timerIntervalMs);
+    GlobalManager::Instance()
+        .Timer()
+        .AddTimer(m_weakFlagOwner.GetWeakFlag(), playCallback, (uint32_t) timerIntervalMs);
 
     //首次调用，初始化当前的值（避免延迟调用导致的错误，比如设置控件大小、位置时，必须做初始化，否则会出现异常）
     if (m_playCallback) {

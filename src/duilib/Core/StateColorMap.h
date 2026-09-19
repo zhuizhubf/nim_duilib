@@ -1,11 +1,10 @@
 #ifndef UI_CORE_STATE_COLOR_MAP_H_
 #define UI_CORE_STATE_COLOR_MAP_H_
 
-#include "render/IRender.h"
 #include "duilib/Core/UiTypes.h"
+#include "render/IRender.h"
 
-namespace ui 
-{
+namespace ui {
 /** 控件状态与颜色值的映射
 */
 class Control;
@@ -13,7 +12,7 @@ class IRender;
 class DUILIB_API StateColorMap
 {
 public:
-    explicit StateColorMap(Control* pControl);
+    explicit StateColorMap(Control *pControl);
 
     /** 获取颜色值，如果不包含此颜色，则返回空
     */
@@ -21,7 +20,7 @@ public:
 
     /** 设置颜色值
     */
-    void SetStateColor(ControlStateType stateType, const DString& color);
+    void SetStateColor(ControlStateType stateType, const DString &color);
 
 public:
     /** 是否包含Hovered状态的颜色
@@ -39,12 +38,12 @@ public:
 public:
     /** 绘制指定状态的颜色
     */
-    void PaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType) const;
+    void PaintStateColor(IRender *pRender, const UiRect &rcPaint, ControlStateType stateType) const;
 
 private:
     /** 关联的控件接口
     */
-    Control* m_pControl;
+    Control *m_pControl;
 
     /** 状态与颜色值的映射表
     */

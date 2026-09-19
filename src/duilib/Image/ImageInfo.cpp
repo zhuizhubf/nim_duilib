@@ -1,27 +1,25 @@
 #include "ImageInfo.h"
-#include "duilib/Image/ImageUtil.h"
-#include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/GlobalManager.h"
+#include "duilib/Image/ImageUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
 #include <cmath>
 
-namespace ui 
-{
+namespace ui {
 
-ImageInfo::ImageInfo():    
-    m_nLoopCount(-1),
-    m_nFrameCount(0),
-    m_nImageInfoWidth(0),
-    m_nImageInfoHeight(0),
-    m_imageType(ImageType::kImageBitmap),
-    m_bEnableImageDpiScale(true),
-    m_bHasCustomSizeScale(false),
-    m_fCustomSizeScaleX(0),
-    m_fCustomSizeScaleY(0),
-    m_nImageFileDpiScale(100),
-    m_fImageSizeScale(1.0f)
-{
-}
+ImageInfo::ImageInfo()
+    : m_nLoopCount(-1)
+    , m_nFrameCount(0)
+    , m_nImageInfoWidth(0)
+    , m_nImageInfoHeight(0)
+    , m_imageType(ImageType::kImageBitmap)
+    , m_bEnableImageDpiScale(true)
+    , m_bHasCustomSizeScale(false)
+    , m_fCustomSizeScaleX(0)
+    , m_fCustomSizeScaleY(0)
+    , m_nImageFileDpiScale(100)
+    , m_fImageSizeScale(1.0f)
+{}
 
 ImageInfo::~ImageInfo()
 {
@@ -43,7 +41,8 @@ bool ImageInfo::IsSvgImage() const
     return (m_imageType == ImageType::kImageSvg);
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& rcSource, Control* pControl)
+std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(
+    const UiRect &rcDest, UiRect &rcSource, Control *pControl)
 {
     std::shared_ptr<IImage> pImageData = m_pImageData;
     ASSERT(pImageData != nullptr);
@@ -52,7 +51,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& r
     }
     std::shared_ptr<ISvgImage> pSvgImage;
     if (m_imageType == ImageType::kImageSvg) {
-        pSvgImage = pImageData->GetImageSvg();        
+        pSvgImage = pImageData->GetImageSvg();
     }
     ASSERT(pSvgImage != nullptr);
     if (pSvgImage == nullptr) {
@@ -73,12 +72,12 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(const UiRect& rcDest, UiRect& r
 
     float fSizeScaleX = static_cast<float>(rcDest.Width()) / rcSource.Width();
     float fSizeScaleY = static_cast<float>(rcDest.Height()) / rcSource.Height();
-    float fImageSizeScale = fSizeScaleX < fSizeScaleY ? fSizeScaleX  : fSizeScaleY ;
+    float fImageSizeScale = fSizeScaleX < fSizeScaleY ? fSizeScaleX : fSizeScaleY;
     std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(fImageSizeScale, pControl);
     return pBitmap;
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale, Control* pControl)
+std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale, Control *pControl)
 {
     GlobalManager::Instance().AssertUIThread();
     //SVG图片，无缓存
@@ -99,26 +98,28 @@ std::shared_ptr<IBitmap> ImageInfo::GetSvgBitmap(float fImageSizeScale, Control*
         if (pSvgImage == nullptr) {
             return nullptr;
         }
-        int32_t nWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)m_nImageInfoWidth, fImageSizeScale);
-        int32_t nHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)m_nImageInfoHeight, fImageSizeScale);
+        int32_t nWidth = (int32_t)
+            ImageUtil::GetScaledImageSize((uint32_t) m_nImageInfoWidth, fImageSizeScale);
+        int32_t nHeight = (int32_t)
+            ImageUtil::GetScaledImageSize((uint32_t) m_nImageInfoHeight, fImageSizeScale);
 
         SvgReplaceColorCallbackFunction svgReplaceColorCallback;
         if (pControl != nullptr) {
             std::weak_ptr<WeakFlag> controlFlag = pControl->GetWeakFlag();
-            svgReplaceColorCallback = [controlFlag, pControl](const DString& strColor) {
+            svgReplaceColorCallback = [controlFlag, pControl](const DString &strColor) {
                 UiColor color;
                 if (!controlFlag.expired() && (pControl != nullptr)) {
                     color = pControl->GetUiColor(strColor);
                 }
                 return color;
-                };
+            };
         }
         pBitmap = pSvgImage->GetBitmap(UiSize(nWidth, nHeight), svgReplaceColorCallback);
     }
     return pBitmap;
 }
 
-std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pControl)
+std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool *bDecodeError, Control *pControl)
 {
     GlobalManager::Instance().AssertUIThread();
     if (m_imageType == ImageType::kImageBitmap) {
@@ -126,8 +127,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pCont
         if (m_pBitmap != nullptr) {
             return m_pBitmap;
         }
-    }
-    else if (m_imageType == ImageType::kImageSvg) {
+    } else if (m_imageType == ImageType::kImageSvg) {
         //SVG图片
         std::shared_ptr<IBitmap> pBitmap = GetSvgBitmap(IMAGE_SIZE_SCALE_NONE, pControl);
         if (pBitmap == nullptr) {
@@ -136,8 +136,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pCont
             }
         }
         return pBitmap;
-    }
-    else {
+    } else {
         if (bDecodeError != nullptr) {
             *bDecodeError = true;
         }
@@ -169,12 +168,13 @@ std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pCont
         if (pBitmap == nullptr) {
             return nullptr;
         }
-        if (((int32_t)pBitmap->GetWidth() == m_nImageInfoWidth) && ((int32_t)pBitmap->GetHeight() == m_nImageInfoHeight)) {
+        if (((int32_t) pBitmap->GetWidth() == m_nImageInfoWidth)
+            && ((int32_t) pBitmap->GetHeight() == m_nImageInfoHeight)) {
             m_pBitmap = pBitmap;
-        }
-        else {
+        } else {
             //若大小不一致，生成缓存位图后，释放原图
-            m_pBitmap = ImageUtil::ResizeImageBitmap(pBitmap.get(), m_nImageInfoWidth, m_nImageInfoHeight);
+            m_pBitmap
+                = ImageUtil::ResizeImageBitmap(pBitmap.get(), m_nImageInfoWidth, m_nImageInfoHeight);
             ASSERT(m_pBitmap != nullptr);
             ReleaseImage();
             if (m_pBitmap == nullptr) {
@@ -184,8 +184,7 @@ std::shared_ptr<IBitmap> ImageInfo::GetBitmap(bool* bDecodeError, Control* pCont
             }
         }
         return m_pBitmap;
-    }
-    else {
+    } else {
         //未知错误
         if (bDecodeError != nullptr) {
             *bDecodeError = true;
@@ -227,7 +226,7 @@ std::shared_ptr<IAnimationImage> ImageInfo::GetAnimationImage(uint32_t nFrameInd
     return pAnimationImage;
 }
 
-AnimationFramePtr ImageInfo::GetFrame(uint32_t nFrameIndex, const UiSize& szDestRectSize)
+AnimationFramePtr ImageInfo::GetFrame(uint32_t nFrameIndex, const UiSize &szDestRectSize)
 {
 #if DUILIB_PERFORMANCE_STAT_ENABLED
     //性能统计
@@ -292,10 +291,11 @@ int32_t ImageInfo::GetFrameDelayMs(uint32_t nFrameIndex)
     return IMAGE_ANIMATION_DELAY_MS;
 }
 
-bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
-                             const std::shared_ptr<IImage>& pImageData,                             
-                             bool bImageDpiScaleEnabled,
-                             uint32_t nImageFileDpiScale)
+bool ImageInfo::SetImageData(
+    const ImageLoadParam &loadParam,
+    const std::shared_ptr<IImage> &pImageData,
+    bool bImageDpiScaleEnabled,
+    uint32_t nImageFileDpiScale)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pImageData != nullptr);
@@ -310,7 +310,13 @@ bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
     //计算ImageInfo的大小
     int32_t nImageInfoWidth = 0;
     int32_t nImageInfoHeight = 0;
-    CalcImageInfoSize(loadParam, pImageData, bImageDpiScaleEnabled, nImageFileDpiScale, nImageInfoWidth, nImageInfoHeight);
+    CalcImageInfoSize(
+        loadParam,
+        pImageData,
+        bImageDpiScaleEnabled,
+        nImageFileDpiScale,
+        nImageInfoWidth,
+        nImageInfoHeight);
 
     ASSERT((nImageInfoWidth > 0) && (nImageInfoHeight > 0));
     if ((nImageInfoWidth <= 0) || (nImageInfoHeight <= 0)) {
@@ -323,7 +329,7 @@ bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
     if ((nImageWidth <= 0) || (nImageHeight <= 0)) {
         return false;
     }
-    
+
     //设置宽度和高度
     m_nImageInfoWidth = nImageInfoWidth;
     m_nImageInfoHeight = nImageInfoHeight;
@@ -344,7 +350,7 @@ bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
     }
 
     m_loadParam = loadParam;
-    m_pImageData = pImageData;    
+    m_pImageData = pImageData;
 
     //设置图片内部数据
     ImageType imageType = pImageData->GetImageType();
@@ -352,12 +358,10 @@ bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
     if (imageType == ImageType::kImageBitmap) {
         m_nFrameCount = 1;
         m_nLoopCount = -1;
-    }
-    else if (imageType == ImageType::kImageSvg) {
+    } else if (imageType == ImageType::kImageSvg) {
         m_nFrameCount = 1;
         m_nLoopCount = -1;
-    }
-    else if (imageType == ImageType::kImageAnimation) {
+    } else if (imageType == ImageType::kImageAnimation) {
         std::shared_ptr<IAnimationImage> pAnimationImage = pImageData->GetImageAnimation();
         ASSERT(pAnimationImage != nullptr);
         if (pAnimationImage == nullptr) {
@@ -372,20 +376,20 @@ bool ImageInfo::SetImageData(const ImageLoadParam& loadParam,
         if (m_nLoopCount == 0) {
             m_nLoopCount = -1;
         }
-    }
-    else {
+    } else {
         ASSERT(0);
         return false;
     }
     return true;
 }
 
-void ImageInfo::CalcImageInfoSize(const ImageLoadParam& loadParam,
-                                  const std::shared_ptr<IImage>& pImageData,
-                                  bool bImageDpiScaleEnabled,
-                                  uint32_t nImageFileDpiScale,
-                                  int32_t& nImageInfoWidth,
-                                  int32_t& nImageInfoHeight) const
+void ImageInfo::CalcImageInfoSize(
+    const ImageLoadParam &loadParam,
+    const std::shared_ptr<IImage> &pImageData,
+    bool bImageDpiScaleEnabled,
+    uint32_t nImageFileDpiScale,
+    int32_t &nImageInfoWidth,
+    int32_t &nImageInfoHeight) const
 {
     nImageInfoWidth = 0;
     nImageInfoHeight = 0;
@@ -412,19 +416,28 @@ void ImageInfo::CalcImageInfoSize(const ImageLoadParam& loadParam,
     ASSERT((nImageInfoWidth > 0) && (nImageInfoHeight > 0));
     if ((nImageInfoWidth <= 0) || (nImageInfoHeight <= 0)) {
         return;
-    }    
-    if (bImageDpiScaleEnabled && (nImageFileDpiScale != 100) && ImageUtil::IsValidImageScale(pImageData->GetImageSizeScale())) {
-        const float fRealImageSizeScale = pImageData->GetImageSizeScale(); //实际加载的缩放比例(此值与加载时传入的缩放比例不一定相同)
+    }
+    if (bImageDpiScaleEnabled && (nImageFileDpiScale != 100)
+        && ImageUtil::IsValidImageScale(pImageData->GetImageSizeScale())) {
+        const float fRealImageSizeScale
+            = pImageData
+                  ->GetImageSizeScale(); //实际加载的缩放比例(此值与加载时传入的缩放比例不一定相同)
         //举例：原图文件为"autumn.png"，如果匹配到DPI自适应图文件名为"autumn@175.png"，此时nImageFileDpiScale的值就是175
         const float fSizeScale = static_cast<float>(loadParam.GetLoadDpiScale()) / 100.0f;
         //用的是图片自适应图片（非原图），需要用原图大小来计算ImageInfo大小
-        int32_t nImageOrgWidth = static_cast<int32_t>(std::ceil(nImageInfoWidth * 1.0f / fRealImageSizeScale));
-        nImageOrgWidth = static_cast<int32_t>(std::ceil(nImageOrgWidth * 100.0f / nImageFileDpiScale));    //原图大小
-        nImageOrgWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageOrgWidth, fSizeScale); //用原图大小，重新计算ImageInfo的大小
+        int32_t nImageOrgWidth = static_cast<int32_t>(
+            std::ceil(nImageInfoWidth * 1.0f / fRealImageSizeScale));
+        nImageOrgWidth = static_cast<int32_t>(
+            std::ceil(nImageOrgWidth * 100.0f / nImageFileDpiScale)); //原图大小
+        nImageOrgWidth = (int32_t) ImageUtil::GetScaledImageSize(
+            (uint32_t) nImageOrgWidth, fSizeScale); //用原图大小，重新计算ImageInfo的大小
 
-        int32_t nImageOrgHeight = static_cast<int32_t>(std::ceil(nImageInfoHeight * 1.0f / fRealImageSizeScale));
-        nImageOrgHeight = static_cast<int32_t>(std::ceil(nImageOrgHeight * 100.0f / nImageFileDpiScale));    //原图大小
-        nImageOrgHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageOrgHeight, fSizeScale); //用原图大小，重新计算ImageInfo的大小
+        int32_t nImageOrgHeight = static_cast<int32_t>(
+            std::ceil(nImageInfoHeight * 1.0f / fRealImageSizeScale));
+        nImageOrgHeight = static_cast<int32_t>(
+            std::ceil(nImageOrgHeight * 100.0f / nImageFileDpiScale)); //原图大小
+        nImageOrgHeight = (int32_t) ImageUtil::GetScaledImageSize(
+            (uint32_t) nImageOrgHeight, fSizeScale); //用原图大小，重新计算ImageInfo的大小
 
         if ((nImageOrgWidth > 0) && (nImageOrgHeight > 0)) {
             nImageInfoWidth = nImageOrgWidth;
@@ -435,60 +448,66 @@ void ImageInfo::CalcImageInfoSize(const ImageLoadParam& loadParam,
     //计算设置的比例, 影响加载的缩放百分比（通过width='300'或者width='300%'这种形式设置的图片属性）
     uint32_t nImageFixedWidth = 0;
     uint32_t nImageFixedHeight = 0;
-    const bool bHasFixedSize = loadParam.GetImageFixedSize(nImageFixedWidth, nImageFixedHeight); //绝对数值，已经做过DPI自适应
+    const bool bHasFixedSize
+        = loadParam
+              .GetImageFixedSize(nImageFixedWidth, nImageFixedHeight); //绝对数值，已经做过DPI自适应
 
     float fImageFixedWidthPercent = 1.0f;
     float fImageFixedHeightPercent = 1.0f;
-    const bool bHasFixedPercent = loadParam.GetImageFixedPercent(fImageFixedWidthPercent, fImageFixedHeightPercent);//百分比
+    const bool bHasFixedPercent
+        = loadParam.GetImageFixedPercent(fImageFixedWidthPercent, fImageFixedHeightPercent); //百分比
 
     if (bHasFixedSize || bHasFixedPercent) {
         //有设置图片属性：通过width='300'或者width='300%'这种形式设置的图片属性
-        bool bFixedWidthSet = (nImageFixedWidth > 0) || ImageUtil::NeedResizeImage(fImageFixedWidthPercent);
-        bool bFixedHeightSet = (nImageFixedHeight > 0) || ImageUtil::NeedResizeImage(fImageFixedHeightPercent);
+        bool bFixedWidthSet = (nImageFixedWidth > 0)
+                              || ImageUtil::NeedResizeImage(fImageFixedWidthPercent);
+        bool bFixedHeightSet = (nImageFixedHeight > 0)
+                               || ImageUtil::NeedResizeImage(fImageFixedHeightPercent);
         if (bFixedWidthSet && bFixedHeightSet) {
             //宽度和高度均设置
             if (nImageFixedWidth > 0) {
                 nImageInfoWidth = nImageFixedWidth;
-            }
-            else if (ImageUtil::NeedResizeImage(fImageFixedWidthPercent)) {
-                nImageInfoWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoWidth, fImageFixedWidthPercent);
+            } else if (ImageUtil::NeedResizeImage(fImageFixedWidthPercent)) {
+                nImageInfoWidth = (int32_t) ImageUtil::GetScaledImageSize(
+                    (uint32_t) nImageInfoWidth, fImageFixedWidthPercent);
             }
 
             if (nImageFixedHeight > 0) {
                 nImageInfoHeight = nImageFixedHeight;
+            } else if (ImageUtil::NeedResizeImage(fImageFixedHeightPercent)) {
+                nImageInfoHeight = (int32_t) ImageUtil::GetScaledImageSize(
+                    (uint32_t) nImageInfoHeight, fImageFixedHeightPercent);
             }
-            else if (ImageUtil::NeedResizeImage(fImageFixedHeightPercent)) {
-                nImageInfoHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoHeight, fImageFixedHeightPercent);
-            }
-        }
-        else if (bFixedWidthSet) {
+        } else if (bFixedWidthSet) {
             //只设置了宽度，高度同比例缩放
             int32_t nOldImageInfoWidth = nImageInfoWidth;
             if (nImageFixedWidth > 0) {
                 nImageInfoWidth = nImageFixedWidth;
-            }
-            else if (ImageUtil::NeedResizeImage(fImageFixedWidthPercent)) {
-                nImageInfoWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoWidth, fImageFixedWidthPercent);
+            } else if (ImageUtil::NeedResizeImage(fImageFixedWidthPercent)) {
+                nImageInfoWidth = (int32_t) ImageUtil::GetScaledImageSize(
+                    (uint32_t) nImageInfoWidth, fImageFixedWidthPercent);
             }
             float fNewScale = static_cast<float>(nImageInfoWidth) / nOldImageInfoWidth;
-            nImageInfoHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoHeight, fNewScale);
-        }
-        else if (bFixedHeightSet) {
+            nImageInfoHeight
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) nImageInfoHeight, fNewScale);
+        } else if (bFixedHeightSet) {
             //只设置了高度，宽度同比例缩放
             int32_t nOldImageInfoHeight = nImageInfoHeight;
             if (nImageFixedHeight > 0) {
                 nImageInfoHeight = nImageFixedHeight;
-            }
-            else if (ImageUtil::NeedResizeImage(fImageFixedHeightPercent)) {
-                nImageInfoHeight = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoHeight, fImageFixedHeightPercent);
+            } else if (ImageUtil::NeedResizeImage(fImageFixedHeightPercent)) {
+                nImageInfoHeight = (int32_t) ImageUtil::GetScaledImageSize(
+                    (uint32_t) nImageInfoHeight, fImageFixedHeightPercent);
             }
             float fNewScale = static_cast<float>(nImageInfoHeight) / nOldImageInfoHeight;
-            nImageInfoWidth = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)nImageInfoWidth, fNewScale);
+            nImageInfoWidth
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) nImageInfoWidth, fNewScale);
         }
     }
 }
 
-void ImageInfo::ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcDestCorners, UiRect& rcSource, UiRect& rcSourceCorners)
+void ImageInfo::ScaleImageSourceRect(
+    const DpiManager &dpi, UiRect &rcDestCorners, UiRect &rcSource, UiRect &rcSourceCorners)
 {
     int32_t nImageInfoWidth = GetWidth();
     int32_t nImageInfoHeight = GetHeight();
@@ -499,12 +518,11 @@ void ImageInfo::ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcDestCorner
 
     //对rcSourceCorners进行处理：对边角值进行容错处理（四个边代表边距，不代表矩形区域）
     //在XML解析加载的时候，未做DPI自适应；
-    //在绘制的时候，如果图片做过DPI自适应，也要做DPI自适应，如果图片未做DPI自适应，也不需要做。    
-    if ((rcSourceCorners.left < 0) || (rcSourceCorners.top < 0) ||
-        (rcSourceCorners.right < 0) || (rcSourceCorners.bottom < 0)) {
+    //在绘制的时候，如果图片做过DPI自适应，也要做DPI自适应，如果图片未做DPI自适应，也不需要做。
+    if ((rcSourceCorners.left < 0) || (rcSourceCorners.top < 0) || (rcSourceCorners.right < 0)
+        || (rcSourceCorners.bottom < 0)) {
         rcSourceCorners.Clear();
-    }
-    else if (m_bEnableImageDpiScale) {
+    } else if (m_bEnableImageDpiScale) {
         dpi.ScaleRect(rcSourceCorners);
     }
 
@@ -513,30 +531,28 @@ void ImageInfo::ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcDestCorner
     rcDestCorners = rcSourceCorners;
 
     // 如果源位图已经按照DPI缩放过，那么对应的rcImageSource也需要缩放
-    if ((rcSource.left < 0) || (rcSource.top < 0) ||
-        (rcSource.right < 0) || (rcSource.bottom < 0) ||
-        (rcSource.Width() <= 0) || (rcSource.Height() <= 0)) {
+    if ((rcSource.left < 0) || (rcSource.top < 0) || (rcSource.right < 0) || (rcSource.bottom < 0)
+        || (rcSource.Width() <= 0) || (rcSource.Height() <= 0)) {
         //如果是无效值，则重置为整个图片大小
         rcSource.left = 0;
         rcSource.top = 0;
-        rcSource.right = (int32_t)nImageInfoWidth;
-        rcSource.bottom = (int32_t)nImageInfoHeight;
-    }
-    else if (m_bEnableImageDpiScale) {
+        rcSource.right = (int32_t) nImageInfoWidth;
+        rcSource.bottom = (int32_t) nImageInfoHeight;
+    } else if (m_bEnableImageDpiScale) {
         //如果外部设置此值，做DPI自适应处理
         dpi.ScaleRect(rcSource);
     }
 
     //图片源容错处理
-    if (rcSource.right > (int32_t)nImageInfoWidth) {
-        rcSource.right = (int32_t)nImageInfoWidth;
+    if (rcSource.right > (int32_t) nImageInfoWidth) {
+        rcSource.right = (int32_t) nImageInfoWidth;
     }
-    if (rcSource.bottom > (int32_t)nImageInfoHeight) {
-        rcSource.bottom = (int32_t)nImageInfoHeight;
+    if (rcSource.bottom > (int32_t) nImageInfoHeight) {
+        rcSource.bottom = (int32_t) nImageInfoHeight;
     }
 }
 
-void ImageInfo::ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcSource)
+void ImageInfo::ScaleImageSourceRect(const DpiManager &dpi, UiRect &rcSource)
 {
     UiRect rcDestCorners;
     UiRect rcSourceCorners;
@@ -593,7 +609,7 @@ uint32_t ImageInfo::GetImageFileDpiScale() const
     return m_nImageFileDpiScale;
 }
 
-void ImageInfo::SetImageKey(const DString& imageKey)
+void ImageInfo::SetImageKey(const DString &imageKey)
 {
     m_imageKey = imageKey;
 }
@@ -603,4 +619,4 @@ DString ImageInfo::GetImageKey() const
     return m_imageKey.c_str();
 }
 
-}
+} // namespace ui

@@ -3,24 +3,21 @@
 
 namespace ui {
 
-RenderTest2::RenderTest2(ui::Window* pWindow):
-    ui::Control(pWindow)
-{
-}
+RenderTest2::RenderTest2(ui::Window *pWindow)
+    : ui::Control(pWindow)
+{}
 
-RenderTest2::~RenderTest2()
-{
-}
+RenderTest2::~RenderTest2() {}
 
-void RenderTest2::AlphaPaint(IRender* pRender, const UiRect& rcPaint)
+void RenderTest2::AlphaPaint(IRender *pRender, const UiRect &rcPaint)
 {
     BaseClass::AlphaPaint(pRender, rcPaint);
 }
 
-void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
+void RenderTest2::Paint(IRender *pRender, const UiRect &rcPaint)
 {
     BaseClass::Paint(pRender, rcPaint);
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
 
     int marginLeft = 8;
@@ -40,7 +37,7 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
 
     rect.right = rect.left + nSize;
     rect.bottom = rect.top + nSize;
-    int currentBottom = rect.bottom;//记录当前的bottom值
+    int currentBottom = rect.bottom; //记录当前的bottom值
 
     //画直线
     int32_t nLineIndex = 0;
@@ -49,10 +46,17 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         const int nLineWidth = 3;
         const float fWidth = Dpi().GetDisplayScale() * nLineWidth;
         if ((nLineIndex % 2) == 0) {
-            pRender->DrawLine(UiPointF((float)rect.left, (float)topValue), UiPointF((float)rect.right, (float)topValue), UiColor(UiColors::DarkCyan), fWidth);
-        }
-        else {
-            pRender->DrawLine(UiPointF(rect.left, topValue), UiPointF(rect.right, topValue), UiColor(UiColors::DarkCyan), (float)DpiScaledInt(nLineWidth));
+            pRender->DrawLine(
+                UiPointF((float) rect.left, (float) topValue),
+                UiPointF((float) rect.right, (float) topValue),
+                UiColor(UiColors::DarkCyan),
+                fWidth);
+        } else {
+            pRender->DrawLine(
+                UiPointF(rect.left, topValue),
+                UiPointF(rect.right, topValue),
+                UiColor(UiColors::DarkCyan),
+                (float) DpiScaledInt(nLineWidth));
         }
         ++nLineIndex;
     }
@@ -71,25 +75,23 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     //画各种线形的线
     rect.Offset(UiPoint(rect.Width() + 10, 0));
     if (pRenderFactory != nullptr) {
-        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
+        std::unique_ptr<IPen> pen(
+            pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
         int32_t style = 0;
         for (int32_t topValue = rect.top; topValue <= rect.bottom; topValue += sep) {
             if (style == 0) {
                 pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleSolid);
-            }
-            else if (style == 1) {
+            } else if (style == 1) {
                 pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDash);
-            }
-            else if (style == 2) {
+            } else if (style == 2) {
                 pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDot);
-            }
-            else if (style == 3) {
+            } else if (style == 3) {
                 pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDot);
-            }
-            else if (style == 4) {
+            } else if (style == 4) {
                 pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDotDot);
             }
-            pRender->DrawLine(UiPointF(rect.left, topValue), UiPointF(rect.right, topValue), pen.get());
+            pRender
+                ->DrawLine(UiPointF(rect.left, topValue), UiPointF(rect.right, topValue), pen.get());
             ++style;
             if (style > 4) {
                 style = 0;
@@ -97,33 +99,45 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         }
     }
 
-
     //画一个正六边形
     UiRect hexagonRect = rect;
     hexagonRect.Offset(UiPoint(rect.Width() + 10, 0));
-    DrawRegularHexagon3(pRender, hexagonRect.Center(), rect.Width() / 2, UiColor(UiColors::White), 2, UiColor(UiColors::Olive));
+    DrawRegularHexagon3(
+        pRender,
+        hexagonRect.Center(),
+        rect.Width() / 2,
+        UiColor(UiColors::White),
+        2,
+        UiColor(UiColors::Olive));
 
     //画一个正六边形
     hexagonRect.Offset(UiPoint(rect.Width() + 10, 0));
-    UiPointF centerF((float)hexagonRect.CenterX(), (float)hexagonRect.CenterY());
-    DrawRegularHexagon(pRender, centerF, rect.Width() / 2, UiColor(UiColors::White), 2, UiColor(UiColors::SandyBrown));
+    UiPointF centerF((float) hexagonRect.CenterX(), (float) hexagonRect.CenterY());
+    DrawRegularHexagon(
+        pRender,
+        centerF,
+        rect.Width() / 2,
+        UiColor(UiColors::White),
+        2,
+        UiColor(UiColors::SandyBrown));
 
     //用正六边形拼接一个复杂图形
     hexagonRect.Offset(UiPoint(rect.Width() + 10, 0));
     DrawColorMap(pRender, hexagonRect);
 
     //换行
-    currentBottom = textRect.bottom;//记录当前的bottom值
+    currentBottom = textRect.bottom; //记录当前的bottom值
     rect = GetRect();
     rect.left += marginLeft;
     rect.right = rect.left;
     rect.top = currentBottom + marginTop;
     rect.bottom = rect.top + nSize;
-    
+
     //画矩形
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    pRender->DrawRect(UiRectF::MakeFromRect(rect), UiColor(UiColors::Fuchsia), (float)DpiScaledInt(2));
+    pRender
+        ->DrawRect(UiRectF::MakeFromRect(rect), UiColor(UiColors::Fuchsia), (float) DpiScaledInt(2));
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -136,25 +150,21 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         rect.left = rect.right + marginLeft;
         rect.right = rect.left + nSize;
 
-        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
+        std::unique_ptr<IPen> pen(
+            pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
         if (style == 0) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleSolid);
-        }
-        else if (style == 1) {
+        } else if (style == 1) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDash);
-        }
-        else if (style == 2) {
+        } else if (style == 2) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDot);
-        }
-        else if (style == 3) {
+        } else if (style == 3) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDot);
-        }
-        else if (style == 4) {
+        } else if (style == 4) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDotDot);
         }
         pRender->DrawRect(UiRectF::MakeFromRect(rect), pen.get());
     }
-    
 
     //填充矩形
     rect.left = rect.right + marginLeft;
@@ -178,7 +188,7 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     pRender->DrawString(_T("FillRect Alpha"), drawParam);
 
     //换行
-    currentBottom = textRect.bottom;//记录当前的bottom值
+    currentBottom = textRect.bottom; //记录当前的bottom值
     rect = GetRect();
     rect.left += marginLeft;
     rect.right = rect.left;
@@ -195,7 +205,12 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     roundSize.cx = (roundSize.cx / 2) * 2;
     roundSize.cy = (roundSize.cy / 2) * 2;
 
-    pRender->DrawRoundRect(UiRectF::MakeFromRect(rect), (float)roundSize.cx, (float)roundSize.cy, UiColor(0xffC63535), DpiScaledFloat(2));
+    pRender->DrawRoundRect(
+        UiRectF::MakeFromRect(rect),
+        (float) roundSize.cx,
+        (float) roundSize.cy,
+        UiColor(0xffC63535),
+        DpiScaledFloat(2));
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -209,29 +224,31 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         rect.left = rect.right + marginLeft;
         rect.right = rect.left + nSize;
 
-        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
+        std::unique_ptr<IPen> pen(
+            pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
         if (style == 0) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleSolid);
-        }
-        else if (style == 1) {
+        } else if (style == 1) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDash);
-        }
-        else if (style == 2) {
+        } else if (style == 2) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDot);
-        }
-        else if (style == 3) {
+        } else if (style == 3) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDot);
-        }
-        else if (style == 4) {
+        } else if (style == 4) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDotDot);
         }
-        pRender->DrawRoundRect(UiRectF::MakeFromRect(rect), (float)roundSize.cx, (float)roundSize.cy, pen.get());
+        pRender->DrawRoundRect(
+            UiRectF::MakeFromRect(rect), (float) roundSize.cx, (float) roundSize.cy, pen.get());
     }
 
     //填充圆角矩形
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    pRender->FillRoundRect(UiRectF::MakeFromRect(rect), (float)roundSize.cx, (float)roundSize.cy, UiColor(UiColors::Blue));
+    pRender->FillRoundRect(
+        UiRectF::MakeFromRect(rect),
+        (float) roundSize.cx,
+        (float) roundSize.cy,
+        UiColor(UiColors::Blue));
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -242,7 +259,12 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
 
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    pRender->FillRoundRect(UiRectF::MakeFromRect(rect), (float)roundSize.cx, (float)roundSize.cy, UiColor(UiColors::Blue), 128);
+    pRender->FillRoundRect(
+        UiRectF::MakeFromRect(rect),
+        (float) roundSize.cx,
+        (float) roundSize.cy,
+        UiColor(UiColors::Blue),
+        128);
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -251,7 +273,7 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     pRender->DrawString(_T("FillRoundRect Alpha"), drawParam);
 
     //换行
-    currentBottom = textRect.bottom;//记录当前的bottom值
+    currentBottom = textRect.bottom; //记录当前的bottom值
     rect = GetRect();
     rect.left += marginLeft;
     rect.right = rect.left;
@@ -261,8 +283,9 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     //画圆形/填充圆形
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    float fRadius = std::min(rect.Width(), rect.Height()) / 2.0f;//圆的半径
-    pRender->DrawCircle(UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::Blue), DpiScaledFloat(2));
+    float fRadius = std::min(rect.Width(), rect.Height()) / 2.0f; //圆的半径
+    pRender->DrawCircle(
+        UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::Blue), DpiScaledFloat(2));
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -275,20 +298,17 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         rect.left = rect.right + marginLeft;
         rect.right = rect.left + nSize;
 
-        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
+        std::unique_ptr<IPen> pen(
+            pRenderFactory->CreatePen(UiColor(UiColors::CornflowerBlue), DpiScaledFloat(2)));
         if (style == 0) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleSolid);
-        }
-        else if (style == 1) {
+        } else if (style == 1) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDash);
-        }
-        else if (style == 2) {
+        } else if (style == 2) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDot);
-        }
-        else if (style == 3) {
+        } else if (style == 3) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDot);
-        }
-        else if (style == 4) {
+        } else if (style == 4) {
             pen->SetDashStyle(ui::IPen::DashStyle::kDashStyleDashDotDot);
         }
         pRender->DrawCircle(UiPointF::MakeFromPoint(rect.Center()), fRadius, pen.get());
@@ -296,7 +316,8 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
 
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    pRender->FillCircle(UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::CadetBlue), 255);
+    pRender->FillCircle(
+        UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::CadetBlue), 255);
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
@@ -306,16 +327,17 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
 
     rect.left = rect.right + marginLeft;
     rect.right = rect.left + nSize;
-    pRender->FillCircle(UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::CadetBlue), 96);
+    pRender->FillCircle(
+        UiPointF::MakeFromPoint(rect.Center()), fRadius, UiColor(UiColors::CadetBlue), 96);
     textRect = rect;
     textRect.top = rect.bottom;
     textRect.bottom = textRect.top + nTextLineHeight;
 
     drawParam.textRect = textRect;
     pRender->DrawString(_T("FillCircle Alpha"), drawParam);
-    
+
     //换行
-    currentBottom = textRect.bottom;//记录当前的bottom值
+    currentBottom = textRect.bottom; //记录当前的bottom值
     rect = GetRect();
     rect.left += marginLeft;
     rect.right = rect.left;
@@ -324,19 +346,28 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
 
     //用DrawPath画圆角四边形
     rect.left = rect.right + marginLeft;
-    rect.right = rect.left + nSize;    
+    rect.right = rect.left + nSize;
     if (pRenderFactory != nullptr) {
         std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(UiColor(0xff006DD9), DpiScaledFloat(2)));
         std::unique_ptr<IPath> path(pRenderFactory->CreatePath());
         if (pen && path) {
-            const UiRect& rc = rect;
-            path->AddArc(UiRect(rc.left, rc.top, rc.left + roundSize.cx, rc.top + roundSize.cy), 180, 90);
+            const UiRect &rc = rect;
+            path->AddArc(
+                UiRect(rc.left, rc.top, rc.left + roundSize.cx, rc.top + roundSize.cy), 180, 90);
             path->AddLine(rc.left + roundSize.cx / 2, rc.top, rc.right - roundSize.cx / 2, rc.top);
-            path->AddArc(UiRect(rc.right - roundSize.cx, rc.top, rc.right, rc.top + roundSize.cy), 270, 90);
+            path->AddArc(
+                UiRect(rc.right - roundSize.cx, rc.top, rc.right, rc.top + roundSize.cy), 270, 90);
             path->AddLine(rc.right, rc.top + roundSize.cy / 2, rc.right, rc.bottom - roundSize.cy / 2);
-            path->AddArc(UiRect(rc.right - roundSize.cx, rc.bottom - roundSize.cy, rc.right, rc.bottom), 0, 90);
-            path->AddLine(rc.right - roundSize.cx / 2, rc.bottom, rc.left + roundSize.cx / 2, rc.bottom);
-            path->AddArc(UiRect(rc.left, rc.bottom - roundSize.cy, rc.left + roundSize.cx, rc.bottom), 90, 90);
+            path->AddArc(
+                UiRect(rc.right - roundSize.cx, rc.bottom - roundSize.cy, rc.right, rc.bottom),
+                0,
+                90);
+            path->AddLine(
+                rc.right - roundSize.cx / 2, rc.bottom, rc.left + roundSize.cx / 2, rc.bottom);
+            path->AddArc(
+                UiRect(rc.left, rc.bottom - roundSize.cy, rc.left + roundSize.cx, rc.bottom),
+                90,
+                90);
             path->AddLine(rc.left, rc.bottom - roundSize.cy / 2, rc.left, rc.top + roundSize.cy / 2);
             path->Close();
 
@@ -360,15 +391,24 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
         std::unique_ptr<IPath> path(pRenderFactory->CreatePath());
 
         if (pen && brush && path) {
-            const UiRect& rc = rect;
+            const UiRect &rc = rect;
 
-            path->AddArc(UiRect(rc.left, rc.top, rc.left + roundSize.cx, rc.top + roundSize.cy), 180, 90);
-            path->AddLine(rc.left + roundSize.cx / 2, rc.top, rc.right - roundSize.cx / 2, rc.top);                      
-            path->AddArc(UiRect(rc.right - roundSize.cx, rc.top, rc.right, rc.top + roundSize.cy), 270, 90);
+            path->AddArc(
+                UiRect(rc.left, rc.top, rc.left + roundSize.cx, rc.top + roundSize.cy), 180, 90);
+            path->AddLine(rc.left + roundSize.cx / 2, rc.top, rc.right - roundSize.cx / 2, rc.top);
+            path->AddArc(
+                UiRect(rc.right - roundSize.cx, rc.top, rc.right, rc.top + roundSize.cy), 270, 90);
             path->AddLine(rc.right, rc.top + roundSize.cy / 2, rc.right, rc.bottom - roundSize.cy / 2);
-            path->AddArc(UiRect(rc.right - roundSize.cx, rc.bottom - roundSize.cy, rc.right, rc.bottom), 0, 90);
-            path->AddLine(rc.right - roundSize.cx / 2, rc.bottom, rc.left + roundSize.cx / 2, rc.bottom);
-            path->AddArc(UiRect(rc.left, rc.bottom - roundSize.cy, rc.left + roundSize.cx, rc.bottom), 90, 90);
+            path->AddArc(
+                UiRect(rc.right - roundSize.cx, rc.bottom - roundSize.cy, rc.right, rc.bottom),
+                0,
+                90);
+            path->AddLine(
+                rc.right - roundSize.cx / 2, rc.bottom, rc.left + roundSize.cx / 2, rc.bottom);
+            path->AddArc(
+                UiRect(rc.left, rc.bottom - roundSize.cy, rc.left + roundSize.cx, rc.bottom),
+                90,
+                90);
             path->AddLine(rc.left, rc.bottom - roundSize.cy / 2, rc.left, rc.top + roundSize.cy / 2);
             path->Close();
 
@@ -394,7 +434,8 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     Dpi().ScaleSize(roundSize2);
     roundSize2.cx = (roundSize2.cx / 2) * 2;
     roundSize2.cy = (roundSize2.cy / 2) * 2;
-    pRender->DrawBoxShadow(rect, roundSize2, UiPoint(0, 0), nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
+    pRender->DrawBoxShadow(
+        rect, roundSize2, UiPoint(0, 0), nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
 
     textRect = rect;
     textRect.top = rect.bottom;
@@ -409,7 +450,8 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     rect.right = rect.left + nSize;
     nBlurRadius = DpiScaledInt(6);
     nSpreadRadius = DpiScaledInt(4);
-    pRender->DrawBoxShadow(rect, UiSize(0, 0), UiPoint(0, 0), nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
+    pRender->DrawBoxShadow(
+        rect, UiSize(0, 0), UiPoint(0, 0), nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
 
     textRect = rect;
     textRect.top = rect.bottom;
@@ -426,7 +468,8 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     UiPoint cpOffset;
     cpOffset.x = DpiScaledInt(2);
     cpOffset.y = DpiScaledInt(3);
-    pRender->DrawBoxShadow(rect, UiSize(0, 0), cpOffset, nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
+    pRender->DrawBoxShadow(
+        rect, UiSize(0, 0), cpOffset, nBlurRadius, nSpreadRadius, UiColor(0xffC63535), 255);
 
     textRect = rect;
     textRect.top = rect.bottom;
@@ -436,7 +479,7 @@ void RenderTest2::Paint(IRender* pRender, const UiRect& rcPaint)
     pRender->DrawString(_T("DrawBoxShadow"), drawParam);
 }
 
-void RenderTest2::PaintChild(IRender* pRender, const UiRect& rcPaint)
+void RenderTest2::PaintChild(IRender *pRender, const UiRect &rcPaint)
 {
     BaseClass::PaintChild(pRender, rcPaint);
 }
@@ -451,45 +494,52 @@ float RenderTest2::DpiScaledFloat(int32_t iValue)
     return Dpi().GetScaleFloat(iValue);
 }
 
-void RenderTest2::DrawColorMap(IRender* pRender, const UiRect& rect)
+void RenderTest2::DrawColorMap(IRender *pRender, const UiRect &rect)
 {
     int32_t radius = static_cast<int32_t>(rect.Width() / 13 / 2 / std::cos(30 / 57.2957795f)); //半径
     const float distance = radius * std::cos(30 / 57.2957795f); //中心点到边的垂直距离
 
-    UiPointF firstCenterPt = UiPointF((float)rect.CenterX(), (float)rect.CenterY()); //矩形中心点坐标
-    firstCenterPt.x = firstCenterPt.x - distance * 2 * 6 * std::sin(30 / 57.2957795f); //第一个六边形中心点X坐标
-    firstCenterPt.y = firstCenterPt.y - distance * 2 * 6 * std::cos(30 / 57.2957795f); //第一个六边形中心点Y坐标
+    UiPointF firstCenterPt
+        = UiPointF((float) rect.CenterX(), (float) rect.CenterY()); //矩形中心点坐标
+    firstCenterPt.x = firstCenterPt.x
+                      - distance * 2 * 6 * std::sin(30 / 57.2957795f); //第一个六边形中心点X坐标
+    firstCenterPt.y = firstCenterPt.y
+                      - distance * 2 * 6 * std::cos(30 / 57.2957795f); //第一个六边形中心点Y坐标
 
     for (int32_t y = 0; y < 13; ++y) { //共计13行
         int32_t count = 0;
         if (y < 7) {
             count = 7 + y;
-        }
-        else {
+        } else {
             count = 7 + (13 - y - 1);
         }
         for (int32_t x = 0; x < count; ++x) {
             UiPointF centerPt = firstCenterPt;
             if (y < 7) {
                 centerPt.x += distance * 2 * x - distance * y;
-            }
-            else {
+            } else {
                 centerPt.x += distance * 2 * x - distance * (13 - y - 1);
             }
             centerPt.y += radius * 1.5f * y;
-            DrawRegularHexagon(pRender, centerPt, radius, UiColor(UiColors::Blue), 1, UiColor(UiColors::Salmon));
+            DrawRegularHexagon(
+                pRender, centerPt, radius, UiColor(UiColors::Blue), 1, UiColor(UiColors::Salmon));
         }
     }
 }
 
-bool RenderTest2::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt, int32_t radius,
-                                     const UiColor& penColor, int32_t penWidth, const UiColor& brushColor)
+bool RenderTest2::DrawRegularHexagon(
+    IRender *pRender,
+    const UiPointF &centerPt,
+    int32_t radius,
+    const UiColor &penColor,
+    int32_t penWidth,
+    const UiColor &brushColor)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return false;
     }
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         return false;
@@ -500,10 +550,10 @@ bool RenderTest2::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt,
     }
 
     const int32_t count = 6; //多边形的边数
-    //正多边形上任意一个顶点的坐标为： x = r * cos(θ) y = r * sin(θ) 
+    //正多边形上任意一个顶点的坐标为： x = r * cos(θ) y = r * sin(θ)
     std::vector<UiPointF> polygonPoints;
     for (int32_t i = 0; i < count; ++i) {
-        int32_t degree = i * 60 + 30;// +30是为了使顶点在中心点的最上方
+        int32_t degree = i * 60 + 30; // +30是为了使顶点在中心点的最上方
         float radian = degree / 57.2957795f;
         float x = radius * std::cos(radian) + 0.5f;
         float y = radius * std::sin(radian) + 0.5f;
@@ -511,7 +561,7 @@ bool RenderTest2::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt,
     }
 
     std::unique_ptr<IPath> path(pRenderFactory->CreatePath());
-    path->AddPolygon(polygonPoints.data(), (int32_t)polygonPoints.size());
+    path->AddPolygon(polygonPoints.data(), (int32_t) polygonPoints.size());
     path->Close();
 
     bool bRet = false;
@@ -521,21 +571,26 @@ bool RenderTest2::DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt,
         bRet = true;
     }
     if ((penColor.GetARGB() != 0) && (penWidth > 0)) {
-        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(penColor, (float)penWidth));
+        std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(penColor, (float) penWidth));
         pRender->DrawPath(path.get(), pen.get());
         bRet = true;
     }
     return bRet;
 }
 
-bool RenderTest2::DrawRegularHexagon3(IRender* pRender, const UiPoint& centerPt, int32_t radius,
-                                      const UiColor& penColor, int32_t penWidth, const UiColor& brushColor)
+bool RenderTest2::DrawRegularHexagon3(
+    IRender *pRender,
+    const UiPoint &centerPt,
+    int32_t radius,
+    const UiColor &penColor,
+    int32_t penWidth,
+    const UiColor &brushColor)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return false;
     }
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         return false;
@@ -567,14 +622,14 @@ bool RenderTest2::DrawRegularHexagon3(IRender* pRender, const UiPoint& centerPt,
             float angle = 2 * degree * i;
             spMatrix->RotateAt(angle, 0.0f, 0.0f);
             path->Transform(spMatrix.get());
-        }        
+        }
         if (brushColor.GetARGB() != 0) {
             std::unique_ptr<IBrush> brush(pRenderFactory->CreateBrush(brushColor));
             pRender->FillPath(path.get(), brush.get());
             bRet = true;
         }
         if ((penColor.GetARGB() != 0) && (penWidth > 0)) {
-            std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(penColor, (float)penWidth));
+            std::unique_ptr<IPen> pen(pRenderFactory->CreatePen(penColor, (float) penWidth));
             pRender->DrawPath(path.get(), pen.get());
             bRet = true;
         }

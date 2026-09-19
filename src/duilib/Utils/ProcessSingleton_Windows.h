@@ -5,19 +5,18 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include <wincrypt.h>
 #include <sddl.h>
 #include <userenv.h>
+#include <wincrypt.h>
 
-namespace ui
-{
+namespace ui {
 /** 跨进程单例的实现（通信部分, Windows实现）
 */
 class DUILIB_API ProcessSingletonImpl : public ProcessSingleton
 {
 public:
-    explicit ProcessSingletonImpl(const std::string& strAppName) :
-        ProcessSingleton(strAppName)
+    explicit ProcessSingletonImpl(const std::string &strAppName)
+        : ProcessSingleton(strAppName)
     {
         InitializePlatformComponents();
     }
@@ -29,18 +28,19 @@ public:
     }
 
 protected:
-    ProcessSingletonImpl(const ProcessSingleton&) = delete;
-    ProcessSingletonImpl& operator=(const ProcessSingletonImpl&) = delete;
+    ProcessSingletonImpl(const ProcessSingleton &) = delete;
+    ProcessSingletonImpl &operator=(const ProcessSingletonImpl &) = delete;
 
 public:
     virtual void InitializePlatformComponents() override final
     {
         try {
-            SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES) };
+            SECURITY_ATTRIBUTES sa = {sizeof(SECURITY_ATTRIBUTES)};
             sa.bInheritHandle = FALSE;
 
             // 设置低完整性级别
-            ::ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &sa.lpSecurityDescriptor, nullptr);
+            ::ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &sa.lpSecurityDescriptor, nullptr);
             std::wstring wstrMutexName = GetUserSpecificName();
             m_hMutex = ::CreateMutexW(&sa, FALSE, wstrMutexName.c_str());
             m_dwLastError = ::GetLastError();
@@ -51,14 +51,13 @@ public:
             ::LocalFree(sa.lpSecurityDescriptor);
 
             if (m_hCancelEvent == nullptr) {
-                m_hCancelEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr); // 手动重置的取消事件                
+                m_hCancelEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr); // 手动重置的取消事件
                 ASSERT(m_hCancelEvent != nullptr);
                 if (m_hCancelEvent) {
                     ::ResetEvent(m_hCancelEvent);
                 }
             }
-        }
-        catch (const std::exception& /*ex*/) {
+        } catch (const std::exception & /*ex*/) {
             CleanupPlatformComponents();
             throw;
         }
@@ -69,30 +68,35 @@ public:
         return m_dwLastError == ERROR_ALREADY_EXISTS;
     }
 
-    virtual bool PlatformSendData(const std::string& strData) override final
+    virtual bool PlatformSendData(const std::string &strData) override final
     {
         try {
             std::wstring wstrPipeName = L"\\\\.\\pipe\\" + GetUserSpecificName();
-            HANDLE hPipe = ::CreateFileW(wstrPipeName.c_str(),
-                                        GENERIC_WRITE,
-                                        0,
-                                        nullptr,
-                                        OPEN_EXISTING,
-                                        FILE_FLAG_OVERLAPPED,
-                                        nullptr);
+            HANDLE hPipe = ::CreateFileW(
+                wstrPipeName.c_str(),
+                GENERIC_WRITE,
+                0,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_FLAG_OVERLAPPED,
+                nullptr);
             if (hPipe == INVALID_HANDLE_VALUE) {
                 return false;
             }
 
-            OVERLAPPED overlapped = { 0 };
+            OVERLAPPED overlapped = {0};
             overlapped.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
             DWORD dwWritten = 0;
-            if (!::WriteFile(hPipe, strData.data(), static_cast<DWORD>(strData.size()), &dwWritten, &overlapped)) {
+            if (!::WriteFile(
+                    hPipe,
+                    strData.data(),
+                    static_cast<DWORD>(strData.size()),
+                    &dwWritten,
+                    &overlapped)) {
                 if (::GetLastError() == ERROR_IO_PENDING) {
                     ::WaitForSingleObject(overlapped.hEvent, INFINITE);
-                }
-                else {
+                } else {
                     ::CloseHandle(hPipe);
                     ::CloseHandle(overlapped.hEvent);
                     return false;
@@ -102,8 +106,7 @@ public:
             ::CloseHandle(hPipe);
             ::CloseHandle(overlapped.hEvent);
             return true;
-        }
-        catch (const std::exception& ex) {
+        } catch (const std::exception &ex) {
             LogError("Windows send error: " + std::string(ex.what()));
             return false;
         }
@@ -114,21 +117,24 @@ public:
         while (m_bRunning) {
             try {
                 std::wstring wstrPipeName = L"\\\\.\\pipe\\" + GetUserSpecificName();
-                m_hPipe = ::CreateNamedPipeW(wstrPipeName.c_str(),
-                                             PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
-                                             PIPE_TYPE_BYTE | PIPE_WAIT,
-                                             PIPE_UNLIMITED_INSTANCES,
-                                             ProcessSingletonData::MAX_DATA_SIZE + sizeof(ProcessSingletonData::ProtocolHeader),
-                                             ProcessSingletonData::MAX_DATA_SIZE + sizeof(ProcessSingletonData::ProtocolHeader),
-                                             0,
-                                             nullptr);
+                m_hPipe = ::CreateNamedPipeW(
+                    wstrPipeName.c_str(),
+                    PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                    PIPE_TYPE_BYTE | PIPE_WAIT,
+                    PIPE_UNLIMITED_INSTANCES,
+                    ProcessSingletonData::MAX_DATA_SIZE
+                        + sizeof(ProcessSingletonData::ProtocolHeader),
+                    ProcessSingletonData::MAX_DATA_SIZE
+                        + sizeof(ProcessSingletonData::ProtocolHeader),
+                    0,
+                    nullptr);
 
                 if (m_hPipe == INVALID_HANDLE_VALUE) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     continue;
                 }
 
-                OVERLAPPED overlapped = { 0 };
+                OVERLAPPED overlapped = {0};
                 overlapped.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
                 bool bConnected = true;
@@ -137,22 +143,24 @@ public:
                         if (!WaitForPipe(m_hPipe, overlapped, m_hCancelEvent)) {
                             bConnected = false;
                         }
-                    }
-                    else {
+                    } else {
                         ::CloseHandle(m_hPipe);
                         m_hPipe = INVALID_HANDLE_VALUE;
                         continue;
                     }
                 }
 
-                char pBuffer[ProcessSingletonData::MAX_DATA_SIZE + sizeof(ProcessSingletonData::ProtocolHeader)] = { 0 };
+                char pBuffer
+                    [ProcessSingletonData::MAX_DATA_SIZE
+                     + sizeof(ProcessSingletonData::ProtocolHeader)] = {0};
                 DWORD dwRead = 0;
-                if (bConnected && m_bRunning && ::ReadFile(m_hPipe, pBuffer, sizeof(pBuffer), &dwRead, &overlapped)) {
+                if (bConnected && m_bRunning
+                    && ::ReadFile(m_hPipe, pBuffer, sizeof(pBuffer), &dwRead, &overlapped)) {
                     try {
-                        auto vecArgs = ProcessSingletonData::DeserializeData(std::string(pBuffer, dwRead));
+                        auto vecArgs = ProcessSingletonData::DeserializeData(
+                            std::string(pBuffer, dwRead));
                         OnAlreadyRunningAppRelaunch(vecArgs);
-                    }
-                    catch (const std::exception& ex) {
+                    } catch (const std::exception &ex) {
                         LogError("Invalid data received: " + std::string(ex.what()));
                     }
                 }
@@ -161,19 +169,18 @@ public:
                 ::CloseHandle(m_hPipe);
                 ::CloseHandle(overlapped.hEvent);
                 m_hPipe = INVALID_HANDLE_VALUE;
-            }
-            catch (const std::exception& ex) {
+            } catch (const std::exception &ex) {
                 LogError("Windows listener error: " + std::string(ex.what()));
             }
         }
     }
-    
+
     virtual void CleanupPlatformComponents() override final
     {
         m_bRunning = false;
         if (m_hCancelEvent) {
             ::SetEvent(m_hCancelEvent);
-        }        
+        }
         if (m_thListener.joinable()) {
             m_thListener.join();
         }
@@ -186,57 +193,56 @@ public:
             m_hMutex = nullptr;
         }
     }
-    
+
 private:
-    bool WaitForPipe(HANDLE hPipe, OVERLAPPED& overlapped, HANDLE hCancelEvent) const
+    bool WaitForPipe(HANDLE hPipe, OVERLAPPED &overlapped, HANDLE hCancelEvent) const
     {
         HANDLE waitHandles[2] = {overlapped.hEvent, hCancelEvent};
         DWORD waitResult = ::WaitForMultipleObjects(2, waitHandles, FALSE, INFINITE);
 
         bool bRet = false;
         switch (waitResult) {
-            case WAIT_OBJECT_0: // 连接完成或取消
-                {
-                    DWORD bytesTransferred = 0;
-                    BOOL success = ::GetOverlappedResult(hPipe, &overlapped, &bytesTransferred, FALSE);
-                    if (!success) {
-                        DWORD error = ::GetLastError();
-                        if (error == ERROR_OPERATION_ABORTED) {
-                            // 操作被取消
-                            bRet = false;
-                        }
-                        else {
-                            // 其他错误
-                            bRet = false;
-                        }
-                    }
-                    else {
-                        // 连接成功处理
-                        bRet = true;
-                    }
-                    break;
+        case WAIT_OBJECT_0: // 连接完成或取消
+        {
+            DWORD bytesTransferred = 0;
+            BOOL success = ::GetOverlappedResult(hPipe, &overlapped, &bytesTransferred, FALSE);
+            if (!success) {
+                DWORD error = ::GetLastError();
+                if (error == ERROR_OPERATION_ABORTED) {
+                    // 操作被取消
+                    bRet = false;
+                } else {
+                    // 其他错误
+                    bRet = false;
                 }
-            case WAIT_OBJECT_0 + 1: // 取消事件触发
-                {
-                    // 取消I/O操作
-                    ::CancelIo(hPipe);
+            } else {
+                // 连接成功处理
+                bRet = true;
+            }
+            break;
+        }
+        case WAIT_OBJECT_0
+            + 1: // 取消事件触发
+        {
+            // 取消I/O操作
+            ::CancelIo(hPipe);
 
-                    // 等待重叠操作完成
-                    ::WaitForSingleObject(overlapped.hEvent, INFINITE);
-                    DWORD error = ::GetLastError();
-                    if (error == ERROR_OPERATION_ABORTED) {
-                        // 确认已取消
-                        bRet = false;
-                    }
-                    break;
-                }
-            default:
-                // 处理等待错误
-                break;
+            // 等待重叠操作完成
+            ::WaitForSingleObject(overlapped.hEvent, INFINITE);
+            DWORD error = ::GetLastError();
+            if (error == ERROR_OPERATION_ABORTED) {
+                // 确认已取消
+                bRet = false;
+            }
+            break;
+        }
+        default:
+            // 处理等待错误
+            break;
         }
         return bRet;
     }
-    std::wstring GetUserSpecificName() 
+    std::wstring GetUserSpecificName()
     {
         HANDLE hToken = nullptr;
         if (!::OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &hToken)) {
@@ -248,7 +254,8 @@ private:
         ::GetUserObjectSecurity(hToken, &siRequested, nullptr, 0, &dwSize);
         if (::GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
             ::CloseHandle(hToken);
-            throw std::system_error(GetLastError(), std::system_category(), "GetUserObjectSecurity failed");
+            throw std::system_error(
+                GetLastError(), std::system_category(), "GetUserObjectSecurity failed");
         }
 
         std::vector<BYTE> vecBuffer(dwSize);
@@ -256,7 +263,8 @@ private:
         siRequested = OWNER_SECURITY_INFORMATION;
         if (!::GetUserObjectSecurity(hToken, &siRequested, pSD, dwSize, &dwSize)) {
             ::CloseHandle(hToken);
-            throw std::system_error(GetLastError(), std::system_category(), "GetUserObjectSecurity failed");
+            throw std::system_error(
+                GetLastError(), std::system_category(), "GetUserObjectSecurity failed");
         }
 
         PSID pSid = nullptr;
@@ -269,7 +277,8 @@ private:
         LPWSTR pszSid = nullptr;
         if (!::ConvertSidToStringSidW(pSid, &pszSid)) {
             ::CloseHandle(hToken);
-            throw std::system_error(GetLastError(), std::system_category(), "ConvertSidToStringSid failed");
+            throw std::system_error(
+                GetLastError(), std::system_category(), "ConvertSidToStringSid failed");
         }
 
         std::wstring wstrSid(pszSid);
@@ -287,7 +296,7 @@ private:
     HANDLE m_hCancelEvent = nullptr;
 };
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN
 

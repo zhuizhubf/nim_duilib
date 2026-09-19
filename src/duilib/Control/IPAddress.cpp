@@ -1,25 +1,25 @@
 #include "IPAddress.h"
-#include "duilib/Control/RichEdit.h"
 #include "duilib/Control/Label.h"
+#include "duilib/Control/RichEdit.h"
 
-namespace ui
-{
+namespace ui {
 
-IPAddress::IPAddress(Window* pWindow):
-    HBox(pWindow),
-    m_pLastFocus(nullptr)
+IPAddress::IPAddress(Window *pWindow)
+    : HBox(pWindow)
+    , m_pLastFocus(nullptr)
+{}
+
+DString IPAddress::GetType() const
 {
+    return DUI_CTR_IPADDRESS;
 }
 
-DString IPAddress::GetType() const { return DUI_CTR_IPADDRESS; }
-
-void IPAddress::SetAttribute(const DString& strName, const DString& strValue2)
+void IPAddress::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("ip")) {
         SetIPAddress(strValue);
-    }    
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -32,7 +32,7 @@ void IPAddress::OnInit()
     BaseClass::OnInit();
     m_editList.clear();
     for (size_t index = 0; index < 4; ++index) {
-        RichEdit* pRichEdit = new RichEdit(GetWindow());
+        RichEdit *pRichEdit = new RichEdit(GetWindow());
         pRichEdit->SetText(_T(""));
         pRichEdit->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
         pRichEdit->SetAttribute(_T("limit_text"), _T("3"));
@@ -44,7 +44,7 @@ void IPAddress::OnInit()
         AddItem(pRichEdit);
         m_editList.push_back(pRichEdit);
         if (index != 3) {
-            Label* pLabel = new Label(GetWindow());
+            Label *pLabel = new Label(GetWindow());
             pLabel->SetText(_T("."));
             pLabel->SetAttribute(_T("text_align"), _T("bottom,hcenter"));
             pLabel->SetAttribute(_T("width"), _T("4"));
@@ -56,26 +56,25 @@ void IPAddress::OnInit()
     }
 
     for (size_t index = 0; index < m_editList.size(); ++index) {
-        RichEdit* pRichEdit = m_editList[index];
+        RichEdit *pRichEdit = m_editList[index];
         if (pRichEdit == nullptr) {
             continue;
         }
-        pRichEdit->AttachReturn([this, index](const EventArgs& /*args*/) {
+        pRichEdit->AttachReturn([this, index](const EventArgs & /*args*/) {
             //回车后，切换到下一个编辑框，并且循环
             if (index < m_editList.size()) {
                 if (index == (m_editList.size() - 1)) {
                     m_editList[0]->SetFocus();
-                }
-                else {
+                } else {
                     m_editList[index + 1]->SetFocus();
                 }
             }
             return true;
-            });
-        pRichEdit->AttachKillFocus([this, pRichEdit](const EventArgs& args) {
-            OnKillFocusEvent(pRichEdit, (Control*)args.wParam);
+        });
+        pRichEdit->AttachKillFocus([this, pRichEdit](const EventArgs &args) {
+            OnKillFocusEvent(pRichEdit, (Control *) args.wParam);
             return true;
-            });
+        });
     }
     if (!m_ipAddress.empty()) {
         SetIPAddress(m_ipAddress.c_str());
@@ -85,7 +84,7 @@ void IPAddress::OnInit()
 void IPAddress::SetFocus()
 {
     if (IsVisible() && IsEnabled() && !m_editList.empty()) {
-        RichEdit* pRichEdit = m_editList.front();
+        RichEdit *pRichEdit = m_editList.front();
         if (m_pLastFocus != nullptr) {
             if (std::find(m_editList.begin(), m_editList.end(), m_pLastFocus) != m_editList.end()) {
                 pRichEdit = m_pLastFocus;
@@ -94,13 +93,12 @@ void IPAddress::SetFocus()
         if (pRichEdit != nullptr) {
             pRichEdit->SetFocus();
         }
-    }
-    else {
+    } else {
         BaseClass::SetFocus();
     }
 }
 
-void IPAddress::SetIPAddress(const DString& ipAddress)
+void IPAddress::SetIPAddress(const DString &ipAddress)
 {
     m_ipAddress = ipAddress;
     if (!ipAddress.empty() && m_editList.size() == 4) {
@@ -136,17 +134,16 @@ DString IPAddress::GetIPAddress() const
         ip3 = std::max(ip3, 0);
         ip4 = std::max(ip4, 0);
         ipAddress = StringUtil::Printf(_T("%d.%d.%d.%d"), ip1, ip2, ip3, ip4);
-    }
-    else {
+    } else {
         ipAddress = m_ipAddress.c_str();
     }
     return ipAddress;
 }
 
-void IPAddress::SendEventMsg(const EventArgs& msg)
+void IPAddress::SendEventMsg(const EventArgs &msg)
 {
     if ((msg.GetSender() == this) && (msg.eventType == kEventKillFocus)) {
-        Control* pNewFocus = (Control*)msg.wParam;
+        Control *pNewFocus = (Control *) msg.wParam;
         if (std::find(m_editList.begin(), m_editList.end(), pNewFocus) != m_editList.end()) {
             //焦点切换到编辑框，不发出KillFocus事件
             return;
@@ -155,7 +152,7 @@ void IPAddress::SendEventMsg(const EventArgs& msg)
     BaseClass::SendEventMsg(msg);
 }
 
-void IPAddress::OnKillFocusEvent(RichEdit* pRichEdit, Control* pNewFocus)
+void IPAddress::OnKillFocusEvent(RichEdit *pRichEdit, Control *pNewFocus)
 {
     m_pLastFocus = pRichEdit;
     if (pNewFocus == this) {
@@ -168,5 +165,4 @@ void IPAddress::OnKillFocusEvent(RichEdit* pRichEdit, Control* pNewFocus)
     SendEvent(kEventKillFocus);
 }
 
-}//namespace ui
-
+} //namespace ui

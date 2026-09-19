@@ -2,18 +2,15 @@
 #include "MainThread.h"
 #include "MainForm.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN)
-    #include "resource.h"
+#if defined(DUILIB_BUILD_FOR_WIN)
+#include "resource.h"
 #endif
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -23,16 +20,15 @@ bool MainThread::OnInit()
         //使用本地文件夹作为资源
         ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
         ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
-    }
-    else if (resType == ui::ResourceType::kZipFile) {
-        //使用本地zip压缩包作为资源（压缩包位于exe相同目录）    
+    } else if (resType == ui::ResourceType::kZipFile) {
+        //使用本地zip压缩包作为资源（压缩包位于exe相同目录）
         ui::ZipFileResParam resParam;
         resParam.resourcePath = DUILIB_RESOURCE_DIR;
         resParam.zipFilePath = ui::GlobalManager::GetResourceZipPath();
         resParam.zipPassword = _T("");
         ui::GlobalManager::Instance().Startup(resParam);
     }
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     else if (resType == ui::ResourceType::kResZipFile) {
         //使用exe资源文件中的zip压缩包
         ui::ResZipFileResParam resParam;
@@ -50,7 +46,7 @@ bool MainThread::OnInit()
 
     //在下面加入启动窗口代码
     //创建一个默认带有阴影的居中窗口
-    MainForm* window = new MainForm();
+    MainForm *window = new MainForm();
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("MultiLang"), true));
     window->PostQuitMsgWhenClosed(true);
     window->ShowWindow(ui::kSW_SHOW_NORMAL);

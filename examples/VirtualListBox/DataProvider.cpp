@@ -1,41 +1,38 @@
 #include "DataProvider.h"
 #include "Item.h"
 
-
 int g_index = 1;
 
-DataProvider::DataProvider():
-    m_nTotal(0),
-    m_bMultiSelect(true)
-{
-}
+DataProvider::DataProvider()
+    : m_nTotal(0)
+    , m_bMultiSelect(true)
+{}
 
+DataProvider::~DataProvider() = default;
 
-DataProvider::~DataProvider()
-= default;
-
-ui::Control* DataProvider::CreateElement(ui::VirtualListBox* pVirtualListBox)
+ui::Control *DataProvider::CreateElement(ui::VirtualListBox *pVirtualListBox)
 {
     ASSERT(pVirtualListBox != nullptr);
     if (pVirtualListBox == nullptr) {
         return nullptr;
     }
     ASSERT(pVirtualListBox->GetWindow() != nullptr);
-    Item* item = new Item(pVirtualListBox->GetWindow());
-    ui::GlobalManager::Instance().FillBoxWithCache(item, ui::FilePath(_T("virtual_list_box/item.xml")));
+    Item *item = new Item(pVirtualListBox->GetWindow());
+    ui::GlobalManager::Instance()
+        .FillBoxWithCache(item, ui::FilePath(_T("virtual_list_box/item.xml")));
     return item;
 }
 
-bool DataProvider::FillElement(ui::Control* pControl, size_t nElementIndex)
+bool DataProvider::FillElement(ui::Control *pControl, size_t nElementIndex)
 {
     std::lock_guard<std::mutex> guard(m_lock);
-    Item* pItem = dynamic_cast<Item*>(pControl);
+    Item *pItem = dynamic_cast<Item *>(pControl);
     ASSERT(pItem != nullptr);
     ASSERT(nElementIndex < m_vTasks.size());
     if ((pItem == nullptr) || (nElementIndex >= m_vTasks.size())) {
         return false;
     }
-    const DownloadTask& task = m_vTasks[nElementIndex];
+    const DownloadTask &task = m_vTasks[nElementIndex];
     DString img = _T("icon.png");
     DString title = ui::StringUtil::Printf(_T("%s [%02d]"), task.sName, task.nId);
     pItem->InitSubControls(img, title, nElementIndex);
@@ -75,7 +72,7 @@ bool DataProvider::IsElementSelected(size_t nElementIndex) const
     return bSelected;
 }
 
-void DataProvider::GetSelectedElements(std::vector<size_t>& selectedIndexs) const
+void DataProvider::GetSelectedElements(std::vector<size_t> &selectedIndexs) const
 {
     selectedIndexs.clear();
     std::lock_guard<std::mutex> guard(m_lock);
@@ -118,13 +115,13 @@ void DataProvider::Refresh()
     int nTotal = m_nTotal;
     m_lock.lock();
     for (auto task : m_vTasks) {
-        delete [] task.sName;
+        delete[] task.sName;
     }
     m_vTasks.clear();
-    DString name = ui::GlobalManager::Instance().Lang().GetStringByID(_T("STRID_VIRTUALLISTBOX_TASK_NAME"));
+    DString name = ui::GlobalManager::Instance().Lang().GetStringByID(
+        _T("STRID_VIRTUALLISTBOX_TASK_NAME"));
     m_vTasks.reserve(nTotal);
-    for (auto i=0; i < nTotal; i++)
-    {
+    for (auto i = 0; i < nTotal; i++) {
         DownloadTask task;
         task.nId = i;
         //不适用DString，因为它占用的内存很多，当数据量达到千万级别以上时，占的内存太多
@@ -139,7 +136,7 @@ void DataProvider::Refresh()
 }
 
 void DataProvider::RemoveTask(size_t nIndex)
-{    
+{
     m_lock.lock();
     bool bUpdated = false;
     if (nIndex < m_vTasks.size()) {
@@ -152,10 +149,10 @@ void DataProvider::RemoveTask(size_t nIndex)
     if (bUpdated) {
         // 通知TileBox数据总数变动
         EmitCountChanged();
-    }    
+    }
 }
 
-void DataProvider::ChangeTaskName(size_t nIndex, const DString& sName)
+void DataProvider::ChangeTaskName(size_t nIndex, const DString &sName)
 {
     m_lock.lock();
     bool bUpdated = false;
@@ -170,5 +167,5 @@ void DataProvider::ChangeTaskName(size_t nIndex, const DString& sName)
     // 发送数据变动通知
     if (bUpdated) {
         EmitDataChanged(nIndex, nIndex);
-    }    
+    }
 }

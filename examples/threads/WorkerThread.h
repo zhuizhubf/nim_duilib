@@ -21,7 +21,7 @@ public:
 public:
     /** 设置主界面的接口，用于与主界面交互
     */
-    void SetMainForm(MainForm* pMainForm);
+    void SetMainForm(MainForm *pMainForm);
 
 private:
     /** 运行前初始化，在进入消息循环前调用，如果初始化失败则不进入消息循环
@@ -35,13 +35,12 @@ private:
 
     /** 输出日志
     */
-    void PrintLog(const DString& log);
+    void PrintLog(const DString &log);
 
 private:
     /** 主界面的接口
     */
     ui::ControlPtrT<MainForm> m_pMainForm;
-
 };
 
 #endif // EXAMPLES_WORKDER_THREAD_H_

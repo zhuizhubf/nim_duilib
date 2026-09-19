@@ -1,15 +1,15 @@
 #include "ScreenCapture.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
 
-#include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 /** 创建位图
 */
-static HBITMAP CreateBitmap(const Window* pWindow, int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID* pBits)
+static HBITMAP CreateBitmap(
+    const Window *pWindow, int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID *pBits)
 {
     ASSERT((nWidth > 0) && (nHeight > 0));
     if (nWidth == 0 || nHeight == 0) {
@@ -21,16 +21,15 @@ static HBITMAP CreateBitmap(const Window* pWindow, int32_t nWidth, int32_t nHeig
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = nWidth;
     if (flipHeight) {
-        bmi.bmiHeader.biHeight = -nHeight;//负数表示位图方向：从上到下，左上角为圆点
-    }
-    else {
+        bmi.bmiHeader.biHeight = -nHeight; //负数表示位图方向：从上到下，左上角为圆点
+    } else {
         bmi.bmiHeader.biHeight = nHeight; //正数表示位图方向：从下到上，左下角为圆点
     }
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
     //注意：nWidth * nHeight * sizeof(DWORD) 在 int32 范围内可能溢出（如 32768*32768*4 > INT32_MAX），必须先转为 size_t
-    bmi.bmiHeader.biSizeImage = (DWORD)((size_t)nWidth * nHeight * sizeof(DWORD));
+    bmi.bmiHeader.biSizeImage = (DWORD) ((size_t) nWidth * nHeight * sizeof(DWORD));
 
     HWND hWnd = (pWindow != nullptr) ? pWindow->NativeWnd()->GetHWND() : nullptr;
     HBITMAP hBitmap = nullptr;
@@ -43,13 +42,13 @@ static HBITMAP CreateBitmap(const Window* pWindow, int32_t nWidth, int32_t nHeig
     return hBitmap;
 }
 
-std::shared_ptr<IBitmap> ScreenCapture::CaptureBitmap(const Window* pWindow)
+std::shared_ptr<IBitmap> ScreenCapture::CaptureBitmap(const Window *pWindow)
 {
     if (pWindow == nullptr) {
         return nullptr;
     }
     std::shared_ptr<IBitmap> spBitmap;
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory != nullptr) {
         spBitmap.reset(pRenderFactory->CreateBitmap());
@@ -68,7 +67,7 @@ std::shared_ptr<IBitmap> ScreenCapture::CaptureBitmap(const Window* pWindow)
     if ((cxScreen <= 0) || (cyScreen <= 0)) {
         return nullptr;
     }
-    HWND hWnd = nullptr; //取桌面
+    HWND hWnd = nullptr;        //取桌面
     HDC hdcSrc = ::GetDC(hWnd); // 获取屏幕句柄
     if (hdcSrc == nullptr) {
         return nullptr;
@@ -88,7 +87,7 @@ std::shared_ptr<IBitmap> ScreenCapture::CaptureBitmap(const Window* pWindow)
     }
     ::SelectObject(hdcDst, hBitmap);
     ::BitBlt(hdcDst, 0, 0, cxScreen, cyScreen, hdcSrc, xScreen, yScreen, SRCCOPY); // 复制屏幕内容到位图
-    ::ReleaseDC(hWnd, hdcSrc); // 释放句柄
+    ::ReleaseDC(hWnd, hdcSrc);                                                     // 释放句柄
     ::DeleteDC(hdcDst);
 
     if (!spBitmap->Init(cxScreen, cyScreen, pBits)) {

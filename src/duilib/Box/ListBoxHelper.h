@@ -5,20 +5,19 @@
 #include "duilib/Core/EventArgs.h"
 #include "duilib/Core/UiTypes.h"
 
-namespace ui 
-{
+namespace ui {
 class ListBox;
 class IRender;
 
 /** ListBox鼠标键盘操作的辅助类
 */
-class DUILIB_API ListBoxHelper: public SupportWeakCallback
+class DUILIB_API ListBoxHelper : public SupportWeakCallback
 {
 public:
-    explicit ListBoxHelper(ListBox* pListBox);
+    explicit ListBoxHelper(ListBox *pListBox);
     ~ListBoxHelper();
-    ListBoxHelper(const ListBoxHelper&) = delete;
-    ListBoxHelper& operator = (const ListBoxHelper&) = delete;
+    ListBoxHelper(const ListBoxHelper &) = delete;
+    ListBoxHelper &operator=(const ListBoxHelper &) = delete;
 
 public:
     /** 设置是否支持鼠标框选功能
@@ -31,7 +30,7 @@ public:
 
     /** 设置鼠标框选填充颜色
     */
-    void SetFrameSelectionColor(const DString& frameSelectionColor);
+    void SetFrameSelectionColor(const DString &frameSelectionColor);
 
     /** 获取鼠标框选填充颜色
     */
@@ -47,7 +46,7 @@ public:
 
     /** 设置鼠标框选边框颜色
     */
-    void SetFrameSelectionBorderColor(const DString& frameSelectionBorderColor);
+    void SetFrameSelectionBorderColor(const DString &frameSelectionBorderColor);
 
     /** 获取鼠标框选边框颜色
     */
@@ -72,11 +71,11 @@ public:
 
 public:
     //鼠标消息处理
-    void OnButtonDown(const UiPoint& ptMouse, Control* pSender);
-    void OnButtonUp(const UiPoint& ptMouse, Control* pSender);
-    void OnRButtonDown(const UiPoint& ptMouse, Control* pSender);
-    void OnRButtonUp(const UiPoint& ptMouse, Control* pSender);
-    void OnMouseMove(const UiPoint& ptMouse, Control* pSender);
+    void OnButtonDown(const UiPoint &ptMouse, Control *pSender);
+    void OnButtonUp(const UiPoint &ptMouse, Control *pSender);
+    void OnRButtonDown(const UiPoint &ptMouse, Control *pSender);
+    void OnRButtonUp(const UiPoint &ptMouse, Control *pSender);
+    void OnMouseMove(const UiPoint &ptMouse, Control *pSender);
 
     /** 收到窗口失去焦点消息
     */
@@ -85,10 +84,9 @@ public:
 public:
     /** 绘制鼠标框选的边框和填充颜色
     */
-    void PaintFrameSelection(IRender* pRender);
+    void PaintFrameSelection(IRender *pRender);
 
 private:
-
     /** 检查是否需要滚动视图
     */
     void OnCheckScrollView();
@@ -100,7 +98,7 @@ private:
 private:
     /** 关联的ListBox控件
     */
-    ListBox* m_pListBox;
+    ListBox *m_pListBox;
 
 private:
     /** 是否鼠标在视图中按下左键或者右键
@@ -129,7 +127,7 @@ private:
 
     /** 鼠标按下时的控件接口
     */
-    Control* m_pMouseSender;
+    Control *m_pMouseSender;
 
     /** 定时器滚动视图时的取消机制
     */
@@ -158,8 +156,8 @@ private:
     /** 普通列表项（ListCtrl: 非Header、非置顶）的top坐标
     */
     int32_t m_nNormalItemTop;
-private:
 
+private:
 };
 
 } // namespace ui

@@ -3,8 +3,7 @@
 
 #include "duilib/Core/ColorMap.h"
 
-namespace ui 
-{
+namespace ui {
 /** 颜色值的管理类
 */
 class DUILIB_API ColorManager
@@ -17,19 +16,19 @@ public:
      * @param [in] strName 颜色名称（如 white）
      * @param [in] strValue 颜色具体数值（如 #FFFFFFFF）
      */
-    void AddColor(const DString& strName, const DString& strValue);
+    void AddColor(const DString &strName, const DString &strValue);
 
     /** 添加一个全局颜色值
      * @param [in] strName 颜色名称（如 white）
      * @param [in] argb 颜色具体数值, 以ARGB格式表示
      */
-    void AddColor(const DString& strName, UiColor argb);
+    void AddColor(const DString &strName, UiColor argb);
 
     /** 根据名称获取一个颜色的具体数值
      * @param [in] strName 要获取的颜色名称（已通过AddColor添加到管理器的名称）
      * @return 返回 ARGB 格式的颜色描述值
      */
-    UiColor GetColor(const DString& strName) const;
+    UiColor GetColor(const DString &strName) const;
 
     /** 删除所有颜色属性
      */
@@ -47,7 +46,7 @@ public:
      *  (3) 内置的标准颜色值，比如"blue"，参见ui::UiColors::UiColorConsts函数中的定义
      *  (4) 通过AddColor添加的颜色名称
      */
-    UiColor ConvertToUiColor(const DString& strColor);
+    UiColor ConvertToUiColor(const DString &strColor);
 
     /** 设置当前主题是否为深色主题
     */
@@ -61,19 +60,19 @@ public:
     /** 获取默认禁用状态下字体颜色
      * @return 默认禁用状态颜色的字符串表示，对应 global.xml 中指定颜色值
      */
-    const DString& GetDefaultDisabledTextColor();
+    const DString &GetDefaultDisabledTextColor();
 
     /** 设置默认禁用状态下的字体颜色
      */
-    void SetDefaultDisabledTextColor(const DString& strColor);
+    void SetDefaultDisabledTextColor(const DString &strColor);
 
     /** 获取默认字体颜色
      */
-    const DString& GetDefaultTextColor();
+    const DString &GetDefaultTextColor();
 
     /** 设置默认字体颜色
      */
-    void SetDefaultTextColor(const DString& strColor);
+    void SetDefaultTextColor(const DString &strColor);
 
 private:
     /** 颜色名称与颜色值的映射关系

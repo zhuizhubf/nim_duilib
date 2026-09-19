@@ -1,29 +1,24 @@
 #include "BrowserForm_Windows.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 #include "Windows/BrowserBox_Windows.h"
 #include "browser/BrowserManager.h"
 
-namespace
-{
-    // 注册这个消息，收到这个消息后表示窗口对应的任务栏按钮被系统创建，这时候初始化ITaskbarList4接口
-    UINT WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
-}
+namespace {
+// 注册这个消息，收到这个消息后表示窗口对应的任务栏按钮被系统创建，这时候初始化ITaskbarList4接口
+UINT WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
+} // namespace
 
-BrowserForm_Windows::BrowserForm_Windows()
-{
-}
+BrowserForm_Windows::BrowserForm_Windows() {}
 
-BrowserForm_Windows::~BrowserForm_Windows()
-{
-}
+BrowserForm_Windows::~BrowserForm_Windows() {}
 
-BrowserBox* BrowserForm_Windows::CreateBrowserBox(ui::Window* pWindow, std::string id)
+BrowserBox *BrowserForm_Windows::CreateBrowserBox(ui::Window *pWindow, std::string id)
 {
     return new BrowserBox_Windows(pWindow, id);
 }
 
-LRESULT BrowserForm_Windows::OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+LRESULT BrowserForm_Windows::OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled)
 {
     if (uMsg == WM_TASKBARBUTTONCREATED) {
         bHandled = true;
@@ -37,12 +32,12 @@ LRESULT BrowserForm_Windows::OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lP
                 continue;
             }
 
-            BrowserBox_Windows* pBrowserBox = dynamic_cast<BrowserBox_Windows*>(pBoxItem);
+            BrowserBox_Windows *pBrowserBox = dynamic_cast<BrowserBox_Windows *>(pBoxItem);
             if (pBrowserBox == nullptr) {
                 continue;
             }
 
-            TaskbarTabItem* pTaskbarItem = pBrowserBox->GetTaskbarItem();
+            TaskbarTabItem *pTaskbarItem = pBrowserBox->GetTaskbarItem();
             if (pTaskbarItem != nullptr) {
                 m_taskbarManager.RegisterTab(*pTaskbarItem);
             }
@@ -53,11 +48,11 @@ LRESULT BrowserForm_Windows::OnWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lP
     return BaseClass::OnWindowMessage(uMsg, wParam, lParam, bHandled);
 }
 
-void BrowserForm_Windows::OnCreateNewTabPage(ui::TabCtrlItem* pTabItem, BrowserBox* pBrowserBox)
+void BrowserForm_Windows::OnCreateNewTabPage(ui::TabCtrlItem *pTabItem, BrowserBox *pBrowserBox)
 {
     BaseClass::OnCreateNewTabPage(pTabItem, pBrowserBox);
 
-    BrowserBox_Windows* pBrowserBoxWindows = dynamic_cast<BrowserBox_Windows*>(pBrowserBox);
+    BrowserBox_Windows *pBrowserBoxWindows = dynamic_cast<BrowserBox_Windows *>(pBrowserBox);
     if (pBrowserBoxWindows != nullptr) {
         auto pTaskbarItem = pBrowserBoxWindows->GetTaskbarItem();
         if (pTaskbarItem) {
@@ -66,11 +61,11 @@ void BrowserForm_Windows::OnCreateNewTabPage(ui::TabCtrlItem* pTabItem, BrowserB
     }
 }
 
-void BrowserForm_Windows::OnCloseTabPage(BrowserBox* pBrowserBox)
+void BrowserForm_Windows::OnCloseTabPage(BrowserBox *pBrowserBox)
 {
     BaseClass::OnCloseTabPage(pBrowserBox);
 
-    BrowserBox_Windows* pBrowserBoxWindows = dynamic_cast<BrowserBox_Windows*>(pBrowserBox);
+    BrowserBox_Windows *pBrowserBoxWindows = dynamic_cast<BrowserBox_Windows *>(pBrowserBox);
     if (pBrowserBoxWindows != nullptr) {
         auto pTaskbarItem = pBrowserBoxWindows->GetTaskbarItem();
         if (pTaskbarItem) {

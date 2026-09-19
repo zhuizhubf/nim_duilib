@@ -1,35 +1,32 @@
 #include "BrowserManager.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    #include "Windows/BrowserForm_Windows.h"
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+#include "Windows/BrowserForm_Windows.h"
 #else
-    #include "BrowserForm.h"
+#include "BrowserForm.h"
 #endif
 
-BrowserManager::BrowserManager()
-{
-}
+BrowserManager::BrowserManager() {}
 
-BrowserManager::~BrowserManager()
-{
-}
+BrowserManager::~BrowserManager() {}
 
-BrowserManager* BrowserManager::GetInstance()
+BrowserManager *BrowserManager::GetInstance()
 {
     static BrowserManager self;
     return &self;
 }
 
-BrowserForm* BrowserManager::CreateBrowserForm()
+BrowserForm *BrowserManager::CreateBrowserForm()
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     return new BrowserForm_Windows;
 #else
     return new BrowserForm;
 #endif
 }
 
-BrowserBox* BrowserManager::CreateBorwserBox(BrowserForm* pBrowserForm, std::string browserId, const DString& url)
+BrowserBox *BrowserManager::CreateBorwserBox(
+    BrowserForm *pBrowserForm, std::string browserId, const DString &url)
 {
     if (browserId.empty()) {
         browserId = CreateBrowserID();
@@ -42,7 +39,7 @@ BrowserBox* BrowserManager::CreateBorwserBox(BrowserForm* pBrowserForm, std::str
             pBrowserForm = nullptr;
             return nullptr;
         }
-        pBrowserForm->ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);          
+        pBrowserForm->ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NORMAL);
     }
     pBrowserBox = pBrowserForm->CreateBox(browserId, url);
     ASSERT(pBrowserBox != nullptr);
@@ -53,38 +50,35 @@ BrowserBox* BrowserManager::CreateBorwserBox(BrowserForm* pBrowserForm, std::str
     return pBrowserBox;
 }
 
-bool BrowserManager::IsBorwserBoxActive(const std::string& browserId)
+bool BrowserManager::IsBorwserBoxActive(const std::string &browserId)
 {
-    BrowserBox* pBrowserBox = FindBorwserBox(browserId);
+    BrowserBox *pBrowserBox = FindBorwserBox(browserId);
     if (pBrowserBox != nullptr) {
-        BrowserForm* parent_form = pBrowserBox->GetBrowserForm();
+        BrowserForm *parent_form = pBrowserBox->GetBrowserForm();
         return parent_form->IsActiveBox(pBrowserBox);
     }
     return false;
 }
 
-BrowserBox* BrowserManager::FindBorwserBox(const std::string& browserId)
+BrowserBox *BrowserManager::FindBorwserBox(const std::string &browserId)
 {
-    std::map<std::string, BrowserBox*>::const_iterator i = m_boxMap.find(browserId);
+    std::map<std::string, BrowserBox *>::const_iterator i = m_boxMap.find(browserId);
     if (i == m_boxMap.end()) {
         return nullptr;
-    }
-    else {
+    } else {
         return i->second;
     }
 }
 
-void BrowserManager::RemoveBorwserBox(const std::string& browserId, const BrowserBox* box)
+void BrowserManager::RemoveBorwserBox(const std::string &browserId, const BrowserBox *box)
 {
     auto it_box = m_boxMap.find(browserId);
     if (it_box == m_boxMap.end()) {
         ASSERT(0);
-    }
-    else {
+    } else {
         if ((box == nullptr) || (box == it_box->second)) {
             m_boxMap.erase(it_box);
-        }
-        else {
+        } else {
             ASSERT(0);
         }
     }
@@ -94,18 +88,18 @@ void BrowserManager::RemoveBorwserBox(const std::string& browserId, const Browse
     }
 }
 
-BrowserForm* BrowserManager::GetLastActiveBrowserForm() const
+BrowserForm *BrowserManager::GetLastActiveBrowserForm() const
 {
-    BrowserForm* pLastActiveBrowserForm = nullptr;
+    BrowserForm *pLastActiveBrowserForm = nullptr;
     for (auto iter : m_boxMap) {
         if (iter.second != nullptr) {
-            BrowserForm* pBrowserForm = iter.second->GetBrowserForm();
-            if ((pBrowserForm != nullptr) && pBrowserForm->IsWindow() && pBrowserForm->IsWindowVisible()) {
+            BrowserForm *pBrowserForm = iter.second->GetBrowserForm();
+            if ((pBrowserForm != nullptr) && pBrowserForm->IsWindow()
+                && pBrowserForm->IsWindowVisible()) {
                 if (pBrowserForm->IsWindowForeground()) {
                     pLastActiveBrowserForm = pBrowserForm;
                     break;
-                }
-                else {
+                } else {
                     pLastActiveBrowserForm = pBrowserForm;
                 }
             }

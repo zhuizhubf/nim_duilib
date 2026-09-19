@@ -1,34 +1,35 @@
 #include "RichEditFindReplace.h"
 
-RichEditFindReplace::RichEditFindReplace():
-    m_pRichEdit(nullptr),
-    m_bFindDown(true),
-    m_bMatchCase(true),
-    m_bMatchWholeWord(false),
-    m_bFirstSearch(true),
-    m_nInitialSearchPos(0),
-    m_nOldCursor(0)
-{
-}
+RichEditFindReplace::RichEditFindReplace()
+    : m_pRichEdit(nullptr)
+    , m_bFindDown(true)
+    , m_bMatchCase(true)
+    , m_bMatchWholeWord(false)
+    , m_bFirstSearch(true)
+    , m_nInitialSearchPos(0)
+    , m_nOldCursor(0)
+{}
 
-void RichEditFindReplace::SetRichEdit(ui::RichEdit* pRichEdit)
+void RichEditFindReplace::SetRichEdit(ui::RichEdit *pRichEdit)
 {
     m_pRichEdit = pRichEdit;
 }
 
-bool RichEditFindReplace::FindRichText(const DString& findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog)
+bool RichEditFindReplace::FindRichText(
+    const DString &findText,
+    bool bFindDown,
+    bool bMatchCase,
+    bool bMatchWholeWord,
+    ui::Window *pWndDialog)
 {
     bool bChanged = false;
     if (m_sFindNext != findText) {
         bChanged = true;
-    }
-    else if (m_bFindDown != bFindDown) {
+    } else if (m_bFindDown != bFindDown) {
         bChanged = true;
-    }
-    else if (m_bMatchCase != bMatchCase) {
+    } else if (m_bMatchCase != bMatchCase) {
         bChanged = true;
-    }
-    else if (m_bMatchWholeWord != bMatchWholeWord) {
+    } else if (m_bMatchWholeWord != bMatchWholeWord) {
         bChanged = true;
     }
 
@@ -41,13 +42,12 @@ bool RichEditFindReplace::FindRichText(const DString& findText, bool bFindDown, 
     if (bChanged) {
         m_bFirstSearch = true;
         m_nInitialSearchPos = 0;
-    }    
+    }
     if (FindTextSimple(findText, bFindDown, bMatchCase, bMatchWholeWord)) {
         //找到
         AdjustDialogPosition(pWndDialog);
         return true;
-    }
-    else {
+    } else {
         //没找到
         TextNotFound(findText);
         return false;
@@ -62,15 +62,20 @@ bool RichEditFindReplace::FindNext()
     if (FindTextSimple(m_sFindNext, m_bFindDown, m_bMatchCase, m_bMatchWholeWord)) {
         //找到
         return true;
-    }
-    else {
+    } else {
         //没找到
         TextNotFound(m_sFindNext);
         return false;
     }
 }
 
-bool RichEditFindReplace::ReplaceRichText(const DString& findText, const DString& replaceText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog)
+bool RichEditFindReplace::ReplaceRichText(
+    const DString &findText,
+    const DString &replaceText,
+    bool bFindDown,
+    bool bMatchCase,
+    bool bMatchWholeWord,
+    ui::Window *pWndDialog)
 {
     m_sFindNext = findText;
     m_sReplaceWith = replaceText;
@@ -80,14 +85,11 @@ bool RichEditFindReplace::ReplaceRichText(const DString& findText, const DString
     bool bChanged = false;
     if (m_sFindNext != findText) {
         bChanged = true;
-    }
-    else if (m_bFindDown != bFindDown) {
+    } else if (m_bFindDown != bFindDown) {
         bChanged = true;
-    }
-    else if (m_bMatchCase != bMatchCase) {
+    } else if (m_bMatchCase != bMatchCase) {
         bChanged = true;
-    }
-    else if (m_bMatchWholeWord != bMatchWholeWord) {
+    } else if (m_bMatchWholeWord != bMatchWholeWord) {
         bChanged = true;
     }
     if (bChanged) {
@@ -109,14 +111,19 @@ bool RichEditFindReplace::ReplaceRichText(const DString& findText, const DString
 
     if (!FindTextSimple(m_sFindNext, m_bMatchCase, m_bMatchWholeWord, m_bFindDown)) {
         TextNotFound(m_sFindNext);
-    }
-    else {
+    } else {
         AdjustDialogPosition(pWndDialog);
     }
     return bReplaced;
 }
 
-bool RichEditFindReplace::ReplaceAllRichText(const DString& findText, const DString& replaceText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord, ui::Window* pWndDialog)
+bool RichEditFindReplace::ReplaceAllRichText(
+    const DString &findText,
+    const DString &replaceText,
+    bool bFindDown,
+    bool bMatchCase,
+    bool bMatchWholeWord,
+    ui::Window *pWndDialog)
 {
     m_sFindNext = findText;
     m_sReplaceWith = replaceText;
@@ -126,14 +133,11 @@ bool RichEditFindReplace::ReplaceAllRichText(const DString& findText, const DStr
     bool bChanged = false;
     if (m_sFindNext != findText) {
         bChanged = true;
-    }
-    else if (m_bFindDown != bFindDown) {
+    } else if (m_bFindDown != bFindDown) {
         bChanged = true;
-    }
-    else if (m_bMatchCase != bMatchCase) {
+    } else if (m_bMatchCase != bMatchCase) {
         bChanged = true;
-    }
-    else if (m_bMatchWholeWord != bMatchWholeWord) {
+    } else if (m_bMatchWholeWord != bMatchWholeWord) {
         bChanged = true;
     }
     if (bChanged) {
@@ -147,7 +151,7 @@ bool RichEditFindReplace::ReplaceAllRichText(const DString& findText, const DStr
         return false;
     }
 
-    if (!SameAsSelected(m_sFindNext, m_bMatchCase))    {
+    if (!SameAsSelected(m_sFindNext, m_bMatchCase)) {
         if (!FindTextSimple(m_sFindNext, m_bFindDown, m_bMatchCase, m_bMatchWholeWord)) {
             TextNotFound(m_sFindNext);
             return false;
@@ -165,7 +169,8 @@ bool RichEditFindReplace::ReplaceAllRichText(const DString& findText, const DStr
     return replaceCount > 0;
 }
 
-bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord)
+bool RichEditFindReplace::FindTextSimple(
+    const DString &findText, bool bFindDown, bool bMatchCase, bool bMatchWholeWord)
 {
     if (m_pRichEdit == nullptr) {
         return false;
@@ -180,8 +185,7 @@ bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown
     if (m_bFirstSearch) {
         if (bFindDown) {
             m_nInitialSearchPos = nStartChar;
-        }
-        else {
+        } else {
             m_nInitialSearchPos = nEndChar;
         }
         m_bFirstSearch = false;
@@ -192,11 +196,10 @@ bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown
     findParam.bFindDown = bFindDown;
     findParam.bMatchCase = bMatchCase;
     findParam.bMatchWholeWord = bMatchWholeWord;
-    if (findParam.chrg.cpMin != findParam.chrg.cpMax)    {
+    if (findParam.chrg.cpMin != findParam.chrg.cpMax) {
         if (bFindDown) {
             findParam.chrg.cpMin++;
-        }
-        else {
+        } else {
             findParam.chrg.cpMin = std::max(findParam.chrg.cpMin, 0);
         }
     }
@@ -208,8 +211,7 @@ bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown
             findParam.chrg.cpMax = m_pRichEdit->GetTextLength();
         }
         ASSERT(findParam.chrg.cpMax >= findParam.chrg.cpMin);
-    }
-    else {
+    } else {
         if (m_nInitialSearchPos >= 0) {
             findParam.chrg.cpMax = 0;
         }
@@ -219,13 +221,11 @@ bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown
     bool bRet = false;
     if (FindAndSelect(findParam)) {
         bRet = true;
-    }
-    else if (m_nInitialSearchPos > 0) {
+    } else if (m_nInitialSearchPos > 0) {
         if (bFindDown) {
             findParam.chrg.cpMin = 0;
             findParam.chrg.cpMax = m_nInitialSearchPos;
-        }
-        else {
+        } else {
             findParam.chrg.cpMin = m_pRichEdit->GetTextLength();
             findParam.chrg.cpMax = m_nInitialSearchPos;
         }
@@ -235,7 +235,7 @@ bool RichEditFindReplace::FindTextSimple(const DString& findText, bool bFindDown
     return bRet;
 }
 
-bool RichEditFindReplace::FindAndSelect(const ui::FindTextParam& findParam)
+bool RichEditFindReplace::FindAndSelect(const ui::FindTextParam &findParam)
 {
     ui::TextCharRange chrgText;
     if ((m_pRichEdit != nullptr) && m_pRichEdit->FindRichText(findParam, chrgText)) {
@@ -246,7 +246,7 @@ bool RichEditFindReplace::FindAndSelect(const ui::FindTextParam& findParam)
     return false;
 }
 
-bool RichEditFindReplace::SameAsSelected(const DString& replaceText, bool bMatchCase)
+bool RichEditFindReplace::SameAsSelected(const DString &replaceText, bool bMatchCase)
 {
     if (m_pRichEdit == nullptr) {
         return false;
@@ -254,20 +254,19 @@ bool RichEditFindReplace::SameAsSelected(const DString& replaceText, bool bMatch
     DString selectedText = m_pRichEdit->GetSelText();
     if (bMatchCase) {
         return selectedText == replaceText;
-    }
-    else {
+    } else {
         return ui::StringUtil::IsEqualNoCase(selectedText, replaceText);
     }
 }
 
-void RichEditFindReplace::TextNotFound(const DString& findText)
+void RichEditFindReplace::TextNotFound(const DString &findText)
 {
     m_bFirstSearch = true;
     m_nInitialSearchPos = 0;
     OnTextNotFound(findText);
 }
 
-void RichEditFindReplace::AdjustDialogPosition(ui::Window* pWndDialog)
+void RichEditFindReplace::AdjustDialogPosition(ui::Window *pWndDialog)
 {
     if ((pWndDialog == nullptr) || !pWndDialog->IsWindow()) {
         return;
@@ -284,10 +283,9 @@ void RichEditFindReplace::AdjustDialogPosition(ui::Window* pWndDialog)
     ui::UiRect rect;
     pWndDialog->GetWindowRect(rect);
     if (rect.ContainsPt(pt)) {
-        if (pt.y > (rect.bottom - rect.top))    {
+        if (pt.y > (rect.bottom - rect.top)) {
             rect.Offset(0, pt.y - rect.bottom - 20);
-        }
-        else {
+        } else {
             ui::UiRect rcWork;
             pWndDialog->GetMonitorWorkRect(rcWork);
             int32_t nVertExt = rcWork.Height();
@@ -299,9 +297,7 @@ void RichEditFindReplace::AdjustDialogPosition(ui::Window* pWndDialog)
     }
 }
 
-void RichEditFindReplace::OnTextNotFound(const DString& findText)
-{
-}
+void RichEditFindReplace::OnTextNotFound(const DString &findText) {}
 
 void RichEditFindReplace::OnReplaceAllCoreBegin()
 {

@@ -1,12 +1,8 @@
 #include "MainForm.h"
 
-MainForm::MainForm()
-{
-}
+MainForm::MainForm() {}
 
-MainForm::~MainForm()
-{
-}
+MainForm::~MainForm() {}
 
 DString MainForm::GetSkinFolder()
 {

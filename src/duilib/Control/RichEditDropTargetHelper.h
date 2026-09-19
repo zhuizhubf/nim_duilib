@@ -3,8 +3,7 @@
 
 #include "duilib/Core/ControlDropTarget.h"
 
-namespace ui 
-{
+namespace ui {
 
 class RichEdit2;
 
@@ -16,7 +15,7 @@ public:
     /** 构造函数
      * @param [in] pRichEdit 关联的RichEdit2控件指针
      */
-    explicit RichEditDropTargetHelper(RichEdit2* pRichEdit, const std::vector<DString>& dropTextList);
+    explicit RichEditDropTargetHelper(RichEdit2 *pRichEdit, const std::vector<DString> &dropTextList);
 
 public:
     /** 检查文本是否满足拖入条件
@@ -24,21 +23,21 @@ public:
      * @return 文本有效返回true，否则返回false
      * @note 检查单行/多行模式、数字模式、限制字符等
      */
-    bool CheckDropText(const UiPoint& clientPt) const;
+    bool CheckDropText(const UiPoint &clientPt) const;
 
     /** 检查是否需要滚动视图，按需滚动
      * @param [in] clientPt 客户区坐标
      */
-    void CheckTextScroll(const UiPoint& clientPt);
+    void CheckTextScroll(const UiPoint &clientPt);
 
 private:
     /** 关联的RichEdit2控件指针
     */
-    RichEdit2* m_pRichEdit;
+    RichEdit2 *m_pRichEdit;
 
     /** 拖入的文本列表
     */
-    const std::vector<DString>& m_dropTextList;
+    const std::vector<DString> &m_dropTextList;
 };
 
 } // namespace ui

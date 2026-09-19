@@ -5,23 +5,23 @@
 
 namespace ui {
 
-VirtualListBoxElement::VirtualListBoxElement():
-    m_pVirtualListBox(nullptr),
-    m_pfnCountChangedNotify(),
-    m_pfnDataChangedNotify()
-{
-}
+VirtualListBoxElement::VirtualListBoxElement()
+    : m_pVirtualListBox(nullptr)
+    , m_pfnCountChangedNotify()
+    , m_pfnDataChangedNotify()
+{}
 
-void VirtualListBoxElement::RegNotifys(VirtualListBox* pVirtualListBox,
-                                       const DataChangedNotify& dcNotify,
-                                       const CountChangedNotify& ccNotify)
+void VirtualListBoxElement::RegNotifys(
+    VirtualListBox *pVirtualListBox,
+    const DataChangedNotify &dcNotify,
+    const CountChangedNotify &ccNotify)
 {
     m_pVirtualListBox = pVirtualListBox;
     m_pfnDataChangedNotify = dcNotify;
     m_pfnCountChangedNotify = ccNotify;
 }
 
-void VirtualListBoxElement::UnRegNotifys(VirtualListBox* pVirtualListBox)
+void VirtualListBoxElement::UnRegNotifys(VirtualListBox *pVirtualListBox)
 {
     if (m_pVirtualListBox == pVirtualListBox) {
         m_pVirtualListBox = nullptr;
@@ -46,7 +46,7 @@ void VirtualListBoxElement::EmitCountChanged()
 
 /////////////////////////////////////////////////////////////////////////////
 //
-VirtualListBox::VirtualListBox(Window* pWindow, Layout* pLayout)
+VirtualListBox::VirtualListBox(Window *pWindow, Layout *pLayout)
     : ListBox(pWindow, pLayout)
     , m_pDataProvider(nullptr)
     , m_pVirtualLayout(nullptr)
@@ -56,18 +56,18 @@ VirtualListBox::VirtualListBox(Window* pWindow, Layout* pLayout)
     ASSERT(pLayout != nullptr);
 }
 
-void VirtualListBox::SetVirtualLayout(VirtualLayout* pVirtualLayout)
+void VirtualListBox::SetVirtualLayout(VirtualLayout *pVirtualLayout)
 {
     ASSERT(pVirtualLayout != nullptr);
     m_pVirtualLayout = pVirtualLayout;
 }
 
-VirtualLayout* VirtualListBox::GetVirtualLayout() const
+VirtualLayout *VirtualListBox::GetVirtualLayout() const
 {
     return m_pVirtualLayout;
 }
 
-void VirtualListBox::SetDataProvider(VirtualListBoxElement* pProvider)
+void VirtualListBox::SetDataProvider(VirtualListBoxElement *pProvider)
 {
     if ((m_pDataProvider != pProvider) && (m_pDataProvider != nullptr)) {
         //注销原来的关联关系
@@ -79,13 +79,18 @@ void VirtualListBox::SetDataProvider(VirtualListBoxElement* pProvider)
         pProvider->SetMultiSelect(IsMultiSelect());
 
         //注册模型数据变动通知回调
-        pProvider->RegNotifys(this,
-                              UiBind(&VirtualListBox::OnModelDataChanged, this, std::placeholders::_1, std::placeholders::_2),
-                              UiBind(&VirtualListBox::OnModelCountChanged, this));
+        pProvider->RegNotifys(
+            this,
+            UiBind(
+                &VirtualListBox::OnModelDataChanged,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2),
+            UiBind(&VirtualListBox::OnModelCountChanged, this));
     }
 }
 
-VirtualListBoxElement* VirtualListBox::GetDataProvider() const
+VirtualListBoxElement *VirtualListBox::GetDataProvider() const
 {
     return m_pDataProvider;
 }
@@ -131,24 +136,24 @@ void VirtualListBox::SetMultiSelect(bool bMultiSelect)
     m_bEnableUpdateProvider = bOldValue;
 }
 
-Control* VirtualListBox::CreateElement()
+Control *VirtualListBox::CreateElement()
 {
-    Control* pListBoxItem = nullptr;
+    Control *pListBoxItem = nullptr;
     ASSERT(m_pDataProvider != nullptr);
     if (m_pDataProvider != nullptr) {
         pListBoxItem = m_pDataProvider->CreateElement(this);
-        ASSERT(dynamic_cast<IListBoxItem*>(pListBoxItem) != nullptr);
-    }    
+        ASSERT(dynamic_cast<IListBoxItem *>(pListBoxItem) != nullptr);
+    }
     return pListBoxItem;
 }
 
-void VirtualListBox::FillElementData(Control* pControl, size_t nElementIndex)
+void VirtualListBox::FillElementData(Control *pControl, size_t nElementIndex)
 {
     ASSERT(pControl != nullptr);
     if (pControl == nullptr) {
         return;
     }
-    IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+    IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
     ASSERT(pListBoxItem != nullptr);
     if (pListBoxItem == nullptr) {
         return;
@@ -165,7 +170,7 @@ void VirtualListBox::FillElementData(Control* pControl, size_t nElementIndex)
     pListBoxItem->SetItemSelected(bSelected);
     //设置元素索引号
     pListBoxItem->SetElementIndex(nElementIndex);
-    bool bFilled = m_pDataProvider->FillElement(pControl, nElementIndex);    
+    bool bFilled = m_pDataProvider->FillElement(pControl, nElementIndex);
     ASSERT_UNUSED_VARIABLE(bFilled);
 
     //更新元素索引号（避免被更改）
@@ -176,65 +181,84 @@ void VirtualListBox::FillElementData(Control* pControl, size_t nElementIndex)
     m_bEnableUpdateProvider = bOldValue;
 }
 
-void VirtualListBox::OnListBoxItemAdded(Control* pControl)
+void VirtualListBox::OnListBoxItemAdded(Control *pControl)
 {
     if (pControl == nullptr) {
         return;
     }
-    if (dynamic_cast<IListBoxItem*>(pControl) == nullptr) {
+    if (dynamic_cast<IListBoxItem *>(pControl) == nullptr) {
         return;
     }
-    const EventCallbackID callbackID = (EventCallbackID)(Control*)this;
-    Control* pListBoxItem = pControl;
+    const EventCallbackID callbackID = (EventCallbackID) (Control *) this;
+    Control *pListBoxItem = pControl;
 
     //挂载鼠标事件，转接给VirtualListBox本身，将事件分发到应用层
-    pListBoxItem->AttachMouseEnter([this](const EventArgs& args) {
-        VFireMouseEnterLeaveEvent(args);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachMouseLeave([this](const EventArgs& args) {
-        VFireMouseEnterLeaveEvent(args);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachDoubleClick([this](const EventArgs& args) {
-        VSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachClick([this](const EventArgs& args) {
-        VSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachRClick([this](const EventArgs& args) {
-        VSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventReturn, [this](const EventArgs& args) {
-        VSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventKeyDown, [this](const EventArgs& args) {
-        VSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventKeyUp, [this](const EventArgs& args) {
-        VSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
-        return true;
-        }, callbackID);
+    pListBoxItem->AttachMouseEnter(
+        [this](const EventArgs &args) {
+            VFireMouseEnterLeaveEvent(args);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachMouseLeave(
+        [this](const EventArgs &args) {
+            VFireMouseEnterLeaveEvent(args);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachDoubleClick(
+        [this](const EventArgs &args) {
+            VSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachClick(
+        [this](const EventArgs &args) {
+            VSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachRClick(
+        [this](const EventArgs &args) {
+            VSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventReturn,
+        [this](const EventArgs &args) {
+            VSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventKeyDown,
+        [this](const EventArgs &args) {
+            VSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventKeyUp,
+        [this](const EventArgs &args) {
+            VSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
+            return true;
+        },
+        callbackID);
 }
 
-void VirtualListBox::OnListBoxItemRemoved(Control* pControl)
+void VirtualListBox::OnListBoxItemRemoved(Control *pControl)
 {
     if (pControl == nullptr) {
         return;
     }
-    if (dynamic_cast<IListBoxItem*>(pControl) == nullptr) {
+    if (dynamic_cast<IListBoxItem *>(pControl) == nullptr) {
         return;
     }
-    const EventCallbackID callbackID = (EventCallbackID)(Control*)this;
+    const EventCallbackID callbackID = (EventCallbackID) (Control *) this;
     pControl->DetachEventByID(callbackID);
 }
 
-void VirtualListBox::OnItemSelectedChanged(size_t /*iIndex*/, IListBoxItem* pListBoxItem)
+void VirtualListBox::OnItemSelectedChanged(size_t /*iIndex*/, IListBoxItem *pListBoxItem)
 {
     if (!m_bEnableUpdateProvider) {
         return;
@@ -273,7 +297,7 @@ void VirtualListBox::SetElementSelected(size_t nElementIndex, bool bSelected)
     }
 }
 
-bool VirtualListBox::SetSelectedElements(const std::vector<size_t>& selectedIndexs, bool bClearOthers)
+bool VirtualListBox::SetSelectedElements(const std::vector<size_t> &selectedIndexs, bool bClearOthers)
 {
     std::vector<size_t> refreshIndexs;
     SetSelectedElements(selectedIndexs, bClearOthers, refreshIndexs);
@@ -283,9 +307,8 @@ bool VirtualListBox::SetSelectedElements(const std::vector<size_t>& selectedInde
     return !refreshIndexs.empty();
 }
 
-void VirtualListBox::SetSelectedElements(const std::vector<size_t>& selectedIndexs,
-                                         bool bClearOthers,
-                                         std::vector<size_t>& refreshIndexs)
+void VirtualListBox::SetSelectedElements(
+    const std::vector<size_t> &selectedIndexs, bool bClearOthers, std::vector<size_t> &refreshIndexs)
 {
     refreshIndexs.clear();
     ASSERT(m_pDataProvider != nullptr);
@@ -301,7 +324,7 @@ void VirtualListBox::SetSelectedElements(const std::vector<size_t>& selectedInde
     }
     std::set<size_t> refreshSet;
     std::vector<size_t> oldSelectedIndexs;
-    if (bClearOthers) {        
+    if (bClearOthers) {
         m_pDataProvider->GetSelectedElements(oldSelectedIndexs);
         if (!oldSelectedIndexs.empty()) {
             for (size_t nElementIndex : oldSelectedIndexs) {
@@ -336,7 +359,7 @@ bool VirtualListBox::IsElementSelected(size_t nElementIndex) const
     return bSelected;
 }
 
-void VirtualListBox::GetSelectedElements(std::vector<size_t>& selectedIndexs) const
+void VirtualListBox::GetSelectedElements(std::vector<size_t> &selectedIndexs) const
 {
     selectedIndexs.clear();
     ASSERT(m_pDataProvider != nullptr);
@@ -357,8 +380,8 @@ bool VirtualListBox::SetSelectAll()
     std::vector<size_t> selectedIndexs;
     size_t nCount = m_pDataProvider->GetElementCount();
     for (size_t nElementIndex = 0; nElementIndex < nCount; ++nElementIndex) {
-        if (IsSelectableElement(nElementIndex) && 
-            !m_pDataProvider->IsElementSelected(nElementIndex)) {
+        if (IsSelectableElement(nElementIndex)
+            && !m_pDataProvider->IsElementSelected(nElementIndex)) {
             m_pDataProvider->SetElementSelected(nElementIndex, true);
             selectedIndexs.push_back(nElementIndex);
         }
@@ -379,13 +402,13 @@ bool VirtualListBox::SetSelectNone()
     return !refreshIndexs.empty();
 }
 
-void VirtualListBox::SetSelectNone(std::vector<size_t>& refreshIndexs)
+void VirtualListBox::SetSelectNone(std::vector<size_t> &refreshIndexs)
 {
     SetSelectNoneExclude(std::vector<size_t>(), refreshIndexs);
 }
 
-void VirtualListBox::SetSelectNoneExclude(const std::vector<size_t>& excludeIndexs,
-                                          std::vector<size_t>& refreshIndexs)
+void VirtualListBox::SetSelectNoneExclude(
+    const std::vector<size_t> &excludeIndexs, std::vector<size_t> &refreshIndexs)
 {
     refreshIndexs.clear();
     ASSERT(m_pDataProvider != nullptr);
@@ -417,7 +440,7 @@ void VirtualListBox::RefreshElements(size_t nStartElementIndex, size_t nEndEleme
     OnModelDataChanged(nStartElementIndex, nEndElementIndex);
 }
 
-void VirtualListBox::RefreshElements(const std::vector<size_t>& elementIndexs)
+void VirtualListBox::RefreshElements(const std::vector<size_t> &elementIndexs)
 {
     if (elementIndexs.empty()) {
         return;
@@ -430,17 +453,17 @@ void VirtualListBox::RefreshElements(const std::vector<size_t>& elementIndexs)
     VirtualListBox::RefreshData refreshData;
     const size_t nItemCount = m_items.size();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = m_items[nItemIndex];
+        Control *pControl = m_items[nItemIndex];
         if ((pControl == nullptr) || !pControl->IsVisible()) {
             continue;
         }
-        IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListBoxItem == nullptr) {
             continue;
         }
         size_t nElementIndex = pListBoxItem->GetElementIndex();
         if (nElementIndex != Box::InvalidIndex) {
-            if (indexSet.find(nElementIndex) != indexSet.end()) {                
+            if (indexSet.find(nElementIndex) != indexSet.end()) {
                 FillElementData(pControl, nElementIndex);
                 pControl->Invalidate();
 
@@ -463,15 +486,14 @@ void VirtualListBox::OnModelDataChanged(size_t nStartElementIndex, size_t nEndEl
     VirtualListBox::RefreshData refreshData;
     size_t nItemCount = m_items.size();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = m_items[nItemIndex];
+        Control *pControl = m_items[nItemIndex];
         if ((pControl == nullptr) || !pControl->IsVisible()) {
             continue;
         }
-        IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListBoxItem != nullptr) {
             size_t nElementIndex = pListBoxItem->GetElementIndex();
-            if ((nElementIndex >= nStartElementIndex) &&
-                (nElementIndex <= nEndElementIndex)) {
+            if ((nElementIndex >= nStartElementIndex) && (nElementIndex <= nEndElementIndex)) {
                 FillElementData(pControl, nElementIndex);
                 pControl->Invalidate();
 
@@ -488,22 +510,22 @@ void VirtualListBox::OnModelDataChanged(size_t nStartElementIndex, size_t nEndEl
     }
 }
 
-void VirtualListBox::OnFilledElements(const RefreshDataList& refreshDataList)
+void VirtualListBox::OnFilledElements(const RefreshDataList &refreshDataList)
 {
     if (!HasEventCallback(kEventElementFilled)) {
         //本控件中未注册回调函数（不支持父祖控件中注册的Bubbled事件，避免影响效率）
         return;
     }
     auto weakFLag = GetWeakFlag();
-    for (const VirtualListBox::RefreshData& itemData : refreshDataList) {
+    for (const VirtualListBox::RefreshData &itemData : refreshDataList) {
         if (weakFLag.expired()) {
             break;
         }
         EventArgs msg;
         msg.eventType = kEventElementFilled;
         msg.SetSender(this);
-        msg.wParam = (WPARAM)itemData.nItemIndex;
-        msg.lParam = (LPARAM)itemData.nElementIndex;
+        msg.wParam = (WPARAM) itemData.nItemIndex;
+        msg.lParam = (LPARAM) itemData.nElementIndex;
         msg.pEventData = itemData.pControl;
         FireAllEvents(msg);
     }
@@ -542,7 +564,7 @@ void VirtualListBox::Refresh(bool bSync)
     if (nNewItemCount > nMaxItemCount) {
         nNewItemCount = nMaxItemCount;
     }
-    
+
     if (nItemCount > nNewItemCount) {
         //如果现有子项总数大于新计算的子项数，移除比数据总数多出的子项（从后面删除）
         size_t n = nItemCount - nNewItemCount;
@@ -550,14 +572,13 @@ void VirtualListBox::Refresh(bool bSync)
             size_t itemCount = GetItemCount();
             if (itemCount > 0) {
                 RemoveItemAt(itemCount - 1);
-            }            
+            }
         }
-    }
-    else if (nItemCount < nNewItemCount) {
+    } else if (nItemCount < nNewItemCount) {
         //如果现有子项总数小于新计算的子项数，新增比数据总数少的子项
         size_t n = nNewItemCount - nItemCount;
         for (size_t i = 0; i < n; ++i) {
-            Control* pControl = CreateElement();
+            Control *pControl = CreateElement();
             AddItem(pControl);
         }
     }
@@ -572,7 +593,7 @@ void VirtualListBox::Refresh(bool bSync)
     }
 }
 
-void VirtualListBox::GetDisplayElements(std::vector<size_t>& collection) const
+void VirtualListBox::GetDisplayElements(std::vector<size_t> &collection) const
 {
     collection.clear();
     ASSERT(m_pVirtualLayout != nullptr);
@@ -584,8 +605,8 @@ void VirtualListBox::GetDisplayElements(std::vector<size_t>& collection) const
     std::vector<size_t> collection2;
     size_t nItemCount = GetItemCount();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = GetItemAt(nItemIndex);
-        IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+        Control *pControl = GetItemAt(nItemIndex);
+        IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListBoxItem != nullptr) {
             size_t iElementIndex = pListBoxItem->GetElementIndex();
             ASSERT(iElementIndex != Box::InvalidIndex);
@@ -601,11 +622,11 @@ size_t VirtualListBox::GetDisplayItemIndex(size_t nElementIndex) const
     size_t nFoundItemIndex = Box::InvalidIndex;
     const size_t nItemCount = GetItemCount();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = GetItemAt(nItemIndex);
+        Control *pControl = GetItemAt(nItemIndex);
         if (pControl == nullptr) {
             continue;
         }
-        IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListBoxItem != nullptr) {
             if (nElementIndex == pListBoxItem->GetElementIndex()) {
                 nFoundItemIndex = nItemIndex;
@@ -619,9 +640,9 @@ size_t VirtualListBox::GetDisplayItemIndex(size_t nElementIndex) const
 size_t VirtualListBox::GetDisplayItemElementIndex(size_t nItemIndex) const
 {
     size_t nElementIndex = Box::InvalidIndex;
-    Control* pControl = GetItemAt(nItemIndex);
+    Control *pControl = GetItemAt(nItemIndex);
     if (pControl != nullptr) {
-        IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListBoxItem != nullptr) {
             nElementIndex = pListBoxItem->GetElementIndex();
         }
@@ -647,21 +668,20 @@ void VirtualListBox::EnsureVisible(size_t nElementIndex, bool bToTop)
     }
 }
 
-void VirtualListBox::EnsureVisible(const UiRect& rcItem,
-                                   ListBoxVerVisible vVisibleType,
-                                   ListBoxHorVisible hVisibleType)
+void VirtualListBox::EnsureVisible(
+    const UiRect &rcItem, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
 {
     BaseClass::EnsureVisible(rcItem, vVisibleType, hVisibleType);
 }
 
-size_t VirtualListBox::EnsureVisible(size_t iIndex, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
+size_t VirtualListBox::EnsureVisible(
+    size_t iIndex, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
 {
     size_t nNewIndex = iIndex;
     size_t nElementIndex = GetDisplayItemElementIndex(iIndex);
     if (nElementIndex >= GetElementCount()) {
         nNewIndex = BaseClass::EnsureVisible(iIndex, vVisibleType, hVisibleType);
-    }
-    else {
+    } else {
         EnsureVisible(nElementIndex, false);
         nNewIndex = GetDisplayItemIndex(nElementIndex);
     }
@@ -691,18 +711,18 @@ void VirtualListBox::SetPos(ui::UiRect rc)
     }
 }
 
-void VirtualListBox::PaintChild(IRender* pRender, const UiRect& rcPaint)
+void VirtualListBox::PaintChild(IRender *pRender, const UiRect &rcPaint)
 {
     ReArrangeChild(false);
     BaseClass::PaintChild(pRender, rcPaint);
 }
 
-void VirtualListBox::SendEventMsg(const EventArgs& msg)
+void VirtualListBox::SendEventMsg(const EventArgs &msg)
 {
     VSendEvent(msg, false);
 }
 
-void VirtualListBox::VSendEvent(const EventArgs& msg, bool bFromItem, bool bFireEventOnly)
+void VirtualListBox::VSendEvent(const EventArgs &msg, bool bFromItem, bool bFireEventOnly)
 {
     EventArgs newMsg = msg;
     if (bFromItem) {
@@ -711,54 +731,46 @@ void VirtualListBox::VSendEvent(const EventArgs& msg, bool bFromItem, bool bFire
         if (nItemIndex < GetItemCount()) {
             newMsg.wParam = nItemIndex;
             newMsg.lParam = GetDisplayItemElementIndex(nItemIndex);
-        }
-        else {
+        } else {
             newMsg.wParam = Box::InvalidIndex;
             newMsg.lParam = Box::InvalidIndex;
         }
-    }
-    else if ((msg.eventType == kEventMouseDoubleClick) ||
-             (msg.eventType == kEventClick) ||
-             (msg.eventType == kEventRClick) ||
-             (msg.eventType == kEventKeyDown) ||
-             (msg.eventType == kEventKeyUp)) {
+    } else if (
+        (msg.eventType == kEventMouseDoubleClick) || (msg.eventType == kEventClick)
+        || (msg.eventType == kEventRClick) || (msg.eventType == kEventKeyDown)
+        || (msg.eventType == kEventKeyUp)) {
         //需要设置wParam和lParam，按接口对应的Attach函数，设置这两个参数值
         if (msg.GetSender() == this) {
             newMsg.wParam = Box::InvalidIndex;
             newMsg.lParam = Box::InvalidIndex;
         }
-    }
-    else if (msg.eventType == kEventSelect) {
-        size_t nItemIndex = (size_t)msg.wParam;
+    } else if (msg.eventType == kEventSelect) {
+        size_t nItemIndex = (size_t) msg.wParam;
         ASSERT(nItemIndex < GetItemCount());
         if (nItemIndex < GetItemCount()) {
             newMsg.wParam = nItemIndex;
             newMsg.lParam = GetDisplayItemElementIndex(nItemIndex);
-        }
-        else {
+        } else {
             newMsg.wParam = Box::InvalidIndex;
             newMsg.lParam = Box::InvalidIndex;
         }
     }
     if (bFireEventOnly) {
         BaseClass::FireAllEvents(newMsg);
-    }
-    else {
+    } else {
         BaseClass::SendEventMsg(newMsg);
     }
 }
 
-void VirtualListBox::VFireMouseEnterLeaveEvent(const EventArgs& msg)
+void VirtualListBox::VFireMouseEnterLeaveEvent(const EventArgs &msg)
 {
     EventArgs newMsg = msg;
     newMsg.SetSender(this);
     if (msg.eventType == kEventMouseEnter) {
         newMsg.eventType = kEventItemMouseEnter;
-    }
-    else if (msg.eventType == kEventMouseLeave) {
+    } else if (msg.eventType == kEventMouseLeave) {
         newMsg.eventType = kEventItemMouseLeave;
-    }
-    else {
+    } else {
         ASSERT(0);
         return;
     }
@@ -766,15 +778,14 @@ void VirtualListBox::VFireMouseEnterLeaveEvent(const EventArgs& msg)
     if (nItemIndex < GetItemCount()) {
         newMsg.wParam = nItemIndex;
         newMsg.lParam = GetDisplayItemElementIndex(nItemIndex);
-    }
-    else {
+    } else {
         newMsg.wParam = Box::InvalidIndex;
         newMsg.lParam = Box::InvalidIndex;
     }
     BaseClass::FireAllEvents(newMsg);
 }
 
-bool VirtualListBox::RemoveItem(Control* pControl)
+bool VirtualListBox::RemoveItem(Control *pControl)
 {
     return BaseClass::RemoveItem(pControl);
 }
@@ -803,8 +814,8 @@ void VirtualListBox::ReArrangeChild(bool bForce)
     ASSERT(!m_pVirtualLayout->NeedReArrange());
 }
 
-bool VirtualListBox::OnFindSelectable(size_t nCurSel, SelectableMode mode,
-                                      size_t nCount, size_t& nDestItemIndex)
+bool VirtualListBox::OnFindSelectable(
+    size_t nCurSel, SelectableMode mode, size_t nCount, size_t &nDestItemIndex)
 {
     nDestItemIndex = Box::InvalidIndex;
     const size_t nElementCount = GetElementCount();
@@ -814,8 +825,7 @@ bool VirtualListBox::OnFindSelectable(size_t nCurSel, SelectableMode mode,
     }
     size_t nElementIndex = Box::InvalidIndex;
     size_t nIndex = nCurSel;
-    bool bForward = (mode == SelectableMode::kForward) ||
-                    (mode == SelectableMode::kHome);
+    bool bForward = (mode == SelectableMode::kForward) || (mode == SelectableMode::kHome);
     if (mode == SelectableMode::kSelect) {
         //定位到当前选择的数据
         bool bRet = false;
@@ -828,7 +838,7 @@ bool VirtualListBox::OnFindSelectable(size_t nCurSel, SelectableMode mode,
             }
             EnsureVisible(nElementIndex, false);
             size_t nSelItemIndex = GetDisplayItemIndex(nElementIndex);
-            ASSERT(nSelItemIndex < GetItemCount());            
+            ASSERT(nSelItemIndex < GetItemCount());
             if (nSelItemIndex < GetItemCount()) {
                 SetCurSel(nSelItemIndex);
                 nDestItemIndex = nSelItemIndex;
@@ -837,21 +847,17 @@ bool VirtualListBox::OnFindSelectable(size_t nCurSel, SelectableMode mode,
             }
         }
         return bRet;
-    }
-    else if (mode == SelectableMode::kHome) {
+    } else if (mode == SelectableMode::kHome) {
         //定位到第一条数据
         nElementIndex = 0;
         nIndex = 0;
-    }
-    else if (mode == SelectableMode::kEnd) {
+    } else if (mode == SelectableMode::kEnd) {
         //定位到最后一条数据
-        nElementIndex = nElementCount - 1;        
+        nElementIndex = nElementCount - 1;
         if (itemCount > 0) {
             nIndex = itemCount - 1;
         }
-    }
-    else if ((mode == SelectableMode::kForward) || 
-             (mode == SelectableMode::kBackward)) {
+    } else if ((mode == SelectableMode::kForward) || (mode == SelectableMode::kBackward)) {
         //向前或者向后定位到第nCount条数据
         if ((nCount == 0) || (nCount == Box::InvalidIndex)) {
             nCount = 1;
@@ -871,25 +877,21 @@ bool VirtualListBox::OnFindSelectable(size_t nCurSel, SelectableMode mode,
             if (nIndex >= itemCount) {
                 nIndex = itemCount - 1;
             }
-        }
-        else {
+        } else {
             //向后
             if (nCount > nElementIndex) {
                 //已经到达第1条
                 nElementIndex = 0;
-            }
-            else {
+            } else {
                 nElementIndex -= nCount;
             }
             if (nCount > nCurSel) {
                 nIndex = 0;
-            }
-            else {
+            } else {
                 nIndex = nCurSel - nCount;
             }
         }
-    }
-    else {
+    } else {
         //不存在
         ASSERT(0);
         return false;
@@ -944,8 +946,7 @@ size_t VirtualListBox::GetItemCountAfter(size_t nCurSel)
     size_t nElementIndex = GetDisplayItemElementIndex(nCurSel);
     if (nElementIndex < GetElementCount()) {
         nElementIndex = GetElementCount() - nElementIndex - 1;
-    }
-    else {
+    } else {
         nElementIndex = 0;
     }
     return nElementIndex;
@@ -961,7 +962,7 @@ size_t VirtualListBox::FindSelectableElement(size_t nElementIndex, bool /*bForwa
     return nElementIndex;
 }
 
-bool VirtualListBox::SortItems(PFNCompareFunc /*pfnCompare*/, void* /*pCompareContext*/)
+bool VirtualListBox::SortItems(PFNCompareFunc /*pfnCompare*/, void * /*pCompareContext*/)
 {
     //不支持外部排序
     ASSERT(!"SortItems no impl!");
@@ -985,10 +986,16 @@ size_t VirtualListBox::GetLastNoShiftIndex() const
     return m_nLastNoShiftIndex;
 }
 
-void VirtualListBox::CalcTileElementRectV(size_t nElemenetIndex, const UiSize& szItem,
-                                          int32_t nColumns, int32_t childMarginX, int32_t childMarginY,
-                                          int64_t& iLeft, int64_t& iTop,
-                                          int64_t& iRight, int64_t& iBottom) const
+void VirtualListBox::CalcTileElementRectV(
+    size_t nElemenetIndex,
+    const UiSize &szItem,
+    int32_t nColumns,
+    int32_t childMarginX,
+    int32_t childMarginY,
+    int64_t &iLeft,
+    int64_t &iTop,
+    int64_t &iRight,
+    int64_t &iBottom) const
 {
     iLeft = 0;
     iRight = 0;
@@ -1019,10 +1026,16 @@ void VirtualListBox::CalcTileElementRectV(size_t nElemenetIndex, const UiSize& s
     iLeft = iRight - szItem.cx;
 }
 
-void VirtualListBox::CalcTileElementRectH(size_t nElemenetIndex, const UiSize& szItem,
-                                          int32_t nRows, int32_t childMarginX, int32_t childMarginY,
-                                          int64_t& iLeft, int64_t& iTop,
-                                          int64_t& iRight, int64_t& iBottom) const
+void VirtualListBox::CalcTileElementRectH(
+    size_t nElemenetIndex,
+    const UiSize &szItem,
+    int32_t nRows,
+    int32_t childMarginX,
+    int32_t childMarginY,
+    int64_t &iLeft,
+    int64_t &iTop,
+    int64_t &iRight,
+    int64_t &iBottom) const
 {
     iLeft = 0;
     iRight = 0;
@@ -1059,7 +1072,7 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
     if ((top > bottom) && (left > right)) {
         return false;
     }
-    VirtualListBoxElement* pDataProvider = GetDataProvider();
+    VirtualListBoxElement *pDataProvider = GetDataProvider();
     ASSERT(pDataProvider != nullptr);
     if (pDataProvider == nullptr) {
         return false;
@@ -1068,16 +1081,16 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
     if (dataItemCount == 0) {
         return false;
     }
-    Layout* pLayout = GetLayout();
+    Layout *pLayout = GetLayout();
     ASSERT(pLayout != nullptr);
     if (pLayout == nullptr) {
         return false;
     }
-    VirtualHTileLayout* pHTileLayout = dynamic_cast<VirtualHTileLayout*>(pLayout);
-    VirtualVTileLayout* pVTileLayout = dynamic_cast<VirtualVTileLayout*>(pLayout);
+    VirtualHTileLayout *pHTileLayout = dynamic_cast<VirtualHTileLayout *>(pLayout);
+    VirtualVTileLayout *pVTileLayout = dynamic_cast<VirtualVTileLayout *>(pLayout);
 
-    VirtualHLayout* pHLayout = dynamic_cast<VirtualHLayout*>(pLayout);
-    VirtualVLayout* pVLayout = dynamic_cast<VirtualVLayout*>(pLayout);
+    VirtualHLayout *pHLayout = dynamic_cast<VirtualHLayout *>(pLayout);
+    VirtualVLayout *pVLayout = dynamic_cast<VirtualVLayout *>(pLayout);
 
     bool bHLayout = (pHTileLayout != nullptr) || (pHLayout != nullptr);
     bool bVLayout = (pVTileLayout != nullptr) || (pVLayout != nullptr);
@@ -1089,14 +1102,11 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
     UiSize szItem;
     if (pHTileLayout != nullptr) {
         szItem = pHTileLayout->GetItemSize();
-    }
-    else if (pVTileLayout != nullptr) {
+    } else if (pVTileLayout != nullptr) {
         szItem = pVTileLayout->GetItemSize();
-    }
-    else if (pHLayout != nullptr) {
+    } else if (pHLayout != nullptr) {
         szItem = pHLayout->GetItemSize();
-    }
-    else if (pVLayout != nullptr) {
+    } else if (pVLayout != nullptr) {
         szItem = pVLayout->GetItemSize();
     }
 
@@ -1122,7 +1132,7 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
         if (childMarginY < 0) {
             childMarginY = 0;
         }
-        int32_t nRows = 1;//VirtualVLayout只有1行
+        int32_t nRows = 1; //VirtualVLayout只有1行
         if (pHTileLayout != nullptr) {
             nRows = CalcHTileRows(pHTileLayout);
         }
@@ -1133,11 +1143,20 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
         if (childMarginX < 0) {
             childMarginX = 0;
         }
-        int64_t nStartIndex = ((int64_t)left / ((int64_t)szItem.cx + childMarginX)) * nRows;
+        int64_t nStartIndex = ((int64_t) left / ((int64_t) szItem.cx + childMarginX)) * nRows;
         const size_t nCount = GetElementCount();
-        for (size_t nElemenetIndex = (size_t)nStartIndex; nElemenetIndex < nCount; ++nElemenetIndex) {
-            CalcTileElementRectH(nElemenetIndex, szItem, nRows, childMarginX, childMarginY,
-                                 iLeft, iTop, iRight, iBottom);
+        for (size_t nElemenetIndex = (size_t) nStartIndex; nElemenetIndex < nCount;
+             ++nElemenetIndex) {
+            CalcTileElementRectH(
+                nElemenetIndex,
+                szItem,
+                nRows,
+                childMarginX,
+                childMarginY,
+                iLeft,
+                iTop,
+                iRight,
+                iBottom);
             cLeft = std::max(left, iLeft);
             cTop = std::max(top, iTop);
             cRight = std::min(right, iRight);
@@ -1150,14 +1169,13 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
             }
         }
         bRet = SetSelectedElements(itemIndexList, true);
-    }
-    else if (bVLayout) {
+    } else if (bVLayout) {
         //纵向布局
         int32_t childMarginX = pLayout->GetChildMarginX();
         if (childMarginX < 0) {
             childMarginX = 0;
         }
-        int32_t nColumns = 1;//VirtualHLayout只有1列
+        int32_t nColumns = 1; //VirtualHLayout只有1列
         if (pVTileLayout != nullptr) {
             nColumns = CalcVTileColumns(pVTileLayout);
         }
@@ -1168,11 +1186,20 @@ bool VirtualListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, 
         if (childMarginY < 0) {
             childMarginY = 0;
         }
-        int64_t nStartIndex = ((int64_t)top / ((int64_t)szItem.cy + childMarginY)) * nColumns;
+        int64_t nStartIndex = ((int64_t) top / ((int64_t) szItem.cy + childMarginY)) * nColumns;
         const size_t nCount = GetElementCount();
-        for (size_t nElemenetIndex = (size_t)nStartIndex; nElemenetIndex < nCount; ++nElemenetIndex) {
-            CalcTileElementRectV(nElemenetIndex, szItem, nColumns, childMarginX, childMarginY,
-                                 iLeft, iTop, iRight, iBottom);
+        for (size_t nElemenetIndex = (size_t) nStartIndex; nElemenetIndex < nCount;
+             ++nElemenetIndex) {
+            CalcTileElementRectV(
+                nElemenetIndex,
+                szItem,
+                nColumns,
+                childMarginX,
+                childMarginY,
+                iLeft,
+                iTop,
+                iRight,
+                iBottom);
             cLeft = std::max(left, iLeft);
             cTop = std::max(top, iTop);
             cRight = std::min(right, iRight);
@@ -1198,8 +1225,8 @@ bool VirtualListBox::SelectItem(size_t iIndex, bool bTakeFocus, bool bTriggerEve
     return ListCtrlSelectItem(iIndex, bTakeFocus, bTriggerEvent, vkFlag);
 }
 
-bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
-                                        bool bTriggerEvent, uint64_t vkFlag)
+bool VirtualListBox::ListCtrlSelectItem(
+    size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag)
 {
     //事件触发，需要放在函数返回之前，不能放在代码中间
     bool bSelectStatusChanged = false;
@@ -1211,8 +1238,7 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
             //无有效选择，按多选处理（比如：ListCtrl的表头）
             bRet = SelectItemMulti(iIndex, bTakeFocus, bTriggerEvent);
             return bRet;
-        }
-        else if (!IsSelectableElement(nCurElementIndex)) {
+        } else if (!IsSelectableElement(nCurElementIndex)) {
             //选择在置顶的数据项，按单选处理
             std::vector<size_t> refreshDataIndexs;
             std::vector<size_t> excludeIndexs;
@@ -1225,8 +1251,7 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
             ASSERT(nCurElementIndex == GetDisplayItemElementIndex(iIndex));
             bSelectStatusChanged = true;
             bRet = true;
-        }
-        else {
+        } else {
             bool bRbuttonDown = vkFlag & kVkRButton;
             bool bShiftDown = vkFlag & kVkShift;
             bool bControlDown = vkFlag & kVkControl;
@@ -1238,18 +1263,16 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
             if (bRbuttonDown || (!bShiftDown && !bControlDown)) {
                 //按右键的时候：如果当前项没选择，按单选逻辑实现，只保留一个选项；
                 //            如果已经选择，则保持原选择，所有项选择状态不变（以提供右键菜单，对所选项操作的机会）
-                //在没有按下Control键也没有按Shift键：按单选逻辑实现，只保留一个选项            
+                //在没有按下Control键也没有按Shift键：按单选逻辑实现，只保留一个选项
                 size_t nElementIndex = GetDisplayItemElementIndex(iIndex);
                 if (bRbuttonDown && IsElementSelected(nElementIndex)) {
                     bRet = true;
-                }
-                else {
+                } else {
                     std::vector<size_t> refreshDataIndexs;
                     SetLastNoShiftIndex(nElementIndex);
                     if (nElementIndex == Box::InvalidIndex) {
                         SetSelectNone(refreshDataIndexs);
-                    }
-                    else {
+                    } else {
                         std::vector<size_t> excludeIndexs;
                         excludeIndexs.push_back(nElementIndex);
                         SetSelectNoneExclude(excludeIndexs, refreshDataIndexs);
@@ -1262,8 +1285,7 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                     bSelectStatusChanged = true;
                     bRet = true;
                 }
-            }
-            else {
+            } else {
                 if (bShiftDown) {
                     //按左键: 同时按下了Shift键
                     size_t nIndexStart = GetLastNoShiftIndex();
@@ -1289,13 +1311,11 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                         ASSERT(nElementIndex == GetDisplayItemElementIndex(iIndex));
                         bSelectStatusChanged = true;
                         bRet = true;
-                    }
-                    else {
+                    } else {
                         //未知情况，正常无法走到这里
                         bRet = SelectItemMulti(iIndex, bTakeFocus, false);
                     }
-                }
-                else {
+                } else {
                     //按左键: 同时按下了Control键，保持多选
                     bRet = SelectItemMulti(iIndex, bTakeFocus, false);
                     if (bRet) {
@@ -1304,8 +1324,7 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                 }
             }
         }
-    }
-    else {
+    } else {
         //单选
         bRet = SelectItemSingle(iIndex, bTakeFocus, false);
     }
@@ -1320,31 +1339,32 @@ bool VirtualListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
 
 int32_t VirtualListBox::CalcRows() const
 {
-    VirtualHLayout* pHLayout = dynamic_cast<VirtualHLayout*>(GetLayout());
+    VirtualHLayout *pHLayout = dynamic_cast<VirtualHLayout *>(GetLayout());
     if (pHLayout != nullptr) {
         //此布局固定1行
         return 1;
     }
-    VirtualHTileLayout* pHTileLayout = dynamic_cast<VirtualHTileLayout*>(GetLayout());
+    VirtualHTileLayout *pHTileLayout = dynamic_cast<VirtualHTileLayout *>(GetLayout());
     return CalcHTileRows(pHTileLayout);
 }
 
 int32_t VirtualListBox::CalcColumns() const
 {
-    VirtualVLayout* pVLayout = dynamic_cast<VirtualVLayout*>(GetLayout());
+    VirtualVLayout *pVLayout = dynamic_cast<VirtualVLayout *>(GetLayout());
     if (pVLayout != nullptr) {
         //此布局固定1列
         return 1;
     }
-    VirtualVTileLayout* pVTileLayout = dynamic_cast<VirtualVTileLayout*>(GetLayout());
+    VirtualVTileLayout *pVTileLayout = dynamic_cast<VirtualVTileLayout *>(GetLayout());
     return CalcVTileColumns(pVTileLayout);
 }
 
-bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
+bool VirtualListBox::OnListCtrlKeyDown(const EventArgs &msg)
 {
     ASSERT(msg.eventType == kEventKeyDown);
     bool bHandled = false;
-    bool bCtrlADown = (msg.eventType == kEventKeyDown) && ((msg.vkCode == _T('A')) || (msg.vkCode == _T('a')));
+    bool bCtrlADown = (msg.eventType == kEventKeyDown)
+                      && ((msg.vkCode == _T('A')) || (msg.vkCode == _T('a')));
     if (bCtrlADown) {
         //Ctrl + A 全选操作
         bHandled = true;
@@ -1357,11 +1377,11 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     }
 
     //方向键操作
-    bool bArrowKeyDown = (msg.eventType == kEventKeyDown) &&
-                         ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN) ||
-                          (msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT) ||
-                          (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT) ||
-                          (msg.vkCode == kVK_HOME) || (msg.vkCode == kVK_END));
+    bool bArrowKeyDown = (msg.eventType == kEventKeyDown)
+                         && ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN)
+                             || (msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT)
+                             || (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT)
+                             || (msg.vkCode == kVK_HOME) || (msg.vkCode == kVK_END));
     const size_t nElementCount = GetElementCount();
     if (!bArrowKeyDown || !IsMultiSelect() || (nElementCount == 0)) {
         //在方向键按下消息、无数据、不支持多选的情况下，走默认处理流程
@@ -1382,7 +1402,7 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     size_t nCurSel = GetCurSel();
     if (nCurSel < GetItemCount()) {
         //判断其是否可以选择：置顶项是不可选择的，应加以过滤
-        Control* pControl = GetItemAt(nCurSel);
+        Control *pControl = GetItemAt(nCurSel);
         if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsSelectableType()) {
             nCurSel = Box::InvalidIndex;
         }
@@ -1391,11 +1411,11 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
         //查找当前视图内第一个可选择的项目，作为起始点
         size_t nCount = GetItemCount();
         for (size_t index = 0; index < nCount; ++index) {
-            Control* pControl = GetItemAt(index);
+            Control *pControl = GetItemAt(index);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsSelectableType()) {
                 continue;
             }
-            IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(pControl);
             if ((pItem != nullptr) && pItem->IsSelected()) {
                 nCurSel = index;
                 break;
@@ -1414,14 +1434,13 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
         //全部尝试未成功后，以当前视图内的第一个元素为起始点
         size_t nCount = GetItemCount();
         for (size_t index = 0; index < nCount; ++index) {
-            Control* pControl = GetItemAt(index);
+            Control *pControl = GetItemAt(index);
             if ((pControl == nullptr) || !pControl->IsVisible()) {
                 continue;
             }
-            IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(pControl);
-            if ((pItem != nullptr) &&
-                (pItem->GetElementIndex() < nElementCount) &&
-                pControl->IsSelectableType()) {
+            IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(pControl);
+            if ((pItem != nullptr) && (pItem->GetElementIndex() < nElementCount)
+                && pControl->IsSelectableType()) {
                 nCurSel = index;
                 SetCurSel(nCurSel);
                 break;
@@ -1433,8 +1452,8 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     if (nCurSel < GetItemCount()) {
         nIndexCurSel = GetDisplayItemElementIndex(nCurSel);
     }
-    const bool bForward = (msg.vkCode == kVK_DOWN) || (msg.vkCode == kVK_RIGHT) || 
-                          (msg.vkCode == kVK_NEXT) || (msg.vkCode == kVK_END);
+    const bool bForward = (msg.vkCode == kVK_DOWN) || (msg.vkCode == kVK_RIGHT)
+                          || (msg.vkCode == kVK_NEXT) || (msg.vkCode == kVK_END);
     if (nIndexCurSel < nElementCount) {
         //匹配可选择项
         nIndexCurSel = FindSelectableElement(nIndexCurSel, bForward);
@@ -1456,17 +1475,14 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if (nIndexCurSel >= 1) {
                 nIndexEnd = nIndexCurSel - 1;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
-        }
-        else {
+        } else {
             //纵向布局
-            if ((int32_t)nIndexCurSel >= nColumns) {
+            if ((int32_t) nIndexCurSel >= nColumns) {
                 nIndexEnd = nIndexCurSel - nColumns;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
         }
@@ -1476,17 +1492,14 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if ((nIndexCurSel + 1) < nElementCount) {
                 nIndexEnd = nIndexCurSel + 1;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nElementCount - 1;
             }
-        }
-        else {
+        } else {
             //纵向布局
             if ((nIndexCurSel + nColumns) < nElementCount) {
                 nIndexEnd = nIndexCurSel + nColumns;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nElementCount - 1;
             }
         }
@@ -1494,25 +1507,21 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     case kVK_LEFT:
         if (IsHorizontalLayout()) {
             //横向布局
-            if ((int32_t)nIndexCurSel >= nRows) {
+            if ((int32_t) nIndexCurSel >= nRows) {
                 nIndexEnd = nIndexCurSel - nRows;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
-        }
-        else {
+        } else {
             //纵向布局
             if (nColumns <= 1) {
                 //只有1列的时候，按滚动处理
                 LineLeft();
                 bHandled = true;
-            }
-            else {
+            } else {
                 if (nIndexCurSel >= 1) {
                     nIndexEnd = nIndexCurSel - 1;
-                }
-                else {
+                } else {
                     nIndexEnsureVisible = 0;
                 }
             }
@@ -1523,58 +1532,50 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if ((nIndexCurSel + nRows) < nElementCount) {
                 nIndexEnd = nIndexCurSel + nRows;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nElementCount - 1;
             }
-        }
-        else {
+        } else {
             if (nColumns <= 1) {
                 //只有1列的时候，按滚动处理
                 LineRight();
                 bHandled = true;
-            }
-            else {
+            } else {
                 //纵向布局
                 if ((nIndexCurSel + 1) < nElementCount) {
                     nIndexEnd = nIndexCurSel + 1;
-                }
-                else {
+                } else {
                     nIndexEnsureVisible = nElementCount - 1;
                 }
             }
         }
         break;
-    case kVK_PRIOR:
-    {
+    case kVK_PRIOR: {
         size_t nShowColumns = 0;
         size_t nShowRows = 0;
         if (IsHorizontalLayout()) {
             //横向布局
             GetDisplayItemCount(true, nShowColumns, nShowRows);
-        }
-        else {
-            //纵向布局            
+        } else {
+            //纵向布局
             GetDisplayItemCount(false, nShowColumns, nShowRows);
         }
         size_t nScrollCount = nShowColumns * nShowRows;
         if (nIndexCurSel >= nScrollCount) {
             nIndexEnd = nIndexCurSel - nScrollCount;
-        }
-        else {
+        } else {
             if (IsHorizontalLayout()) {
-                for (int32_t nColumn = (int32_t)nShowColumns - 1; nColumn >= 0; --nColumn) {
-                    nScrollCount = (size_t)nColumn * nShowRows;
+                for (int32_t nColumn = (int32_t) nShowColumns - 1; nColumn >= 0; --nColumn) {
+                    nScrollCount = (size_t) nColumn * nShowRows;
                     if (nIndexCurSel >= nScrollCount) {
                         //跳转到第一列，同行的位置
                         nIndexEnd = nIndexCurSel - nScrollCount;
                         break;
                     }
                 }
-            }
-            else {
-                for (int32_t nRow = (int32_t)nShowRows - 1; nRow >= 0; --nRow) {
-                    nScrollCount = nShowColumns * (size_t)nRow;
+            } else {
+                for (int32_t nRow = (int32_t) nShowRows - 1; nRow >= 0; --nRow) {
+                    nScrollCount = nShowColumns * (size_t) nRow;
                     if (nIndexCurSel >= nScrollCount) {
                         //跳转到第一行，同列的位置
                         nIndexEnd = nIndexCurSel - nScrollCount;
@@ -1583,28 +1584,24 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 }
             }
         }
-    }
-    break;
-    case kVK_NEXT:
-    {
+    } break;
+    case kVK_NEXT: {
         size_t nShowColumns = 0;
         size_t nShowRows = 0;
         if (IsHorizontalLayout()) {
             //横向布局
-            GetDisplayItemCount(true, nShowColumns, nShowRows);            
-        }
-        else {
-            //纵向布局            
-            GetDisplayItemCount(false, nShowColumns, nShowRows);            
+            GetDisplayItemCount(true, nShowColumns, nShowRows);
+        } else {
+            //纵向布局
+            GetDisplayItemCount(false, nShowColumns, nShowRows);
         }
         size_t nScrollCount = nShowColumns * nShowRows;
         if ((nIndexCurSel + nScrollCount) < nElementCount) {
             nIndexEnd = nIndexCurSel + nScrollCount;
-        }
-        else {
+        } else {
             if (IsHorizontalLayout()) {
-                for (int32_t nColumn = (int32_t)nShowColumns - 1; nColumn >= 0; --nColumn) {
-                    nScrollCount = (size_t)nColumn * nShowRows;
+                for (int32_t nColumn = (int32_t) nShowColumns - 1; nColumn >= 0; --nColumn) {
+                    nScrollCount = (size_t) nColumn * nShowRows;
                     if ((nIndexCurSel + nScrollCount) < nElementCount) {
                         //跳转到最后一列，同行的位置
                         nIndexEnd = nIndexCurSel + nScrollCount;
@@ -1612,10 +1609,9 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
                         break;
                     }
                 }
-            }
-            else {
-                for (int32_t nRow = (int32_t)nShowRows - 1; nRow >= 0; --nRow) {
-                    nScrollCount = nShowColumns * (size_t)nRow;
+            } else {
+                for (int32_t nRow = (int32_t) nShowRows - 1; nRow >= 0; --nRow) {
+                    nScrollCount = nShowColumns * (size_t) nRow;
                     if ((nIndexCurSel + nScrollCount) < nElementCount) {
                         //跳转到最后一行，同列的位置
                         nIndexEnd = nIndexCurSel + nScrollCount;
@@ -1625,8 +1621,7 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 }
             }
         }
-    }
-    break;
+    } break;
     case kVK_HOME:
         nIndexEnd = 0;
         break;
@@ -1654,7 +1649,7 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     std::vector<size_t> selectedIndexs; //需要选择的列表
     if (bShiftDown) {
         //按住Shift键：选择范围内的所有数据
-        size_t nLastNoShiftIndex = GetLastNoShiftIndex();//起始的元素索引号
+        size_t nLastNoShiftIndex = GetLastNoShiftIndex(); //起始的元素索引号
         if (nLastNoShiftIndex >= nElementCount) {
             nLastNoShiftIndex = 0;
         }
@@ -1665,8 +1660,7 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 selectedIndexs.push_back(i);
             }
         }
-    }
-    else {
+    } else {
         //没有按住Shift键：只选择最后一个数据
         selectedIndexs.push_back(nIndexEnd);
     }
@@ -1677,10 +1671,9 @@ bool VirtualListBox::OnListCtrlKeyDown(const EventArgs& msg)
     RefreshElements(refreshIndexs);
     if (nIndexEnsureVisible != Box::InvalidIndex) {
         EnsureVisible(nIndexEnsureVisible, false);
-    }
-    else {
+    } else {
         EnsureVisible(nIndexEnd, false);
-    }    
+    }
     nCurSel = GetDisplayItemIndex(nIndexEnd);
     ASSERT(nCurSel < GetItemCount());
     bool bTriggerEvent = false;

@@ -3,10 +3,9 @@
 
 #include "cef/CefManager.h"
 
-#if defined (DUILIB_BUILD_FOR_LINUX) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_LINUX) && defined(DUILIB_BUILD_FOR_CEF)
 
-namespace ui
-{
+namespace ui {
 /** CEF组件管理器（Linux实现）
  */
 class CefManager_Linux : public CefManager
@@ -16,8 +15,9 @@ class CefManager_Linux : public CefManager
 
 protected:
     CefManager_Linux();
-    CefManager_Linux(const CefManager_Linux&) = delete;
-    CefManager_Linux& operator=(const CefManager_Linux&) = delete;
+    CefManager_Linux(const CefManager_Linux &) = delete;
+    CefManager_Linux &operator=(const CefManager_Linux &) = delete;
+
 protected:
     virtual ~CefManager_Linux() override;
 
@@ -31,13 +31,13 @@ public:
     * @param [in] nExitCode 当函数返回false时，进程的退出码
     * @return bool true 继续运行，false 应该结束程序
     */
-    virtual bool Initialize(bool bEnableOffScreenRendering,
-                            const DString& appName,
-                            int argc,
-                            char** argv,
-                            OnCefSettingsEvent callback,
-                            int32_t& nExitCode) override;
-
+    virtual bool Initialize(
+        bool bEnableOffScreenRendering,
+        const DString &appName,
+        int argc,
+        char **argv,
+        OnCefSettingsEvent callback,
+        int32_t &nExitCode) override;
 };
 
 } //namespace ui

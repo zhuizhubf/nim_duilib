@@ -1,27 +1,23 @@
 #include "DateTimeWnd_SDL.h"
 #include "DateTime.h"
-#include "duilib/Control/RichEdit.h"
-#include "duilib/Control/Label.h"
-#include "duilib/Control/Button.h"
 #include "duilib/Box/VBox.h"
+#include "duilib/Control/Button.h"
+#include "duilib/Control/Label.h"
+#include "duilib/Control/RichEdit.h"
 #include "duilib/Core/GlobalManager.h"
 
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
 
-namespace ui
-{
-DateTimeWnd::DateTimeWnd(DateTime* pOwner):
-    m_pOwner(pOwner),
-    m_bInited(false),
-    m_editFormat(-1),
-    m_pSpinBox(nullptr)
-{
-}
-DateTimeWnd::~DateTimeWnd()
-{
-}
+namespace ui {
+DateTimeWnd::DateTimeWnd(DateTime *pOwner)
+    : m_pOwner(pOwner)
+    , m_bInited(false)
+    , m_editFormat(-1)
+    , m_pSpinBox(nullptr)
+{}
+DateTimeWnd::~DateTimeWnd() {}
 
-bool DateTimeWnd::Init(DateTime* pOwner)
+bool DateTimeWnd::Init(DateTime *pOwner)
 {
     ASSERT(m_pOwner == pOwner);
     if (pOwner == nullptr) {
@@ -29,7 +25,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     }
     m_pOwner = pOwner;
     DateTime::EditFormat editFormat = pOwner->GetEditFormat();
-    if (m_bInited && (m_editFormat == (int8_t)editFormat)) {
+    if (m_bInited && (m_editFormat == (int8_t) editFormat)) {
         //无需重复初始化
         return true;
     }
@@ -40,8 +36,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     sep = pOwner->GetDateSeparator();
 
     m_editList.resize(EditType::COUNT, nullptr);
-    switch (editFormat)
-    {
+    switch (editFormat) {
     case DateTime::EditFormat::kDateTimeUpDown:
         //年-月-日 时:分:秒
         m_editList[EditType::YEAR] = CreateEditYear();
@@ -111,7 +106,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     }
 
     //设置公共属性
-    for (RichEdit* pRichEdit : m_editList) {
+    for (RichEdit *pRichEdit : m_editList) {
         if (pRichEdit != nullptr) {
             pRichEdit->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
             pRichEdit->SetAttribute(_T("number_only"), _T("true"));
@@ -127,7 +122,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     }
 
     //右侧填充
-    Control* pEmpty = new Control(m_pOwner->GetWindow());
+    Control *pEmpty = new Control(m_pOwner->GetWindow());
     pEmpty->SetAttribute(_T("width"), _T("100%"));
     pEmpty->SetAttribute(_T("height"), _T("100%"));
     pEmpty->SetBkColor(_T("white"));
@@ -136,11 +131,11 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     pEmpty->SetMouseEnabled(false);
     pOwner->AddItem(pEmpty);
 
-    //初始化日期值    
+    //初始化日期值
     if (!pOwner->IsValidDateTime()) {
         pOwner->InitLocalTime();
     }
-    const struct tm& timeValue = pOwner->GetDateTime();
+    const struct tm &timeValue = pOwner->GetDateTime();
     if (m_editList[EditType::YEAR] != nullptr) {
         m_editList[EditType::YEAR]->SetText(StringUtil::Printf(_T("%d"), timeValue.tm_year + 1900));
     }
@@ -157,29 +152,33 @@ bool DateTimeWnd::Init(DateTime* pOwner)
         m_editList[EditType::MIN]->SetText(StringUtil::Printf(_T("%02d"), timeValue.tm_min));
     }
     if (m_editList[EditType::SEC] != nullptr) {
-        m_editList[EditType::SEC]->SetText(StringUtil::Printf(_T("%02d"), timeValue.tm_sec > 59 ? 59 : timeValue.tm_sec)); //可能是60或者61，闰秒，改为显示59
+        m_editList[EditType::SEC]->SetText(
+            StringUtil::Printf(
+                _T("%02d"),
+                timeValue.tm_sec > 59 ? 59 : timeValue.tm_sec)); //可能是60或者61，闰秒，改为显示59
     }
-    m_editFormat = (int8_t)editFormat;
+    m_editFormat = (int8_t) editFormat;
     m_bInited = true;
 
     //挂载事件，控制日的范围（闰年等情况）
-    if ((m_editList[EditType::YEAR] != nullptr) && (m_editList[EditType::MON] != nullptr) && (m_editList[EditType::MDAY] != nullptr)) {
-        m_editList[EditType::MON]->AttachTextChanged([this](const EventArgs&) {
+    if ((m_editList[EditType::YEAR] != nullptr) && (m_editList[EditType::MON] != nullptr)
+        && (m_editList[EditType::MDAY] != nullptr)) {
+        m_editList[EditType::MON]->AttachTextChanged([this](const EventArgs &) {
             UpdateDayRange();
             return true;
-            });
+        });
     }
 
     for (size_t index = 0; index < m_editList.size(); ++index) {
-        RichEdit* pRichEdit = m_editList[index];
+        RichEdit *pRichEdit = m_editList[index];
         if (pRichEdit == nullptr) {
             continue;
         }
-        pRichEdit->AttachReturn([this](const EventArgs& /*args*/) {
+        pRichEdit->AttachReturn([this](const EventArgs & /*args*/) {
             //回车后，结束编辑
             EndEditDateTime();
             return true;
-            });
+        });
     }
 
     //Spin功能
@@ -191,18 +190,18 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     //挂载失去焦点事件
     const size_t nItemCount = pOwner->GetItemCount();
     for (size_t nItem = 0; nItem < nItemCount; ++nItem) {
-        Control* pControl = pOwner->GetItemAt(nItem);
+        Control *pControl = pOwner->GetItemAt(nItem);
         if (pControl == nullptr) {
             continue;
         }
-        pControl->AttachKillFocus([this, pControl](const EventArgs& args) {
-            OnKillFocusEvent(pControl, (Control*)args.wParam);
+        pControl->AttachKillFocus([this, pControl](const EventArgs &args) {
+            OnKillFocusEvent(pControl, (Control *) args.wParam);
             return true;
-            });
+        });
     }
 
     //设置焦点到编辑框
-    for (RichEdit* pRichEdit : m_editList) {
+    for (RichEdit *pRichEdit : m_editList) {
         if (pRichEdit != nullptr) {
             pRichEdit->SetFocus();
             int32_t nTextLen = pRichEdit->GetTextLength();
@@ -213,7 +212,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
     return true;
 }
 
-void DateTimeWnd::OnKillFocusEvent(Control* /*pControl*/, Control* pNewFocus)
+void DateTimeWnd::OnKillFocusEvent(Control * /*pControl*/, Control *pNewFocus)
 {
     if ((pNewFocus == nullptr) || (m_pOwner == nullptr) || (m_pOwner == pNewFocus)) {
         return;
@@ -234,7 +233,7 @@ void DateTimeWnd::EndEditDateTime()
         m_pOwner->InitLocalTime();
     }
     DateTime::EditFormat editFormat = m_pOwner->GetEditFormat();
-    if (m_editFormat != (int8_t)editFormat) {
+    if (m_editFormat != (int8_t) editFormat) {
         return;
     }
     //校验日的范围
@@ -247,8 +246,7 @@ void DateTimeWnd::EndEditDateTime()
     bool bSec = false;
 
     struct tm timeValue = m_pOwner->GetDateTime();
-    switch (editFormat)
-    {
+    switch (editFormat) {
     case DateTime::EditFormat::kDateTimeUpDown:
         //年-月-日 时:分:秒
         bYear = true;
@@ -327,9 +325,9 @@ void DateTimeWnd::EndEditDateTime()
     m_pOwner->EndEditDateTime();
 }
 
-RichEdit* DateTimeWnd::CreateEditYear() const
+RichEdit *DateTimeWnd::CreateEditYear() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());    
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("4"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%04I64d"));
     pRichEdit->SetText(L"2024");
@@ -337,9 +335,9 @@ RichEdit* DateTimeWnd::CreateEditYear() const
     return pRichEdit;
 }
 
-RichEdit* DateTimeWnd::CreateEditMon() const
+RichEdit *DateTimeWnd::CreateEditMon() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"01");
@@ -348,9 +346,9 @@ RichEdit* DateTimeWnd::CreateEditMon() const
     return pRichEdit;
 }
 
-RichEdit* DateTimeWnd::CreateEditMDay() const
+RichEdit *DateTimeWnd::CreateEditMDay() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"01");
@@ -359,9 +357,9 @@ RichEdit* DateTimeWnd::CreateEditMDay() const
     return pRichEdit;
 }
 
-RichEdit* DateTimeWnd::CreateEditHour() const
+RichEdit *DateTimeWnd::CreateEditHour() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
@@ -370,9 +368,9 @@ RichEdit* DateTimeWnd::CreateEditHour() const
     return pRichEdit;
 }
 
-RichEdit* DateTimeWnd::CreateEditMin() const
+RichEdit *DateTimeWnd::CreateEditMin() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
@@ -381,9 +379,9 @@ RichEdit* DateTimeWnd::CreateEditMin() const
     return pRichEdit;
 }
 
-RichEdit* DateTimeWnd::CreateEditSec() const
+RichEdit *DateTimeWnd::CreateEditSec() const
 {
-    RichEdit* pRichEdit = new RichEdit(m_pOwner->GetWindow());
+    RichEdit *pRichEdit = new RichEdit(m_pOwner->GetWindow());
     pRichEdit->SetAttribute(_T("limit_text"), _T("2"));
     pRichEdit->SetAttribute(_T("number_format"), _T("%02I64d"));
     pRichEdit->SetText(L"00");
@@ -392,9 +390,9 @@ RichEdit* DateTimeWnd::CreateEditSec() const
     return pRichEdit;
 }
 
-Control* DateTimeWnd::CreateLabel(const DString& text) const
+Control *DateTimeWnd::CreateLabel(const DString &text) const
 {
-    Label* pLabel = new Label(m_pOwner->GetWindow());
+    Label *pLabel = new Label(m_pOwner->GetWindow());
     pLabel->SetText(text);
     pLabel->SetAttribute(_T("text_align"), _T("vcenter,hcenter"));
     pLabel->SetAttribute(_T("width"), _T("auto"));
@@ -409,12 +407,12 @@ Control* DateTimeWnd::CreateLabel(const DString& text) const
 
 void DateTimeWnd::UpdateDayRange()
 {
-    if ((m_editList[EditType::YEAR] != nullptr) && (m_editList[EditType::MON] != nullptr) && (m_editList[EditType::MDAY] != nullptr)) {
+    if ((m_editList[EditType::YEAR] != nullptr) && (m_editList[EditType::MON] != nullptr)
+        && (m_editList[EditType::MDAY] != nullptr)) {
         int32_t nYear = StringUtil::StringToInt32(m_editList[EditType::YEAR]->GetText());
         int32_t nMonth = StringUtil::StringToInt32(m_editList[EditType::MON]->GetText());
         if ((nYear >= 1900) && (nMonth >= 1) && (nMonth <= 12)) {
-            switch (nMonth)
-            {
+            switch (nMonth) {
             case 1:
             case 3:
             case 5:
@@ -428,8 +426,7 @@ void DateTimeWnd::UpdateDayRange()
                 if ((nYear % 400 == 0) || ((nYear % 4 == 0) && (nYear % 100 != 0))) {
                     //闰年
                     m_editList[EditType::MDAY]->SetMaxNumber(29);
-                }
-                else {
+                } else {
                     m_editList[EditType::MDAY]->SetMaxNumber(28);
                 }
                 break;
@@ -446,10 +443,12 @@ void DateTimeWnd::UpdateDayRange()
 
         int32_t nDay = StringUtil::StringToInt32(m_editList[EditType::MDAY]->GetText());
         if (nDay < m_editList[EditType::MDAY]->GetMinNumber()) {
-            m_editList[EditType::MDAY]->SetText(StringUtil::Printf(_T("%02d"), m_editList[EditType::MDAY]->GetMinNumber()));
+            m_editList[EditType::MDAY]->SetText(
+                StringUtil::Printf(_T("%02d"), m_editList[EditType::MDAY]->GetMinNumber()));
         }
         if (nDay > m_editList[EditType::MDAY]->GetMaxNumber()) {
-            m_editList[EditType::MDAY]->SetText(StringUtil::Printf(_T("%02d"), m_editList[EditType::MDAY]->GetMaxNumber()));
+            m_editList[EditType::MDAY]->SetText(
+                StringUtil::Printf(_T("%02d"), m_editList[EditType::MDAY]->GetMaxNumber()));
         }
     }
 }
@@ -476,7 +475,7 @@ void DateTimeWnd::Clear()
     m_editFormat = -1;
 }
 
-bool DateTimeWnd::SetSpinClass(const DString& spinClass)
+bool DateTimeWnd::SetSpinClass(const DString &spinClass)
 {
     ASSERT(m_pOwner != nullptr);
     if (m_pOwner == nullptr) {
@@ -496,8 +495,8 @@ bool DateTimeWnd::SetSpinClass(const DString& spinClass)
         ASSERT(!spinBoxClass.empty() && !spinBtnUpClass.empty() && !spinBtnDownClass.empty());
     }
     if (!spinBoxClass.empty() && !spinBtnUpClass.empty() && !spinBtnDownClass.empty()) {
-        Button* pUpButton = nullptr;
-        Button* pDownButton = nullptr;
+        Button *pUpButton = nullptr;
+        Button *pDownButton = nullptr;
         if (m_pSpinBox == nullptr) {
             m_pSpinBox = new VBox(m_pOwner->GetWindow());
             m_pOwner->AddItem(m_pSpinBox);
@@ -507,10 +506,9 @@ bool DateTimeWnd::SetSpinClass(const DString& spinClass)
 
             pDownButton = new Button(m_pOwner->GetWindow());
             m_pSpinBox->AddItem(pDownButton);
-        }
-        else {
-            pUpButton = dynamic_cast<Button*>(m_pSpinBox->GetItemAt(0));
-            pDownButton = dynamic_cast<Button*>(m_pSpinBox->GetItemAt(1));
+        } else {
+            pUpButton = dynamic_cast<Button *>(m_pSpinBox->GetItemAt(0));
+            pDownButton = dynamic_cast<Button *>(m_pSpinBox->GetItemAt(1));
         }
 
         ASSERT((pUpButton != nullptr) && (pDownButton != nullptr));
@@ -525,56 +523,55 @@ bool DateTimeWnd::SetSpinClass(const DString& spinClass)
 
         //挂载事件处理
         pUpButton->DetachEvent(kEventClick);
-        pUpButton->AttachClick([this](const EventArgs& /*args*/) {
+        pUpButton->AttachClick([this](const EventArgs & /*args*/) {
             AdjustTextNumber(1);
             return true;
-            });
+        });
 
         pUpButton->DetachEvent(kEventMouseButtonDown);
-        pUpButton->AttachButtonDown([this](const EventArgs& /*args*/) {
+        pUpButton->AttachButtonDown([this](const EventArgs & /*args*/) {
             StartAutoAdjustTextNumberTimer(1);
             return true;
-            });
+        });
 
         pUpButton->DetachEvent(kEventMouseButtonUp);
-        pUpButton->AttachButtonUp([this](const EventArgs& /*args*/) {
+        pUpButton->AttachButtonUp([this](const EventArgs & /*args*/) {
             StopAutoAdjustTextNumber();
             return true;
-            });
+        });
 
         pUpButton->DetachEvent(kEventMouseLeave);
-        pUpButton->AttachMouseLeave([this](const EventArgs& /*args*/) {
+        pUpButton->AttachMouseLeave([this](const EventArgs & /*args*/) {
             StopAutoAdjustTextNumber();
             return true;
-            });
+        });
 
         pDownButton->DetachEvent(kEventClick);
-        pDownButton->AttachClick([this](const EventArgs& /*args*/) {
+        pDownButton->AttachClick([this](const EventArgs & /*args*/) {
             StopAutoAdjustTextNumber();
             AdjustTextNumber(-1);
             return true;
-            });
+        });
 
         pDownButton->DetachEvent(kEventMouseButtonDown);
-        pDownButton->AttachButtonDown([this](const EventArgs& /*args*/) {
+        pDownButton->AttachButtonDown([this](const EventArgs & /*args*/) {
             StartAutoAdjustTextNumberTimer(-1);
             return true;
-            });
+        });
 
         pDownButton->DetachEvent(kEventMouseButtonUp);
-        pDownButton->AttachButtonUp([this](const EventArgs& /*args*/) {
+        pDownButton->AttachButtonUp([this](const EventArgs & /*args*/) {
             StopAutoAdjustTextNumber();
             return true;
-            });
+        });
 
         pDownButton->DetachEvent(kEventMouseLeave);
-        pDownButton->AttachMouseLeave([this](const EventArgs& /*args*/) {
+        pDownButton->AttachMouseLeave([this](const EventArgs & /*args*/) {
             StopAutoAdjustTextNumber();
             return true;
-            });
+        });
         return true;
-    }
-    else {
+    } else {
         if (m_pSpinBox != nullptr) {
             m_pOwner->RemoveItem(m_pSpinBox);
             m_pSpinBox = nullptr;
@@ -588,8 +585,11 @@ void DateTimeWnd::StartAutoAdjustTextNumberTimer(int32_t nDelta)
     if (nDelta != 0) {
         //启动定时器
         m_flagAdjustTextNumber.Cancel();
-        std::function<void()> closure = UiBind(&DateTimeWnd::StartAutoAdjustTextNumber, this, nDelta);
-        GlobalManager::Instance().Timer().AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 1000, 1);
+        std::function<void()> closure
+            = UiBind(&DateTimeWnd::StartAutoAdjustTextNumber, this, nDelta);
+        GlobalManager::Instance()
+            .Timer()
+            .AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 1000, 1);
     }
 }
 
@@ -599,7 +599,9 @@ void DateTimeWnd::StartAutoAdjustTextNumber(int32_t nDelta)
         //启动定时器
         m_flagAdjustTextNumber.Cancel();
         std::function<void()> closure = UiBind(&DateTimeWnd::AdjustTextNumber, this, nDelta);
-        GlobalManager::Instance().Timer().AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 120);
+        GlobalManager::Instance()
+            .Timer()
+            .AddTimer(m_flagAdjustTextNumber.GetWeakFlag(), closure, 120);
     }
 }
 
@@ -611,7 +613,7 @@ void DateTimeWnd::StopAutoAdjustTextNumber()
 void DateTimeWnd::AdjustTextNumber(int32_t nDelta)
 {
     for (size_t index = 0; index < m_editList.size(); ++index) {
-        RichEdit* pRichEdit = m_editList[index];
+        RichEdit *pRichEdit = m_editList[index];
         if ((pRichEdit == nullptr) || !pRichEdit->IsFocused()) {
             continue;
         }
@@ -623,4 +625,3 @@ void DateTimeWnd::AdjustTextNumber(int32_t nDelta)
 } //namespace ui
 
 #endif // DUILIB_BUILD_FOR_SDL
-

@@ -3,7 +3,7 @@
 
 #include "duilib/duilib_defs.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
 #include <functional>
 
 namespace ui {
@@ -14,8 +14,8 @@ class DUILIB_API MessageLoop_Windows
 {
 public:
     MessageLoop_Windows();
-    MessageLoop_Windows(const MessageLoop_Windows& r) = delete;
-    MessageLoop_Windows& operator = (const MessageLoop_Windows& r) = delete;
+    MessageLoop_Windows(const MessageLoop_Windows &r) = delete;
+    MessageLoop_Windows &operator=(const MessageLoop_Windows &r) = delete;
     ~MessageLoop_Windows();
 
 public:

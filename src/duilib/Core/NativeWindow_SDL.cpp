@@ -2,21 +2,21 @@
 #include "MessageLoop_SDL.h"
 #include "WindowDropTarget_SDL.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Utils/StringUtil.h"
-#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FileUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
 #ifdef DUILIB_BUILD_FOR_SDL
 
 #include <SDL3/SDL.h>
 
 #if defined DUILIB_BUILD_FOR_MACOS
-    #include "SDL_MacOS.h"
-#elif defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
-    #include "SDL_Linux.h"
-#elif defined (DUILIB_BUILD_FOR_WIN)
-    #include "duilib/Utils/ApiWrapper_Windows.h"
+#include "SDL_MacOS.h"
+#elif defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
+#include "SDL_Linux.h"
+#elif defined(DUILIB_BUILD_FOR_WIN)
+#include "duilib/Utils/ApiWrapper_Windows.h"
 #endif
 
 /** 主动绘制
@@ -30,9 +30,9 @@
 namespace ui {
 
 //窗口指针与SDL窗口ID的映射关系，用于转接消息
-std::unordered_map<SDL_WindowID, NativeWindow_SDL*> NativeWindow_SDL::s_windowIDMap;
+std::unordered_map<SDL_WindowID, NativeWindow_SDL *> NativeWindow_SDL::s_windowIDMap;
 
-void NativeWindow_SDL::SetWindowFromID(SDL_WindowID id, NativeWindow_SDL* pNativeWindow)
+void NativeWindow_SDL::SetWindowFromID(SDL_WindowID id, NativeWindow_SDL *pNativeWindow)
 {
     ASSERT(id != 0);
     if (id == 0) {
@@ -53,10 +53,10 @@ void NativeWindow_SDL::SetWindowFromID(SDL_WindowID id, NativeWindow_SDL* pNativ
     s_windowIDMap[id] = pNativeWindow;
 }
 
-void NativeWindow_SDL::ClearWindowFromID(SDL_WindowID id, NativeWindow_SDL* pNativeWindow)
+void NativeWindow_SDL::ClearWindowFromID(SDL_WindowID id, NativeWindow_SDL *pNativeWindow)
 {
     ASSERT(id != 0);
-    NativeWindow_SDL* pOldNativeWindow = nullptr;
+    NativeWindow_SDL *pOldNativeWindow = nullptr;
     auto iter = s_windowIDMap.find(id);
     if (iter != s_windowIDMap.end()) {
         pOldNativeWindow = iter->second;
@@ -85,7 +85,7 @@ uint32_t NativeWindow_SDL::GetModifiers(SDL_Keymod keymod)
     return modifierKey;
 }
 
-NativeWindow_SDL* NativeWindow_SDL::GetWindowFromID(SDL_WindowID id)
+NativeWindow_SDL *NativeWindow_SDL::GetWindowFromID(SDL_WindowID id)
 {
     ASSERT(id != 0);
     auto iter = s_windowIDMap.find(id);
@@ -100,9 +100,9 @@ uint32_t NativeWindow_SDL::GetHoverMsgId()
     return WM_USER_HOVER_MSG;
 }
 
-SDL_WindowID NativeWindow_SDL::GetWindowIdFromEvent(const SDL_Event& sdlEvent)
+SDL_WindowID NativeWindow_SDL::GetWindowIdFromEvent(const SDL_Event &sdlEvent)
 {
-    SDL_Window* sdlWindow = SDL_GetWindowFromEvent(&sdlEvent);
+    SDL_Window *sdlWindow = SDL_GetWindowFromEvent(&sdlEvent);
     if (sdlWindow != nullptr) {
         //优先使用SDL的API获取窗口ID
         return SDL_GetWindowID(sdlWindow);
@@ -162,12 +162,11 @@ SDL_WindowID NativeWindow_SDL::GetWindowIdFromEvent(const SDL_Event& sdlEvent)
 
 /** 绘制的辅助类
 */
-class NativeWindowRenderPaint :
-    public IRenderPaint
+class NativeWindowRenderPaint : public IRenderPaint
 {
 public:
-    NativeWindow_SDL* m_pNativeWindow = nullptr;
-    INativeWindow* m_pOwner = nullptr;
+    NativeWindow_SDL *m_pNativeWindow = nullptr;
+    INativeWindow *m_pOwner = nullptr;
     NativeMsg m_nativeMsg;
     bool m_bHandled = false;
 
@@ -175,7 +174,7 @@ public:
     /** 通过回调接口，完成绘制
     * @param [in] rcPaint 需要绘制的区域（客户区坐标）
     */
-    virtual bool DoPaint(const UiRect& rcPaint) override
+    virtual bool DoPaint(const UiRect &rcPaint) override
     {
         if (m_pOwner != nullptr) {
             m_pOwner->OnNativePaintMsg(rcPaint, m_nativeMsg, m_bHandled);
@@ -195,14 +194,14 @@ public:
     * @param [out] rcUpdate 返回需要绘制的区域矩形范围
     * @return 返回true表示支持局部绘制，返回false表示不支持局部绘制
     */
-    virtual bool GetUpdateRect(UiRect& rcUpdate) const override
+    virtual bool GetUpdateRect(UiRect &rcUpdate) const override
     {
         rcUpdate = m_pNativeWindow->GetUpdateRect();
         return !rcUpdate.IsEmpty();
     }
 };
 
-void NativeWindow_SDL::CheckWindowSnap(SDL_Window* window)
+void NativeWindow_SDL::CheckWindowSnap(SDL_Window *window)
 {
     if (IsUseSystemCaption() || IsSystemShadowEnabled()) {
         //使用系统标题栏或者系统阴影时，不需要执行自己实现的snap功能
@@ -213,7 +212,8 @@ void NativeWindow_SDL::CheckWindowSnap(SDL_Window* window)
         return;
     }
     SDL_WindowFlags flags = SDL_GetWindowFlags(window);
-    if ((flags & SDL_WINDOW_MAXIMIZED) || (flags & SDL_WINDOW_MINIMIZED) || (flags & SDL_WINDOW_FULLSCREEN) ) {
+    if ((flags & SDL_WINDOW_MAXIMIZED) || (flags & SDL_WINDOW_MINIMIZED)
+        || (flags & SDL_WINDOW_FULLSCREEN)) {
         return;
     }
 
@@ -253,9 +253,9 @@ void NativeWindow_SDL::CheckWindowSnap(SDL_Window* window)
     }
 }
 
-bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
+bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event &sdlEvent)
 {
-    INativeWindow* pOwner = m_pOwner;
+    INativeWindow *pOwner = m_pOwner;
     ASSERT(pOwner != nullptr);
     if (pOwner == nullptr) {
         return false;
@@ -265,7 +265,7 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
 
     //消息首先转给过滤器(全部消息)
     bool bHandled = false;
-    LRESULT lResult = pOwner->OnNativeWindowMessage(sdlEvent.type, (WPARAM)&sdlEvent, 0, bHandled);
+    LRESULT lResult = pOwner->OnNativeWindowMessage(sdlEvent.type, (WPARAM) &sdlEvent, 0, bHandled);
     if (bHandled || ownerFlag.expired()) {
         return true;
     }
@@ -278,69 +278,95 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
 
     //派发消息到处理函数
     switch (sdlEvent.type) {
-    case SDL_EVENT_WINDOW_SHOWN:
-        {
-            lResult = pOwner->OnNativeShowWindowMsg(true, NativeMsg(SDL_EVENT_WINDOW_SHOWN, 0, 0), bHandled);
+    case SDL_EVENT_WINDOW_SHOWN: {
+        lResult
+            = pOwner->OnNativeShowWindowMsg(true, NativeMsg(SDL_EVENT_WINDOW_SHOWN, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_HIDDEN: {
+        lResult = pOwner->OnNativeShowWindowMsg(
+            false, NativeMsg(SDL_EVENT_WINDOW_HIDDEN, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_RESIZED: {
+        //窗口大小改变
+        WindowSizeType sizeType = WindowSizeType::kSIZE_RESTORED;
+        SDL_WindowFlags nFlags = SDL_GetWindowFlags(m_sdlWindow);
+        if (nFlags & SDL_WINDOW_FULLSCREEN) {
+            sizeType = WindowSizeType::kSIZE_MAXIMIZED;
+        } else if (nFlags & SDL_WINDOW_MAXIMIZED) {
+            sizeType = WindowSizeType::kSIZE_MAXIMIZED;
+        } else if (nFlags & SDL_WINDOW_MINIMIZED) {
+            sizeType = WindowSizeType::kSIZE_MINIMIZED;
         }
-        break;
-    case SDL_EVENT_WINDOW_HIDDEN:
-        {
-            lResult = pOwner->OnNativeShowWindowMsg(false, NativeMsg(SDL_EVENT_WINDOW_HIDDEN, 0, 0), bHandled);
+        UiSize newWindowSize;
+        newWindowSize.cx = sdlEvent.window.data1;
+        newWindowSize.cy = sdlEvent.window.data2;
+        lResult = pOwner->OnNativeSizeMsg(
+            sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_RESIZED, 0, 0), bHandled);
+        if (!ownerFlag.expired()) {
+            CheckWindowSnap(m_sdlWindow);
         }
-        break;
-    case SDL_EVENT_WINDOW_RESIZED:
-        {
-            //窗口大小改变
-            WindowSizeType sizeType = WindowSizeType::kSIZE_RESTORED;
-            SDL_WindowFlags nFlags = SDL_GetWindowFlags(m_sdlWindow);
-            if (nFlags & SDL_WINDOW_FULLSCREEN) {
-                sizeType = WindowSizeType::kSIZE_MAXIMIZED;
+    } break;
+    case SDL_EVENT_WINDOW_MINIMIZED: {
+        //窗口最小化
+        WindowSizeType sizeType = WindowSizeType::kSIZE_MINIMIZED;
+        UiSize newWindowSize;
+        SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);
+        lResult = pOwner->OnNativeSizeMsg(
+            sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_MINIMIZED, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_MAXIMIZED: {
+        //窗口最大化
+        WindowSizeType sizeType = WindowSizeType::kSIZE_MAXIMIZED;
+        UiSize newWindowSize;
+        SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);
+        lResult = pOwner->OnNativeSizeMsg(
+            sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_MAXIMIZED, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_RESTORED: {
+        //窗口还原
+        WindowSizeType sizeType = WindowSizeType::kSIZE_RESTORED;
+        UiSize newWindowSize;
+        SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);
+        lResult = pOwner->OnNativeSizeMsg(
+            sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_RESTORED, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED: {
+        //窗口显示的DPI变化, 触发DPI发生变化的事件
+        float fNewDisplayScale = SDL_GetWindowDisplayScale(m_sdlWindow);
+        float fNewPixelDensity = SDL_GetWindowPixelDensity(m_sdlWindow);
+#ifdef DUILIB_HDPI_TEST_PIXEL_DENSITY
+        //TEST ONLY
+        fNewPixelDensity = DUILIB_HDPI_TEST_PIXEL_DENSITY;
+#endif
+        uint32_t nOldDisplayScale = pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
+        pOwner->OnNativeProcessDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
+        uint32_t nNewDisplayScale = pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
+
+        if (!ownerFlag.expired() && (nOldDisplayScale != nNewDisplayScale)) {
+            //界面显示比例发生了变化
+            m_ptLastMousePos
+                = pOwner->OnNativeGetDpi().GetScalePoint(m_ptLastMousePos, nOldDisplayScale);
+
+            //需要按DPI比例调整窗口大小，避免界面显示比例失衡
+            if ((nNewDisplayScale != 0) && (nOldDisplayScale != 0)) {
+                int w = 0;
+                int h = 0;
+                if (SDL_GetWindowSize(m_sdlWindow, &w, &h)) {
+                    w = pOwner->OnNativeGetDpi()
+                            .MulDiv(w, (int) nNewDisplayScale, (int) nOldDisplayScale);
+                    h = pOwner->OnNativeGetDpi()
+                            .MulDiv(h, (int) nNewDisplayScale, (int) nOldDisplayScale);
+                    SDL_SetWindowSize(m_sdlWindow, w, h);
+                }
             }
-            else if (nFlags & SDL_WINDOW_MAXIMIZED) {
-                sizeType = WindowSizeType::kSIZE_MAXIMIZED;
-            }
-            else if (nFlags & SDL_WINDOW_MINIMIZED) {
-                sizeType = WindowSizeType::kSIZE_MINIMIZED;
-            }
-            UiSize newWindowSize;
-            newWindowSize.cx = sdlEvent.window.data1;
-            newWindowSize.cy = sdlEvent.window.data2;
-            lResult = pOwner->OnNativeSizeMsg(sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_RESIZED, 0, 0), bHandled);
-            if (!ownerFlag.expired()) {
-                CheckWindowSnap(m_sdlWindow);
-            }            
         }
-        break;
-    case SDL_EVENT_WINDOW_MINIMIZED:
-        {
-            //窗口最小化
-            WindowSizeType sizeType = WindowSizeType::kSIZE_MINIMIZED;
-            UiSize newWindowSize;
-            SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);            
-            lResult = pOwner->OnNativeSizeMsg(sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_MINIMIZED, 0, 0), bHandled);
+        if (!ownerFlag.expired()) {
+            pOwner->OnNativeDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
         }
-        break;
-    case SDL_EVENT_WINDOW_MAXIMIZED:
-        {
-            //窗口最大化
-            WindowSizeType sizeType = WindowSizeType::kSIZE_MAXIMIZED;
-            UiSize newWindowSize;
-            SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);
-            lResult = pOwner->OnNativeSizeMsg(sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_MAXIMIZED, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_WINDOW_RESTORED:
-        {
-            //窗口还原
-            WindowSizeType sizeType = WindowSizeType::kSIZE_RESTORED;
-            UiSize newWindowSize;
-            SDL_GetWindowSize(m_sdlWindow, &newWindowSize.cx, &newWindowSize.cy);
-            lResult = pOwner->OnNativeSizeMsg(sizeType, newWindowSize, NativeMsg(SDL_EVENT_WINDOW_RESTORED, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
-        {
-            //窗口显示的DPI变化, 触发DPI发生变化的事件
+    } break;
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
+        if (GlobalManager::Instance().Dpi().IsPixelDensityEnabled()) {
+            //窗口像素密度发生变化, 触发DPI发生变化的事件
             float fNewDisplayScale = SDL_GetWindowDisplayScale(m_sdlWindow);
             float fNewPixelDensity = SDL_GetWindowPixelDensity(m_sdlWindow);
 #ifdef DUILIB_HDPI_TEST_PIXEL_DENSITY
@@ -349,64 +375,30 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
 #endif
             uint32_t nOldDisplayScale = pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
             pOwner->OnNativeProcessDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
-            uint32_t nNewDisplayScale = pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
-
-            if (!ownerFlag.expired() && (nOldDisplayScale != nNewDisplayScale)) {
-                //界面显示比例发生了变化
-                m_ptLastMousePos = pOwner->OnNativeGetDpi().GetScalePoint(m_ptLastMousePos, nOldDisplayScale);
-
-                //需要按DPI比例调整窗口大小，避免界面显示比例失衡
-                if ((nNewDisplayScale != 0) && (nOldDisplayScale != 0)) {
-                    int w = 0;
-                    int h = 0;
-                    if (SDL_GetWindowSize(m_sdlWindow, &w, &h)) {
-                        w = pOwner->OnNativeGetDpi().MulDiv(w, (int)nNewDisplayScale, (int)nOldDisplayScale);
-                        h = pOwner->OnNativeGetDpi().MulDiv(h, (int)nNewDisplayScale, (int)nOldDisplayScale);
-                        SDL_SetWindowSize(m_sdlWindow, w, h);
-                    }
-                }
+            if (!ownerFlag.expired()
+                && (nOldDisplayScale != pOwner->OnNativeGetDpi().GetDisplayScaleFactor())) {
+                m_ptLastMousePos
+                    = pOwner->OnNativeGetDpi().GetScalePoint(m_ptLastMousePos, nOldDisplayScale);
             }
             if (!ownerFlag.expired()) {
                 pOwner->OnNativeDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
             }
         }
-        break;
-    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
-        {
-            if (GlobalManager::Instance().Dpi().IsPixelDensityEnabled()) {
-                //窗口像素密度发生变化, 触发DPI发生变化的事件
-                float fNewDisplayScale = SDL_GetWindowDisplayScale(m_sdlWindow);
-                float fNewPixelDensity = SDL_GetWindowPixelDensity(m_sdlWindow);
-#ifdef DUILIB_HDPI_TEST_PIXEL_DENSITY
-                //TEST ONLY
-                fNewPixelDensity = DUILIB_HDPI_TEST_PIXEL_DENSITY;
-#endif
-                uint32_t nOldDisplayScale = pOwner->OnNativeGetDpi().GetDisplayScaleFactor();
-                pOwner->OnNativeProcessDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
-                if (!ownerFlag.expired() && (nOldDisplayScale != pOwner->OnNativeGetDpi().GetDisplayScaleFactor())) {
-                    m_ptLastMousePos = pOwner->OnNativeGetDpi().GetScalePoint(m_ptLastMousePos, nOldDisplayScale);
-                }                
-                if (!ownerFlag.expired()) {
-                    pOwner->OnNativeDisplayScaleChangedMsg(fNewDisplayScale, fNewPixelDensity);
-                }
-            }
+    } break;
+    case SDL_EVENT_WINDOW_MOVED: {
+        //窗口移动
+        UiPoint ptTopLeft;
+        ptTopLeft.x = sdlEvent.window.data1;
+        ptTopLeft.y = sdlEvent.window.data2;
+        lResult
+            = pOwner->OnNativeMoveMsg(ptTopLeft, NativeMsg(SDL_EVENT_WINDOW_MOVED, 0, 0), bHandled);
+        if (!ownerFlag.expired()) {
+            CheckWindowSnap(m_sdlWindow);
         }
-        break;
-    case SDL_EVENT_WINDOW_MOVED:
-        {
-            //窗口移动
-            UiPoint ptTopLeft;
-            ptTopLeft.x = sdlEvent.window.data1;
-            ptTopLeft.y = sdlEvent.window.data2;
-            lResult = pOwner->OnNativeMoveMsg(ptTopLeft, NativeMsg(SDL_EVENT_WINDOW_MOVED, 0, 0), bHandled);
-            if (!ownerFlag.expired()) {
-                CheckWindowSnap(m_sdlWindow);
-            }
-        }
-        break;
+    } break;
     case SDL_EVENT_WINDOW_EXPOSED:
         //异步窗口绘制消息: 系统发生的消息已经进行了同步绘制，此处不重新绘制
-#if defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#if defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
         if (!m_bInitWindowPosFlag) {
             m_bInitWindowPosFlag = true;
             if (IsVideoDriverWayland()) {
@@ -414,10 +406,14 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
                 if ((m_ptInitWindow.x == kCW_USEDEFAULT) || (m_ptInitWindow.y == kCW_USEDEFAULT)) {
                     uFlags |= WindowPosFlags::kSWP_NOMOVE;
                 }
-                SetWindowPos(nullptr, InsertAfterFlag::kHWND_DEFAULT,
-                             m_ptInitWindow.x, m_ptInitWindow.y,
-                             m_szInitWindow.cx, m_szInitWindow.cy,
-                             uFlags);
+                SetWindowPos(
+                    nullptr,
+                    InsertAfterFlag::kHWND_DEFAULT,
+                    m_ptInitWindow.x,
+                    m_ptInitWindow.y,
+                    m_szInitWindow.cx,
+                    m_szInitWindow.cy,
+                    uFlags);
             }
         }
 #endif
@@ -432,261 +428,255 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
             UiPoint pt;
             GetCursorPos(pt);
             ScreenToClient(pt);
-            lResult = pOwner->OnNativeMouseHoverMsg(pt, 0, NativeMsg(WM_USER_HOVER_MSG, 0, 0), bHandled);
+            lResult
+                = pOwner->OnNativeMouseHoverMsg(pt, 0, NativeMsg(WM_USER_HOVER_MSG, 0, 0), bHandled);
         }
         break;
     case SDL_EVENT_WINDOW_MOUSE_ENTER:
         //不需要处理，Windows没有这个消息
         break;
-    case SDL_EVENT_WINDOW_MOUSE_LEAVE:
-        {
-            //鼠标离开窗口
-            lResult = pOwner->OnNativeMouseLeaveMsg(NativeMsg(SDL_EVENT_WINDOW_MOUSE_LEAVE, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_MOUSE_MOTION:
-        {
-            UiPoint pt;
-            pt.x = (int32_t)sdlEvent.motion.x;
-            pt.y = (int32_t)sdlEvent.motion.y;
-            pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
-            uint32_t modifierKey = GetModifiers(SDL_GetModState());
-            lResult = pOwner->OnNativeMouseMoveMsg(pt, modifierKey, false, NativeMsg(SDL_EVENT_MOUSE_MOTION, 0, 0), bHandled);
+    case SDL_EVENT_WINDOW_MOUSE_LEAVE: {
+        //鼠标离开窗口
+        lResult
+            = pOwner->OnNativeMouseLeaveMsg(NativeMsg(SDL_EVENT_WINDOW_MOUSE_LEAVE, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_MOUSE_MOTION: {
+        UiPoint pt;
+        pt.x = (int32_t) sdlEvent.motion.x;
+        pt.y = (int32_t) sdlEvent.motion.y;
+        pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
+        uint32_t modifierKey = GetModifiers(SDL_GetModState());
+        lResult = pOwner->OnNativeMouseMoveMsg(
+            pt, modifierKey, false, NativeMsg(SDL_EVENT_MOUSE_MOTION, 0, 0), bHandled);
 
-            //由于SDL没有WM_SETCURSOR消息，在鼠标移动的时候，触发设置光标消息
-            if (!ownerFlag.expired()) {
-                bool bNativeHandled = false;
-                pOwner->OnNativeSetCursorMsg(NativeMsg(SDL_EVENT_MOUSE_MOTION, 0, 0), bNativeHandled);
-            }
+        //由于SDL没有WM_SETCURSOR消息，在鼠标移动的时候，触发设置光标消息
+        if (!ownerFlag.expired()) {
+            bool bNativeHandled = false;
+            pOwner->OnNativeSetCursorMsg(NativeMsg(SDL_EVENT_MOUSE_MOTION, 0, 0), bNativeHandled);
         }
-        break;
-    case SDL_EVENT_MOUSE_WHEEL:
-        {
+    } break;
+    case SDL_EVENT_MOUSE_WHEEL: {
 #ifdef DUILIB_BUILD_FOR_WIN
-            #define WHEEL_DELTA     120
+#define WHEEL_DELTA 120
 #else
-            //TODO: 确认其他平台应该时什么值
-            #define WHEEL_DELTA     120
+//TODO: 确认其他平台应该时什么值
+#define WHEEL_DELTA 120
 #endif
-            int32_t wheelDelta = (int32_t)(sdlEvent.wheel.y * WHEEL_DELTA);
-            pOwner->OnNativeGetDpi().WindowSizeToClientSize(wheelDelta);
-            UiPoint pt;
-            pt.x = (int32_t)sdlEvent.wheel.mouse_x;
-            pt.y = (int32_t)sdlEvent.wheel.mouse_y;
-            pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
-            uint32_t modifierKey = GetModifiers(SDL_GetModState());
-            lResult = pOwner->OnNativeMouseWheelMsg(wheelDelta, pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_WHEEL, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        {
-            UiPoint pt;
-            pt.x = (int32_t)sdlEvent.button.x;
-            pt.y = (int32_t)sdlEvent.button.y;
-            pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
+        int32_t wheelDelta = (int32_t) (sdlEvent.wheel.y * WHEEL_DELTA);
+        pOwner->OnNativeGetDpi().WindowSizeToClientSize(wheelDelta);
+        UiPoint pt;
+        pt.x = (int32_t) sdlEvent.wheel.mouse_x;
+        pt.y = (int32_t) sdlEvent.wheel.mouse_y;
+        pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
+        uint32_t modifierKey = GetModifiers(SDL_GetModState());
+        lResult = pOwner->OnNativeMouseWheelMsg(
+            wheelDelta, pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_WHEEL, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+        UiPoint pt;
+        pt.x = (int32_t) sdlEvent.button.x;
+        pt.y = (int32_t) sdlEvent.button.y;
+        pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
 
-#if defined (DUILIB_BUILD_FOR_MACOS)
-            //MacOS平台：当存在CEF子窗口时，先点击页面，然后再点击主界面，此时SDL给出的pt值不正确，所以进行修正
-            UiPoint mousePt;
-            GetCursorPos(mousePt);
-            ScreenToClient(mousePt);
-            if ((mousePt.x != pt.x) || (mousePt.y != pt.y)) {
-                pt.x = mousePt.x;
-                pt.y = mousePt.y;
-            }
+#if defined(DUILIB_BUILD_FOR_MACOS)
+        //MacOS平台：当存在CEF子窗口时，先点击页面，然后再点击主界面，此时SDL给出的pt值不正确，所以进行修正
+        UiPoint mousePt;
+        GetCursorPos(mousePt);
+        ScreenToClient(mousePt);
+        if ((mousePt.x != pt.x) || (mousePt.y != pt.y)) {
+            pt.x = mousePt.x;
+            pt.y = mousePt.y;
+        }
 #endif
 
-            uint32_t modifierKey = GetModifiers(SDL_GetModState());
-            if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
-                //鼠标左键
-                lResult = pOwner->OnNativeMouseLButtonDownMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+        uint32_t modifierKey = GetModifiers(SDL_GetModState());
+        if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
+            //鼠标左键
+            lResult = pOwner->OnNativeMouseLButtonDownMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+        } else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
+            //鼠标右键
+            lResult = pOwner->OnNativeMouseRButtonDownMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+        } else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
+            //鼠标中键
+            lResult = pOwner->OnNativeMouseMButtonDownMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+        }
+    } break;
+    case SDL_EVENT_MOUSE_BUTTON_UP: {
+        UiPoint pt;
+        pt.x = (int32_t) sdlEvent.button.x;
+        pt.y = (int32_t) sdlEvent.button.y;
+        pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
+        uint32_t modifierKey = GetModifiers(SDL_GetModState());
+        bool bDoubleClick = (sdlEvent.button.clicks == 2) ? true : false; //是否为双击
+        if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
+            //鼠标左键: 先触发左键弹起消息，然后再触发左键双击消息，避免左键弹起消息丢失的现象
+            lResult = pOwner->OnNativeMouseLButtonUpMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
+            if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
+                lResult = pOwner->OnNativeMouseLButtonDbClickMsg(
+                    pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
             }
-            else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
-                //鼠标右键
-                lResult = pOwner->OnNativeMouseRButtonDownMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+        } else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
+            //鼠标右键: 先触发右键弹起消息，然后再触发右键双击消息，避免右键弹起消息丢失的现象
+            lResult = pOwner->OnNativeMouseRButtonUpMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
+            if (!bHandled && !ownerFlag.expired() && (sdlEvent.button.clicks == 1)) {
+                //模拟Windows，触发一次Context Menu事件
+                bool bMenuHandled = false;
+                pOwner->OnNativeContextMenuMsg(pt, NativeMsg(0, 0, 0), bMenuHandled);
             }
-            else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
-                //鼠标中键
-                lResult = pOwner->OnNativeMouseMButtonDownMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_DOWN, 0, 0), bHandled);
+            if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
+                lResult = pOwner->OnNativeMouseRButtonDbClickMsg(
+                    pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
+            }
+        } else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
+            //鼠标中键: 先触发中键弹起消息，然后再触发中键双击消息，避免中键弹起消息丢失的现象
+            lResult = pOwner->OnNativeMouseMButtonUpMsg(
+                pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
+            if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
+                lResult = pOwner->OnNativeMouseMButtonDbClickMsg(
+                    pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
             }
         }
-        break;
-    case SDL_EVENT_MOUSE_BUTTON_UP:
-        {
-            UiPoint pt;
-            pt.x = (int32_t)sdlEvent.button.x;
-            pt.y = (int32_t)sdlEvent.button.y;
-            pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
-            uint32_t modifierKey = GetModifiers(SDL_GetModState());
-            bool bDoubleClick = (sdlEvent.button.clicks == 2) ? true : false;//是否为双击
-            if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
-                //鼠标左键: 先触发左键弹起消息，然后再触发左键双击消息，避免左键弹起消息丢失的现象
-                lResult = pOwner->OnNativeMouseLButtonUpMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
-                    lResult = pOwner->OnNativeMouseLButtonDbClickMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                }
-            }
-            else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
-                //鼠标右键: 先触发右键弹起消息，然后再触发右键双击消息，避免右键弹起消息丢失的现象
-                lResult = pOwner->OnNativeMouseRButtonUpMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                if (!bHandled && !ownerFlag.expired() && (sdlEvent.button.clicks == 1)) {
-                    //模拟Windows，触发一次Context Menu事件
-                    bool bMenuHandled = false;
-                    pOwner->OnNativeContextMenuMsg(pt, NativeMsg(0, 0, 0), bMenuHandled);
-                }
-                if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
-                    lResult = pOwner->OnNativeMouseRButtonDbClickMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                }
-            }
-            else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
-                //鼠标中键: 先触发中键弹起消息，然后再触发中键双击消息，避免中键弹起消息丢失的现象
-                lResult = pOwner->OnNativeMouseMButtonUpMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                if (!bHandled && bDoubleClick && !ownerFlag.expired()) {
-                    lResult = pOwner->OnNativeMouseMButtonDbClickMsg(pt, modifierKey, NativeMsg(SDL_EVENT_MOUSE_BUTTON_UP, 0, 0), bHandled);
-                }
-            }
-        }
-        break;
-    case SDL_EVENT_WINDOW_FOCUS_GAINED:
-        {
-            //获取键盘输入焦点
-            INativeWindow* pLostFocusWindow = nullptr;//此参数得不到（目前无影响，代码中目前没有使用这个参数的）
-            lResult = pOwner->OnNativeSetFocusMsg(pLostFocusWindow, NativeMsg(SDL_EVENT_WINDOW_FOCUS_GAINED, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_WINDOW_FOCUS_LOST:
-        {
-            INativeWindow* pSetFocusWindow = nullptr;//此参数得不到，只能间接获取（这个参数代码中使用的较多，需要获取到）
-            SDL_Window* pKeyboardFocus = SDL_GetKeyboardFocus();
-            if (pKeyboardFocus != nullptr) {
-                SDL_WindowID id = SDL_GetWindowID(pKeyboardFocus);
-                if (id != 0) {
-                    NativeWindow_SDL* pNativeWindow = GetWindowFromID(id);
-                    if ((pNativeWindow != nullptr) && (pNativeWindow != this)) {
-                        pSetFocusWindow = pNativeWindow->m_pOwner;
-                    }
-                }
-            }
-            lResult = pOwner->OnNativeKillFocusMsg(pSetFocusWindow, NativeMsg(SDL_EVENT_WINDOW_FOCUS_LOST, 0, 0), bHandled);
-        }
-        break;
-    case SDL_EVENT_KEY_DOWN:
-        {            
-            VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
-            uint32_t modifierKey = GetModifiers(sdlEvent.key.mod);
-            lResult = pOwner->OnNativeKeyDownMsg(vkCode, modifierKey, NativeMsg(SDL_EVENT_KEY_DOWN, SDL_EVENT_KEY_DOWN, (WPARAM)(SDL_KeyboardEvent*)&sdlEvent.key), bHandled);
-        }
-        break;
-    case SDL_EVENT_KEY_UP:
-        {
-            VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
-            uint32_t modifierKey = GetModifiers(sdlEvent.key.mod);
-            lResult = pOwner->OnNativeKeyUpMsg(vkCode, modifierKey, NativeMsg(SDL_EVENT_KEY_UP, SDL_EVENT_KEY_UP, (WPARAM)(SDL_KeyboardEvent*)&sdlEvent.key), bHandled);
-        }
-        break;
-    case SDL_EVENT_TEXT_INPUT:
-        {
-            //相当于Windows下的WM_CHAR消息
-            if (sdlEvent.text.text != nullptr) {
-                //该文本为UTF-8编码的
-                DStringW textW = StringConvert::UTF8ToWString(sdlEvent.text.text);
-                if (!textW.empty()) {
-                    //转换成WM_CHAR事件, 多个字符时，通过NativeMsg传递
-                    VirtualKeyCode vkCode = VirtualKeyCode::kVK_None;
-                    uint32_t modifierKey = GetModifiers(SDL_GetModState());
-                    NativeMsg nativeMsg(SDL_EVENT_TEXT_INPUT, (WPARAM)textW.c_str(), (LPARAM)textW.size());//wParam: 整个字符串的地址，lParam：字符数量
-                    lResult = m_pOwner->OnNativeCharMsg(vkCode, modifierKey, nativeMsg, bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_FOCUS_GAINED: {
+        //获取键盘输入焦点
+        INativeWindow *pLostFocusWindow
+            = nullptr; //此参数得不到（目前无影响，代码中目前没有使用这个参数的）
+        lResult = pOwner->OnNativeSetFocusMsg(
+            pLostFocusWindow, NativeMsg(SDL_EVENT_WINDOW_FOCUS_GAINED, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_WINDOW_FOCUS_LOST: {
+        INativeWindow *pSetFocusWindow
+            = nullptr; //此参数得不到，只能间接获取（这个参数代码中使用的较多，需要获取到）
+        SDL_Window *pKeyboardFocus = SDL_GetKeyboardFocus();
+        if (pKeyboardFocus != nullptr) {
+            SDL_WindowID id = SDL_GetWindowID(pKeyboardFocus);
+            if (id != 0) {
+                NativeWindow_SDL *pNativeWindow = GetWindowFromID(id);
+                if ((pNativeWindow != nullptr) && (pNativeWindow != this)) {
+                    pSetFocusWindow = pNativeWindow->m_pOwner;
                 }
             }
         }
-        break;
-    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-        {
-            //回调关闭事件
-            bHandled = false;
-            pOwner->OnNativeWindowCloseMsg((uint32_t)m_closeParam, NativeMsg(SDL_EVENT_WINDOW_CLOSE_REQUESTED, 0, 0), bHandled);
-            if (bHandled && !ownerFlag.expired()) {
-                //拦截了关闭事件, 恢复关闭前的状态
-                m_bCloseing = false;
+        lResult = pOwner->OnNativeKillFocusMsg(
+            pSetFocusWindow, NativeMsg(SDL_EVENT_WINDOW_FOCUS_LOST, 0, 0), bHandled);
+    } break;
+    case SDL_EVENT_KEY_DOWN: {
+        VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
+        uint32_t modifierKey = GetModifiers(sdlEvent.key.mod);
+        lResult = pOwner->OnNativeKeyDownMsg(
+            vkCode,
+            modifierKey,
+            NativeMsg(
+                SDL_EVENT_KEY_DOWN,
+                SDL_EVENT_KEY_DOWN,
+                (WPARAM) (SDL_KeyboardEvent *) &sdlEvent.key),
+            bHandled);
+    } break;
+    case SDL_EVENT_KEY_UP: {
+        VirtualKeyCode vkCode = Keycode::GetVirtualKeyCode(sdlEvent.key.key);
+        uint32_t modifierKey = GetModifiers(sdlEvent.key.mod);
+        lResult = pOwner->OnNativeKeyUpMsg(
+            vkCode,
+            modifierKey,
+            NativeMsg(
+                SDL_EVENT_KEY_UP, SDL_EVENT_KEY_UP, (WPARAM) (SDL_KeyboardEvent *) &sdlEvent.key),
+            bHandled);
+    } break;
+    case SDL_EVENT_TEXT_INPUT: {
+        //相当于Windows下的WM_CHAR消息
+        if (sdlEvent.text.text != nullptr) {
+            //该文本为UTF-8编码的
+            DStringW textW = StringConvert::UTF8ToWString(sdlEvent.text.text);
+            if (!textW.empty()) {
+                //转换成WM_CHAR事件, 多个字符时，通过NativeMsg传递
+                VirtualKeyCode vkCode = VirtualKeyCode::kVK_None;
+                uint32_t modifierKey = GetModifiers(SDL_GetModState());
+                NativeMsg nativeMsg(
+                    SDL_EVENT_TEXT_INPUT,
+                    (WPARAM) textW.c_str(),
+                    (LPARAM) textW.size()); //wParam: 整个字符串的地址，lParam：字符数量
+                lResult = m_pOwner->OnNativeCharMsg(vkCode, modifierKey, nativeMsg, bHandled);
             }
-            else if(!ownerFlag.expired()) {
-                //PreClose事件
-                pOwner->OnNativePreCloseWindow();
+        }
+    } break;
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
+        //回调关闭事件
+        bHandled = false;
+        pOwner->OnNativeWindowCloseMsg(
+            (uint32_t) m_closeParam, NativeMsg(SDL_EVENT_WINDOW_CLOSE_REQUESTED, 0, 0), bHandled);
+        if (bHandled && !ownerFlag.expired()) {
+            //拦截了关闭事件, 恢复关闭前的状态
+            m_bCloseing = false;
+        } else if (!ownerFlag.expired()) {
+            //PreClose事件
+            pOwner->OnNativePreCloseWindow();
 
-                //关闭窗口
-                if (!ownerFlag.expired()) {
-                    ClearNativeWindow();
-                }
-            }
-        }
-        break;
-    case SDL_EVENT_WINDOW_DESTROYED:
-        {
-            //窗口已经销毁
-            SDL_WindowID windowID = NativeWindow_SDL::GetWindowIdFromEvent(sdlEvent);
-            ClearWindowFromID(windowID, this);
-
-            //窗口已经关闭（关闭后）
-            pOwner->OnNativePostCloseWindow();
+            //关闭窗口
             if (!ownerFlag.expired()) {
-                OnFinalMessage();
+                ClearNativeWindow();
             }
         }
-        break;
-    case SDL_EVENT_DROP_BEGIN:
-        {
-            bHandled = true;
-            if (m_pWindowDropTarget != nullptr) {
-                m_pWindowDropTarget->OnDropBegin();
-            }
+    } break;
+    case SDL_EVENT_WINDOW_DESTROYED: {
+        //窗口已经销毁
+        SDL_WindowID windowID = NativeWindow_SDL::GetWindowIdFromEvent(sdlEvent);
+        ClearWindowFromID(windowID, this);
+
+        //窗口已经关闭（关闭后）
+        pOwner->OnNativePostCloseWindow();
+        if (!ownerFlag.expired()) {
+            OnFinalMessage();
         }
-        break;
-    case SDL_EVENT_DROP_POSITION:
-        {
-            bHandled = true;
-            if (m_pWindowDropTarget != nullptr) {
-                UiPoint pt((uint32_t)sdlEvent.drop.x, (uint32_t)sdlEvent.drop.y);
-                pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
-                m_pWindowDropTarget->OnDropPosition(pt);
-            }
+    } break;
+    case SDL_EVENT_DROP_BEGIN: {
+        bHandled = true;
+        if (m_pWindowDropTarget != nullptr) {
+            m_pWindowDropTarget->OnDropBegin();
         }
-        break;
-    case SDL_EVENT_DROP_TEXT:
-        {
-            bHandled = true;
-            if (m_pWindowDropTarget != nullptr) {
-                DStringA dropText;
-                if (sdlEvent.drop.data != nullptr) {
-                    dropText = sdlEvent.drop.data;
-                }
-                m_pWindowDropTarget->OnDropText(dropText);
-            }
+    } break;
+    case SDL_EVENT_DROP_POSITION: {
+        bHandled = true;
+        if (m_pWindowDropTarget != nullptr) {
+            UiPoint pt((uint32_t) sdlEvent.drop.x, (uint32_t) sdlEvent.drop.y);
+            pOwner->OnNativeGetDpi().WindowSizeToClientSize(pt);
+            m_pWindowDropTarget->OnDropPosition(pt);
         }
-        break;
-    case SDL_EVENT_DROP_FILE:
-        {
-            bHandled = true;
-            if (m_pWindowDropTarget != nullptr) {
-                DStringA dropSource;
-                DStringA dropFile;
-                if (sdlEvent.drop.data != nullptr) {
-                    dropFile = sdlEvent.drop.data;
-                }
-                if (sdlEvent.drop.source != nullptr) {
-                    dropSource = sdlEvent.drop.source;
-                }
-                m_pWindowDropTarget->OnDropFile(dropSource, dropFile);
+    } break;
+    case SDL_EVENT_DROP_TEXT: {
+        bHandled = true;
+        if (m_pWindowDropTarget != nullptr) {
+            DStringA dropText;
+            if (sdlEvent.drop.data != nullptr) {
+                dropText = sdlEvent.drop.data;
             }
+            m_pWindowDropTarget->OnDropText(dropText);
         }
-        break;
-    case SDL_EVENT_DROP_COMPLETE:
-        {
-            bHandled = true;
-            if (m_pWindowDropTarget != nullptr) {
-                m_pWindowDropTarget->OnDropComplete();
+    } break;
+    case SDL_EVENT_DROP_FILE: {
+        bHandled = true;
+        if (m_pWindowDropTarget != nullptr) {
+            DStringA dropSource;
+            DStringA dropFile;
+            if (sdlEvent.drop.data != nullptr) {
+                dropFile = sdlEvent.drop.data;
             }
+            if (sdlEvent.drop.source != nullptr) {
+                dropSource = sdlEvent.drop.source;
+            }
+            m_pWindowDropTarget->OnDropFile(dropSource, dropFile);
         }
-        break;
+    } break;
+    case SDL_EVENT_DROP_COMPLETE: {
+        bHandled = true;
+        if (m_pWindowDropTarget != nullptr) {
+            m_pWindowDropTarget->OnDropComplete();
+        }
+    } break;
     default:
         break;
     }
@@ -694,14 +684,14 @@ bool NativeWindow_SDL::OnSDLWindowEvent(const SDL_Event& sdlEvent)
     return true;
 }
 
-static bool SDLCALL OnNativeWindowExposedEvent(void* userdata, SDL_Event* event)
+static bool SDLCALL OnNativeWindowExposedEvent(void *userdata, SDL_Event *event)
 {
     //窗口绘制事件：同步绘制，避免黑屏现象
     if ((userdata != nullptr) && (event != nullptr)) {
-        SDL_EventType eventType = (SDL_EventType)event->type;
+        SDL_EventType eventType = (SDL_EventType) event->type;
         if (eventType == SDL_EVENT_WINDOW_EXPOSED) {
-            NativeWindow_SDL* pNativeWindow = (NativeWindow_SDL*)userdata;
-            if ((SDL_Window*)pNativeWindow->GetWindowHandle() == SDL_GetWindowFromEvent(event)) {
+            NativeWindow_SDL *pNativeWindow = (NativeWindow_SDL *) userdata;
+            if ((SDL_Window *) pNativeWindow->GetWindowHandle() == SDL_GetWindowFromEvent(event)) {
                 pNativeWindow->PaintWindow(true);
             }
         }
@@ -709,29 +699,29 @@ static bool SDLCALL OnNativeWindowExposedEvent(void* userdata, SDL_Event* event)
     return true;
 }
 
-NativeWindow_SDL::NativeWindow_SDL(INativeWindow* pOwner):
-    m_pOwner(pOwner),
-    m_sdlWindow(nullptr),
-    m_sdlRenderer(nullptr),
-    m_bIsLayeredWindow(false),
-    m_nLayeredWindowAlpha(255),
-    m_nLayeredWindowOpacity(255),
-    m_bUseSystemCaption(false),
-    m_bMouseCapture(false),
-    m_bCloseing(false),
-    m_bChildWindow(false),
-    m_closeParam(kWindowCloseNormal),
-    m_bEnableDragDrop(true),
-    m_bFakeModal(false),
-    m_bDoModal(false),
-    m_bFullscreen(false),
-    m_bFullscreenExiting(false),
-    m_bFullscreenMaximized(false),
-    m_ptLastMousePos(-1, -1),
-    m_bInitWindowPosFlag(false),
-    m_systemShadowType(NativeWindowShadowType::kShadowSystemDisabled)
+NativeWindow_SDL::NativeWindow_SDL(INativeWindow *pOwner)
+    : m_pOwner(pOwner)
+    , m_sdlWindow(nullptr)
+    , m_sdlRenderer(nullptr)
+    , m_bIsLayeredWindow(false)
+    , m_nLayeredWindowAlpha(255)
+    , m_nLayeredWindowOpacity(255)
+    , m_bUseSystemCaption(false)
+    , m_bMouseCapture(false)
+    , m_bCloseing(false)
+    , m_bChildWindow(false)
+    , m_closeParam(kWindowCloseNormal)
+    , m_bEnableDragDrop(true)
+    , m_bFakeModal(false)
+    , m_bDoModal(false)
+    , m_bFullscreen(false)
+    , m_bFullscreenExiting(false)
+    , m_bFullscreenMaximized(false)
+    , m_ptLastMousePos(-1, -1)
+    , m_bInitWindowPosFlag(false)
+    , m_systemShadowType(NativeWindowShadowType::kShadowSystemDisabled)
 {
-    ASSERT(m_pOwner != nullptr);    
+    ASSERT(m_pOwner != nullptr);
 }
 
 NativeWindow_SDL::~NativeWindow_SDL()
@@ -743,15 +733,16 @@ NativeWindow_SDL::~NativeWindow_SDL()
     ClearNativeWindow();
 }
 
-bool NativeWindow_SDL::CreateWnd(NativeWindow_SDL* pParentWindow,
-                                 const WindowCreateParam& createParam,
-                                 const WindowCreateAttributes& createAttributes)
+bool NativeWindow_SDL::CreateWnd(
+    NativeWindow_SDL *pParentWindow,
+    const WindowCreateParam &createParam,
+    const WindowCreateAttributes &createAttributes)
 {
     //获取DiplayMode，避免在底层出现错误时，出现卡死现象
     {
         SDL_DisplayID id = SDL_GetPrimaryDisplay();
-        const SDL_DisplayMode* mode1 = SDL_GetDesktopDisplayMode(id);
-        const SDL_DisplayMode* mode2 = SDL_GetCurrentDisplayMode(id);
+        const SDL_DisplayMode *mode1 = SDL_GetDesktopDisplayMode(id);
+        const SDL_DisplayMode *mode2 = SDL_GetCurrentDisplayMode(id);
         if (mode1 == mode2) {
             id = 0;
         }
@@ -799,7 +790,8 @@ bool NativeWindow_SDL::CreateWnd(NativeWindow_SDL* pParentWindow,
     return true;
 }
 
-bool NativeWindow_SDL::CreateWindowAndRender(NativeWindow_SDL* pParentWindow, const WindowCreateAttributes& createAttributes)
+bool NativeWindow_SDL::CreateWindowAndRender(
+    NativeWindow_SDL *pParentWindow, const WindowCreateAttributes &createAttributes)
 {
     //创建SDL窗口
     m_sdlWindow = CreateSdlWindow(pParentWindow, createAttributes);
@@ -822,13 +814,14 @@ bool NativeWindow_SDL::CreateWindowAndRender(NativeWindow_SDL* pParentWindow, co
     return true;
 }
 
-SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, const WindowCreateAttributes& createAttributes)
+SDL_Window *NativeWindow_SDL::CreateSdlWindow(
+    NativeWindow_SDL *pParentWindow, const WindowCreateAttributes &createAttributes)
 {
     bool bOpenGL = false;
     bool bSupportTransparent = false;
 #ifndef DUILIB_BUILD_FOR_WIN
     //macOS/Linux/FreeBSD平台
-    bool bOpenGLES2 = false;    
+    bool bOpenGLES2 = false;
     QueryRenderProperties(createAttributes.m_sdlRenderName, bOpenGL, bOpenGLES2, bSupportTransparent);
 #endif
 
@@ -839,7 +832,7 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
         //窗口居中时，计算窗口的起始位置，避免窗口弹出时出现窗口位置变动的现象
         int32_t xPos = 0;
         int32_t yPos = 0;
-        SDL_Window* pCenterWindow = pParentWindow != nullptr ? pParentWindow->m_sdlWindow : nullptr;
+        SDL_Window *pCenterWindow = pParentWindow != nullptr ? pParentWindow->m_sdlWindow : nullptr;
         if (CalculateCenterWindowPos(pCenterWindow, xPos, yPos)) {
             m_createParam.m_nX = xPos;
             m_createParam.m_nY = yPos;
@@ -850,7 +843,7 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
     SDL_PropertiesID props = SDL_CreateProperties();
     SetCreateWindowProperties(props, pParentWindow, createAttributes, bOpenGL);
 
-    SDL_Window* pSdlWindow = nullptr;
+    SDL_Window *pSdlWindow = nullptr;
 #ifndef DUILIB_BUILD_FOR_WIN
     //Linux平台
     std::vector<DString> renderNames;
@@ -870,8 +863,7 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
         if (pSdlWindow == nullptr) {
             pSdlWindow = SDL_CreateWindowWithProperties(props);
         }
-    }
-    else {
+    } else {
         pSdlWindow = SDL_CreateWindowWithProperties(props);
     }
 #else
@@ -894,10 +886,12 @@ SDL_Window* NativeWindow_SDL::CreateSdlWindow(NativeWindow_SDL* pParentWindow, c
     return pSdlWindow;
 }
 
-int32_t NativeWindow_SDL::DoModal(NativeWindow_SDL* pParentWindow,
-                                  const WindowCreateParam& createParam,
-                                  const WindowCreateAttributes& createAttributes,
-                                  bool bCloseByEsc, bool bCloseByEnter)
+int32_t NativeWindow_SDL::DoModal(
+    NativeWindow_SDL *pParentWindow,
+    const WindowCreateParam &createParam,
+    const WindowCreateAttributes &createAttributes,
+    bool bCloseByEsc,
+    bool bCloseByEnter)
 {
     ASSERT(m_sdlWindow == nullptr);
     if (m_sdlWindow != nullptr) {
@@ -924,7 +918,7 @@ int32_t NativeWindow_SDL::DoModal(NativeWindow_SDL* pParentWindow,
     if (!CreateWindowAndRender(pParentWindow, createAttributes)) {
         return false;
     }
-    
+
     //标记为模式对话框状态
     m_bDoModal = true;
 
@@ -967,7 +961,8 @@ int32_t NativeWindow_SDL::DoModal(NativeWindow_SDL* pParentWindow,
     return m_closeParam;
 }
 
-bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight)
+bool NativeWindow_SDL::CreateChildWnd(
+    NativeWindow_SDL *pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight)
 {
     ASSERT(m_sdlWindow == nullptr);
     if (m_sdlWindow != nullptr) {
@@ -977,7 +972,7 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
     if (m_sdlRenderer != nullptr) {
         return false;
     }
-    SDL_Window* sdlParentWindow = nullptr;
+    SDL_Window *sdlParentWindow = nullptr;
     if (pParentWindow != nullptr) {
         sdlParentWindow = pParentWindow->m_sdlWindow;
     }
@@ -1026,19 +1021,21 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows平台，使用外部创建的子窗口句柄关联SDL窗口
     SDL_PropertiesID propID = SDL_GetWindowProperties(sdlParentWindow);
-    HMODULE hModule = (HMODULE)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
+    HMODULE hModule
+        = (HMODULE) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
     ASSERT(hModule != nullptr);
     if (hModule == nullptr) {
-        hModule = (HMODULE)GlobalManager::Instance().GetPlatformData();
+        hModule = (HMODULE) GlobalManager::Instance().GetPlatformData();
     }
     if (hModule == nullptr) {
         hModule = ::GetModuleHandle(nullptr);
     }
     HWND hChild = nullptr;
-    HWND hParent = (HWND)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+    HWND hParent
+        = (HWND) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
     if (hParent != nullptr) {
         const DString className = _T("duilib_child_window");
-        WNDCLASS wc = { 0 };
+        WNDCLASS wc = {0};
         wc.lpfnWndProc = ::DefWindowProc;
         wc.hInstance = hModule;
         wc.lpszClassName = className.c_str();
@@ -1049,20 +1046,23 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
         static bool bAddAtExitFunction = false;
         if (!bAddAtExitFunction) {
             bAddAtExitFunction = true;
-            GlobalManager::Instance().AddAtExitFunction([className, hModule]() {
-                ::UnregisterClass(className.c_str(), hModule);
-                });
+            GlobalManager::Instance().AddAtExitFunction(
+                [className, hModule]() { ::UnregisterClass(className.c_str(), hModule); });
         }
         // 创建Windows子窗口（WS_CHILD样式）
-        hChild = ::CreateWindowEx( 0,
-                                   className.c_str(),
-                                   0,
-                                   WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-                                   nX, nY, nWidth, nHeight,
-                                   hParent,
-                                   nullptr,
-                                   hModule,
-                                   nullptr);
+        hChild = ::CreateWindowEx(
+            0,
+            className.c_str(),
+            0,
+            WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+            nX,
+            nY,
+            nWidth,
+            nHeight,
+            hParent,
+            nullptr,
+            hModule,
+            nullptr);
     }
     if (hChild != nullptr) {
         SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, hChild);
@@ -1088,7 +1088,9 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
         ASSERT(SDL_GetRenderer(m_sdlWindow) == m_sdlRenderer);
 #ifdef DUILIB_BUILD_FOR_WIN
         SDL_PropertiesID childPropID = SDL_GetWindowProperties(m_sdlWindow);
-        ASSERT((HWND)SDL_GetPointerProperty(childPropID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr) == hChild);
+        ASSERT(
+            (HWND) SDL_GetPointerProperty(childPropID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr)
+            == hChild);
         UNUSED_VARIABLE(childPropID);
 #endif
 
@@ -1109,8 +1111,7 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
             m_pOwner->OnNativeCreateWndMsg(false, NativeMsg(0, 0, 0), bHandled);
         }
         return true;
-    }
-    else {
+    } else {
 #ifdef DUILIB_BUILD_FOR_WIN
         if (hChild != nullptr) {
             ::DestroyWindow(hChild);
@@ -1118,10 +1119,10 @@ bool NativeWindow_SDL::CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t n
         }
 #endif
         return false;
-    }    
+    }
 }
 
-SDL_Renderer* NativeWindow_SDL::CreateSdlRenderer(const DString& sdlRenderName) const
+SDL_Renderer *NativeWindow_SDL::CreateSdlRenderer(const DString &sdlRenderName) const
 {
     std::vector<DString> renderNames;
     GetRenderNameList(sdlRenderName, renderNames);
@@ -1131,7 +1132,7 @@ SDL_Renderer* NativeWindow_SDL::CreateSdlRenderer(const DString& sdlRenderName) 
         return nullptr;
     }
 
-    SDL_Renderer* sdlRenderer = nullptr;
+    SDL_Renderer *sdlRenderer = nullptr;
     for (auto iter = renderNames.begin(); iter != renderNames.end(); ++iter) {
         const DStringA renderName = StringConvert::TToUTF8(*iter);
         sdlRenderer = SDL_CreateRenderer(m_sdlWindow, renderName.c_str());
@@ -1147,7 +1148,8 @@ SDL_Renderer* NativeWindow_SDL::CreateSdlRenderer(const DString& sdlRenderName) 
     return sdlRenderer;
 }
 
-void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std::vector<DString>& renderNames) const
+void NativeWindow_SDL::GetRenderNameList(
+    const DString &externalRenderName, std::vector<DString> &renderNames) const
 {
     //以下为可用的Render名称列表（并不是每个名称的Render都可用，比如有的不能工作，有的不支持半透明窗口等特性）：
     //Windows平台："gpu,direct3d11,direct3d12,direct3d,opengl,opengles2,vulkan,software"
@@ -1157,7 +1159,7 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
     renderNames.clear();
     if (m_sdlRenderer != nullptr) {
         //当前的Render为第一优先级
-        const char* renderName = SDL_GetRendererName(m_sdlRenderer);
+        const char *renderName = SDL_GetRendererName(m_sdlRenderer);
         if (renderName != nullptr) {
             std::string name = renderName;
             renderNames.push_back(StringConvert::UTF8ToT(name));
@@ -1167,16 +1169,16 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
     if (renderNames.empty()) {
         //如果已经有窗口，则优先使用已有窗口的Render Name，避免同时存在的窗口使用不同的Render Name
         int32_t nWindowCount = 0;
-        SDL_Window** ppSdlWindow = SDL_GetWindows(&nWindowCount);
+        SDL_Window **ppSdlWindow = SDL_GetWindows(&nWindowCount);
         if ((nWindowCount > 0) && (ppSdlWindow != nullptr)) {
             for (int32_t nWindow = 0; nWindow < nWindowCount; ++nWindow) {
-                SDL_Renderer* pSdlRender = nullptr;
-                SDL_Window* pSdlWindow = ppSdlWindow[nWindow];
+                SDL_Renderer *pSdlRender = nullptr;
+                SDL_Window *pSdlWindow = ppSdlWindow[nWindow];
                 if (pSdlWindow != nullptr) {
-                    pSdlRender = SDL_GetRenderer(pSdlWindow);                    
+                    pSdlRender = SDL_GetRenderer(pSdlWindow);
                 }
                 if (pSdlRender != nullptr) {
-                    const char* pRenderName = SDL_GetRendererName(pSdlRender);
+                    const char *pRenderName = SDL_GetRendererName(pSdlRender);
                     if ((pRenderName != nullptr) && (pRenderName[0] != '\0')) {
                         //作为第一优先级的Render名称
                         DString name = StringConvert::UTF8ToT(std::string(pRenderName));
@@ -1207,7 +1209,7 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
     renderNames.push_back(_T("opengles2"));
     renderNames.push_back(_T("vulkan"));
     renderNames.push_back(_T("opengl"));
-#elif defined (DUILIB_BUILD_FOR_MACOS)
+#elif defined(DUILIB_BUILD_FOR_MACOS)
     //macOS平台：当前平台支持透明的（属性：SDL_WINDOW_TRANSPARENT）
     renderNames.push_back(_T("metal"));
     renderNames.push_back(_T("opengles2"));
@@ -1224,7 +1226,7 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
     std::vector<DString> renderDrivers;
     int32_t nRenderCount = SDL_GetNumRenderDrivers();
     for (int32_t nRenderIndex = 0; nRenderIndex < nRenderCount; ++nRenderIndex) {
-        const char* renderName = SDL_GetRenderDriver(nRenderIndex);
+        const char *renderName = SDL_GetRenderDriver(nRenderIndex);
         if (renderName != nullptr) {
             DString name = StringConvert::UTF8ToT(std::string(renderName));
             if (!name.empty()) {
@@ -1233,19 +1235,22 @@ void NativeWindow_SDL::GetRenderNameList(const DString& externalRenderName, std:
         }
     }
     auto iter = renderNames.begin();
-    while ( iter != renderNames.end()) {
-        const DString& name = *iter;
+    while (iter != renderNames.end()) {
+        const DString &name = *iter;
         if (std::find(renderDrivers.begin(), renderDrivers.end(), name) == renderDrivers.end()) {
             //不存在，移除
             iter = renderNames.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
 }
 
-void NativeWindow_SDL::QueryRenderProperties(const DString& externalRenderName, bool& bOpenGL, bool& bOpenGLES2, bool& bSupportTransparent) const
+void NativeWindow_SDL::QueryRenderProperties(
+    const DString &externalRenderName,
+    bool &bOpenGL,
+    bool &bOpenGLES2,
+    bool &bSupportTransparent) const
 {
     bOpenGL = false;
     bOpenGLES2 = false;
@@ -1253,18 +1258,16 @@ void NativeWindow_SDL::QueryRenderProperties(const DString& externalRenderName, 
 
     if (m_sdlRenderer != nullptr) {
         //当前的Render为第一优先级
-        const char* renderName = SDL_GetRendererName(m_sdlRenderer);
+        const char *renderName = SDL_GetRendererName(m_sdlRenderer);
         if (renderName != nullptr) {
             std::string name = renderName;
             bSupportTransparent = IsRenderSupportTransparent(StringConvert::UTF8ToT(name));
             if (name == "opengles2") {
                 bOpenGL = true;
                 bOpenGLES2 = true;
-            }
-            else if (name == "opengl") {
+            } else if (name == "opengl") {
                 bOpenGL = true;
-            }
-            else if (name == "vulkan") {
+            } else if (name == "vulkan") {
                 //需要添加SDL_WINDOW_OPENGL标志，否则vulkan无法工作，原因未知
                 bOpenGL = true;
             }
@@ -1275,18 +1278,16 @@ void NativeWindow_SDL::QueryRenderProperties(const DString& externalRenderName, 
     std::vector<DString> renderNames;
     GetRenderNameList(externalRenderName, renderNames);
     for (auto iter = renderNames.begin(); iter != renderNames.end(); ++iter) {
-        const DString& name = *iter;
+        const DString &name = *iter;
         if (name.empty()) {
             continue;
         }
         if (name == _T("opengles2")) {
             bOpenGL = true;
             bOpenGLES2 = true;
-        }
-        else if (name == _T("opengl")) {
+        } else if (name == _T("opengl")) {
             bOpenGL = true;
-        }
-        else if (name == _T("vulkan")) {
+        } else if (name == _T("vulkan")) {
             //需要添加SDL_WINDOW_OPENGL标志，否则vulkan无法工作，原因未知
             bOpenGL = true;
         }
@@ -1298,40 +1299,35 @@ void NativeWindow_SDL::QueryRenderProperties(const DString& externalRenderName, 
     }
 }
 
-bool NativeWindow_SDL::IsRenderSupportTransparent(const DString& renderName) const
+bool NativeWindow_SDL::IsRenderSupportTransparent(const DString &renderName) const
 {
     bool bSupportTransparent = false;
 #ifdef DUILIB_BUILD_FOR_WIN
     if (renderName == _T("direct3d11")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("opengl")) {
+    } else if (renderName == _T("opengl")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("vulkan")) {
+    } else if (renderName == _T("vulkan")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("opengles2")) {
+    } else if (renderName == _T("opengles2")) {
         bSupportTransparent = true;
     }
 #else
     if (renderName == _T("opengles2")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("opengl")) {
+    } else if (renderName == _T("opengl")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("vulkan")) {
+    } else if (renderName == _T("vulkan")) {
         bSupportTransparent = true;
-    }
-    else if (renderName == _T("metal")) {
+    } else if (renderName == _T("metal")) {
         bSupportTransparent = true;
     }
 #endif
     return bSupportTransparent;
 }
 
-void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& createAttributes, bool bSupportTransparent)
+void NativeWindow_SDL::SyncCreateWindowAttributes(
+    const WindowCreateAttributes &createAttributes, bool bSupportTransparent)
 {
     m_bUseSystemCaption = false;
     if (createAttributes.m_bUseSystemCaptionDefined && createAttributes.m_bUseSystemCaption) {
@@ -1352,9 +1348,9 @@ void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& 
         if (m_createParam.m_dwStyle & kWS_POPUP) {
             //弹出式窗口
             m_createParam.m_dwStyle |= (kWS_CAPTION | kWS_SYSMENU);
-        }
-        else {
-            m_createParam.m_dwStyle |= (kWS_CAPTION | kWS_SYSMENU | kWS_MINIMIZEBOX | kWS_MAXIMIZEBOX);
+        } else {
+            m_createParam.m_dwStyle
+                |= (kWS_CAPTION | kWS_SYSMENU | kWS_MINIMIZEBOX | kWS_MAXIMIZEBOX);
         }
     }
 
@@ -1363,16 +1359,17 @@ void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& 
         if (createAttributes.m_bIsLayeredWindow) {
             m_bIsLayeredWindow = true;
         }
-    }
-    else if (m_createParam.m_dwExStyle & kWS_EX_LAYERED) {
+    } else if (m_createParam.m_dwExStyle & kWS_EX_LAYERED) {
         m_bIsLayeredWindow = true;
     }
 
     //如果设置了不透明度，则设置为层窗口
-    if (createAttributes.m_bLayeredWindowOpacityDefined && (createAttributes.m_nLayeredWindowOpacity != 255)) {
+    if (createAttributes.m_bLayeredWindowOpacityDefined
+        && (createAttributes.m_nLayeredWindowOpacity != 255)) {
         m_bIsLayeredWindow = true;
     }
-    if (createAttributes.m_bLayeredWindowAlphaDefined && (createAttributes.m_nLayeredWindowAlpha != 255)) {
+    if (createAttributes.m_bLayeredWindowAlphaDefined
+        && (createAttributes.m_nLayeredWindowAlpha != 255)) {
         m_bIsLayeredWindow = true;
     }
 
@@ -1391,14 +1388,16 @@ void NativeWindow_SDL::SyncCreateWindowAttributes(const WindowCreateAttributes& 
     }
     if (m_bIsLayeredWindow) {
         m_createParam.m_dwExStyle |= kWS_EX_LAYERED;
-    }
-    else {
+    } else {
         m_createParam.m_dwExStyle &= ~kWS_EX_LAYERED;
     }
 }
 
-void NativeWindow_SDL::SetCreateWindowProperties(SDL_PropertiesID props, NativeWindow_SDL* pParentWindow,
-                                                 const WindowCreateAttributes& createAttributes, bool bUseOpenGL)
+void NativeWindow_SDL::SetCreateWindowProperties(
+    SDL_PropertiesID props,
+    NativeWindow_SDL *pParentWindow,
+    const WindowCreateAttributes &createAttributes,
+    bool bUseOpenGL)
 {
     //设置关闭窗口的时候，不自动退出消息循环
     SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "false");
@@ -1446,7 +1445,8 @@ void NativeWindow_SDL::SetCreateWindowProperties(SDL_PropertiesID props, NativeW
 
     //父窗口
     if ((pParentWindow != nullptr) && (pParentWindow->m_sdlWindow != nullptr)) {
-        SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_PARENT_POINTER, pParentWindow->m_sdlWindow);
+        SDL_SetPointerProperty(
+            props, SDL_PROP_WINDOW_CREATE_PARENT_POINTER, pParentWindow->m_sdlWindow);
     }
 
     //窗口属性
@@ -1475,8 +1475,7 @@ void NativeWindow_SDL::SetCreateWindowProperties(SDL_PropertiesID props, NativeW
 
     if (bPopupWindow && (m_createParam.m_dwExStyle & kWS_EX_TOOLWINDOW)) {
         windowFlags |= SDL_WINDOW_UTILITY;
-    }
-    else if (bPopupWindow && (pParentWindow != nullptr)) {
+    } else if (bPopupWindow && (pParentWindow != nullptr)) {
         //SDL窗口的父子窗口关系：在系统层面，并未设置父子关系，所以弹出窗口需要设置这个属性，避免任务栏出现多个窗口的现象
         //但由于SDL未使用系统的父子窗口关系，弹出窗口后，主窗口便失去焦点，任务栏上显示的是非激活状态，体验不佳
         windowFlags |= SDL_WINDOW_UTILITY;
@@ -1504,22 +1503,20 @@ void NativeWindow_SDL::SetCreateWindowProperties(SDL_PropertiesID props, NativeW
     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, windowFlags);
 }
 
-static SDL_HitTestResult SDLCALL NativeWindow_SDL_HitTest(SDL_Window* win,
-                                                          const SDL_Point* area,
-                                                          void* data)
+static SDL_HitTestResult SDLCALL
+NativeWindow_SDL_HitTest(SDL_Window *win, const SDL_Point *area, void *data)
 {
-    NativeWindow_SDL* pWindow = (NativeWindow_SDL*)data;
+    NativeWindow_SDL *pWindow = (NativeWindow_SDL *) data;
     if (pWindow == nullptr) {
         return SDL_HITTEST_NORMAL;
     }
-    return (SDL_HitTestResult)pWindow->SDL_HitTest(win, area, data);
+    return (SDL_HitTestResult) pWindow->SDL_HitTest(win, area, data);
 }
 
-int32_t NativeWindow_SDL::SDL_HitTest(SDL_Window* win, const SDL_Point* area, void* data)
+int32_t NativeWindow_SDL::SDL_HitTest(SDL_Window *win, const SDL_Point *area, void *data)
 {
-    if (((NativeWindow_SDL*)data != this) ||
-        (area == nullptr) || (win != GetWindowHandle()) ||
-        IsUseSystemCaption() || (m_pOwner == nullptr)) {
+    if (((NativeWindow_SDL *) data != this) || (area == nullptr) || (win != GetWindowHandle())
+        || IsUseSystemCaption() || (m_pOwner == nullptr)) {
         return SDL_HITTEST_NORMAL;
     }
 
@@ -1547,50 +1544,41 @@ int32_t NativeWindow_SDL::SDL_HitTest(SDL_Window* win, const SDL_Point* area, vo
         if (pt.y < rcClient.top + rcSizeBox.top) {
             if (pt.y >= rcClient.top) {
                 if (pt.x < (rcClient.left + rcSizeBox.left) && pt.x >= rcClient.left) {
-                    return SDL_HITTEST_RESIZE_TOPLEFT;//在窗口边框的左上角。
+                    return SDL_HITTEST_RESIZE_TOPLEFT; //在窗口边框的左上角。
+                } else if (pt.x > (rcClient.right - rcSizeBox.right) && pt.x <= rcClient.right) {
+                    return SDL_HITTEST_RESIZE_TOPRIGHT; //在窗口边框的右上角
+                } else {
+                    return SDL_HITTEST_RESIZE_TOP; //在窗口的上水平边框中
                 }
-                else if (pt.x > (rcClient.right - rcSizeBox.right) && pt.x <= rcClient.right) {
-                    return SDL_HITTEST_RESIZE_TOPRIGHT;//在窗口边框的右上角
-                }
-                else {
-                    return SDL_HITTEST_RESIZE_TOP;//在窗口的上水平边框中
-                }
+            } else {
+                return SDL_HITTEST_NORMAL; //在工作区中
             }
-            else {
-                return SDL_HITTEST_NORMAL;//在工作区中
-            }
-        }
-        else if (pt.y > rcClient.bottom - rcSizeBox.bottom) {
+        } else if (pt.y > rcClient.bottom - rcSizeBox.bottom) {
             if (pt.y <= rcClient.bottom) {
                 if (pt.x < (rcClient.left + rcSizeBox.left) && pt.x >= rcClient.left) {
-                    return SDL_HITTEST_RESIZE_BOTTOMLEFT;//在窗口边框的左下角
+                    return SDL_HITTEST_RESIZE_BOTTOMLEFT; //在窗口边框的左下角
+                } else if (pt.x > (rcClient.right - rcSizeBox.right) && pt.x <= rcClient.right) {
+                    return SDL_HITTEST_RESIZE_BOTTOMRIGHT; //在窗口边框的右下角
+                } else {
+                    return SDL_HITTEST_RESIZE_BOTTOM; //在窗口的下水平边框中
                 }
-                else if (pt.x > (rcClient.right - rcSizeBox.right) && pt.x <= rcClient.right) {
-                    return SDL_HITTEST_RESIZE_BOTTOMRIGHT;//在窗口边框的右下角
-                }
-                else {
-                    return SDL_HITTEST_RESIZE_BOTTOM;//在窗口的下水平边框中
-                }
-            }
-            else {
-                return SDL_HITTEST_NORMAL;//在工作区中
+            } else {
+                return SDL_HITTEST_NORMAL; //在工作区中
             }
         }
 
         if (pt.x < rcClient.left + rcSizeBox.left) {
             if (pt.x >= rcClient.left) {
-                return SDL_HITTEST_RESIZE_LEFT;//在窗口的左边框
-            }
-            else {
-                return SDL_HITTEST_NORMAL;//在工作区中
+                return SDL_HITTEST_RESIZE_LEFT; //在窗口的左边框
+            } else {
+                return SDL_HITTEST_NORMAL; //在工作区中
             }
         }
         if (pt.x > rcClient.right - rcSizeBox.right) {
             if (pt.x <= rcClient.right) {
-                return SDL_HITTEST_RESIZE_RIGHT;//在窗口的右边框中
-            }
-            else {
-                return SDL_HITTEST_NORMAL;//在工作区中
+                return SDL_HITTEST_RESIZE_RIGHT; //在窗口的右边框中
+            } else {
+                return SDL_HITTEST_NORMAL; //在工作区中
             }
         }
     }
@@ -1606,10 +1594,9 @@ int32_t NativeWindow_SDL::SDL_HitTest(SDL_Window* win, const SDL_Point* area, vo
     if (rcCaptionRect.ContainsPt(pt)) {
         //在标题栏范围内（SDL不支持HTSYSMENU和HTMAXBUTTON，此处实现与Windows默认的不同）
         if (m_pOwner->OnNativeIsPtInCaptionBarControl(pt)) {
-            return SDL_HITTEST_NORMAL;//在工作区中（放在标题栏上的控件，视为工作区）
-        }
-        else {
-            return SDL_HITTEST_DRAGGABLE;//在标题栏中
+            return SDL_HITTEST_NORMAL; //在工作区中（放在标题栏上的控件，视为工作区）
+        } else {
+            return SDL_HITTEST_DRAGGABLE; //在标题栏中
         }
     }
     //其他，在工作区中
@@ -1630,8 +1617,7 @@ void NativeWindow_SDL::InitNativeWindow()
     if (!IsUseSystemCaption()) {
         bool nRet = SDL_SetWindowHitTest(m_sdlWindow, NativeWindow_SDL_HitTest, this);
         ASSERT_UNUSED_VARIABLE(nRet);
-    }
-    else {
+    } else {
         bool nRet = SDL_SetWindowHitTest(m_sdlWindow, nullptr, nullptr);
         ASSERT_UNUSED_VARIABLE(nRet);
     }
@@ -1655,8 +1641,8 @@ void NativeWindow_SDL::InitNativeWindow()
 
 void NativeWindow_SDL::ClearNativeWindow()
 {
-    SDL_Renderer* sdlRenderer = m_sdlRenderer;
-    SDL_Window* sdlWindow = m_sdlWindow;
+    SDL_Renderer *sdlRenderer = m_sdlRenderer;
+    SDL_Window *sdlWindow = m_sdlWindow;
     m_sdlRenderer = nullptr;
     m_sdlWindow = nullptr;
 
@@ -1673,7 +1659,7 @@ void NativeWindow_SDL::ClearNativeWindow()
     m_pWindowDropTarget.reset();
 }
 
-void* NativeWindow_SDL::GetWindowHandle() const
+void *NativeWindow_SDL::GetWindowHandle() const
 {
     return m_sdlWindow;
 }
@@ -1681,7 +1667,7 @@ void* NativeWindow_SDL::GetWindowHandle() const
 DString NativeWindow_SDL::GetVideoDriverName() const
 {
     DString driverName;
-    const char* name = SDL_GetCurrentVideoDriver();
+    const char *name = SDL_GetCurrentVideoDriver();
     if (name != nullptr) {
         driverName = StringConvert::UTF8ToT(std::string(name));
     }
@@ -1692,9 +1678,9 @@ DString NativeWindow_SDL::GetWindowRenderName() const
 {
     DString renderName;
     if (m_sdlWindow != nullptr) {
-        SDL_Renderer* sdlRenderer = SDL_GetRenderer(m_sdlWindow);
+        SDL_Renderer *sdlRenderer = SDL_GetRenderer(m_sdlWindow);
         if (sdlRenderer != nullptr) {
-            const char* name = SDL_GetRendererName(sdlRenderer);
+            const char *name = SDL_GetRendererName(sdlRenderer);
             if (name != nullptr) {
                 renderName = StringConvert::UTF8ToT(std::string(name));
             }
@@ -1713,7 +1699,7 @@ bool NativeWindow_SDL::IsChildWindow() const
     return m_bChildWindow;
 }
 
-bool NativeWindow_SDL::SetParentWindow(NativeWindow_SDL* pParentWindow)
+bool NativeWindow_SDL::SetParentWindow(NativeWindow_SDL *pParentWindow)
 {
     ASSERT((pParentWindow != nullptr) && pParentWindow->IsWindow());
     if ((pParentWindow == nullptr) || !pParentWindow->IsWindow()) {
@@ -1737,7 +1723,7 @@ HWND NativeWindow_SDL::GetHWND() const
         return nullptr;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    HWND hWnd = (HWND)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+    HWND hWnd = (HWND) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
     if (!::IsWindow(hWnd)) {
         hWnd = nullptr;
     }
@@ -1750,10 +1736,11 @@ HMODULE NativeWindow_SDL::GetResModuleHandle() const
         return nullptr;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    HMODULE hModule = (HMODULE)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
+    HMODULE hModule
+        = (HMODULE) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
     ASSERT(hModule != nullptr);
     if (hModule == nullptr) {
-        hModule = (HMODULE)GlobalManager::Instance().GetPlatformData();
+        hModule = (HMODULE) GlobalManager::Instance().GetPlatformData();
     }
     if (hModule == nullptr) {
         hModule = ::GetModuleHandle(nullptr);
@@ -1767,14 +1754,14 @@ HDC NativeWindow_SDL::GetPaintDC() const
         return nullptr;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    HDC hDC = (HDC)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HDC_POINTER, nullptr);
+    HDC hDC = (HDC) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HDC_POINTER, nullptr);
     ASSERT(hDC != nullptr);
     return hDC;
 }
 
 #endif //DUILIB_BUILD_FOR_WIN
 
-#if defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#if defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
 bool NativeWindow_SDL::IsVideoDriverX11() const
 {
     DString videoDriverName = StringUtil::MakeLowerString(GetVideoDriverName());
@@ -1793,7 +1780,8 @@ size_t NativeWindow_SDL::GetX11DisplayPointer() const
         return 0;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    size_t nWindowDisplay = (size_t)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr);
+    size_t nWindowDisplay
+        = (size_t) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr);
     return nWindowDisplay;
 }
 
@@ -1803,7 +1791,8 @@ uint64_t NativeWindow_SDL::GetX11ScreenNumber() const
         return 0;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    uint64_t nScreenNumber = (uint64_t)SDL_GetNumberProperty(propID, SDL_PROP_WINDOW_X11_SCREEN_NUMBER, 0);
+    uint64_t nScreenNumber
+        = (uint64_t) SDL_GetNumberProperty(propID, SDL_PROP_WINDOW_X11_SCREEN_NUMBER, 0);
     return nScreenNumber;
 }
 
@@ -1813,7 +1802,8 @@ uint64_t NativeWindow_SDL::GetX11WindowNumber() const
         return 0;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    uint64_t nWindowNumber = (uint64_t)SDL_GetNumberProperty(propID, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+    uint64_t nWindowNumber
+        = (uint64_t) SDL_GetNumberProperty(propID, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
     return nWindowNumber;
 }
 
@@ -1823,7 +1813,8 @@ size_t NativeWindow_SDL::GetWaylandDisplayPointer() const
         return 0;
     }
     SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-    size_t nWaylandDisplay = (size_t)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr);
+    size_t nWaylandDisplay
+        = (size_t) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr);
     return nWaylandDisplay;
 }
 
@@ -1832,7 +1823,7 @@ size_t NativeWindow_SDL::GetWaylandDisplayPointer() const
 #if defined DUILIB_BUILD_FOR_MACOS
 /** 获取NSView*指针
 */
-void* NativeWindow_SDL::GetNSView() const
+void *NativeWindow_SDL::GetNSView() const
 {
     if (!IsWindow()) {
         return nullptr;
@@ -1842,7 +1833,7 @@ void* NativeWindow_SDL::GetNSView() const
 
 /** 获取GetNSWindow*指针
 */
-void* NativeWindow_SDL::GetNSWindow() const
+void *NativeWindow_SDL::GetNSWindow() const
 {
     if (!IsWindow()) {
         return nullptr;
@@ -1937,7 +1928,7 @@ bool NativeWindow_SDL::SetLayeredWindowOpacity(int32_t nAlpha)
         return false;
     }
     m_nLayeredWindowOpacity = static_cast<uint8_t>(nAlpha);
-    float opacity = 1.0f;//完全不透明
+    float opacity = 1.0f; //完全不透明
     if (m_nLayeredWindowOpacity != 255) {
         //支持不透明度设置
         opacity = 1.0f * nAlpha / 255.0f;
@@ -1982,10 +1973,9 @@ void NativeWindow_SDL::SetUseSystemCaption(bool bUseSystemCaption)
 
         //设置Hit Test函数为默认
         SDL_SetWindowHitTest(m_sdlWindow, nullptr, nullptr);
-    }
-    else {
+    } else {
         //需要提前设置这个属性，在无边框的情况下，可以保持调整窗口大小的功能
-        SDL_SetHint("SDL_BORDERLESS_RESIZABLE_STYLE", "true"); 
+        SDL_SetHint("SDL_BORDERLESS_RESIZABLE_STYLE", "true");
         bool nRet = SDL_SetWindowBordered(m_sdlWindow, false);
         ASSERT_UNUSED_VARIABLE(nRet);
 
@@ -2018,43 +2008,38 @@ bool NativeWindow_SDL::ShowWindow(ShowWindowCommands nCmdShow)
         }
     }
     bool nRet = false;
-    switch(nCmdShow)
-    {
+    switch (nCmdShow) {
     case kSW_HIDE:
         nRet = SDL_HideWindow(m_sdlWindow);
         break;
     case kSW_SHOW:
-    case kSW_SHOW_NORMAL:
-        {
-            const bool bActivate = SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true);
-            if (!bActivate) {
-                SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "true");
-                ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == true);
-            }
-            nRet = SDL_ShowWindow(m_sdlWindow);
-            if (!bActivate) {
-                SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "false");
-                ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == false);
-            }
-            //调整窗口的Z-Order，避免有时候窗口不显示的问题
-            SDL_RaiseWindow(m_sdlWindow);
-        }        
-        break;
-    case kSW_SHOW_NA:
-    case kSW_SHOW_NOACTIVATE:
-        {
-            const bool bActivate = SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true);
-            if (bActivate) {
-                SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "false");
-                ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == false);
-            }
-            nRet = SDL_ShowWindow(m_sdlWindow);
-            if (bActivate) {
-                SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "true");
-                ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == true);
-            }
+    case kSW_SHOW_NORMAL: {
+        const bool bActivate = SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true);
+        if (!bActivate) {
+            SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "true");
+            ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == true);
         }
-        break;
+        nRet = SDL_ShowWindow(m_sdlWindow);
+        if (!bActivate) {
+            SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "false");
+            ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == false);
+        }
+        //调整窗口的Z-Order，避免有时候窗口不显示的问题
+        SDL_RaiseWindow(m_sdlWindow);
+    } break;
+    case kSW_SHOW_NA:
+    case kSW_SHOW_NOACTIVATE: {
+        const bool bActivate = SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true);
+        if (bActivate) {
+            SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "false");
+            ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == false);
+        }
+        nRet = SDL_ShowWindow(m_sdlWindow);
+        if (bActivate) {
+            SDL_SetHint(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, "true");
+            ASSERT(SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true) == true);
+        }
+    } break;
     case kSW_MINIMIZE:
     case kSW_SHOW_MINIMIZED:
         nRet = SDL_MinimizeWindow(m_sdlWindow);
@@ -2076,7 +2061,7 @@ bool NativeWindow_SDL::ShowWindow(ShowWindowCommands nCmdShow)
     return nRet;
 }
 
-void NativeWindow_SDL::ShowModalFake(NativeWindow_SDL* pParentWindow)
+void NativeWindow_SDL::ShowModalFake(NativeWindow_SDL *pParentWindow)
 {
     ASSERT(IsWindow());
     if (!IsWindow()) {
@@ -2102,10 +2087,10 @@ void NativeWindow_SDL::ShowModalFake(NativeWindow_SDL* pParentWindow)
         nRet = SDL_SetWindowModal(m_sdlWindow, true);
         ASSERT_UNUSED_VARIABLE(nRet);
         m_bFakeModal = true;
-    }    
+    }
 }
 
-void NativeWindow_SDL::OnCloseModalFake(NativeWindow_SDL* pParentWindow)
+void NativeWindow_SDL::OnCloseModalFake(NativeWindow_SDL *pParentWindow)
 {
     if (IsFakeModal()) {
         if (pParentWindow != nullptr) {
@@ -2127,17 +2112,25 @@ bool NativeWindow_SDL::IsDoModal() const
 }
 
 void NativeWindow_SDL::CenterWindow()
-{  
+{
     ASSERT(IsWindow());
-    SDL_Window* pCenterWindow = SDL_GetWindowParent(m_sdlWindow);
+    SDL_Window *pCenterWindow = SDL_GetWindowParent(m_sdlWindow);
     int32_t xLeft = 0;
     int32_t yTop = 0;
     if (CalculateCenterWindowPos(pCenterWindow, xLeft, yTop)) {
-        SetWindowPos(nullptr, InsertAfterFlag(), xLeft, yTop, -1, -1, kSWP_NOSIZE | kSWP_NOZORDER | kSWP_NOACTIVATE);
-    }    
+        SetWindowPos(
+            nullptr,
+            InsertAfterFlag(),
+            xLeft,
+            yTop,
+            -1,
+            -1,
+            kSWP_NOSIZE | kSWP_NOZORDER | kSWP_NOACTIVATE);
+    }
 }
 
-bool NativeWindow_SDL::CalculateCenterWindowPos(SDL_Window* pCenterWindow, int32_t& xPos, int32_t& yPos) const
+bool NativeWindow_SDL::CalculateCenterWindowPos(
+    SDL_Window *pCenterWindow, int32_t &xPos, int32_t &yPos) const
 {
     //当前窗口的宽度和高度
     int32_t nWindowWidth = 0;
@@ -2147,8 +2140,7 @@ bool NativeWindow_SDL::CalculateCenterWindowPos(SDL_Window* pCenterWindow, int32
         GetWindowRect(rcDlg);
         nWindowWidth = rcDlg.Width();
         nWindowHeight = rcDlg.Height();
-    }
-    else {
+    } else {
         if ((m_createParam.m_nWidth <= 0) || (m_createParam.m_nHeight <= 0)) {
             //当前的窗口宽度未知，无法计算
             return false;
@@ -2163,11 +2155,9 @@ bool NativeWindow_SDL::CalculateCenterWindowPos(SDL_Window* pCenterWindow, int32
     GetMonitorRect(pCenterWindow != nullptr ? pCenterWindow : m_sdlWindow, rcMonitor, rcArea);
     if (pCenterWindow == nullptr) {
         rcCenter = rcArea;
-    }
-    else if (SDL_GetWindowFlags(pCenterWindow) & SDL_WINDOW_MINIMIZED) {
+    } else if (SDL_GetWindowFlags(pCenterWindow) & SDL_WINDOW_MINIMIZED) {
         rcCenter = rcArea;
-    }
-    else {
+    } else {
         GetWindowRect(pCenterWindow, rcCenter);
     }
 
@@ -2178,14 +2168,12 @@ bool NativeWindow_SDL::CalculateCenterWindowPos(SDL_Window* pCenterWindow, int32
     // The dialog is outside the screen, move it inside
     if (xLeft < rcArea.left) {
         xLeft = rcArea.left;
-    }
-    else if (xLeft + nWindowWidth > rcArea.right) {
+    } else if (xLeft + nWindowWidth > rcArea.right) {
         xLeft = rcArea.right - nWindowWidth;
     }
     if (yTop < rcArea.top) {
         yTop = rcArea.top;
-    }
-    else if (yTop + nWindowHeight > rcArea.bottom) {
+    } else if (yTop + nWindowHeight > rcArea.bottom) {
         yTop = rcArea.bottom - nWindowHeight;
     }
     xPos = xLeft;
@@ -2221,11 +2209,11 @@ bool NativeWindow_SDL::SetWindowForeground()
     }
     bool nRet = SDL_RaiseWindow(m_sdlWindow);
     ASSERT(nRet);
-//#ifdef _DEBUG
-//    备注：这里有时候会出现条件不成立的情况，暂时未发现影响功能
-//    auto pKeyboardFocus = SDL_GetKeyboardFocus();
-//    ASSERT(pKeyboardFocus == m_sdlWindow);
-//#endif
+    //#ifdef _DEBUG
+    //    备注：这里有时候会出现条件不成立的情况，暂时未发现影响功能
+    //    auto pKeyboardFocus = SDL_GetKeyboardFocus();
+    //    ASSERT(pKeyboardFocus == m_sdlWindow);
+    //#endif
     return nRet;
 }
 
@@ -2243,7 +2231,7 @@ bool NativeWindow_SDL::SetWindowFocus()
     if (!IsWindow()) {
         return false;
     }
-    SDL_Window* pKeyboardFocus = SDL_GetKeyboardFocus();
+    SDL_Window *pKeyboardFocus = SDL_GetKeyboardFocus();
     if (pKeyboardFocus != m_sdlWindow) {
         SetWindowForeground();
         pKeyboardFocus = SDL_GetKeyboardFocus();
@@ -2264,15 +2252,15 @@ void NativeWindow_SDL::CheckSetWindowFocus()
     if (!IsWindowFocused()) {
         SetWindowFocus();
     }
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     //当存在子窗口时，SDL获取的焦点窗口存在问题，不正确，需要补充检查（影响RichEdit输入）
     HWND hWnd = GetHWND();
     if (::GetFocus() != hWnd) {
         ::SetFocus(hWnd);
     }
-#elif defined (DUILIB_BUILD_FOR_MACOS)
+#elif defined(DUILIB_BUILD_FOR_MACOS)
     SetFocus_MacOS(GetNSWindow());
-#elif defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#elif defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
     SetFocus_Linux(GetX11WindowNumber());
 #endif
 }
@@ -2288,7 +2276,7 @@ LRESULT NativeWindow_SDL::PostMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
     if ((uMsg <= SDL_EVENT_USER) || (uMsg >= SDL_EVENT_LAST)) {
         return -1;
     }
-    
+
     SDL_Event sdlEvent;
     sdlEvent.type = uMsg;
     sdlEvent.common.timestamp = 0;
@@ -2296,8 +2284,8 @@ LRESULT NativeWindow_SDL::PostMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
     sdlEvent.user.reserved = 0;
     sdlEvent.user.timestamp = 0;
     sdlEvent.user.code = uMsg;
-    sdlEvent.user.data1 = (void*)wParam;
-    sdlEvent.user.data2 = (void*)lParam;
+    sdlEvent.user.data1 = (void *) wParam;
+    sdlEvent.user.data2 = (void *) lParam;
     sdlEvent.user.windowID = SDL_GetWindowID(m_sdlWindow);
     bool nRet = SDL_PushEvent(&sdlEvent);
     ASSERT(nRet);
@@ -2339,19 +2327,19 @@ bool NativeWindow_SDL::EnterFullscreen()
         //需要去掉可调整窗口大小的属性，否则在部分平台下无法正常设置全屏
         SDL_SetWindowResizable(m_sdlWindow, false);
     }
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     //全屏时，必须禁用系统阴影，否则内容显示不全
     if (IsSystemShadowEnabled()) {
         ModifyDwmStyle(GetHWND(), NativeWindowShadowType::kShadowSystemDisabled);
     }
 #endif
 
-#if defined (__APPLE__)
+#if defined(__APPLE__)
     //设置特定显示模式，使 SDL 使用独占全屏（绕过 Spaces），避免全屏拉伸动画
     //同时 allow_spaces 保持默认 1，日常窗口正常有系统阴影
     SDL_DisplayID displayID = SDL_GetDisplayForWindow(m_sdlWindow);
     if (displayID != 0) {
-        const SDL_DisplayMode* desktopMode = SDL_GetDesktopDisplayMode(displayID);
+        const SDL_DisplayMode *desktopMode = SDL_GetDesktopDisplayMode(displayID);
         if (desktopMode) {
             SDL_SetWindowFullscreenMode(m_sdlWindow, desktopMode);
         }
@@ -2377,12 +2365,12 @@ bool NativeWindow_SDL::ExitFullscreen()
     if (m_bFullscreenExiting) {
         return false;
     }
-    m_bFullscreenExiting = true;//避免重复进入退出流程
+    m_bFullscreenExiting = true; //避免重复进入退出流程
 
     bool nRet = SDL_SetWindowFullscreen(m_sdlWindow, false);
     ASSERT_UNUSED_VARIABLE(nRet);
 
-#if defined (__APPLE__)
+#if defined(__APPLE__)
     //清除独占全屏模式，恢复默认的桌面全屏行为（Spaces）
     SDL_SetWindowFullscreenMode(m_sdlWindow, nullptr);
     //退出全屏后需要恢复窗口阴影（SDL 在独占全屏退出时可能未正确恢复）
@@ -2405,7 +2393,7 @@ bool NativeWindow_SDL::ExitFullscreen()
         SDL_MaximizeWindow(m_sdlWindow);
     }
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     if (IsSystemShadowEnabled()) {
         ModifyDwmStyle(GetHWND(), m_systemShadowType);
     }
@@ -2456,10 +2444,14 @@ bool NativeWindow_SDL::IsWindowVisible() const
     return (windowFlags & SDL_WINDOW_HIDDEN) ? false : true;
 }
 
-bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
-                                   InsertAfterFlag insertAfterFlag,
-                                   int32_t X, int32_t Y, int32_t cx, int32_t cy,
-                                   uint32_t uFlags)
+bool NativeWindow_SDL::SetWindowPos(
+    const NativeWindow_SDL *pInsertAfterWindow,
+    InsertAfterFlag insertAfterFlag,
+    int32_t X,
+    int32_t Y,
+    int32_t cx,
+    int32_t cy,
+    uint32_t uFlags)
 {
     ASSERT(m_sdlWindow != nullptr);
     if (m_sdlWindow == nullptr) {
@@ -2479,8 +2471,7 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
         ASSERT_UNUSED_VARIABLE(nRet);
         if (!nRet) {
             bRet = false;
-        }
-        else {
+        } else {
             bModified = true;
         }
     }
@@ -2493,8 +2484,7 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
         ASSERT_UNUSED_VARIABLE(nRet);
         if (!nRet) {
             bRet = false;
-        }
-        else {
+        } else {
             bModified = true;
         }
     }
@@ -2506,8 +2496,7 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
     if (uFlags & kSWP_HIDEWINDOW) {
         if (!ShowWindow(ShowWindowCommands::kSW_HIDE)) {
             bRet = false;
-        }
-        else {
+        } else {
             bModified = true;
         }
     }
@@ -2518,8 +2507,7 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
         }
         if (!ShowWindow(showCommand)) {
             bRet = false;
-        }
-        else {
+        } else {
             bModified = true;
         }
     }
@@ -2527,11 +2515,9 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
         //仅支持pInsertAfterWindow为nullptr的情况
         if (insertAfterFlag == InsertAfterFlag::kHWND_TOPMOST) {
             SDL_SetWindowAlwaysOnTop(m_sdlWindow, true);
-        }
-        else if (insertAfterFlag == InsertAfterFlag::kHWND_NOTOPMOST) {
+        } else if (insertAfterFlag == InsertAfterFlag::kHWND_NOTOPMOST) {
             SDL_SetWindowAlwaysOnTop(m_sdlWindow, false);
-        }
-        else if (insertAfterFlag == InsertAfterFlag::kHWND_TOP) {
+        } else if (insertAfterFlag == InsertAfterFlag::kHWND_TOP) {
             bool bForce = SDL_GetHintBoolean(SDL_HINT_FORCE_RAISEWINDOW, false);
             bool bActivate = SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_RAISED, true);
             SDL_SetHint(SDL_HINT_FORCE_RAISEWINDOW, "false");
@@ -2543,11 +2529,12 @@ bool NativeWindow_SDL::SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
     }
     if (bRet) {
         SDL_SyncWindow(m_sdlWindow);
-    }    
+    }
     return bRet;
 }
 
-bool NativeWindow_SDL::MoveWindow(int32_t X, int32_t Y, int32_t nWidth, int32_t nHeight, bool bRepaint)
+bool NativeWindow_SDL::MoveWindow(
+    int32_t X, int32_t Y, int32_t nWidth, int32_t nHeight, bool bRepaint)
 {
     ASSERT(IsWindow());
     bool bRet = SDL_SetWindowPosition(m_sdlWindow, X, Y);
@@ -2566,7 +2553,7 @@ bool NativeWindow_SDL::MoveWindow(int32_t X, int32_t Y, int32_t nWidth, int32_t 
     return nRet;
 }
 
-void NativeWindow_SDL::SetText(const DString& strText)
+void NativeWindow_SDL::SetText(const DString &strText)
 {
     ASSERT(IsWindow());
     //转为UTF-8编码
@@ -2579,7 +2566,7 @@ DString NativeWindow_SDL::GetText() const
 {
     DString windowText;
     if (m_sdlWindow != nullptr) {
-        const char* szText = SDL_GetWindowTitle(m_sdlWindow);
+        const char *szText = SDL_GetWindowTitle(m_sdlWindow);
         if (szText != nullptr) {
             windowText = StringConvert::UTF8ToT(szText);
         }
@@ -2587,7 +2574,7 @@ DString NativeWindow_SDL::GetText() const
     return windowText;
 }
 
-void NativeWindow_SDL::SetWindowMaximumSize(const UiSize& szMaxWindow)
+void NativeWindow_SDL::SetWindowMaximumSize(const UiSize &szMaxWindow)
 {
     m_szMaxWindow = szMaxWindow;
     if (m_szMaxWindow.cx < 0) {
@@ -2602,12 +2589,12 @@ void NativeWindow_SDL::SetWindowMaximumSize(const UiSize& szMaxWindow)
     }
 }
 
-const UiSize& NativeWindow_SDL::GetWindowMaximumSize() const
+const UiSize &NativeWindow_SDL::GetWindowMaximumSize() const
 {
     return m_szMaxWindow;
 }
 
-void NativeWindow_SDL::SetWindowMinimumSize(const UiSize& szMinWindow)
+void NativeWindow_SDL::SetWindowMinimumSize(const UiSize &szMinWindow)
 {
     m_szMinWindow = szMinWindow;
     if (m_szMinWindow.cx < 0) {
@@ -2622,7 +2609,7 @@ void NativeWindow_SDL::SetWindowMinimumSize(const UiSize& szMinWindow)
     }
 }
 
-const UiSize& NativeWindow_SDL::GetWindowMinimumSize() const
+const UiSize &NativeWindow_SDL::GetWindowMinimumSize() const
 {
     return m_szMinWindow;
 }
@@ -2633,10 +2620,10 @@ void NativeWindow_SDL::SetCapture()
     if (SDL_GetMouseFocus() == m_sdlWindow) {
         bool nRet = SDL_CaptureMouse(true);
         if (!nRet) {
-            const char* szErrorMsg = SDL_GetError();
+            const char *szErrorMsg = SDL_GetError();
             ASSERT_UNUSED_VARIABLE(nRet);
             UNUSED_VARIABLE(szErrorMsg);
-        }        
+        }
         if (nRet) {
             m_bMouseCapture = true;
         }
@@ -2662,14 +2649,14 @@ bool NativeWindow_SDL::IsCaptured() const
 
 struct NativeWindowExposedEvent
 {
-    SDL_Window* m_sdlWindow = nullptr;
+    SDL_Window *m_sdlWindow = nullptr;
     bool m_bFoundExposedEvent = false;
 };
 
-static bool SDLCALL FilterNativeWindowExposedEvent(void* userdata, SDL_Event* event)
+static bool SDLCALL FilterNativeWindowExposedEvent(void *userdata, SDL_Event *event)
 {
     if ((userdata != nullptr) && (event != nullptr)) {
-        NativeWindowExposedEvent* data = (NativeWindowExposedEvent*)userdata;
+        NativeWindowExposedEvent *data = (NativeWindowExposedEvent *) userdata;
         if (!data->m_bFoundExposedEvent && (event->type == WM_USER_PAINT_MSG)) {
             if (data->m_sdlWindow == SDL_GetWindowFromEvent(event)) {
                 data->m_bFoundExposedEvent = true;
@@ -2679,12 +2666,11 @@ static bool SDLCALL FilterNativeWindowExposedEvent(void* userdata, SDL_Event* ev
     return true;
 }
 
-void NativeWindow_SDL::Invalidate(const UiRect& rcItem)
+void NativeWindow_SDL::Invalidate(const UiRect &rcItem)
 {
     if (m_rcUpdateRect.IsZero()) {
         m_rcUpdateRect = rcItem;
-    }
-    else {
+    } else {
         m_rcUpdateRect.Union(rcItem);
     }
 
@@ -2715,7 +2701,7 @@ void NativeWindow_SDL::PaintWindow(bool bPaintAll)
         //绘制全部
         m_rcUpdateRect.Clear();
     }
-    INativeWindow* pOwner = m_pOwner;
+    INativeWindow *pOwner = m_pOwner;
     ASSERT(pOwner != nullptr);
     if (pOwner == nullptr) {
         return;
@@ -2729,13 +2715,12 @@ void NativeWindow_SDL::PaintWindow(bool bPaintAll)
             if (pOwner != nullptr) {
                 UiRect rcPaint = GetUpdateRect();
                 bool bHandled = false;
-                NativeMsg nativeMsg = NativeMsg(SDL_EVENT_WINDOW_EXPOSED, (WPARAM)m_sdlWindow, 0);
+                NativeMsg nativeMsg = NativeMsg(SDL_EVENT_WINDOW_EXPOSED, (WPARAM) m_sdlWindow, 0);
                 pOwner->OnNativePaintMsg(rcPaint, nativeMsg, bHandled);
             }
-        }
-        else {
+        } else {
             //正常模式，由内部负责绘制流程管理
-            IRender* pRender = pOwner->OnNativeGetRender();
+            IRender *pRender = pOwner->OnNativeGetRender();
             ASSERT(pRender != nullptr);
             if ((pRender != nullptr) && !ownerFlag.expired()) {
                 NativeWindowRenderPaint renderPaint;
@@ -2750,7 +2735,7 @@ void NativeWindow_SDL::PaintWindow(bool bPaintAll)
     m_rcUpdateRect.Clear();
 }
 
-const UiRect& NativeWindow_SDL::GetUpdateRect() const
+const UiRect &NativeWindow_SDL::GetUpdateRect() const
 {
     return m_rcUpdateRect;
 }
@@ -2759,28 +2744,26 @@ void NativeWindow_SDL::SetImeOpenStatus(bool bOpen)
 {
     if (m_sdlWindow == nullptr) {
         return;
-    }    
+    }
     if (bOpen) {
         if (!SDL_TextInputActive(m_sdlWindow)) {
             SDL_StartTextInput(m_sdlWindow);
             SDL_SetTextInputArea(m_sdlWindow, nullptr, 0);
-        }        
-    }
-    else {
+        }
+    } else {
         SDL_SetTextInputArea(m_sdlWindow, nullptr, 0);
-        SDL_StopTextInput(m_sdlWindow);        
+        SDL_StopTextInput(m_sdlWindow);
     }
 }
 
-void NativeWindow_SDL::SetTextInputArea(const UiRect* rect, int32_t nCursor)
+void NativeWindow_SDL::SetTextInputArea(const UiRect *rect, int32_t nCursor)
 {
     if (m_sdlWindow == nullptr) {
         return;
     }
     if (rect == nullptr) {
         SDL_SetTextInputArea(m_sdlWindow, nullptr, nCursor);
-    }
-    else {
+    } else {
         SDL_Rect sdlRect;
         sdlRect.x = rect->left;
         sdlRect.y = rect->top;
@@ -2790,7 +2773,7 @@ void NativeWindow_SDL::SetTextInputArea(const UiRect* rect, int32_t nCursor)
     }
 }
 
-void NativeWindow_SDL::GetClientRect(UiRect& rcClient) const
+void NativeWindow_SDL::GetClientRect(UiRect &rcClient) const
 {
     rcClient.Clear();
     ASSERT(IsWindow());
@@ -2799,11 +2782,10 @@ void NativeWindow_SDL::GetClientRect(UiRect& rcClient) const
     bool nRet = false;
     if (GlobalManager::Instance().Dpi().IsPixelDensityEnabled()) {
         nRet = SDL_GetWindowSizeInPixels(m_sdlWindow, &nWidth, &nHeight);
-    }
-    else {
+    } else {
         nRet = SDL_GetWindowSize(m_sdlWindow, &nWidth, &nHeight);
     }
-    
+
     ASSERT(nRet);
     if (nRet) {
         rcClient.left = 0;
@@ -2814,17 +2796,17 @@ void NativeWindow_SDL::GetClientRect(UiRect& rcClient) const
 
 #ifdef DUILIB_HDPI_TEST_PIXEL_DENSITY
     //TEST ONLY
-    rcClient.right = (int32_t)std::round(rcClient.left + nWidth * DUILIB_HDPI_TEST_PIXEL_DENSITY);
-    rcClient.bottom = (int32_t)std::round(rcClient.top + nHeight * DUILIB_HDPI_TEST_PIXEL_DENSITY);
+    rcClient.right = (int32_t) std::round(rcClient.left + nWidth * DUILIB_HDPI_TEST_PIXEL_DENSITY);
+    rcClient.bottom = (int32_t) std::round(rcClient.top + nHeight * DUILIB_HDPI_TEST_PIXEL_DENSITY);
 #endif
 }
 
-void NativeWindow_SDL::GetWindowRect(UiRect& rcWindow) const
+void NativeWindow_SDL::GetWindowRect(UiRect &rcWindow) const
 {
     GetWindowRect(m_sdlWindow, rcWindow);
 }
 
-void NativeWindow_SDL::GetWindowRect(SDL_Window* sdlWindow, UiRect& rcWindow) const
+void NativeWindow_SDL::GetWindowRect(SDL_Window *sdlWindow, UiRect &rcWindow) const
 {
     rcWindow.Clear();
     ASSERT(sdlWindow != nullptr);
@@ -2849,7 +2831,7 @@ void NativeWindow_SDL::GetWindowRect(SDL_Window* sdlWindow, UiRect& rcWindow) co
     int nRightBorder = 0;
     if (bRet) {
         SDL_GetWindowBordersSize(sdlWindow, &nTopBorder, &nLeftBorder, &nBottomBorder, &nRightBorder);
-    }    
+    }
 
     //客户区大小
     int nWidth = 0;
@@ -2861,25 +2843,25 @@ void NativeWindow_SDL::GetWindowRect(SDL_Window* sdlWindow, UiRect& rcWindow) co
     rcWindow.right = rcWindow.left + nWidth + nLeftBorder + nRightBorder;
     rcWindow.bottom = rcWindow.top + nHeight + nTopBorder + nBottomBorder;
 
-//#if defined (DUILIB_BUILD_FOR_WIN) && defined (_DEBUG)
-//    {
-//        HWND hWnd = GetHWND();
-//        if (!::IsIconic(hWnd) && ::IsWindowVisible(hWnd)) {
-//            //最小化的时候，或者隐藏的时候，不比对，两者不同
-//            RECT rect = { 0, };
-//            ::GetWindowRect(hWnd, &rect);
-//            if (rect.left != -32000) {
-//                ASSERT(rcWindow.left == rect.left);
-//                ASSERT(rcWindow.top == rect.top);
-//                ASSERT(rcWindow.right == rect.right);
-//                ASSERT(rcWindow.bottom == rect.bottom);
-//            }            
-//        }
-//    }
-//#endif
+    //#if defined (DUILIB_BUILD_FOR_WIN) && defined (_DEBUG)
+    //    {
+    //        HWND hWnd = GetHWND();
+    //        if (!::IsIconic(hWnd) && ::IsWindowVisible(hWnd)) {
+    //            //最小化的时候，或者隐藏的时候，不比对，两者不同
+    //            RECT rect = { 0, };
+    //            ::GetWindowRect(hWnd, &rect);
+    //            if (rect.left != -32000) {
+    //                ASSERT(rcWindow.left == rect.left);
+    //                ASSERT(rcWindow.top == rect.top);
+    //                ASSERT(rcWindow.right == rect.right);
+    //                ASSERT(rcWindow.bottom == rect.bottom);
+    //            }
+    //        }
+    //    }
+    //#endif
 }
 
-void NativeWindow_SDL::ScreenToClient(UiPoint& pt) const
+void NativeWindow_SDL::ScreenToClient(UiPoint &pt) const
 {
     int nXPos = 0;
     int nYPos = 0;
@@ -2895,14 +2877,14 @@ void NativeWindow_SDL::ScreenToClient(UiPoint& pt) const
     }
 }
 
-void NativeWindow_SDL::ClientToScreen(UiPoint& pt) const
+void NativeWindow_SDL::ClientToScreen(UiPoint &pt) const
 {
     if ((m_pOwner != nullptr) && m_pOwner->OnNativeGetDpi().HasPixelDensity()) {
         m_pOwner->OnNativeGetDpi().ClientSizeToWindowSize(pt);
     }
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (_DEBUG)
-    POINT ptWnd = { pt.x, pt.y };
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(_DEBUG)
+    POINT ptWnd = {pt.x, pt.y};
 #endif
 
     int nXPos = 0;
@@ -2913,7 +2895,7 @@ void NativeWindow_SDL::ClientToScreen(UiPoint& pt) const
         pt.x += nXPos;
         pt.y += nYPos;
     }
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (_DEBUG)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(_DEBUG)
     {
         HWND hWnd = GetHWND();
         ::ClientToScreen(hWnd, &ptWnd);
@@ -2923,22 +2905,22 @@ void NativeWindow_SDL::ClientToScreen(UiPoint& pt) const
 #endif
 }
 
-void NativeWindow_SDL::GetCursorPos(UiPoint& pt) const
+void NativeWindow_SDL::GetCursorPos(UiPoint &pt) const
 {
     float x = 0;
     float y = 0;
     SDL_GetGlobalMouseState(&x, &y);
-    pt.x = (int32_t)x;
-    pt.y = (int32_t)y;
+    pt.x = (int32_t) x;
+    pt.y = (int32_t) y;
 }
 
-bool NativeWindow_SDL::GetMonitorRect(UiRect& rcMonitor) const
+bool NativeWindow_SDL::GetMonitorRect(UiRect &rcMonitor) const
 {
     UiRect rcWork;
     return GetMonitorRect(m_sdlWindow, rcMonitor, rcWork);
 }
 
-bool NativeWindow_SDL::GetMonitorRect(SDL_Window* sdlWindow, UiRect& rcMonitor, UiRect& rcWork) const
+bool NativeWindow_SDL::GetMonitorRect(SDL_Window *sdlWindow, UiRect &rcMonitor, UiRect &rcWork) const
 {
     rcMonitor.Clear();
     rcWork.Clear();
@@ -2955,7 +2937,9 @@ bool NativeWindow_SDL::GetMonitorRect(SDL_Window* sdlWindow, UiRect& rcMonitor, 
         return false;
     }
 
-    SDL_Rect rect = {0, };
+    SDL_Rect rect = {
+        0,
+    };
     bool nRet = SDL_GetDisplayBounds(displayID, &rect);
     ASSERT(nRet);
     if (nRet) {
@@ -2976,13 +2960,13 @@ bool NativeWindow_SDL::GetMonitorRect(SDL_Window* sdlWindow, UiRect& rcMonitor, 
     return !rcMonitor.IsEmpty() && !rcWork.IsEmpty();
 }
 
-bool NativeWindow_SDL::GetMonitorWorkRect(UiRect& rcWork) const
+bool NativeWindow_SDL::GetMonitorWorkRect(UiRect &rcWork) const
 {
     UiRect rcMonitor;
     return GetMonitorRect(m_sdlWindow, rcMonitor, rcWork);
 }
 
-bool NativeWindow_SDL::GetPrimaryMonitorWorkRect(UiRect& rcWork)
+bool NativeWindow_SDL::GetPrimaryMonitorWorkRect(UiRect &rcWork)
 {
     rcWork.Clear();
     //初始化SDL
@@ -2995,7 +2979,9 @@ bool NativeWindow_SDL::GetPrimaryMonitorWorkRect(UiRect& rcWork)
     if (displayID == 0) {
         return false;
     }
-    SDL_Rect rect = { 0, };
+    SDL_Rect rect = {
+        0,
+    };
     bool nRet = SDL_GetDisplayUsableBounds(displayID, &rect);
     ASSERT(nRet);
     if (nRet) {
@@ -3007,7 +2993,7 @@ bool NativeWindow_SDL::GetPrimaryMonitorWorkRect(UiRect& rcWork)
     return !rcWork.IsEmpty();
 }
 
-bool NativeWindow_SDL::GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) const
+bool NativeWindow_SDL::GetMonitorWorkRect(const UiPoint &pt, UiRect &rcWork) const
 {
     rcWork.Clear();
     SDL_Point point = {pt.x, pt.y};
@@ -3020,7 +3006,9 @@ bool NativeWindow_SDL::GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) con
         return false;
     }
 
-    SDL_Rect rect = { 0, };
+    SDL_Rect rect = {
+        0,
+    };
     bool nRet = SDL_GetDisplayUsableBounds(displayID, &rect);
     ASSERT(nRet);
     if (nRet) {
@@ -3032,37 +3020,37 @@ bool NativeWindow_SDL::GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) con
     return !rcWork.IsEmpty();
 }
 
-const UiPoint& NativeWindow_SDL::GetLastMousePos() const
+const UiPoint &NativeWindow_SDL::GetLastMousePos() const
 {
     return m_ptLastMousePos;
 }
 
-void NativeWindow_SDL::SetLastMousePos(const UiPoint& pt)
+void NativeWindow_SDL::SetLastMousePos(const UiPoint &pt)
 {
     m_ptLastMousePos = pt;
 }
 
-INativeWindow* NativeWindow_SDL::WindowBaseFromPoint(const UiPoint& pt, bool /*bIgnoreChildWindow*/)
+INativeWindow *NativeWindow_SDL::WindowBaseFromPoint(const UiPoint &pt, bool /*bIgnoreChildWindow*/)
 {
-    SDL_Window* pKeyboardFocus = SDL_GetKeyboardFocus();
+    SDL_Window *pKeyboardFocus = SDL_GetKeyboardFocus();
     if (pKeyboardFocus != nullptr) {
-        SDL_Window* sdlWindow = pKeyboardFocus;
+        SDL_Window *sdlWindow = pKeyboardFocus;
         UiRect rcWindow;
         GetWindowRect(sdlWindow, rcWindow);
         if (rcWindow.ContainsPt(pt)) {
-            NativeWindow_SDL* pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
+            NativeWindow_SDL *pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
             if ((pWindow != nullptr) && !pWindow->IsClosingWnd()) {
                 return pWindow->m_pOwner;
             }
         }
     }
-    SDL_Window* pMouseFocus = SDL_GetMouseFocus();
+    SDL_Window *pMouseFocus = SDL_GetMouseFocus();
     if (pMouseFocus != nullptr) {
-        SDL_Window* sdlWindow = pMouseFocus;
+        SDL_Window *sdlWindow = pMouseFocus;
         UiRect rcWindow;
         GetWindowRect(sdlWindow, rcWindow);
         if (rcWindow.ContainsPt(pt)) {
-            NativeWindow_SDL* pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
+            NativeWindow_SDL *pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
             if ((pWindow != nullptr) && !pWindow->IsClosingWnd()) {
                 return pWindow->m_pOwner;
             }
@@ -3070,18 +3058,18 @@ INativeWindow* NativeWindow_SDL::WindowBaseFromPoint(const UiPoint& pt, bool /*b
     }
 
     int nCount = 0;
-    SDL_Window* const* pWindowList = SDL_GetWindows(&nCount);
-    if ((nCount <= 0) || (pWindowList == nullptr)){
+    SDL_Window *const *pWindowList = SDL_GetWindows(&nCount);
+    if ((nCount <= 0) || (pWindowList == nullptr)) {
         return nullptr;
     }
     //TODO: 没考虑Z-Order的问题
     for (int nIndex = 0; nIndex < nCount; ++nIndex) {
-        SDL_Window* sdlWindow = pWindowList[nIndex];
+        SDL_Window *sdlWindow = pWindowList[nIndex];
         if (sdlWindow != nullptr) {
             UiRect rcWindow;
             GetWindowRect(sdlWindow, rcWindow);
             if (rcWindow.ContainsPt(pt)) {
-                NativeWindow_SDL* pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
+                NativeWindow_SDL *pWindow = GetWindowFromID(SDL_GetWindowID(sdlWindow));
                 if ((pWindow != nullptr) && !pWindow->IsClosingWnd()) {
                     return pWindow->m_pOwner;
                 }
@@ -3100,7 +3088,7 @@ void NativeWindow_SDL::OnFinalMessage()
     }
 }
 
-bool NativeWindow_SDL::SetWindowIcon(const FilePath& iconFilePath)
+bool NativeWindow_SDL::SetWindowIcon(const FilePath &iconFilePath)
 {
     std::vector<uint8_t> fileData;
     bool bRet = FileUtil::ReadFileData(iconFilePath, fileData);
@@ -3111,7 +3099,8 @@ bool NativeWindow_SDL::SetWindowIcon(const FilePath& iconFilePath)
     return bRet;
 }
 
-bool NativeWindow_SDL::SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName)
+bool NativeWindow_SDL::SetWindowIcon(
+    const std::vector<uint8_t> &iconFileData, const DString &iconFileName)
 {
     ASSERT(!iconFileData.empty());
     if (iconFileData.empty()) {
@@ -3125,8 +3114,9 @@ bool NativeWindow_SDL::SetWindowIcon(const std::vector<uint8_t>& iconFileData, c
     if (!IsWindow()) {
         return false;
     }
-    ImageDecoderFactory& imageDecoders = GlobalManager::Instance().ImageDecoders();
-    float fImageSizeScale = (m_pOwner != nullptr) ? m_pOwner->OnNativeGetDpi().GetDisplayScale() : 1.0f;
+    ImageDecoderFactory &imageDecoders = GlobalManager::Instance().ImageDecoders();
+    float fImageSizeScale = (m_pOwner != nullptr) ? m_pOwner->OnNativeGetDpi().GetDisplayScale()
+                                                  : 1.0f;
     ImageDecodeParam decodeParam;
     decodeParam.m_imageFilePath = iconFileName;
     decodeParam.m_fImageSizeScale = fImageSizeScale;
@@ -3141,7 +3131,7 @@ bool NativeWindow_SDL::SetWindowIcon(const std::vector<uint8_t>& iconFileData, c
         return false;
     }
 
-    void* pPixelBits = pBitmap->LockPixelBits();
+    void *pPixelBits = pBitmap->LockPixelBits();
     ASSERT(pPixelBits != nullptr);
     if (pPixelBits == nullptr) {
         return false;
@@ -3152,7 +3142,12 @@ bool NativeWindow_SDL::SetWindowIcon(const std::vector<uint8_t>& iconFileData, c
 #else
     SDL_PixelFormat format = SDL_PIXELFORMAT_RGBA32;
 #endif
-    SDL_Surface* cursorSurface = SDL_CreateSurfaceFrom(pBitmap->GetWidth(), pBitmap->GetHeight(), format, pPixelBits, pBitmap->GetWidth() * sizeof(uint32_t));
+    SDL_Surface *cursorSurface = SDL_CreateSurfaceFrom(
+        pBitmap->GetWidth(),
+        pBitmap->GetHeight(),
+        format,
+        pPixelBits,
+        pBitmap->GetWidth() * sizeof(uint32_t));
     ASSERT(cursorSurface != nullptr);
     if (cursorSurface == nullptr) {
         return false;
@@ -3169,8 +3164,7 @@ void NativeWindow_SDL::SetEnableDragDrop(bool bEnable)
     m_bEnableDragDrop = bEnable;
     if (bEnable) {
         m_pWindowDropTarget = std::make_unique<WindowDropTarget>(this);
-    }
-    else {
+    } else {
         m_pWindowDropTarget.reset();
     }
 }
@@ -3180,7 +3174,7 @@ bool NativeWindow_SDL::IsEnableDragDrop() const
     return m_bEnableDragDrop;
 }
 
-Control* NativeWindow_SDL::FindControl(const UiPoint& pt) const
+Control *NativeWindow_SDL::FindControl(const UiPoint &pt) const
 {
     return m_pOwner->OnNativeFindControl(pt);
 }
@@ -3190,7 +3184,7 @@ bool NativeWindow_SDL::NeedCenterWindowAfterCreated() const
     return m_createParam.m_bCenterWindow;
 }
 
-bool NativeWindow_SDL::GetWindowSize(int32_t* w, int32_t* h) const
+bool NativeWindow_SDL::GetWindowSize(int32_t *w, int32_t *h) const
 {
     if (m_sdlWindow != nullptr) {
         return SDL_GetWindowSize(m_sdlWindow, w, h);
@@ -3198,7 +3192,7 @@ bool NativeWindow_SDL::GetWindowSize(int32_t* w, int32_t* h) const
     return false;
 }
 
-bool NativeWindow_SDL::GetWindowSizeInPixels(int32_t* w, int32_t* h) const
+bool NativeWindow_SDL::GetWindowSizeInPixels(int32_t *w, int32_t *h) const
 {
     if (m_sdlWindow != nullptr) {
         return SDL_GetWindowSizeInPixels(m_sdlWindow, w, h);
@@ -3211,7 +3205,7 @@ float NativeWindow_SDL::GetDisplayContentScale() const
     if (m_sdlWindow != nullptr) {
         return SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(m_sdlWindow));
     }
-    return 0.0f;    
+    return 0.0f;
 }
 
 float NativeWindow_SDL::GetWindowDisplayScale() const
@@ -3238,9 +3232,9 @@ bool NativeWindow_SDL::SetLayeredWindow(bool bIsLayeredWindow, bool /*bRedraw*/)
     return true;
 }
 
-bool NativeWindow_SDL::SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw)
+bool NativeWindow_SDL::SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw)
 {
-    IRender* pRender = m_pOwner->OnNativeGetRender();
+    IRender *pRender = m_pOwner->OnNativeGetRender();
     if (!IsChildWindow()) {
         ASSERT(pRender != nullptr);
     }
@@ -3250,9 +3244,9 @@ bool NativeWindow_SDL::SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, floa
     return false;
 }
 
-bool NativeWindow_SDL::SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw)
+bool NativeWindow_SDL::SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw)
 {
-    IRender* pRender = m_pOwner->OnNativeGetRender();
+    IRender *pRender = m_pOwner->OnNativeGetRender();
     if (!IsChildWindow()) {
         ASSERT(pRender != nullptr);
     }
@@ -3264,7 +3258,7 @@ bool NativeWindow_SDL::SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw)
 
 void NativeWindow_SDL::ClearWindowRgn(bool bRedraw)
 {
-    IRender* pRender = m_pOwner->OnNativeGetRender();
+    IRender *pRender = m_pOwner->OnNativeGetRender();
     if (!IsChildWindow()) {
         ASSERT(pRender != nullptr);
     }
@@ -3283,7 +3277,7 @@ void NativeWindow_SDL::OnDropBegin()
     m_pOwner->OnNativeDropEnterMsg(kControlDropTypeSDL, &data);
 }
 
-void NativeWindow_SDL::OnDropPosition(const UiPoint& pt, bool& bHandled)
+void NativeWindow_SDL::OnDropPosition(const UiPoint &pt, bool &bHandled)
 {
     ControlDropData_SDL data;
     data.m_bHandled = false;
@@ -3294,7 +3288,8 @@ void NativeWindow_SDL::OnDropPosition(const UiPoint& pt, bool& bHandled)
     bHandled = data.m_bHandled;
 }
 
-void NativeWindow_SDL::OnDropTexts(const std::vector<DString>& textList, const UiPoint& pt, bool& bHandled)
+void NativeWindow_SDL::OnDropTexts(
+    const std::vector<DString> &textList, const UiPoint &pt, bool &bHandled)
 {
     ControlDropData_SDL data;
     data.m_bHandled = false;
@@ -3306,7 +3301,8 @@ void NativeWindow_SDL::OnDropTexts(const std::vector<DString>& textList, const U
     bHandled = data.m_bHandled;
 }
 
-void NativeWindow_SDL::OnDropFiles(const DString& source, const std::vector<DString>& fileList, const UiPoint& pt, bool& bHandled)
+void NativeWindow_SDL::OnDropFiles(
+    const DString &source, const std::vector<DString> &fileList, const UiPoint &pt, bool &bHandled)
 {
     ControlDropData_SDL data;
     data.m_bHandled = false;
@@ -3337,7 +3333,8 @@ bool NativeWindow_SDL::IsSystemShadowSupported() const
 
 bool NativeWindow_SDL::IsSystemShadowEnabled() const
 {
-    return IsSystemShadowSupported() && (GetSystemShadowType() != NativeWindowShadowType::kShadowSystemDisabled);
+    return IsSystemShadowSupported()
+           && (GetSystemShadowType() != NativeWindowShadowType::kShadowSystemDisabled);
 }
 
 bool NativeWindow_SDL::SetSystemShadowType(NativeWindowShadowType nativeShadowType)
@@ -3371,10 +3368,10 @@ int32_t NativeWindow_SDL::GetSystemShadowFrameBorderSize() const
 #if defined DUILIB_BUILD_FOR_WIN
     UINT outThickness = 0;
     GetDwmVisibleFrameBorderThickness(GetHWND(), outThickness);
-    return (int32_t)outThickness;
+    return (int32_t) outThickness;
 #else
     return 0;
-#endif    
+#endif
 }
 
 bool NativeWindow_SDL::KillWindowFocus()
@@ -3400,7 +3397,7 @@ bool NativeWindow_SDL::UpdateWindow() const
     //没有此功能
     if (m_sdlWindow != nullptr) {
         SDL_SyncWindow(m_sdlWindow);
-    }    
+    }
     return true;
 }
 
@@ -3416,14 +3413,15 @@ int32_t NativeWindow_SDL::SetWindowHotKey(uint8_t /*wVirtualKeyCode*/, uint8_t /
     return -1;
 }
 
-bool NativeWindow_SDL::GetWindowHotKey(uint8_t& /*wVirtualKeyCode*/, uint8_t& /*wModifiers*/) const
+bool NativeWindow_SDL::GetWindowHotKey(uint8_t & /*wVirtualKeyCode*/, uint8_t & /*wModifiers*/) const
 {
     //不支持此功能
     ASSERT(0);
     return false;
 }
 
-bool NativeWindow_SDL::RegisterHotKey(uint8_t /*wVirtualKeyCode*/, uint8_t /*wModifiers*/, int32_t /*id*/)
+bool NativeWindow_SDL::RegisterHotKey(
+    uint8_t /*wVirtualKeyCode*/, uint8_t /*wModifiers*/, int32_t /*id*/)
 {
     //不支持此功能
     ASSERT(0);

@@ -14,8 +14,7 @@
 #include "AutoClip.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 
 // 构造一个矩形裁剪守卫。
 // 行为说明：
@@ -23,7 +22,7 @@ namespace ui
 //   2. 仅当 bClip 为 true 时，才真正尝试对 IRender 设置裁剪区域；
 //   3. 启用裁剪时要求 pRender 必须非空，使用 ASSERT 在 Debug 下提示，
 //      Release 下即使 pRender 为空也不会崩溃（析构时已做空指针保护）。
-AutoClip::AutoClip(IRender* pRender, const UiRect& rc, bool bClip)
+AutoClip::AutoClip(IRender *pRender, const UiRect &rc, bool bClip)
 {
     // 先将成员初始化为安全状态，防止对象在 bClip=false 路径下被错误使用
     m_pRender = nullptr;
@@ -49,8 +48,8 @@ AutoClip::AutoClip(IRender* pRender, const UiRect& rc, bool bClip)
 
 // 构造一个圆角矩形裁剪守卫。
 // 行为与矩形版本一致，只是最终调用的是 SetRoundClip。
-AutoClip::AutoClip(IRender* pRender, const UiRect& rcRound,
-                   float fRoundWidth, float fRoundHeight, bool bClip)
+AutoClip::AutoClip(
+    IRender *pRender, const UiRect &rcRound, float fRoundWidth, float fRoundHeight, bool bClip)
 {
     // 同样先将成员重置为安全状态
     m_pRender = nullptr;

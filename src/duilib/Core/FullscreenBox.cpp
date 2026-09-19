@@ -1,14 +1,13 @@
 #include "FullscreenBox.h"
-#include "duilib/Core/Window.h"
 #include "duilib/Control/Button.h"
+#include "duilib/Core/Window.h"
 
-namespace ui 
-{
-FullscreenBox::FullscreenBox(Window* pWindow) :
-    Box(pWindow),
-    m_nOldItemIndex(0),
-    m_bWindowMaximized(false),
-    m_bWindowFullscreen(false)
+namespace ui {
+FullscreenBox::FullscreenBox(Window *pWindow)
+    : Box(pWindow)
+    , m_nOldItemIndex(0)
+    , m_bWindowMaximized(false)
+    , m_bWindowFullscreen(false)
 {
     //关闭控件自身的内边距
     SetEnableControlPadding(false);
@@ -26,16 +25,20 @@ FullscreenBox::FullscreenBox(Window* pWindow) :
 FullscreenBox::~FullscreenBox()
 {
     //从全屏直接退出窗口时，需要手动释放原来的root
-    Box* pOldRoot = m_pOldRoot.get();
+    Box *pOldRoot = m_pOldRoot.get();
     if (pOldRoot != nullptr) {
         delete pOldRoot;
         pOldRoot = nullptr;
     }
 }
 
-DString FullscreenBox::GetType() const { return _T("FullscreenBox"); }
+DString FullscreenBox::GetType() const
+{
+    return _T("FullscreenBox");
+}
 
-bool FullscreenBox::EnterControlFullscreen(Box* pOldRoot, Control* pFullscreenControl, const DString& exitButtonClass)
+bool FullscreenBox::EnterControlFullscreen(
+    Box *pOldRoot, Control *pFullscreenControl, const DString &exitButtonClass)
 {
     ASSERT((pOldRoot != nullptr) && (pFullscreenControl != nullptr));
     if ((pOldRoot == nullptr) || (pFullscreenControl == nullptr)) {
@@ -71,7 +74,8 @@ bool FullscreenBox::EnterControlFullscreen(Box* pOldRoot, Control* pFullscreenCo
     return true;
 }
 
-bool FullscreenBox::UpdateControlFullscreen(Control* pFullscreenControl, const DString& exitButtonClass)
+bool FullscreenBox::UpdateControlFullscreen(
+    Control *pFullscreenControl, const DString &exitButtonClass)
 {
     if (pFullscreenControl == nullptr) {
         return false;
@@ -101,7 +105,7 @@ void FullscreenBox::ExitControlFullscreen()
     m_exitButtonClass.clear();
 }
 
-void FullscreenBox::RemoveControlFromBox(Control* pFullscreenControl)
+void FullscreenBox::RemoveControlFromBox(Control *pFullscreenControl)
 {
     if (pFullscreenControl == nullptr) {
         return;
@@ -142,7 +146,7 @@ void FullscreenBox::RestoreControlToBox()
     m_rcOldMargin.Clear();
 }
 
-void FullscreenBox::UpdateExitFullscreenBtn(const DString& exitButtonClass)
+void FullscreenBox::UpdateExitFullscreenBtn(const DString &exitButtonClass)
 {
     if (m_exitButtonClass == exitButtonClass) {
         if (m_exitButtonClass.empty()) {
@@ -151,8 +155,7 @@ void FullscreenBox::UpdateExitFullscreenBtn(const DString& exitButtonClass)
                 m_pExitFullscreenBtn.reset();
             }
             return;
-        }
-        else {
+        } else {
             if (m_pExitFullscreenBtn != nullptr) {
                 return;
             }
@@ -165,40 +168,39 @@ void FullscreenBox::UpdateExitFullscreenBtn(const DString& exitButtonClass)
 
     m_exitButtonClass = exitButtonClass;
     if (!exitButtonClass.empty()) {
-        Button* pButton = new Button(GetWindow());
+        Button *pButton = new Button(GetWindow());
         m_pExitFullscreenBtn = pButton;
         AddItem(pButton);
         pButton->SetClass(exitButtonClass);
 
-        pButton->AttachClick([this](const EventArgs&) {
+        pButton->AttachClick([this](const EventArgs &) {
             //退出全屏
             if (GetWindow()) {
                 GetWindow()->ExitControlFullscreen();
             }
             return true;
-            });
+        });
     }
 }
 
-void FullscreenBox::ProcessFullscreenButtonMouseMove(const UiPoint& pt)
+void FullscreenBox::ProcessFullscreenButtonMouseMove(const UiPoint &pt)
 {
     if (m_pExitFullscreenBtn != nullptr) {
-        Control* pExitFullscreenBtn = m_pExitFullscreenBtn.get();
+        Control *pExitFullscreenBtn = m_pExitFullscreenBtn.get();
         if (pExitFullscreenBtn->GetRect().ContainsPt(pt)) {
             pExitFullscreenBtn->SetFadeVisible(true);
-        }
-        else if (pExitFullscreenBtn->GetAlpha() > 0) {
+        } else if (pExitFullscreenBtn->GetAlpha() > 0) {
             pExitFullscreenBtn->SetFadeVisible(false);
         }
     }
 }
 
-Control* FullscreenBox::GetFullscreenControl() const
+Control *FullscreenBox::GetFullscreenControl() const
 {
     return m_pFullscreenControl.get();
 }
 
-Box* FullscreenBox::GetOldRoot() const
+Box *FullscreenBox::GetOldRoot() const
 {
     return m_pOldRoot.get();
 }

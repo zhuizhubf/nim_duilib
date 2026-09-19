@@ -3,12 +3,10 @@
 
 #include "duilib/Utils/FilePath.h"
 
-namespace ui 
-{
+namespace ui {
 /** 资源的类型
 */
-enum class ResourceType
-{
+enum class ResourceType {
     /** 本地文件的形式，所有资源都已本地文件的形式存在
     */
     kLocalFiles,
@@ -24,27 +22,27 @@ enum class ResourceType
 
 /** 默认的资源目录名（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_RESOURCE_DIR         _T("resources/")
+#define DUILIB_RESOURCE_DIR _T("resources/")
 
 /** 默认的资源压缩包名（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_RESOURCE_ZIP         _T("resources.zip")
+#define DUILIB_RESOURCE_ZIP _T("resources.zip")
 
 /** 公共资源的子目录名称（内部有使用，如修改，需要重新编译本库代码）
 */
-#define DUILIB_PUBLIC_RES_DIR       _T("public")
+#define DUILIB_PUBLIC_RES_DIR _T("public")
 
 /** 浅色主题的子目录路径名称(位于主题根目录)
 */
-#define DUILIB_LIGHT_COLOR_PATH     _T("color_light")
+#define DUILIB_LIGHT_COLOR_PATH _T("color_light")
 
 /** 深色主题的子目录路径名称(位于主题根目录)
 */
-#define DUILIB_DARK_COLOR_PATH      _T("color_dark")
+#define DUILIB_DARK_COLOR_PATH _T("color_dark")
 
 /** 语言文件中，语言名称的字符串ID
 */
-#define DUILIB_LANGUAGE_NAME         _T("LANGUAGE_NAME")
+#define DUILIB_LANGUAGE_NAME _T("LANGUAGE_NAME")
 
 /** 语言文件中，语言显示名称的字符串ID
 */
@@ -55,8 +53,10 @@ enum class ResourceType
 class DUILIB_API ResourceParam
 {
 protected:
-    explicit ResourceParam(ResourceType resourceType): resType(resourceType) { }
-    ~ResourceParam() { }
+    explicit ResourceParam(ResourceType resourceType)
+        : resType(resourceType)
+    {}
+    ~ResourceParam() {}
 
 protected:
     /** 资源的类型
@@ -95,7 +95,7 @@ public:
      *  该值可以为空，如果为空则跟随系统
      *  取值示例："color_dark" (启动时默认设置为深色主题)，或者 "color_light" (启动时默认设置为浅色主题)
      */
-    FilePath colorThemePath = FilePath(_T(""));//比如："color_dark" 为启动时默认设置为深色主题
+    FilePath colorThemePath = FilePath(_T("")); //比如："color_dark" 为启动时默认设置为深色主题
 
     /** 图标主题资源路径（在themeRootPath中的相对路径）
      *  当需要切换界面中的图标时（比如菜单图标、按钮图标等），可以通过切换图标主题来实现；
@@ -123,18 +123,18 @@ public:
 
 /** 加载全局资源所需的参数（本地文件形式，对应资源类型：kLocalFiles）
 */
-class DUILIB_API LocalFilesResParam: public ResourceParam
+class DUILIB_API LocalFilesResParam : public ResourceParam
 {
 public:
-    LocalFilesResParam() : ResourceParam(ResourceType::kLocalFiles)
-    {
-    }
+    LocalFilesResParam()
+        : ResourceParam(ResourceType::kLocalFiles)
+    {}
 
     /** 构造一个本地文件形式的参数
     * @param [in] resPath 本地资源文件所在的路径（绝对路径）
     */
-    explicit LocalFilesResParam(const FilePath& resPath) :
-        ResourceParam(ResourceType::kLocalFiles)
+    explicit LocalFilesResParam(const FilePath &resPath)
+        : ResourceParam(ResourceType::kLocalFiles)
     {
         resourcePath = resPath;
     }
@@ -145,9 +145,9 @@ public:
 class DUILIB_API ZipFileResParam : public ResourceParam
 {
 public:
-    ZipFileResParam() : ResourceParam(ResourceType::kZipFile)
-    {
-    }
+    ZipFileResParam()
+        : ResourceParam(ResourceType::kZipFile)
+    {}
 
     /** 压缩包的本地路径（绝对路径）
     */
@@ -166,9 +166,9 @@ public:
 class DUILIB_API ResZipFileResParam : public ResourceParam
 {
 public:
-    ResZipFileResParam() : ResourceParam(ResourceType::kResZipFile)
-    {
-    }
+    ResZipFileResParam()
+        : ResourceParam(ResourceType::kResZipFile)
+    {}
 
     /** Zip压缩包所在资源的模块句柄，可以为nullptr
     */

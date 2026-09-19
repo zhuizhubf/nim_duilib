@@ -15,8 +15,8 @@ class DUILIB_API ThreadMessage
 {
 public:
     ThreadMessage();
-    ThreadMessage(const ThreadMessage& r) = delete;
-    ThreadMessage& operator = (const ThreadMessage& r) = delete;
+    ThreadMessage(const ThreadMessage &r) = delete;
+    ThreadMessage &operator=(const ThreadMessage &r) = delete;
     ~ThreadMessage();
 
 public:
@@ -24,13 +24,13 @@ public:
     * @param [in] platformData 平台相关数据（可选参数，如不填写则使用默认值：nullptr）
     * Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）
     */
-    void Initialize(void* platformData);
+    void Initialize(void *platformData);
 
     /** 设置消息回调函数
     * @param [in] msgId 消息ID
     * @param [in] callback 回调函数
     */
-    void SetMessageCallback(uint32_t msgId, const ThreadMessageCallback& callback);
+    void SetMessageCallback(uint32_t msgId, const ThreadMessageCallback &callback);
 
     /** 发送一个消息
     * @param [in] msgId 消息ID
@@ -38,7 +38,7 @@ public:
     * @param [in] lParam 消息的第2个参数
     * @param [out] nErrorCode 发生错误时，返回错误码
     */
-    bool PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t* nErrorCode);
+    bool PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t *nErrorCode);
 
     /** 从消息队列里面移除多余的消息
     * @param [in] msgId 消息ID
@@ -58,7 +58,7 @@ private:
     /** 内部实现
     */
     class TImpl;
-    TImpl* m_impl;
+    TImpl *m_impl;
 };
 
 } // namespace ui

@@ -3,17 +3,16 @@
 #ifdef DUILIB_BUILD_FOR_WIN
 
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/FilePath.h"
-#include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/DiskUtils_Windows.h"
 #include "duilib/Utils/DllManager_Windows.h"
+#include "duilib/Utils/FilePath.h"
+#include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Utils/StringConvert.h"
 
 #include <ShellApi.h>
 #include <Shlobj.h>
 
-namespace ui
-{
+namespace ui {
 
 struct DirectoryTreeImpl::TImpl
 {
@@ -30,8 +29,8 @@ struct DirectoryTreeImpl::TImpl
     uint32_t m_nSmallIconID = 0;
 };
 
-DirectoryTreeImpl::DirectoryTreeImpl(DirectoryTree* pTree):
-    m_pTree(pTree)
+DirectoryTreeImpl::DirectoryTreeImpl(DirectoryTree *pTree)
+    : m_pTree(pTree)
 {
     m_impl = new TImpl;
 }
@@ -50,7 +49,8 @@ DirectoryTreeImpl::~DirectoryTreeImpl()
     m_impl = nullptr;
 }
 
-bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FilePath& filePath, DString& displayName, uint32_t& nIconID)
+bool DirectoryTreeImpl::GetVirtualDirectoryInfo(
+    VirtualDirectoryType type, FilePath &filePath, DString &displayName, uint32_t &nIconID)
 {
     filePath.Clear();
     displayName.clear();
@@ -67,7 +67,7 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
     switch (type) {
     case VirtualDirectoryType::kUserHome:
         csidl = -1;
-        fid = FOLDERID_UserProfiles;        
+        fid = FOLDERID_UserProfiles;
         break;
     case VirtualDirectoryType::kDesktop:
         csidl = CSIDL_DESKTOP;
@@ -97,19 +97,18 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         break;
     }
 
-    typedef HRESULT (CALLBACK *PFN_SHGetKnownFolderPath)( REFKNOWNFOLDERID rfid,
-                                                 DWORD            dwFlags,
-                                                 HANDLE           hToken,
-                                                 PWSTR * ppszPath );
-    typedef HRESULT (CALLBACK *PFN_SHGetKnownFolderIDList)( REFKNOWNFOLDERID rfid,
-                                                   DWORD            dwFlags,
-                                                   HANDLE           hToken,
-                                                   PIDLIST_ABSOLUTE * ppidl );
+    typedef HRESULT(CALLBACK * PFN_SHGetKnownFolderPath)(
+        REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR * ppszPath);
+    typedef HRESULT(CALLBACK * PFN_SHGetKnownFolderIDList)(
+        REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PIDLIST_ABSOLUTE * ppidl);
 
-    PFN_SHGetKnownFolderPath pfnSHGetKnownFolderPath = (PFN_SHGetKnownFolderPath)::GetProcAddress(m_impl->m_hShell32Dll, "SHGetKnownFolderPath");
-    PFN_SHGetKnownFolderIDList pfnSHGetKnownFolderIDList = (PFN_SHGetKnownFolderIDList)::GetProcAddress(m_impl->m_hShell32Dll, "SHGetKnownFolderIDList");
+    PFN_SHGetKnownFolderPath pfnSHGetKnownFolderPath
+        = (PFN_SHGetKnownFolderPath)::GetProcAddress(m_impl->m_hShell32Dll, "SHGetKnownFolderPath");
+    PFN_SHGetKnownFolderIDList pfnSHGetKnownFolderIDList
+        = (PFN_SHGetKnownFolderIDList)::GetProcAddress(
+            m_impl->m_hShell32Dll, "SHGetKnownFolderIDList");
 
-    WCHAR folder[MAX_PATH] = { 0 };
+    WCHAR folder[MAX_PATH] = {0};
     LPITEMIDLIST lpPidl = nullptr;
 
     if (pfnSHGetKnownFolderPath != nullptr) {
@@ -151,12 +150,13 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
     }
 
     bool bRet = false;
-    SHFILEINFO shFileInfo = { 0 };
-    if (::SHGetFileInfo((LPCTSTR)lpPidl,
-                        0,
-                        &shFileInfo,
-                        sizeof(SHFILEINFO),
-                        SHGFI_PIDL | SHGFI_DISPLAYNAME | SHGFI_ICON | SHGFI_SMALLICON)) {
+    SHFILEINFO shFileInfo = {0};
+    if (::SHGetFileInfo(
+            (LPCTSTR) lpPidl,
+            0,
+            &shFileInfo,
+            sizeof(SHFILEINFO),
+            SHGFI_PIDL | SHGFI_DISPLAYNAME | SHGFI_ICON | SHGFI_SMALLICON)) {
         displayName = StringConvert::LocalToT(shFileInfo.szDisplayName);
         filePath = FilePath(folder);
         nIconID = GlobalManager::Instance().Icon().AddIcon(shFileInfo.hIcon);
@@ -176,7 +176,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
     return bRet;
 }
 
-void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<DirectoryTree::PathInfo>& pathInfoList)
+void DirectoryTreeImpl::GetRootPathInfoList(
+    bool bLargeIcon, std::vector<DirectoryTree::PathInfo> &pathInfoList)
 {
     pathInfoList.clear();
     std::vector<DString> driveList;
@@ -184,8 +185,8 @@ void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<Directo
     for (auto iter = driveList.begin(); iter != driveList.end(); ++iter) {
         DString driverName = *iter;
         // 过滤A:盘和B:盘
-        if (StringUtil::IsEqualNoCase(driverName, _T("A:\\")) ||
-            StringUtil::IsEqualNoCase(driverName, _T("B:\\"))) {
+        if (StringUtil::IsEqualNoCase(driverName, _T("A:\\"))
+            || StringUtil::IsEqualNoCase(driverName, _T("B:\\"))) {
             continue;
         }
 
@@ -204,8 +205,7 @@ void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<Directo
         UINT uFlags = SHGFI_ICON | SHGFI_DISPLAYNAME;
         if (bLargeIcon) {
             uFlags |= SHGFI_LARGEICON;
-        }
-        else {
+        } else {
             uFlags |= SHGFI_SMALLICON;
         }
         if (::SHGetFileInfo(driverName.c_str(), 0, &shFileInfo, sizeof(SHFILEINFO), uFlags)) {
@@ -227,7 +227,8 @@ void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<Directo
 
 /** 获取一个路径的图标和文件类型信息
 */
-static bool GetFileInfo_Windows(const DStringW& filePath, uint32_t* pIconId, bool bLargeIcon, DString* szTypeName)
+static bool GetFileInfo_Windows(
+    const DStringW &filePath, uint32_t *pIconId, bool bLargeIcon, DString *szTypeName)
 {
     if (pIconId != nullptr) {
         *pIconId = 0;
@@ -244,8 +245,7 @@ static bool GetFileInfo_Windows(const DStringW& filePath, uint32_t* pIconId, boo
     if (uFlags & SHGFI_ICON) {
         if (bLargeIcon) {
             uFlags |= SHGFI_LARGEICON;
-        }
-        else {
+        } else {
             uFlags |= SHGFI_SMALLICON;
         }
     }
@@ -270,11 +270,12 @@ static bool GetFileInfo_Windows(const DStringW& filePath, uint32_t* pIconId, boo
     return bRet;
 }
 
-void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
-                                          const std::weak_ptr<WeakFlag>& weakFlag,
-                                          bool bLargeIcon,
-                                          std::vector<DirectoryTree::PathInfo>& folderList,
-                                          std::vector<DirectoryTree::PathInfo>* fileList)
+void DirectoryTreeImpl::GetFolderContents(
+    const FilePath &path,
+    const std::weak_ptr<WeakFlag> &weakFlag,
+    bool bLargeIcon,
+    std::vector<DirectoryTree::PathInfo> &folderList,
+    std::vector<DirectoryTree::PathInfo> *fileList)
 {
     folderList.clear();
     if (fileList != nullptr) {
@@ -285,7 +286,7 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
     HANDLE hFile = ::FindFirstFileW(findPath.ToStringW().c_str(), &findData);
     if (hFile == INVALID_HANDLE_VALUE) {
         return;
-    }   
+    }
 
     do {
         if (weakFlag.expired()) {
@@ -312,8 +313,8 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
             }
         }
 
-        if ((StringUtil::StringCompare(findData.cFileName, L".") == 0) ||
-            (StringUtil::StringCompare(findData.cFileName, L"..") == 0)) {
+        if ((StringUtil::StringCompare(findData.cFileName, L".") == 0)
+            || (StringUtil::StringCompare(findData.cFileName, L"..") == 0)) {
             continue;
         }
 
@@ -334,48 +335,46 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
             //文件夹(图标共享，只获取一次)
             pathInfo.m_bIconShared = true;
             pathInfo.m_nIconID = bLargeIcon ? m_impl->m_nLargeIconID : m_impl->m_nSmallIconID;
-            uint32_t* pIconId = nullptr;
+            uint32_t *pIconId = nullptr;
             if (pathInfo.m_nIconID == 0) {
                 pIconId = &pathInfo.m_nIconID;
             }
-            if (GetFileInfo_Windows(folderPath.ToStringW(), pIconId, bLargeIcon, &pathInfo.m_typeName)) {
+            if (GetFileInfo_Windows(
+                    folderPath.ToStringW(), pIconId, bLargeIcon, &pathInfo.m_typeName)) {
                 if (pIconId != nullptr) {
                     if (bLargeIcon) {
                         m_impl->m_nLargeIconID = *pIconId;
-                    }
-                    else {
+                    } else {
                         m_impl->m_nSmallIconID = *pIconId;
                     }
                 }
-            }
-            else {
+            } else {
                 ASSERT(0);
             }
-        }
-        else {
+        } else {
             //文件(图标不共享，每个文件获取一次)
             pathInfo.m_bIconShared = true;
-            if (!GetFileInfo_Windows(folderPath.ToStringW(), &pathInfo.m_nIconID, bLargeIcon, &pathInfo.m_typeName)) {
+            if (!GetFileInfo_Windows(
+                    folderPath.ToStringW(), &pathInfo.m_nIconID, bLargeIcon, &pathInfo.m_typeName)) {
                 ASSERT(0);
             }
         }
         if (bFolder) {
             //文件夹
             folderList.emplace_back(std::move(pathInfo));
-        }
-        else {
+        } else {
             //普通文件
             ASSERT(fileList != nullptr);
             if (fileList != nullptr) {
                 fileList->emplace_back(std::move(pathInfo));
-            }            
+            }
         }
     } while (::FindNextFileW(hFile, &findData));
     ::FindClose(hFile);
     hFile = INVALID_HANDLE_VALUE;
 }
 
-bool DirectoryTreeImpl::NeedShowDirPath(const FilePath& path) const
+bool DirectoryTreeImpl::NeedShowDirPath(const FilePath &path) const
 {
     if ((m_pTree == nullptr) || path.IsEmpty()) {
         return false;
@@ -393,7 +392,8 @@ bool DirectoryTreeImpl::NeedShowDirPath(const FilePath& path) const
     if (path.NativePath().size() == 3) {
         DString s = path.NativePath();
         if (s.size() == 3) {
-            if (((s[0] >= _T('C')) || (s[0] <= _T('Z'))) && (s[1] == _T(':')) && (s[2]) == _T('\\')) {
+            if (((s[0] >= _T('C')) || (s[0] <= _T('Z'))) && (s[1] == _T(':'))
+                && (s[2]) == _T('\\')) {
                 //根目录，始终显示，因为后续判断逻辑不正确
                 return true;
             }
@@ -424,19 +424,22 @@ static HICON GetMyComputerIcon_Windows()
     LPITEMIDLIST pidl;
     if (SUCCEEDED(::SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidl))) {
         // 成功获取PIDL
-        SHFILEINFO sfi = { 0 };
-        if (::SHGetFileInfo((LPCTSTR)pidl, 0, &sfi, sizeof(sfi),
-            SHGFI_PIDL | SHGFI_ICON | SHGFI_LARGEICON)) {
+        SHFILEINFO sfi = {0};
+        if (::SHGetFileInfo(
+                (LPCTSTR) pidl, 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_ICON | SHGFI_LARGEICON)) {
             // 成功获取图标句柄
             hMyComputerIcon = sfi.hIcon;
         }
     }
     ILFree(pidl);
     if (hMyComputerIcon == nullptr) {
-        SHFILEINFO sfi = { 0 };
-        if (::SHGetFileInfo(_T("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"),
-            FILE_ATTRIBUTE_DIRECTORY, &sfi, sizeof(sfi),
-            SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON)) {
+        SHFILEINFO sfi = {0};
+        if (::SHGetFileInfo(
+                _T("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"),
+                FILE_ATTRIBUTE_DIRECTORY,
+                &sfi,
+                sizeof(sfi),
+                SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON)) {
             hMyComputerIcon = sfi.hIcon;
         }
     }
@@ -449,13 +452,14 @@ uint32_t DirectoryTreeImpl::GetMyComputerIconID() const
     return GlobalManager::Instance().Icon().AddIcon(hIcon);
 }
 
-void DirectoryTreeImpl::GetDiskInfoList(const std::weak_ptr<WeakFlag>& weakFlag,
-                                        bool bLargeIcon,
-                                        std::vector<DirectoryTree::DiskInfo>& diskInfoList)
+void DirectoryTreeImpl::GetDiskInfoList(
+    const std::weak_ptr<WeakFlag> &weakFlag,
+    bool bLargeIcon,
+    std::vector<DirectoryTree::DiskInfo> &diskInfoList)
 {
     std::vector<DirectoryTree::PathInfo> pathInfoList;
     GetRootPathInfoList(bLargeIcon, pathInfoList);
-    for (const DirectoryTree::PathInfo& pathInfo : pathInfoList) {
+    for (const DirectoryTree::PathInfo &pathInfo : pathInfoList) {
         if (weakFlag.expired()) {
             break;
         }
@@ -478,7 +482,7 @@ void DirectoryTreeImpl::GetDiskInfoList(const std::weak_ptr<WeakFlag>& weakFlag,
     }
     if (weakFlag.expired()) {
         diskInfoList.clear();
-        for (const DirectoryTree::PathInfo& pathInfo : pathInfoList) {
+        for (const DirectoryTree::PathInfo &pathInfo : pathInfoList) {
             if (!pathInfo.m_bIconShared) {
                 GlobalManager::Instance().Icon().RemoveIcon(pathInfo.m_nIconID);
             }

@@ -10,13 +10,12 @@
 
 namespace ui {
 
-CefControlNative::CefControlNative(ui::Window* pWindow):
-    CefControl(pWindow),
-    m_bWindowFirstShown(false),
-    m_bSetCefWindowParentNull(false),
-    m_bInGotFocusEvent(false)
-{
-}
+CefControlNative::CefControlNative(ui::Window *pWindow)
+    : CefControl(pWindow)
+    , m_bWindowFirstShown(false)
+    , m_bSetCefWindowParentNull(false)
+    , m_bInGotFocusEvent(false)
+{}
 
 CefControlNative::~CefControlNative(void)
 {
@@ -37,14 +36,18 @@ void CefControlNative::Init()
         LONG style = ::GetWindowLong(hWnd, GWL_STYLE);
         ::SetWindowLong(hWnd, GWL_STYLE, style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
         //无法在分层窗口内使用本控件, Native模式不支持分层窗口
-        ASSERT((::GetWindowLong(hWnd, GWL_EXSTYLE) & WS_EX_LAYERED) == 0 && _T("CefControlNative::Init WS_EX_LAYERED error!"));
+        ASSERT(
+            (::GetWindowLong(hWnd, GWL_EXSTYLE) & WS_EX_LAYERED) == 0
+            && _T("CefControlNative::Init WS_EX_LAYERED error!"));
 #endif
         m_pBrowserHandler = new CefBrowserHandler;
         m_pBrowserHandler->SetHostWindow(GetWindow());
         m_pBrowserHandler->SetHandlerDelegate(this);
 
         //异步创建Browser对象, 避免阻塞主界面的解析和显示速度
-        GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, UiBind(&CefControlNative::ReCreateBrowser, this));
+        GlobalManager::Instance()
+            .Thread()
+            .PostTask(ui::kThreadUI, UiBind(&CefControlNative::ReCreateBrowser, this));
     }
 
     if (!m_jsBridge.get()) {
@@ -56,7 +59,7 @@ void CefControlNative::Init()
 void CefControlNative::ReCreateBrowser()
 {
     GlobalManager::Instance().AssertUIThread();
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return;
@@ -75,12 +78,12 @@ void CefControlNative::ReCreateBrowser()
     if (!pWindow->IsWindowFirstShown()) {
         if (!m_bWindowFirstShown) {
             std::weak_ptr<WeakFlag> weakFlag = GetWeakFlag();
-            pWindow->AttachWindowFirstShown([weakFlag, this](const EventArgs& /*args*/) {
+            pWindow->AttachWindowFirstShown([weakFlag, this](const EventArgs & /*args*/) {
                 if (!weakFlag.expired()) {
                     ReCreateBrowser();
                 }
                 return true;
-                });
+            });
             m_bWindowFirstShown = true;
         }
         return;
@@ -94,15 +97,15 @@ void CefControlNative::ReCreateBrowser()
 #endif
     UiRect rc = GetRect();
     Dpi().ClientSizeToWindowSize(rc);
-    CefRect rect = { rc.left, rc.top, rc.right, rc.bottom};
+    CefRect rect = {rc.left, rc.top, rc.right, rc.bottom};
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows
     window_info.SetAsChild(pWindow->NativeWnd()->GetHWND(), rect);
-#elif defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#elif defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
     //Linux
-    CefWindowHandle hParenWindow = (CefWindowHandle)pWindow->NativeWnd()->GetX11WindowNumber();
+    CefWindowHandle hParenWindow = (CefWindowHandle) pWindow->NativeWnd()->GetX11WindowNumber();
     if (pWindow->NativeWnd()->IsVideoDriverWayland()) {
-        hParenWindow = (CefWindowHandle)pWindow->NativeWnd()->GetWaylandDisplayPointer();
+        hParenWindow = (CefWindowHandle) pWindow->NativeWnd()->GetWaylandDisplayPointer();
     }
     window_info.SetAsChild(hParenWindow, rect);
 #elif defined DUILIB_BUILD_FOR_MACOS
@@ -111,8 +114,9 @@ void CefControlNative::ReCreateBrowser()
 #endif
 
     CefBrowserSettings browser_settings;
-    CefString url = GetInitURL();//创建成功后，立即加载的URL
-    CefBrowserHost::CreateBrowser(window_info, m_pBrowserHandler, url, browser_settings, nullptr, nullptr);
+    CefString url = GetInitURL(); //创建成功后，立即加载的URL
+    CefBrowserHost::CreateBrowser(
+        window_info, m_pBrowserHandler, url, browser_settings, nullptr, nullptr);
 }
 
 void CefControlNative::SetPos(ui::UiRect rc)
@@ -130,7 +134,7 @@ void CefControlNative::OnGotFocus()
         return;
     }
 
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if (pWindow != nullptr) {
         //页面获取焦点时，禁止主界面输入文字（解决的问题：macOS下：在页面输入文字，按键一次，会触发多次输入，应该是SDL内部又触发了输入）
         pWindow->NativeWnd()->SetImeOpenStatus(false);
@@ -145,7 +149,7 @@ void CefControlNative::OnGotFocus()
     }
 }
 
-bool CefControlNative::OnSetFocus(const EventArgs& msg)
+bool CefControlNative::OnSetFocus(const EventArgs &msg)
 {
     if (!m_bInGotFocusEvent) {
         //避免在OnGotFocus回调函数中调用CefBrowserHost::SetFocus，容易产生死循环
@@ -157,7 +161,7 @@ bool CefControlNative::OnSetFocus(const EventArgs& msg)
     return BaseClass::OnSetFocus(msg);
 }
 
-bool CefControlNative::OnKillFocus(const EventArgs& msg)
+bool CefControlNative::OnKillFocus(const EventArgs &msg)
 {
     CefRefPtr<CefBrowserHost> browserHost = GetCefBrowserHost();
     if (browserHost != nullptr) {
@@ -203,7 +207,7 @@ void CefControlNative::CloseAllBrowsers()
     DoCloseAllNativeBrowsers(true);
 }
 
-void CefControlNative::SetWindow(ui::Window* pWindow)
+void CefControlNative::SetWindow(ui::Window *pWindow)
 {
     GlobalManager::Instance().AssertUIThread();
     if ((pWindow == nullptr) || (BaseClass::GetWindow() == pWindow)) {
@@ -226,9 +230,9 @@ std::shared_ptr<IBitmap> CefControlNative::MakeImageSnapshot()
     int32_t width = 0;
     int32_t height = 0;
     bool bRet = CaptureCefWindowBitmap(GetCefWindowHandle(), bitmap, width, height);
-    if (bRet && (width > 0) && (height > 0) && ((int32_t)bitmap.size() == (width * height * 4))) {
+    if (bRet && (width > 0) && (height > 0) && ((int32_t) bitmap.size() == (width * height * 4))) {
         std::shared_ptr<IBitmap> spBitmap;
-        IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+        IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
         ASSERT(pRenderFactory != nullptr);
         if (pRenderFactory != nullptr) {
             spBitmap.reset(pRenderFactory->CreateBitmap());

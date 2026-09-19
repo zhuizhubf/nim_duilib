@@ -6,8 +6,7 @@
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Utils/FilePath.h"
 
-namespace ui
-{
+namespace ui {
 
 class Box;
 class Control;
@@ -38,15 +37,15 @@ public:
     /** 构造函数
     * @param [in] pWindow 关联的窗口指针，不能为空
     */
-    explicit WindowRoot(Window* pWindow);
+    explicit WindowRoot(Window *pWindow);
 
     /** 禁用拷贝构造函数
     */
-    WindowRoot(const WindowRoot& r) = delete;
+    WindowRoot(const WindowRoot &r) = delete;
 
     /** 禁用赋值运算符
     */
-    WindowRoot& operator=(const WindowRoot& r) = delete;
+    WindowRoot &operator=(const WindowRoot &r) = delete;
 
     /** 析构函数
     *  负责清理根容器和阴影资源
@@ -58,26 +57,26 @@ public:
     * @return 返回窗口根容器的指针，可能是阴影容器（当AttachShadow被调用后），
     *         也可能是XML配置的原始Box容器
     */
-    Box* GetRoot() const;
+    Box *GetRoot() const;
 
     /** 获取XML配置的原始根容器
     * @return 返回XML文件中配置的Box容器，不包含阴影容器
     */
-    Box* GetXmlRoot() const;
+    Box *GetXmlRoot() const;
 
     /** 绑定窗口的根容器
     * @param [in] pRoot 要绑定的根容器指针
     * @return 绑定成功返回true，否则返回false
     * @note 会先清理旧的根容器，然后设置新的根容器，并更新控件查找器
     */
-    bool AttachBox(Box* pRoot);
+    bool AttachBox(Box *pRoot);
 
 public:
     /** 获取窗口阴影对象指针
     * @return 返回阴影对象的指针
     * @note 当处于控件全屏状态时，如果根容器是FullscreenBox类型，返回nullptr
     */
-    Shadow* GetShadow() const;
+    Shadow *GetShadow() const;
 
     /** 创建窗口阴影对象
     * @param [in] bLayeredWindow 是否为分层窗口
@@ -100,12 +99,12 @@ public:
     * @return 设置成功返回true，失败返回false
     * @note 全屏后可以通过ExitControlFullscreen()函数退出全屏状态
     */
-    bool SetFullscreenControl(Control* pFullscreenControl, const DString& exitButtonClass);
+    bool SetFullscreenControl(Control *pFullscreenControl, const DString &exitButtonClass);
 
     /** 获取当前全屏显示的控件
     * @return 返回当前全屏显示的控件指针，如果没有则返回nullptr
     */
-    Control* GetFullscreenControl() const;
+    Control *GetFullscreenControl() const;
 
     /** 退出控件的全屏显示状态
     *  恢复到控件全屏前的窗口状态
@@ -137,14 +136,14 @@ public:
     * @param [in] pt 当前鼠标位置，客户区坐标
     * @note 用于实现全屏按钮的动态显示/隐藏效果
     */
-    void ProcessFullscreenButtonMouseMove(const UiPoint& pt);
+    void ProcessFullscreenButtonMouseMove(const UiPoint &pt);
 
 public:
     /** 将阴影附加到窗口的根容器
     * @param [in] pXmlRoot XML配置的原始根容器
     * @return 如果阴影已附加返回阴影Box，否则返回原始根容器
     */
-    Box* AttachShadow(Box* pXmlRoot);
+    Box *AttachShadow(Box *pXmlRoot);
 
     /** 设置是否附加阴影效果
     * @param [in] bShadowAttached true-启用阴影，false-禁用阴影
@@ -176,7 +175,7 @@ public:
     /** 设置阴影图片
     * @param [in] shadowImage 阴影图片的路径
     */
-    void SetShadowImage(const DString& shadowImage);
+    void SetShadowImage(const DString &shadowImage);
 
     /** 设置阴影边框大小（未经过DPI缩放）
     * @param [in] nShadowBorderSize 阴影边框大小，单位像素
@@ -191,7 +190,7 @@ public:
     /** 设置阴影边框颜色
     * @param [in] shadowBorderColor 阴影边框颜色，ARGB格式字符串
     */
-    void SetShadowBorderColor(const DString& shadowBorderColor);
+    void SetShadowBorderColor(const DString &shadowBorderColor);
 
     /** 获取阴影边框颜色
     * @return 返回阴影边框颜色字符串
@@ -212,7 +211,7 @@ public:
     /** 设置阴影九宫格描述
     * @param [in] rcShadowCorner 阴影图片的九宫格属性，未经DPI缩放
     */
-    void SetShadowCorner(const UiPadding& rcShadowCorner);
+    void SetShadowCorner(const UiPadding &rcShadowCorner);
 
     /** 设置阴影圆角大小（未经过DPI缩放）
     * @param [in] szBorderRound 阴影的圆角大小
@@ -255,14 +254,14 @@ public:
     * @param [in] nOldScaleFactor 旧的DPI缩放百分比
     * @param [in] nNewScaleFactor 新的DPI缩放百分比
     */
-    void ChangeDpiScale(const DpiManager& dpi, uint32_t nOldScaleFactor, uint32_t nNewScaleFactor);
+    void ChangeDpiScale(const DpiManager &dpi, uint32_t nOldScaleFactor, uint32_t nNewScaleFactor);
 
 public:
     /** 设置控件查找器指针
     * @param [in] pControlFinder 控件查找器指针
     * @note 用于在AttachBox时自动更新控件查找器的根节点
     */
-    void SetControlFinder(ControlFinder* pControlFinder);
+    void SetControlFinder(ControlFinder *pControlFinder);
 
     /** 释放所有资源
     */
@@ -279,7 +278,7 @@ private:
     * @return 成功返回true，失败返回false
     * @note 负责创建FullscreenBox并完成全屏设置
     */
-    bool EnterControlFullscreen(Control* pFullscreenControl, const DString& exitButtonClass);
+    bool EnterControlFullscreen(Control *pFullscreenControl, const DString &exitButtonClass);
 
     /** 获取窗口最大化时的外边距（内部函数）
     * @note 根据当前窗口大小和屏幕工作区计算并设置外边距
@@ -303,7 +302,7 @@ private:
 private:
     /** 关联的窗口指针
     */
-    Window* m_pWindow;
+    Window *m_pWindow;
 
     /** 窗口根容器指针
     *  可能是XML配置的原始Box，也可能被阴影Box包装
@@ -327,7 +326,7 @@ private:
     /** 控件查找器指针
     *  用于快速查找控件
     */
-    ControlFinder* m_pControlFinder;
+    ControlFinder *m_pControlFinder;
 };
 
 } // namespace ui

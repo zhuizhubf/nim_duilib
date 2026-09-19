@@ -109,7 +109,8 @@ public:
      *  @param b 输出蓝色值(0-255)
      *  @return 解析成功返回true，否则返回false
      */
-    static bool ParseHexColor(const std::string& colorStr, uint8_t& alpha, uint8_t& r, uint8_t& g, uint8_t& b);
+    static bool ParseHexColor(
+        const std::string &colorStr, uint8_t &alpha, uint8_t &r, uint8_t &g, uint8_t &b);
 
     /** @brief 将RGB转换为Hex字符串
      *  @param alpha Alpha值(0-255)
@@ -129,7 +130,7 @@ public:
      *  @param l 输出明度(0.0-1.0)
      *  @note HSL是更直观的颜色表示，便于按比例调整
      */
-    static void RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double& h, double& s, double& l);
+    static void RGBToHSL(uint8_t r, uint8_t g, uint8_t b, double &h, double &s, double &l);
 
     /** @brief 将HSL色彩空间转换为RGB
      *  @param h 色相(0-360)
@@ -139,7 +140,7 @@ public:
      *  @param g 输出绿色值(0-255)
      *  @param b 输出蓝色值(0-255)
      */
-    static void HSLToRGB(double h, double s, double l, uint8_t& r, uint8_t& g, uint8_t& b);
+    static void HSLToRGB(double h, double s, double l, uint8_t &r, uint8_t &g, uint8_t &b);
 
     // ==================== 相对亮度 ====================
 
@@ -156,7 +157,7 @@ public:
      *  @param color2 颜色2的Hex字符串
      *  @return 对比度值，失败返回0.0
      */
-    static double CalculateContrastRatio(const std::string& color1, const std::string& color2);
+    static double CalculateContrastRatio(const std::string &color1, const std::string &color2);
 
     // ==================== RGB <-> OKLCH ====================
 
@@ -169,7 +170,7 @@ public:
      *  @param H 输出色相值(0-360)
      *  @return 转换成功返回true，否则返回false
      */
-    static bool RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double& L, double& C, double& H);
+    static bool RGBToOKLCH(uint8_t r, uint8_t g, uint8_t b, double &L, double &C, double &H);
 
     /** @brief 将RGB(双精度)转换为OKLCH
      *  @param red 红色值(0.0-1.0)
@@ -180,7 +181,7 @@ public:
      *  @param H 输出色相值(0-360)
      *  @return 成功返回0，失败返回-1
      */
-    static int RGBToOKLCH(double red, double green, double blue, double* L, double* C, double* H);
+    static int RGBToOKLCH(double red, double green, double blue, double *L, double *C, double *H);
 
     /** @brief 将OKLCH转换为ARGB十六进制字符串
      *  @param L 明度值(0-1，超出范围会被自动钳制)
@@ -200,7 +201,7 @@ public:
      *  @param blue 输出蓝色值(0.0-1.0)
      *  @return 成功返回0，失败返回-1
      */
-    static int OKLCHToRGB(double L, double C, double H, double* red, double* green, double* blue);
+    static int OKLCHToRGB(double L, double C, double H, double *red, double *green, double *blue);
 
     /** @brief 将OKLCH转换为RGB(字节)
      *  @param L 明度值(0-1)
@@ -211,7 +212,7 @@ public:
      *  @param blue 输出蓝色值(0-255)
      *  @return 成功返回0，失败返回-1
      */
-    static int OKLCHToRGB(double L, double C, double H, uint8_t& red, uint8_t& green, uint8_t& blue);
+    static int OKLCHToRGB(double L, double C, double H, uint8_t &red, uint8_t &green, uint8_t &blue);
 
 private:
     /** @brief sRGB传输函数(Gamma校正) */
@@ -223,9 +224,9 @@ private:
     /** @brief 立方根函数 */
     static double Cbrt(double x);
 
-    static constexpr double PI = 3.14159265358979323846;  ///< 圆周率常量
+    static constexpr double PI = 3.14159265358979323846; ///< 圆周率常量
 };
 
-}  // namespace ui
+} // namespace ui
 
-#endif  // DUILIB_CORE_COLORCONVERTER_H_
+#endif // DUILIB_CORE_COLORCONVERTER_H_

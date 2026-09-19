@@ -2,28 +2,29 @@
 #include "DateTime.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-#include <windowsx.h>
+#include <CommCtrl.h>
 #include <ctime>
-#include <sstream>
 #include <iomanip>
 #include <olectl.h>
-#include <CommCtrl.h>
+#include <sstream>
+#include <windowsx.h>
 
-namespace ui
-{
-DateTimeWnd::DateTimeWnd(DateTime* pOwner):
-    m_hDateTimeWnd(nullptr),
-    m_OldWndProc(::DefWindowProc),
-    m_pOwner(pOwner),
-    m_bInit(false),
-    m_bDropOpen(false),
-    m_oldSysTime({ 0, }),
-    m_hFont(nullptr)
+namespace ui {
+DateTimeWnd::DateTimeWnd(DateTime *pOwner)
+    : m_hDateTimeWnd(nullptr)
+    , m_OldWndProc(::DefWindowProc)
+    , m_pOwner(pOwner)
+    , m_bInit(false)
+    , m_bDropOpen(false)
+    , m_oldSysTime({
+          0,
+      })
+    , m_hFont(nullptr)
 {
     ASSERT(m_pOwner != nullptr);
 }
@@ -36,7 +37,7 @@ DateTimeWnd::~DateTimeWnd()
     }
 }
 
-bool DateTimeWnd::Init(DateTime* pOwner)
+bool DateTimeWnd::Init(DateTime *pOwner)
 {
     m_pOwner = pOwner;
     ASSERT(pOwner != nullptr);
@@ -55,8 +56,8 @@ bool DateTimeWnd::Init(DateTime* pOwner)
             dwStyle |= DTS_UPDOWN;
         }
 
-        UiPoint pt1 = { rcPos.left, rcPos.top };
-        UiPoint pt2 = { rcPos.right, rcPos.bottom };
+        UiPoint pt1 = {rcPos.left, rcPos.top};
+        UiPoint pt2 = {rcPos.right, rcPos.bottom};
         pOwner->GetWindow()->ClientToScreen(pt1);
         pOwner->GetWindow()->ClientToScreen(pt2);
 
@@ -66,13 +67,20 @@ bool DateTimeWnd::Init(DateTime* pOwner)
         HWND hParentWnd = m_pOwner->GetWindow()->NativeWnd()->GetHWND();
         HMODULE hModule = m_pOwner->GetWindow()->NativeWnd()->GetResModuleHandle();
         DString className = GetWindowClassName();
-        UiRect rc = { pt1.x, pt1.y, pt2.x, pt2.y };
-        m_hDateTimeWnd = ::CreateWindowExW(0,
-                                         StringConvert::TToWString(className).c_str(),
-                                         L"",
-                                         dwStyle,
-                                         rc.left, rc.top, rc.Width(), rc.Height(),
-                                         hParentWnd, nullptr, hModule, this);
+        UiRect rc = {pt1.x, pt1.y, pt2.x, pt2.y};
+        m_hDateTimeWnd = ::CreateWindowExW(
+            0,
+            StringConvert::TToWString(className).c_str(),
+            L"",
+            dwStyle,
+            rc.left,
+            rc.top,
+            rc.Width(),
+            rc.Height(),
+            hParentWnd,
+            nullptr,
+            hModule,
+            this);
 
         ASSERT(m_hDateTimeWnd != nullptr);
 
@@ -89,12 +97,11 @@ bool DateTimeWnd::Init(DateTime* pOwner)
 
     if (m_pOwner->IsValidDateTime()) {
         m_oldSysTime = StdTimeToSystemTime(m_pOwner->GetDateTime());
-    }
-    else {
+    } else {
         ::GetLocalTime(&m_oldSysTime);
     }
 
-    ::SendMessage(m_hDateTimeWnd, DTM_SETSYSTEMTIME, 0, (LPARAM)&m_oldSysTime);
+    ::SendMessage(m_hDateTimeWnd, DTM_SETSYSTEMTIME, 0, (LPARAM) &m_oldSysTime);
     DString sEditFormat;
     switch (editFormat) {
     case DateTime::EditFormat::kDateCalendar:
@@ -117,7 +124,7 @@ bool DateTimeWnd::Init(DateTime* pOwner)
         sEditFormat = _T("yyy-MM-dd");
         break;
     }
-    ::SendMessage(m_hDateTimeWnd, DTM_SETFORMAT, 0, (LPARAM)sEditFormat.c_str());
+    ::SendMessage(m_hDateTimeWnd, DTM_SETFORMAT, 0, (LPARAM) sEditFormat.c_str());
     ::ShowWindow(m_hDateTimeWnd, SW_SHOW);
     ::SetFocus(m_hDateTimeWnd);
 
@@ -138,7 +145,7 @@ bool DateTimeWnd::RegisterSuperClass()
     HMODULE hModule = m_pOwner->GetWindow()->NativeWnd()->GetResModuleHandle();
     // Get the class information from an existing
     // window so we can subclass it later on...
-    WNDCLASSEXW wc = { 0 };
+    WNDCLASSEXW wc = {0};
     wc.cbSize = sizeof(WNDCLASSEXW);
     DStringW superClassName = DATETIMEPICK_CLASSW;
     if (!::GetClassInfoExW(nullptr, superClassName.c_str(), &wc)) {
@@ -159,9 +166,8 @@ bool DateTimeWnd::RegisterSuperClass()
     static bool bAddAtExitFunction = false;
     if (!bAddAtExitFunction) {
         bAddAtExitFunction = true;
-        GlobalManager::Instance().AddAtExitFunction([hModule]() {
-            ::UnregisterClassW(DATETIMEPICK_CLASSW, hModule);
-            });
+        GlobalManager::Instance().AddAtExitFunction(
+            [hModule]() { ::UnregisterClassW(DATETIMEPICK_CLASSW, hModule); });
     }
 
     return ret != 0 || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
@@ -172,21 +178,20 @@ DString DateTimeWnd::GetWindowClassName() const
     return _T("DateTimeWnd");
 }
 
-static const DStringW::value_type* sPropName = L"DuiLibDateTimeWndX"; // 属性名称
+static const DStringW::value_type *sPropName = L"DuiLibDateTimeWndX"; // 属性名称
 
 LRESULT CALLBACK DateTimeWnd::__ControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    DateTimeWnd* pThis = nullptr;
+    DateTimeWnd *pThis = nullptr;
     if (uMsg == WM_NCCREATE) {
         LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
-        pThis = static_cast<DateTimeWnd*>(lpcs->lpCreateParams);
+        pThis = static_cast<DateTimeWnd *>(lpcs->lpCreateParams);
         if (pThis != nullptr) {
-            ::SetPropW(hWnd, sPropName, (HANDLE)pThis);
+            ::SetPropW(hWnd, sPropName, (HANDLE) pThis);
             pThis->m_hDateTimeWnd = hWnd;
         }
-    }
-    else {
-        pThis = static_cast<DateTimeWnd*>(::GetPropW(hWnd, sPropName));
+    } else {
+        pThis = static_cast<DateTimeWnd *>(::GetPropW(hWnd, sPropName));
         if (uMsg == WM_NCDESTROY && pThis != nullptr) {
             LRESULT lRes = ::CallWindowProc(pThis->m_OldWndProc, hWnd, uMsg, wParam, lParam);
             ::SetPropW(hWnd, sPropName, nullptr);
@@ -198,8 +203,7 @@ LRESULT CALLBACK DateTimeWnd::__ControlProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     if (pThis != nullptr) {
         ASSERT(hWnd == pThis->m_hDateTimeWnd);
         return pThis->WindowMessageProc(uMsg, wParam, lParam);
-    }
-    else {
+    } else {
         return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 }
@@ -221,37 +225,36 @@ LRESULT DateTimeWnd::WindowMessageProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
         m_pOwner->SetDateTime(SystemTimeToStdTime(m_oldSysTime));
         ::PostMessage(m_hDateTimeWnd, WM_CLOSE, 0, 0);
         bHandled = true;
-    }
-    else if (uMsg == WM_KEYDOWN && wParam == VK_RETURN) {
-        SYSTEMTIME systime = { 0, };
-        ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM)&systime);
+    } else if (uMsg == WM_KEYDOWN && wParam == VK_RETURN) {
+        SYSTEMTIME systime = {
+            0,
+        };
+        ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM) &systime);
         m_pOwner->SetDateTime(SystemTimeToStdTime(systime));
         ::PostMessage(m_hDateTimeWnd, WM_CLOSE, 0, 0);
         bHandled = true;
-    }
-    else if (uMsg == OCM_NOTIFY)
-    {
-        NMHDR* pHeader = (NMHDR*)lParam;
+    } else if (uMsg == OCM_NOTIFY) {
+        NMHDR *pHeader = (NMHDR *) lParam;
         if (pHeader != nullptr && pHeader->hwndFrom == m_hDateTimeWnd) {
             if (pHeader->code == DTN_DATETIMECHANGE) {
-                SYSTEMTIME systime = { 0, };
-                ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM)&systime);
+                SYSTEMTIME systime = {
+                    0,
+                };
+                ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM) &systime);
                 m_pOwner->SetDateTime(SystemTimeToStdTime(systime));
-            }
-            else if (pHeader->code == DTN_DROPDOWN) {
+            } else if (pHeader->code == DTN_DROPDOWN) {
                 m_bDropOpen = true;
-            }
-            else if (pHeader->code == DTN_CLOSEUP) {
-                SYSTEMTIME systime = { 0, };
-                ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM)&systime);
+            } else if (pHeader->code == DTN_CLOSEUP) {
+                SYSTEMTIME systime = {
+                    0,
+                };
+                ::SendMessage(m_hDateTimeWnd, DTM_GETSYSTEMTIME, 0, (LPARAM) &systime);
                 m_pOwner->SetDateTime(SystemTimeToStdTime(systime));
                 ::PostMessage(m_hDateTimeWnd, WM_CLOSE, 0, 0);
                 m_bDropOpen = false;
             }
         }
-    }
-    else if (uMsg == WM_KILLFOCUS)
-    {
+    } else if (uMsg == WM_KILLFOCUS) {
         if (!m_bDropOpen) {
             ::PostMessage(m_hDateTimeWnd, WM_CLOSE, 0, 0);
         }
@@ -273,8 +276,8 @@ void DateTimeWnd::UpdateWndPos()
     if (rcPos.IsEmpty()) {
         return;
     }
-    UiPoint pt1 = { rcPos.left, rcPos.top };
-    UiPoint pt2 = { rcPos.right, rcPos.bottom };
+    UiPoint pt1 = {rcPos.left, rcPos.top};
+    UiPoint pt2 = {rcPos.right, rcPos.bottom};
     m_pOwner->GetWindow()->ClientToScreen(pt1);
     m_pOwner->GetWindow()->ClientToScreen(pt2);
     UiRect rc;
@@ -282,7 +285,14 @@ void DateTimeWnd::UpdateWndPos()
     rc.top = pt1.y;
     rc.right = pt2.x;
     rc.bottom = pt2.y;
-    ::SetWindowPos(m_hDateTimeWnd, nullptr, rc.left, rc.top, rc.Width(), rc.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+    ::SetWindowPos(
+        m_hDateTimeWnd,
+        nullptr,
+        rc.left,
+        rc.top,
+        rc.Width(),
+        rc.Height(),
+        SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 void DateTimeWnd::ShowWindow()
@@ -296,7 +306,7 @@ UiRect DateTimeWnd::CalPos()
     UiRect rcPos = m_pOwner->GetPos();
     UiPoint scrollPos = m_pOwner->GetScrollOffsetInScrollBox();
     rcPos.Offset(-scrollPos.x, -scrollPos.y);
-    Control* pParent = m_pOwner->GetParent();
+    Control *pParent = m_pOwner->GetParent();
     UiRect rcParent;
     while (pParent != nullptr) {
         if (!pParent->IsVisible()) {
@@ -318,7 +328,7 @@ UiRect DateTimeWnd::CalPos()
 HFONT DateTimeWnd::CreateHFont() const
 {
     //优先获取默认字体
-    IFont* pFont = GlobalManager::Instance().Font().GetIFont(_T(""), m_pOwner->Dpi());
+    IFont *pFont = GlobalManager::Instance().Font().GetIFont(_T(""), m_pOwner->Dpi());
     if (pFont == nullptr) {
         pFont = GlobalManager::Instance().Font().GetIFont(_T("system_12"), m_pOwner->Dpi());
     }
@@ -326,7 +336,7 @@ HFONT DateTimeWnd::CreateHFont() const
     if (pFont == nullptr) {
         return nullptr;
     }
-    LOGFONTW lf = { 0 };
+    LOGFONTW lf = {0};
     ::GetObjectW(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONTW), &lf);
     StringUtil::StringCopy(lf.lfFaceName, StringConvert::TToWString(pFont->FontName()).c_str());
     lf.lfCharSet = DEFAULT_CHARSET;
@@ -348,9 +358,11 @@ HFONT DateTimeWnd::CreateHFont() const
     return hFont;
 }
 
-struct tm DateTimeWnd::SystemTimeToStdTime(const SYSTEMTIME& sysTime) const
+struct tm DateTimeWnd::SystemTimeToStdTime(const SYSTEMTIME &sysTime) const
 {
-    struct tm tmTime = { 0, };
+    struct tm tmTime = {
+        0,
+    };
     tmTime.tm_sec = sysTime.wSecond;
     tmTime.tm_min = sysTime.wMinute;
     tmTime.tm_hour = sysTime.wHour;
@@ -361,20 +373,20 @@ struct tm DateTimeWnd::SystemTimeToStdTime(const SYSTEMTIME& sysTime) const
     return tmTime;
 }
 
-
-SYSTEMTIME DateTimeWnd::StdTimeToSystemTime(const struct tm& tmTime) const
+SYSTEMTIME DateTimeWnd::StdTimeToSystemTime(const struct tm &tmTime) const
 {
-    SYSTEMTIME st = { (WORD)(tmTime.tm_year + 1900),
-                      (WORD)(tmTime.tm_mon + 1),
-                      (WORD)tmTime.tm_wday,
-                      (WORD)tmTime.tm_mday,
-                      (WORD)tmTime.tm_hour,
-                      (WORD)tmTime.tm_min,
-                      (WORD)tmTime.tm_sec,
-                      0 };
+    SYSTEMTIME st
+        = {(WORD) (tmTime.tm_year + 1900),
+           (WORD) (tmTime.tm_mon + 1),
+           (WORD) tmTime.tm_wday,
+           (WORD) tmTime.tm_mday,
+           (WORD) tmTime.tm_hour,
+           (WORD) tmTime.tm_min,
+           (WORD) tmTime.tm_sec,
+           0};
     return st;
 }
 
-}//namespace ui
+} //namespace ui
 
 #endif // (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)

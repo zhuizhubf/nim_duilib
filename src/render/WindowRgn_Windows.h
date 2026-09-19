@@ -5,8 +5,7 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-namespace ui 
-{
+namespace ui {
 class WindowRgn
 {
 public:
@@ -17,14 +16,15 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    static bool SetWindowRoundRectRgn(HWND hWnd, const UiRect& rcWnd, float rx, float ry, bool bRedraw);
+    static bool SetWindowRoundRectRgn(
+        HWND hWnd, const UiRect &rcWnd, float rx, float ry, bool bRedraw);
 
     /** 设置窗口的形状为直角矩形
     * @param [in] hWnd 关联的窗口句柄
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    static bool SetWindowRectRgn(HWND hWnd, const UiRect& rcWnd, bool bRedraw);
+    static bool SetWindowRectRgn(HWND hWnd, const UiRect &rcWnd, bool bRedraw);
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] hWnd 关联的窗口句柄

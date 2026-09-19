@@ -5,8 +5,7 @@
 
 #include <SDL3/SDL.h>
 
-namespace ui
-{
+namespace ui {
 
 bool Keyboard::IsKeyDown(VirtualKeyCode nVirtKey)
 {
@@ -54,51 +53,39 @@ bool Keyboard::IsKeyDown(VirtualKeyCode nVirtKey)
     case kVK_CAPITAL:
         bKeyDown = (SDL_GetModState() & SDL_KMOD_CAPS) ? true : false;
         break;
-    case kVK_LBUTTON:
-        {
-            Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
-            bKeyDown = (mouse_state & SDL_BUTTON_LMASK) ? true : false;
-        }
-        break;
-    case kVK_MBUTTON:
-        {
-            Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
-            bKeyDown = (mouse_state & SDL_BUTTON_MMASK) ? true : false;
-        }
-        break;
-    case kVK_RBUTTON:
-        {
-            Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
-            bKeyDown = (mouse_state & SDL_BUTTON_RMASK) ? true : false;
-        }
-        break;
-    case kVK_XBUTTON1:
-        {
-            Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
-            bKeyDown = (mouse_state & SDL_BUTTON_X1MASK) ? true : false;
-        }
-        break;
-    case kVK_XBUTTON2:
-        {
-            Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
-            bKeyDown = (mouse_state & SDL_BUTTON_X2MASK) ? true : false;
-        }
-        break;
-    default:
-        {
-            SDL_Keycode sdlKeycode = Keycode::GetSDLKeyCode(nVirtKey);
-            if (sdlKeycode != SDLK_UNKNOWN) {
-                SDL_Scancode sdlScancode = SDL_GetScancodeFromKey(sdlKeycode, nullptr);
-                if (sdlScancode != SDL_SCANCODE_UNKNOWN) {
-                    int numkeys = 0;
-                    const bool* keyboardState = SDL_GetKeyboardState(&numkeys);
-                    if ((keyboardState != nullptr) && (sdlKeycode < (SDL_Keycode)numkeys)) {
-                        bKeyDown = keyboardState[sdlScancode];
-                    }
+    case kVK_LBUTTON: {
+        Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
+        bKeyDown = (mouse_state & SDL_BUTTON_LMASK) ? true : false;
+    } break;
+    case kVK_MBUTTON: {
+        Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
+        bKeyDown = (mouse_state & SDL_BUTTON_MMASK) ? true : false;
+    } break;
+    case kVK_RBUTTON: {
+        Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
+        bKeyDown = (mouse_state & SDL_BUTTON_RMASK) ? true : false;
+    } break;
+    case kVK_XBUTTON1: {
+        Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
+        bKeyDown = (mouse_state & SDL_BUTTON_X1MASK) ? true : false;
+    } break;
+    case kVK_XBUTTON2: {
+        Uint32 mouse_state = SDL_GetMouseState(NULL, NULL);
+        bKeyDown = (mouse_state & SDL_BUTTON_X2MASK) ? true : false;
+    } break;
+    default: {
+        SDL_Keycode sdlKeycode = Keycode::GetSDLKeyCode(nVirtKey);
+        if (sdlKeycode != SDLK_UNKNOWN) {
+            SDL_Scancode sdlScancode = SDL_GetScancodeFromKey(sdlKeycode, nullptr);
+            if (sdlScancode != SDL_SCANCODE_UNKNOWN) {
+                int numkeys = 0;
+                const bool *keyboardState = SDL_GetKeyboardState(&numkeys);
+                if ((keyboardState != nullptr) && (sdlKeycode < (SDL_Keycode) numkeys)) {
+                    bKeyDown = keyboardState[sdlScancode];
                 }
             }
         }
-        break;
+    } break;
     }
     return bKeyDown;
 }
@@ -123,7 +110,7 @@ DString Keyboard::GetKeyName(VirtualKeyCode nVirtKey, bool /*fExtended*/)
     DString keyName;
     SDL_Keycode sdlKeycode = Keycode::GetSDLKeyCode(nVirtKey);
     if (sdlKeycode != SDLK_UNKNOWN) {
-        const char* szName = SDL_GetKeyName(sdlKeycode);
+        const char *szName = SDL_GetKeyName(sdlKeycode);
         if (szName != nullptr) {
             keyName = StringConvert::UTF8ToT(szName);
         }

@@ -2,20 +2,19 @@
 #define UI_RENDER_IRENDER_H_
 
 #include "duilib/Core/Callback.h"
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Core/SharePtr.h"
+#include "duilib/Core/UiTypes.h"
 #include <map>
 
-namespace ui 
-{
+namespace ui {
 /** 字体接口
 */
-class DUILIB_API IFont: public virtual SupportWeakCallback
+class DUILIB_API IFont : public virtual SupportWeakCallback
 {
 public:
     /** 初始化字体(内部未对字体大小做DPI自适应)
      */
-    virtual bool InitFont(const UiFont& fontInfo) = 0;
+    virtual bool InitFont(const UiFont &fontInfo) = 0;
 
     /** 获取字体名
     */
@@ -45,7 +44,7 @@ public:
     * @param [in] unicodeChar UTF32字符
     * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     */
-    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t* glyphId) = 0;
+    virtual bool IsUnicodeCharSupported(uint32_t unicodeChar, uint16_t *glyphId) = 0;
 };
 
 /** 字体回退管理器（当支持的字体无法显示字符时，会查询回退字体管理器，以正确显示文字）
@@ -59,7 +58,8 @@ public:
     * @param [out] glyphId 如果unicodeChar不为0，返回对应的SkGlyphID值
     * @return 返回对应的回退字体接口
     */
-    virtual IFont* CreateFallbackFont(const IFont* pFont, uint32_t unicodeChar, uint16_t* glyphId) = 0;
+    virtual IFont *CreateFallbackFont(const IFont *pFont, uint32_t unicodeChar, uint16_t *glyphId)
+        = 0;
 };
 
 /** 字体管理器接口
@@ -77,32 +77,32 @@ public:
     * @param [out] fontName 返回字体名称
     * @return 成功返回true，失败返回false
     */
-    virtual bool GetFontName(uint32_t nIndex, DString& fontName) const = 0;
+    virtual bool GetFontName(uint32_t nIndex, DString &fontName) const = 0;
 
     /** 判断是否含有该字体
     * @param [int] fontName 字体名称
     * @return 如果含有该字体名称对应的字体返回true，否则返回false
     */
-    virtual bool HasFontName(const DString& fontName) const = 0;
+    virtual bool HasFontName(const DString &fontName) const = 0;
 
     /** 设置默认字体名称（当需要加载的字体不存在时，使用默认的字体）
     * @param [in] fontName 默认的字体名称
     */
-    virtual void SetDefaultFontName(const DString& fontName) = 0;
+    virtual void SetDefaultFontName(const DString &fontName) = 0;
 
     /** 加载指定字体文件
     * @param [in] fontFilePath 字体文件的路径（本地绝对路径）
     * @return 成功返回true，失败返回false
     */
-    virtual bool LoadFontFile(const DString& fontFilePath) = 0;
+    virtual bool LoadFontFile(const DString &fontFilePath) = 0;
 
     /** 加载指定字体数据
     * @param [in] data 字体文件的内存数据
     * @param [in] length 字体文件的内存数据长度
     * @return 成功返回true，失败返回false
     */
-    virtual bool LoadFontFileData(const void* data, size_t length) = 0;
-  
+    virtual bool LoadFontFileData(const void *data, size_t length) = 0;
+
     /** 清除已加载的字体文件
     */
     virtual void ClearFontFiles() = 0;
@@ -114,22 +114,21 @@ public:
     /** 设置字体回退管理器
     * @param [in] 字体回退管理器(生命周期由设置者来管理)
     */
-    virtual void SetFallbackFontMgr(IFallbackFontMgr* pFallbackFontMgr) = 0;
+    virtual void SetFallbackFontMgr(IFallbackFontMgr *pFallbackFontMgr) = 0;
 
     /** 获取字体回退管理器
     * @return 返回字体回退管理器，外部不应存储该指针
     */
-    virtual IFallbackFontMgr* GetFallbackFontMgr() const = 0;
+    virtual IFallbackFontMgr *GetFallbackFontMgr() const = 0;
 };
 
 /** Skia引擎需要传入Alpha类型
 */
-enum class DUILIB_API BitmapAlphaType: int
-{
-    kUnknown_SkAlphaType,   //!< uninitialized
-    kOpaque_SkAlphaType,    //!< pixel is opaque
-    kPremul_SkAlphaType,    //!< pixel components are premultiplied by alpha
-    kUnpremul_SkAlphaType   //!< pixel components are independent of alpha
+enum class DUILIB_API BitmapAlphaType : int {
+    kUnknown_SkAlphaType, //!< uninitialized
+    kOpaque_SkAlphaType,  //!< pixel is opaque
+    kPremul_SkAlphaType,  //!< pixel components are premultiplied by alpha
+    kUnpremul_SkAlphaType //!< pixel components are independent of alpha
 };
 
 /** 位图接口
@@ -144,9 +143,12 @@ public:
     @param [in] fImageSizeScale 图片的缩放比例，1.0f表示原值
     @param [in] alphaType 位图的Alpha类型，只有Skia引擎需要此参数
     */
-    virtual bool Init(uint32_t nWidth, uint32_t nHeight,
-                      const void* pPixelBits, float fImageSizeScale = 1.0f,
-                      BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType) = 0;
+    virtual bool Init(
+        uint32_t nWidth,
+        uint32_t nHeight,
+        const void *pPixelBits,
+        float fImageSizeScale = 1.0f,
+        BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType) = 0;
 
     /** 获取图片宽度
     */
@@ -163,7 +165,7 @@ public:
 
     /** 锁定位图数据，数据长度 = GetWidth() * GetHeight() * 4
     */
-    virtual void* LockPixelBits() = 0;
+    virtual void *LockPixelBits() = 0;
 
     /** 释放位图数据
     */
@@ -172,7 +174,7 @@ public:
     /** 克隆生成新的的位图
     *@return 返回新生成的位图接口，由调用方释放资源
     */
-    virtual IBitmap* Clone() = 0;
+    virtual IBitmap *Clone() = 0;
 };
 
 /** 画笔接口
@@ -198,11 +200,10 @@ public:
 
     /** 笔帽样式
     */
-    enum LineCap
-    {
-        kButt_Cap   = 0,    //平笔帽（默认）
-        kRound_Cap  = 1,    //圆笔帽
-        kSquare_Cap = 2     //方笔帽
+    enum LineCap {
+        kButt_Cap = 0,  //平笔帽（默认）
+        kRound_Cap = 1, //圆笔帽
+        kSquare_Cap = 2 //方笔帽
     };
 
     /** 设置线段起始的笔帽样式
@@ -231,11 +232,10 @@ public:
 
     /** 线段末尾使用的联接样式，该线段与另一个线段相遇
     */
-    enum LineJoin
-    {
-        kMiter_Join = 0,    //尖角（默认）
-        kBevel_Join = 1,    //平角
-        kRound_Join = 2     //圆角        
+    enum LineJoin {
+        kMiter_Join = 0, //尖角（默认）
+        kBevel_Join = 1, //平角
+        kRound_Join = 2  //圆角
     };
 
     /** 设置线段末尾使用的联接样式
@@ -248,13 +248,12 @@ public:
 
     /** 笔绘制的线条的线条样式
     */
-    enum DashStyle
-    {
-        kDashStyleSolid         = 0,    //实线（默认）
-        kDashStyleDash          = 1,    //虚线
-        kDashStyleDot           = 2,    //虚线
-        kDashStyleDashDot       = 3,    //交替虚线
-        kDashStyleDashDotDot    = 4     //交替短划线点点线
+    enum DashStyle {
+        kDashStyleSolid = 0,     //实线（默认）
+        kDashStyleDash = 1,      //虚线
+        kDashStyleDot = 2,       //虚线
+        kDashStyleDashDot = 3,   //交替虚线
+        kDashStyleDashDotDot = 4 //交替短划线点点线
     };
 
     /** 设置绘制的线条样式
@@ -267,7 +266,7 @@ public:
 
     /** 复制Pen对象
     */
-    virtual IPen* Clone() const = 0;
+    virtual IPen *Clone() const = 0;
 };
 
 /** 画刷接口
@@ -276,7 +275,7 @@ public:
 class DUILIB_API IBrush : public virtual SupportWeakCallback
 {
 public:
-    virtual IBrush* Clone() = 0;
+    virtual IBrush *Clone() = 0;
     virtual UiColor GetColor() const = 0;
 };
 
@@ -285,26 +284,25 @@ public:
 class IMatrix;
 class DUILIB_API IPath : public virtual SupportWeakCallback
 {
-public:    
+public:
     /** 填充类型，在路径或曲线相交时如何填充形成的区域
     */
-    enum class FillType 
-    {
+    enum class FillType {
         /** Specifies that "inside" is computed by an odd number of edge crossings
         */
-        kEvenOdd        = 0, //FillModeAlternate
+        kEvenOdd = 0, //FillModeAlternate
 
         /** Specifies that "inside" is computed by a non-zero sum of signed edge crossings 
         */
-        kWinding        = 1, //FillModeWinding
+        kWinding = 1, //FillModeWinding
 
         /** Same as EvenOdd, but draws outside of the path, rather than inside 
         */
-        kInverseEvenOdd    = 2,
+        kInverseEvenOdd = 2,
 
         /** Same as Winding, but draws outside of the path, rather than inside 
         */
-        kInverseWinding    = 3
+        kInverseWinding = 3
     };
 
     /** 设置填充类型
@@ -330,8 +328,8 @@ public:
                          其他每个点都用作一行的终点，下一行的起点。
     * @param [in] count 点数组中的元素数
     */
-    virtual void AddLines(const UiPoint* points, int32_t count) = 0;
-    virtual void AddLines(const UiPointF* points, int32_t count) = 0;
+    virtual void AddLines(const UiPoint *points, int32_t count) = 0;
+    virtual void AddLines(const UiPointF *points, int32_t count) = 0;
 
     /** 将贝塞尔(Bézier)曲线样条添加到此路径的当前图中
     *    贝塞尔自由绘制曲线是一条由四个点指定的曲线：
@@ -347,8 +345,17 @@ public:
     * @param [in] x4 终点的 x 坐标
     * @param [in] y4 终点的 y 坐标
     */
-    virtual void AddBezier(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, int32_t x4, int32_t y4) = 0;
-    virtual void AddBezier(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) = 0;
+    virtual void AddBezier(
+        int32_t x1,
+        int32_t y1,
+        int32_t x2,
+        int32_t y2,
+        int32_t x3,
+        int32_t y3,
+        int32_t x4,
+        int32_t y4) = 0;
+    virtual void AddBezier(
+        float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) = 0;
 
     /** 将连接的 Bézier 样条序列添加到此路径的当前图中
     * @param [in] points 指向连接的样条的起始点、结束点和控制点数组的指针。 
@@ -357,14 +364,14 @@ public:
     *                    前一个样条的终点用作起点，序列中的下两个点是控制点，第三个点是终点。
     * @param [in] count 数组中的元素数
     */
-    virtual void AddBeziers(const UiPoint* points, int32_t count) = 0;
-    virtual void AddBeziers(const UiPointF* points, int32_t count) = 0;
+    virtual void AddBeziers(const UiPoint *points, int32_t count) = 0;
+    virtual void AddBeziers(const UiPointF *points, int32_t count) = 0;
 
     /** 将矩形添加到此路径
     * @param [in] rect 矩形区域
     */
-    virtual void AddRect(const UiRect& rect) = 0;
-    virtual void AddRect(const UiRectF& rect) = 0;
+    virtual void AddRect(const UiRect &rect) = 0;
+    virtual void AddRect(const UiRectF &rect) = 0;
 
     /** 将椭圆添加到此路径
     * @param [in] 椭圆的矩形区域 
@@ -373,33 +380,33 @@ public:
     *             right left + 椭圆边界矩形的宽度
     *             bottom top + 椭圆边界矩形的高度
     */
-    virtual void AddEllipse(const UiRect& rect) = 0;
-    virtual void AddEllipse(const UiRectF& rect) = 0;
+    virtual void AddEllipse(const UiRect &rect) = 0;
+    virtual void AddEllipse(const UiRectF &rect) = 0;
 
     /** 将椭圆弧添加到此路径
     * @param [in] 椭圆的矩形区域 
     * @param [in] startAngle 椭圆水平轴与弧线起点之间的顺时针角度（以度为单位）
     * @param [in] sweepAngle 起点 (startAngle) 和弧的终点之间的顺时针角度（以度为单位）
     */
-    virtual void AddArc(const UiRect& rect, float startAngle, float sweepAngle) = 0;
-    virtual void AddArc(const UiRectF& rect, float startAngle, float sweepAngle) = 0;
+    virtual void AddArc(const UiRect &rect, float startAngle, float sweepAngle) = 0;
+    virtual void AddArc(const UiRectF &rect, float startAngle, float sweepAngle) = 0;
 
     /** 将多边形添加到此路径
     * @param [in] points 指定多边形顶点的点数组
     * @param [in] count 数组中的元素数
     */
-    virtual void AddPolygon(const UiPoint* points, int32_t count) = 0;
-    virtual void AddPolygon(const UiPointF* points, int32_t count) = 0;
+    virtual void AddPolygon(const UiPoint *points, int32_t count) = 0;
+    virtual void AddPolygon(const UiPointF *points, int32_t count) = 0;
 
     /** 对路径进行矩阵变换，可以进行旋转等操作
     * @param [in] pMatrix 矩阵接口
     */
-    virtual void Transform(IMatrix* pMatrix) = 0;
+    virtual void Transform(IMatrix *pMatrix) = 0;
 
     /** 获取此路径的边界矩形
     * @param [in] pen 关联的Pen对象，可以为nullptr
     */
-    virtual UiRect GetBounds(const IPen* pen) = 0;
+    virtual UiRect GetBounds(const IPen *pen) = 0;
 
     /** 关闭当前绘图
     */
@@ -411,7 +418,7 @@ public:
 
     /** 复制Path对象
     */
-    virtual IPath* Clone() = 0;
+    virtual IPath *Clone() = 0;
 };
 
 /** 3x3 矩阵接口
@@ -494,7 +501,7 @@ public:
     /** 通过回调接口，完成绘制
     * @param [in] rcPaint 需要绘制的区域（客户区坐标）
     */
-    virtual bool DoPaint(const UiRect& rcPaint) = 0;
+    virtual bool DoPaint(const UiRect &rcPaint) = 0;
 
     /** 回调接口，获取当前窗口的透明度值
     */
@@ -504,14 +511,13 @@ public:
     * @param [out] rcUpdate 返回需要绘制的区域矩形范围
     * @return 返回true表示支持局部绘制，返回false表示不支持局部绘制
     */
-    virtual bool GetUpdateRect(UiRect& rcUpdate) const = 0;
+    virtual bool GetUpdateRect(UiRect &rcUpdate) const = 0;
 };
 
 /** 光栅操作代码
 */
-enum class DUILIB_API RopMode
-{
-    kSrcCopy,    //对应于 SRCCOPY
+enum class DUILIB_API RopMode {
+    kSrcCopy,   //对应于 SRCCOPY
     kDstInvert, //对应于 DSTINVERT
     kSrcInvert, //对应于 SRCINVERT
     kSrcAnd     //对应于 SRCAND
@@ -519,34 +525,33 @@ enum class DUILIB_API RopMode
 
 /** 绘制文本时的格式
 */
-enum DUILIB_API DrawStringFormat
-{
-    TEXT_LEFT           = 0x0001,   //水平对齐方式：靠左
-    TEXT_HCENTER        = 0x0002,   //水平对齐方式：居中
-    TEXT_RIGHT          = 0x0004,   //水平对齐方式：靠右
-    TEXT_HJUSTIFY       = 0x0008,   //水平对齐方式：两端对齐
-    TEXT_HALIGN_ALL     = TEXT_LEFT | TEXT_HCENTER | TEXT_RIGHT | TEXT_HJUSTIFY,
+enum DUILIB_API DrawStringFormat {
+    TEXT_LEFT = 0x0001,     //水平对齐方式：靠左
+    TEXT_HCENTER = 0x0002,  //水平对齐方式：居中
+    TEXT_RIGHT = 0x0004,    //水平对齐方式：靠右
+    TEXT_HJUSTIFY = 0x0008, //水平对齐方式：两端对齐
+    TEXT_HALIGN_ALL = TEXT_LEFT | TEXT_HCENTER | TEXT_RIGHT | TEXT_HJUSTIFY,
 
-    TEXT_TOP            = 0x0010,   //垂直对齐方式：靠上
-    TEXT_VCENTER        = 0x0020,   //垂直对齐方式：居中
-    TEXT_BOTTOM         = 0x0040,   //垂直对齐方式：靠下
-    TEXT_VJUSTIFY       = 0x0080,   //垂直对齐方式：两端对齐
-    TEXT_VALIGN_ALL     = TEXT_TOP | TEXT_VCENTER | TEXT_BOTTOM | TEXT_VJUSTIFY,
+    TEXT_TOP = 0x0010,      //垂直对齐方式：靠上
+    TEXT_VCENTER = 0x0020,  //垂直对齐方式：居中
+    TEXT_BOTTOM = 0x0040,   //垂直对齐方式：靠下
+    TEXT_VJUSTIFY = 0x0080, //垂直对齐方式：两端对齐
+    TEXT_VALIGN_ALL = TEXT_TOP | TEXT_VCENTER | TEXT_BOTTOM | TEXT_VJUSTIFY,
 
-    TEXT_SINGLELINE     = 0x0100,   //单行文本
-    TEXT_NOCLIP         = 0x0200,   //绘制的时候，不设置剪辑区域
-    TEXT_WORD_WRAP      = 0x0400,   //自动换行（仅在IRender::DrawRichText接口支持此属性，其他文字绘制函数不支持该属性）
+    TEXT_SINGLELINE = 0x0100, //单行文本
+    TEXT_NOCLIP = 0x0200,     //绘制的时候，不设置剪辑区域
+    TEXT_WORD_WRAP
+    = 0x0400, //自动换行（仅在IRender::DrawRichText接口支持此属性，其他文字绘制函数不支持该属性）
 
-    TEXT_VERTICAL       = 0x0800,   //纵向绘制文本，文本绘制方向为从上到下，从右到左
+    TEXT_VERTICAL = 0x0800, //纵向绘制文本，文本绘制方向为从上到下，从右到左
 
-    TEXT_PATH_ELLIPSIS  = 0x4000,   //如果绘制区域不足，按显示文件路径的方式，在中间加"..."省略部分文字
-    TEXT_END_ELLIPSIS   = 0x8000    //如果绘制区域不足，在结尾加"..."，省略部分文字
+    TEXT_PATH_ELLIPSIS = 0x4000, //如果绘制区域不足，按显示文件路径的方式，在中间加"..."省略部分文字
+    TEXT_END_ELLIPSIS = 0x8000   //如果绘制区域不足，在结尾加"..."，省略部分文字
 };
 
 /** Render类型
 */
-enum class RenderType
-{
+enum class RenderType {
     kRenderType_Skia = 0,
 
     /** GDI/GDI+ 渲染后端（Windows）
@@ -560,32 +565,33 @@ struct DUILIB_API RenderCapabilities
 {
     /** 能力标志位
     */
-    enum Flags: uint64_t
-    {
-        kNone              = 0,             //!< 无特殊能力
-        kPath              = 1ull << 0,     //!< 支持路径
-        kGradientFill      = 1ull << 1,     //!< 支持渐变填充
-        kAlphaBlend        = 1ull << 2,     //!< 支持半透明合成
-        kLayeredWindow     = 1ull << 3,     //!< 支持分层窗口
-        kImageTransform    = 1ull << 4,     //!< 支持图片变换
-        kRichText          = 1ull << 5,     //!< 支持富文本
-        kVerticalText      = 1ull << 6,     //!< 支持竖排文本
-        kFontFallback      = 1ull << 7,     //!< 支持字体回退
-        kColorEmoji        = 1ull << 8,     //!< 支持彩色 Emoji
-        kBoxShadow         = 1ull << 9,     //!< 支持阴影
-        kBoxShadowBlur     = 1ull << 10,    //!< 支持高斯模糊阴影
-        kTextPathEllipsis  = 1ull << 11,    //!< 支持路径中间省略
-        kAntiAlias         = 1ull << 12     //!< 支持抗锯齿
+    enum Flags : uint64_t {
+        kNone = 0,                      //!< 无特殊能力
+        kPath = 1ull << 0,              //!< 支持路径
+        kGradientFill = 1ull << 1,      //!< 支持渐变填充
+        kAlphaBlend = 1ull << 2,        //!< 支持半透明合成
+        kLayeredWindow = 1ull << 3,     //!< 支持分层窗口
+        kImageTransform = 1ull << 4,    //!< 支持图片变换
+        kRichText = 1ull << 5,          //!< 支持富文本
+        kVerticalText = 1ull << 6,      //!< 支持竖排文本
+        kFontFallback = 1ull << 7,      //!< 支持字体回退
+        kColorEmoji = 1ull << 8,        //!< 支持彩色 Emoji
+        kBoxShadow = 1ull << 9,         //!< 支持阴影
+        kBoxShadowBlur = 1ull << 10,    //!< 支持高斯模糊阴影
+        kTextPathEllipsis = 1ull << 11, //!< 支持路径中间省略
+        kAntiAlias = 1ull << 12         //!< 支持抗锯齿
     };
 
     uint64_t m_value = kNone;
 
     RenderCapabilities() = default;
-    explicit RenderCapabilities(uint64_t value): m_value(value) { }
+    explicit RenderCapabilities(uint64_t value)
+        : m_value(value)
+    {}
 
-    bool Has(Flags flag) const { return (m_value & (uint64_t)flag) != 0; }
-    void Add(Flags flag) { m_value |= (uint64_t)flag; }
-    void Remove(Flags flag) { m_value &= ~(uint64_t)flag; }
+    bool Has(Flags flag) const { return (m_value & (uint64_t) flag) != 0; }
+    void Add(Flags flag) { m_value |= (uint64_t) flag; }
+    void Remove(Flags flag) { m_value &= ~(uint64_t) flag; }
     void Clear() { m_value = kNone; }
     bool IsEmpty() const { return m_value == kNone; }
 };
@@ -626,12 +632,12 @@ public:
 
 /** 绘制的字符标记位
 */
-enum RichTextCharFlag: uint8_t
-{
-    kIsIgnoredChar  = 0x01,     //当前字符为未绘制字符
-    kIsLowSurrogate = 0x02,     //该字符为低代理字符（由两个Unicode字符构成的字，UTF16编码的字形，每个字占1个或者2个Unicode字符）
-    kIsReturn       = 0x04,     //当前字符是否为回车'\r'
-    kIsNewLine      = 0x08,     //当前字符是否为换行'\n'
+enum RichTextCharFlag : uint8_t {
+    kIsIgnoredChar = 0x01, //当前字符为未绘制字符
+    kIsLowSurrogate
+    = 0x02, //该字符为低代理字符（由两个Unicode字符构成的字，UTF16编码的字形，每个字占1个或者2个Unicode字符）
+    kIsReturn = 0x04,  //当前字符是否为回车'\r'
+    kIsNewLine = 0x08, //当前字符是否为换行'\n'
 };
 
 /** 绘制的字符属性（共4个字节）
@@ -644,7 +650,7 @@ struct RichTextCharInfo
     {
         uint32_t v = m_value;
         v >>= 24;
-        return (uint8_t)v;
+        return (uint8_t) v;
     }
 
     /** 属性标志(设置)
@@ -671,7 +677,7 @@ struct RichTextCharInfo
     inline float CharWidth() const
     {
         uint32_t v = m_value & 0x00FFFFFF;
-        float fValue = (float)v;
+        float fValue = (float) v;
         fValue /= 1000.0f;
         return fValue;
     }
@@ -680,7 +686,7 @@ struct RichTextCharInfo
     */
     inline void SetCharWidth(float charWidth)
     {
-        uint32_t v = (uint32_t)(ui::CEILF(charWidth * 1000.0f));
+        uint32_t v = (uint32_t) (ui::CEILF(charWidth * 1000.0f));
         ASSERT(v < 0x00FFFFFF);
         v &= 0x00FFFFFF;
         m_value &= 0xFF000000;
@@ -705,8 +711,8 @@ struct RichTextCharInfo
 
     /** 比较操作符
     */
-    inline bool operator == (const RichTextCharInfo& r) const { return m_value == r.m_value; }
-    inline bool operator != (const RichTextCharInfo& r) const { return m_value != r.m_value; }
+    inline bool operator==(const RichTextCharInfo &r) const { return m_value == r.m_value; }
+    inline bool operator!=(const RichTextCharInfo &r) const { return m_value != r.m_value; }
 
 private:
     /** 使用整型存储，减少内存占有量
@@ -716,7 +722,7 @@ private:
 
 /** 逻辑行(矩形区域内显示的行，物理行数据在自动换行的情况下会对应多个逻辑行)的基本信息
 */
-struct RichTextRowInfo: public NVRefCount<RichTextRowInfo>
+struct RichTextRowInfo : public NVRefCount<RichTextRowInfo>
 {
     /** 本行中的字符个数，字符属性
     */
@@ -734,7 +740,7 @@ typedef SharePtr<RichTextRowInfo> RichTextRowInfoPtr;
 
 /** 物理行文本的数据
 */
-struct RichTextLineInfo: public NVRefCount<RichTextLineInfo>
+struct RichTextLineInfo : public NVRefCount<RichTextLineInfo>
 {
     /** 文本数据长度
     */
@@ -768,7 +774,7 @@ struct RichTextLineInfoParam
 
     /** 物理行的数据
     */
-    RichTextLineInfoList* m_pLineInfoList = nullptr;
+    RichTextLineInfoList *m_pLineInfoList = nullptr;
 };
 
 /** DrawRichText的绘制缓存
@@ -777,8 +783,7 @@ class DrawRichTextCache;
 
 /** 裁剪区域类型
 */
-enum class RenderClipType
-{
+enum class RenderClipType {
     kEmpty, //空，无裁剪信息
     kRect,  //裁剪区域是个矩形
     kRegion //裁剪区域是个Region
@@ -786,8 +791,7 @@ enum class RenderClipType
 
 /** 后台绘制方式
 */
-enum class RenderBackendType
-{
+enum class RenderBackendType {
     /** 使用CPU绘制
     */
     kRaster_BackendType = 0,
@@ -805,33 +809,40 @@ enum class RenderBackendType
 */
 struct MeasureStringParam
 {
-    int32_t rectSize = DUI_NOSET_VALUE; //横向文本，表示当前区域的限制宽度；纵向文本，表示当前区域的限制高度
-                                        //多行文本：应设置合理值，如果不设置则文本不会自动换行；单行文本：忽略该值)
+    int32_t rectSize
+        = DUI_NOSET_VALUE; //横向文本，表示当前区域的限制宽度；纵向文本，表示当前区域的限制高度
+    //多行文本：应设置合理值，如果不设置则文本不会自动换行；单行文本：忽略该值)
 
-    IFont* pFont = nullptr;             //文字的字体数据接口, 不可为nullptr
-    uint32_t uFormat = 0;               //文字的格式，参见 enum DrawStringFormat 类型定义
-    float fSpacingMul = 1.0f;           //行间距倍数: 字体大小的倍数比例（默认值通常为 1.0，即 100% 字体大小），用于按比例调整行间距
-    float fSpacingAdd = 0;              //行间距附加量: 是固定的附加像素值（默认值通常为 0），用于在比例调整的基础上增加固定偏移（像素）
-    float fWordSpacing = 0;             //设置两个相邻的字符之间的间隔（像素）
+    IFont *pFont = nullptr; //文字的字体数据接口, 不可为nullptr
+    uint32_t uFormat = 0;   //文字的格式，参见 enum DrawStringFormat 类型定义
+    float fSpacingMul
+        = 1.0f; //行间距倍数: 字体大小的倍数比例（默认值通常为 1.0，即 100% 字体大小），用于按比例调整行间距
+    float fSpacingAdd
+        = 0; //行间距附加量: 是固定的附加像素值（默认值通常为 0），用于在比例调整的基础上增加固定偏移（像素）
+    float fWordSpacing = 0; //设置两个相邻的字符之间的间隔（像素）
 
-    bool bUseFontHeight = true;         //纵向绘制时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
-    bool bRotate90ForAscii = true;      //纵向绘制时，对于字母数字等，旋转90度显示
+    bool bUseFontHeight
+        = true; //纵向绘制时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
+    bool bRotate90ForAscii = true; //纵向绘制时，对于字母数字等，旋转90度显示
 };
 
 struct DrawStringParam
 {
-    UiRect textRect;        //文字绘制的矩形区域
-    UiColor dwTextColor;    //文字颜色值
-    uint8_t uFade = 255;    //文字的透明度[0 - 255]
+    UiRect textRect;     //文字绘制的矩形区域
+    UiColor dwTextColor; //文字颜色值
+    uint8_t uFade = 255; //文字的透明度[0 - 255]
 
-    IFont* pFont = nullptr;             //文字的字体
-    uint32_t uFormat = 0;               //文字的格式，参见 enum DrawStringFormat 类型定义    
-    float fSpacingMul = 1.0f;           //行间距倍数: 字体大小的倍数比例（默认值通常为 1.0，即 100% 字体大小），用于按比例调整行间距
-    float fSpacingAdd = 0;              //行间距附加量: 是固定的附加像素值（默认值通常为 0），用于在比例调整的基础上增加固定偏移（像素）
-    float fWordSpacing = 0;             //设置两个相邻的字符之间的间隔（像素）
+    IFont *pFont = nullptr; //文字的字体
+    uint32_t uFormat = 0;   //文字的格式，参见 enum DrawStringFormat 类型定义
+    float fSpacingMul
+        = 1.0f; //行间距倍数: 字体大小的倍数比例（默认值通常为 1.0，即 100% 字体大小），用于按比例调整行间距
+    float fSpacingAdd
+        = 0; //行间距附加量: 是固定的附加像素值（默认值通常为 0），用于在比例调整的基础上增加固定偏移（像素）
+    float fWordSpacing = 0; //设置两个相邻的字符之间的间隔（像素）
 
-    bool bUseFontHeight = true;         //纵向绘制时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
-    bool bRotate90ForAscii = true;      //纵向绘制时，对于字母数字等，旋转90度显示
+    bool bUseFontHeight
+        = true; //纵向绘制时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
+    bool bRotate90ForAscii = true; //纵向绘制时，对于字母数字等，旋转90度显示
 };
 
 /** 渲染接口
@@ -881,11 +892,11 @@ public:
      * @return 返回当前的视区原点坐标(x,y)
      */
     virtual UiPoint GetWindowOrg() const = 0;
-    
+
     /** 保存指定设备上下文的当前状态
     * @param [out] 返回保存的设备上下文标志，在RestoreClip的时候，作为参数传入
     */
-    virtual void SaveClip(int32_t& nState) = 0;
+    virtual void SaveClip(int32_t &nState) = 0;
 
     /** 将设备上下文还原到最近一次保存的状态
     * @param [in] 保存的设备上下文标志（由SaveClip返回）
@@ -897,7 +908,7 @@ public:
     * @param [in] bIntersect ClipOp操作标志，true表示kIntersect操作，false表示kDifference操作
     * @return 返回当前设备上下文标志，在调用ClearClip的时候需要传回该返回值，错误时返回-1
     */
-    virtual int32_t SetClip(const UiRect& rc, bool bIntersect = true) = 0;
+    virtual int32_t SetClip(const UiRect &rc, bool bIntersect = true) = 0;
 
     /** 设置圆角矩形剪辑区域，并保存当前设备上下文的状态
     * @param [in] rcItem 剪辑区域，与当前剪辑区取交集作为新的剪辑区域
@@ -906,7 +917,8 @@ public:
     * @param [in] bIntersect ClipOp操作标志，true表示kIntersect操作，false表示kDifference操作
     * @return 返回当前设备上下文标志，在调用ClearClip的时候需要传回该返回值，错误时返回-1
     */
-    virtual int32_t SetRoundClip(const UiRect& rcItem, float rx, float ry, bool bIntersect = true) = 0;
+    virtual int32_t SetRoundClip(const UiRect &rcItem, float rx, float ry, bool bIntersect = true)
+        = 0;
 
     /** 清除矩形剪辑区域，并恢复设备上下文到最近一次保存的状态
     * @return [in] nState 设备上下文标志, 由SetClip或者SetRoundClip函数返回
@@ -924,9 +936,15 @@ public:
     * @param [in] ySrc 源矩形左上角的 y 坐标
     * @param [in] rop 光栅操作代码
     */
-    virtual bool BitBlt(int32_t x, int32_t y, int32_t cx, int32_t cy,
-                        IRender* pSrcRender, int32_t xSrc, int32_t ySrc,
-                        RopMode rop) = 0;
+    virtual bool BitBlt(
+        int32_t x,
+        int32_t y,
+        int32_t cx,
+        int32_t cy,
+        IRender *pSrcRender,
+        int32_t xSrc,
+        int32_t ySrc,
+        RopMode rop) = 0;
 
     /** 函数将一个位图从源矩形复制到目标矩形中，并拉伸或压缩位图以适应目标矩形的尺寸（如有必要）。 
         系统根据当前在目标设备上下文中设置的拉伸模式拉伸或压缩位图。
@@ -941,10 +959,17 @@ public:
     * @param [in] heightSrc 源矩形的高度
     * @param [in] rop 光栅操作代码
     */
-    virtual bool StretchBlt(int32_t xDest, int32_t yDest, int32_t widthDest, int32_t heightDest,
-                            IRender* pSrcRender, int32_t xSrc, int32_t ySrc, int32_t widthSrc, int32_t heightSrc,
-                            RopMode rop) = 0;
-
+    virtual bool StretchBlt(
+        int32_t xDest,
+        int32_t yDest,
+        int32_t widthDest,
+        int32_t heightDest,
+        IRender *pSrcRender,
+        int32_t xSrc,
+        int32_t ySrc,
+        int32_t widthSrc,
+        int32_t heightSrc,
+        RopMode rop) = 0;
 
     /** 显示具有透明或半透明像素的位图，如果源矩形和目标矩形的大小不相同，则会拉伸源位图以匹配目标矩形。
     * @param [in] xDest 目标矩形左上角的 x 坐标
@@ -958,9 +983,17 @@ public:
     * @param [in] heightSrc 源矩形的高度
     * @param [in] alpha 透明度 alpha 值（0 - 255）
     */
-    virtual bool AlphaBlend(int32_t xDest, int32_t yDest, int32_t widthDest, int32_t heightDest,
-                            IRender* pSrcRender, int32_t xSrc, int32_t ySrc, int32_t widthSrc, int32_t heightSrc,
-                            uint8_t alpha = 255) = 0;
+    virtual bool AlphaBlend(
+        int32_t xDest,
+        int32_t yDest,
+        int32_t widthDest,
+        int32_t heightDest,
+        IRender *pSrcRender,
+        int32_t xSrc,
+        int32_t ySrc,
+        int32_t widthSrc,
+        int32_t heightSrc,
+        uint8_t alpha = 255) = 0;
 
     /** 绘制图片（采用九宫格方式绘制图片）
     * @param [in] rcPaint 当前全部可绘制区域（用于避免非可绘制区域的绘制，以提高绘制性能）
@@ -973,19 +1006,26 @@ public:
     * @param [in] pTiledDrawParam 平铺相关参数，不平铺绘制时可传nullptr
     * @param [in] bWindowShadowMode 九宫格绘制时，不绘制中间部分（比如窗口阴影，只需要绘制边框，不需要绘制中间部分）
     */
-    virtual void DrawImage(const UiRect& rcPaint, IBitmap* pBitmap, 
-                           const UiRect& rcDest, const UiRect& rcDestCorners,
-                           const UiRect& rcSource, const UiRect& rcSourceCorners,
-                           uint8_t uFade = 255,
-                           const TiledDrawParam* pTiledDrawParam = nullptr,
-                           bool bWindowShadowMode = false) = 0;
+    virtual void DrawImage(
+        const UiRect &rcPaint,
+        IBitmap *pBitmap,
+        const UiRect &rcDest,
+        const UiRect &rcDestCorners,
+        const UiRect &rcSource,
+        const UiRect &rcSourceCorners,
+        uint8_t uFade = 255,
+        const TiledDrawParam *pTiledDrawParam = nullptr,
+        bool bWindowShadowMode = false) = 0;
     /** 绘制图片（采用九宫格方式绘制图片）, 无圆角参数
     */
-    virtual void DrawImage(const UiRect& rcPaint, IBitmap* pBitmap, 
-                           const UiRect& rcDest,  const UiRect& rcSource, 
-                           uint8_t uFade = 255,
-                           const TiledDrawParam* pTiledDrawParam = nullptr,
-                           bool bWindowShadowMode = false) = 0;
+    virtual void DrawImage(
+        const UiRect &rcPaint,
+        IBitmap *pBitmap,
+        const UiRect &rcDest,
+        const UiRect &rcSource,
+        uint8_t uFade = 255,
+        const TiledDrawParam *pTiledDrawParam = nullptr,
+        bool bWindowShadowMode = false) = 0;
 
     /** 绘制图片
     * @param [in] rcPaint 当前全部可绘制区域（用于避免非可绘制区域的绘制，以提高绘制性能）
@@ -995,9 +1035,13 @@ public:
     * @param [in] uFade 透明度（0 - 255）
     * @param [in] pMatrix 绘制时的变换矩阵接口
     */
-    virtual void DrawImageRect(const UiRect& rcPaint, IBitmap* pBitmap,
-                               const UiRect& rcDest, const UiRect& rcSource,
-                               uint8_t uFade = 255, IMatrix* pMatrix = nullptr) = 0;
+    virtual void DrawImageRect(
+        const UiRect &rcPaint,
+        IBitmap *pBitmap,
+        const UiRect &rcDest,
+        const UiRect &rcSource,
+        uint8_t uFade = 255,
+        IMatrix *pMatrix = nullptr) = 0;
 
     /** 绘制直线
     * @param [in] pt1 起始点坐标
@@ -1005,14 +1049,15 @@ public:
     * @param [in] penColor 画笔的颜色值
     * @param [in] nWidth 画笔的宽度
     */
-    virtual void DrawLine(const UiPointF& pt1, const UiPointF& pt2, UiColor penColor, float fWidth) = 0;
+    virtual void DrawLine(const UiPointF &pt1, const UiPointF &pt2, UiColor penColor, float fWidth)
+        = 0;
 
     /** 绘制直线，支持各种线形
     * @param [in] pt1 起始点坐标
     * @param [in] pt2 终止点坐标
     * @param [in] pen 画笔的接口
     */
-    virtual void DrawLine(const UiPointF& pt1, const UiPointF& pt2, IPen* pen) = 0;
+    virtual void DrawLine(const UiPointF &pt1, const UiPointF &pt2, IPen *pen) = 0;
 
     /** 绘制矩形
     * @param [in] rc 矩形区域
@@ -1020,21 +1065,22 @@ public:
     * @param [in] fWidth 画笔的宽度
     * @param [in] bLineInRect 如果为true，表示确保画出的线条严格限制在rc矩形内部，否则线的中心点是与rc边线对齐的，线条会有部分超出rc矩形范围
     */
-    virtual void DrawRect(const UiRectF& rc, UiColor penColor, float fWidth, bool bLineInRect = false) = 0;
+    virtual void DrawRect(
+        const UiRectF &rc, UiColor penColor, float fWidth, bool bLineInRect = false) = 0;
 
     /** 绘制矩形，支持各种线形
     * @param [in] rc 矩形区域
     * @param [in] pen 画笔的接口
     * @param [in] bLineInRect 如果为true，表示确保画出的线条严格限制在rc矩形内部，否则线的中心点是与rc边线对齐的，线条会有部分超出rc矩形范围
     */
-    virtual void DrawRect(const UiRectF& rc, IPen* pen, bool bLineInRect = false) = 0;
+    virtual void DrawRect(const UiRectF &rc, IPen *pen, bool bLineInRect = false) = 0;
 
     /** 用颜色填充矩形
     * @param [in] rc 目标矩形区域
     * @param [in] dwColor 颜色值
     * @param [in] uFade 透明度（0 - 255）
     */
-    virtual void FillRect(const UiRectF& rc, UiColor dwColor, uint8_t uFade = 255) = 0;
+    virtual void FillRect(const UiRectF &rc, UiColor dwColor, uint8_t uFade = 255) = 0;
 
     /** 用渐变颜色填充矩形（支持渐变颜色）
     * @param [in] rc 目标矩形区域
@@ -1043,7 +1089,12 @@ public:
     * @param [in] nColor2Direction 渐变颜色的渐变方向，"1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
     * @param [in] uFade 透明度（0 - 255）
     */
-    virtual void FillRect(const UiRectF& rc, UiColor dwColor, UiColor dwColor2, int8_t nColor2Direction, uint8_t uFade = 255) = 0;
+    virtual void FillRect(
+        const UiRectF &rc,
+        UiColor dwColor,
+        UiColor dwColor2,
+        int8_t nColor2Direction,
+        uint8_t uFade = 255) = 0;
 
     /** 绘制圆角矩形
     * @param [in] rc 矩形区域
@@ -1052,7 +1103,8 @@ public:
     * @param [in] penColor 画笔的颜色值
     * @param [in] fWidth 画笔的宽度
     */
-    virtual void DrawRoundRect(const UiRectF& rc, float rx, float ry, UiColor penColor, float fWidth) = 0;
+    virtual void DrawRoundRect(
+        const UiRectF &rc, float rx, float ry, UiColor penColor, float fWidth) = 0;
 
     /** 绘制圆角矩形，支持各种线形
     * @param [in] rc 矩形区域
@@ -1060,7 +1112,7 @@ public:
     * @param [in] ry 圆角的高度
     * @param [in] pen 画笔的接口
     */
-    virtual void DrawRoundRect(const UiRectF& rc, float rx, float ry, IPen* pen) = 0;
+    virtual void DrawRoundRect(const UiRectF &rc, float rx, float ry, IPen *pen) = 0;
 
     /** 用颜色填充圆角矩形
     * @param [in] rc 矩形区域
@@ -1069,7 +1121,8 @@ public:
     * @param [in] dwColor 颜色值
     * @param [in] uFade 透明度（0 - 255）
     */
-    virtual void FillRoundRect(const UiRectF& rc, float rx, float ry, UiColor dwColor, uint8_t uFade = 255) = 0;
+    virtual void FillRoundRect(
+        const UiRectF &rc, float rx, float ry, UiColor dwColor, uint8_t uFade = 255) = 0;
 
     /** 用颜色填充圆角矩形(支持渐变颜色)
     * @param [in] rc 矩形区域
@@ -1080,7 +1133,14 @@ public:
     * @param [in] nColor2Direction 渐变颜色的渐变方向，"1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
     * @param [in] uFade 透明度（0 - 255）
     */
-    virtual void FillRoundRect(const UiRectF& rc, float rx, float ry, UiColor dwColor, UiColor dwColor2, int8_t nColor2Direction, uint8_t uFade = 255) = 0;
+    virtual void FillRoundRect(
+        const UiRectF &rc,
+        float rx,
+        float ry,
+        UiColor dwColor,
+        UiColor dwColor2,
+        int8_t nColor2Direction,
+        uint8_t uFade = 255) = 0;
 
     /** 绘制曲线（椭圆的一部分）
     * @param [in] rc 包含圆弧的椭圆的矩形边界区域
@@ -1091,9 +1151,14 @@ public:
     * @param [in] gradientColor 可选参数，渐变颜色
     * @param [in] gradientRect 可选参数，渐变颜色的矩形区域设置，仅当gradientColor不为nullptr时有效
     */
-    virtual void DrawArc(const UiRect& rc, float startAngle, float sweepAngle, bool useCenter, 
-                         const IPen* pen, 
-                         UiColor* gradientColor = nullptr, const UiRect* gradientRect = nullptr) = 0;
+    virtual void DrawArc(
+        const UiRect &rc,
+        float startAngle,
+        float sweepAngle,
+        bool useCenter,
+        const IPen *pen,
+        UiColor *gradientColor = nullptr,
+        const UiRect *gradientRect = nullptr) = 0;
 
     /** 绘制圆形
     * @param [in] centerPt 圆心坐标点
@@ -1101,14 +1166,15 @@ public:
     * @param [in] penColor 画笔的颜色值
     * @param [in] fWidth 画笔的宽度
     */
-    virtual void DrawCircle(const UiPointF& centerPt, float radius, UiColor penColor, float fWidth) = 0;
+    virtual void DrawCircle(const UiPointF &centerPt, float radius, UiColor penColor, float fWidth)
+        = 0;
 
     /** 绘制圆形，支持各种线形
     * @param [in] centerPt 圆心坐标点
     * @param [in] radius 圆的半径
     * @param [in] pen 画笔的接口
     */
-    virtual void DrawCircle(const UiPointF& centerPt, float radius, IPen* pen) = 0;
+    virtual void DrawCircle(const UiPointF &centerPt, float radius, IPen *pen) = 0;
 
     /** 填充圆形
     * @param [in] centerPt 圆心坐标点
@@ -1116,19 +1182,20 @@ public:
     * @param [in] dwColor 颜色值
     * @param [in] uFade 透明度（0 - 255）
     */
-    virtual void FillCircle(const UiPointF& centerPt, float radius, UiColor dwColor, uint8_t uFade = 255) = 0;
+    virtual void FillCircle(
+        const UiPointF &centerPt, float radius, UiColor dwColor, uint8_t uFade = 255) = 0;
 
     /** 绘制路径
     * @param [in] path 路径的接口
     * @param [in] pen 绘制路径使用的画笔
     */
-    virtual void DrawPath(const IPath* path, const IPen* pen) = 0;
+    virtual void DrawPath(const IPath *path, const IPen *pen) = 0;
 
     /** 填充路径
     * @param [in] path 路径的接口
     * @param [in] brush 填充路径使用的画刷
     */
-    virtual void FillPath(const IPath* path, const IBrush* brush) = 0;
+    virtual void FillPath(const IPath *path, const IBrush *brush) = 0;
 
     /** 填充路径（支持背景颜色渐变）
     * @param [in] path 路径的接口
@@ -1137,20 +1204,25 @@ public:
     * @param [in] dwColor2 填充路径使用的第二个颜色
     * @param [in] nColor2Direction 渐变颜色的渐变方向，"1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下
     */
-    virtual void FillPath(const IPath* path, const UiRectF& rc, UiColor dwColor, UiColor dwColor2, int8_t nColor2Direction) = 0;
+    virtual void FillPath(
+        const IPath *path,
+        const UiRectF &rc,
+        UiColor dwColor,
+        UiColor dwColor2,
+        int8_t nColor2Direction) = 0;
 
     /** 计算指定文本字符串的宽度和高度
     * @param [in] strText 文字内容
     * @param [in] measureParam 评估相关的参数
     * @return 返回文本字符串的宽度和高度，以矩形表示结果
     */
-    virtual UiRect MeasureString(const DString& strText, const MeasureStringParam& measureParam) = 0;
+    virtual UiRect MeasureString(const DString &strText, const MeasureStringParam &measureParam) = 0;
 
     /** 绘制文字
     * @param [in] strText 文字内容
     * @param [in] drawParam 文字绘制相关的参数
     */
-    virtual void DrawString(const DString& strText, const DrawStringParam& drawParam) = 0;
+    virtual void DrawString(const DString &strText, const DrawStringParam &drawParam) = 0;
 
     /** 计算格式文本的宽度和高度
     * @param [in] textRect 绘制文本的矩形区域
@@ -1159,11 +1231,12 @@ public:
     * @param [in] richTextData 格式化文字内容，返回文字绘制的区域
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    virtual void MeasureRichText(const UiRect& textRect,
-                                 const UiSize& szScrollOffset,
-                                 IRenderFactory* pRenderFactory, 
-                                 const std::vector<RichTextData>& richTextData,
-                                 std::vector<std::vector<UiRect>>* pRichTextRects) = 0;
+    virtual void MeasureRichText(
+        const UiRect &textRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        std::vector<std::vector<UiRect>> *pRichTextRects) = 0;
 
     /** 计算格式文本的宽度和高度, 并计算每个字符的位置
     * @param [in] textRect 绘制文本的矩形区域
@@ -1173,12 +1246,13 @@ public:
     * @param [in,out] pLineInfoParam 如果不为nullptr，则计算每个字符的区域
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    virtual void MeasureRichText2(const UiRect& textRect,
-                                  const UiSize& szScrollOffset,
-                                  IRenderFactory* pRenderFactory, 
-                                  const std::vector<RichTextData>& richTextData,
-                                  RichTextLineInfoParam* pLineInfoParam,
-                                  std::vector<std::vector<UiRect>>* pRichTextRects) = 0;
+    virtual void MeasureRichText2(
+        const UiRect &textRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        RichTextLineInfoParam *pLineInfoParam,
+        std::vector<std::vector<UiRect>> *pRichTextRects) = 0;
 
     /** 计算格式文本的宽度和高度, 并计算每个字符的位置，并创建绘制缓存
     * @param [in] textRect 绘制文本的矩形区域
@@ -1189,13 +1263,14 @@ public:
     * @param [out] spDrawRichTextCache 返回绘制缓存
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    virtual void MeasureRichText3(const UiRect& textRect,
-                                  const UiSize& szScrollOffset,
-                                  IRenderFactory* pRenderFactory, 
-                                  const std::vector<RichTextData>& richTextData,
-                                  RichTextLineInfoParam* pLineInfoParam,
-                                  std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
-                                  std::vector<std::vector<UiRect>>* pRichTextRects) = 0;
+    virtual void MeasureRichText3(
+        const UiRect &textRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        RichTextLineInfoParam *pLineInfoParam,
+        std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache,
+        std::vector<std::vector<UiRect>> *pRichTextRects) = 0;
 
     /** 绘制格式文本
     * @param [in] textRect 绘制文本的矩形区域
@@ -1205,12 +1280,13 @@ public:
     * @param [in] uFade 透明度（0 - 255）
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    virtual void DrawRichText(const UiRect& textRect,
-                              const UiSize& szScrollOffset,
-                              IRenderFactory* pRenderFactory, 
-                              const std::vector<RichTextData>& richTextData,
-                              uint8_t uFade = 255,
-                              std::vector<std::vector<UiRect>>* pRichTextRects = nullptr) = 0;
+    virtual void DrawRichText(
+        const UiRect &textRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        uint8_t uFade = 255,
+        std::vector<std::vector<UiRect>> *pRichTextRects = nullptr) = 0;
 
     /** 创建RichText的绘制缓存
     * @param [in] textRect 绘制文本的矩形区域
@@ -1219,20 +1295,22 @@ public:
     * @param [in] richTextData 格式化文字内容
     * @param [out] spDrawRichTextCache 返回绘制缓存
     */
-    virtual bool CreateDrawRichTextCache(const UiRect& textRect,
-                                         const UiSize& szScrollOffset,
-                                         IRenderFactory* pRenderFactory,
-                                         const std::vector<RichTextData>& richTextData,
-                                         std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache) = 0;
+    virtual bool CreateDrawRichTextCache(
+        const UiRect &textRect,
+        const UiSize &szScrollOffset,
+        IRenderFactory *pRenderFactory,
+        const std::vector<RichTextData> &richTextData,
+        std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache) = 0;
 
     /** 判断RichText的绘制缓存是否有效
     * @param [in] textRect 绘制文本的矩形区域
     * @param [in] richTextData 格式化文字内容，返回文字绘制的区域
     * @param [out] spDrawRichTextCache 返回绘制缓存
     */
-    virtual bool IsValidDrawRichTextCache(const UiRect& textRect,
-                                          const std::vector<RichTextData>& richTextData,
-                                          const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache) = 0;
+    virtual bool IsValidDrawRichTextCache(
+        const UiRect &textRect,
+        const std::vector<RichTextData> &richTextData,
+        const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache) = 0;
 
     /** 更新RichText的绘制缓存(增量计算)
     * @param [in] spOldDrawRichTextCache 需要更新的缓存
@@ -1245,19 +1323,21 @@ public:
     * @param [in] nDeletedRows 删除了几个逻辑行
     * @param [in] rowRectTopList 每个逻辑行的top坐标，用于更新行的坐标(下标值为逻辑行，从0开始编号)
     */
-    virtual bool UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& spOldDrawRichTextCache,
-                                         const std::shared_ptr<DrawRichTextCache>& spUpdateDrawRichTextCache,
-                                         std::vector<RichTextData>& richTextDataNew,
-                                         size_t nStartLine,
-                                         const std::vector<size_t>& modifiedLines,
-                                         size_t nModifiedRows,
-                                         const std::vector<size_t>& deletedLines,
-                                         size_t nDeletedRows,
-                                         const std::vector<int32_t>& rowRectTopList) = 0;
+    virtual bool UpdateDrawRichTextCache(
+        std::shared_ptr<DrawRichTextCache> &spOldDrawRichTextCache,
+        const std::shared_ptr<DrawRichTextCache> &spUpdateDrawRichTextCache,
+        std::vector<RichTextData> &richTextDataNew,
+        size_t nStartLine,
+        const std::vector<size_t> &modifiedLines,
+        size_t nModifiedRows,
+        const std::vector<size_t> &deletedLines,
+        size_t nDeletedRows,
+        const std::vector<int32_t> &rowRectTopList) = 0;
 
     /** 比较两个绘制缓存的数据是否一致
     */
-    virtual bool IsDrawRichTextCacheEqual(const DrawRichTextCache& first, const DrawRichTextCache& second) const = 0;
+    virtual bool IsDrawRichTextCacheEqual(
+        const DrawRichTextCache &first, const DrawRichTextCache &second) const = 0;
 
     /** 绘制RichText的缓存中的内容（绘制前，需要使用IsValidDrawRichTextCache判断缓存是否失效）
     * @param [in] spDrawRichTextCache 缓存的数据
@@ -1267,12 +1347,13 @@ public:
     * @param [in] uFade 透明度（0 - 255）
     * @param [out] pRichTextRects 如果不为nullptr，则返回richTextData中每个数据绘制的矩形范围列表
     */
-    virtual void DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,
-                                       const UiRect& textRect,
-                                       const UiSize& szNewScrollOffset,
-                                       const std::vector<int32_t>& rowXOffset,
-                                       uint8_t uFade,
-                                       std::vector<std::vector<UiRect>>* pRichTextRects = nullptr) = 0;
+    virtual void DrawRichTextCacheData(
+        const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache,
+        const UiRect &textRect,
+        const UiSize &szNewScrollOffset,
+        const std::vector<int32_t> &rowXOffset,
+        uint8_t uFade,
+        std::vector<std::vector<UiRect>> *pRichTextRects = nullptr) = 0;
 
     /** 在指定矩形周围绘制阴影（高斯模糊, 只支持外部阴影，不支持内部阴影）
     * @param [in] rc 矩形区域
@@ -1286,38 +1367,40 @@ public:
     * @param [in] dwColor 阴影的颜色值
     * @param [in] uAlpha 透明度（0 - 255）
     */
-    virtual void DrawBoxShadow(const UiRect& rc, 
-                               const UiSize& roundSize, 
-                               const UiPoint& cpOffset, 
-                               int32_t nBlurRadius, 
-                               int32_t nSpreadRadius,
-                               UiColor dwColor,
-                               uint8_t uAlpha) = 0;
-
+    virtual void DrawBoxShadow(
+        const UiRect &rc,
+        const UiSize &roundSize,
+        const UiPoint &cpOffset,
+        int32_t nBlurRadius,
+        int32_t nSpreadRadius,
+        UiColor dwColor,
+        uint8_t uAlpha) = 0;
 
     /** 分离位图
     *@return 返回位图接口，返回后由调用方管理资源（包括释放资源等）
     */
-    virtual IBitmap* MakeImageSnapshot() = 0;
+    virtual IBitmap *MakeImageSnapshot() = 0;
 
     /** 将矩形区域内的图像Alpha设定为指定值alpha(0 - 255)
     * @param [in] rcDirty 矩形区域
     * @param [in] alpha 需要设定的Aplpa值
     */
-    virtual void ClearAlpha(const UiRect& rcDirty, uint8_t alpha = 0) = 0;
+    virtual void ClearAlpha(const UiRect &rcDirty, uint8_t alpha = 0) = 0;
 
     /** 恢复矩形区域内的图像Alpha值为alpha(0 - 255)
     * @param [in] rcDirty 矩形区域
     * @param [in] rcShadowPadding 阴影边距（分别对应矩形的左/右/上/下边距的Padding值）
     * @param [in] alpha 需要恢复的Alpha值（需要与ClearAlpha时传入的alpha值相同）
     */
-    virtual void RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding, uint8_t alpha) = 0;
+    virtual void RestoreAlpha(
+        const UiRect &rcDirty, const UiPadding &rcShadowPadding, uint8_t alpha) = 0;
 
     /** 恢复矩形区域内的图像Alpha值为255
     * @param [in] rcDirty 矩形区域
     * @param [in] rcShadowPadding 阴影边距（分别对应矩形的左/右/上/下边距的Padding值）
     */
-    virtual void RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding = UiPadding()) = 0;
+    virtual void RestoreAlpha(const UiRect &rcDirty, const UiPadding &rcShadowPadding = UiPadding())
+        = 0;
 
 #ifdef DUILIB_BUILD_FOR_WIN
     /** 获取DC句柄，当不使用后，需要调用ReleaseDC接口释放资源
@@ -1334,13 +1417,13 @@ public:
     /** 清除位图数据，填充指定颜色（若要使位图数据全部清零，可传入UiColor()参数）
     * @param [in] uiColor 需要填充的颜色值
     */
-    virtual void Clear(const UiColor& uiColor) = 0;
+    virtual void Clear(const UiColor &uiColor) = 0;
 
     /** 清除位图指定区域的数据，填充指定颜色（若要使位图数据全部清零，可传入UiColor()参数）
     * @param [in] rcDirty 需要清除的区域
     * @param [in] uiColor 需要填充的颜色值
     */
-    virtual void ClearRect(const UiRect& rcDirty, const UiColor& uiColor) = 0;
+    virtual void ClearRect(const UiRect &rcDirty, const UiColor &uiColor) = 0;
 
     /** 克隆一个新的对象
     */
@@ -1351,14 +1434,14 @@ public:
     * @param [in] dstPixels 读取的目标缓冲区起始地址
     * @param [in] dstPixelsLen 目标dstPixels的缓冲区长度, 长度需要满足要求：dstPixelsLen >= (rc.Width() * rc.Height() * sizeof(uint32_t))
     */
-    virtual bool ReadPixels(const UiRect& rc, void* dstPixels, size_t dstPixelsLen) = 0;
+    virtual bool ReadPixels(const UiRect &rc, void *dstPixels, size_t dstPixelsLen) = 0;
 
     /** 将数据写入到位图中去（数据是复制一份到目标数据）
     * @param [in] srcPixels 源数据的缓冲区起始地址
     * @param [in] srcPixelsLen 源数据srcPixels缓冲区长度, 长度需要满足要求：srcPixelsLen == (rc.Width() * rc.Height() * sizeof(uint32_t))
     * @param [in] rc 在Render中的矩形范围，将位图数据写入到此矩形内，rc.Width()代表图像数据的宽度，rc.Height()代表图像数据的高度
     */
-    virtual bool WritePixels(void* srcPixels, size_t srcPixelsLen, const UiRect& rc) = 0;
+    virtual bool WritePixels(void *srcPixels, size_t srcPixelsLen, const UiRect &rc) = 0;
 
     /** 将数据写入到位图中去(数据是复制一份到目标数据，仅复制绘制部分)
     * @param [in] srcPixels 源数据的缓冲区起始地址
@@ -1366,7 +1449,8 @@ public:
     * @param [in] rc 在Render中的矩形范围，rc.Width()代表图像数据的宽度，rc.Height()代表图像数据的高度
     * @param [in] rcPaint 绘制的部分矩形范围，代表脏区域，仅绘制rcPaint与rc交集的部分区域
     */
-    virtual bool WritePixels(void* srcPixels, size_t srcPixelsLen, const UiRect& rc, const UiRect& rcPaint) = 0;
+    virtual bool WritePixels(
+        void *srcPixels, size_t srcPixelsLen, const UiRect &rc, const UiRect &rcPaint) = 0;
 
     /** 获取当前的裁剪区域
     * @param [out] clipRects 返回裁剪区域的矩形数据，矩形区域坐标为客户区坐标
@@ -1374,7 +1458,7 @@ public:
                              如果是RenderClipType::kRegion类型，容器中有多个元素，用于构建Region
     * @return 返回裁剪区域类型
     */
-    virtual RenderClipType GetClipInfo(std::vector<UiRect>& clipRects) = 0;
+    virtual RenderClipType GetClipInfo(std::vector<UiRect> &clipRects) = 0;
 
     /** 判断裁剪区域是否为空(如果为空不需要绘制)
     */
@@ -1386,12 +1470,12 @@ public:
 
     /** 设置Render使用的DPI转换接口
     */
-    virtual void SetRenderDpi(const IRenderDpiPtr& spRenderDpi) = 0;
+    virtual void SetRenderDpi(const IRenderDpiPtr &spRenderDpi) = 0;
 
     /** 绘制并刷新到屏幕（Render的实现已经与窗口关联）, 同步完成
     * @param [in] pRenderPaint 界面绘制所需的回调接口
     */
-    virtual bool PaintAndSwapBuffers(IRenderPaint* pRenderPaint) = 0;
+    virtual bool PaintAndSwapBuffers(IRenderPaint *pRenderPaint) = 0;
 
     /** 设置窗口的形状为圆角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
@@ -1399,19 +1483,18 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw) = 0;
+    virtual bool SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw) = 0;
 
     /** 设置窗口的形状为直角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    virtual bool SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw) = 0;
+    virtual bool SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw) = 0;
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] bRedraw 是否重绘
     */
     virtual void ClearWindowRgn(bool bRedraw) = 0;
-
 };
 
 /** 渲染接口管理，用于创建Font、Pen、Brush、Path、Matrix、Bitmap、Render等渲染实现对象
@@ -1423,40 +1506,41 @@ public:
 
     /** 创建一个Font对象
     */
-    virtual IFont* CreateIFont() = 0;
+    virtual IFont *CreateIFont() = 0;
 
     /** 创建一个Pen对象
     */
-    virtual IPen* CreatePen(UiColor color, float fWidth = 1) = 0;
+    virtual IPen *CreatePen(UiColor color, float fWidth = 1) = 0;
 
     /** 创建一个Brush对象
     */
-    virtual IBrush* CreateBrush(UiColor corlor) = 0;
+    virtual IBrush *CreateBrush(UiColor corlor) = 0;
 
     /** 创建一个Path对象
     */
-    virtual IPath* CreatePath() = 0;
+    virtual IPath *CreatePath() = 0;
 
     /** 创建一个Matrix对象
     */
-    virtual IMatrix* CreateMatrix() = 0;
+    virtual IMatrix *CreateMatrix() = 0;
 
     /** 创建一个Bitmap对象
     */
-    virtual IBitmap* CreateBitmap() = 0;
+    virtual IBitmap *CreateBitmap() = 0;
 
     /** 创建一个Render对象
     * @param [in] spRenderDpi 关联的DPI转换接口
     * @param [in] platformData 平台相关的数据，Windows平台该值是窗口句柄
     * @parma [in] backendType 后台绘制方式
     */
-    virtual IRender* CreateRender(const IRenderDpiPtr& spRenderDpi,
-                                  void* platformData = nullptr,
-                                  RenderBackendType backendType = RenderBackendType::kRaster_BackendType) = 0;
+    virtual IRender *CreateRender(
+        const IRenderDpiPtr &spRenderDpi,
+        void *platformData = nullptr,
+        RenderBackendType backendType = RenderBackendType::kRaster_BackendType) = 0;
 
     /** 获取字体管理器接口（每个factory共享一个对象）
     */
-    virtual IFontMgr* GetFontMgr() const = 0;
+    virtual IFontMgr *GetFontMgr() const = 0;
 };
 
 } // namespace ui

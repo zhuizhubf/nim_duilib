@@ -21,12 +21,15 @@ class ChildWindowPaintScheduler;
 class MyChildWindowEvents : public ui::ChildWindowEvents
 {
 public:
-    MyChildWindowEvents(ui::ChildWindow* pChildWindow, size_t nChildWindowIndex, ChildWindowPaintScheduler* pPaintScheduler);
+    MyChildWindowEvents(
+        ui::ChildWindow *pChildWindow,
+        size_t nChildWindowIndex,
+        ChildWindowPaintScheduler *pPaintScheduler);
     virtual ~MyChildWindowEvents() override;
 
     /** 获取关联的子窗口
     */
-    ui::ChildWindow* GetChildWindow() const;
+    ui::ChildWindow *GetChildWindow() const;
 
     /** 当前是否处于持续绘制的状态
     */
@@ -41,7 +44,8 @@ protected:
      * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
      * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
      */
-    virtual LRESULT OnPaintMsg(const ui::UiRect& rcPaint, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnPaintMsg(
+        const ui::UiRect &rcPaint, const ui::NativeMsg &nativeMsg, bool &bHandled) override;
 
 private:
     //关联的子窗口
@@ -51,7 +55,7 @@ private:
     std::unique_ptr<ChildWindowPaint> m_childWindowPaint;
 
     //窗口绘制管理器
-    ChildWindowPaintScheduler* m_pPaintScheduler;
+    ChildWindowPaintScheduler *m_pPaintScheduler;
 
     //FPS计数器
     std::unique_ptr<FPSCounter> m_fps;

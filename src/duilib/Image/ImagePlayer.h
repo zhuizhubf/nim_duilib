@@ -1,38 +1,37 @@
 #ifndef UI_IMAGE_IMAGE_PLAYER_H_
 #define UI_IMAGE_IMAGE_PLAYER_H_
 
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Core/Callback.h"
 #include "duilib/Core/ControlPtrT.h"
+#include "duilib/Core/UiTypes.h"
 #include <map>
 
-namespace ui 
-{
+namespace ui {
 class Image;
 class Control;
 
 /** 控件图片动画播放的逻辑封装（支持GIF/WebP/APNG/Lottie-JSON/PAG动画）
 */
-class DUILIB_API ImagePlayer: public SupportWeakCallback
+class DUILIB_API ImagePlayer : public SupportWeakCallback
 {
 public:
     ImagePlayer();
     virtual ~ImagePlayer() override;
-    ImagePlayer(const ImagePlayer&) = delete;
-    ImagePlayer& operator = (const ImagePlayer&) = delete;
+    ImagePlayer(const ImagePlayer &) = delete;
+    ImagePlayer &operator=(const ImagePlayer &) = delete;
 
 public:
     /** 设置关联的控件接口
     */
-    void SetControl(Control* pControl);
+    void SetControl(Control *pControl);
 
     /** 设置关联的图片接口
     */
-    void SetImage(Image* pImage);
+    void SetImage(Image *pImage);
 
     /** 设置动画的显示区域（在绘制前调用）
     */
-    void SetImageAnimationRect(const UiRect& rcImageRect);
+    void SetImageAnimationRect(const UiRect &rcImageRect);
 
     /** 播放动画（按需检测是否应该自动播放图片动画, 正常情况下，图片动画会自动播放）
      */
@@ -84,7 +83,7 @@ private:
 
     /** 获取动画图片的播放状态
     */
-    void GetImageAnimationStatus(ImageAnimationStatus& animStatus);
+    void GetImageAnimationStatus(ImageAnimationStatus &animStatus);
 
 private:
     /** 图片动画播放的取消机制
@@ -97,7 +96,7 @@ private:
 
     /** 图片接口
     */
-    Image* m_pImage;
+    Image *m_pImage;
 
     /** 动画的显示区域
     */

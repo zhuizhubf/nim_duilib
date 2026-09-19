@@ -1,20 +1,18 @@
 #ifndef UI_UTILS_TRAY_ICON_H_
 #define UI_UTILS_TRAY_ICON_H_
 
-#include "duilib/duilib_defs.h"
 #include "duilib/Core/UiTypes.h"
+#include "duilib/duilib_defs.h"
 #include <functional>
 #include <memory>
 
-namespace ui
-{
+namespace ui {
 
 class Window;
 
 /** 托盘图标消息类型
 */
-enum class TrayIconMessageType
-{
+enum class TrayIconMessageType {
     kLeftClick,        // 左键单击
     kLeftDoubleClick,  // 左键双击      (非Windows平台，使用SDL时，无此消息)
     kRightClick,       // 右键单击
@@ -29,7 +27,8 @@ enum class TrayIconMessageType
  * @param [in] x 鼠标X坐标（屏幕坐标）
  * @param [in] y 鼠标Y坐标（屏幕坐标）
  */
-typedef std::function<void(TrayIconMessageType msgType, int32_t x, int32_t y)> TrayIconMessageCallback;
+typedef std::function<void(TrayIconMessageType msgType, int32_t x, int32_t y)>
+    TrayIconMessageCallback;
 
 /** 托盘图标功能
 */
@@ -37,8 +36,8 @@ class DUILIB_API TrayIcon
 {
 protected:
     TrayIcon();
-    TrayIcon(const TrayIcon&) = delete;
-    TrayIcon& operator=(const TrayIcon&) = delete;
+    TrayIcon(const TrayIcon &) = delete;
+    TrayIcon &operator=(const TrayIcon &) = delete;
 
 public:
     virtual ~TrayIcon();
@@ -49,7 +48,8 @@ public:
     * @param [in] tooltip 托盘提示文本
     * @return 托盘图标实例指针，创建失败返回nullptr
     */
-    static std::unique_ptr<TrayIcon> Create(const Window* pWindow, const DString& iconFilePath, const DString& tooltip = _T(""));
+    static std::unique_ptr<TrayIcon> Create(
+        const Window *pWindow, const DString &iconFilePath, const DString &tooltip = _T(""));
 
 public:
     /** 设置托盘图标
@@ -57,13 +57,13 @@ public:
     * @param [in] iconFilePath 图标文件路径（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     * @return 设置成功返回true，失败返回false
     */
-    virtual bool SetIcon(const Window* pWindow, const DString& iconFilePath) = 0;
+    virtual bool SetIcon(const Window *pWindow, const DString &iconFilePath) = 0;
 
     /** 设置托盘提示文本
     * @param [in] tooltip 提示文本
     * @return 设置成功返回true，失败返回false
     */
-    virtual bool SetTooltip(const DString& tooltip) = 0;
+    virtual bool SetTooltip(const DString &tooltip) = 0;
 
     /** 显示气泡提示
     * @param [in] title 气泡标题
@@ -71,7 +71,8 @@ public:
     * @param [in] timeoutMs 显示超时时间（毫秒），默认3000ms
     * @return 显示成功返回true，失败返回false
     */
-    virtual bool ShowBalloon(const DString& title, const DString& content, uint32_t timeoutMs = 3000) = 0;
+    virtual bool ShowBalloon(
+        const DString &title, const DString &content, uint32_t timeoutMs = 3000) = 0;
 
     /** 隐藏托盘图标
     * @return 隐藏成功返回true，失败返回false
@@ -96,7 +97,7 @@ public:
     /** 获取内部实现的托盘句柄
     *@return SDL实现时，返回的是SDL_Tray*，Windows SDK实现时，返回的是托盘窗口句柄HWND 
     */
-    virtual void* GetTrayHandle() const = 0;
+    virtual void *GetTrayHandle() const = 0;
 
     /** 设置消息回调函数
     * @param [in] callback 回调函数

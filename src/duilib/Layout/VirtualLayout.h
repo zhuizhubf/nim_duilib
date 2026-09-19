@@ -3,16 +3,15 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui 
-{
+namespace ui {
 /** 虚表实现的布局接口
 */
 class DUILIB_API VirtualLayout
 {
 public:
     VirtualLayout() = default;
-    VirtualLayout(const VirtualLayout& r) = delete;
-    VirtualLayout& operator=(const VirtualLayout& r) = delete;
+    VirtualLayout(const VirtualLayout &r) = delete;
+    VirtualLayout &operator=(const VirtualLayout &r) = delete;
     virtual ~VirtualLayout() = default;
 
 public:
@@ -30,7 +29,7 @@ public:
     * @param [in] rc 当前显示区域的矩形，不包含内边距
     * @return 返回元素的索引
     */
-    virtual size_t GetTopElementIndex(UiRect rc) const = 0 ;
+    virtual size_t GetTopElementIndex(UiRect rc) const = 0;
 
     /** 判断某个元素是否在可见范围内
     * @param[in] iIndex 元素索引
@@ -47,7 +46,7 @@ public:
     * @param [in] rc 当前显示区域的矩形，不包含内边距
     * @param[out] collection 索引列表，范围是：[0, GetElementCount())
     */
-    virtual void GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const = 0;
+    virtual void GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const = 0;
 
     /** 让控件在可见范围内
     * @param [in] rc 当前显示区域的矩形，不包含内边距

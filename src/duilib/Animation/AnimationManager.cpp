@@ -2,20 +2,18 @@
 #include "duilib/Core/Control.h"
 #include "duilib/Core/ControlPtrT.h"
 
-namespace ui 
-{
+namespace ui {
 // 显示 / 隐藏的动画类型列表
 std::vector<AnimationType> AnimationManager::s_animationList;
 
-AnimationManager::AnimationManager(Control* pControl) :
-    m_pControl(pControl),
-    m_bControlVisible(false),
-    m_bControlVisibleInited(false),
-    m_frameIntervalMillSeconds(-1),
-    m_totalMillSeconds(-1),
-    m_easingFunctionType(EasingFunctionType::EaseInOutCubic)
-{
-}
+AnimationManager::AnimationManager(Control *pControl)
+    : m_pControl(pControl)
+    , m_bControlVisible(false)
+    , m_bControlVisibleInited(false)
+    , m_frameIntervalMillSeconds(-1)
+    , m_totalMillSeconds(-1)
+    , m_easingFunctionType(EasingFunctionType::EaseInOutCubic)
+{}
 
 bool AnimationManager::HasAnimationPlayer(AnimationType animationType) const
 {
@@ -23,55 +21,54 @@ bool AnimationManager::HasAnimationPlayer(AnimationType animationType) const
     return (it != m_animationMap.end());
 }
 
-AnimationPlayer* AnimationManager::GetAnimationPlayer(AnimationType animationType) const
+AnimationPlayer *AnimationManager::GetAnimationPlayer(AnimationType animationType) const
 {
     auto it = m_animationMap.find(animationType);
     if (it != m_animationMap.end()) {
         return it->second.get();
-    }
-    else {
+    } else {
         return nullptr;
     }
 }
 
-AnimationPlayer* AnimationManager::SetFadeAlpha(bool bFadeVisible, uint8_t nEndAlpha)
+AnimationPlayer *AnimationManager::SetFadeAlpha(bool bFadeVisible, uint8_t nEndAlpha)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     const AnimationType animationType = AnimationType::kAnimationAlpha;
     if (bFadeVisible) {
         pAnimationPlayer = CreateAnimationPlayer(animationType);
         pAnimationPlayer->SetStartValue(0);
-        pAnimationPlayer->SetEndValue((int32_t)nEndAlpha);
+        pAnimationPlayer->SetEndValue((int32_t) nEndAlpha);
         ControlPtr pControl(m_pControl);
         AnimationPlayCallback playCallback = [pControl](int32_t nNewValue) {
-                if (pControl != nullptr) {
-                    if (nNewValue < 0) {
-                        nNewValue = 0;
-                    }
-                    if (nNewValue > 255) {
-                        nNewValue = 255;
-                    }
-                    pControl->SetAlpha(TruncateToUInt8(nNewValue));
+            if (pControl != nullptr) {
+                if (nNewValue < 0) {
+                    nNewValue = 0;
                 }
-            };
+                if (nNewValue > 255) {
+                    nNewValue = 255;
+                }
+                pControl->SetAlpha(TruncateToUInt8(nNewValue));
+            }
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else {
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-AnimationPlayer* AnimationManager::SetFadeWidth(bool bFadeWidth)
+AnimationPlayer *AnimationManager::SetFadeWidth(bool bFadeWidth)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     int32_t cx = 0;
     if (bFadeWidth) {
         // 使用一个超大尺寸去探测控件"不受限"时的自然宽度
         // 该常量定义在 AnimationManager.h 中
-        UiEstSize estSize = m_pControl->EstimateSize(UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
+        UiEstSize estSize = m_pControl->EstimateSize(
+            UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
         cx = estSize.cx.GetInt32();
         ASSERT(cx > 0);
     }
@@ -82,30 +79,30 @@ AnimationPlayer* AnimationManager::SetFadeWidth(bool bFadeWidth)
         pAnimationPlayer->SetEndValue(cx);
         ControlPtr pControl(m_pControl);
         AnimationPlayCallback playCallback = [pControl](int32_t nNewValue) {
-                if (pControl != nullptr) {
-                    if (nNewValue < 0) {
-                        nNewValue = 0;
-                    }
-                    pControl->SetFixedWidth(UiFixedInt(nNewValue), true, false);
+            if (pControl != nullptr) {
+                if (nNewValue < 0) {
+                    nNewValue = 0;
                 }
-            };
+                pControl->SetFixedWidth(UiFixedInt(nNewValue), true, false);
+            }
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else {
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-AnimationPlayer* AnimationManager::SetFadeHeight(bool bFadeHeight)
+AnimationPlayer *AnimationManager::SetFadeHeight(bool bFadeHeight)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     int32_t cy = 0;
     if (bFadeHeight) {
         // 使用一个超大尺寸去探测控件"不受限"时的自然高度
-        UiEstSize estSize = m_pControl->EstimateSize(UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
+        UiEstSize estSize = m_pControl->EstimateSize(
+            UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
         cy = estSize.cy.GetInt32();
         ASSERT(cy > 0);
     }
@@ -116,32 +113,32 @@ AnimationPlayer* AnimationManager::SetFadeHeight(bool bFadeHeight)
         pAnimationPlayer->SetEndValue(cy);
         ControlPtr pControl(m_pControl);
         AnimationPlayCallback playCallback = [pControl](int32_t nNewValue) {
-                if (pControl != nullptr) {
-                    if (nNewValue < 0) {
-                        nNewValue = 0;
-                    }
-                    pControl->SetFixedHeight(UiFixedInt(nNewValue), true, false);
+            if (pControl != nullptr) {
+                if (nNewValue < 0) {
+                    nNewValue = 0;
                 }
-            };
+                pControl->SetFixedHeight(UiFixedInt(nNewValue), true, false);
+            }
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else {
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-AnimationPlayer* AnimationManager::SetFadeSize(bool bFadeSize)
+AnimationPlayer *AnimationManager::SetFadeSize(bool bFadeSize)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     int32_t cx = 0;
     int32_t cy = 0;
     if (bFadeSize) {
         // 使用一个超大尺寸去探测控件"不受限"时的自然尺寸
         // 该常量定义在 AnimationManager.h 中
-        UiEstSize estSize = m_pControl->EstimateSize(UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
+        UiEstSize estSize = m_pControl->EstimateSize(
+            UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
         cx = estSize.cx.GetInt32();
         cy = estSize.cy.GetInt32();
         ASSERT(cy > 0);
@@ -156,102 +153,101 @@ AnimationPlayer* AnimationManager::SetFadeSize(bool bFadeSize)
         AnimationPlayCallback playCallback = [pControl, cx, cy](int32_t nNewValue) {
             if (pControl != nullptr) {
                 if (nNewValue > 0) {
-                    int32_t cxNow = TruncateToInt32((int64_t)cx * nNewValue / 100);
-                    int32_t cyNow = TruncateToInt32((int64_t)cy * nNewValue / 100);
+                    int32_t cxNow = TruncateToInt32((int64_t) cx * nNewValue / 100);
+                    int32_t cyNow = TruncateToInt32((int64_t) cy * nNewValue / 100);
                     pControl->SetFixedWidth(UiFixedInt(cxNow), true, false);
                     pControl->SetFixedHeight(UiFixedInt(cyNow), true, false);
                 }
             }
-            };
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else {
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-AnimationPlayer* AnimationManager::SetFadeInOutX(bool bFade, bool bIsFromRight)
+AnimationPlayer *AnimationManager::SetFadeInOutX(bool bFade, bool bIsFromRight)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     int32_t cx = 0;
     if (bFade) {
         // 使用一个超大尺寸去探测控件"不受限"时的自然宽度
-        UiEstSize estSize = m_pControl->EstimateSize(UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
+        UiEstSize estSize = m_pControl->EstimateSize(
+            UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
         cx = estSize.cx.GetInt32();
         if (cx <= 0) {
             cx = 100;
         }
     }
-    const AnimationType animationType = bIsFromRight ? AnimationType::kAnimationInoutXFromRight : AnimationType::kAnimationInoutXFromLeft;
+    const AnimationType animationType = bIsFromRight ? AnimationType::kAnimationInoutXFromRight
+                                                     : AnimationType::kAnimationInoutXFromLeft;
     if (bFade) {
         pAnimationPlayer = CreateAnimationPlayer(animationType);
         pAnimationPlayer->SetEndValue(0);
         ControlPtr pControl(m_pControl);
         AnimationPlayCallback playCallback = [pControl](int32_t nNewValue) {
-                if (pControl != nullptr) {
-                    pControl->SetRenderOffsetX(nNewValue);
-                }
-            };
+            if (pControl != nullptr) {
+                pControl->SetRenderOffsetX(nNewValue);
+            }
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
 
         if (bIsFromRight) {
-            pAnimationPlayer->SetStartValue(-cx);            
-        }
-        else {
+            pAnimationPlayer->SetStartValue(-cx);
+        } else {
             pAnimationPlayer->SetStartValue(cx);
         }
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else{
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-AnimationPlayer* AnimationManager::SetFadeInOutY(bool bFade, bool bIsFromBottom)
+AnimationPlayer *AnimationManager::SetFadeInOutY(bool bFade, bool bIsFromBottom)
 {
-    AnimationPlayer* pAnimationPlayer = nullptr;
+    AnimationPlayer *pAnimationPlayer = nullptr;
     int32_t cy = 0;
     if (bFade) {
         // 使用一个超大尺寸去探测控件"不受限"时的自然高度
-        UiEstSize estSize = m_pControl->EstimateSize(UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
+        UiEstSize estSize = m_pControl->EstimateSize(
+            UiSize(kAnimationEstimateMaxSize, kAnimationEstimateMaxSize));
         cy = estSize.cy.GetInt32();
         if (cy <= 0) {
             cy = 100;
         }
     }
-    const AnimationType animationType = bIsFromBottom ? AnimationType::kAnimationInoutYFromBottom : AnimationType::kAnimationInoutYFromTop;
+    const AnimationType animationType = bIsFromBottom ? AnimationType::kAnimationInoutYFromBottom
+                                                      : AnimationType::kAnimationInoutYFromTop;
     if (bFade) {
         pAnimationPlayer = CreateAnimationPlayer(animationType);
         pAnimationPlayer->SetEndValue(0);
         ControlPtr pControl(m_pControl);
         AnimationPlayCallback playCallback = [pControl](int32_t nNewValue) {
-                if (pControl != nullptr) {
-                    pControl->SetRenderOffsetY(nNewValue);
-                }
-            };
+            if (pControl != nullptr) {
+                pControl->SetRenderOffsetY(nNewValue);
+            }
+        };
         pAnimationPlayer->SetPlayCallback(playCallback);
 
         if (bIsFromBottom) {
             pAnimationPlayer->SetStartValue(-cy);
-        }
-        else {
+        } else {
             pAnimationPlayer->SetStartValue(cy);
         }
         m_animationMap[animationType].reset(pAnimationPlayer);
-    }
-    else{
+    } else {
         m_animationMap.erase(animationType);
     }
 
     return pAnimationPlayer;
 }
 
-void AnimationManager::InitAppearAnimationList(std::vector<AnimationType>& animationList) const
+void AnimationManager::InitAppearAnimationList(std::vector<AnimationType> &animationList) const
 {
     if (animationList.empty()) {
         animationList.push_back(AnimationType::kAnimationAlpha);
@@ -278,28 +274,25 @@ void AnimationManager::Appear()
 
     m_pControl->SetVisible(true);
 
-    std::vector<AnimationType>& animationList = s_animationList;
+    std::vector<AnimationType> &animationList = s_animationList;
     InitAppearAnimationList(animationList);
     if (!m_animationMap.empty()) {
         for (AnimationType animationType : animationList) {
             if (HasAnimationPlayer(animationType)) {
-                AnimationPlayer* pAnimationPlayer = m_animationMap[animationType].get();
+                AnimationPlayer *pAnimationPlayer = m_animationMap[animationType].get();
                 pAnimationPlayer->SetCompleteCallback(AnimationCompleteCallback());
                 if (bOldVisibleInited && (bOldVisible == bNewVisible)) {
                     //可见属性未发生变化
                     if (pAnimationPlayer->IsPlaying()) {
                         pAnimationPlayer->Continue();
-                    }
-                    else {
+                    } else {
                         pAnimationPlayer->Stop();
                     }
-                }
-                else {
+                } else {
                     //可见属性发生变化
                     if (pAnimationPlayer->IsPlaying()) {
                         pAnimationPlayer->Continue();
-                    }
-                    else {
+                    } else {
                         pAnimationPlayer->Start();
                     }
                 }
@@ -324,28 +317,25 @@ void AnimationManager::Disappear()
     const bool bNewVisible = false;
 
     AnimationCompleteCallback completeCallback = UiBind(&Control::SetVisible, m_pControl, false);
-    std::vector<AnimationType>& animationList = s_animationList;
+    std::vector<AnimationType> &animationList = s_animationList;
     InitAppearAnimationList(animationList);
     if (!m_animationMap.empty()) {
         for (AnimationType animationType : animationList) {
             if (HasAnimationPlayer(animationType)) {
-                AnimationPlayer* pAnimationPlayer = m_animationMap[animationType].get();
+                AnimationPlayer *pAnimationPlayer = m_animationMap[animationType].get();
                 pAnimationPlayer->SetCompleteCallback(completeCallback);
                 if (bOldVisibleInited && (bOldVisible == bNewVisible)) {
                     //可见属性未发生变化
                     if (pAnimationPlayer->IsPlaying()) {
                         pAnimationPlayer->ReverseContinue();
-                    }
-                    else {
+                    } else {
                         pAnimationPlayer->Stop();
                     }
-                }
-                else {
+                } else {
                     //可见属性发生变化
                     if (pAnimationPlayer->IsPlaying()) {
                         pAnimationPlayer->ReverseContinue();
-                    }
-                    else {
+                    } else {
                         pAnimationPlayer->ReverseStart();
                     }
                 }
@@ -353,7 +343,7 @@ void AnimationManager::Disappear()
             }
         }
     }
-    
+
     if (!handled) {
         m_pControl->SetVisible(false);
     }
@@ -361,13 +351,13 @@ void AnimationManager::Disappear()
     m_bControlVisible = false;
 }
 
-void AnimationManager::Clear(Control* control)
+void AnimationManager::Clear(Control *control)
 {
     if (m_pControl != nullptr) {
         ASSERT_UNUSED_VARIABLE(control == m_pControl);
     }
 
-    for (auto& iter : m_animationMap) {
+    for (auto &iter : m_animationMap) {
         if (iter.second != nullptr) {
             iter.second->Clear();
         }
@@ -377,9 +367,9 @@ void AnimationManager::Clear(Control* control)
     m_animationMap.clear();
 }
 
-AnimationPlayer* AnimationManager::CreateAnimationPlayer(AnimationType animationType) const
+AnimationPlayer *AnimationManager::CreateAnimationPlayer(AnimationType animationType) const
 {
-    AnimationPlayer* pAnimationPlayer = new AnimationPlayer();
+    AnimationPlayer *pAnimationPlayer = new AnimationPlayer();
     pAnimationPlayer->SetAnimationType(animationType);
     pAnimationPlayer->SetFrameIntervalMillSeconds(GetFrameIntervalMillSeconds());
     pAnimationPlayer->SetTotalMillSeconds(GetTotalMillSeconds());
@@ -390,7 +380,7 @@ AnimationPlayer* AnimationManager::CreateAnimationPlayer(AnimationType animation
 void AnimationManager::SetFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds)
 {
     m_frameIntervalMillSeconds = frameIntervalMillSeconds;
-    for (auto& iter : m_animationMap) {
+    for (auto &iter : m_animationMap) {
         if (iter.second != nullptr) {
             iter.second->SetFrameIntervalMillSeconds(frameIntervalMillSeconds);
         }
@@ -405,7 +395,7 @@ int32_t AnimationManager::GetFrameIntervalMillSeconds() const
 void AnimationManager::SetTotalMillSeconds(int32_t totalMillSeconds)
 {
     m_totalMillSeconds = totalMillSeconds;
-    for (auto& iter : m_animationMap) {
+    for (auto &iter : m_animationMap) {
         if (iter.second != nullptr) {
             iter.second->SetTotalMillSeconds(totalMillSeconds);
         }
@@ -420,7 +410,7 @@ int32_t AnimationManager::GetTotalMillSeconds() const
 void AnimationManager::SetEasingFunctionType(EasingFunctionType easingFunctionType)
 {
     m_easingFunctionType = easingFunctionType;
-    for (auto& iter : m_animationMap) {
+    for (auto &iter : m_animationMap) {
         if (iter.second != nullptr) {
             iter.second->SetEasingFunctionType(easingFunctionType);
         }
@@ -432,4 +422,4 @@ EasingFunctionType AnimationManager::GetEasingFunctionType() const
     return m_easingFunctionType;
 }
 
-}
+} // namespace ui

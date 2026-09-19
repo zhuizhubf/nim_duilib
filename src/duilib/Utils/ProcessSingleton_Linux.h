@@ -3,25 +3,24 @@
 
 #include "ProcessSingletonData.h"
 
-#if defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#if defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
 
+#include <fcntl.h>
+#include <pwd.h>
 #include <sys/file.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <pwd.h>
 
-namespace ui
-{
+namespace ui {
 /** 跨进程单例的实现（通信部分，Linux实现）
 */
-class DUILIB_API ProcessSingletonImpl: public ProcessSingleton
+class DUILIB_API ProcessSingletonImpl : public ProcessSingleton
 {
 public:
-    explicit ProcessSingletonImpl(const std::string& strAppName) :
-        ProcessSingleton(strAppName)
+    explicit ProcessSingletonImpl(const std::string &strAppName)
+        : ProcessSingleton(strAppName)
     {
         InitializePlatformComponents();
     }
@@ -33,8 +32,8 @@ public:
     }
 
 protected:
-    ProcessSingletonImpl(const ProcessSingleton&) = delete;
-    ProcessSingletonImpl& operator=(const ProcessSingletonImpl&) = delete;
+    ProcessSingletonImpl(const ProcessSingleton &) = delete;
+    ProcessSingletonImpl &operator=(const ProcessSingletonImpl &) = delete;
 
 public:
     virtual void InitializePlatformComponents() override final
@@ -58,19 +57,15 @@ public:
 
             // 设置文件权限
             ::fchmod(m_nLockFile, 0600);
-        }
-        catch (const std::exception& ex) {
+        } catch (const std::exception &ex) {
             CleanupPlatformComponents();
             throw;
         }
     }
 
-    virtual bool PlatformCheckInstance() override final
-    {
-        return errno == EWOULDBLOCK;
-    }
+    virtual bool PlatformCheckInstance() override final { return errno == EWOULDBLOCK; }
 
-    virtual bool PlatformSendData(const std::string& strData) override final
+    virtual bool PlatformSendData(const std::string &strData) override final
     {
         try {
             int nSocket = ::socket(AF_UNIX, SOCK_STREAM, 0);
@@ -78,12 +73,12 @@ public:
                 throw std::system_error(errno, std::system_category(), "Socket creation failed");
             }
 
-            sockaddr_un addr = { 0 };
+            sockaddr_un addr = {0};
             addr.sun_family = AF_UNIX;
             std::string strSocketPath = GetUserRuntimePath() + "/" + m_strAppName + ".sock";
             ::strncpy(addr.sun_path, strSocketPath.c_str(), sizeof(addr.sun_path) - 1);
 
-            if (::connect(nSocket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+            if (::connect(nSocket, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
                 ::close(nSocket);
                 return false;
             }
@@ -91,8 +86,7 @@ public:
             ssize_t nSent = ::write(nSocket, strData.data(), strData.size());
             ::close(nSocket);
             return nSent == static_cast<ssize_t>(strData.size());
-        }
-        catch (const std::exception& ex) {
+        } catch (const std::exception &ex) {
             LogError("Linux send error: " + std::string(ex.what()));
             return false;
         }
@@ -106,13 +100,13 @@ public:
                 throw std::system_error(errno, std::system_category(), "Socket creation failed");
             }
 
-            sockaddr_un addr = { 0 };
+            sockaddr_un addr = {0};
             addr.sun_family = AF_UNIX;
             std::string strSocketPath = GetUserRuntimePath() + "/" + m_strAppName + ".sock";
             ::strncpy(addr.sun_path, strSocketPath.c_str(), sizeof(addr.sun_path) - 1);
 
             ::unlink(strSocketPath.c_str());
-            if (::bind(m_nSocket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+            if (::bind(m_nSocket, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
                 ::close(m_nSocket);
                 throw std::system_error(errno, std::system_category(), "Socket bind failed");
             }
@@ -125,16 +119,19 @@ public:
 
             while (m_bRunning) {
                 int nClient = ::accept(m_nSocket, nullptr, nullptr);
-                if (nClient == -1) continue;
+                if (nClient == -1)
+                    continue;
 
-                char pBuffer[ProcessSingletonData::MAX_DATA_SIZE + sizeof(ProcessSingletonData::ProtocolHeader)] = { 0 };
+                char pBuffer
+                    [ProcessSingletonData::MAX_DATA_SIZE
+                     + sizeof(ProcessSingletonData::ProtocolHeader)] = {0};
                 ssize_t nRead = ::recv(nClient, pBuffer, sizeof(pBuffer), MSG_NOSIGNAL);
                 if (nRead > 0) {
                     try {
-                        auto vecArgs = ProcessSingletonData::DeserializeData(std::string(pBuffer, nRead));
+                        auto vecArgs = ProcessSingletonData::DeserializeData(
+                            std::string(pBuffer, nRead));
                         OnAlreadyRunningAppRelaunch(vecArgs);
-                    }
-                    catch (const std::exception& ex) {
+                    } catch (const std::exception &ex) {
                         LogError("Invalid data received: " + std::string(ex.what()));
                     }
                 }
@@ -143,12 +140,11 @@ public:
 
             ::close(m_nSocket);
             ::unlink(strSocketPath.c_str());
-        }
-        catch (const std::exception& ex) {
+        } catch (const std::exception &ex) {
             LogError("Linux listener error: " + std::string(ex.what()));
         }
     }
-    
+
     virtual void CleanupPlatformComponents() override final
     {
         if (m_nLockFile != -1) {
@@ -166,22 +162,22 @@ public:
     }
 
 private:
-    std::string GetUserRuntimePath() 
+    std::string GetUserRuntimePath()
     {
-        const char* pszXdgRuntimeDir = ::getenv("XDG_RUNTIME_DIR");
+        const char *pszXdgRuntimeDir = ::getenv("XDG_RUNTIME_DIR");
         if (pszXdgRuntimeDir && *pszXdgRuntimeDir) {
             return std::string(pszXdgRuntimeDir) + "/.cppapp";
         }
 
-        struct passwd* pwd = ::getpwuid(getuid());
+        struct passwd *pwd = ::getpwuid(getuid());
         if (pwd && pwd->pw_dir) {
             return std::string(pwd->pw_dir) + "/.cache/.cppapp";
         }
 
         return "/tmp/.cppapp_" + std::to_string(getuid());
     }
-    
-    static void CreateDirectoryRecursive(const std::string& strPath)
+
+    static void CreateDirectoryRecursive(const std::string &strPath)
     {
         std::string::size_type nPos = 0;
         do {
@@ -192,13 +188,14 @@ private:
             }
         } while (nPos != std::string::npos);
     }
+
 private:
     // Linux实现
     int m_nLockFile = -1;
     int m_nSocket = -1;
 };
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_LINUX
 #endif // UI_UTILS_PROCESS_SINGLETON_LINUX_H_

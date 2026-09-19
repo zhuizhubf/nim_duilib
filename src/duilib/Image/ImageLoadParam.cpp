@@ -1,43 +1,42 @@
 #include "ImageLoadParam.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/FilePath.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Utils/StringUtil.h"
 
-namespace ui 
-{
-ImageLoadParam::ImageLoadParam():
-    m_bImageDpiScaleEnabled(true),
-    m_nLoadDpiScale(100),
-    m_bAsyncDecode(false),
-    m_bIconAsAnimation(false),
-    m_nIconFrameDelayMs(1000),
-    m_nIconSize(0),
-    m_fPagMaxFrameRate(30.0f),
-    m_bAssertEnabled(true)
-{
-}
+namespace ui {
+ImageLoadParam::ImageLoadParam()
+    : m_bImageDpiScaleEnabled(true)
+    , m_nLoadDpiScale(100)
+    , m_bAsyncDecode(false)
+    , m_bIconAsAnimation(false)
+    , m_nIconFrameDelayMs(1000)
+    , m_nIconSize(0)
+    , m_fPagMaxFrameRate(30.0f)
+    , m_bAssertEnabled(true)
+{}
 
-ImageLoadParam::ImageLoadParam(DString srcWidth,
-                               DString srcHeight,
-                               bool bImageDpiScaleEnabled,
-                               uint32_t nLoadDpiScale,
-                               bool bAsyncDecode,
-                               bool bIconAsAnimation,
-                               int32_t nIconFrameDelayMs,
-                               uint32_t nIconSize,
-                               float fPagMaxFrameRate,
-                               bool bAssertEnabled,
-                               const DString& svgReplaceColors):
-    m_bImageDpiScaleEnabled(bImageDpiScaleEnabled),
-    m_nLoadDpiScale(nLoadDpiScale),
-    m_bAsyncDecode(bAsyncDecode),
-    m_bIconAsAnimation(bIconAsAnimation),
-    m_nIconFrameDelayMs(nIconFrameDelayMs),
-    m_nIconSize(nIconSize),
-    m_fPagMaxFrameRate(fPagMaxFrameRate),
-    m_bAssertEnabled(bAssertEnabled),
-    m_svgReplaceColors(svgReplaceColors)
+ImageLoadParam::ImageLoadParam(
+    DString srcWidth,
+    DString srcHeight,
+    bool bImageDpiScaleEnabled,
+    uint32_t nLoadDpiScale,
+    bool bAsyncDecode,
+    bool bIconAsAnimation,
+    int32_t nIconFrameDelayMs,
+    uint32_t nIconSize,
+    float fPagMaxFrameRate,
+    bool bAssertEnabled,
+    const DString &svgReplaceColors)
+    : m_bImageDpiScaleEnabled(bImageDpiScaleEnabled)
+    , m_nLoadDpiScale(nLoadDpiScale)
+    , m_bAsyncDecode(bAsyncDecode)
+    , m_bIconAsAnimation(bIconAsAnimation)
+    , m_nIconFrameDelayMs(nIconFrameDelayMs)
+    , m_nIconSize(nIconSize)
+    , m_fPagMaxFrameRate(fPagMaxFrameRate)
+    , m_bAssertEnabled(bAssertEnabled)
+    , m_svgReplaceColors(svgReplaceColors)
 {
     StringUtil::Trim(srcWidth);
     StringUtil::Trim(srcHeight);
@@ -45,13 +44,13 @@ ImageLoadParam::ImageLoadParam(DString srcWidth,
     m_srcHeight = srcHeight;
 }
 
-void ImageLoadParam::SetImageLoadPath(const ImageLoadPath& imageLoadPath)
+void ImageLoadParam::SetImageLoadPath(const ImageLoadPath &imageLoadPath)
 {
     m_srcImageLoadPath = imageLoadPath;
-    m_srcImageLoadPath.m_imageFullPath.NormalizeFilePath();//路径规范化      
+    m_srcImageLoadPath.m_imageFullPath.NormalizeFilePath(); //路径规范化
 }
 
-const ImageLoadPath& ImageLoadParam::GetImageLoadPath() const
+const ImageLoadPath &ImageLoadParam::GetImageLoadPath() const
 {
     ASSERT(!m_srcImageLoadPath.m_imageFullPath.IsEmpty());
     return m_srcImageLoadPath;
@@ -106,7 +105,7 @@ bool ImageLoadParam::IsImageDpiScaleEnabled() const
 
 void ImageLoadParam::SetLoadDpiScale(uint32_t nLoadDpiScale)
 {
-    m_nLoadDpiScale = nLoadDpiScale;    
+    m_nLoadDpiScale = nLoadDpiScale;
 }
 
 uint32_t ImageLoadParam::GetLoadDpiScale() const
@@ -159,7 +158,7 @@ bool ImageLoadParam::HasImageFixedSize(void) const
     return GetImageFixedSize(nImageFixedWidth, nImageFixedHeight);
 }
 
-bool ImageLoadParam::GetImageFixedSize(uint32_t& nImageWidth, uint32_t& nImageHeight) const
+bool ImageLoadParam::GetImageFixedSize(uint32_t &nImageWidth, uint32_t &nImageHeight) const
 {
     if (!GetScaledFixedSize(m_srcWidth.c_str(), nImageWidth)) {
         nImageWidth = 0;
@@ -170,15 +169,14 @@ bool ImageLoadParam::GetImageFixedSize(uint32_t& nImageWidth, uint32_t& nImageHe
     return (nImageHeight > 0) || (nImageWidth > 0);
 }
 
-bool ImageLoadParam::GetScaledFixedSize(const DString& srcSize, uint32_t& nScaledSize) const
+bool ImageLoadParam::GetScaledFixedSize(const DString &srcSize, uint32_t &nScaledSize) const
 {
     nScaledSize = 0;
     if (!srcSize.empty()) {
         if (srcSize.back() == _T('%')) {
             //按照百分比缩放
             nScaledSize = 0;
-        }
-        else {
+        } else {
             //设置固定值
             nScaledSize = StringUtil::StringToInt32(srcSize.c_str());
             if (nScaledSize > 0) {
@@ -186,7 +184,8 @@ bool ImageLoadParam::GetScaledFixedSize(const DString& srcSize, uint32_t& nScale
                 if ((nLoadDpiScale > 0) && (nLoadDpiScale != 100)) {
                     if (IsImageDpiScaleEnabled()) {
                         //该图片支持DPI自适应
-                        nScaledSize = static_cast<uint32_t>(nScaledSize * nLoadDpiScale * 1.0 / 100.0 + 0.5);
+                        nScaledSize = static_cast<uint32_t>(
+                            nScaledSize * nLoadDpiScale * 1.0 / 100.0 + 0.5);
                     }
                 }
             }
@@ -202,7 +201,7 @@ bool ImageLoadParam::HasImageFixedPercent() const
     return GetImageFixedPercent(fImageFixedWidthPercent, fImageFixedHeightPercent);
 }
 
-bool ImageLoadParam::GetImageFixedPercent(float& fImageWidthPercent, float& fImageHeightPercent) const
+bool ImageLoadParam::GetImageFixedPercent(float &fImageWidthPercent, float &fImageHeightPercent) const
 {
     bool bRetWidth = GetScaledFixedPercent(m_srcWidth.c_str(), fImageWidthPercent);
     if (!bRetWidth) {
@@ -215,16 +214,16 @@ bool ImageLoadParam::GetImageFixedPercent(float& fImageWidthPercent, float& fIma
     return bRetWidth || bRetHeight;
 }
 
-bool ImageLoadParam::GetScaledFixedPercent(const DString& srcSize, float& fScaledPercent) const
+bool ImageLoadParam::GetScaledFixedPercent(const DString &srcSize, float &fScaledPercent) const
 {
     bool bRet = false;
     fScaledPercent = 1.0f;
     if (!srcSize.empty()) {
         if (srcSize.back() == _T('%')) {
             //按照百分比缩放(实际值需要除以100)
-            double fRatio = StringUtil::StringToDouble(srcSize);            
-            if (fRatio > 1) {//最小值为1%
-                bRet = true;                
+            double fRatio = StringUtil::StringToDouble(srcSize);
+            if (fRatio > 1) { //最小值为1%
+                bRet = true;
                 fRatio /= 100;
                 fScaledPercent = static_cast<float>(fRatio);
             }
@@ -233,7 +232,7 @@ bool ImageLoadParam::GetScaledFixedPercent(const DString& srcSize, float& fScale
     return bRet && !ImageUtil::IsSameImageScale(fScaledPercent, 1.0f);
 }
 
-void ImageLoadParam::SetMaxDestRectSize(const UiSize& rcMaxDestRectSize)
+void ImageLoadParam::SetMaxDestRectSize(const UiSize &rcMaxDestRectSize)
 {
     m_rcMaxDestRectSize = rcMaxDestRectSize;
 }

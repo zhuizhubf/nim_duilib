@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiRect.h"
 
-namespace ui
-{
+namespace ui {
 
 class IRender;
 
@@ -51,7 +50,7 @@ public:
       * @param[in] bClip   是否启用裁剪。默认为 true。
       *                    传 false 可用于通过单个变量控制是否启用裁剪的模板/泛型代码。
       */
-    AutoClip(IRender* pRender, const UiRect& rc, bool bClip = true);
+    AutoClip(IRender *pRender, const UiRect &rc, bool bClip = true);
 
     /** @brief 构造一个圆角矩形裁剪守卫。
       *
@@ -67,7 +66,12 @@ public:
       * @param[in] fRoundHeight 圆角的垂直半径（Y 方向圆角半径）。
       * @param[in] bClip        是否启用裁剪。默认为 true。
       */
-    AutoClip(IRender* pRender, const UiRect& rcRound, float fRoundWidth, float fRoundHeight, bool bClip = true);
+    AutoClip(
+        IRender *pRender,
+        const UiRect &rcRound,
+        float fRoundWidth,
+        float fRoundHeight,
+        bool bClip = true);
 
     /** @brief 析构函数。
       *
@@ -83,7 +87,7 @@ private:
       *  仅在启用裁剪时（即 m_bClip == true）才可能为非空。
       *  不持有所有权，生命周期由调用方负责管理。
       */
-    IRender* m_pRender;
+    IRender *m_pRender;
 
     /** 裁剪区域的设备上下文标志
     */

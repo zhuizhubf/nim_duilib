@@ -1,15 +1,14 @@
 #include "MonitorUtil.h"
-#include "duilib/Core/WindowBase.h"
 #include "duilib/Core/DpiManager.h"
+#include "duilib/Core/WindowBase.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 #include "duilib/Utils/ApiWrapper_Windows.h"
 #include "duilib/duilib_config_windows.h"
 #include <VersionHelpers.h>
 
-namespace ui
-{
-float MonitorUtil::GetWindowDisplayScale(const WindowBase* pWindowBase, float& fWindowPixelDensity)
+namespace ui {
+float MonitorUtil::GetWindowDisplayScale(const WindowBase *pWindowBase, float &fWindowPixelDensity)
 {
     fWindowPixelDensity = 1.0f;
     //读取窗口的DPI值
@@ -17,7 +16,7 @@ float MonitorUtil::GetWindowDisplayScale(const WindowBase* pWindowBase, float& f
     HWND hWnd = nullptr;
     if ((pWindowBase != nullptr) && pWindowBase->IsWindow()) {
         hWnd = pWindowBase->NativeWnd()->GetHWND();
-    }    
+    }
     if ((uDPI == 0) && (hWnd != nullptr) && ::IsWindows8OrGreater()) {
         HMONITOR hMonitor = ::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
         if (hMonitor != nullptr) {
@@ -38,13 +37,13 @@ float MonitorUtil::GetWindowDisplayScale(const WindowBase* pWindowBase, float& f
     if ((uDPI == 0) && (hWnd != nullptr)) {
         HDC hDC = ::GetDC(hWnd);
         if (hDC != nullptr) {
-            uDPI = (uint32_t)::GetDeviceCaps(hDC, LOGPIXELSX);
+            uDPI = (uint32_t) ::GetDeviceCaps(hDC, LOGPIXELSX);
             ::ReleaseDC(hWnd, hDC);
         }
     }
     if (uDPI != 0) {
         //将DPI转换为显示比例
-        return (float)DpiManager::MulDiv(uDPI, 100u, 96u) / 100.0f;
+        return (float) DpiManager::MulDiv(uDPI, 100u, 96u) / 100.0f;
     }
     return GetPrimaryMonitorDisplayScale();
 }
@@ -68,12 +67,13 @@ float MonitorUtil::GetPrimaryMonitorDisplayScale()
     }
 
     if (!bOk && ::IsWindows10OrGreater()) {
-        if (GetDpiForSystemWrapper(uDPI)) {//该API在进程启动后，如果修改系统DPI，该API返回的依旧是旧值
+        if (GetDpiForSystemWrapper(
+                uDPI)) { //该API在进程启动后，如果修改系统DPI，该API返回的依旧是旧值
             bOk = true;
         }
     }
     if (!bOk && ::IsWindows8OrGreater()) {
-        POINT pt = { 1, 1 };
+        POINT pt = {1, 1};
         HMONITOR hMonitor = ::MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
         if (hMonitor != nullptr) {
             uint32_t dpix = 96;
@@ -86,14 +86,14 @@ float MonitorUtil::GetPrimaryMonitorDisplayScale()
     }
     if (!bOk) {
         HDC desktopDc = ::GetDC(nullptr);
-        uDPI = (uint32_t)::GetDeviceCaps(desktopDc, LOGPIXELSX);
+        uDPI = (uint32_t) ::GetDeviceCaps(desktopDc, LOGPIXELSX);
         ::ReleaseDC(nullptr, desktopDc);
     }
     if (uDPI == 0) {
         uDPI = 96;
     }
     //将DPI转换为显示比例
-    return (float)DpiManager::MulDiv(uDPI, 100u, 96u) / 100.0f;
+    return (float) DpiManager::MulDiv(uDPI, 100u, 96u) / 100.0f;
 }
 
 } // namespace ui

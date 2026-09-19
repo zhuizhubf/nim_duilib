@@ -4,11 +4,10 @@
 #include "duilib/Animation/EasingFunctions.h"
 #include "duilib/Core/Callback.h"
 
-namespace ui 
-{
+namespace ui {
 
-typedef std::function<void (int32_t)> AnimationPlayCallback;     //播放回调函数
-typedef std::function<void (void)> AnimationCompleteCallback;    //播放完成回调函数
+typedef std::function<void(int32_t)> AnimationPlayCallback;  //播放回调函数
+typedef std::function<void(void)> AnimationCompleteCallback; //播放完成回调函数
 
 //缓动函数的实现
 class EasingFunctions;
@@ -21,8 +20,8 @@ public:
     AnimationPlayer();
     virtual ~AnimationPlayer() override;
 
-    AnimationPlayer(const AnimationPlayer& r) = delete;
-    AnimationPlayer& operator=(const AnimationPlayer& r) = delete;
+    AnimationPlayer(const AnimationPlayer &r) = delete;
+    AnimationPlayer &operator=(const AnimationPlayer &r) = delete;
 
 public:
     /** 设置动画类型
@@ -36,12 +35,15 @@ public:
 
     /** 设置缓动函数类型
     */
-    void SetEasingFunctionType(EasingFunctionType easingFunctionType) { m_easingFunctionType = easingFunctionType ; }
+    void SetEasingFunctionType(EasingFunctionType easingFunctionType)
+    {
+        m_easingFunctionType = easingFunctionType;
+    }
 
     /** 获取缓动函数类型
     */
     EasingFunctionType GetEasingFunctionType() const { return m_easingFunctionType; }
-    
+
     /** 设置动画播放起始值
     * @param [in] startValue 动画播放的起始值
     */
@@ -63,7 +65,10 @@ public:
     /** 设置播放动画的定时器时间间隔（毫秒）
     * @param [in] frameIntervalMillSeconds 播放动画的定时器时间间隔（毫秒）
     */
-    void SetFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds) { m_frameIntervalMillSeconds = frameIntervalMillSeconds; }
+    void SetFrameIntervalMillSeconds(int32_t frameIntervalMillSeconds)
+    {
+        m_frameIntervalMillSeconds = frameIntervalMillSeconds;
+    }
 
     /** 获取动画播放的定时器时间间隔（毫秒）
     */
@@ -81,7 +86,10 @@ public:
 public:
     /** 设置播放回调函数
     */
-    void SetPlayCallback(const AnimationPlayCallback& playCallback) { m_playCallback = playCallback; }
+    void SetPlayCallback(const AnimationPlayCallback &playCallback)
+    {
+        m_playCallback = playCallback;
+    }
 
     /** 获取播放回调函数
     */
@@ -89,7 +97,10 @@ public:
 
     /** 设置播放完成回调函数
     */
-    void SetCompleteCallback(const AnimationCompleteCallback& completeCallback) { m_completeCallback = completeCallback; }
+    void SetCompleteCallback(const AnimationCompleteCallback &completeCallback)
+    {
+        m_completeCallback = completeCallback;
+    }
 
     /** 获取播放完成回调函数
     */

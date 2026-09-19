@@ -2,7 +2,7 @@
 
 AppDb::AppDb()
 {
-    //这里可以打开db的一些操作 
+    //这里可以打开db的一些操作
 }
 
 AppDb::~AppDb()
@@ -10,7 +10,7 @@ AppDb::~AppDb()
     //这里可以关闭db的一些操作
 }
 
-bool AppDb::LoadFromDb(std::vector<AppItem>& app_list)
+bool AppDb::LoadFromDb(std::vector<AppItem> &app_list)
 {
     app_list.clear();
     //select from....
@@ -94,11 +94,11 @@ bool AppDb::LoadFromDb(std::vector<AppItem>& app_list)
         item.m_isFrequent = false;
         item.m_name = _T("STRID_MOVECONTROL_TEST_10");
         app_list.emplace_back(item);
-    }   
+    }
     return true;
 }
 
-bool AppDb::SaveToDb(const AppItem& item)
+bool AppDb::SaveToDb(const AppItem &item)
 {
     // insert or replace into ....
     return true;

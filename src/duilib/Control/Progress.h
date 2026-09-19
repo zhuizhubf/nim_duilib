@@ -4,22 +4,22 @@
 #include "duilib/Control/Label.h"
 #include "duilib/Image/Image.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 进度条控件
 */
 class DUILIB_API Progress : public LabelTemplate<Control>
 {
     typedef LabelTemplate<Control> BaseClass;
+
 public:
-    explicit Progress(Window* pWindow);
+    explicit Progress(Window *pWindow);
     virtual ~Progress() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void PaintStateImages(IRender* pRender) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void PaintStateImages(IRender *pRender) override;
     virtual void ClearImageCache() override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -86,7 +86,7 @@ public:
     /** 设置进度条背景图片
      * @param [in] strImage 图片地址
      */
-    void SetProgressImage(const DString& strImage);
+    void SetProgressImage(const DString &strImage);
 
     /** 获取进度条背景颜色
      * @return 返回背景颜色的字符串值，对应 global.xml 中的指定色值
@@ -96,7 +96,7 @@ public:
     /** 设置进度条背景颜色
      * @param [in] 要设置的背景颜色字符串，该字符串必须在 global.xml 中存在
      */
-    void SetProgressColor(const DString& strProgressColor);
+    void SetProgressColor(const DString &strProgressColor);
 
     /** 获取进度条位置
     * @return 返回进度条区域坐标（以GetRect()为整个区域的相对坐标，左上角为<0,0>）
@@ -109,7 +109,7 @@ public:
 
     /** 绘制Marquee
      */
-    void PaintMarquee(IRender* pRender);
+    void PaintMarquee(IRender *pRender);
 
     /** 是否是Marquee
      */
@@ -169,7 +169,7 @@ private:
     double m_fCurrentValue;
 
     //进度条前景图片
-    Image* m_pProgressImage;
+    Image *m_pProgressImage;
 
     //进度条前景图片属性
     UiString m_sProgressImageModify;

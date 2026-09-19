@@ -3,7 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
 namespace ui {
 
@@ -14,13 +14,13 @@ class DUILIB_API WebView2Manager
 public:
     WebView2Manager();
     ~WebView2Manager();
-    WebView2Manager(const WebView2Manager&) = delete;
-    WebView2Manager& operator=(const WebView2Manager&) = delete;
+    WebView2Manager(const WebView2Manager &) = delete;
+    WebView2Manager &operator=(const WebView2Manager &) = delete;
 
 public:
     /** 单例对象
     */
-    static WebView2Manager& GetInstance();
+    static WebView2Manager &GetInstance();
 
     /** 初始化
     * @param [in] userDataFolder 网页缓存目录
@@ -29,11 +29,12 @@ public:
     * @param [in] additionalBrowserArguments 额外浏览器参数
     * @param [in] browserExecutableFolder WebView2模块所在目录
     */
-    bool Initialize(const DString& userDataFolder = _T(""),
-                    const DString& language = _T(""),
-                    const DString& userAgent = _T(""),
-                    const DString& additionalBrowserArguments = _T(""),
-                    const DString& browserExecutableFolder = _T(""));
+    bool Initialize(
+        const DString &userDataFolder = _T(""),
+        const DString &language = _T(""),
+        const DString &userAgent = _T(""),
+        const DString &additionalBrowserArguments = _T(""),
+        const DString &browserExecutableFolder = _T(""));
 
     /** 清理
     */
@@ -42,33 +43,33 @@ public:
     /** 获取默认的网页缓存目录
     * @param [in] appName 应用程序名称
     */
-    DString GetDefaultUserDataFolder(const DString& appName) const;
+    DString GetDefaultUserDataFolder(const DString &appName) const;
 
 public:
     /** WebView2模块所在目录
     */
-    void SetBrowserExecutableFolder(const DString& browserExecutableFolder);
-    const DString& GetBrowserExecutableFolder() const;
+    void SetBrowserExecutableFolder(const DString &browserExecutableFolder);
+    const DString &GetBrowserExecutableFolder() const;
 
     /** 网页缓存目录
     */
-    void SetUserDataFolder(const DString& userDataFolder);
-    const DString& GetUserDataFolder() const;
+    void SetUserDataFolder(const DString &userDataFolder);
+    const DString &GetUserDataFolder() const;
 
     /** 语言
     */
-    void SetLanguage(const DString& language);
+    void SetLanguage(const DString &language);
     DString GetLanguage() const;
 
     /** UserAgent
     */
-    void SetUserAgent(const DString& userAgent);
-    const DString& GetUserAgent() const;
+    void SetUserAgent(const DString &userAgent);
+    const DString &GetUserAgent() const;
 
     /** 额外的参数
     */
-    void SetAdditionalBrowserArguments(const DString& additionalBrowserArguments);
-    const DString& GetAdditionalBrowserArguments() const;
+    void SetAdditionalBrowserArguments(const DString &additionalBrowserArguments);
+    const DString &GetAdditionalBrowserArguments() const;
 
     /** 是否启用JavaScript
     */
@@ -145,7 +146,7 @@ private:
     /** 是否启用Web消息
     */
     bool m_bWebMessageEnabled;
-    
+
     /** 是否启用默认脚本对话框
     */
     bool m_bAreDefaultScriptDialogsEnabled;

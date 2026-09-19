@@ -3,15 +3,14 @@
 
 #include "render/IRender.h"
 
-namespace ui 
-{
+namespace ui {
 
 class Pen_Skia : public IPen
 {
 public:
     explicit Pen_Skia(UiColor color, float fWidth = 1.0f);
-    Pen_Skia(const Pen_Skia& r);
-    Pen_Skia& operator=(const Pen_Skia& r) = delete;
+    Pen_Skia(const Pen_Skia &r);
+    Pen_Skia &operator=(const Pen_Skia &r) = delete;
 
     /** 设置画笔宽度
     */
@@ -71,7 +70,7 @@ public:
 
     /** 复制Pen对象
     */
-    virtual IPen* Clone() const override;
+    virtual IPen *Clone() const override;
 
 private:
     /** 画笔颜色

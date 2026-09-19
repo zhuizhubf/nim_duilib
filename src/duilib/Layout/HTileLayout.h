@@ -3,8 +3,7 @@
 
 #include "duilib/Layout/Layout.h"
 
-namespace ui 
-{
+namespace ui {
 
 /** 瓦片布局(横向)
  *  水平方向对齐方式：靠左对齐，按控件依次排列
@@ -14,6 +13,7 @@ namespace ui
 class DUILIB_API HTileLayout : public Layout
 {
     typedef Layout BaseClass;
+
 public:
     HTileLayout();
 
@@ -27,35 +27,36 @@ public:
      * @param [in] bEstimateOnly true表示仅评估不调整控件的位置，false表示调整控件的位置
      * @return 返回排列后最终布局的宽度和高度信息，包含Box容器的内边距，但不包含Box容器本身的外边距(当容器支持滚动条时使用该返回值)
      */
-    virtual UiSize64 ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly = false) override;
+    virtual UiSize64 ArrangeChildren(
+        const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly = false) override;
 
     /** 根据内部子控件大小估算容器布局大小（用于评估宽度或者高度为"auto"类型的控件大小，拉伸类型的子控件不计入大小估算）
      * @param [in] items 子控件列表
      * @param [in] szAvailable 容器的可用宽度和高度，包含分配给该容器的内边距，但不包含分配给容器的外边距
      * @return 返回排列后最终布局的大小信息（宽度和高度），包含Box容器本身的内边距，但不包含Box容器本身的外边距；
      */
-    virtual UiSize64 EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable) override;
-    
+    virtual UiSize64 EstimateLayoutSize(
+        const std::vector<Control *> &items, UiSize szAvailable) override;
+
     /** 设置布局属性
      * @param [in] strName 要设置的属性名
      * @param [in] strValue 要设置的属性值
      * @param [in] dpiManager DPI管理接口
      * @return true 设置成功，false 属性不存在
      */
-    virtual bool SetAttribute(const DString& strName, 
-                              const DString& strValue,
-                              const DpiManager& dpiManager) override;
+    virtual bool SetAttribute(
+        const DString &strName, const DString &strValue, const DpiManager &dpiManager) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
     * @param [in] dpiManager DPI缩放管理器
     */
-    virtual void ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale) override;
+    virtual void ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale) override;
 
 public:
     /** 获取子项大小，该宽度和高度，是包含了控件的外边距和内边距的
      */
-    const UiSize& GetItemSize() const;
+    const UiSize &GetItemSize() const;
 
     /** 设置子项大小
      * @param[in] szItem 子项大小数据，该宽度和高度，是包含了控件的外边距和内边距的
@@ -102,14 +103,15 @@ public:
 
     /** 计算子项的高度
     */
-    bool AutoCalcItemHeight(int32_t nRows, int32_t nMarginY, int32_t szAvailable, int32_t& nItemHeight) const;
+    bool AutoCalcItemHeight(
+        int32_t nRows, int32_t nMarginY, int32_t szAvailable, int32_t &nItemHeight) const;
 
 private:
     /** 未处理的子控件接口和其宽高信息
     */
     struct ItemSizeInfo
     {
-        Control* pControl = nullptr; //子控件接口
+        Control *pControl = nullptr; //子控件接口
         int32_t cx = 0;              //子控件的宽度
         int32_t cy = 0;              //子控件的高度
     };
@@ -120,7 +122,7 @@ private:
     * @param [in] rc 瓦片控件所在容器的可用区域矩形
     * @return 返回该空间的估算大小（宽和高）
     */
-    static UiSize CalcEstimateSize(Control* pControl, const UiSize& szItem, const UiRect& rc);
+    static UiSize CalcEstimateSize(Control *pControl, const UiSize &szItem, const UiRect &rc);
 
     /** 获取基本参数：瓦片的列数
     * @param [in] normalItems 子控件列表
@@ -130,13 +132,17 @@ private:
     * @param [in] childMarginY 子控件的Y轴间隔    
     * @param [out] nRows 返回总行数
     */
-    static void CalcTileRows(const std::vector<ItemSizeInfo>& normalItems, const UiRect& rc,
-                             int32_t tileHeight, int32_t childMarginX, int32_t childMarginY,
-                             int32_t& nRows);
+    static void CalcTileRows(
+        const std::vector<ItemSizeInfo> &normalItems,
+        const UiRect &rc,
+        int32_t tileHeight,
+        int32_t childMarginX,
+        int32_t childMarginY,
+        int32_t &nRows);
 
     /** 估算浮动控件的大小
     */
-    static UiSize64 EstimateFloatSize(Control* pControl, const UiRect& rc);
+    static UiSize64 EstimateFloatSize(Control *pControl, const UiRect &rc);
 
     /** 处理浮动子控件，并返回未处理的子控件列表
     * @param [in] items 子控件列表
@@ -146,11 +152,12 @@ private:
     * @param [out] normalItems 返回未处理的子控件列表，及其大小信息
     * @return 返回浮动控件所占的区域宽度和高度
     */
-    static UiSize64 ArrangeFloatChild(const std::vector<Control*>& items,
-                                      const UiRect& rc,
-                                      const UiSize& szItem,
-                                      bool bEstimateOnly,
-                                      std::vector<ItemSizeInfo>& normalItems);
+    static UiSize64 ArrangeFloatChild(
+        const std::vector<Control *> &items,
+        const UiRect &rc,
+        const UiSize &szItem,
+        bool bEstimateOnly,
+        std::vector<ItemSizeInfo> &normalItems);
 
     /** 获取基本参数：瓦片高度，布局排列过程中，在每列开始时，计算本列的宽度
     * @param [in] normalItems 子控件列表
@@ -159,10 +166,11 @@ private:
     * @param [in] szItem 瓦片控件宽度和高度（设置值）
     * @return 返回高宽值，包含了外边距Margin.top + Margin.bottom值
     */
-    static int32_t CalcTileColumnWidth(const std::vector<ItemSizeInfo>& normalItems,
-                                       const std::vector<ItemSizeInfo>::const_iterator iterBegin,
-                                        int32_t nRows,
-                                       const UiSize& szItem);
+    static int32_t CalcTileColumnWidth(
+        const std::vector<ItemSizeInfo> &normalItems,
+        const std::vector<ItemSizeInfo>::const_iterator iterBegin,
+        int32_t nRows,
+        const UiSize &szItem);
 
     /** 计算瓦片控件的显示坐标和大小
     * @param [in] itemSizeInfo 瓦片控件的接口, 及控件的大小信息
@@ -173,12 +181,13 @@ private:
     * @param [out] szTilePos 瓦片控件的显示坐标、宽度和高度
     * @return 返回瓦片控件目标区域的大小（宽和高），宽度和高度包含了控件的外边距
     */
-    static UiSize CalcTilePosition(const ItemSizeInfo& itemSizeInfo,
-                                   int32_t tileWidth,
-                                   int32_t tileHeight,
-                                   const UiPoint& ptTile,
-                                   bool bScaleDown, 
-                                   UiRect& szTilePos);
+    static UiSize CalcTilePosition(
+        const ItemSizeInfo &itemSizeInfo,
+        int32_t tileWidth,
+        int32_t tileHeight,
+        const UiPoint &ptTile,
+        bool bScaleDown,
+        UiRect &szTilePos);
 
 private:
     /** 对子控件布局的内部实现函数（默认对齐方式：居中对齐）
@@ -189,11 +198,12 @@ private:
     * @param [out] outRowHeights 本次布局，使用的每行高度值
     * @return 返回区域的宽度和高度
     */
-    UiSize64 ArrangeChildNormal(const std::vector<Control*>& items, 
-                                UiRect rect,
-                                bool bEstimateOnly,
-                                const std::vector<int32_t>& inRowHeights,
-                                std::vector<int32_t>& outRowHeights) const;
+    UiSize64 ArrangeChildNormal(
+        const std::vector<Control *> &items,
+        UiRect rect,
+        bool bEstimateOnly,
+        const std::vector<int32_t> &inRowHeights,
+        std::vector<int32_t> &outRowHeights) const;
 
     /** 使用自由布局排列控件(无固定列数，尽量充分利用展示空间，显示尽可能多的内容)（默认对齐方式：居中对齐）
     * @param [in] items 子控件列表
@@ -201,9 +211,8 @@ private:
     * @param [in] bEstimateOnly 如果为true表示仅计算区域，对控件位置不做调整；如果为false，表示对控件位置做调整。
     * @return 返回区域的宽度和高度
     */
-    UiSize64 ArrangeChildFreeLayout(const std::vector<Control*>& items, 
-                                    UiRect rect, 
-                                    bool bEstimateOnly) const;
+    UiSize64 ArrangeChildFreeLayout(
+        const std::vector<Control *> &items, UiRect rect, bool bEstimateOnly) const;
 
 private:
     //子项大小, 该宽度和高度，是包含了控件的外边距和内边距的

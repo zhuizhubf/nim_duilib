@@ -2,17 +2,16 @@
 
 #ifdef DUILIB_BUILD_FOR_SDL
 
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Core/Control.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/FileUtil.h"
 #include <map>
 
 #include <SDL3/SDL.h>
 
-namespace ui
-{
+namespace ui {
 class CursorManager::TImpl
 {
 public:
@@ -21,16 +20,14 @@ public:
 
     /** 已经加载的光标资源句柄
     */
-    std::map<FilePath, SDL_Cursor*> m_cursorMap;
+    std::map<FilePath, SDL_Cursor *> m_cursorMap;
 
     /** 系统光标
     */
-    std::map<CursorType, SDL_Cursor*> m_systemCursorMap;
+    std::map<CursorType, SDL_Cursor *> m_systemCursorMap;
 };
 
-CursorManager::TImpl::TImpl()
-{
-}
+CursorManager::TImpl::TImpl() {}
 
 CursorManager::TImpl::~TImpl()
 {
@@ -68,8 +65,8 @@ bool CursorManager::SetCursor(CursorType cursorType)
         ASSERT_UNUSED_VARIABLE(nRet);
         return nRet;
     }
-    
-    SDL_Cursor* sdlCursor = nullptr;
+
+    SDL_Cursor *sdlCursor = nullptr;
     switch (cursorType) {
     case CursorType::kCursorArrow:
         sdlCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
@@ -100,7 +97,7 @@ bool CursorManager::SetCursor(CursorType cursorType)
         break;
     case CursorType::kCursorSizeAll:
         sdlCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
-        break;    
+        break;
     case CursorType::kCursorNo:
         sdlCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NOT_ALLOWED);
         break;
@@ -114,8 +111,7 @@ bool CursorManager::SetCursor(CursorType cursorType)
     if (sdlCursor == nullptr) {
         //默认光标
         sdlCursor = SDL_GetDefaultCursor();
-    }
-    else {
+    } else {
         m_impl->m_systemCursorMap[cursorType] = sdlCursor;
     }
 
@@ -130,13 +126,14 @@ bool CursorManager::SetCursor(CursorType cursorType)
 
 /** 从内存数据中加载光标
 */
-static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& fileData, const FilePath& imageFilePath)
+static SDL_Cursor *LoadCursorFromData(
+    const Window *pWindow, std::vector<uint8_t> &fileData, const FilePath &imageFilePath)
 {
     if (fileData.empty() || (pWindow == nullptr)) {
         return nullptr;
     }
-    
-    ImageDecoderFactory& imageDecoders = GlobalManager::Instance().ImageDecoders();
+
+    ImageDecoderFactory &imageDecoders = GlobalManager::Instance().ImageDecoders();
     float fImageSizeScale = pWindow->Dpi().GetDisplayScale();
     ImageDecodeParam decodeParam;
     decodeParam.m_imageFilePath = imageFilePath;
@@ -152,7 +149,7 @@ static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t
         return nullptr;
     }
 
-    void* pPixelBits = pBitmap->LockPixelBits();
+    void *pPixelBits = pBitmap->LockPixelBits();
     ASSERT(pPixelBits != nullptr);
     if (pPixelBits == nullptr) {
         return nullptr;
@@ -161,21 +158,23 @@ static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t
 #ifdef DUILIB_BUILD_FOR_WIN
     //交换R和G，Windows平台使用ABGR格式，需要转换为RGBA32格式
     // RGBA 像素结构体
-    struct CurRGBA {
+    struct CurRGBA
+    {
         uint8_t r, g, b, a;
     };
     ASSERT(sizeof(CurRGBA) == 4);
-    CurRGBA* pPixelBitsRGBA = (CurRGBA*)pPixelBits;
+    CurRGBA *pPixelBitsRGBA = (CurRGBA *) pPixelBits;
     const int32_t nImageHeight = pBitmap->GetHeight();
     const int32_t nImageWidth = pBitmap->GetWidth();
     for (int y = 0; y < nImageHeight; y++) {
         for (int x = 0; x < nImageWidth; x++) {
-            CurRGBA& pixelColor = pPixelBitsRGBA[y * nImageWidth + x];
+            CurRGBA &pixelColor = pPixelBitsRGBA[y * nImageWidth + x];
             std::swap(pixelColor.b, pixelColor.r);
         }
     }
 #endif
-    SDL_Surface* cursorSurface = SDL_CreateSurfaceFrom(nWidth, nHeight, SDL_PIXELFORMAT_RGBA32, pPixelBits, nWidth * sizeof(uint32_t));
+    SDL_Surface *cursorSurface = SDL_CreateSurfaceFrom(
+        nWidth, nHeight, SDL_PIXELFORMAT_RGBA32, pPixelBits, nWidth * sizeof(uint32_t));
     ASSERT(cursorSurface != nullptr);
     if (cursorSurface == nullptr) {
         return nullptr;
@@ -192,10 +191,10 @@ static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t
             hot_x = (fileData[0x0B] << 8) | fileData[0x0A];
             //hot_y位于 0x0C，2个字节
             hot_y = (fileData[0x0D] << 8) | fileData[0x0C];
-            if ((hot_x >= (int)pBitmap->GetWidth()) || (hot_x < 0)) {
+            if ((hot_x >= (int) pBitmap->GetWidth()) || (hot_x < 0)) {
                 hot_x = 0;
             }
-            if ((hot_y >= (int)pBitmap->GetHeight()) || (hot_y < 0)){
+            if ((hot_y >= (int) pBitmap->GetHeight()) || (hot_y < 0)) {
                 hot_y = 0;
             }
             pWindow->Dpi().ScaleInt(hot_x);
@@ -203,7 +202,7 @@ static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t
         }
     }
 
-    SDL_Cursor* sdlCursor = SDL_CreateColorCursor(cursorSurface, hot_x, hot_y);
+    SDL_Cursor *sdlCursor = SDL_CreateColorCursor(cursorSurface, hot_x, hot_y);
     SDL_DestroySurface(cursorSurface);
     cursorSurface = nullptr;
 
@@ -211,7 +210,7 @@ static SDL_Cursor* LoadCursorFromData(const Window* pWindow, std::vector<uint8_t
     return sdlCursor;
 }
 
-bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curImagePath)
+bool CursorManager::SetImageCursor(const Window *pWindow, const FilePath &curImagePath)
 {
     ASSERT(!curImagePath.IsEmpty());
     ASSERT(pWindow != nullptr);
@@ -220,26 +219,26 @@ bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curIma
     }
 
     //设置窗口图标
-    FilePath cursorFullPath = GlobalManager::Instance().GetExistsResFullPath(pWindow->GetResourcePath(), pWindow->GetXmlPath(), curImagePath);
+    FilePath cursorFullPath = GlobalManager::Instance().GetExistsResFullPath(
+        pWindow->GetResourcePath(), pWindow->GetXmlPath(), curImagePath);
     ASSERT(!cursorFullPath.IsEmpty());
     if (cursorFullPath.IsEmpty()) {
         return false;
     }
 
-    SDL_Cursor* sdlCursor = nullptr;
+    SDL_Cursor *sdlCursor = nullptr;
     auto iter = m_impl->m_cursorMap.find(cursorFullPath);
     if (iter != m_impl->m_cursorMap.end()) {
         sdlCursor = iter->second;
-    }
-    else {
+    } else {
         //加载光标
         std::vector<uint8_t> fileData;
-        if (GlobalManager::Instance().Zip().IsUseZip() && GlobalManager::Instance().Zip().IsZipResExist(cursorFullPath)) {
-            //使用压缩包               
+        if (GlobalManager::Instance().Zip().IsUseZip()
+            && GlobalManager::Instance().Zip().IsZipResExist(cursorFullPath)) {
+            //使用压缩包
             bool bRet = GlobalManager::Instance().Zip().GetZipData(cursorFullPath, fileData);
             ASSERT_UNUSED_VARIABLE(bRet);
-        }
-        else {
+        } else {
             //使用本地文件
             bool bRet = FileUtil::ReadFileData(cursorFullPath, fileData);
             ASSERT_UNUSED_VARIABLE(bRet);
@@ -268,8 +267,7 @@ bool CursorManager::ShowCursor(bool bShow)
     bool nRet = false;
     if (bShow) {
         nRet = SDL_ShowCursor();
-    }
-    else {
+    } else {
         nRet = SDL_HideCursor();
     }
     ASSERT(nRet);
@@ -278,12 +276,12 @@ bool CursorManager::ShowCursor(bool bShow)
 
 CursorID CursorManager::GetCursorID() const
 {
-    return (CursorID)SDL_GetCursor();
+    return (CursorID) SDL_GetCursor();
 }
 
 bool CursorManager::SetCursorByID(CursorID cursorId)
 {
-    bool nRet = SDL_SetCursor((SDL_Cursor*)cursorId);
+    bool nRet = SDL_SetCursor((SDL_Cursor *) cursorId);
     ASSERT(nRet);
     return nRet;
 }

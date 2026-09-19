@@ -1,20 +1,15 @@
 #include "WindowManager.h"
-#include "duilib/Core/Window.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
 #include <set>
 
-namespace ui 
-{
-WindowManager::WindowManager()
-{
-}
+namespace ui {
+WindowManager::WindowManager() {}
 
-WindowManager::~WindowManager()
-{
-}
+WindowManager::~WindowManager() {}
 
-void WindowManager::AddWindow(Window* pWindow)
+void WindowManager::AddWindow(Window *pWindow)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pWindow != nullptr);
@@ -26,7 +21,7 @@ void WindowManager::AddWindow(Window* pWindow)
         m_windowList.push_back(WindowPtr(pWindow));
     }
 
-#ifdef _DEBUG    
+#ifdef _DEBUG
     if (1) {
         //校验窗口ID是否重复
         std::set<DString> windowIdSet;
@@ -45,7 +40,7 @@ void WindowManager::AddWindow(Window* pWindow)
 #endif
 }
 
-void WindowManager::RemoveWindow(Window* pWindow)
+void WindowManager::RemoveWindow(Window *pWindow)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pWindow != nullptr);
@@ -57,7 +52,7 @@ void WindowManager::RemoveWindow(Window* pWindow)
     }
 }
 
-bool WindowManager::HasWindow(Window* pWindow) const
+bool WindowManager::HasWindow(Window *pWindow) const
 {
     GlobalManager::Instance().AssertUIThread();
     if (pWindow != nullptr) {
@@ -70,7 +65,7 @@ bool WindowManager::HasWindow(Window* pWindow) const
     return false;
 }
 
-bool WindowManager::HasWindowBase(WindowBase* pWindowBase) const
+bool WindowManager::HasWindowBase(WindowBase *pWindowBase) const
 {
     GlobalManager::Instance().AssertUIThread();
     if (pWindowBase != nullptr) {
@@ -95,7 +90,7 @@ std::vector<WindowPtr> WindowManager::GetAllWindowList() const
     return windowList;
 }
 
-std::vector<WindowPtr> WindowManager::GetAllWindowList(const DString& windowClassName) const
+std::vector<WindowPtr> WindowManager::GetAllWindowList(const DString &windowClassName) const
 {
     GlobalManager::Instance().AssertUIThread();
     std::vector<WindowPtr> windowList;
@@ -109,7 +104,7 @@ std::vector<WindowPtr> WindowManager::GetAllWindowList(const DString& windowClas
     return windowList;
 }
 
-WindowPtr WindowManager::GetWindowById(const DString& windowId) const
+WindowPtr WindowManager::GetWindowById(const DString &windowId) const
 {
     GlobalManager::Instance().AssertUIThread();
     WindowPtr pWindow;

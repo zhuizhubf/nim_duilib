@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui
-{
+namespace ui {
 /** 剪切板操作
 */
 class DUILIB_API Clipboard
@@ -12,19 +11,19 @@ class DUILIB_API Clipboard
 public:
     /** 获取粘贴板字符串（UTF16）
     */
-    static bool GetClipboardText(DStringW& text);
+    static bool GetClipboardText(DStringW &text);
 
     /** 获取粘贴板字符串（UTF8）
     */
-    static bool GetClipboardText(DStringA& text);
+    static bool GetClipboardText(DStringA &text);
 
     /** 设置剪贴板数据（UTF16）
     */
-    static bool SetClipboardText(const DStringW& text);
+    static bool SetClipboardText(const DStringW &text);
 
     /** 设置剪贴板数据（UTF8）
     */
-    static bool SetClipboardText(const DStringA& text);
+    static bool SetClipboardText(const DStringA &text);
 };
 
 } //namespace ui

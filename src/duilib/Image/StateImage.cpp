@@ -1,22 +1,20 @@
 #include "StateImage.h"
-#include "duilib/Image/Image.h"
+#include "duilib/Animation/AnimationManager.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Image/Image.h"
 #include "render/IRender.h"
-#include "duilib/Animation/AnimationManager.h"
 
-namespace ui 
-{
-StateImage::StateImage() :
-    m_pControl(nullptr),
-    m_stateImageMap()
-{
-}
+namespace ui {
+StateImage::StateImage()
+    : m_pControl(nullptr)
+    , m_stateImageMap()
+{}
 
 StateImage::~StateImage()
 {
     for (auto iter : m_stateImageMap) {
-        Image* pImage = iter.second;
+        Image *pImage = iter.second;
         if (pImage != nullptr) {
             delete pImage;
         }
@@ -24,22 +22,21 @@ StateImage::~StateImage()
     m_stateImageMap.clear();
 }
 
-void StateImage::SetControl(Control* pControl)
-{ 
+void StateImage::SetControl(Control *pControl)
+{
     m_pControl = pControl;
     for (auto iter : m_stateImageMap) {
-        Image* pImage = iter.second;
+        Image *pImage = iter.second;
         if (pImage != nullptr) {
             pImage->SetControl(pControl);
         }
     }
 }
 
-void StateImage::SetImageString(ControlStateType stateType, 
-                                const DString& strImageString,
-                                const DpiManager& dpi)
+void StateImage::SetImageString(
+    ControlStateType stateType, const DString &strImageString, const DpiManager &dpi)
 {
-    Image* pImage = nullptr;
+    Image *pImage = nullptr;
     auto iter = m_stateImageMap.find(stateType);
     if (iter != m_stateImageMap.end()) {
         pImage = iter->second;
@@ -78,7 +75,8 @@ DString StateImage::GetImagePath(ControlStateType stateType) const
     return imageFilePath;
 }
 
-bool StateImage::AreImageSourceRectsEqual(ControlStateType stateType1, ControlStateType stateType2) const
+bool StateImage::AreImageSourceRectsEqual(
+    ControlStateType stateType1, ControlStateType stateType2) const
 {
     auto iter1 = m_stateImageMap.find(stateType1);
     auto iter2 = m_stateImageMap.find(stateType2);
@@ -100,9 +98,9 @@ int32_t StateImage::GetImageFade(ControlStateType stateType) const
     return nFade;
 }
 
-Image* StateImage::GetStateImage(ControlStateType stateType) const
+Image *StateImage::GetStateImage(ControlStateType stateType) const
 {
-    Image* pImage = nullptr;
+    Image *pImage = nullptr;
     auto iter = m_stateImageMap.find(stateType);
     if (iter != m_stateImageMap.end()) {
         pImage = iter->second;
@@ -117,22 +115,22 @@ bool StateImage::HasHoveredImage() const
 
 bool StateImage::HasImage() const
 {
-    return !GetImageString(kControlStateNormal).empty() ||
-           !GetImageString(kControlStateHovered).empty()    ||
-           !GetImageString(kControlStatePressed).empty() ||
-           !GetImageString(kControlStateDisabled).empty();
+    return !GetImageString(kControlStateNormal).empty()
+           || !GetImageString(kControlStateHovered).empty()
+           || !GetImageString(kControlStatePressed).empty()
+           || !GetImageString(kControlStateDisabled).empty();
 }
 
-bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType, 
-                                 const DString& sImageModify, UiRect* pDestRect)
+bool StateImage::PaintStateImage(
+    IRender *pRender, ControlStateType stateType, const DString &sImageModify, UiRect *pDestRect)
 {
-    if (m_pControl != nullptr) {        
-        if (((stateType == kControlStateNormal) || (stateType == kControlStateHovered)) &&
-            m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
+    if (m_pControl != nullptr) {
+        if (((stateType == kControlStateNormal) || (stateType == kControlStateHovered))
+            && m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
             //正在播放Hovered状态动画
             uint8_t nHoveredAlpha = m_pControl->GetHoveredAlpha();
-            Image* pNormalImage = GetStateImage(kControlStateNormal);
-            Image* pHoveredImage = GetStateImage(kControlStateHovered);
+            Image *pNormalImage = GetStateImage(kControlStateNormal);
+            Image *pHoveredImage = GetStateImage(kControlStateHovered);
             for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
                 ASSERT(iter->second != nullptr);
                 bool bNeedPause = true;
@@ -153,18 +151,20 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
             //先绘制Normal图片
             if (pNormalImage != nullptr) {
                 int32_t nNormalFade = GetImageFade(kControlStateNormal);
-                nNormalFade = int32_t(nNormalFade * (double)(255 - nHoveredAlpha) / 255);
+                nNormalFade = int32_t(nNormalFade * (double) (255 - nHoveredAlpha) / 255);
                 if (pHoveredImage == nullptr) {
                     nNormalFade = -1;
                 }
-                bNormalPaintd = m_pControl->PaintImage(pRender, pNormalImage, sImageModify, nNormalFade, nullptr, nullptr, pDestRect);
+                bNormalPaintd = m_pControl->PaintImage(
+                    pRender, pNormalImage, sImageModify, nNormalFade, nullptr, nullptr, pDestRect);
             }
 
             //绘制Hovered图片
             if (pHoveredImage != nullptr) {
                 int32_t nHoveredFade = GetImageFade(kControlStateHovered);
-                nHoveredFade = int32_t(nHoveredFade * (double)nHoveredAlpha / 255);
-                bHoveredPaintd = m_pControl->PaintImage(pRender, pHoveredImage, sImageModify, nHoveredFade);                
+                nHoveredFade = int32_t(nHoveredFade * (double) nHoveredAlpha / 255);
+                bHoveredPaintd
+                    = m_pControl->PaintImage(pRender, pHoveredImage, sImageModify, nHoveredFade);
             }
 
             if (bNormalPaintd || bHoveredPaintd) {
@@ -186,7 +186,7 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
     if (stateType == kControlStateDisabled && GetImageString(kControlStateDisabled).empty()) {
         stateType = kControlStateNormal;
     }
-    Image* pImage = GetStateImage(stateType);
+    Image *pImage = GetStateImage(stateType);
     if ((pImage == nullptr) && (stateType != kControlStateNormal)) {
         //正常状态的图片，作为保底图片
         stateType = kControlStateNormal;
@@ -208,16 +208,16 @@ bool StateImage::PaintStateImage(IRender* pRender, ControlStateType stateType,
     return false;
 }
 
-Image* StateImage::GetEstimateImage() const
+Image *StateImage::GetEstimateImage() const
 {
-    Image* pEstimateImage = nullptr;
+    Image *pEstimateImage = nullptr;
     auto iter = m_stateImageMap.find(kControlStateNormal);
     if (iter != m_stateImageMap.end()) {
         if (!iter->second->GetImagePath().empty()) {
             pEstimateImage = iter->second;
-        }        
+        }
     }
-    if(pEstimateImage == nullptr) {
+    if (pEstimateImage == nullptr) {
         iter = m_stateImageMap.find(kControlStateHovered);
         if (iter != m_stateImageMap.end()) {
             if (!iter->second->GetImagePath().empty()) {
@@ -244,7 +244,7 @@ Image* StateImage::GetEstimateImage() const
     return pEstimateImage;
 }
 
-void StateImage::GetAllImages(std::vector<Image*>& allImages) const
+void StateImage::GetAllImages(std::vector<Image *> &allImages) const
 {
     for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
         ASSERT(iter->second != nullptr);
@@ -253,7 +253,7 @@ void StateImage::GetAllImages(std::vector<Image*>& allImages) const
 }
 
 void StateImage::ClearImageCache()
-{    
+{
     for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
         ASSERT(iter->second != nullptr);
         iter->second->ClearImageCache();
@@ -276,13 +276,13 @@ void StateImage::PauseImageAnimation()
     }
 }
 
-Image* StateImage::FindImageByName(const DString& imageName) const
+Image *StateImage::FindImageByName(const DString &imageName) const
 {
     if (imageName.empty()) {
         return nullptr;
     }
     for (auto iter = m_stateImageMap.begin(); iter != m_stateImageMap.end(); ++iter) {
-        Image* pImage = iter->second;
+        Image *pImage = iter->second;
         ASSERT(pImage != nullptr);
         if (pImage != nullptr) {
             if (pImage->GetImageAttribute().m_sImageName == imageName) {
@@ -293,4 +293,4 @@ Image* StateImage::FindImageByName(const DString& imageName) const
     return nullptr;
 }
 
-}
+} // namespace ui

@@ -1,38 +1,37 @@
 #include "TimerManager.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/WindowMessage.h"
 #include "duilib/Utils/LogUtil.h"
 #include "duilib/Utils/StringUtil.h"
-#include "duilib/Core/WindowMessage.h"
 
-#if defined (DUILIB_BUILD_FOR_SDL)
-    #include <SDL3/SDL.h>
+#if defined(DUILIB_BUILD_FOR_SDL)
+#include <SDL3/SDL.h>
 #endif
 
 /** 自定义消息
 */
-#if defined (DUILIB_BUILD_FOR_SDL)
-    #define WM_USER_DEFINED_TIMER   (SDL_EVENT_USER + 2)
+#if defined(DUILIB_BUILD_FOR_SDL)
+#define WM_USER_DEFINED_TIMER (SDL_EVENT_USER + 2)
 #else
-    #define WM_USER_DEFINED_TIMER   (kWM_USER + 567)
+#define WM_USER_DEFINED_TIMER (kWM_USER + 567)
 #endif
 
-namespace ui 
-{
+namespace ui {
 
 /** 定时器的数据
 */
 class TimerInfo
 {
 public:
-    TimerInfo(): 
-        timerCallback(nullptr),
-        uElapseMs(0),
-        uRepeatTime(0),
-        m_nTimerId(0)
-    {
-    }
+    TimerInfo()
+        : timerCallback(nullptr)
+        , uElapseMs(0)
+        , uRepeatTime(0)
+        , m_nTimerId(0)
+    {}
 
-    bool operator < (const TimerInfo& r) const {
+    bool operator<(const TimerInfo &r) const
+    {
         //排序条件：最先触发的排在前面
         return trigerTime > r.trigerTime;
     }
@@ -56,22 +55,28 @@ public:
     std::chrono::steady_clock::time_point trigerTime;
 };
 
-TimerManager::TimerManager():
-    m_nNextTimerId(1),
-    m_bRunning(false),
-    m_bHasPenddingPoll(false)
-{
-}
+TimerManager::TimerManager()
+    : m_nNextTimerId(1)
+    , m_bRunning(false)
+    , m_bHasPenddingPoll(false)
+{}
 
 TimerManager::~TimerManager()
 {
     Clear();
 }
 
-void TimerManager::Initialize(void* platformData)
+void TimerManager::Initialize(void *platformData)
 {
     m_threadMsg.Initialize(platformData);
-    m_threadMsg.SetMessageCallback(WM_USER_DEFINED_TIMER, UiBind(&TimerManager::OnTimerMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    m_threadMsg.SetMessageCallback(
+        WM_USER_DEFINED_TIMER,
+        UiBind(
+            &TimerManager::OnTimerMessage,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            std::placeholders::_3));
 }
 
 void TimerManager::Clear()
@@ -96,8 +101,11 @@ void TimerManager::Clear()
     }
 }
 
-size_t TimerManager::AddTimer(const std::weak_ptr<WeakFlag>& weakFlag, const TimerCallback& callback,
-                              uint32_t uElapseMs, int32_t iRepeatTime)
+size_t TimerManager::AddTimer(
+    const std::weak_ptr<WeakFlag> &weakFlag,
+    const TimerCallback &callback,
+    uint32_t uElapseMs,
+    int32_t iRepeatTime)
 {
     ASSERT((callback != nullptr) && (uElapseMs > 0) && (iRepeatTime != 0));
     if ((callback == nullptr) || (uElapseMs == 0) || (iRepeatTime == 0)) {
@@ -110,7 +118,8 @@ size_t TimerManager::AddTimer(const std::weak_ptr<WeakFlag>& weakFlag, const Tim
     pTimer.timerCallback = callback;
     pTimer.uElapseMs = uElapseMs;
     pTimer.trigerTime = std::chrono::steady_clock::now();
-    pTimer.trigerTime += std::chrono::milliseconds(uElapseMs); //计算出下次触发时间(当前时间 + 间隔的毫秒数)
+    pTimer.trigerTime += std::chrono::milliseconds(
+        uElapseMs); //计算出下次触发时间(当前时间 + 间隔的毫秒数)
     pTimer.uRepeatTime = static_cast<uint32_t>(iRepeatTime);
     pTimer.weakFlag = weakFlag;
 
@@ -147,8 +156,7 @@ bool TimerManager::IsTimerRemoved(size_t nTimerId) const
 {
     if (!m_removedTimerIds.empty()) {
         return m_removedTimerIds.find(nTimerId) != m_removedTimerIds.end();
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -165,7 +173,7 @@ void TimerManager::OnTimerMessage(uint32_t msgId, WPARAM /*wParam*/, LPARAM /*lP
         //LogUtil::OutputLine(StringUtil::Printf(_T("TimerManager::OnTimerMessage: received timer event")));
         m_threadMsg.RemoveDuplicateMsg(WM_USER_DEFINED_TIMER);
         Poll();
-    }    
+    }
 }
 
 void TimerManager::Poll()
@@ -177,8 +185,7 @@ void TimerManager::Poll()
             //删除已经失效或者取消的定时器
             ClearRemovedTimerId(m_aTimers.top().m_nTimerId);
             m_aTimers.pop();
-        }
-        else if (std::chrono::steady_clock::now() >= m_aTimers.top().trigerTime) {
+        } else if (std::chrono::steady_clock::now() >= m_aTimers.top().trigerTime) {
             //队列顶的定时器：已经达到定时器触发条件
             TimerInfo timerTask = m_aTimers.top();
             m_aTimers.pop();
@@ -193,20 +200,18 @@ void TimerManager::Poll()
             if (timerTask.uRepeatTime > 0) {
                 timerTask.uRepeatTime--;
             }
-            if ((timerTask.uRepeatTime > 0) &&
-                !timerTask.weakFlag.expired() &&
-                !IsTimerRemoved(timerTask.m_nTimerId)) {
+            if ((timerTask.uRepeatTime > 0) && !timerTask.weakFlag.expired()
+                && !IsTimerRemoved(timerTask.m_nTimerId)) {
                 //如果未达到触发次数限制，重新设置下次触发的时间
                 timerTask.trigerTime = std::chrono::steady_clock::now();
-                timerTask.trigerTime += std::chrono::milliseconds(timerTask.uElapseMs); //计算出下次触发时间(当前时间 + 间隔的毫秒数)
+                timerTask.trigerTime += std::chrono::milliseconds(
+                    timerTask.uElapseMs); //计算出下次触发时间(当前时间 + 间隔的毫秒数)
                 m_aTimers.push(timerTask);
-            }
-            else {
+            } else {
                 //执行已完成或者已经失效
                 ClearRemovedTimerId(timerTask.m_nTimerId);
             }
-        }
-        else {
+        } else {
             //已经没有触发的定时器任务
             break;
         }
@@ -229,27 +234,27 @@ void TimerManager::WorkerThreadProc()
         }
         if (m_aTimers.empty()) {
             //为空，等待任务；使用谓词避免虚假唤醒
-            m_cv.wait(taskGuard, [this] { return !m_bRunning.load(std::memory_order_acquire) || !m_aTimers.empty(); });
+            m_cv.wait(taskGuard, [this] {
+                return !m_bRunning.load(std::memory_order_acquire) || !m_aTimers.empty();
+            });
             if (!m_bRunning.load(std::memory_order_acquire)) {
                 break;
             }
-        }
-        else {
+        } else {
             //计算最早的任务，等待超时
             uint32_t nDetaTimeMs = 0;
             auto currentTime = std::chrono::steady_clock::now();
             if (m_aTimers.top().weakFlag.expired() || IsTimerRemoved(m_aTimers.top().m_nTimerId)) {
                 //删除已经失效或者取消的定时器
                 nDetaTimeMs = 0;
-            }
-            else if (currentTime >= m_aTimers.top().trigerTime) {
+            } else if (currentTime >= m_aTimers.top().trigerTime) {
                 //队列顶的定时器：已经达到定时器触发条件
                 nDetaTimeMs = 0;
-            }
-            else {
+            } else {
                 //已经没有触发的定时器任务
-                auto nDiffTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(m_aTimers.top().trigerTime - currentTime);
-                nDetaTimeMs = (uint32_t)nDiffTimeMs.count();
+                auto nDiffTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    m_aTimers.top().trigerTime - currentTime);
+                nDetaTimeMs = (uint32_t) nDiffTimeMs.count();
             }
 
             if (nDetaTimeMs > 0) {
@@ -266,10 +271,9 @@ void TimerManager::WorkerThreadProc()
                 //     新增了更早触发的定时器或队首被换，需立刻退出重新评估
                 auto deadline = currentTime + std::chrono::milliseconds(nDetaTimeMs);
                 m_cv.wait_until(taskGuard, deadline, [this, deadline] {
-                    return !m_bRunning.load(std::memory_order_acquire)
-                        || m_aTimers.empty()
-                        || m_aTimers.top().trigerTime < deadline;
-                    });
+                    return !m_bRunning.load(std::memory_order_acquire) || m_aTimers.empty()
+                           || m_aTimers.top().trigerTime < deadline;
+                });
             }
 
             //如果已经停止运行，跳过消息投递，直接退出循环
@@ -283,9 +287,10 @@ void TimerManager::WorkerThreadProc()
 
             uint32_t nErrorCode = 0;
             bool bRet = m_threadMsg.PostMsg(WM_USER_DEFINED_TIMER, 0, 0, &nErrorCode);
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
             if (!bRet) {
-                if ((nErrorCode == ERROR_NOT_ENOUGH_QUOTA) && !GlobalManager::Instance().IsInUIThread()) {
+                if ((nErrorCode == ERROR_NOT_ENOUGH_QUOTA)
+                    && !GlobalManager::Instance().IsInUIThread()) {
                     //在程序启动时，如果在子线程向主线程Post消息，会遇到此错误
                     for (int32_t i = 0; i < 200; ++i) {
                         ::Sleep(50);
@@ -312,15 +317,17 @@ void TimerManager::WorkerThreadProc()
                 ASSERT_UNUSED_VARIABLE(bRet);
             }
 
-            if (m_bRunning.load(std::memory_order_acquire) && m_bHasPenddingPoll.load(std::memory_order_acquire)) {
+            if (m_bRunning.load(std::memory_order_acquire)
+                && m_bHasPenddingPoll.load(std::memory_order_acquire)) {
                 //使用谓词等待，避免虚假唤醒
                 m_cv.wait(taskGuard, [this] {
-                    return !m_bRunning.load(std::memory_order_acquire) || !m_bHasPenddingPoll.load(std::memory_order_acquire);
-                    });
+                    return !m_bRunning.load(std::memory_order_acquire)
+                           || !m_bHasPenddingPoll.load(std::memory_order_acquire);
+                });
             }
         }
     }
     m_bRunning.store(false, std::memory_order_release);
 }
 
-}
+} // namespace ui

@@ -4,8 +4,7 @@
 #include "duilib/Core/UiTypes.h"
 #include <map>
 
-namespace ui 
-{
+namespace ui {
 /** 控件状态与图片的映射
 */
 class Control;
@@ -21,16 +20,15 @@ public:
 
     /** 设置关联的控件接口
     */
-    void SetControl(Control* pControl);
+    void SetControl(Control *pControl);
 
     /** 设置图片属性
     * @param [in] stateType 图片类型
     * @param [in] strImageString 图片属性字符串
     * @param [in] dpi DPI缩放管理接口
     */
-    void SetImageString(ControlStateType stateType, 
-                        const DString& strImageString,
-                        const DpiManager& dpi);
+    void SetImageString(
+        ControlStateType stateType, const DString &strImageString, const DpiManager &dpi);
 
     /** 获取图片属性
     *@param [in] stateType 图片类型
@@ -55,7 +53,7 @@ public:
 
     /** 获取图片接口(可读，可写)
     */
-    Image* GetStateImage(ControlStateType stateType) const;
+    Image *GetStateImage(ControlStateType stateType) const;
 
 public:
     /** 是否包含Hovered状态的图片
@@ -73,17 +71,19 @@ public:
     * @param [out] pDestRect 返回图片绘制的最终目标矩形区域
     * @return 绘制成功返回true, 否则返回false
     */
-    bool PaintStateImage(IRender* pRender, ControlStateType stateType, 
-                         const DString& sImageModify = _T(""),
-                         UiRect* pDestRect = nullptr);
+    bool PaintStateImage(
+        IRender *pRender,
+        ControlStateType stateType,
+        const DString &sImageModify = _T(""),
+        UiRect *pDestRect = nullptr);
 
     /** 获取用于估算Control控件大小（宽和高）的图片接口
     */
-    Image* GetEstimateImage() const;
+    Image *GetEstimateImage() const;
 
     /** 获取所有图片接口
     */
-    void GetAllImages(std::vector<Image*>& allImages) const;
+    void GetAllImages(std::vector<Image *> &allImages) const;
 
     /** 清空图片缓存，释放资源
     */
@@ -99,14 +99,14 @@ public:
 
     /** 获取指定名称的图片接口
     */
-    Image* FindImageByName(const DString& imageName) const;
+    Image *FindImageByName(const DString &imageName) const;
 
 private:
     //关联的控件接口
-    Control* m_pControl;
+    Control *m_pControl;
 
     //每个状态的图片接口
-    std::map<ControlStateType, Image*> m_stateImageMap;
+    std::map<ControlStateType, Image *> m_stateImageMap;
 };
 
 } // namespace ui

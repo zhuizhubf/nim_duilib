@@ -6,8 +6,7 @@
 
 #include "turbojpeg.h"
 
-namespace ui
-{
+namespace ui {
 struct Image_JPEG::TImpl
 {
     //图片文件路径
@@ -60,36 +59,35 @@ Image_JPEG::~Image_JPEG()
 }
 
 // 查找与fImageSizeScale最接近的数值(但需要保证返回的值不小于fImageSizeScale)
-static bool FindClosestScale1(const std::vector<tjscalingfactor>& scalingFactorList,
-                              float fImageSizeScale,
-                              tjscalingfactor& selectedScalingfactor)
+static bool FindClosestScale1(
+    const std::vector<tjscalingfactor> &scalingFactorList,
+    float fImageSizeScale,
+    tjscalingfactor &selectedScalingfactor)
 {
     if (scalingFactorList.empty()) {
         return false;
     }
     //存储所有可能的比例值
-    struct TScalingfactor {
+    struct TScalingfactor
+    {
         size_t index;
         tjscalingfactor factor;
         float value;
-        bool operator == (const TScalingfactor& r) const
+        bool operator==(const TScalingfactor &r) const
         {
             return ImageUtil::IsSameImageScale(this->value, r.value);
         }
-        bool operator < (const TScalingfactor& r) const
-        {
-            return this->value < r.value;
-        }
+        bool operator<(const TScalingfactor &r) const { return this->value < r.value; }
     };
     std::vector<TScalingfactor> scales;
     for (size_t index = 0; index < scalingFactorList.size(); ++index) {
-        const tjscalingfactor& factor = scalingFactorList[index];
+        const tjscalingfactor &factor = scalingFactorList[index];
         if ((factor.num < 1) || (factor.denom < 1)) {
             continue;
         }
         TScalingfactor scalingFactor;
         scalingFactor.index = index;
-        scalingFactor.factor = factor;        
+        scalingFactor.factor = factor;
         scalingFactor.value = factor.num * 1.0f / factor.denom;
         scales.push_back(scalingFactor);
     }
@@ -108,7 +106,7 @@ static bool FindClosestScale1(const std::vector<tjscalingfactor>& scalingFactorL
 
     // 找到所有大于等于目标值的元素
     std::vector<TScalingfactor> candidates;
-    for (const TScalingfactor& scale : scales) {
+    for (const TScalingfactor &scale : scales) {
         if (scale.value >= fImageSizeScale) {
             candidates.push_back(scale);
         }
@@ -135,22 +133,24 @@ static bool FindClosestScale1(const std::vector<tjscalingfactor>& scalingFactorL
 }
 
 // 查找与fImageSizeScale最接近的数值
-static bool FindClosestScale2(const std::vector<tjscalingfactor>& scalingFactorList,
-                              float fImageSizeScale,
-                              tjscalingfactor& selectedScalingfactor)
+static bool FindClosestScale2(
+    const std::vector<tjscalingfactor> &scalingFactorList,
+    float fImageSizeScale,
+    tjscalingfactor &selectedScalingfactor)
 {
     if (scalingFactorList.empty()) {
         return false;
     }
     //存储所有可能的比例值
-    struct TScalingfactor {
+    struct TScalingfactor
+    {
         size_t index;
         tjscalingfactor factor;
         float value;
     };
     std::vector<TScalingfactor> scales;
     for (size_t index = 0; index < scalingFactorList.size(); ++index) {
-        const tjscalingfactor& factor = scalingFactorList[index];
+        const tjscalingfactor &factor = scalingFactorList[index];
         if ((factor.num < 1) || (factor.denom < 1)) {
             continue;
         }
@@ -187,12 +187,13 @@ static bool FindClosestScale2(const std::vector<tjscalingfactor>& scalingFactorL
     return false;
 }
 
-bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
-                               const FilePath& imageFilePath,
-                               float fImageSizeScale,
-                               bool bAsyncDecode,
-                               const UiSize& rcMaxDestRectSize,
-                               bool bAssertEnabled)
+bool Image_JPEG::LoadImageFile(
+    std::vector<uint8_t> &fileData,
+    const FilePath &imageFilePath,
+    float fImageSizeScale,
+    bool bAsyncDecode,
+    const UiSize &rcMaxDestRectSize,
+    bool bAssertEnabled)
 {
     ASSERT(!fileData.empty() || !imageFilePath.IsEmpty());
     if (fileData.empty() && imageFilePath.IsEmpty()) {
@@ -202,7 +203,7 @@ bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
     //自动释放资源
     struct TAutoReleaseJpeg
     {
-        std::vector<uint8_t>* pFileData = nullptr;
+        std::vector<uint8_t> *pFileData = nullptr;
         tjhandle tjInstance = nullptr;
         ~TAutoReleaseJpeg()
         {
@@ -244,13 +245,14 @@ bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
     int jpegSubsamp = 0;
     int jpegColorspace = 0;
     // 解码JPEG头信息获取图像基本信息
-    int ret = tjDecompressHeader3(tjInstance,
-                                  fileData.data(),
-                                  (unsigned long)fileData.size(),
-                                  &width,
-                                  &height,
-                                  &jpegSubsamp,
-                                  &jpegColorspace);
+    int ret = tjDecompressHeader3(
+        tjInstance,
+        fileData.data(),
+        (unsigned long) fileData.size(),
+        &width,
+        &height,
+        &jpegSubsamp,
+        &jpegColorspace);
     if (ret != 0) {
         m_impl->m_bDecodeError = true;
         return false;
@@ -268,17 +270,17 @@ bool Image_JPEG::LoadImageFile(std::vector<uint8_t>& fileData,
     }
     //加载缩放时，只支持固定的锁定的比例，如果比例不符合要求，会导致解码失败，该比例列表可以通过API查询到
     int numscalingfactors = 0;
-    tjscalingfactor* pScalingFactors = tjGetScalingFactors(&numscalingfactors);
+    tjscalingfactor *pScalingFactors = tjGetScalingFactors(&numscalingfactors);
     std::vector<tjscalingfactor> scalingFactorList;
     if ((pScalingFactors != nullptr) && (numscalingfactors > 0)) {
         for (int i = 0; i < numscalingfactors; ++i) {
-            const tjscalingfactor& factor = pScalingFactors[i];
+            const tjscalingfactor &factor = pScalingFactors[i];
             if ((factor.num > 0) && factor.denom > 0) {
                 scalingFactorList.push_back(factor);
             }
         }
     }
-    tjscalingfactor selectedScalingfactor = TJUNSCALED;//默认为原始图像大小，不缩放
+    tjscalingfactor selectedScalingfactor = TJUNSCALED; //默认为原始图像大小，不缩放
     ASSERT(selectedScalingfactor.num == 1);
     ASSERT(selectedScalingfactor.denom == 1);
     if (!scalingFactorList.empty()) {
@@ -337,42 +339,39 @@ float Image_JPEG::GetImageSizeScale() const
     return m_impl->m_fImageSizeScale;
 }
 
-std::shared_ptr<IBitmap> Image_JPEG::GetBitmap(bool* bDecodeError)
+std::shared_ptr<IBitmap> Image_JPEG::GetBitmap(bool *bDecodeError)
 {
     GlobalManager::Instance().AssertUIThread();
     std::shared_ptr<IBitmap> pBitmap;
     if (m_impl->m_bAsyncDecode || (m_impl->m_pBitmap != nullptr)) {
         //异步解码, 或者已经完成解码
         pBitmap = m_impl->m_pBitmap;
-    }
-    else {
-        //延迟解码        
+    } else {
+        //延迟解码
         m_impl->m_pBitmap = DecodeBitmap();
-        pBitmap = m_impl->m_pBitmap;        
+        pBitmap = m_impl->m_pBitmap;
         if (pBitmap == nullptr) {
             m_impl->m_bDecodeError = true;
             if (bDecodeError != nullptr) {
                 *bDecodeError = true;
             }
         }
-    }    
+    }
     return pBitmap;
 }
 
 std::shared_ptr<IBitmap> Image_JPEG::DecodeBitmap() const
 {
     std::shared_ptr<IBitmap> pJpegBitmap;
-    const TImpl& impl = *m_impl;
-    if ((impl.m_tjInstance != nullptr) &&
-        !impl.m_fileData.empty() &&
-        (impl.m_nWidth > 0) &&
-        (impl.m_nHeight > 0)) {
-        IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    const TImpl &impl = *m_impl;
+    if ((impl.m_tjInstance != nullptr) && !impl.m_fileData.empty() && (impl.m_nWidth > 0)
+        && (impl.m_nHeight > 0)) {
+        IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
         ASSERT(pRenderFactory != nullptr);
         if (pRenderFactory == nullptr) {
             return nullptr;
         }
-        IBitmap* pBitmap = pRenderFactory->CreateBitmap();
+        IBitmap *pBitmap = pRenderFactory->CreateBitmap();
         ASSERT(pBitmap != nullptr);
         if (pBitmap == nullptr) {
             return nullptr;
@@ -381,23 +380,25 @@ std::shared_ptr<IBitmap> Image_JPEG::DecodeBitmap() const
         if (!pBitmap->Init(impl.m_nWidth, impl.m_nHeight, nullptr)) {
             return nullptr;
         }
-        void* pBitmapBits = pBitmap->LockPixelBits();
+        void *pBitmapBits = pBitmap->LockPixelBits();
         if (pBitmapBits == nullptr) {
             return nullptr;
         }
         // RAII 风格：无论后续解码成功或失败，都确保解锁 pixel bits，
         // 避免 IBitmap 析构前仍处于锁定状态
         bool bUnlockNeeded = true;
-        struct TAutoUnlock {
-            IBitmap* pBitmap;
-            bool& bUnlockNeeded;
-            ~TAutoUnlock() {
+        struct TAutoUnlock
+        {
+            IBitmap *pBitmap;
+            bool &bUnlockNeeded;
+            ~TAutoUnlock()
+            {
                 if (bUnlockNeeded && (pBitmap != nullptr)) {
                     pBitmap->UnLockPixelBits();
                 }
             }
         };
-        TAutoUnlock autoUnlock{ pBitmap, bUnlockNeeded };
+        TAutoUnlock autoUnlock{pBitmap, bUnlockNeeded};
 
 #ifdef DUILIB_BUILD_FOR_WIN
         int pixelFormat = TJPF_BGRA;
@@ -406,15 +407,16 @@ std::shared_ptr<IBitmap> Image_JPEG::DecodeBitmap() const
 #endif
 
         // 执行解码：从JPG内存数据解码为RGBA格式
-        int ret = tjDecompress2(impl.m_tjInstance,
-                                impl.m_fileData.data(),
-                                (unsigned long)impl.m_fileData.size(),
-                                (unsigned char*)pBitmapBits,
-                                (int)impl.m_nWidth,
-                                0, // 行间距，0表示使用默认值（width * bytesPerPixel）
-                                (int)impl.m_nHeight,
-                                pixelFormat, // 输出格式为RGBA/BGRA
-                                TJFLAG_FASTDCT); // 使用快速DCT算法加速
+        int ret = tjDecompress2(
+            impl.m_tjInstance,
+            impl.m_fileData.data(),
+            (unsigned long) impl.m_fileData.size(),
+            (unsigned char *) pBitmapBits,
+            (int) impl.m_nWidth,
+            0, // 行间距，0表示使用默认值（width * bytesPerPixel）
+            (int) impl.m_nHeight,
+            pixelFormat,     // 输出格式为RGBA/BGRA
+            TJFLAG_FASTDCT); // 使用快速DCT算法加速
         if (impl.m_bAssertEnabled) {
             ASSERT(ret == 0);
         }
@@ -422,8 +424,7 @@ std::shared_ptr<IBitmap> Image_JPEG::DecodeBitmap() const
             // 解码成功：标记不再需要 RAII 解锁（保持原有显式 Unlock 调用）
             bUnlockNeeded = false;
             pBitmap->UnLockPixelBits();
-        }
-        else {
+        } else {
             // 解码失败：丢弃位图，RAII 会负责解锁
             pJpegBitmap.reset();
         }
@@ -433,13 +434,9 @@ std::shared_ptr<IBitmap> Image_JPEG::DecodeBitmap() const
 
 bool Image_JPEG::IsDelayDecodeEnabled() const
 {
-    if (m_impl->m_bAsyncDecode &&
-        (m_impl->m_tjInstance != nullptr) &&
-        !m_impl->m_fileData.empty() &&
-        (m_impl->m_nWidth > 0) &&
-        (m_impl->m_nHeight > 0) &&
-        (m_impl->m_pDelayBitmap == nullptr) &&
-        !m_impl->m_bDecodeError) {
+    if (m_impl->m_bAsyncDecode && (m_impl->m_tjInstance != nullptr) && !m_impl->m_fileData.empty()
+        && (m_impl->m_nWidth > 0) && (m_impl->m_nHeight > 0) && (m_impl->m_pDelayBitmap == nullptr)
+        && !m_impl->m_bDecodeError) {
         return true;
     }
     return false;
@@ -447,7 +444,8 @@ bool Image_JPEG::IsDelayDecodeEnabled() const
 
 bool Image_JPEG::IsDelayDecodeFinished() const
 {
-    return (m_impl->m_pBitmap != nullptr) || (m_impl->m_pDelayBitmap != nullptr) || m_impl->m_bDecodeError;
+    return (m_impl->m_pBitmap != nullptr) || (m_impl->m_pDelayBitmap != nullptr)
+           || m_impl->m_bDecodeError;
 }
 
 uint32_t Image_JPEG::GetDecodedFrameIndex() const
@@ -455,7 +453,8 @@ uint32_t Image_JPEG::GetDecodedFrameIndex() const
     return 0;
 }
 
-bool Image_JPEG::DelayDecode(uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool* bDecodeError)
+bool Image_JPEG::DelayDecode(
+    uint32_t /*nMinFrameIndex*/, std::function<bool(void)> /*IsAborted*/, bool *bDecodeError)
 {
     bool bRet = false;
     if (IsDelayDecodeEnabled()) {

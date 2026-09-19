@@ -1,17 +1,16 @@
 #include "CursorManager.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Core/Control.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include <map>
 
 #include "duilib/Utils/ApiWrapper_Windows.h"
 
-namespace ui
-{
+namespace ui {
 class CursorManager::TImpl
 {
 public:
@@ -23,9 +22,7 @@ public:
     std::map<FilePath, HCURSOR> m_cursorMap;
 };
 
-CursorManager::TImpl::TImpl()
-{
-}
+CursorManager::TImpl::TImpl() {}
 
 CursorManager::TImpl::~TImpl()
 {
@@ -82,7 +79,7 @@ bool CursorManager::SetCursor(CursorType cursorType)
         break;
     case CursorType::kCursorSizeAll:
         ::SetCursor(::LoadCursor(nullptr, IDC_SIZEALL));
-        break;    
+        break;
     case CursorType::kCursorNo:
         ::SetCursor(::LoadCursor(nullptr, IDC_NO));
         break;
@@ -98,37 +95,39 @@ bool CursorManager::SetCursor(CursorType cursorType)
 
 /** 从内存数据中加载光标
 */
-static HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& fileData)
+static HCURSOR LoadCursorFromData(const Window *pWindow, std::vector<uint8_t> &fileData)
 {
     if (fileData.empty() || (pWindow == nullptr)) {
         return nullptr;
     }
     const size_t fileDataSize = fileData.size();
-    
+
     //Little Endian Only
     int16_t test = 1;
-    bool bLittleEndianHost = (*((char*)&test) == 1);
+    bool bLittleEndianHost = (*((char *) &test) == 1);
     ASSERT_UNUSED_VARIABLE(bLittleEndianHost);
 
     bool bValidIcoFile = false;
     fileData.resize(fileData.size() + 1024); //填充空白
-    typedef struct tagIconDir {
+    typedef struct tagIconDir
+    {
         uint16_t idReserved;
         uint16_t idType;
         uint16_t idCount;
     } ICONHEADER;
-    typedef struct tagIconDirectoryEntry {
-        uint8_t  bWidth;
-        uint8_t  bHeight;
-        uint8_t  bColorCount;
-        uint8_t  bReserved;
-        uint16_t  wPlanes;
-        uint16_t  wBitCount;
+    typedef struct tagIconDirectoryEntry
+    {
+        uint8_t bWidth;
+        uint8_t bHeight;
+        uint8_t bColorCount;
+        uint8_t bReserved;
+        uint16_t wPlanes;
+        uint16_t wBitCount;
         uint32_t dwBytesInRes;
         uint32_t dwImageOffset;
     } ICONDIRENTRY;
 
-    ICONHEADER* icon_header = (ICONHEADER*)fileData.data();
+    ICONHEADER *icon_header = (ICONHEADER *) fileData.data();
     if ((icon_header->idReserved == 0) && (icon_header->idType == 2)) {
         bValidIcoFile = true;
         for (int32_t c = 0; c < icon_header->idCount; ++c) {
@@ -137,12 +136,11 @@ static HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& f
                 bValidIcoFile = false;
                 break;
             }
-            ICONDIRENTRY* pIconDir = (ICONDIRENTRY*)((uint8_t*)fileData.data() + nDataOffset);
+            ICONDIRENTRY *pIconDir = (ICONDIRENTRY *) ((uint8_t *) fileData.data() + nDataOffset);
             if (pIconDir->dwImageOffset >= fileDataSize) {
                 bValidIcoFile = false;
                 break;
-            }
-            else if ((pIconDir->dwImageOffset + pIconDir->dwBytesInRes) > fileDataSize) {
+            } else if ((pIconDir->dwImageOffset + pIconDir->dwBytesInRes) > fileDataSize) {
                 bValidIcoFile = false;
                 break;
             }
@@ -159,15 +157,23 @@ static HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& f
     uint32_t uDpi = pWindow->Dpi().MulDiv(uDpiScaleFactor, 96u, 100u);
     int32_t cxCursor = GetSystemMetricsForDpiWrapper(SM_CXCURSOR, uDpi);
     int32_t cyCursor = GetSystemMetricsForDpiWrapper(SM_CYCURSOR, uDpi);
-    int32_t offset = ::LookupIconIdFromDirectoryEx((PBYTE)fileData.data(), fIcon, cxCursor, cyCursor, LR_DEFAULTCOLOR);
+    int32_t offset = ::LookupIconIdFromDirectoryEx(
+        (PBYTE) fileData.data(), fIcon, cxCursor, cyCursor, LR_DEFAULTCOLOR);
     if (offset > 0) {
-        hIcon = ::CreateIconFromResourceEx((PBYTE)fileData.data() + offset, (DWORD)fileDataSize - (DWORD)offset, fIcon, 0x00030000, cxCursor, cyCursor, LR_DEFAULTCOLOR);
+        hIcon = ::CreateIconFromResourceEx(
+            (PBYTE) fileData.data() + offset,
+            (DWORD) fileDataSize - (DWORD) offset,
+            fIcon,
+            0x00030000,
+            cxCursor,
+            cyCursor,
+            LR_DEFAULTCOLOR);
     }
     ASSERT(hIcon != nullptr);
-    return (HCURSOR)hIcon;
+    return (HCURSOR) hIcon;
 }
 
-bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curImagePath)
+bool CursorManager::SetImageCursor(const Window *pWindow, const FilePath &curImagePath)
 {
     ASSERT(!curImagePath.IsEmpty());
     ASSERT(pWindow != nullptr);
@@ -176,7 +182,8 @@ bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curIma
     }
 
     //设置窗口图标
-    FilePath cursorFullPath = GlobalManager::Instance().GetExistsResFullPath(pWindow->GetResourcePath(), pWindow->GetXmlPath(), curImagePath);
+    FilePath cursorFullPath = GlobalManager::Instance().GetExistsResFullPath(
+        pWindow->GetResourcePath(), pWindow->GetXmlPath(), curImagePath);
     ASSERT(!cursorFullPath.IsEmpty());
     if (cursorFullPath.IsEmpty()) {
         return false;
@@ -186,10 +193,10 @@ bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curIma
     auto iter = m_impl->m_cursorMap.find(cursorFullPath);
     if (iter != m_impl->m_cursorMap.end()) {
         hCursor = iter->second;
-    }
-    else {
+    } else {
         //加载光标
-        if (GlobalManager::Instance().Zip().IsUseZip() && GlobalManager::Instance().Zip().IsZipResExist(cursorFullPath)) {
+        if (GlobalManager::Instance().Zip().IsUseZip()
+            && GlobalManager::Instance().Zip().IsZipResExist(cursorFullPath)) {
             //使用压缩包
             std::vector<uint8_t> fileData;
             GlobalManager::Instance().Zip().GetZipData(cursorFullPath, fileData);
@@ -202,10 +209,15 @@ bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curIma
                     m_impl->m_cursorMap[cursorFullPath] = hCursor;
                 }
             }
-        }
-        else {
+        } else {
             //使用本地文件
-            hCursor = (HCURSOR)::LoadImage(nullptr, cursorFullPath.NativePath().c_str(), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+            hCursor = (HCURSOR)::LoadImage(
+                nullptr,
+                cursorFullPath.NativePath().c_str(),
+                IMAGE_CURSOR,
+                0,
+                0,
+                LR_DEFAULTSIZE | LR_LOADFROMFILE);
             ASSERT(hCursor != nullptr);
             if (hCursor != nullptr) {
                 m_impl->m_cursorMap[cursorFullPath] = hCursor;
@@ -233,7 +245,7 @@ CursorID CursorManager::GetCursorID() const
 
 bool CursorManager::SetCursorByID(CursorID cursorId)
 {
-    ::SetCursor((HCURSOR)cursorId);
+    ::SetCursor((HCURSOR) cursorId);
     return true;
 }
 

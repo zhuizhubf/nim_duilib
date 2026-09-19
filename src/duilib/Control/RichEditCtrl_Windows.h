@@ -3,21 +3,20 @@
 
 #include "duilib/Core/UiTypes.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
+#include <RichOle.h>
 #include <Richedit.h>
 #include <TextServ.h>
-#include <RichOle.h>
 #include <commdlg.h>
 #include <string>
 
-namespace ui
-{
+namespace ui {
 
 //只支持Unicode版本
 #if !defined(_UNICODE) && (_RICHEDIT_VER >= 0x0500)
-  #undef MSFTEDIT_CLASS
-  #define MSFTEDIT_CLASS    "RICHEDIT50W"
+#undef MSFTEDIT_CLASS
+#define MSFTEDIT_CLASS "RICHEDIT50W"
 #endif
 
 /** RichEdit控件主要功能封装（来自WTL源码）
@@ -25,12 +24,12 @@ namespace ui
 class DUILIB_API RichEditCtrl
 {
 public:
-// Constructors
-    RichEditCtrl(): m_pTextServices(nullptr)
-    { }
+    // Constructors
+    RichEditCtrl()
+        : m_pTextServices(nullptr)
+    {}
 
-
-// Attributes
+    // Attributes
     static LPCTSTR GetWndClassName()
     {
 #if (_RICHEDIT_VER >= 0x0500)
@@ -49,10 +48,7 @@ public:
 #endif
     }
 
-    void SetTextServices(ITextServices* pTextServices)
-    {
-        m_pTextServices = pTextServices;
-    }
+    void SetTextServices(ITextServices *pTextServices) { m_pTextServices = pTextServices; }
 
     LRESULT TxSendMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) const
     {
@@ -67,13 +63,13 @@ public:
     int GetLineCount() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETLINECOUNT, 0, 0L);
+        return (int) TxSendMessage(EM_GETLINECOUNT, 0, 0L);
     }
 
     BOOL GetModify() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_GETMODIFY, 0, 0L);
+        return (BOOL) TxSendMessage(EM_GETMODIFY, 0, 0L);
     }
 
     void SetModify(BOOL bModified = TRUE)
@@ -85,26 +81,26 @@ public:
     void GetRect(LPRECT lpRect) const
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_GETRECT, 0, (LPARAM)lpRect);
+        TxSendMessage(EM_GETRECT, 0, (LPARAM) lpRect);
     }
 
     DWORD GetOptions() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_GETOPTIONS, 0, 0L);
+        return (DWORD) TxSendMessage(EM_GETOPTIONS, 0, 0L);
     }
 
     DWORD SetOptions(WORD wOperation, DWORD dwOptions)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_SETOPTIONS, wOperation, dwOptions);
+        return (DWORD) TxSendMessage(EM_SETOPTIONS, wOperation, dwOptions);
     }
 
     // NOTE: first word in lpszBuffer must contain the size of the buffer!
     int GetLine(int nIndex, LPWSTR lpszBuffer) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETLINE, nIndex, (LPARAM)lpszBuffer);
+        return (int) TxSendMessage(EM_GETLINE, nIndex, (LPARAM) lpszBuffer);
     }
 
     int GetLine(int nIndex, LPWSTR lpszBuffer, int nMaxLength) const
@@ -114,103 +110,97 @@ public:
         if (lpszBuffer == nullptr) {
             return 0;
         }
-        *(LPWORD)lpszBuffer = (WORD)nMaxLength;
-        return (int)TxSendMessage(EM_GETLINE, nIndex, (LPARAM)lpszBuffer);
+        *(LPWORD) lpszBuffer = (WORD) nMaxLength;
+        return (int) TxSendMessage(EM_GETLINE, nIndex, (LPARAM) lpszBuffer);
     }
 
     BOOL CanUndo() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_CANUNDO, 0, 0L);
+        return (BOOL) TxSendMessage(EM_CANUNDO, 0, 0L);
     }
 
     BOOL CanPaste(UINT nFormat = 0) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_CANPASTE, nFormat, 0L);
+        return (BOOL) TxSendMessage(EM_CANPASTE, nFormat, 0L);
     }
 
-    void GetSel(LONG& nStartChar, LONG& nEndChar) const
+    void GetSel(LONG &nStartChar, LONG &nEndChar) const
     {
         ASSERT(m_pTextServices != nullptr);
         CHARRANGE cr = {};
-        TxSendMessage(EM_EXGETSEL, 0, (LPARAM)&cr);
+        TxSendMessage(EM_EXGETSEL, 0, (LPARAM) &cr);
         nStartChar = cr.cpMin;
         nEndChar = cr.cpMax;
     }
 
-    void GetSel(CHARRANGE& cr) const
+    void GetSel(CHARRANGE &cr) const
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_EXGETSEL, 0, (LPARAM)&cr);
+        TxSendMessage(EM_EXGETSEL, 0, (LPARAM) &cr);
     }
 
     int SetSel(LONG nStartChar, LONG nEndChar)
     {
         ASSERT(m_pTextServices != nullptr);
-        CHARRANGE cr = { nStartChar, nEndChar };
-        return (int)TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr);
+        CHARRANGE cr = {nStartChar, nEndChar};
+        return (int) TxSendMessage(EM_EXSETSEL, 0, (LPARAM) &cr);
     }
 
-    int SetSel(CHARRANGE& cr)
+    int SetSel(CHARRANGE &cr)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr);
+        return (int) TxSendMessage(EM_EXSETSEL, 0, (LPARAM) &cr);
     }
 
-    int SetSelAll()
-    {
-        return SetSel(0, -1);
-    }
+    int SetSelAll() { return SetSel(0, -1); }
 
-    int SetSelNone()
-    {
-        return SetSel(-1, 0);
-    }
+    int SetSelNone() { return SetSel(-1, 0); }
 
-    DWORD GetDefaultCharFormat(CHARFORMATW& cf) const
+    DWORD GetDefaultCharFormat(CHARFORMATW &cf) const
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMATW);
-        return (DWORD)TxSendMessage(EM_GETCHARFORMAT, 0, (LPARAM)&cf);
+        return (DWORD) TxSendMessage(EM_GETCHARFORMAT, 0, (LPARAM) &cf);
     }
 
-    DWORD GetSelectionCharFormat(CHARFORMATW& cf) const
+    DWORD GetSelectionCharFormat(CHARFORMATW &cf) const
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMATW);
-        return (DWORD)TxSendMessage(EM_GETCHARFORMAT, 1, (LPARAM)&cf);
+        return (DWORD) TxSendMessage(EM_GETCHARFORMAT, 1, (LPARAM) &cf);
     }
 
     DWORD GetEventMask() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_GETEVENTMASK, 0, 0L);
+        return (DWORD) TxSendMessage(EM_GETEVENTMASK, 0, 0L);
     }
 
     void SetLimitText(LONG nChars) const
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_SETLIMITTEXT, (WPARAM)nChars, 0L);
+        TxSendMessage(EM_SETLIMITTEXT, (WPARAM) nChars, 0L);
     }
 
     LONG GetLimitText() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_GETLIMITTEXT, 0, 0L);
+        return (LONG) TxSendMessage(EM_GETLIMITTEXT, 0, 0L);
     }
 
-    DWORD GetParaFormat(PARAFORMAT& pf) const
+    DWORD GetParaFormat(PARAFORMAT &pf) const
     {
         ASSERT(m_pTextServices != nullptr);
         pf.cbSize = sizeof(PARAFORMAT);
-        return (DWORD)TxSendMessage(EM_GETPARAFORMAT, 0, (LPARAM)&pf);
+        return (DWORD) TxSendMessage(EM_GETPARAFORMAT, 0, (LPARAM) &pf);
     }
 
     LONG GetSelText(LPWSTR lpstrBuff) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_GETSELTEXT, 0, (LPARAM)lpstrBuff);
+        return (LONG) TxSendMessage(EM_GETSELTEXT, 0, (LPARAM) lpstrBuff);
     }
 
     /** 是否有选择文本
@@ -218,17 +208,17 @@ public:
     BOOL HasSelText() const
     {
         CHARRANGE cr = {};
-        TxSendMessage(EM_EXGETSEL, 0, (LPARAM)&cr);
+        TxSendMessage(EM_EXGETSEL, 0, (LPARAM) &cr);
         int32_t textLen = cr.cpMax - cr.cpMin;
         return (textLen > 0);
     }
 
-    BOOL GetSelText(std::wstring& text) const
+    BOOL GetSelText(std::wstring &text) const
     {
         ASSERT(m_pTextServices != nullptr);
 
         CHARRANGE cr = {};
-        TxSendMessage(EM_EXGETSEL, 0, (LPARAM)&cr);
+        TxSendMessage(EM_EXGETSEL, 0, (LPARAM) &cr);
 
         text.clear();
         int32_t textLen = cr.cpMax - cr.cpMin;
@@ -236,12 +226,12 @@ public:
             return TRUE;
         }
         textLen += 1;
-        DStringW::value_type* pText = new DStringW::value_type[textLen];
+        DStringW::value_type *pText = new DStringW::value_type[textLen];
         if (pText == nullptr) {
             return FALSE;
         }
         memset(pText, 0, sizeof(DStringW::value_type) * textLen);
-        if (TxSendMessage(EM_GETSELTEXT, 0, (LPARAM)pText) == 0) {
+        if (TxSendMessage(EM_GETSELTEXT, 0, (LPARAM) pText) == 0) {
             delete[] pText;
             return FALSE;
         }
@@ -253,90 +243,90 @@ public:
     WORD GetSelectionType() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (WORD)TxSendMessage(EM_SELECTIONTYPE, 0, 0L);
+        return (WORD) TxSendMessage(EM_SELECTIONTYPE, 0, 0L);
     }
 
     COLORREF SetBackgroundColor(COLORREF cr)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (COLORREF)TxSendMessage(EM_SETBKGNDCOLOR, 0, cr);
+        return (COLORREF) TxSendMessage(EM_SETBKGNDCOLOR, 0, cr);
     }
 
-    COLORREF SetBackgroundColor()   // sets to system background
+    COLORREF SetBackgroundColor() // sets to system background
     {
         ASSERT(m_pTextServices != nullptr);
-        return (COLORREF)TxSendMessage(EM_SETBKGNDCOLOR, 1, 0);
+        return (COLORREF) TxSendMessage(EM_SETBKGNDCOLOR, 1, 0);
     }
 
-    BOOL SetCharFormat(CHARFORMATW& cf, WORD wFlags)
-    {
-        ASSERT(m_pTextServices != nullptr);
-        cf.cbSize = sizeof(CHARFORMATW);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, (WPARAM)wFlags, (LPARAM)&cf);
-    }
-
-    BOOL SetDefaultCharFormat(CHARFORMATW& cf)
+    BOOL SetCharFormat(CHARFORMATW &cf, WORD wFlags)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMATW);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, 0, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, (WPARAM) wFlags, (LPARAM) &cf);
     }
 
-    BOOL SetSelectionCharFormat(CHARFORMATW& cf)
+    BOOL SetDefaultCharFormat(CHARFORMATW &cf)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMATW);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, 0, (LPARAM) &cf);
     }
 
-    BOOL SetWordCharFormat(CHARFORMATW& cf)
+    BOOL SetSelectionCharFormat(CHARFORMATW &cf)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMATW);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+    }
+
+    BOOL SetWordCharFormat(CHARFORMATW &cf)
+    {
+        ASSERT(m_pTextServices != nullptr);
+        cf.cbSize = sizeof(CHARFORMATW);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM) &cf);
     }
 
     DWORD SetEventMask(DWORD dwEventMask)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_SETEVENTMASK, 0, dwEventMask);
+        return (DWORD) TxSendMessage(EM_SETEVENTMASK, 0, dwEventMask);
     }
 
-    BOOL SetParaFormat(PARAFORMAT& pf)
+    BOOL SetParaFormat(PARAFORMAT &pf)
     {
         ASSERT(m_pTextServices != nullptr);
         pf.cbSize = sizeof(PARAFORMAT);
-        return (BOOL)TxSendMessage(EM_SETPARAFORMAT, 0, (LPARAM)&pf);
+        return (BOOL) TxSendMessage(EM_SETPARAFORMAT, 0, (LPARAM) &pf);
     }
 
     BOOL SetTargetDevice(HDC hDC, int cxLineWidth)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETTARGETDEVICE, (WPARAM)hDC, cxLineWidth);
+        return (BOOL) TxSendMessage(EM_SETTARGETDEVICE, (WPARAM) hDC, cxLineWidth);
     }
 
     int GetTextLength() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(WM_GETTEXTLENGTH, 0, 0L);
+        return (int) TxSendMessage(WM_GETTEXTLENGTH, 0, 0L);
     }
 
     BOOL SetReadOnly(BOOL bReadOnly = TRUE)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETREADONLY, bReadOnly, 0L);
+        return (BOOL) TxSendMessage(EM_SETREADONLY, bReadOnly, 0L);
     }
 
     int GetFirstVisibleLine() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETFIRSTVISIBLELINE, 0, 0L);
+        return (int) TxSendMessage(EM_GETFIRSTVISIBLELINE, 0, 0L);
     }
 
-    int GetTextRange(TEXTRANGEW* pTextRange) const
+    int GetTextRange(TEXTRANGEW *pTextRange) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)pTextRange);
+        return (int) TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM) pTextRange);
     }
 
     int GetTextRange(LONG nStartChar, LONG nEndChar, LPWSTR lpstrText) const
@@ -346,126 +336,132 @@ public:
         tr.chrg.cpMin = nStartChar;
         tr.chrg.cpMax = nEndChar;
         tr.lpstrText = lpstrText;
-        return (int)TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&tr);
+        return (int) TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM) &tr);
     }
 
-    DWORD GetDefaultCharFormat(CHARFORMAT2W& cf) const
+    DWORD GetDefaultCharFormat(CHARFORMAT2W &cf) const
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (DWORD)TxSendMessage(EM_GETCHARFORMAT, 0, (LPARAM)&cf);
+        return (DWORD) TxSendMessage(EM_GETCHARFORMAT, 0, (LPARAM) &cf);
     }
 
-    BOOL SetCharFormat(CHARFORMAT2W& cf, WORD wFlags)
+    BOOL SetCharFormat(CHARFORMAT2W &cf, WORD wFlags)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, (WPARAM)wFlags, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, (WPARAM) wFlags, (LPARAM) &cf);
     }
 
-    BOOL SetDefaultCharFormat(CHARFORMAT2W& cf)
+    BOOL SetDefaultCharFormat(CHARFORMAT2W &cf)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, 0, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, 0, (LPARAM) &cf);
     }
 
-    DWORD GetSelectionCharFormat(CHARFORMAT2W& cf) const
+    DWORD GetSelectionCharFormat(CHARFORMAT2W &cf) const
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (DWORD)TxSendMessage(EM_GETCHARFORMAT, 1, (LPARAM)&cf);
+        return (DWORD) TxSendMessage(EM_GETCHARFORMAT, 1, (LPARAM) &cf);
     }
 
-    BOOL SetSelectionCharFormat(CHARFORMAT2W& cf)
+    BOOL SetSelectionCharFormat(CHARFORMAT2W &cf)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
     }
 
-    BOOL SetWordCharFormat(CHARFORMAT2W& cf)
+    BOOL SetWordCharFormat(CHARFORMAT2W &cf)
     {
         ASSERT(m_pTextServices != nullptr);
         cf.cbSize = sizeof(CHARFORMAT2W);
-        return (BOOL)TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
+        return (BOOL) TxSendMessage(EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM) &cf);
     }
 
-    DWORD GetParaFormat(PARAFORMAT2& pf) const
+    DWORD GetParaFormat(PARAFORMAT2 &pf) const
     {
         ASSERT(m_pTextServices != nullptr);
         pf.cbSize = sizeof(PARAFORMAT2);
-        return (DWORD)TxSendMessage(EM_GETPARAFORMAT, 0, (LPARAM)&pf);
+        return (DWORD) TxSendMessage(EM_GETPARAFORMAT, 0, (LPARAM) &pf);
     }
 
-    BOOL SetParaFormat(PARAFORMAT2& pf)
+    BOOL SetParaFormat(PARAFORMAT2 &pf)
     {
         ASSERT(m_pTextServices != nullptr);
         pf.cbSize = sizeof(PARAFORMAT2);
-        return (BOOL)TxSendMessage(EM_SETPARAFORMAT, 0, (LPARAM)&pf);
+        return (BOOL) TxSendMessage(EM_SETPARAFORMAT, 0, (LPARAM) &pf);
     }
 
     TEXTMODE GetTextMode() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (TEXTMODE)TxSendMessage(EM_GETTEXTMODE, 0, 0L);
+        return (TEXTMODE) TxSendMessage(EM_GETTEXTMODE, 0, 0L);
     }
 
     BOOL SetTextMode(TEXTMODE enumTextMode)
     {
         ASSERT(m_pTextServices != nullptr);
-        return !(BOOL)TxSendMessage(EM_SETTEXTMODE, enumTextMode, 0L);
+        return !(BOOL) TxSendMessage(EM_SETTEXTMODE, enumTextMode, 0L);
     }
 
     UNDONAMEID GetUndoName() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (UNDONAMEID)TxSendMessage(EM_GETUNDONAME, 0, 0L);
+        return (UNDONAMEID) TxSendMessage(EM_GETUNDONAME, 0, 0L);
     }
 
     UNDONAMEID GetRedoName() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (UNDONAMEID)TxSendMessage(EM_GETREDONAME, 0, 0L);
+        return (UNDONAMEID) TxSendMessage(EM_GETREDONAME, 0, 0L);
     }
 
     BOOL CanRedo() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_CANREDO, 0, 0L);
+        return (BOOL) TxSendMessage(EM_CANREDO, 0, 0L);
     }
 
     BOOL GetAutoURLDetect() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_GETAUTOURLDETECT, 0, 0L);
+        return (BOOL) TxSendMessage(EM_GETAUTOURLDETECT, 0, 0L);
     }
 
     BOOL SetAutoURLDetect(BOOL bAutoDetect = TRUE)
     {
         ASSERT(m_pTextServices != nullptr);
-        return !(BOOL)TxSendMessage(EM_AUTOURLDETECT, bAutoDetect, 0L);
+        return !(BOOL) TxSendMessage(EM_AUTOURLDETECT, bAutoDetect, 0L);
     }
 
     UINT SetUndoLimit(UINT uUndoLimit)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (UINT)TxSendMessage(EM_SETUNDOLIMIT, uUndoLimit, 0L);
+        return (UINT) TxSendMessage(EM_SETUNDOLIMIT, uUndoLimit, 0L);
     }
 
     void SetPalette(HPALETTE hPalette)
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_SETPALETTE, (WPARAM)hPalette, 0L);
+        TxSendMessage(EM_SETPALETTE, (WPARAM) hPalette, 0L);
     }
 
-    int GetTextEx(GETTEXTEX* pGetTextEx, LPWSTR lpstrText) const
+    int GetTextEx(GETTEXTEX *pGetTextEx, LPWSTR lpstrText) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETTEXTEX, (WPARAM)pGetTextEx, (LPARAM)lpstrText);
+        return (int) TxSendMessage(EM_GETTEXTEX, (WPARAM) pGetTextEx, (LPARAM) lpstrText);
     }
 
-    int GetTextEx(LPWSTR lpstrText, int nTextLen, DWORD dwFlags = GT_DEFAULT, UINT uCodePage = CP_ACP, LPCSTR lpDefaultChar = nullptr, LPBOOL lpUsedDefChar = nullptr) const
+    int GetTextEx(
+        LPWSTR lpstrText,
+        int nTextLen,
+        DWORD dwFlags = GT_DEFAULT,
+        UINT uCodePage = CP_ACP,
+        LPCSTR lpDefaultChar = nullptr,
+        LPBOOL lpUsedDefChar = nullptr) const
     {
         ASSERT(m_pTextServices != nullptr);
         GETTEXTEX gte = {};
@@ -474,13 +470,13 @@ public:
         gte.flags = dwFlags;
         gte.lpDefaultChar = lpDefaultChar;
         gte.lpUsedDefChar = lpUsedDefChar;
-        return (int)TxSendMessage(EM_GETTEXTEX, (WPARAM)&gte, (LPARAM)lpstrText);
+        return (int) TxSendMessage(EM_GETTEXTEX, (WPARAM) &gte, (LPARAM) lpstrText);
     }
 
-    int GetTextLengthEx(GETTEXTLENGTHEX* pGetTextLengthEx) const
+    int GetTextLengthEx(GETTEXTLENGTHEX *pGetTextLengthEx) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETTEXTLENGTHEX, (WPARAM)pGetTextLengthEx, 0L);
+        return (int) TxSendMessage(EM_GETTEXTLENGTHEX, (WPARAM) pGetTextLengthEx, 0L);
     }
 
     int GetTextLengthEx(DWORD dwFlags = GTL_DEFAULT, UINT uCodePage = CP_ACP) const
@@ -489,25 +485,25 @@ public:
         GETTEXTLENGTHEX gtle = {};
         gtle.codepage = uCodePage;
         gtle.flags = dwFlags;
-        return (int)TxSendMessage(EM_GETTEXTLENGTHEX, (WPARAM)&gtle, 0L);
+        return (int) TxSendMessage(EM_GETTEXTLENGTHEX, (WPARAM) &gtle, 0L);
     }
 
     EDITWORDBREAKPROC GetWordBreakProc() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (EDITWORDBREAKPROC)TxSendMessage(EM_GETWORDBREAKPROC, 0, 0L);
+        return (EDITWORDBREAKPROC) TxSendMessage(EM_GETWORDBREAKPROC, 0, 0L);
     }
 
     void SetWordBreakProc(EDITWORDBREAKPROC ewbprc)
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_SETWORDBREAKPROC, 0, (LPARAM)ewbprc);
+        TxSendMessage(EM_SETWORDBREAKPROC, 0, (LPARAM) ewbprc);
     }
 
-    int SetTextEx(SETTEXTEX* pSetTextEx, LPCWSTR lpstrText)
+    int SetTextEx(SETTEXTEX *pSetTextEx, LPCWSTR lpstrText)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_SETTEXTEX, (WPARAM)pSetTextEx, (LPARAM)lpstrText);
+        return (int) TxSendMessage(EM_SETTEXTEX, (WPARAM) pSetTextEx, (LPARAM) lpstrText);
     }
 
     int SetTextEx(LPCWSTR lpstrText, DWORD dwFlags = ST_DEFAULT, UINT uCodePage = CP_ACP)
@@ -516,48 +512,48 @@ public:
         SETTEXTEX ste = {};
         ste.flags = dwFlags;
         ste.codepage = uCodePage;
-        return (int)TxSendMessage(EM_SETTEXTEX, (WPARAM)&ste, (LPARAM)lpstrText);
+        return (int) TxSendMessage(EM_SETTEXTEX, (WPARAM) &ste, (LPARAM) lpstrText);
     }
 
     int GetEditStyle() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_GETEDITSTYLE, 0, 0L);
+        return (int) TxSendMessage(EM_GETEDITSTYLE, 0, 0L);
     }
 
     int SetEditStyle(int nStyle, int nMask = -1)
     {
         ASSERT(m_pTextServices != nullptr);
         if (nMask == -1)
-            nMask = nStyle;   // set everything specified
-        return (int)TxSendMessage(EM_SETEDITSTYLE, nStyle, nMask);
+            nMask = nStyle; // set everything specified
+        return (int) TxSendMessage(EM_SETEDITSTYLE, nStyle, nMask);
     }
 
     BOOL SetFontSize(int nFontSizeDelta)
     {
         ASSERT(m_pTextServices != nullptr);
         ASSERT((nFontSizeDelta >= -1637) && (nFontSizeDelta <= 1638));
-        return (BOOL)TxSendMessage(EM_SETFONTSIZE, nFontSizeDelta, 0L);
+        return (BOOL) TxSendMessage(EM_SETFONTSIZE, nFontSizeDelta, 0L);
     }
 
     void GetScrollPos(LPPOINT lpPoint) const
     {
         ASSERT(m_pTextServices != nullptr);
         ASSERT(lpPoint != nullptr);
-        TxSendMessage(EM_GETSCROLLPOS, 0, (LPARAM)lpPoint);
+        TxSendMessage(EM_GETSCROLLPOS, 0, (LPARAM) lpPoint);
     }
 
     void SetScrollPos(LPPOINT lpPoint)
     {
         ASSERT(m_pTextServices != nullptr);
         ASSERT(lpPoint != nullptr);
-        TxSendMessage(EM_SETSCROLLPOS, 0, (LPARAM)lpPoint);
+        TxSendMessage(EM_SETSCROLLPOS, 0, (LPARAM) lpPoint);
     }
 
-    BOOL GetZoom(int& nNum, int& nDen) const
+    BOOL GetZoom(int &nNum, int &nDen) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_GETZOOM, (WPARAM)&nNum, (LPARAM)&nDen);
+        return (BOOL) TxSendMessage(EM_GETZOOM, (WPARAM) &nNum, (LPARAM) &nDen);
     }
 
     BOOL SetZoom(int nNum, int nDen)
@@ -565,13 +561,13 @@ public:
         ASSERT(m_pTextServices != nullptr);
         ASSERT((nNum >= 0) && (nNum <= 64));
         ASSERT((nDen >= 0) && (nDen <= 64));
-        return (BOOL)TxSendMessage(EM_SETZOOM, nNum, nDen);
+        return (BOOL) TxSendMessage(EM_SETZOOM, nNum, nDen);
     }
 
     BOOL SetZoomOff()
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETZOOM, 0, 0L);
+        return (BOOL) TxSendMessage(EM_SETZOOM, 0, 0L);
     }
 
     void SetMargins(UINT nLeft, UINT nRight, WORD wFlags = EC_LEFTMARGIN | EC_RIGHTMARGIN)
@@ -583,13 +579,13 @@ public:
     WORD GetTypographyOptions() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (WORD)TxSendMessage(EM_GETTYPOGRAPHYOPTIONS, 0, 0L);
+        return (WORD) TxSendMessage(EM_GETTYPOGRAPHYOPTIONS, 0, 0L);
     }
 
     BOOL SetTypographyOptions(WORD wOptions, WORD wMask) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETTYPOGRAPHYOPTIONS, wOptions, wMask);
+        return (BOOL) TxSendMessage(EM_SETTYPOGRAPHYOPTIONS, wOptions, wMask);
     }
 
     // Operations(设置最大字符格式，与SetLimitText相同)
@@ -602,22 +598,22 @@ public:
     int LineFromChar(LONG nIndex) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_EXLINEFROMCHAR, 0, nIndex);
+        return (int) TxSendMessage(EM_EXLINEFROMCHAR, 0, nIndex);
     }
 
     POINT PosFromChar(LONG nChar) const
     {
         ASSERT(m_pTextServices != nullptr);
         POINT point = {};
-        TxSendMessage(EM_POSFROMCHAR, (WPARAM)&point, nChar);
+        TxSendMessage(EM_POSFROMCHAR, (WPARAM) &point, nChar);
         return point;
     }
 
     int CharFromPos(POINT pt) const
     {
         ASSERT(m_pTextServices != nullptr);
-        POINTL ptl = { pt.x, pt.y };
-        return (int)TxSendMessage(EM_CHARFROMPOS, 0, (LPARAM)&ptl);
+        POINTL ptl = {pt.x, pt.y};
+        return (int) TxSendMessage(EM_CHARFROMPOS, 0, (LPARAM) &ptl);
     }
 
     void EmptyUndoBuffer()
@@ -629,69 +625,69 @@ public:
     int LineIndex(int nLine = -1) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_LINEINDEX, nLine, 0L);
+        return (int) TxSendMessage(EM_LINEINDEX, nLine, 0L);
     }
 
     int LineLength(int nLine = -1) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (int)TxSendMessage(EM_LINELENGTH, nLine, 0L);
+        return (int) TxSendMessage(EM_LINELENGTH, nLine, 0L);
     }
 
     BOOL LineScroll(int nLines)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_LINESCROLL, 0, nLines);
+        return (BOOL) TxSendMessage(EM_LINESCROLL, 0, nLines);
     }
 
     void ReplaceSel(LPCWSTR lpszNewText, BOOL bCanUndo = FALSE)
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_REPLACESEL, (WPARAM)bCanUndo, (LPARAM)lpszNewText);
+        TxSendMessage(EM_REPLACESEL, (WPARAM) bCanUndo, (LPARAM) lpszNewText);
     }
 
     void SetRect(LPCRECT lpRect)
     {
         ASSERT(m_pTextServices != nullptr);
-        TxSendMessage(EM_SETRECT, 0, (LPARAM)lpRect);
+        TxSendMessage(EM_SETRECT, 0, (LPARAM) lpRect);
     }
 
     BOOL DisplayBand(LPRECT pDisplayRect)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_DISPLAYBAND, 0, (LPARAM)pDisplayRect);
+        return (BOOL) TxSendMessage(EM_DISPLAYBAND, 0, (LPARAM) pDisplayRect);
     }
 
-    LONG FindTextW(DWORD dwFlags, FINDTEXTW& ft) const
+    LONG FindTextW(DWORD dwFlags, FINDTEXTW &ft) const
     {
         ASSERT(m_pTextServices != nullptr);
 #ifdef _UNICODE
-        return (LONG)TxSendMessage(EM_FINDTEXTW, dwFlags, (LPARAM)&ft);
+        return (LONG) TxSendMessage(EM_FINDTEXTW, dwFlags, (LPARAM) &ft);
 #else
-        return (LONG)TxSendMessage(EM_FINDTEXT, dwFlags, (LPARAM)&ft);
+        return (LONG) TxSendMessage(EM_FINDTEXT, dwFlags, (LPARAM) &ft);
 #endif
     }
 
-    LONG FindTextW(DWORD dwFlags, FINDTEXTEXW& ft) const
+    LONG FindTextW(DWORD dwFlags, FINDTEXTEXW &ft) const
     {
         ASSERT(m_pTextServices != nullptr);
 #ifdef _UNICODE
-        return (LONG)TxSendMessage(EM_FINDTEXTEXW, dwFlags, (LPARAM)&ft);
+        return (LONG) TxSendMessage(EM_FINDTEXTEXW, dwFlags, (LPARAM) &ft);
 #else
-        return (LONG)TxSendMessage(EM_FINDTEXTEX, dwFlags, (LPARAM)&ft);
+        return (LONG) TxSendMessage(EM_FINDTEXTEX, dwFlags, (LPARAM) &ft);
 #endif
     }
 
-    LONG FormatRange(FORMATRANGE& fr, BOOL bDisplay = TRUE)
+    LONG FormatRange(FORMATRANGE &fr, BOOL bDisplay = TRUE)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_FORMATRANGE, bDisplay, (LPARAM)&fr);
+        return (LONG) TxSendMessage(EM_FORMATRANGE, bDisplay, (LPARAM) &fr);
     }
 
-    LONG FormatRange(FORMATRANGE* pFormatRange, BOOL bDisplay = TRUE)
+    LONG FormatRange(FORMATRANGE *pFormatRange, BOOL bDisplay = TRUE)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_FORMATRANGE, bDisplay, (LPARAM)pFormatRange);
+        return (LONG) TxSendMessage(EM_FORMATRANGE, bDisplay, (LPARAM) pFormatRange);
     }
 
     void HideSelection(BOOL bHide = TRUE, BOOL bChangeStyle = FALSE)
@@ -703,8 +699,8 @@ public:
     void PasteSpecial(UINT uClipFormat, DWORD dwAspect = 0, HMETAFILE hMF = 0)
     {
         ASSERT(m_pTextServices != nullptr);
-        REPASTESPECIAL reps = { dwAspect, (DWORD_PTR)hMF };
-        TxSendMessage(EM_PASTESPECIAL, uClipFormat, (LPARAM)&reps);
+        REPASTESPECIAL reps = {dwAspect, (DWORD_PTR) hMF};
+        TxSendMessage(EM_PASTESPECIAL, uClipFormat, (LPARAM) &reps);
     }
 
     void RequestResize()
@@ -713,22 +709,22 @@ public:
         TxSendMessage(EM_REQUESTRESIZE, 0, 0L);
     }
 
-    LONG StreamIn(UINT uFormat, EDITSTREAM& es)
+    LONG StreamIn(UINT uFormat, EDITSTREAM &es)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_STREAMIN, uFormat, (LPARAM)&es);
+        return (LONG) TxSendMessage(EM_STREAMIN, uFormat, (LPARAM) &es);
     }
 
-    LONG StreamOut(UINT uFormat, EDITSTREAM& es)
+    LONG StreamOut(UINT uFormat, EDITSTREAM &es)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (LONG)TxSendMessage(EM_STREAMOUT, uFormat, (LPARAM)&es);
+        return (LONG) TxSendMessage(EM_STREAMOUT, uFormat, (LPARAM) &es);
     }
 
     DWORD FindWordBreak(int nCode, LONG nStartChar)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_FINDWORDBREAK, nCode, nStartChar);
+        return (DWORD) TxSendMessage(EM_FINDWORDBREAK, nCode, nStartChar);
     }
 
     // Additional operations
@@ -757,7 +753,7 @@ public:
     BOOL Undo()
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_UNDO, 0, 0L);
+        return (BOOL) TxSendMessage(EM_UNDO, 0, 0L);
     }
 
     void Clear()
@@ -785,24 +781,24 @@ public:
     }
 
     // OLE support
-    IRichEditOle* GetOleInterface() const
+    IRichEditOle *GetOleInterface() const
     {
         ASSERT(m_pTextServices != nullptr);
-        IRichEditOle* pRichEditOle = nullptr;
-        TxSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM)&pRichEditOle);
+        IRichEditOle *pRichEditOle = nullptr;
+        TxSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM) &pRichEditOle);
         return pRichEditOle;
     }
 
-    BOOL SetOleCallback(IRichEditOleCallback* pCallback)
+    BOOL SetOleCallback(IRichEditOleCallback *pCallback)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETOLECALLBACK, 0, (LPARAM)pCallback);
+        return (BOOL) TxSendMessage(EM_SETOLECALLBACK, 0, (LPARAM) pCallback);
     }
 
     BOOL Redo()
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_REDO, 0, 0L);
+        return (BOOL) TxSendMessage(EM_REDO, 0, 0L);
     }
 
     void StopGroupTyping()
@@ -820,62 +816,62 @@ public:
     BOOL SetTabStops(int nTabStops, LPINT rgTabStops)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETTABSTOPS, nTabStops, (LPARAM)rgTabStops);
+        return (BOOL) TxSendMessage(EM_SETTABSTOPS, nTabStops, (LPARAM) rgTabStops);
     }
 
     BOOL SetTabStops()
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETTABSTOPS, 0, 0L);
+        return (BOOL) TxSendMessage(EM_SETTABSTOPS, 0, 0L);
     }
 
-    BOOL SetTabStops(const int& cxEachStop)    // takes an 'int'
+    BOOL SetTabStops(const int &cxEachStop) // takes an 'int'
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETTABSTOPS, 1, (LPARAM)(LPINT)&cxEachStop);
+        return (BOOL) TxSendMessage(EM_SETTABSTOPS, 1, (LPARAM) (LPINT) &cxEachStop);
     }
 
 #if (_RICHEDIT_VER >= 0x0800)
     AutoCorrectProc GetAutoCorrectProc() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (AutoCorrectProc)TxSendMessage(EM_GETAUTOCORRECTPROC, 0, 0L);
+        return (AutoCorrectProc) TxSendMessage(EM_GETAUTOCORRECTPROC, 0, 0L);
     }
 
     BOOL SetAutoCorrectProc(AutoCorrectProc pfn)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETAUTOCORRECTPROC, (WPARAM)pfn, 0L);
+        return (BOOL) TxSendMessage(EM_SETAUTOCORRECTPROC, (WPARAM) pfn, 0L);
     }
 
     BOOL CallAutoCorrectProc(WCHAR ch)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_CALLAUTOCORRECTPROC, (WPARAM)ch, 0L);
+        return (BOOL) TxSendMessage(EM_CALLAUTOCORRECTPROC, (WPARAM) ch, 0L);
     }
 
     DWORD GetEditStyleEx() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_GETEDITSTYLEEX, 0, 0L);
+        return (DWORD) TxSendMessage(EM_GETEDITSTYLEEX, 0, 0L);
     }
 
     DWORD SetEditStyleEx(DWORD dwStyleEx, DWORD dwMask)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_SETEDITSTYLEEX, dwStyleEx, dwMask);
+        return (DWORD) TxSendMessage(EM_SETEDITSTYLEEX, dwStyleEx, dwMask);
     }
 
     DWORD GetStoryType(int nStoryIndex) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_GETSTORYTYPE, nStoryIndex, 0L);
+        return (DWORD) TxSendMessage(EM_GETSTORYTYPE, nStoryIndex, 0L);
     }
 
     DWORD SetStoryType(int nStoryIndex, DWORD dwStoryType)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (DWORD)TxSendMessage(EM_SETSTORYTYPE, nStoryIndex, dwStoryType);
+        return (DWORD) TxSendMessage(EM_SETSTORYTYPE, nStoryIndex, dwStoryType);
     }
 
     DWORD GetEllipsisMode() const
@@ -883,8 +879,8 @@ public:
         ASSERT(m_pTextServices != nullptr);
 
         DWORD dwMode = 0;
-        BOOL bRet = (BOOL)TxSendMessage(EM_GETELLIPSISMODE, 0, (LPARAM)&dwMode);
-        (void)bRet;   // avoid level 4 warning
+        BOOL bRet = (BOOL) TxSendMessage(EM_GETELLIPSISMODE, 0, (LPARAM) &dwMode);
+        (void) bRet; // avoid level 4 warning
         ASSERT(bRet != FALSE);
 
         return dwMode;
@@ -893,19 +889,19 @@ public:
     BOOL SetEllipsisMode(DWORD dwEllipsisMode)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETELLIPSISMODE, 0, dwEllipsisMode);
+        return (BOOL) TxSendMessage(EM_SETELLIPSISMODE, 0, dwEllipsisMode);
     }
 
     BOOL GetEllipsisState() const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_GETELLIPSISSTATE, 0, 0L);
+        return (BOOL) TxSendMessage(EM_GETELLIPSISSTATE, 0, 0L);
     }
 
     BOOL GetTouchOptions(int nTouchOptions) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_GETTOUCHOPTIONS, nTouchOptions, 0L);
+        return (BOOL) TxSendMessage(EM_GETTOUCHOPTIONS, nTouchOptions, 0L);
     }
 
     void SetTouchOptions(int nTouchOptions, BOOL bEnable)
@@ -914,44 +910,44 @@ public:
         TxSendMessage(EM_SETTOUCHOPTIONS, nTouchOptions, bEnable);
     }
 
-    HRESULT InsertTable(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams)
+    HRESULT InsertTable(TABLEROWPARMS *pRowParams, TABLECELLPARMS *pCellParams)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (HRESULT)TxSendMessage(EM_INSERTTABLE, (WPARAM)pRowParams, (LPARAM)pCellParams);
+        return (HRESULT) TxSendMessage(EM_INSERTTABLE, (WPARAM) pRowParams, (LPARAM) pCellParams);
     }
 
-    HRESULT GetTableParams(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams) const
+    HRESULT GetTableParams(TABLEROWPARMS *pRowParams, TABLECELLPARMS *pCellParams) const
     {
         ASSERT(m_pTextServices != nullptr);
-        return (HRESULT)TxSendMessage(EM_GETTABLEPARMS, (WPARAM)pRowParams, (LPARAM)pCellParams);
+        return (HRESULT) TxSendMessage(EM_GETTABLEPARMS, (WPARAM) pRowParams, (LPARAM) pCellParams);
     }
 
-    HRESULT SetTableParams(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams)
+    HRESULT SetTableParams(TABLEROWPARMS *pRowParams, TABLECELLPARMS *pCellParams)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (HRESULT)TxSendMessage(EM_SETTABLEPARMS, (WPARAM)pRowParams, (LPARAM)pCellParams);
+        return (HRESULT) TxSendMessage(EM_SETTABLEPARMS, (WPARAM) pRowParams, (LPARAM) pCellParams);
     }
 
-    HRESULT InsertImage(RICHEDIT_IMAGE_PARAMETERS* pParams)
+    HRESULT InsertImage(RICHEDIT_IMAGE_PARAMETERS *pParams)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (HRESULT)TxSendMessage(EM_INSERTIMAGE, 0, (LPARAM)pParams);
+        return (HRESULT) TxSendMessage(EM_INSERTIMAGE, 0, (LPARAM) pParams);
     }
 
     BOOL SetUiaName(LPCWSTR lpstrName)
     {
         ASSERT(m_pTextServices != nullptr);
-        return (BOOL)TxSendMessage(EM_SETUIANAME, 0, (LPARAM)lpstrName);
+        return (BOOL) TxSendMessage(EM_SETUIANAME, 0, (LPARAM) lpstrName);
     }
 #endif // (_RICHEDIT_VER >= 0x0800)
 
 private:
     /** TextServices 接口
     */
-    ITextServices* m_pTextServices;
+    ITextServices *m_pTextServices;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif // DUILIB_BUILD_FOR_WIN
 

@@ -7,18 +7,17 @@
 #include "duilib/duilib_config_windows.h"
 
 #include "SkiaHeaderBegin.h"
+#include "SkiaHeaderEnd.h"
 #include "include/core/SkSurface.h"
 #include "tools/window/RasterWindowContext.h"
-#include "SkiaHeaderEnd.h"
 
 // DisplayParams.fGrContextOptions 类型为GrContextOptions:
 // 在GR_TEST_UTILS宏定义和不定义的情况下，结构体大小会不同，如果不一致会导致程序崩溃，注意检查该宏定义的一致性
 #ifndef SK_GL
-    #error 请检查宏定义：SK_GL与Skia库的编译选项保持一致
+#error 请检查宏定义：SK_GL与Skia库的编译选项保持一致
 #endif
 
-namespace ui 
-{
+namespace ui {
 class UiRect;
 class IRender;
 class IRenderPaint;
@@ -26,12 +25,12 @@ class IRenderPaint;
 /** 该类的来源：skia\tools\window\win\RasterWindowContext_win.cpp，做了修改
 *   函数和变量命名规则与Skia一致，以便于后续同步代码时方便比对代码修改。
 */
-class SkRasterWindowContext_Windows: public skwindow::internal::RasterWindowContext
+class SkRasterWindowContext_Windows : public skwindow::internal::RasterWindowContext
 {
 public:
     SkRasterWindowContext_Windows(HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params);
-    SkRasterWindowContext_Windows(const SkRasterWindowContext_Windows& r) = delete;
-    SkRasterWindowContext_Windows& operator = (const SkRasterWindowContext_Windows& r) = delete;
+    SkRasterWindowContext_Windows(const SkRasterWindowContext_Windows &r) = delete;
+    SkRasterWindowContext_Windows &operator=(const SkRasterWindowContext_Windows &r) = delete;
     virtual ~SkRasterWindowContext_Windows() override;
 
 public:
@@ -45,7 +44,7 @@ public:
     * @param [in] pRender 渲染引擎的接口
     * @param [in] pRenderPaint 界面绘制所需的回调接口
     */
-    bool PaintAndSwapBuffers(IRender* pRender, IRenderPaint* pRenderPaint);
+    bool PaintAndSwapBuffers(IRender *pRender, IRenderPaint *pRenderPaint);
 
     /** 获取位图GDI句柄
     */
@@ -61,22 +60,23 @@ protected:
     * @param [in] nLayeredWindowAlpha 窗口透明度，在UpdateLayeredWindow函数中作为参数使用
     * @return 成功返回true，失败则返回false
     */
-    bool SwapPaintBuffers(HDC hPaintDC, const UiRect& rcPaint, IRender* pRender, uint8_t nLayeredWindowAlpha) const;
+    bool SwapPaintBuffers(
+        HDC hPaintDC, const UiRect &rcPaint, IRender *pRender, uint8_t nLayeredWindowAlpha) const;
 
     /** 获取当前窗口的客户区矩形
     * @param [out] rcClient 返回窗口的客户区坐标
     */
-    void GetClientRect(UiRect& rcClient) const;
+    void GetClientRect(UiRect &rcClient) const;
 
     /** 获取当前窗口的窗口区矩形
     * @param [out] rcWindow 返回窗口左上角和右下角的屏幕坐标
     */
-    void GetWindowRect(UiRect& rcWindow) const;
+    void GetWindowRect(UiRect &rcWindow) const;
 
     /** 创建一个设备无关的位图
     *@return 返回位图句柄，由调用方释放位图资源
     */
-    HBITMAP CreateHBitmap(int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID* pBits) const;
+    HBITMAP CreateHBitmap(int32_t nWidth, int32_t nHeight, bool flipHeight, LPVOID *pBits) const;
 
 private:
     /** Surface接口

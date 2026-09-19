@@ -3,26 +3,25 @@
 
 #include "duilib/Core/UiRect.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 对位图数据的Alpha值进行保存和恢复
 */
 class DUILIB_API BitmapAlpha
 {
 public:
-    BitmapAlpha(uint8_t* pPiexl, int32_t nWidth, int32_t nHeight, int32_t nChannels);
+    BitmapAlpha(uint8_t *pPiexl, int32_t nWidth, int32_t nHeight, int32_t nChannels);
     ~BitmapAlpha();
 
 public:
-    void ClearAlpha(const UiRect& rcDirty, uint8_t alpha) const;
-    void RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding, uint8_t alpha) const;
-    void RestoreAlpha(const UiRect& rcDirty, const UiPadding& rcShadowPadding) const;
+    void ClearAlpha(const UiRect &rcDirty, uint8_t alpha) const;
+    void RestoreAlpha(const UiRect &rcDirty, const UiPadding &rcShadowPadding, uint8_t alpha) const;
+    void RestoreAlpha(const UiRect &rcDirty, const UiPadding &rcShadowPadding) const;
 
 private:
     /** 图像数据
     */
-    uint8_t* m_pPiexl;
+    uint8_t *m_pPiexl;
 
     /** 图像宽度
     */

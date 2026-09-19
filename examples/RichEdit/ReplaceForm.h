@@ -8,7 +8,7 @@ class MainForm;
 class ReplaceForm : public ui::WindowImplBase
 {
 public:
-    explicit ReplaceForm(MainForm* pMainForm);
+    explicit ReplaceForm(MainForm *pMainForm);
     virtual ~ReplaceForm() override;
 
     /** 资源相关接口
@@ -32,22 +32,22 @@ private:
 
 private:
     //查找/替换接口
-    MainForm* m_pMainForm;
+    MainForm *m_pMainForm;
 
     //搜索方向选项
-    ui::Option* m_pDirectionOption;
+    ui::Option *m_pDirectionOption;
 
     //是否区分大小写
-    ui::CheckBox* m_pCaseSensitive;
+    ui::CheckBox *m_pCaseSensitive;
 
     //是否全字匹配
-    ui::CheckBox* m_pMatchWholeWord;
+    ui::CheckBox *m_pMatchWholeWord;
 
     //查找内容
-    ui::RichEdit* m_pFindText;
+    ui::RichEdit *m_pFindText;
 
     //替换内容
-    ui::RichEdit* m_pReplaceText;
+    ui::RichEdit *m_pReplaceText;
 };
 
 #endif //EXAMPLES_REPLACE_FORM_H_

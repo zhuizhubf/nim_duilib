@@ -3,19 +3,17 @@
 #ifdef DUILIB_BUILD_FOR_WIN
 
 #ifdef DUILIB_ENABLE_INLINE_HOOK
-    #include "third_party/libudis86/udis86.h"
+#include "third_party/libudis86/udis86.h"
 #endif
 
-namespace ui 
-{
-InlineHook::InlineHook():
-    m_target(nullptr),
-    m_hook(nullptr),
-    m_trampoline(nullptr),
-    m_installRef(0),
-    m_replaceLen(0)
-{
-}
+namespace ui {
+InlineHook::InlineHook()
+    : m_target(nullptr)
+    , m_hook(nullptr)
+    , m_trampoline(nullptr)
+    , m_installRef(0)
+    , m_replaceLen(0)
+{}
 
 InlineHook::~InlineHook()
 {
@@ -29,23 +27,19 @@ bool InlineHook::Uninstall()
     return false;
 }
 
-bool InlineHook::Install(void* /*targetFunc*/, void* /*hookFunc*/)
+bool InlineHook::Install(void * /*targetFunc*/, void * /*hookFunc*/)
 {
     return false;
 }
 
-void InlineHook::GenerateJump()
-{
-}
+void InlineHook::GenerateJump() {}
 
 bool InlineHook::CreateTrampoline()
 {
     return false;
 }
 
-void InlineHook::Clear()
-{
-}
+void InlineHook::Clear() {}
 
 bool InlineHook::DoInstall()
 {
@@ -73,7 +67,7 @@ void InlineHook::Clear()
     m_jumpCode.clear();
 }
 
-bool InlineHook::Install(void* targetFunc, void* hookFunc)
+bool InlineHook::Install(void *targetFunc, void *hookFunc)
 {
     if ((targetFunc == nullptr) || (hookFunc == nullptr)) {
         return false;
@@ -92,8 +86,7 @@ bool InlineHook::Install(void* targetFunc, void* hookFunc)
     if (bInstalled) {
         ++m_installRef;
         ASSERT(m_installRef == 1);
-    }
-    else {
+    } else {
         Clear();
     }
     return bInstalled;
@@ -111,19 +104,19 @@ bool InlineHook::Uninstall()
 }
 
 // 动态解析指令边界并返回覆盖长度
-static size_t CalculateHookLengthWithUdis86(void* target_addr, size_t min_hook_bytes)
+static size_t CalculateHookLengthWithUdis86(void *target_addr, size_t min_hook_bytes)
 {
     ASSERT(min_hook_bytes <= 64);
 
     ud_t ud_ctx;
     ud_init(&ud_ctx);
-#if defined(_M_X64) || defined(_M_AMD64) || defined(_WIN64) || defined(__x86_64__) 
+#if defined(_M_X64) || defined(_M_AMD64) || defined(_WIN64) || defined(__x86_64__)
     ud_set_mode(&ud_ctx, 64);
 #else
     ud_set_mode(&ud_ctx, 32);
 #endif
     ud_set_syntax(&ud_ctx, UD_SYN_INTEL);
-    ud_set_input_buffer(&ud_ctx, (uint8_t*)target_addr, 64); // 扫描前64字节
+    ud_set_input_buffer(&ud_ctx, (uint8_t *) target_addr, 64); // 扫描前64字节
 
     DWORD old_protect = 0;
     ::VirtualProtect(target_addr, 64, PAGE_EXECUTE_READ, &old_protect);
@@ -222,12 +215,13 @@ void InlineHook::GenerateJump()
 {
 #ifdef _M_X64
     // mov rax, address; jmp rax
-    m_jumpCode = { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0 };
-    memcpy(m_jumpCode.data() + 2, &m_hook, sizeof(void*));
+    m_jumpCode = {0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0};
+    memcpy(m_jumpCode.data() + 2, &m_hook, sizeof(void *));
 #else
     // jmp rel32
-    const uint32_t offset = reinterpret_cast<uint32_t>(m_hook) - (reinterpret_cast<uint32_t>(m_target) + 5);
-    m_jumpCode = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
+    const uint32_t offset = reinterpret_cast<uint32_t>(m_hook)
+                            - (reinterpret_cast<uint32_t>(m_target) + 5);
+    m_jumpCode = {0xE9, 0x00, 0x00, 0x00, 0x00};
     memcpy(m_jumpCode.data() + 1, &offset, sizeof(offset));
 #endif
 }
@@ -244,9 +238,8 @@ bool InlineHook::CreateTrampoline()
     //   [jmp rax]
 
     // 分配可执行内存
-    m_trampoline = ::VirtualAlloc(nullptr, m_replaceLen + 16,
-                                  MEM_COMMIT | MEM_RESERVE,
-                                  PAGE_EXECUTE_READWRITE);
+    m_trampoline = ::VirtualAlloc(
+        nullptr, m_replaceLen + 16, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!m_trampoline) {
         return false;
     }
@@ -256,26 +249,25 @@ bool InlineHook::CreateTrampoline()
 
     // 生成跳回指令
 #ifdef _M_X64
-        // mov rax, return_address; jmp rax
-    uint8_t jmpBack[] = { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0xFF, 0xE0 };
-    void* returnAddr = static_cast<char*>(m_target) + m_replaceLen;
+    // mov rax, return_address; jmp rax
+    uint8_t jmpBack[] = {0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0};
+    void *returnAddr = static_cast<char *>(m_target) + m_replaceLen;
     memcpy(jmpBack + 2, &returnAddr, sizeof(returnAddr));
 #else
-        // jmp return_address
-    uint8_t jmpBack[] = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
-    const uint32_t offset = reinterpret_cast<uint32_t>(m_target) + m_replaceLen - (reinterpret_cast<uint32_t>(m_trampoline) + m_replaceLen + 5);
+    // jmp return_address
+    uint8_t jmpBack[] = {0xE9, 0x00, 0x00, 0x00, 0x00};
+    const uint32_t offset = reinterpret_cast<uint32_t>(m_target) + m_replaceLen
+                            - (reinterpret_cast<uint32_t>(m_trampoline) + m_replaceLen + 5);
     memcpy(jmpBack + 1, &offset, sizeof(offset));
 #endif
 
     // 写入跳回指令
-    memcpy(static_cast<char*>(m_trampoline) + m_replaceLen, &jmpBack[0], sizeof(jmpBack));
+    memcpy(static_cast<char *>(m_trampoline) + m_replaceLen, &jmpBack[0], sizeof(jmpBack));
     return true;
 }
 
 #endif //DUILIB_ENABLE_INLINE_HOOK
 
-} //namespace ui 
+} //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN
-

@@ -1,33 +1,33 @@
 #ifndef UI_CONTROL_RICHTEXT_H_
 #define UI_CONTROL_RICHTEXT_H_
 
-#include "duilib/Control/RichTextImpl.h"
 #include "duilib/Box/HBox.h"
 #include "duilib/Box/VBox.h"
+#include "duilib/Control/RichTextImpl.h"
 
-namespace ui 
-{
+namespace ui {
 /** 格式化文本（类HTML格式）
 */
 template<typename T = Control>
-class RichTextT: public T
+class RichTextT : public T
 {
     typedef T BaseClass;
+
 public:
-    explicit RichTextT(Window* pWindow);
-    RichTextT(const RichTextT& r) = delete;
-    RichTextT& operator=(const RichTextT& r) = delete;
+    explicit RichTextT(Window *pWindow);
+    RichTextT(const RichTextT &r) = delete;
+    RichTextT &operator=(const RichTextT &r) = delete;
     virtual ~RichTextT() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void PaintText(IRender* pRender) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void PaintText(IRender *pRender) override;
 
     /** 设置容器所属窗口
      * @param [in] pWindow 窗口指针
      */
-    virtual void SetWindow(Window* pWindow) override;
+    virtual void SetWindow(Window *pWindow) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -60,7 +60,7 @@ public:
      * @param [in] padding 矩形的四个边值分别代表对应的四个内边距值
      * @param [in] bNeedDpiScale 兼容 DPI 缩放，默认为 true
      */
-    void SetTextPadding(const UiPadding& padding, bool bNeedDpiScale = true);
+    void SetTextPadding(const UiPadding &padding, bool bNeedDpiScale = true);
 
     /** 获取当前字体ID
      * @return 返回字体ID，该编号在 global.xml 中标识
@@ -70,7 +70,7 @@ public:
     /** 设置当前字体ID
      * @param [in] strFontId 要设置的字体ID，该ID可在 global.xml 中存在
      */
-    void SetFontId(const DString& strFontId);
+    void SetFontId(const DString &strFontId);
 
     /** 获取默认文本颜色
      */
@@ -78,7 +78,7 @@ public:
 
     /** 设置默认文本颜色
      */
-    void SetTextColor(const DString& sTextColor);
+    void SetTextColor(const DString &sTextColor);
 
     /** 获取行间距倍数
     */
@@ -127,13 +127,13 @@ public:
     * @param [in] richText 带有格式的文本内容
     * @param [in] bRedraw true表示触发重绘，false表示不触发重绘
     */
-    bool SetText(const DString& richText, bool bRedraw = true);
+    bool SetText(const DString &richText, bool bRedraw = true);
 
     /** 设置格式的文本ID
     * @param [in] richTextId 带有格式的文本内容ID
     * @param [in] bRedraw true表示触发重绘，false表示不触发重绘
     */
-    bool SetTextId(const DString& richTextId, bool bRedraw = true);
+    bool SetTextId(const DString &richTextId, bool bRedraw = true);
 
     /** 清空原来的格式文本
     */
@@ -141,23 +141,23 @@ public:
 
     /** 追加一个文本片段
     */
-    void AppendTextSlice(const RichTextSlice&& textSlice);
+    void AppendTextSlice(const RichTextSlice &&textSlice);
 
     /** 追加一个文本片段
     */
-    void AppendTextSlice(const RichTextSlice& textSlice);
+    void AppendTextSlice(const RichTextSlice &textSlice);
 
     /** 根据Trim方案，对文本进行Trim处理，去掉多余的空格
     * @param [in,out] text 传入需要处理的文本，传出处理完成后的文本
     * @return 返回text的引用
     */
-    const DString& TrimText(DString& text);
+    const DString &TrimText(DString &text);
 
     /** 根据Trim方案，对文本进行Trim处理，去掉多余的空格
     * @param [in] text 传入需要处理的文本
     * @return 返回处理好的字符串
     */
-    DString TrimText(const DString::value_type* text);
+    DString TrimText(const DString::value_type *text);
 
     /** 设置是否允许重绘
     * @param [in] bEnable true表示允许重绘，false表示禁止重绘
@@ -177,30 +177,32 @@ public:
      * @param [in] callback 超级链接被点击后的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLinkClick(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventLinkClick, callback, callbackID); }
+    void AttachLinkClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventLinkClick, callback, callbackID);
+    }
 
     /** 获取实现接口
     */
-    RichTextImpl* GetRichTextImpl() const { return m_impl.get(); }
+    RichTextImpl *GetRichTextImpl() const { return m_impl.get(); }
 
 private:
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
-    virtual bool MouseMove(const EventArgs& msg) override;
-    virtual bool MouseHover(const EventArgs& msg) override;
-    virtual bool MouseLeave(const EventArgs& msg) override;
-    virtual bool OnSetCursor(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
+    virtual bool MouseHover(const EventArgs &msg) override;
+    virtual bool MouseLeave(const EventArgs &msg) override;
+    virtual bool OnSetCursor(const EventArgs &msg) override;
 
 private:
-
     //功能内部实现
     std::unique_ptr<RichTextImpl> m_impl;
 };
 
 template<typename T>
-RichTextT<T>::RichTextT(Window* pWindow) :
-    T(pWindow)
+RichTextT<T>::RichTextT(Window *pWindow)
+    : T(pWindow)
 {
     m_impl = std::make_unique<RichTextImpl>(this);
 }
@@ -212,19 +214,31 @@ RichTextT<T>::~RichTextT()
 }
 
 template<typename T>
-inline DString RichTextT<T>::GetType() const { return DUI_CTR_RICHTEXT; }
+inline DString RichTextT<T>::GetType() const
+{
+    return DUI_CTR_RICHTEXT;
+}
 
 template<>
-inline DString RichTextT<Box>::GetType() const { return DUI_CTR_RICHTEXT_BOX; }
+inline DString RichTextT<Box>::GetType() const
+{
+    return DUI_CTR_RICHTEXT_BOX;
+}
 
 template<>
-inline DString RichTextT<HBox>::GetType() const { return DUI_CTR_RICHTEXT_HBOX; }
+inline DString RichTextT<HBox>::GetType() const
+{
+    return DUI_CTR_RICHTEXT_HBOX;
+}
 
 template<>
-inline DString RichTextT<VBox>::GetType() const { return DUI_CTR_RICHTEXT_VBOX; }
+inline DString RichTextT<VBox>::GetType() const
+{
+    return DUI_CTR_RICHTEXT_VBOX;
+}
 
 template<typename T>
-void RichTextT<T>::SetAttribute(const DString& strName, const DString& strValue2)
+void RichTextT<T>::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
     if (!m_impl->SetAttribute(strName, strValue)) {
@@ -233,7 +247,7 @@ void RichTextT<T>::SetAttribute(const DString& strName, const DString& strValue2
 }
 
 template<typename T>
-void RichTextT<T>::SetWindow(Window* pWindow)
+void RichTextT<T>::SetWindow(Window *pWindow)
 {
     BaseClass::SetWindow(pWindow);
     m_impl->OnWindowChanged();
@@ -267,7 +281,7 @@ UiSize RichTextT<T>::EstimateText(UiSize szAvailable)
 }
 
 template<typename T>
-void RichTextT<T>::PaintText(IRender* pRender)
+void RichTextT<T>::PaintText(IRender *pRender)
 {
     m_impl->PaintText(pRender);
 }
@@ -279,19 +293,19 @@ UiPadding RichTextT<T>::GetTextPadding() const
 }
 
 template<typename T>
-void RichTextT<T>::SetTextPadding(const UiPadding& padding, bool bNeedDpiScale)
+void RichTextT<T>::SetTextPadding(const UiPadding &padding, bool bNeedDpiScale)
 {
     m_impl->SetTextPadding(padding, bNeedDpiScale);
 }
 
 template<typename T>
-const DString& RichTextT<T>::TrimText(DString& text)
+const DString &RichTextT<T>::TrimText(DString &text)
 {
     return m_impl->TrimText(text);
 }
 
 template<typename T>
-DString RichTextT<T>::TrimText(const DString::value_type* text)
+DString RichTextT<T>::TrimText(const DString::value_type *text)
 {
     return m_impl->TrimText(text);
 }
@@ -309,13 +323,13 @@ bool RichTextT<T>::IsEnableRedraw() const
 }
 
 template<typename T>
-bool RichTextT<T>::SetText(const DString& richText, bool bRedraw)
+bool RichTextT<T>::SetText(const DString &richText, bool bRedraw)
 {
     return m_impl->SetText(richText, bRedraw);
 }
 
 template<typename T>
-bool RichTextT<T>::SetTextId(const DString& richTextId, bool bRedraw)
+bool RichTextT<T>::SetTextId(const DString &richTextId, bool bRedraw)
 {
     return m_impl->SetTextId(richTextId, bRedraw);
 }
@@ -333,7 +347,7 @@ DString RichTextT<T>::GetFontId() const
 }
 
 template<typename T>
-void RichTextT<T>::SetFontId(const DString& strFontId)
+void RichTextT<T>::SetFontId(const DString &strFontId)
 {
     m_impl->SetFontId(strFontId);
 }
@@ -345,7 +359,7 @@ DString RichTextT<T>::GetTextColor() const
 }
 
 template<typename T>
-void RichTextT<T>::SetTextColor(const DString& sTextColor)
+void RichTextT<T>::SetTextColor(const DString &sTextColor)
 {
     m_impl->SetTextColor(sTextColor);
 }
@@ -411,13 +425,13 @@ VerAlignType RichTextT<T>::GetVAlignType() const
 }
 
 template<typename T>
-void RichTextT<T>::AppendTextSlice(const RichTextSlice&& textSlice)
+void RichTextT<T>::AppendTextSlice(const RichTextSlice &&textSlice)
 {
     m_impl->AppendTextSlice(textSlice);
 }
 
 template<typename T>
-void RichTextT<T>::AppendTextSlice(const RichTextSlice& textSlice)
+void RichTextT<T>::AppendTextSlice(const RichTextSlice &textSlice)
 {
     m_impl->AppendTextSlice(textSlice);
 }
@@ -429,7 +443,7 @@ DString RichTextT<T>::ToString() const
 }
 
 template<typename T>
-bool RichTextT<T>::ButtonDown(const EventArgs& msg)
+bool RichTextT<T>::ButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     m_impl->ButtonDown(msg);
@@ -437,7 +451,7 @@ bool RichTextT<T>::ButtonDown(const EventArgs& msg)
 }
 
 template<typename T>
-bool RichTextT<T>::ButtonUp(const EventArgs& msg)
+bool RichTextT<T>::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     m_impl->ButtonUp(msg);
@@ -445,7 +459,7 @@ bool RichTextT<T>::ButtonUp(const EventArgs& msg)
 }
 
 template<typename T>
-bool RichTextT<T>::MouseMove(const EventArgs& msg)
+bool RichTextT<T>::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     m_impl->MouseMove(msg);
@@ -453,7 +467,7 @@ bool RichTextT<T>::MouseMove(const EventArgs& msg)
 }
 
 template<typename T>
-bool RichTextT<T>::MouseHover(const EventArgs& msg)
+bool RichTextT<T>::MouseHover(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseHover(msg);
     m_impl->MouseHover(msg);
@@ -461,14 +475,14 @@ bool RichTextT<T>::MouseHover(const EventArgs& msg)
 }
 
 template<typename T>
-bool RichTextT<T>::MouseLeave(const EventArgs& msg)
+bool RichTextT<T>::MouseLeave(const EventArgs &msg)
 {
     m_impl->MouseLeave(msg);
     return BaseClass::MouseLeave(msg);
 }
 
 template<typename T>
-bool RichTextT<T>::OnSetCursor(const EventArgs& msg)
+bool RichTextT<T>::OnSetCursor(const EventArgs &msg)
 {
     if (!m_impl->OnSetCursor(msg)) {
         return BaseClass::OnSetCursor(msg);
@@ -477,9 +491,9 @@ bool RichTextT<T>::OnSetCursor(const EventArgs& msg)
 }
 
 typedef RichTextT<Control> RichText;
-typedef RichTextT<Box>     RichTextBox;
-typedef RichTextT<HBox>    RichTextHBox;
-typedef RichTextT<VBox>    RichTextVBox;
+typedef RichTextT<Box> RichTextBox;
+typedef RichTextT<HBox> RichTextHBox;
+typedef RichTextT<VBox> RichTextVBox;
 
 } // namespace ui
 

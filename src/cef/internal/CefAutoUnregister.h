@@ -5,9 +5,9 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include <unordered_map>
 #include <functional>
 #include <list>
+#include <unordered_map>
 
 namespace ui {
 
@@ -16,15 +16,10 @@ typedef std::function<void()> CefUnregisterCallback;
 class CefAutoUnregister
 {
 public:
-    CefAutoUnregister()
-    {
-    }
+    CefAutoUnregister() {}
 
-    void Add(const CefUnregisterCallback& cb)
-    {
-        m_callbackList.emplace_back(cb);
-    }
-    void Add(CefUnregisterCallback&& cb)
+    void Add(const CefUnregisterCallback &cb) { m_callbackList.emplace_back(cb); }
+    void Add(CefUnregisterCallback &&cb)
     {
         m_callbackList.emplace_back(std::forward<CefUnregisterCallback>(cb));
     }
@@ -44,38 +39,35 @@ class CefUnregistedCallbackList : public virtual ui::SupportWeakCallback
 {
 public:
     CefUnregistedCallbackList() {}
-    ~CefUnregistedCallbackList(){ m_elementList.clear(); };
+    ~CefUnregistedCallbackList() { m_elementList.clear(); };
     void Clear() { m_elementList.clear(); }
-    CefUnregisterCallback AddCallback(const TCallback& cb)
+    CefUnregisterCallback AddCallback(const TCallback &cb)
     {
         auto new_cb = std::make_shared<TCallback>(cb);
-        size_t cb_id = (size_t)new_cb.get();
+        size_t cb_id = (size_t) new_cb.get();
         m_elementList.insert(std::make_pair(cb_id, new_cb));
-        return ToWeakCallback([this, cb_id]() {
-            m_elementList.erase(cb_id);
-        });
+        return ToWeakCallback([this, cb_id]() { m_elementList.erase(cb_id); });
     }
-    CefUnregisterCallback AddCallback(TCallback&& cb)
+    CefUnregisterCallback AddCallback(TCallback &&cb)
     {
         auto new_cb = std::make_shared<TCallback>(std::forward<TCallback>(cb));
-        size_t cb_id = (size_t)new_cb.get();
+        size_t cb_id = (size_t) new_cb.get();
         m_elementList.insert(std::make_pair(cb_id, new_cb));
-        return ToWeakCallback([this, cb_id]() {
-            m_elementList.erase(cb_id);
-        });
+        return ToWeakCallback([this, cb_id]() { m_elementList.erase(cb_id); });
     }
     template<typename... TParams>
-    void operator ()(const TParams&... params)
+    void operator()(const TParams &...params)
     {
-        for (auto& it : m_elementList) {
+        for (auto &it : m_elementList) {
             (*it.second)(params...);
         }
-    }    
+    }
+
 private:
     std::unordered_map<size_t, std::shared_ptr<TCallback>> m_elementList;
 };
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_CEF
 

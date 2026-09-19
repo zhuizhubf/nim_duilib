@@ -3,8 +3,7 @@
 
 #include "duilib/Image/ImageDecoder.h"
 
-namespace ui
-{
+namespace ui {
 /** LOTTIE格式的图片数据
 */
 class Image_LOTTIE : public IAnimationImage
@@ -21,11 +20,12 @@ public:
     * @param [in] rcMaxDestRectSize 目标区域大小，用于优化加载性能
     * @param [in] bAssertEnabled 当遇到图片数据错误时，是否允许断言
     */
-    bool LoadImageFile(std::vector<uint8_t>& fileData,
-                       const FilePath& imageFilePath,
-                       float fImageSizeScale,
-                       const UiSize& rcMaxDestRectSize,
-                       bool bAssertEnabled);
+    bool LoadImageFile(
+        std::vector<uint8_t> &fileData,
+        const FilePath &imageFilePath,
+        float fImageSizeScale,
+        const UiSize &rcMaxDestRectSize,
+        bool bAssertEnabled);
 
 public:
     /** 获取图片宽度
@@ -65,7 +65,8 @@ public:
     * @param [out] pAnimationFrame 返回该帧的图片位图数据
     * @return 成功返回true，失败则返回false
     */
-    virtual bool ReadFrameData(int32_t nFrameIndex, const UiSize& szDestRectSize, AnimationFrame* pAnimationFrame) override;
+    virtual bool ReadFrameData(
+        int32_t nFrameIndex, const UiSize &szDestRectSize, AnimationFrame *pAnimationFrame) override;
 
 public:
     /** 是否支持延迟解码数据
@@ -88,9 +89,8 @@ public:
     * @param [out] bDecodeError 返回true表示遇到图片解码错误
     * @return 返回true表示成功，返回false表示解码失败或者外部终止
     */
-    virtual bool DelayDecode(uint32_t nMinFrameIndex,
-                             std::function<bool(void)> IsAborted,
-                             bool* bDecodeError) override;
+    virtual bool DelayDecode(
+        uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError) override;
 
     /** 合并延迟解码图片数据的结果
     */

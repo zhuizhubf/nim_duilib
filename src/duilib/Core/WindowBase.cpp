@@ -1,21 +1,20 @@
 #include "WindowBase.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/WindowCreateAttributes.h"
-#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/MonitorUtil.h"
+#include "duilib/Utils/StringConvert.h"
 #include <random>
 
-namespace ui
-{
-WindowBase::WindowBase():
-    m_pParentWindow(nullptr), 
-    m_pNativeWindow(nullptr),
-    m_bWindowFirstShown(false),
-    m_bWindowRgnUpdated(false),
-    m_bWindowRgnSetFlag(false),
-    m_windowSizeState(WindowSizeState::kUnknown),
-    m_bSendDragEnterMsg(false),
-    m_bLayeredWindowSetFlag(false)
+namespace ui {
+WindowBase::WindowBase()
+    : m_pParentWindow(nullptr)
+    , m_pNativeWindow(nullptr)
+    , m_bWindowFirstShown(false)
+    , m_bWindowRgnUpdated(false)
+    , m_bWindowRgnSetFlag(false)
+    , m_windowSizeState(WindowSizeState::kUnknown)
+    , m_bSendDragEnterMsg(false)
+    , m_bLayeredWindowSetFlag(false)
 {
     m_pNativeWindow = new NativeWindow(this);
 }
@@ -29,7 +28,7 @@ WindowBase::~WindowBase()
     }
 }
 
-bool WindowBase::CreateWnd(WindowBase* pParentWindow, const WindowCreateParam& createParam)
+bool WindowBase::CreateWnd(WindowBase *pParentWindow, const WindowCreateParam &createParam)
 {
     //解析XML，读取窗口的属性参数
     WindowCreateAttributes createAttributes;
@@ -38,12 +37,15 @@ bool WindowBase::CreateWnd(WindowBase* pParentWindow, const WindowCreateParam& c
     m_windowClassName = createParam.m_className;
     m_pParentWindow = pParentWindow;
 
-    NativeWindow* pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
+    NativeWindow *pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
     return m_pNativeWindow->CreateWnd(pNativeWindow, createParam, createAttributes);
 }
 
-int32_t WindowBase::DoModal(WindowBase* pParentWindow, const WindowCreateParam& createParam,
-                            bool bCloseByEsc, bool bCloseByEnter)
+int32_t WindowBase::DoModal(
+    WindowBase *pParentWindow,
+    const WindowCreateParam &createParam,
+    bool bCloseByEsc,
+    bool bCloseByEnter)
 {
     //解析XML，读取窗口的属性参数
     WindowCreateAttributes createAttributes;
@@ -52,19 +54,21 @@ int32_t WindowBase::DoModal(WindowBase* pParentWindow, const WindowCreateParam& 
     m_windowClassName = createParam.m_className;
     m_pParentWindow = pParentWindow;
 
-    NativeWindow* pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
-    return m_pNativeWindow->DoModal(pNativeWindow, createParam, createAttributes, bCloseByEsc, bCloseByEnter);
+    NativeWindow *pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
+    return m_pNativeWindow
+        ->DoModal(pNativeWindow, createParam, createAttributes, bCloseByEsc, bCloseByEnter);
 }
 
-bool WindowBase::CreateChildWnd(WindowBase* pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight)
+bool WindowBase::CreateChildWnd(
+    WindowBase *pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight)
 {
     SetWindowId(_T(""));
     m_pParentWindow = pParentWindow;
-    NativeWindow* pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
+    NativeWindow *pNativeWindow = pParentWindow != nullptr ? pParentWindow->NativeWnd() : nullptr;
     return m_pNativeWindow->CreateChildWnd(pNativeWindow, nX, nY, nWidth, nHeight);
 }
 
-void WindowBase::OnNativeCreateWndMsg(bool bDoModal, const NativeMsg& nativeMsg, bool& bHandled)
+void WindowBase::OnNativeCreateWndMsg(bool bDoModal, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
 
@@ -87,10 +91,10 @@ void WindowBase::OnNativeCreateWndMsg(bool bDoModal, const NativeMsg& nativeMsg,
     }
     if (!windowFlag.expired()) {
         OnWindowCreateMsg(bDoModal, nativeMsg, bHandled);
-    }    
+    }
     if (!windowFlag.expired()) {
         //给应用层回调
-        SendWindowEvent(kWindowCreateMsg, (WPARAM)bDoModal ? 1 : 0);
+        SendWindowEvent(kWindowCreateMsg, (WPARAM) bDoModal ? 1 : 0);
     }
 }
 
@@ -173,8 +177,7 @@ bool WindowBase::OnRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRedraw)
             OnLayeredWindowChanged();
         }
         return bRet;
-    }
-    else {
+    } else {
         //如果外部设置了分层窗口属性，则内部不自动设置，以外部设置的为准
         return false;
     }
@@ -200,9 +203,10 @@ int32_t WindowBase::GetCloseParam() const
     return m_pNativeWindow->GetCloseParam();
 }
 
-bool WindowBase::AddMessageFilter(IUIMessageFilter* pFilter)
+bool WindowBase::AddMessageFilter(IUIMessageFilter *pFilter)
 {
-    if (std::find(m_aMessageFilters.begin(), m_aMessageFilters.end(), pFilter) != m_aMessageFilters.end()) {
+    if (std::find(m_aMessageFilters.begin(), m_aMessageFilters.end(), pFilter)
+        != m_aMessageFilters.end()) {
         ASSERT(false);
         return false;
     }
@@ -211,7 +215,7 @@ bool WindowBase::AddMessageFilter(IUIMessageFilter* pFilter)
     }
     return true;
 }
-bool WindowBase::RemoveMessageFilter(IUIMessageFilter* pFilter)
+bool WindowBase::RemoveMessageFilter(IUIMessageFilter *pFilter)
 {
     auto iter = std::find(m_aMessageFilters.begin(), m_aMessageFilters.end(), pFilter);
     if (iter != m_aMessageFilters.end()) {
@@ -231,27 +235,27 @@ void WindowBase::PostQuitMsg(int32_t nExitCode)
     return NativeWindow::PostQuitMsg(nExitCode);
 }
 
-WindowBase* WindowBase::WindowBaseFromPoint(const UiPoint& pt, bool bIgnoreChildWindow)
+WindowBase *WindowBase::WindowBaseFromPoint(const UiPoint &pt, bool bIgnoreChildWindow)
 {
-    WindowBase* pWindowBase = nullptr;
-    INativeWindow* pNativeWindow = m_pNativeWindow->WindowBaseFromPoint(pt, bIgnoreChildWindow);
+    WindowBase *pWindowBase = nullptr;
+    INativeWindow *pNativeWindow = m_pNativeWindow->WindowBaseFromPoint(pt, bIgnoreChildWindow);
     if (pNativeWindow != nullptr) {
-        pWindowBase = dynamic_cast<WindowBase*>(pNativeWindow);
+        pWindowBase = dynamic_cast<WindowBase *>(pNativeWindow);
     }
     return pWindowBase;
 }
 
-NativeWindow* WindowBase::NativeWnd() const
+NativeWindow *WindowBase::NativeWnd() const
 {
     return m_pNativeWindow;
 }
 
-WindowBase* WindowBase::GetParentWindow() const
+WindowBase *WindowBase::GetParentWindow() const
 {
     return m_pParentWindow.get();
 }
 
-bool WindowBase::SetParentWindow(WindowBase* pParentWindow)
+bool WindowBase::SetParentWindow(WindowBase *pParentWindow)
 {
     ASSERT((pParentWindow != nullptr) && pParentWindow->IsWindow());
     if ((pParentWindow == nullptr) || !pParentWindow->IsWindow()) {
@@ -282,27 +286,27 @@ void WindowBase::InitWindowBase()
     m_dpi->SetDisplayScaleForWindow(this);
 }
 
-void WindowBase::GetClientRect(UiRect& rcClient) const
+void WindowBase::GetClientRect(UiRect &rcClient) const
 {
     m_pNativeWindow->GetClientRect(rcClient);
 }
 
-void WindowBase::GetWindowRect(UiRect& rcWindow) const
+void WindowBase::GetWindowRect(UiRect &rcWindow) const
 {
     m_pNativeWindow->GetWindowRect(rcWindow);
 }
 
-void WindowBase::ScreenToClient(UiPoint& pt) const
+void WindowBase::ScreenToClient(UiPoint &pt) const
 {
     m_pNativeWindow->ScreenToClient(pt);
 }
 
-void WindowBase::ClientToScreen(UiPoint& pt) const
+void WindowBase::ClientToScreen(UiPoint &pt) const
 {
     m_pNativeWindow->ClientToScreen(pt);
 }
 
-void WindowBase::ClientToScreen(UiRect& rc) const
+void WindowBase::ClientToScreen(UiRect &rc) const
 {
     UiPoint pt;
     pt.x = rc.left;
@@ -320,7 +324,7 @@ void WindowBase::ClientToScreen(UiRect& rc) const
     rc.top = pt.y;
 }
 
-void WindowBase::ScreenToClient(UiRect& rc) const
+void WindowBase::ScreenToClient(UiRect &rc) const
 {
     UiPoint pt;
     pt.x = rc.left;
@@ -338,27 +342,27 @@ void WindowBase::ScreenToClient(UiRect& rc) const
     rc.top = pt.y;
 }
 
-void WindowBase::GetCursorPos(UiPoint& pt) const
+void WindowBase::GetCursorPos(UiPoint &pt) const
 {
     m_pNativeWindow->GetCursorPos(pt);
 }
 
-bool WindowBase::GetMonitorRect(UiRect& rcMonitor) const
+bool WindowBase::GetMonitorRect(UiRect &rcMonitor) const
 {
     return m_pNativeWindow->GetMonitorRect(rcMonitor);
 }
 
-bool WindowBase::GetPrimaryMonitorWorkRect(UiRect& rcWork)
+bool WindowBase::GetPrimaryMonitorWorkRect(UiRect &rcWork)
 {
     return NativeWindow::GetPrimaryMonitorWorkRect(rcWork);
 }
 
-bool WindowBase::GetMonitorWorkRect(UiRect& rcWork) const
+bool WindowBase::GetMonitorWorkRect(UiRect &rcWork) const
 {
     return m_pNativeWindow->GetMonitorWorkRect(rcWork);
 }
 
-bool WindowBase::GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) const
+bool WindowBase::GetMonitorWorkRect(const UiPoint &pt, UiRect &rcWork) const
 {
     return m_pNativeWindow->GetMonitorWorkRect(pt, rcWork);
 }
@@ -385,7 +389,8 @@ bool WindowBase::ShowWindow(ShowWindowCommands nCmdShow)
 
 void WindowBase::ShowModalFake()
 {
-    NativeWindow* pNativeWindow = GetParentWindow() != nullptr ? GetParentWindow()->NativeWnd() : nullptr;
+    NativeWindow *pNativeWindow = GetParentWindow() != nullptr ? GetParentWindow()->NativeWnd()
+                                                               : nullptr;
     m_pNativeWindow->ShowModalFake(pNativeWindow);
 }
 
@@ -484,9 +489,12 @@ bool WindowBase::IsWindowVisible() const
     return m_pNativeWindow->IsWindowVisible();
 }
 
-bool WindowBase::SetWindowPos(const InsertAfterWnd& insertAfter, int32_t X, int32_t Y, int32_t cx, int32_t cy, uint32_t uFlags)
+bool WindowBase::SetWindowPos(
+    const InsertAfterWnd &insertAfter, int32_t X, int32_t Y, int32_t cx, int32_t cy, uint32_t uFlags)
 {
-    NativeWindow* pNativeWindow = insertAfter.m_pWindow != nullptr ? insertAfter.m_pWindow->NativeWnd() : nullptr;
+    NativeWindow *pNativeWindow = insertAfter.m_pWindow != nullptr
+                                      ? insertAfter.m_pWindow->NativeWnd()
+                                      : nullptr;
     return m_pNativeWindow->SetWindowPos(pNativeWindow, insertAfter.m_hwndFlag, X, Y, cx, cy, uFlags);
 }
 
@@ -533,20 +541,21 @@ void WindowBase::Resize(int cx, int cy, bool bContainShadow, bool bNeedDpiScale)
         cy += rcShadow.top + rcShadow.bottom;
     }
     ASSERT(IsWindow());
-    WindowBase::SetWindowPos(InsertAfterWnd(), 0, 0, cx, cy, kSWP_NOZORDER | kSWP_NOMOVE | kSWP_NOACTIVATE);
+    WindowBase::SetWindowPos(
+        InsertAfterWnd(), 0, 0, cx, cy, kSWP_NOZORDER | kSWP_NOMOVE | kSWP_NOACTIVATE);
 }
 
-bool WindowBase::SetWindowIcon(const FilePath& iconFilePath)
+bool WindowBase::SetWindowIcon(const FilePath &iconFilePath)
 {
     return m_pNativeWindow->SetWindowIcon(iconFilePath);
 }
 
-bool WindowBase::SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName)
+bool WindowBase::SetWindowIcon(const std::vector<uint8_t> &iconFileData, const DString &iconFileName)
 {
     return m_pNativeWindow->SetWindowIcon(iconFileData, iconFileName);
 }
 
-void WindowBase::SetText(const DString& strText)
+void WindowBase::SetText(const DString &strText)
 {
     m_pNativeWindow->SetText(strText);
 }
@@ -556,19 +565,19 @@ DString WindowBase::GetText() const
     return m_pNativeWindow->GetText();
 }
 
-void WindowBase::SetTextId(const DString& strTextId)
+void WindowBase::SetTextId(const DString &strTextId)
 {
     ASSERT(IsWindow());
     m_textId = strTextId;
-    m_pNativeWindow->SetText(GlobalManager::Instance().Lang().GetStringByID(strTextId));  
+    m_pNativeWindow->SetText(GlobalManager::Instance().Lang().GetStringByID(strTextId));
 }
 
-const DString& WindowBase::GetTextId() const
+const DString &WindowBase::GetTextId() const
 {
     return m_textId;
 }
 
-const DString& WindowBase::GetWindowId() const
+const DString &WindowBase::GetWindowId() const
 {
     return m_windowId;
 }
@@ -579,14 +588,14 @@ static std::string generate_12digit_random()
     std::random_device rd;
     std::mt19937_64 generator(rd());
     std::uniform_int_distribution<int64_t> distribution(
-        100000000000,  // 最小12位数
-        999999999999   // 最大12位数
+        100000000000, // 最小12位数
+        999999999999  // 最大12位数
     );
 
     return std::to_string(distribution(generator));
 }
 
-void WindowBase::SetWindowId(const DString& windowId)
+void WindowBase::SetWindowId(const DString &windowId)
 {
     m_windowId = windowId;
     if (m_windowId.empty()) {
@@ -595,12 +604,12 @@ void WindowBase::SetWindowId(const DString& windowId)
     }
 }
 
-const DString& WindowBase::GetWindowClassName() const
+const DString &WindowBase::GetWindowClassName() const
 {
     return m_windowClassName;
 }
 
-const DpiManager& WindowBase::Dpi() const
+const DpiManager &WindowBase::Dpi() const
 {
     return (m_dpi != nullptr) ? *m_dpi : GlobalManager::Instance().Dpi();
 }
@@ -612,10 +621,13 @@ bool WindowBase::ChangeDisplayScale(uint32_t nNewDisplayScaleFactor, bool bDisab
         return false;
     }
     //DPI缩放比值限制在60到300之间(小于50的时候，会出问题，比如原来是1的，经过DPI转换后，会变成0，导致很多逻辑失效)
-    const uint32_t nDisplayScaleFactorMin = (uint32_t)(DUILIB_DISPLAY_SCALE_MIN * 100 + 0.5f);
-    const uint32_t nDisplayScaleFactorMax = (uint32_t)(DUILIB_DISPLAY_SCALE_MAX * 100 + 0.5f);
-    ASSERT((nNewDisplayScaleFactor >= nDisplayScaleFactorMin) && (nNewDisplayScaleFactor <= nDisplayScaleFactorMax)) ;
-    if ((nNewDisplayScaleFactor < nDisplayScaleFactorMin) || (nNewDisplayScaleFactor > nDisplayScaleFactorMax)) {
+    const uint32_t nDisplayScaleFactorMin = (uint32_t) (DUILIB_DISPLAY_SCALE_MIN * 100 + 0.5f);
+    const uint32_t nDisplayScaleFactorMax = (uint32_t) (DUILIB_DISPLAY_SCALE_MAX * 100 + 0.5f);
+    ASSERT(
+        (nNewDisplayScaleFactor >= nDisplayScaleFactorMin)
+        && (nNewDisplayScaleFactor <= nDisplayScaleFactorMax));
+    if ((nNewDisplayScaleFactor < nDisplayScaleFactorMin)
+        || (nNewDisplayScaleFactor > nDisplayScaleFactorMax)) {
         return false;
     }
 
@@ -661,8 +673,9 @@ void WindowBase::OnProcessDisplayScaleChangedMsg(float fNewDisplayScale, float f
     }
     //更新全局DPI管理器的DPI值
     float fMonitorDisplayScale = MonitorUtil::GetPrimaryMonitorDisplayScale();
-    DpiManager& dpi = GlobalManager::Instance().Dpi();
-    if (!dpi.IsUserDefinedDpi() && dpi.IsDpiAware() && !IsFloatEqual(fMonitorDisplayScale, dpi.GetDisplayScale())) {
+    DpiManager &dpi = GlobalManager::Instance().Dpi();
+    if (!dpi.IsUserDefinedDpi() && dpi.IsDpiAware()
+        && !IsFloatEqual(fMonitorDisplayScale, dpi.GetDisplayScale())) {
         dpi.SetDisplayScale(fMonitorDisplayScale, dpi.GetPixelDensity());
     }
 
@@ -685,7 +698,7 @@ void WindowBase::OnProcessDisplayScaleChangedMsg(float fNewDisplayScale, float f
 
         //按新的DPI更新窗口布局
         if (nOldScaleFactor != nNewScaleFactor) {
-            OnDisplayScaleChanged(nOldScaleFactor, nNewScaleFactor);            
+            OnDisplayScaleChanged(nOldScaleFactor, nNewScaleFactor);
         }
     }
 
@@ -723,7 +736,6 @@ bool WindowBase::NeedSetWindowRgn()
     return true;
 }
 
-
 void WindowBase::UpdateWindowRGN(bool bRedraw)
 {
     m_bWindowRgnUpdated = true;
@@ -738,8 +750,7 @@ void WindowBase::UpdateWindowRGN(bool bRedraw)
     if (IsUseSystemCaption() || IsUseSystemShadow() || IsWindowMinimized() || IsWindowMaximized()) {
         //使用系统工具栏，窗口最小化，窗口最大化的情况下，关闭RGN设置
         ClearWindowRgn(bRedraw);
-    }
-    else {
+    } else {
         //其他情况下
         UiSize szRoundCorner = GetWindowRgnRoundCorner();
         if (szRoundCorner.cx > 0 && szRoundCorner.cy > 0) {
@@ -747,9 +758,8 @@ void WindowBase::UpdateWindowRGN(bool bRedraw)
             UiRect rcWnd;
             GetWindowRect(rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
-            SetWindowRoundRectRgn(rcWnd, (float)szRoundCorner.cx, (float)szRoundCorner.cy, bRedraw);
-        }
-        else {
+            SetWindowRoundRectRgn(rcWnd, (float) szRoundCorner.cx, (float) szRoundCorner.cy, bRedraw);
+        } else {
             //配置为直角窗口
             //不需要设置RGN的时候，使用与窗口大小相同的矩形RGN，而不是使用默认值（因为默认情况下，窗口的左上角和右上角是圆角，左下角和右下角是直角）
             UiRect rcWnd;
@@ -767,13 +777,13 @@ UiSize WindowBase::GetWindowRgnRoundCorner() const
     return GetRoundCorner();
 }
 
-bool WindowBase::SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw)
+bool WindowBase::SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw)
 {
     m_bWindowRgnSetFlag = true;
     return m_pNativeWindow->SetWindowRoundRectRgn(rcWnd, rx, ry, bRedraw);
 }
 
-bool WindowBase::SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw)
+bool WindowBase::SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw)
 {
     m_bWindowRgnSetFlag = true;
     return m_pNativeWindow->SetWindowRectRgn(rcWnd, bRedraw);
@@ -785,7 +795,7 @@ void WindowBase::ClearWindowRgn(bool bRedraw)
     m_pNativeWindow->ClearWindowRgn(bRedraw);
 }
 
-void WindowBase::Invalidate(const UiRect& rcItem)
+void WindowBase::Invalidate(const UiRect &rcItem)
 {
     GlobalManager::Instance().AssertUIThread();
     m_pNativeWindow->Invalidate(rcItem);
@@ -801,12 +811,12 @@ void WindowBase::KeepParentActive()
     m_pNativeWindow->KeepParentActive();
 }
 
-const UiRect& WindowBase::GetSizeBox() const
+const UiRect &WindowBase::GetSizeBox() const
 {
     return m_rcSizeBox;
 }
 
-void WindowBase::SetSizeBox(const UiRect& rcSizeBox, bool bNeedDpiScale)
+void WindowBase::SetSizeBox(const UiRect &rcSizeBox, bool bNeedDpiScale)
 {
     m_rcSizeBox = rcSizeBox;
     if (bNeedDpiScale) {
@@ -826,12 +836,12 @@ void WindowBase::SetSizeBox(const UiRect& rcSizeBox, bool bNeedDpiScale)
     }
 }
 
-const UiRect& WindowBase::GetCaptionRect() const
+const UiRect &WindowBase::GetCaptionRect() const
 {
     return m_rcCaption;
 }
 
-void WindowBase::SetCaptionRect(const UiRect& rcCaption, bool bNeedDpiScale)
+void WindowBase::SetCaptionRect(const UiRect &rcCaption, bool bNeedDpiScale)
 {
     m_rcCaption = rcCaption;
     if (bNeedDpiScale) {
@@ -839,12 +849,12 @@ void WindowBase::SetCaptionRect(const UiRect& rcCaption, bool bNeedDpiScale)
     }
 }
 
-const UiRect& WindowBase::GetSysMenuRect() const
+const UiRect &WindowBase::GetSysMenuRect() const
 {
     return m_rcSysMenuRect;
 }
 
-void WindowBase::SetSysMenuRect(const UiRect& rcSysMenuRect, bool bNeedDpiScale)
+void WindowBase::SetSysMenuRect(const UiRect &rcSysMenuRect, bool bNeedDpiScale)
 {
     m_rcSysMenuRect = rcSysMenuRect;
     if (bNeedDpiScale) {
@@ -872,7 +882,7 @@ bool WindowBase::IsEnableSysMenu() const
     return m_pNativeWindow->IsEnableSysMenu();
 }
 
-const UiSize& WindowBase::GetRoundCorner() const
+const UiSize &WindowBase::GetRoundCorner() const
 {
     return m_szRoundCorner;
 }
@@ -890,8 +900,7 @@ void WindowBase::SetRoundCorner(int cx, int cy, bool bNeedDpiScale)
         if (cy != 0) {
             return;
         }
-    }
-    else {
+    } else {
         if (cy == 0) {
             return;
         }
@@ -904,32 +913,30 @@ void WindowBase::SetRoundCorner(int cx, int cy, bool bNeedDpiScale)
     m_szRoundCorner.cy = cy;
 }
 
-void WindowBase::SetWindowMaximumSize(const UiSize& szMinWindow, bool bNeedDpiScale)
+void WindowBase::SetWindowMaximumSize(const UiSize &szMinWindow, bool bNeedDpiScale)
 {
     if (bNeedDpiScale) {
         NativeWnd()->SetWindowMaximumSize(Dpi().GetScaleWindowSize(szMinWindow));
-    }
-    else {
+    } else {
         NativeWnd()->SetWindowMaximumSize(szMinWindow);
     }
 }
 
-const UiSize& WindowBase::GetWindowMaximumSize() const
+const UiSize &WindowBase::GetWindowMaximumSize() const
 {
     return NativeWnd()->GetWindowMaximumSize();
 }
 
-void WindowBase::SetWindowMinimumSize(const UiSize& szMaxWindow, bool bNeedDpiScale)
+void WindowBase::SetWindowMinimumSize(const UiSize &szMaxWindow, bool bNeedDpiScale)
 {
     if (bNeedDpiScale) {
         NativeWnd()->SetWindowMinimumSize(Dpi().GetScaleWindowSize(szMaxWindow));
-    }
-    else {
+    } else {
         NativeWnd()->SetWindowMinimumSize(szMaxWindow);
     }
 }
 
-const UiSize& WindowBase::GetWindowMinimumSize() const
+const UiSize &WindowBase::GetWindowMinimumSize() const
 {
     return NativeWnd()->GetWindowMinimumSize();
 }
@@ -939,7 +946,7 @@ int32_t WindowBase::SetWindowHotKey(uint8_t wVirtualKeyCode, uint8_t wModifiers)
     return m_pNativeWindow->SetWindowHotKey(wVirtualKeyCode, wModifiers);
 }
 
-bool WindowBase::GetWindowHotKey(uint8_t& wVirtualKeyCode, uint8_t& wModifiers) const
+bool WindowBase::GetWindowHotKey(uint8_t &wVirtualKeyCode, uint8_t &wModifiers) const
 {
     return m_pNativeWindow->GetWindowHotKey(wVirtualKeyCode, wModifiers);
 }
@@ -954,17 +961,17 @@ bool WindowBase::UnregisterHotKey(int32_t id)
     return m_pNativeWindow->UnregisterHotKey(id);
 }
 
-const UiPoint& WindowBase::GetLastMousePos() const
+const UiPoint &WindowBase::GetLastMousePos() const
 {
     return m_pNativeWindow->GetLastMousePos();
 }
 
-void WindowBase::SetLastMousePos(const UiPoint& pt)
+void WindowBase::SetLastMousePos(const UiPoint &pt)
 {
     m_pNativeWindow->SetLastMousePos(pt);
 }
 
-void* WindowBase::GetWindowHandle() const
+void *WindowBase::GetWindowHandle() const
 {
     return m_pNativeWindow->GetWindowHandle();
 }
@@ -992,17 +999,17 @@ void WindowBase::OnNativeWindowEnterFullscreen()
 
 void WindowBase::OnNativeWindowExitFullscreen()
 {
-    NotifyWindowExitFullscreen();   //供Window子类处理业务
-    OnWindowExitFullscreen();       //供应用层处理业务
+    NotifyWindowExitFullscreen(); //供Window子类处理业务
+    OnWindowExitFullscreen();     //供应用层处理业务
     SendWindowEvent(kWindowExitFullscreenMsg);
 }
 
-const DpiManager& WindowBase::OnNativeGetDpi() const
+const DpiManager &WindowBase::OnNativeGetDpi() const
 {
     return Dpi();
 }
 
-void WindowBase::OnNativeGetShadowCorner(UiPadding& rcShadow) const
+void WindowBase::OnNativeGetShadowCorner(UiPadding &rcShadow) const
 {
     GetCurrentShadowCorner(rcShadow);
 }
@@ -1017,34 +1024,35 @@ void WindowBase::OnNativeUseSystemCaptionBarChanged()
     OnUseSystemCaptionBarChanged();
 }
 
-void WindowBase::OnNativeGetCaptionRect(UiRect& captionRect) const
+void WindowBase::OnNativeGetCaptionRect(UiRect &captionRect) const
 {
     captionRect = GetCaptionRect();
 }
 
-void WindowBase::OnNativeGetSysMenuRect(UiRect& sysMenuRect) const
+void WindowBase::OnNativeGetSysMenuRect(UiRect &sysMenuRect) const
 {
     sysMenuRect = GetSysMenuRect();
 }
 
-bool WindowBase::OnNativeIsPtInCaptionBarControl(const UiPoint& pt) const
+bool WindowBase::OnNativeIsPtInCaptionBarControl(const UiPoint &pt) const
 {
     return IsPtInCaptionBarControl(pt);
 }
 
-bool WindowBase::OnNativeHasMinMaxBox(bool& bMinimizeBox, bool& bMaximizeBox) const
+bool WindowBase::OnNativeHasMinMaxBox(bool &bMinimizeBox, bool &bMaximizeBox) const
 {
     return HasMinMaxBox(bMinimizeBox, bMaximizeBox);
 }
 
-bool WindowBase::OnNativeIsPtInMaximizeRestoreButton(const UiPoint& pt) const
+bool WindowBase::OnNativeIsPtInMaximizeRestoreButton(const UiPoint &pt) const
 {
     return IsPtInMaximizeRestoreButton(pt);
 }
 
 void WindowBase::OnNativePreCloseWindow()
 {
-    NativeWindow* pNativeWindow = GetParentWindow() != nullptr ? GetParentWindow()->NativeWnd() : nullptr;
+    NativeWindow *pNativeWindow = GetParentWindow() != nullptr ? GetParentWindow()->NativeWnd()
+                                                               : nullptr;
     m_pNativeWindow->OnCloseModalFake(pNativeWindow);
     PreCloseWindow();
 }
@@ -1059,12 +1067,12 @@ bool WindowBase::OnNativePreparePaint()
     return OnPreparePaint();
 }
 
-IRender* WindowBase::OnNativeGetRender() const
+IRender *WindowBase::OnNativeGetRender() const
 {
     return GetRender();
 }
 
-Control* WindowBase::OnNativeFindControl(const UiPoint& pt) const
+Control *WindowBase::OnNativeFindControl(const UiPoint &pt) const
 {
     return OnFindControl(pt);
 }
@@ -1074,7 +1082,8 @@ bool WindowBase::OnNativeRequestSetLayeredWindow(bool bIsLayeredWindow, bool bRe
     return OnRequestSetLayeredWindow(bIsLayeredWindow, bRedraw);
 }
 
-void WindowBase::OnNativeDisplayResolutionChangedMsg(int32_t nColorDepth, int32_t nScreenWidth, int32_t nScreenHeight)
+void WindowBase::OnNativeDisplayResolutionChangedMsg(
+    int32_t nColorDepth, int32_t nScreenWidth, int32_t nScreenHeight)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     OnDisplayResolutionChangedMsg(nColorDepth, nScreenWidth, nScreenHeight);
@@ -1083,7 +1092,7 @@ void WindowBase::OnNativeDisplayResolutionChangedMsg(int32_t nColorDepth, int32_
         displayResolution.m_nColorDepth = nColorDepth;
         displayResolution.m_nScreenWidth = nScreenWidth;
         displayResolution.m_nScreenHeight = nScreenHeight;
-        SendWindowEvent(kWindowDisplayResolutionChangedMsg, (WPARAM)&displayResolution);
+        SendWindowEvent(kWindowDisplayResolutionChangedMsg, (WPARAM) &displayResolution);
     }
 }
 
@@ -1095,7 +1104,7 @@ void WindowBase::OnNativeDisplayScaleChangedMsg(float fNewDisplayScale, float fN
         WindowDisplayScaleData displayScale;
         displayScale.m_fNewDisplayScale = fNewDisplayScale;
         displayScale.m_fNewPixelDensity = fNewPixelDensity;
-        SendWindowEvent(kWindowDisplayScaleChangedMsg, (WPARAM)&displayScale);
+        SendWindowEvent(kWindowDisplayScaleChangedMsg, (WPARAM) &displayScale);
     }
 }
 
@@ -1105,7 +1114,7 @@ void WindowBase::OnNativeDwmCompositionChangedMsg(bool bDwmCompositionEnabled)
     OnDwmCompositionChangedMsg(bDwmCompositionEnabled);
     if (!windowFlag.expired()) {
         SendWindowEvent(kWindowDwmCompositionChangedMsg, bDwmCompositionEnabled ? 1 : 0);
-    }    
+    }
 }
 
 void WindowBase::OnNativeProcessDisplayScaleChangedMsg(float fNewDisplayScale, float fNewPixelDensity)
@@ -1118,7 +1127,7 @@ void WindowBase::OnNativeFinalMessage()
     if (IsChildWindow() || GlobalManager::Instance().Windows().HasWindowBase(this)) {
         //发送一个窗口关闭事件
         std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
-        WPARAM wParam = (WPARAM)GetCloseParam();
+        WPARAM wParam = (WPARAM) GetCloseParam();
         SendWindowEvent(kWindowCloseMsg, wParam);
         if (windowFlag.expired()) {
             return;
@@ -1127,7 +1136,7 @@ void WindowBase::OnNativeFinalMessage()
     FinalMessage();
 }
 
-LRESULT WindowBase::OnNativeWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+LRESULT WindowBase::OnNativeWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled)
 {
     LRESULT lResult = 0;
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
@@ -1143,14 +1152,14 @@ LRESULT WindowBase::OnNativeWindowMessage(UINT uMsg, WPARAM wParam, LPARAM lPara
         }
     }
 
-    //第二优先级：派发给子类回调函数（子类可以通过设置bHandled为true来截获消息处理）   
+    //第二优先级：派发给子类回调函数（子类可以通过设置bHandled为true来截获消息处理）
     if (!bHandled && !windowFlag.expired()) {
         lResult = OnWindowMessage(uMsg, wParam, lParam, bHandled);
     }
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeWindowPosChangedMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeWindowPosChangedMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnWindowPosChangedMsg(nativeMsg, bHandled);
@@ -1160,7 +1169,8 @@ LRESULT WindowBase::OnNativeWindowPosChangedMsg(const NativeMsg& nativeMsg, bool
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWindowSize, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeSizeMsg(
+    WindowSizeType sizeType, const UiSize &newWindowSize, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     UpdateWindowRGN(true);
@@ -1168,7 +1178,7 @@ LRESULT WindowBase::OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWi
     if (windowFlag.expired()) {
         return lResult;
     }
-    SendWindowEvent(kWindowSizeMsg, (WPARAM)sizeType);
+    SendWindowEvent(kWindowSizeMsg, (WPARAM) sizeType);
     if (windowFlag.expired()) {
         return lResult;
     }
@@ -1186,15 +1196,13 @@ LRESULT WindowBase::OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWi
             m_windowSizeState = WindowSizeState::kMaximized;
             SendWindowEvent(kWindowMaximizedMsg);
         }
-    }
-    else if (sizeType == WindowSizeType::kSIZE_RESTORED) {
+    } else if (sizeType == WindowSizeType::kSIZE_RESTORED) {
         //还原
         if (m_windowSizeState != WindowSizeState::kRestored) {
             m_windowSizeState = WindowSizeState::kRestored;
             SendWindowEvent(kWindowRestoredMsg);
         }
-    }
-    else if (sizeType == WindowSizeType::kSIZE_MINIMIZED) {
+    } else if (sizeType == WindowSizeType::kSIZE_MINIMIZED) {
         //最小化
         m_windowSizeState = WindowSizeState::kMinimized;
         SendWindowEvent(kWindowMaximizedMsg);
@@ -1202,7 +1210,8 @@ LRESULT WindowBase::OnNativeSizeMsg(WindowSizeType sizeType, const UiSize& newWi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMoveMsg(const UiPoint& ptTopLeft, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMoveMsg(
+    const UiPoint &ptTopLeft, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMoveMsg(ptTopLeft, nativeMsg, bHandled);
@@ -1212,7 +1221,7 @@ LRESULT WindowBase::OnNativeMoveMsg(const UiPoint& ptTopLeft, const NativeMsg& n
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeShowWindowMsg(bool bShow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeShowWindowMsg(bool bShow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnShowWindowMsg(bShow, nativeMsg, bHandled);
@@ -1222,7 +1231,8 @@ LRESULT WindowBase::OnNativeShowWindowMsg(bool bShow, const NativeMsg& nativeMsg
     return lResult;
 }
 
-LRESULT WindowBase::OnNativePaintMsg(const UiRect& rcPaint, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativePaintMsg(
+    const UiRect &rcPaint, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnPaintMsg(rcPaint, nativeMsg, bHandled);
@@ -1253,70 +1263,74 @@ LRESULT WindowBase::OnNativePaintMsg(const UiRect& rcPaint, const NativeMsg& nat
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeSetFocusMsg(INativeWindow* pLostFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeSetFocusMsg(
+    INativeWindow *pLostFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
-    WindowBase* pLostFocusWindowBase = nullptr;
+    WindowBase *pLostFocusWindowBase = nullptr;
     if (pLostFocusWindow != nullptr) {
-        pLostFocusWindowBase = dynamic_cast<WindowBase*>(pLostFocusWindow);
+        pLostFocusWindowBase = dynamic_cast<WindowBase *>(pLostFocusWindow);
     }
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnSetFocusMsg(pLostFocusWindowBase, nativeMsg, bHandled);
     if (!windowFlag.expired()) {
-        SendWindowEvent(kWindowSetFocusMsg, (WPARAM)pLostFocusWindowBase);
-    }    
+        SendWindowEvent(kWindowSetFocusMsg, (WPARAM) pLostFocusWindowBase);
+    }
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeKillFocusMsg(INativeWindow* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeKillFocusMsg(
+    INativeWindow *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
-    WindowBase* pSetFocusWindowBase = nullptr;
+    WindowBase *pSetFocusWindowBase = nullptr;
     if (pSetFocusWindow != nullptr) {
-        pSetFocusWindowBase = dynamic_cast<WindowBase*>(pSetFocusWindow);
+        pSetFocusWindowBase = dynamic_cast<WindowBase *>(pSetFocusWindow);
     }
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnKillFocusMsg(pSetFocusWindowBase, nativeMsg, bHandled);
     if (!windowFlag.expired()) {
-        SendWindowEvent(kWindowKillFocusMsg, (WPARAM)pSetFocusWindowBase);
+        SendWindowEvent(kWindowKillFocusMsg, (WPARAM) pSetFocusWindowBase);
     }
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeImeSetContextMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeImeSetContextMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnImeSetContextMsg(nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeImeStartCompositionMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeImeStartCompositionMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnImeStartCompositionMsg(nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeImeCompositionMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeImeCompositionMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnImeCompositionMsg(nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeImeEndCompositionMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeImeEndCompositionMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnImeEndCompositionMsg(nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeSetCursorMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeSetCursorMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnSetCursorMsg(nativeMsg, bHandled);
     if (!windowFlag.expired()) {
         SendWindowEvent(kWindowSetCursorMsg);
-    }    
+    }
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeContextMenuMsg(const UiPoint& pt, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeContextMenuMsg(
+    const UiPoint &pt, const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnContextMenuMsg(pt, nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeKeyDownMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnKeyDownMsg(vkCode, modifierKey, nativeMsg, bHandled);
@@ -1334,7 +1348,8 @@ LRESULT WindowBase::OnNativeKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierK
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeKeyUpMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeKeyUpMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnKeyUpMsg(vkCode, modifierKey, nativeMsg, bHandled);
@@ -1352,17 +1367,28 @@ LRESULT WindowBase::OnNativeKeyUpMsg(VirtualKeyCode vkCode, uint32_t modifierKey
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeCharMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeCharMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnCharMsg(vkCode, modifierKey, nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeHotKeyMsg(int32_t hotkeyId, VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeHotKeyMsg(
+    int32_t hotkeyId,
+    VirtualKeyCode vkCode,
+    uint32_t modifierKey,
+    const NativeMsg &nativeMsg,
+    bool &bHandled)
 {
     return OnHotKeyMsg(hotkeyId, vkCode, modifierKey, nativeMsg, bHandled);
 }
 
-LRESULT WindowBase::OnNativeMouseWheelMsg(int32_t wheelDelta, const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseWheelMsg(
+    int32_t wheelDelta,
+    const UiPoint &pt,
+    uint32_t modifierKey,
+    const NativeMsg &nativeMsg,
+    bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseWheelMsg(wheelDelta, pt, modifierKey, nativeMsg, bHandled);
@@ -1381,17 +1407,19 @@ LRESULT WindowBase::OnNativeMouseWheelMsg(int32_t wheelDelta, const UiPoint& pt,
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseMoveMsg(const UiPoint& pt, uint32_t modifierKey, bool bFromNC, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseMoveMsg(
+    const UiPoint &pt, uint32_t modifierKey, bool bFromNC, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseMoveMsg(pt, modifierKey, bFromNC, nativeMsg, bHandled);
     if (!windowFlag.expired()) {
         SendWindowMouseEvent(kWindowMouseMoveMsg, pt, modifierKey);
-    }    
+    }
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseHoverMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseHoverMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseHoverMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1401,7 +1429,7 @@ LRESULT WindowBase::OnNativeMouseHoverMsg(const UiPoint& pt, uint32_t modifierKe
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseLeaveMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseLeaveMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseLeaveMsg(nativeMsg, bHandled);
@@ -1411,7 +1439,8 @@ LRESULT WindowBase::OnNativeMouseLeaveMsg(const NativeMsg& nativeMsg, bool& bHan
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseLButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseLButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseLButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1421,7 +1450,8 @@ LRESULT WindowBase::OnNativeMouseLButtonDownMsg(const UiPoint& pt, uint32_t modi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseLButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseLButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseLButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1431,7 +1461,8 @@ LRESULT WindowBase::OnNativeMouseLButtonUpMsg(const UiPoint& pt, uint32_t modifi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseLButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseLButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseLButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1441,7 +1472,8 @@ LRESULT WindowBase::OnNativeMouseLButtonDbClickMsg(const UiPoint& pt, uint32_t m
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseRButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseRButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseRButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1451,7 +1483,8 @@ LRESULT WindowBase::OnNativeMouseRButtonDownMsg(const UiPoint& pt, uint32_t modi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseRButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseRButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseRButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1461,7 +1494,8 @@ LRESULT WindowBase::OnNativeMouseRButtonUpMsg(const UiPoint& pt, uint32_t modifi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseRButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseRButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseRButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1471,7 +1505,8 @@ LRESULT WindowBase::OnNativeMouseRButtonDbClickMsg(const UiPoint& pt, uint32_t m
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseMButtonDownMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseMButtonDownMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseMButtonDownMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1481,7 +1516,8 @@ LRESULT WindowBase::OnNativeMouseMButtonDownMsg(const UiPoint& pt, uint32_t modi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseMButtonUpMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseMButtonUpMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseMButtonUpMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1491,7 +1527,8 @@ LRESULT WindowBase::OnNativeMouseMButtonUpMsg(const UiPoint& pt, uint32_t modifi
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeMouseMButtonDbClickMsg(const UiPoint& pt, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeMouseMButtonDbClickMsg(
+    const UiPoint &pt, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnMouseMButtonDbClickMsg(pt, modifierKey, nativeMsg, bHandled);
@@ -1501,7 +1538,7 @@ LRESULT WindowBase::OnNativeMouseMButtonDbClickMsg(const UiPoint& pt, uint32_t m
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeCaptureChangedMsg(const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeCaptureChangedMsg(const NativeMsg &nativeMsg, bool &bHandled)
 {
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     LRESULT lResult = OnCaptureChangedMsg(nativeMsg, bHandled);
@@ -1511,29 +1548,31 @@ LRESULT WindowBase::OnNativeCaptureChangedMsg(const NativeMsg& nativeMsg, bool& 
     return lResult;
 }
 
-LRESULT WindowBase::OnNativeWindowCloseMsg(uint32_t wParam, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT WindowBase::OnNativeWindowCloseMsg(
+    uint32_t wParam, const NativeMsg &nativeMsg, bool &bHandled)
 {
     return OnWindowCloseMsg(wParam, nativeMsg, bHandled);
 }
 
-void WindowBase::OnNativeWindowPosSnapped(bool bLeftSnap, bool bRightSnap, bool bTopSnap, bool bBottomSnap)
+void WindowBase::OnNativeWindowPosSnapped(
+    bool bLeftSnap, bool bRightSnap, bool bTopSnap, bool bBottomSnap)
 {
     OnWindowPosSnapped(bLeftSnap, bRightSnap, bTopSnap, bBottomSnap);
 }
 
 /** 辅助函数，判断消息是否已经处理
 */
-static bool IsDragDropMsgHandled(ControlDropType dropType, void* pDropData)
+static bool IsDragDropMsgHandled(ControlDropType dropType, void *pDropData)
 {
     bool bHandled = false;
     if (dropType == ui::kControlDropTypeWindows) {
-        const ui::ControlDropData_Windows* dropData = (const ui::ControlDropData_Windows*)pDropData;
+        const ui::ControlDropData_Windows *dropData
+            = (const ui::ControlDropData_Windows *) pDropData;
         if (dropData != nullptr) {
             bHandled = dropData->m_bHandled;
         }
-    }
-    else if (dropType == ui::kControlDropTypeSDL) {
-        const ui::ControlDropData_SDL* dropData = (const ui::ControlDropData_SDL*)pDropData;
+    } else if (dropType == ui::kControlDropTypeSDL) {
+        const ui::ControlDropData_SDL *dropData = (const ui::ControlDropData_SDL *) pDropData;
         if (dropData != nullptr) {
             bHandled = dropData->m_bHandled;
         }
@@ -1541,33 +1580,33 @@ static bool IsDragDropMsgHandled(ControlDropType dropType, void* pDropData)
     return bHandled;
 }
 
-void WindowBase::OnNativeDropEnterMsg(ControlDropType dropType, void* pDropData)
+void WindowBase::OnNativeDropEnterMsg(ControlDropType dropType, void *pDropData)
 {
     ASSERT(!IsDragDropMsgHandled(dropType, pDropData));
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     OnDropEnterMsg(dropType, pDropData);
     if (!windowFlag.expired() && !IsDragDropMsgHandled(dropType, pDropData)) {
         m_bSendDragEnterMsg = true;
-        SendWindowEvent(kWindowDropEnterMsg, (WPARAM)dropType, (LPARAM)pDropData);
+        SendWindowEvent(kWindowDropEnterMsg, (WPARAM) dropType, (LPARAM) pDropData);
     }
 }
-void WindowBase::OnNativeDropOverMsg(ControlDropType dropType, void* pDropData)
+void WindowBase::OnNativeDropOverMsg(ControlDropType dropType, void *pDropData)
 {
     ASSERT(!IsDragDropMsgHandled(dropType, pDropData));
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     OnDropOverMsg(dropType, pDropData);
     if (!windowFlag.expired() && !IsDragDropMsgHandled(dropType, pDropData)) {
-        SendWindowEvent(kWindowDropOverMsg, (WPARAM)dropType, (LPARAM)pDropData);
+        SendWindowEvent(kWindowDropOverMsg, (WPARAM) dropType, (LPARAM) pDropData);
     }
 }
 
-void WindowBase::OnNativeDropMsg(ControlDropType dropType, void* pDropData)
+void WindowBase::OnNativeDropMsg(ControlDropType dropType, void *pDropData)
 {
     ASSERT(!IsDragDropMsgHandled(dropType, pDropData));
     std::weak_ptr<WeakFlag> windowFlag = GetWeakFlag();
     OnDropMsg(dropType, pDropData);
     if (!windowFlag.expired() && !IsDragDropMsgHandled(dropType, pDropData)) {
-        SendWindowEvent(kWindowDropMsg, (WPARAM)dropType, (LPARAM)pDropData);
+        SendWindowEvent(kWindowDropMsg, (WPARAM) dropType, (LPARAM) pDropData);
     }
     if (!windowFlag.expired()) {
         //如果已经发送了Drop事件，就不需要DropLeave事件了
@@ -1607,7 +1646,7 @@ bool WindowBase::SendWindowEvent(EventType eventType, WPARAM wParam, LPARAM lPar
     return SendWindowEvent(msg);
 }
 
-bool WindowBase::SendWindowMouseEvent(EventType eventType, const UiPoint& pt, uint32_t modifierKey)
+bool WindowBase::SendWindowMouseEvent(EventType eventType, const UiPoint &pt, uint32_t modifierKey)
 {
     if (m_windowEventMap.empty()) {
         return true;
@@ -1620,7 +1659,7 @@ bool WindowBase::SendWindowMouseEvent(EventType eventType, const UiPoint& pt, ui
     return SendWindowEvent(msg);
 }
 
-bool WindowBase::SendWindowEvent(const EventArgs& msg)
+bool WindowBase::SendWindowEvent(const EventArgs &msg)
 {
     if (!m_windowEventMap.empty()) {
         auto callback = m_windowEventMap.find(msg.eventType);
@@ -1659,208 +1698,219 @@ void WindowBase::DetachWindowEventCallbackByID(EventCallbackID callbackID)
     EventUtils::RemoveEventCallbackByID(m_windowEventMap, callbackID);
 }
 
-void WindowBase::AttachWindowCreateMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowCreateMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowCreateMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowCloseMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowCloseMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowCloseMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowFirstShown(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowFirstShown(const EventCallback &callback, EventCallbackID callbackID)
 {
     ASSERT(!IsWindowFirstShown());
     m_windowEventMap[kWindowFirstShown].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowEnterFullscreenMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowEnterFullscreenMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowEnterFullscreenMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowExitFullscreenMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowExitFullscreenMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowExitFullscreenMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMaximizedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMaximizedMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMaximizedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMinimizedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMinimizedMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMinimizedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowRestoredMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowRestoredMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowRestoredMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowPosChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowPosChangedMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowPosChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowSizeMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowSizeMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowSizeMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMoveMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMoveMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMoveMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowShowWindowMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowShowWindowMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowShowWindowMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowPaintMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowPaintMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowPaintMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowSetFocusMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowSetFocusMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowSetFocusMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowKillFocusMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowKillFocusMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowKillFocusMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowSetCursorMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowSetCursorMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowSetCursorMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowKeyDownMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowKeyDownMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowKeyDownMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowKeyUpMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowKeyUpMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowKeyUpMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMouseWheelMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMouseWheelMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMouseWheelMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMouseMoveMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMouseMoveMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMouseMoveMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMouseHoverMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMouseHoverMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMouseHoverMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMouseLeaveMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMouseLeaveMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMouseLeaveMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowLButtonDownMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowLButtonDownMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowLButtonDownMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowLButtonUpMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowLButtonUpMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowLButtonUpMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowLButtonDbClickMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowLButtonDbClickMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowLButtonDbClickMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowRButtonDownMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowRButtonDownMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowRButtonDownMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowRButtonUpMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowRButtonUpMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowRButtonUpMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowRButtonDbClickMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowRButtonDbClickMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowRButtonDbClickMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMButtonDownMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMButtonDownMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMButtonDownMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMButtonUpMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMButtonUpMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMButtonUpMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowMButtonDbClickMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowMButtonDbClickMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowMButtonDbClickMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowCaptureChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowCaptureChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowCaptureChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDropEnterMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDropEnterMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDropEnterMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDropOverMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDropOverMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDropOverMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDropMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDropMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDropMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDropLeaveMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDropLeaveMsg(const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDropLeaveMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDisplayScaleChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDisplayScaleChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDisplayScaleChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDisplayResolutionChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDisplayResolutionChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDisplayResolutionChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowDwmCompositionChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowDwmCompositionChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowDwmCompositionChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowLanguageChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowLanguageChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowLanguageChangedMsg].AddEventCallback(callback, callbackID);
 }
 
-void WindowBase::AttachWindowThemeChangedMsg(const EventCallback& callback, EventCallbackID callbackID)
+void WindowBase::AttachWindowThemeChangedMsg(
+    const EventCallback &callback, EventCallbackID callbackID)
 {
     m_windowEventMap[kWindowThemeChangedMsg].AddEventCallback(callback, callbackID);
 }

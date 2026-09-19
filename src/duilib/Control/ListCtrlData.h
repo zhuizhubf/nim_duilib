@@ -5,8 +5,7 @@
 #include "duilib/Control/ListCtrlDefs.h"
 #include <unordered_map>
 
-namespace ui
-{
+namespace ui {
 /** 列表项的数据管理器
 */
 class ListCtrl;
@@ -28,13 +27,13 @@ public:
     * @param [in] pVirtualListBox 关联的虚表的接口
     * @return 返回创建后的数据项指针
     */
-    virtual ui::Control* CreateElement(ui::VirtualListBox* pVirtualListBox) override;
+    virtual ui::Control *CreateElement(ui::VirtualListBox *pVirtualListBox) override;
 
     /** 填充指定数据项
     * @param [in] pControl 数据项控件指针
     * @param [in] nElementIndex 数据元素的索引ID，范围：[0, GetElementCount())
     */
-    virtual bool FillElement(ui::Control* pControl, size_t nElementIndex) override;
+    virtual bool FillElement(ui::Control *pControl, size_t nElementIndex) override;
 
     /** 获取数据项总数
     * @return 返回数据项总数
@@ -56,7 +55,7 @@ public:
     /** 获取选择的元素列表
     * @param [in] selectedIndexs 返回当前选择的元素列表，有效范围：[0, GetElementCount())
     */
-    virtual void GetSelectedElements(std::vector<size_t>& selectedIndexs) const override;
+    virtual void GetSelectedElements(std::vector<size_t> &selectedIndexs) const override;
 
     /** 是否支持多选
     */
@@ -70,7 +69,7 @@ public:
 public:
     /** 设置视图接口
     */
-    void SetListView(IListCtrlView* pListView);
+    void SetListView(IListCtrlView *pListView);
 
     /** 设置是否自动勾选选择的数据项(作用于Header与每行)
     */
@@ -92,7 +91,7 @@ public:
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
     * @param [in] dpiManager DPI缩放管理器
     */
-    void ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale);
+    void ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale);
 
 public:
     /** 增加一列, 并刷新界面显示
@@ -131,14 +130,14 @@ public:
     * @param [in] dataItem 数据项的内容
     * @return 成功返回数据项的行索引号，失败则返回Box::InvalidIndex
     */
-    size_t AddDataItem(size_t columnId, const ListCtrlSubItemData& dataItem);
+    size_t AddDataItem(size_t columnId, const ListCtrlSubItemData &dataItem);
 
     /** 在指定行位置添加一个数据项, 并刷新界面显示
     * @param [in] itemIndex 数据项的索引号
     * @param [in] columnId 列的ID
     * @param [in] dataItem 数据项的内容
     */
-    bool InsertDataItem(size_t itemIndex, size_t columnId, const ListCtrlSubItemData& dataItem);
+    bool InsertDataItem(size_t itemIndex, size_t columnId, const ListCtrlSubItemData &dataItem);
 
     /** 删除指定行的数据项, 并刷新界面显示
     * @param [in] itemIndex 数据项的索引号
@@ -156,21 +155,21 @@ public:
     * @param [out] bChanged 返回数据是否变化
     * @param [out] bCheckChanged 返回bCheck标志是否变化
     */
-    bool SetDataItemData(size_t itemIndex, const ListCtrlItemData& itemData, 
-                         bool& bChanged, bool& bCheckChanged);
+    bool SetDataItemData(
+        size_t itemIndex, const ListCtrlItemData &itemData, bool &bChanged, bool &bCheckChanged);
 
     /** 获取数据项的行属性数据
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] itemData 关联的数据
     */
-    bool GetDataItemData(size_t itemIndex, ListCtrlItemData& itemData) const;
+    bool GetDataItemData(size_t itemIndex, ListCtrlItemData &itemData) const;
 
     /** 设置数据项的可见性, 并刷新界面显示
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] bVisible 是否可见
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemVisible(size_t itemIndex, bool bVisible, bool& bChanged);
+    bool SetDataItemVisible(size_t itemIndex, bool bVisible, bool &bChanged);
 
     /** 获取数据项的可见性
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -183,7 +182,7 @@ public:
     * @param [in] bSelected 是否选择状态
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemSelected(size_t itemIndex, bool bSelected, bool& bChanged);
+    bool SetDataItemSelected(size_t itemIndex, bool bSelected, bool &bChanged);
 
     /** 获取数据项的选择属性
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -196,7 +195,7 @@ public:
     * @param [in] imageId 图标资源Id，如果为-1表示行首不显示图标, 该ID由ImageList生成
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemImageId(size_t itemIndex, int32_t imageId, bool& bChanged);
+    bool SetDataItemImageId(size_t itemIndex, int32_t imageId, bool &bChanged);
 
     /** 获取行首的图标
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -207,14 +206,14 @@ public:
     * @param [out] bSelected 是否选择
     * @param [out] bPartSelected 是否部分选择
     */
-    void GetDataItemsSelectStatus(bool& bSelected, bool& bPartSelected) const;
+    void GetDataItemsSelectStatus(bool &bSelected, bool &bPartSelected) const;
 
     /** 设置数据项的勾选属性（每行前面的CheckBox）, 不刷新界面，由外部负责调用界面刷新
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] bChecked 是否勾选状态
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemChecked(size_t itemIndex, bool bChecked, bool& bChanged);
+    bool SetDataItemChecked(size_t itemIndex, bool bChecked, bool &bChanged);
 
     /** 获取数据项的选择属性（每行前面的CheckBox）
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -232,27 +231,28 @@ public:
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SetCheckedDataItems(const std::vector<size_t>& itemIndexs,
-                             bool bClearOthers,
-                             std::vector<size_t>& refreshIndexs);
+    void SetCheckedDataItems(
+        const std::vector<size_t> &itemIndexs,
+        bool bClearOthers,
+        std::vector<size_t> &refreshIndexs);
 
     /** 获取勾选的元素列表（行首的CheckBox打勾的数据）
     * @param [in] itemIndexs 返回当前勾选的数据项索引号，有效范围：[0, GetDataItemCount())
     */
-    void GetCheckedDataItems(std::vector<size_t>& itemIndexs) const;
+    void GetCheckedDataItems(std::vector<size_t> &itemIndexs) const;
 
     /** 获取勾选状态(bChecked)
     * @param [out] bChecked 是否勾选
     * @param [out] bPartChecked 是否部分勾选
     */
-    void GetDataItemsCheckStatus(bool& bChecked, bool& bPartChecked) const;
+    void GetDataItemsCheckStatus(bool &bChecked, bool &bPartChecked) const;
 
     /** 设置数据项的置顶状态, 不刷新界面，由外部负责调用界面刷新
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] nAlwaysAtTop 置顶状态，-1表示不置顶, 0 或者 正数表示置顶，数值越大优先级越高，优先显示在最上面
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemAlwaysAtTop(size_t itemIndex, int8_t nAlwaysAtTop, bool& bChanged);
+    bool SetDataItemAlwaysAtTop(size_t itemIndex, int8_t nAlwaysAtTop, bool &bChanged);
 
     /** 获取数据项的置顶状态
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -265,7 +265,7 @@ public:
     * @param [in] nItemHeight 行高, -1表示使用ListCtrl设置的默认行高，其他值表示本行的设置行高
     * @param [out] bChanged 返回数据是否变化
     */
-    bool SetDataItemHeight(size_t itemIndex, int32_t nItemHeight, bool& bChanged);
+    bool SetDataItemHeight(size_t itemIndex, int32_t nItemHeight, bool &bChanged);
 
     /** 获取数据项的行高
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -292,15 +292,18 @@ public:
     * @param [in] subItemData 指定数据项的内容，列序号在dataItem.nColumnIndex中指定
     * @param [out] bCheckChanged bChecked状态是否变化
     */
-    bool SetSubItemData(size_t itemIndex, size_t columnId,
-                        const ListCtrlSubItemData& subItemData, bool& bCheckChanged);
+    bool SetSubItemData(
+        size_t itemIndex,
+        size_t columnId,
+        const ListCtrlSubItemData &subItemData,
+        bool &bCheckChanged);
 
     /** 获取指定<行,列>的数据项
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [in] columnId 列的ID
     * @param [out] subItemData 指定数据项的内容
     */
-    bool GetSubItemData(size_t itemIndex, size_t columnId, ListCtrlSubItemData& subItemData) const;
+    bool GetSubItemData(size_t itemIndex, size_t columnId, ListCtrlSubItemData &subItemData) const;
 
 public:
     /** 设置指定数据项的文本，并刷新界面显示
@@ -308,7 +311,7 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] text 需要设置的文本内容
     */
-    bool SetSubItemText(size_t itemIndex, size_t columnId, const DString& text);
+    bool SetSubItemText(size_t itemIndex, size_t columnId, const DString &text);
 
     /** 获取指定数据项的文本
     * @param [in] itemIndex 数据项的索引号
@@ -350,7 +353,7 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] userDataS 需要设置的数据项关联的字符串数据
     */
-    bool SetSubItemUserDataS(size_t itemIndex, size_t columnId, const DString& userDataS);
+    bool SetSubItemUserDataS(size_t itemIndex, size_t columnId, const DString &userDataS);
 
     /** 获取指定数据项的关联用户数据（字符串）
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -365,14 +368,14 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] textColor 需要设置的文本颜色
     */
-    bool SetSubItemTextColor(size_t itemIndex, size_t columnId, const UiColor& textColor);
+    bool SetSubItemTextColor(size_t itemIndex, size_t columnId, const UiColor &textColor);
 
     /** 获取指定数据项的文本颜色，并刷新界面显示
     * @param [in] itemIndex 数据项的索引号
     * @param [in] columnId 列的ID
     * @param [out] textColor 数据项关联的文本颜色
     */
-    bool GetSubItemTextColor(size_t itemIndex, size_t columnId, UiColor& textColor) const;
+    bool GetSubItemTextColor(size_t itemIndex, size_t columnId, UiColor &textColor) const;
 
     /** 设置指定数据项的文本属性（文本对齐方式等），并刷新界面显示
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -393,14 +396,14 @@ public:
     * @param [in] columnId 列的ID
     * @param [in] bkColor 需要设置的背景颜色
     */
-    bool SetSubItemBkColor(size_t itemIndex, size_t columnId, const UiColor& bkColor);
+    bool SetSubItemBkColor(size_t itemIndex, size_t columnId, const UiColor &bkColor);
 
     /** 获取指定数据项的背景颜色
     * @param [in] itemIndex 数据项的索引号
     * @param [in] columnId 列的ID
     * @param [out] bkColor 数据项关联的背景颜色
     */
-    bool GetSubItemBkColor(size_t itemIndex, size_t columnId, UiColor& bkColor) const;
+    bool GetSubItemBkColor(size_t itemIndex, size_t columnId, UiColor &bkColor) const;
 
     /** 是否显示CheckBox
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -428,14 +431,14 @@ public:
     * @param [in] columnId 列的ID
     * @param [out] bChecked true表示勾选，false表示不勾选
     */
-    bool GetSubItemCheck(size_t itemIndex, size_t columnId, bool& bChecked) const;
+    bool GetSubItemCheck(size_t itemIndex, size_t columnId, bool &bChecked) const;
 
     /** 获取某一列的勾选状态(bChecked)
     * @param [in] columnId 列的ID
     * @param [out] bChecked 是否选择
     * @param [out] bPartChecked 是否部分选择
     */
-    void GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& bPartChecked) const;
+    void GetColumnCheckStatus(size_t columnId, bool &bChecked, bool &bPartChecked) const;
 
     /** 设置该列的图标，并刷新界面显示
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -471,15 +474,19 @@ public:
     * @param [in] pfnCompareFunc 数据比较函数
     * @param [in] pUserData 用户自定义数据，调用比较函数的时候，通过参数传回给比较函数
     */
-    bool SortDataItems(size_t nColumnId, size_t nColumnIndex,
-                       bool bSortedUp, uint8_t nSortFlag,
-                       ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData);
+    bool SortDataItems(
+        size_t nColumnId,
+        size_t nColumnIndex,
+        bool bSortedUp,
+        uint8_t nSortFlag,
+        ListCtrlDataCompareFunc pfnCompareFunc,
+        void *pUserData);
 
     /** 设置外部自定义的排序函数, 替换默认的排序函数
     * @param [in] pfnCompareFunc 数据比较函数
     * @param [in] pUserData 用户自定义数据，调用比较函数的时候，通过参数传回给比较函数
     */
-    void SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData);
+    void SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void *pUserData);
 
 public:
     /** 批量设置选择元素, 不更新界面显示
@@ -487,31 +494,32 @@ public:
     * @param [in] bClearOthers 如果为true，表示对其他已选择的进行清除选择，只保留本次设置的为选择项
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SetSelectedElements(const std::vector<size_t>& selectedIndexs,
-                             bool bClearOthers,
-                             std::vector<size_t>& refreshIndexs);
+    void SetSelectedElements(
+        const std::vector<size_t> &selectedIndexs,
+        bool bClearOthers,
+        std::vector<size_t> &refreshIndexs);
 
     /** 选择全部(排除不可见元素、置顶元素), 不更新界面显示
     * @return 如果有数据变化返回true，否则返回false
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    bool SelectAll(std::vector<size_t>& refreshIndexs);
+    bool SelectAll(std::vector<size_t> &refreshIndexs);
 
     /** 取消所有选择, 不更新界面显示，可以由外部刷新界面显示
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SelectNone(std::vector<size_t>& refreshIndexs);
+    void SelectNone(std::vector<size_t> &refreshIndexs);
 
     /** 取消所有选择(但排除部分元素), 不更新界面显示，可以由外部刷新界面显示
     * @param [in] excludeIndexs 需要排除的元素索引号，这部分元素的选择状态保持原状
     * @param [out] refreshIndexs 返回需要刷新显示的元素索引号
     */
-    void SelectNoneExclude(const std::vector<size_t>& excludeIndexs,
-                           std::vector<size_t>& refreshIndexs);
+    void SelectNoneExclude(
+        const std::vector<size_t> &excludeIndexs, std::vector<size_t> &refreshIndexs);
 
     /** 判断一个行数据是否可选择
     */
-    bool IsSelectableRowData(const ListCtrlItemData& rowData) const;
+    bool IsSelectableRowData(const ListCtrlItemData &rowData) const;
 
     /** 判断一个数据元素是否为可选择项
     * @param [in] nElementIndex 元素索引号，有效范围：[0, GetElementCount())
@@ -521,11 +529,11 @@ public:
 private:
     /** 数据转换为存储数据结构
     */
-    void SubItemToStorage(const ListCtrlSubItemData& item, Storage& storage) const;
+    void SubItemToStorage(const ListCtrlSubItemData &item, Storage &storage) const;
 
     /** 存储数据转换为结构数据
     */
-    void StorageToSubItem(const Storage& storage, ListCtrlSubItemData& item) const;
+    void StorageToSubItem(const Storage &storage, ListCtrlSubItemData &item) const;
 
     /** 判断一个数据项索引是否有效
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
@@ -554,12 +562,13 @@ private:
     * @param [in] itemIndex 数据项的索引号, 有效范围：[0, GetDataItemCount())
     * @param [out] subItemList 返回改行所有列的数据列表
     */
-    bool GetSubItemStorageList(size_t itemIndex, std::vector<ListCtrlSubItemData2Pair>& subItemList) const;
+    bool GetSubItemStorageList(
+        size_t itemIndex, std::vector<ListCtrlSubItemData2Pair> &subItemList) const;
 
 public:
     /** 获取行属性数据
     */
-    const RowDataList& GetItemDataList() const;
+    const RowDataList &GetItemDataList() const;
 
     /** 是否为标准模式（行高都为默认行高，无隐藏行，无置顶行）
     */
@@ -570,7 +579,7 @@ private:
     */
     struct StorageData
     {
-        size_t index;       //原来的数据索引号
+        size_t index; //原来的数据索引号
         StoragePtr pStorage;
     };
 
@@ -583,9 +592,14 @@ private:
     * @param [in] pfnCompareFunc 数据比较函数
     * @param [in] pUserData 用户自定义数据，调用比较函数的时候，通过参数传回给比较函数
     */
-    bool SortStorageData(std::vector<StorageData>& dataList, size_t nColumnId, size_t nColumnIndex,
-                         bool bSortedUp, uint8_t nSortFlag,
-                         ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData);
+    bool SortStorageData(
+        std::vector<StorageData> &dataList,
+        size_t nColumnId,
+        size_t nColumnIndex,
+        bool bSortedUp,
+        uint8_t nSortFlag,
+        ListCtrlDataCompareFunc pfnCompareFunc,
+        void *pUserData);
 
     /** 默认的数据比较函数
     * @param [in] a 第一个比较数据
@@ -593,7 +607,8 @@ private:
     * @param [in] nSortFlag 排序方法标志位，参见 ListCtrlSubItemSortFlag 的枚举值
     * @return 如果 (a < b)，返回true，否则返回false
     */
-    bool SortDataCompareFunc(const ListCtrlSubItemData2& a, const ListCtrlSubItemData2& b, uint8_t nSortFlag) const;
+    bool SortDataCompareFunc(
+        const ListCtrlSubItemData2 &a, const ListCtrlSubItemData2 &b, uint8_t nSortFlag) const;
 
     /** 更新个性化数据（隐藏行、行高、置顶等）
     */
@@ -602,7 +617,7 @@ private:
 private:
     /** 视图控件接口
     */
-    IListCtrlView* m_pListView;
+    IListCtrlView *m_pListView;
 
     /** 是否自动勾选选择的数据项
     */
@@ -622,7 +637,7 @@ private:
 
     /** 外部设置的排序函数附加数据
     */
-    void* m_pUserData;
+    void *m_pUserData;
 
     /** 隐藏行的个数
     */
@@ -653,6 +668,6 @@ private:
     int32_t m_nDefaultItemHeight;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_DATA_PROVIDER_H_

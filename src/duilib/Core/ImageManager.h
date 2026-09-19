@@ -4,15 +4,14 @@
 #include "duilib/Core/Callback.h"
 #include "duilib/Core/ControlPtrT.h"
 #include "duilib/Image/ImageDecoder.h"
-#include <string>
-#include <vector>
-#include <list>
-#include <unordered_map>
-#include <memory>
 #include <chrono>
+#include <list>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-namespace ui 
-{
+namespace ui {
 class ImageInfo;
 class ImageLoadParam;
 class DpiManager;
@@ -25,8 +24,8 @@ class Image;
  * @param [in] imageFullPath 该图片的完整路径
  * @return 返回true表示允许放入延迟释放队列，返回false表示组织放入延迟释放队列
  */
-using ReleaseImageCallback = std::function<bool (const std::shared_ptr<ui::IImage>& pImageData,
-                                                 const DString& imageFullPath)>;
+using ReleaseImageCallback = std::function<
+    bool(const std::shared_ptr<ui::IImage> &pImageData, const DString &imageFullPath)>;
 
 /** 图片管理器（对于图片资源的释放：延迟释放，内部有个原图图片队列，如果需要立即释放图片，则需要ReleaseImageCallback回调函数阻止放入延迟释放队列）
  */
@@ -35,8 +34,8 @@ class DUILIB_API ImageManager
 public:
     ImageManager();
     ~ImageManager();
-    ImageManager(const ImageManager&) = delete;
-    ImageManager& operator = (const ImageManager&) = delete;
+    ImageManager(const ImageManager &) = delete;
+    ImageManager &operator=(const ImageManager &) = delete;
 
 public:
     /** 加载图片 ImageInfo 对象
@@ -45,9 +44,10 @@ public:
      * @param [out] bImageDataFromCache 返回true表示从缓存获取的ImageData共享原图数据，否则表示重新加载的
      * @return 返回图片 ImageInfo 对象的智能指针
      */
-    std::shared_ptr<ImageInfo> GetImage(const ImageLoadParam& loadParam,
-                                        SvgReplaceColorCallbackFunction svgReplaceColorCallback,
-                                        bool& bImageDataFromCache);
+    std::shared_ptr<ImageInfo> GetImage(
+        const ImageLoadParam &loadParam,
+        SvgReplaceColorCallbackFunction svgReplaceColorCallback,
+        bool &bImageDataFromCache);
 
     /** 从缓存中删除所有图片
      */
@@ -57,11 +57,11 @@ public:
     * @param [in] pImageData 原图的图像数据接口
     * @param [in] imageFullPath 该图片的完整路径
     */
-    void ReleaseImage(const std::shared_ptr<IImage>& pImageData, const DString& imageFullPath);
+    void ReleaseImage(const std::shared_ptr<IImage> &pImageData, const DString &imageFullPath);
 
     /** 取消释放原图图片
     */
-    void CancelReleaseImage(const std::shared_ptr<IImage>& pImageData);
+    void CancelReleaseImage(const std::shared_ptr<IImage> &pImageData);
 
     /** 设置延迟释放图片的回调函数，可以用来阻止图片资源放入延迟释放队列，立即释放图片资源
      *   备注：如果图片资源是在虚表的子项中使用，立即释放原图资源会导致性能降低，因为虚表的元素是每次刷新都重新填充
@@ -94,53 +94,54 @@ public:
     * @param [in] pImage 图片接口
     * @param [in] imageKey 图片资源的KEY
     */
-    void AddDelayPaintData(Control* pControl, Image* pImage, const DString& imageKey);
+    void AddDelayPaintData(Control *pControl, Image *pImage, const DString &imageKey);
 
     /** 从延迟绘制列表中移除图片关联的数据
     * @param [in] pControl 图片关联的控件
     * @param [in] pImage 图片接口
     */
-    void RemoveDelayPaintData(Control* pControl);
-    void RemoveDelayPaintData(Image* pImage);
+    void RemoveDelayPaintData(Control *pControl);
+    void RemoveDelayPaintData(Image *pImage);
 
     /** 执行延迟绘制（当图片资源在子线程加载完成时调用）
     * @param [in] imageKey 图片资源的KEY
     */
-    void DelayPaintImage(const DString& imageKey);
+    void DelayPaintImage(const DString &imageKey);
 
 private:
     /** 图片信息被销毁的回调函数，用于释放图片资源
     * @param[in] pImageInfo 图片对应的 ImageInfo 对象
     */
-    static void CallImageInfoDestroy(ImageInfo* pImageInfo);
+    static void CallImageInfoDestroy(ImageInfo *pImageInfo);
 
     /** 图片数据被销毁的回调函数，用于释放图片资源的数据
     * @param[in] pImage 图片数据接口
     */
-    static void CallImageDataDestroy(IImage* pImage);
+    static void CallImageDataDestroy(IImage *pImage);
 
 private:
     /** 图片信息被创建的回调函数
     * @param[in] pImageInfo 图片对应的 ImageInfo 对象
     */
-    void OnImageInfoCreate(std::shared_ptr<ImageInfo>& pImageInfo);
+    void OnImageInfoCreate(std::shared_ptr<ImageInfo> &pImageInfo);
 
     /** 图片信息被销毁的回调函数，用于释放图片资源
      * @param[in] pImageInfo 图片对应的 ImageInfo 对象
      */
-    void OnImageInfoDestroy(ImageInfo* pImageInfo);
+    void OnImageInfoDestroy(ImageInfo *pImageInfo);
 
     /** 图片数据被创建的回调函数
      * @param[in] imageKey 图片的KEY
      * @param[in] pImage 图片数据接口
      * @param[in] fImageSizeScale 该图片的缩放比
      */
-    void OnImageDataCreate(const DString& imageKey, std::shared_ptr<IImage>& pImage, float fImageSizeScale);
+    void OnImageDataCreate(
+        const DString &imageKey, std::shared_ptr<IImage> &pImage, float fImageSizeScale);
 
     /** 图片数据被销毁的回调函数，用于释放图片资源的数据
      * @param[in] pImage 图片数据接口
      */
-    void OnImageDataDestroy(IImage* pImage);
+    void OnImageDataDestroy(IImage *pImage);
 
 private:
     /** 查找指定DPI缩放百分比下的图片，可以每个DPI设置一个图片，以提高不同DPI下的图片质量
@@ -151,11 +152,12 @@ private:
     * @param [out] dpiImageFullPath 返回指定DPI下的图片资源路径，如果没找到，则返回空串
     * @param [out] nImageFileDpiScale 图片对应的DPI缩放百分比
     */
-    bool GetDpiScaleImageFullPath(uint32_t dpiScale, 
-                                  bool bIsUseZip,
-                                  const DString& imageFullPath,
-                                  DString& dpiImageFullPath,
-                                  uint32_t& nImageFileDpiScale) const;
+    bool GetDpiScaleImageFullPath(
+        uint32_t dpiScale,
+        bool bIsUseZip,
+        const DString &imageFullPath,
+        DString &dpiImageFullPath,
+        uint32_t &nImageFileDpiScale) const;
 
     /** 查找指定DPI缩放百分比下的图片，可以每个DPI设置一个图片，以提高不同DPI下的图片质量
     *   举例：DPI缩放百分比为120（即放大到120%）的图片："image.png" 对应于 "image@120.png"
@@ -164,10 +166,11 @@ private:
     * @param [in] imageFullPath 图片资源的完整路径
     * @param [out] dpiImageFullPath 返回指定DPI下的图片资源路径，如果没找到，则返回空串
     */
-    bool FindDpiScaleImageFullPath(uint32_t dpiScale, 
-                                  bool bIsUseZip,
-                                  const DString& imageFullPath,
-                                  DString& dpiImageFullPath) const;
+    bool FindDpiScaleImageFullPath(
+        uint32_t dpiScale,
+        bool bIsUseZip,
+        const DString &imageFullPath,
+        DString &dpiImageFullPath) const;
 
     /** 获取指定DPI缩放百分比下的图片资源路径
     *   举例：DPI缩放百分比为120（即放大到120%）的图片："image.png" 对应于 "image@120.png"
@@ -175,13 +178,13 @@ private:
     * @param [in] imageFullPath 图片资源的完整路径
     * @return 返回指定DPI下的图片资源路径, 如果失败则返回空串
     */
-    DString GetDpiScaledPath(uint32_t dpiScale, const DString& imageFullPath) const;
+    DString GetDpiScaledPath(uint32_t dpiScale, const DString &imageFullPath) const;
 
     /** 生成一个图片的KEY
     * @param [in] imageFullPath 图片的完整路径
     * @param [in] svgReplaceColors SVG 图片替换颜色的字符串
     */
-    DString CreateImageKey(const DString& imageFullPath, const DString& svgReplaceColors) const;
+    DString CreateImageKey(const DString &imageFullPath, const DString &svgReplaceColors) const;
 
 private:
     /** 是否智能匹配临近的缩放百分比图片
@@ -202,15 +205,13 @@ private:
     struct TImageData
     {
         //构造函数
-        TImageData() :
-            m_fImageSizeScale(1.0f)
-        {
-        }
-        TImageData(const std::shared_ptr<IImage>& pImage, float fImageSizeScale) :
-            m_pImage(pImage),
-            m_fImageSizeScale(fImageSizeScale)
-        {
-        }
+        TImageData()
+            : m_fImageSizeScale(1.0f)
+        {}
+        TImageData(const std::shared_ptr<IImage> &pImage, float fImageSizeScale)
+            : m_pImage(pImage)
+            , m_fImageSizeScale(fImageSizeScale)
+        {}
 
         //释放的图片接口
         std::weak_ptr<IImage> m_pImage;
@@ -245,12 +246,12 @@ private:
     */
     struct TImageDelayPaintData
     {
-        ControlPtr m_pControl;          //关联的控件接口
-        ControlPtrT<Image> m_pImage;    //关联的图片接口
-        DString m_imageKey;             //图片资源的KEY
+        ControlPtr m_pControl;       //关联的控件接口
+        ControlPtrT<Image> m_pImage; //关联的图片接口
+        DString m_imageKey;          //图片资源的KEY
     };
     std::list<TImageDelayPaintData> m_delayPaintImageList;
 };
 
-}
+} // namespace ui
 #endif //UI_CORE_IMAGEMANAGER_H_

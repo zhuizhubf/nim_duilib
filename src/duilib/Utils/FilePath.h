@@ -6,45 +6,44 @@
 #include <string>
 #include <vector>
 
-namespace ui
-{
+namespace ui {
 /** 文件路径(封装std::filesystem::path，所有函数均不会抛出异常)
 */
 class DUILIB_API FilePath
 {
 public:
     FilePath();
-    FilePath(const FilePath&);
-    FilePath(FilePath&&);
+    FilePath(const FilePath &);
+    FilePath(FilePath &&);
     ~FilePath();
-    FilePath& operator=(const FilePath&);
-    FilePath& operator=(FilePath&&) noexcept;
+    FilePath &operator=(const FilePath &);
+    FilePath &operator=(FilePath &&) noexcept;
 
     /** 从字符串构造
     * @param [in] filePath 路径字符串，UTF8编码
     */
-    explicit FilePath(const std::string& filePath);
+    explicit FilePath(const std::string &filePath);
 
     /** 从字符串构造
     * @param [in] filePath 路径字符串，UTF16编码
     */
-    explicit FilePath(const std::wstring& filePath);
+    explicit FilePath(const std::wstring &filePath);
 
     /** 从字符串构造
     * @param [in] filePath 路径字符串，UTF8编码
     * @param [in] bLexicallyNormal 路径是否已经规范化
     */
-    FilePath(const std::string& filePath, bool bLexicallyNormal);
+    FilePath(const std::string &filePath, bool bLexicallyNormal);
 
     /** 从字符串构造
     * @param [in] filePath 路径字符串，UTF16编码
     * @param [in] bLexicallyNormal 路径是否已经规范化
     */
-    FilePath(const std::wstring& filePath, bool bLexicallyNormal);
+    FilePath(const std::wstring &filePath, bool bLexicallyNormal);
 
     /** 与另外一个对象交换数据
     */
-    void Swap(FilePath& r);
+    void Swap(FilePath &r);
 
 public:
     /** 是否为空
@@ -88,7 +87,7 @@ public:
     *         如果DString不是Unicode版本: Window平台返回的是Ansi编码的字符串(MBCS), 其他平台返回UTF8编码的字符串
     */
 #ifdef DUILIB_UNICODE
-    const DString& NativePath() const;
+    const DString &NativePath() const;
 #else
     DString NativePath() const;
 #endif
@@ -101,12 +100,12 @@ public:
 #ifdef DUILIB_UNICODE
     /** 转换为字符串(UTF16编码 或 UTF8编码)
     */
-    const DString& ToString() const;
+    const DString &ToString() const;
 #else
 #ifdef DUILIB_BUILD_FOR_WIN
     DString ToString() const;
 #else
-    const DString& ToString() const;
+    const DString &ToString() const;
 #endif
 #endif
 
@@ -161,41 +160,41 @@ public:
     /** 当前目录是否为另外一个目录的子目录
     * @param [in] parentPath 父目录
     */
-    bool IsSubDirectory(const FilePath& parentPath) const;
+    bool IsSubDirectory(const FilePath &parentPath) const;
 
     /** 获取父目录列表
     * @param [in] parentPathList 返回该目录的父目录列表（完整路径）
     */
-    void GetParentPathList(std::vector<FilePath>& parentPathList) const;
+    void GetParentPathList(std::vector<FilePath> &parentPathList) const;
 
     /** 路径赋值
     * @param [in] rightPath 跟随DString的编码：路径为UTF8编码或者UTF16编码
     */
-    FilePath& operator = (const DString& rightPath);
+    FilePath &operator=(const DString &rightPath);
 
     /** 路径连接: 将当前路径与右侧的路径连接后生成一个新的路径
     */
-    FilePath& JoinFilePath(const FilePath& rightPath);
+    FilePath &JoinFilePath(const FilePath &rightPath);
 
     /** 路径连接: 将当前路径与右侧的路径连接后生成一个新的路径（与JoinFilePath相同）
     */
-    FilePath& operator /= (const FilePath& rightPath);
+    FilePath &operator/=(const FilePath &rightPath);
 
     /** 将两个路径拼接成一个路径（按字符串形式拼接，不会在两个路径之间主动添加路径分隔符）
     * @param [in] rightPath 右侧路径
     */
-    FilePath& operator += (const FilePath& rightPath);
+    FilePath &operator+=(const FilePath &rightPath);
 
     /** 将两个路径拼接成一个路径（按字符串形式拼接，不会在两个路径之间主动添加路径分隔符）
     * @param [in] rightPath 跟随DString的编码：路径为UTF8编码或者UTF16编码
     */
-    FilePath& operator += (const DString& rightPath);
+    FilePath &operator+=(const DString &rightPath);
 
     /** 比较操作符
     */
-    bool operator != (const FilePath& otherPath) const noexcept;
-    bool operator == (const FilePath& otherPath) const noexcept;
-    bool operator < (const FilePath& otherPath) const noexcept;
+    bool operator!=(const FilePath &otherPath) const noexcept;
+    bool operator==(const FilePath &otherPath) const noexcept;
+    bool operator<(const FilePath &otherPath) const noexcept;
 
     /** 计算路径的Hash值
     */
@@ -215,15 +214,15 @@ private:
     bool m_bLexicallyNormal = false;
 };
 
-}
+} // namespace ui
 
 //为FilePath定义hash算法, 使其可用作为基于哈希表的容器的KEY值
 namespace std {
-    template <> struct hash<ui::FilePath> {
-        size_t operator()(const ui::FilePath& p) const {
-            return p.HashValue();
-        }
-    };
-}
+template<>
+struct hash<ui::FilePath>
+{
+    size_t operator()(const ui::FilePath &p) const { return p.HashValue(); }
+};
+} // namespace std
 
 #endif // UI_UTILS_FILE_PATH_H_

@@ -1,14 +1,11 @@
 #include "MainThread.h"
 #include "RenderForm.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -17,7 +14,7 @@ bool MainThread::OnInit()
     ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
 
     // 创建一个默认带有阴影的居中窗口
-    RenderForm* window = new RenderForm();
+    RenderForm *window = new RenderForm();
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("render"), true));
     window->ShowWindow(ui::kSW_SHOW_NORMAL);
     return true;

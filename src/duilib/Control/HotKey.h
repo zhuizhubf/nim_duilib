@@ -3,17 +3,17 @@
 
 #include "duilib/Box/HBox.h"
 
-namespace ui
-{
+namespace ui {
 class HotKeyRichEdit;
 
 /** 热键控件
 */
-class DUILIB_API HotKey: public HBox
+class DUILIB_API HotKey : public HBox
 {
     typedef HBox BaseClass;
+
 public:
-    explicit HotKey(Window* pWindow);
+    explicit HotKey(Window *pWindow);
     virtual ~HotKey() override;
 
     /** 获取控件类型
@@ -22,7 +22,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** 让控件获取焦点
      */
@@ -39,7 +39,7 @@ public:
     * @param [out] wVirtualKeyCode 虚拟键盘码，比如：VK_DOWN等
     * @param [out] wModifiers 热键组合键标志位，参见HotKeyModifiers枚举类型的值
     */
-    void GetHotKey(uint8_t& wVirtualKeyCode, uint8_t& wModifiers) const;
+    void GetHotKey(uint8_t &wVirtualKeyCode, uint8_t &wModifiers) const;
 
     /** 设置热键的值[由MAKEWORD(wVirtualKeyCode, wModifiers)生成]
     * @param [in] dwHotKey 高8位为wModifiers，低8位为wVirtualKeyCode
@@ -58,7 +58,7 @@ public:
     /** 根据显示名称设置热键
     * @param [in] hotKeyName 热键名称，比如"Ctrl + C"等
     */
-    bool SetHotKeyName(const DString& hotKeyName);
+    bool SetHotKeyName(const DString &hotKeyName);
 
 public:
     /** 获取键的显示名称
@@ -68,16 +68,15 @@ public:
     static DString GetKeyName(uint8_t wVirtualKeyCode, bool fExtended);
 
 protected:
-
     //初始化
     virtual void OnInit() override;
 
 private:
     /** 编辑框控件的接口
     */
-    HotKeyRichEdit* m_pRichEdit;
+    HotKeyRichEdit *m_pRichEdit;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_HOTKEY_H_

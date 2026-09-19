@@ -7,17 +7,16 @@
 */
 class SkFont;
 
-namespace ui 
-{
+namespace ui {
 
 /** 字体管理器接口的实现
 */
-class FontMgr_Skia: public IFontMgr
+class FontMgr_Skia : public IFontMgr
 {
 public:
     explicit FontMgr_Skia();
-    FontMgr_Skia(const FontMgr_Skia&) = delete;
-    FontMgr_Skia& operator=(const FontMgr_Skia&) = delete;
+    FontMgr_Skia(const FontMgr_Skia &) = delete;
+    FontMgr_Skia &operator=(const FontMgr_Skia &) = delete;
     virtual ~FontMgr_Skia() override;
 
 public:
@@ -31,31 +30,31 @@ public:
     * @param [out] fontName 返回字体名称
     * @return 成功返回true，失败返回false
     */
-    virtual bool GetFontName(uint32_t nIndex, DString& fontName) const override;
+    virtual bool GetFontName(uint32_t nIndex, DString &fontName) const override;
 
     /** 判断是否含有该字体
     * @param [int] fontName 字体名称
     * @return 如果含有该字体名称对应的字体返回true，否则返回false
     */
-    virtual bool HasFontName(const DString& fontName) const override;
+    virtual bool HasFontName(const DString &fontName) const override;
 
     /** 设置默认字体名称（当需要加载的字体不存在时，使用默认的字体）
     * @param [in] fontName 默认的字体名称
     */
-    virtual void SetDefaultFontName(const DString& fontName) override;
+    virtual void SetDefaultFontName(const DString &fontName) override;
 
     /** 加载指定字体文件
     * @param [in] fontFilePath 字体文件的路径（本地绝对路径）
     * @return 成功返回true，失败返回false
     */
-    virtual bool LoadFontFile(const DString& fontFilePath) override;
+    virtual bool LoadFontFile(const DString &fontFilePath) override;
 
     /** 加载指定字体数据
     * @param [in] data 字体文件的内存数据
     * @param [in] length 字体文件的内存数据长度
     * @return 成功返回true，失败返回false
     */
-    virtual bool LoadFontFileData(const void* data, size_t length) override;
+    virtual bool LoadFontFileData(const void *data, size_t length) override;
 
     /** 清除已加载的字体文件
     */
@@ -68,34 +67,34 @@ public:
     /** 设置字体回退管理器
     * @param [in] 字体回退管理器(生命周期由设置者来管理)
     */
-    virtual void SetFallbackFontMgr(IFallbackFontMgr* pFallbackFontMgr) override;
+    virtual void SetFallbackFontMgr(IFallbackFontMgr *pFallbackFontMgr) override;
 
     /** 获取字体回退管理器
     * @return 返回字体回退管理器，外部不应存储该指针
     */
-    virtual IFallbackFontMgr* GetFallbackFontMgr() const override;
+    virtual IFallbackFontMgr *GetFallbackFontMgr() const override;
 
 public:
     /** 创建Skia字体
     * @param [in] fontInfo 字体属性
     * @return 成功返回Skia字体指针，需要调用DeleteSkFont删除指针指向的字体
     */
-    SkFont* CreateSkFont(const UiFont& fontInfo);
+    SkFont *CreateSkFont(const UiFont &fontInfo);
 
     /** 删除Skia字体
     */
-    void DeleteSkFont(SkFont* pSkFont);
+    void DeleteSkFont(SkFont *pSkFont);
 
 public:
     /** 返回sk_sp<SkFontMgr>的指针(&sk_sp<SkFontMgr>)
     */
-    void* GetSkiaFontMgrPtr() const;
+    void *GetSkiaFontMgrPtr() const;
 
 private:
     /** 内部实现类
     */
     class TImpl;
-    TImpl* m_impl;
+    TImpl *m_impl;
 };
 
 } // namespace ui

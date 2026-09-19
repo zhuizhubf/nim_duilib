@@ -1,12 +1,11 @@
 #include "EasingFunctions.h"
-#include <map>
 #include <cmath>
+#include <map>
 
 ////////////////////////////////////////////////////////////////
 //效果参考：https://easings.net/
 
-namespace ui
-{
+namespace ui {
 // 定义PI常量（如果系统未定义）
 #ifndef PI
 #define PI 3.14159265358979323846
@@ -29,7 +28,8 @@ static double easeLinear(double t)
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInSine(double t) {
+static double easeInSine(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return 1.0 - cos(t * PI / 2.0); // 标准公式：1 - cos(πt/2)
 }
@@ -39,7 +39,8 @@ static double easeInSine(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutSine(double t) {
+static double easeOutSine(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return sin(t * PI / 2.0); // 标准公式：sin(πt/2)，无需修改原t
 }
@@ -49,7 +50,8 @@ static double easeOutSine(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutSine(double t) {
+static double easeInOutSine(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return -0.5 * (cos(PI * t) - 1.0); // 标准公式：-0.5*(cos(πt)-1)
 }
@@ -59,7 +61,8 @@ static double easeInOutSine(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInQuad(double t) {
+static double easeInQuad(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return t * t;
 }
@@ -69,7 +72,8 @@ static double easeInQuad(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutQuad(double t) {
+static double easeOutQuad(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return t * (2.0 - t);
 }
@@ -79,12 +83,12 @@ static double easeOutQuad(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutQuad(double t) {
+static double easeInOutQuad(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         return 2.0 * t * t;
-    }
-    else {
+    } else {
         t -= 0.5;
         return 1.0 - 2.0 * t * t; // 标准公式，避免超出0~1范围
     }
@@ -95,7 +99,8 @@ static double easeInOutQuad(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInCubic(double t) {
+static double easeInCubic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return t * t * t;
 }
@@ -105,7 +110,8 @@ static double easeInCubic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutCubic(double t) {
+static double easeOutCubic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     double temp = t - 1.0; // 临时变量，不修改原t
     return 1.0 + temp * temp * temp;
@@ -116,13 +122,13 @@ static double easeOutCubic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutCubic(double t) {
+static double easeInOutCubic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         return 4.0 * t * t * t; // 前半段：4t³
-    }
-    else {
-        double temp = 2.0 * t - 2.0; // 临时变量，不修改原t
+    } else {
+        double temp = 2.0 * t - 2.0;           // 临时变量，不修改原t
         return 1.0 + 0.5 * temp * temp * temp; // 后半段：1 - 4(1-t)³
     }
 }
@@ -132,7 +138,8 @@ static double easeInOutCubic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInQuart(double t) {
+static double easeInQuart(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     t *= t;
     return t * t;
@@ -143,7 +150,8 @@ static double easeInQuart(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutQuart(double t) {
+static double easeOutQuart(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     double temp = t - 1.0; // 临时变量，不修改原t
     temp *= temp;
@@ -155,14 +163,14 @@ static double easeOutQuart(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutQuart(double t) {
+static double easeInOutQuart(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         double temp = 2.0 * t;
         temp *= temp;
         return 0.5 * temp * temp;
-    }
-    else {
+    } else {
         double temp = 2.0 * (t - 1.0);
         temp *= temp;
         return 1.0 - 0.5 * temp * temp;
@@ -174,7 +182,8 @@ static double easeInOutQuart(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInQuint(double t) {
+static double easeInQuint(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     double t2 = t * t;
     return t * t2 * t2; // t*t²*t² = t⁵
@@ -185,7 +194,8 @@ static double easeInQuint(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutQuint(double t) {
+static double easeOutQuint(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     double temp = t - 1.0; // 临时变量，不修改原t
     double temp2 = temp * temp;
@@ -197,14 +207,14 @@ static double easeOutQuint(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutQuint(double t) {
+static double easeInOutQuint(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         double temp = 2.0 * t;
         double temp2 = temp * temp;
         return 0.5 * temp * temp2 * temp2; // 16t⁵ / 2 = 8t⁵
-    }
-    else {
+    } else {
         double temp = 2.0 * (t - 1.0);
         double temp2 = temp * temp;
         return 1.0 + 0.5 * temp * temp2 * temp2; // 1 - 8(1-t)⁵
@@ -216,7 +226,8 @@ static double easeInOutQuint(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInExpo(double t) {
+static double easeInExpo(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return t == 0.0 ? 0.0 : (pow(2.0, 8.0 * t) - 1.0) / 255.0;
 }
@@ -226,7 +237,8 @@ static double easeInExpo(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutExpo(double t) {
+static double easeOutExpo(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return t == 1.0 ? 1.0 : 1.0 - pow(2.0, -8.0 * t);
 }
@@ -236,15 +248,15 @@ static double easeOutExpo(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutExpo(double t) {
+static double easeInOutExpo(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t == 0.0 || t == 1.0) {
         return t;
     }
     if (t < 0.5) {
         return (pow(2.0, 16.0 * t) - 1.0) / 510.0;
-    }
-    else {
+    } else {
         return 1.0 - 0.5 * pow(2.0, -16.0 * (t - 0.5));
     }
 }
@@ -254,7 +266,8 @@ static double easeInOutExpo(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInCirc(double t) {
+static double easeInCirc(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return 1.0 - sqrt(1.0 - t * t);
 }
@@ -264,7 +277,8 @@ static double easeInCirc(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutCirc(double t) {
+static double easeOutCirc(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     double temp = t - 1.0;
     return sqrt(1.0 - temp * temp);
@@ -275,13 +289,13 @@ static double easeOutCirc(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutCirc(double t) {
+static double easeInOutCirc(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         double temp = 2.0 * t;
         return 0.5 * (1.0 - sqrt(1.0 - temp * temp));
-    }
-    else {
+    } else {
         double temp = 2.0 * (t - 1.0);
         return 0.5 * (sqrt(1.0 - temp * temp) + 1.0);
     }
@@ -292,7 +306,8 @@ static double easeInOutCirc(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能短暂<0）
 */
-static double easeInBack(double t) {
+static double easeInBack(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c1 = 1.70158; // 经典回退系数
     const double c3 = c1 + 1.0;
@@ -304,7 +319,8 @@ static double easeInBack(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能短暂>1）
 */
-static double easeOutBack(double t) {
+static double easeOutBack(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c1 = 1.70158;
     const double c3 = c1 + 1.0;
@@ -317,15 +333,15 @@ static double easeOutBack(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能短暂超出0~1）
 */
-static double easeInOutBack(double t) {
+static double easeInOutBack(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c1 = 1.70158;
     const double c2 = c1 * 1.525; // 缓入缓出系数
     if (t < 0.5) {
         double temp = 2.0 * t;
         return 0.5 * (temp * temp * ((c2 + 1.0) * temp - c2));
-    }
-    else {
+    } else {
         double temp = 2.0 * (t - 1.0);
         return 0.5 * (2.0 + temp * temp * ((c2 + 1.0) * temp + c2));
     }
@@ -336,7 +352,8 @@ static double easeInOutBack(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能有波动）
 */
-static double easeInElastic(double t) {
+static double easeInElastic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c4 = (2.0 * PI) / 3.0; // 弹性系数
     if (t == 0.0 || t == 1.0) {
@@ -350,7 +367,8 @@ static double easeInElastic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能有波动）
 */
-static double easeOutElastic(double t) {
+static double easeOutElastic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c4 = (2.0 * PI) / 3.0;
     if (t == 0.0 || t == 1.0) {
@@ -364,7 +382,8 @@ static double easeOutElastic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（可能有波动）
 */
-static double easeInOutElastic(double t) {
+static double easeInOutElastic(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double c5 = (2.0 * PI) / 4.5;
     if (t == 0.0 || t == 1.0) {
@@ -372,8 +391,7 @@ static double easeInOutElastic(double t) {
     }
     if (t < 0.5) {
         return -0.5 * pow(2.0, 20.0 * t - 10.0) * sin((20.0 * t - 11.125) * c5);
-    }
-    else {
+    } else {
         return pow(2.0, -20.0 * t + 10.0) * sin((20.0 * t - 11.125) * c5) * 0.5 + 1.0;
     }
 }
@@ -383,22 +401,20 @@ static double easeInOutElastic(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeOutBounce(double t) {
+static double easeOutBounce(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     const double n1 = 7.5625; // 回弹系数
-    const double d1 = 2.75;    // 回弹除数
+    const double d1 = 2.75;   // 回弹除数
     if (t < 1.0 / d1) {
         return n1 * t * t;
-    }
-    else if (t < 2.0 / d1) {
+    } else if (t < 2.0 / d1) {
         t -= 1.5 / d1;
         return n1 * t * t + 0.75;
-    }
-    else if (t < 2.5 / d1) {
+    } else if (t < 2.5 / d1) {
         t -= 2.25 / d1;
         return n1 * t * t + 0.9375;
-    }
-    else {
+    } else {
         t -= 2.625 / d1;
         return n1 * t * t + 0.984375;
     }
@@ -409,7 +425,8 @@ static double easeOutBounce(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInBounce(double t) {
+static double easeInBounce(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     return 1.0 - easeOutBounce(1.0 - t); // 复用缓出逻辑，反向实现
 }
@@ -419,12 +436,12 @@ static double easeInBounce(double t) {
 * @param t 归一化时间（0~1）
 * @return 变换后的缓动值（0~1）
 */
-static double easeInOutBounce(double t) {
+static double easeInOutBounce(double t)
+{
     t = std::fmax(0.0, std::fmin(1.0, t));
     if (t < 0.5) {
         return (1.0 - easeOutBounce(1.0 - 2.0 * t)) * 0.5;
-    }
-    else {
+    } else {
         return (easeOutBounce(2.0 * t - 1.0) + 1.0) * 0.5;
     }
 }
@@ -440,37 +457,37 @@ EasingFunction EasingFunctions::GetEasingFunction(EasingFunctionType function)
     static std::map<EasingFunctionType, EasingFunction> easingFunctions;
     if (easingFunctions.empty()) {
         // 初始化枚举与函数的映射关系
-        easingFunctions.insert(std::make_pair(EaseLinear,        easeLinear));
-        easingFunctions.insert(std::make_pair(EaseInSine,        easeInSine));
-        easingFunctions.insert(std::make_pair(EaseOutSine,       easeOutSine));
-        easingFunctions.insert(std::make_pair(EaseInOutSine,     easeInOutSine));
-        easingFunctions.insert(std::make_pair(EaseInQuad,        easeInQuad));
-        easingFunctions.insert(std::make_pair(EaseOutQuad,       easeOutQuad));
-        easingFunctions.insert(std::make_pair(EaseInOutQuad,     easeInOutQuad));
-        easingFunctions.insert(std::make_pair(EaseInCubic,       easeInCubic));
-        easingFunctions.insert(std::make_pair(EaseOutCubic,      easeOutCubic));
-        easingFunctions.insert(std::make_pair(EaseInOutCubic,    easeInOutCubic));
-        easingFunctions.insert(std::make_pair(EaseInQuart,       easeInQuart));
-        easingFunctions.insert(std::make_pair(EaseOutQuart,      easeOutQuart));
-        easingFunctions.insert(std::make_pair(EaseInOutQuart,    easeInOutQuart));
-        easingFunctions.insert(std::make_pair(EaseInQuint,       easeInQuint));
-        easingFunctions.insert(std::make_pair(EaseOutQuint,      easeOutQuint));
-        easingFunctions.insert(std::make_pair(EaseInOutQuint,    easeInOutQuint));
-        easingFunctions.insert(std::make_pair(EaseInExpo,        easeInExpo));
-        easingFunctions.insert(std::make_pair(EaseOutExpo,       easeOutExpo));
-        easingFunctions.insert(std::make_pair(EaseInOutExpo,     easeInOutExpo));
-        easingFunctions.insert(std::make_pair(EaseInCirc,        easeInCirc));
-        easingFunctions.insert(std::make_pair(EaseOutCirc,       easeOutCirc));
-        easingFunctions.insert(std::make_pair(EaseInOutCirc,     easeInOutCirc));
-        easingFunctions.insert(std::make_pair(EaseInBack,        easeInBack));
-        easingFunctions.insert(std::make_pair(EaseOutBack,       easeOutBack));
-        easingFunctions.insert(std::make_pair(EaseInOutBack,     easeInOutBack));
-        easingFunctions.insert(std::make_pair(EaseInElastic,     easeInElastic));
-        easingFunctions.insert(std::make_pair(EaseOutElastic,    easeOutElastic));
-        easingFunctions.insert(std::make_pair(EaseInOutElastic,  easeInOutElastic));
-        easingFunctions.insert(std::make_pair(EaseInBounce,      easeInBounce));
-        easingFunctions.insert(std::make_pair(EaseOutBounce,     easeOutBounce));
-        easingFunctions.insert(std::make_pair(EaseInOutBounce,   easeInOutBounce));
+        easingFunctions.insert(std::make_pair(EaseLinear, easeLinear));
+        easingFunctions.insert(std::make_pair(EaseInSine, easeInSine));
+        easingFunctions.insert(std::make_pair(EaseOutSine, easeOutSine));
+        easingFunctions.insert(std::make_pair(EaseInOutSine, easeInOutSine));
+        easingFunctions.insert(std::make_pair(EaseInQuad, easeInQuad));
+        easingFunctions.insert(std::make_pair(EaseOutQuad, easeOutQuad));
+        easingFunctions.insert(std::make_pair(EaseInOutQuad, easeInOutQuad));
+        easingFunctions.insert(std::make_pair(EaseInCubic, easeInCubic));
+        easingFunctions.insert(std::make_pair(EaseOutCubic, easeOutCubic));
+        easingFunctions.insert(std::make_pair(EaseInOutCubic, easeInOutCubic));
+        easingFunctions.insert(std::make_pair(EaseInQuart, easeInQuart));
+        easingFunctions.insert(std::make_pair(EaseOutQuart, easeOutQuart));
+        easingFunctions.insert(std::make_pair(EaseInOutQuart, easeInOutQuart));
+        easingFunctions.insert(std::make_pair(EaseInQuint, easeInQuint));
+        easingFunctions.insert(std::make_pair(EaseOutQuint, easeOutQuint));
+        easingFunctions.insert(std::make_pair(EaseInOutQuint, easeInOutQuint));
+        easingFunctions.insert(std::make_pair(EaseInExpo, easeInExpo));
+        easingFunctions.insert(std::make_pair(EaseOutExpo, easeOutExpo));
+        easingFunctions.insert(std::make_pair(EaseInOutExpo, easeInOutExpo));
+        easingFunctions.insert(std::make_pair(EaseInCirc, easeInCirc));
+        easingFunctions.insert(std::make_pair(EaseOutCirc, easeOutCirc));
+        easingFunctions.insert(std::make_pair(EaseInOutCirc, easeInOutCirc));
+        easingFunctions.insert(std::make_pair(EaseInBack, easeInBack));
+        easingFunctions.insert(std::make_pair(EaseOutBack, easeOutBack));
+        easingFunctions.insert(std::make_pair(EaseInOutBack, easeInOutBack));
+        easingFunctions.insert(std::make_pair(EaseInElastic, easeInElastic));
+        easingFunctions.insert(std::make_pair(EaseOutElastic, easeOutElastic));
+        easingFunctions.insert(std::make_pair(EaseInOutElastic, easeInOutElastic));
+        easingFunctions.insert(std::make_pair(EaseInBounce, easeInBounce));
+        easingFunctions.insert(std::make_pair(EaseOutBounce, easeOutBounce));
+        easingFunctions.insert(std::make_pair(EaseInOutBounce, easeInOutBounce));
     }
 
     // 查找对应函数
@@ -528,10 +545,14 @@ EasingFunctionType EasingFunctions::GetEasingFunctionType(DString easingFunction
     return it == easingFunctions.end() ? EaseLinear : it->second;
 }
 
-EasingFunctions::EasingFunctions(int32_t nStartValue, int32_t nEndValue, int32_t nFrameCount, EasingFunctionType easingFunctionType) :
-    m_nStartValue(nStartValue),
-    m_nEndValue(nEndValue),
-    m_nFrameCount(nFrameCount)
+EasingFunctions::EasingFunctions(
+    int32_t nStartValue,
+    int32_t nEndValue,
+    int32_t nFrameCount,
+    EasingFunctionType easingFunctionType)
+    : m_nStartValue(nStartValue)
+    , m_nEndValue(nEndValue)
+    , m_nFrameCount(nFrameCount)
 {
     m_easingFunction = GetEasingFunction(easingFunctionType);
     ASSERT(m_easingFunction != nullptr);
@@ -544,10 +565,7 @@ EasingFunctions::EasingFunctions(int32_t nStartValue, int32_t nEndValue, int32_t
     }
 }
 
-EasingFunctions::~EasingFunctions()
-{
-
-}
+EasingFunctions::~EasingFunctions() {}
 
 /** 缓动插值函数：消除浮点数精度误差，支持可选的精度截断
  * @details 核心功能是将0~1范围内的归一化时间t，通过缓动函数映射到[start, end]的数值范围，
@@ -568,8 +586,7 @@ static double InterpolateFunction(double start, double end, double t, EasingFunc
     if (!func) {
         // 无缓动函数时，使用线性插值
         result = start + (end - start) * t;
-    }
-    else {
+    } else {
         // 有缓动函数时，先计算缓动后的t值，再映射到[start, end]范围
         double easedT = func(t);
         result = start + (end - start) * easedT;
@@ -578,8 +595,7 @@ static double InterpolateFunction(double start, double end, double t, EasingFunc
     // 关键优化：t=1时强制返回目标值，消除所有浮点数运算累积的精度误差
     if (t >= 1.0) {
         result = end;
-    }
-    else if (t <= 0.0) {
+    } else if (t <= 0.0) {
         result = start;
     }
     return result;

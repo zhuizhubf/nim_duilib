@@ -6,51 +6,49 @@
 
 #include "duilib/duilib_defs.h"
 
-namespace ui
-{
+namespace ui {
 /** 缓动函数类型枚举
  * 涵盖常用的缓动曲线：正弦、二次、三次、四次、五次、指数、圆形、回退、弹性、回弹
  * 每种曲线分为In(缓入)、Out(缓出)、InOut(缓入缓出)三种形式
  */
-enum DUILIB_API EasingFunctionType: uint8_t
-{
-    EaseLinear,          // 线性函数
+enum DUILIB_API EasingFunctionType : uint8_t {
+    EaseLinear, // 线性函数
 
-    EaseInSine,          // 正弦缓入
-    EaseOutSine,         // 正弦缓出
-    EaseInOutSine,       // 正弦缓入缓出
-    EaseInQuad,          // 二次缓入
-    EaseOutQuad,         // 二次缓出
-    EaseInOutQuad,       // 二次缓入缓出
-    EaseInCubic,         // 三次缓入
-    EaseOutCubic,        // 三次缓出
-    EaseInOutCubic,      // 三次缓入缓出
-    EaseInQuart,         // 四次缓入
-    EaseOutQuart,        // 四次缓出
-    EaseInOutQuart,      // 四次缓入缓出
-    EaseInQuint,         // 五次缓入
-    EaseOutQuint,        // 五次缓出
-    EaseInOutQuint,      // 五次缓入缓出
-    EaseInExpo,          // 指数缓入
-    EaseOutExpo,         // 指数缓出
-    EaseInOutExpo,       // 指数缓入缓出
-    EaseInCirc,          // 圆形缓入
-    EaseOutCirc,         // 圆形缓出
-    EaseInOutCirc,       // 圆形缓入缓出
-    EaseInBack,          // 回退缓入（先反向再前进）
-    EaseOutBack,         // 回退缓出（超过目标再回弹）
-    EaseInOutBack,       // 回退缓入缓出
-    EaseInElastic,       // 弹性缓入
-    EaseOutElastic,      // 弹性缓出
-    EaseInOutElastic,    // 弹性缓入缓出
-    EaseInBounce,        // 回弹缓入
-    EaseOutBounce,       // 回弹缓出
-    EaseInOutBounce      // 回弹缓入缓出
+    EaseInSine,       // 正弦缓入
+    EaseOutSine,      // 正弦缓出
+    EaseInOutSine,    // 正弦缓入缓出
+    EaseInQuad,       // 二次缓入
+    EaseOutQuad,      // 二次缓出
+    EaseInOutQuad,    // 二次缓入缓出
+    EaseInCubic,      // 三次缓入
+    EaseOutCubic,     // 三次缓出
+    EaseInOutCubic,   // 三次缓入缓出
+    EaseInQuart,      // 四次缓入
+    EaseOutQuart,     // 四次缓出
+    EaseInOutQuart,   // 四次缓入缓出
+    EaseInQuint,      // 五次缓入
+    EaseOutQuint,     // 五次缓出
+    EaseInOutQuint,   // 五次缓入缓出
+    EaseInExpo,       // 指数缓入
+    EaseOutExpo,      // 指数缓出
+    EaseInOutExpo,    // 指数缓入缓出
+    EaseInCirc,       // 圆形缓入
+    EaseOutCirc,      // 圆形缓出
+    EaseInOutCirc,    // 圆形缓入缓出
+    EaseInBack,       // 回退缓入（先反向再前进）
+    EaseOutBack,      // 回退缓出（超过目标再回弹）
+    EaseInOutBack,    // 回退缓入缓出
+    EaseInElastic,    // 弹性缓入
+    EaseOutElastic,   // 弹性缓出
+    EaseInOutElastic, // 弹性缓入缓出
+    EaseInBounce,     // 回弹缓入
+    EaseOutBounce,    // 回弹缓出
+    EaseInOutBounce   // 回弹缓入缓出
 };
 
 /** 缓动函数的函数指针类型声明前置
 */
-typedef double(*EasingFunction)(double);
+typedef double (*EasingFunction)(double);
 
 /** 缓动函数的插值函数封装(供应用层使用)
 */
@@ -75,7 +73,11 @@ public:
     * @param [in] nFrameCount 动画总的帧数
     * @param [in] easingFunctionType 使用的缓动函数类型
     */
-    EasingFunctions(int32_t nStartValue, int32_t nEndValue, int32_t nFrameCount, EasingFunctionType easingFunctionType);
+    EasingFunctions(
+        int32_t nStartValue,
+        int32_t nEndValue,
+        int32_t nFrameCount,
+        EasingFunctionType easingFunctionType);
     ~EasingFunctions();
 
 public:

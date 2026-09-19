@@ -4,17 +4,17 @@
 #include "duilib/Core/Box.h"
 #include "duilib/Core/ControlPtrT.h"
 
-namespace ui 
-{
+namespace ui {
 class Window;
 
 /** 全屏时的根容器
 */
-class DUILIB_API FullscreenBox: public Box
+class DUILIB_API FullscreenBox : public Box
 {
     typedef Box BaseClass;
+
 public:
-    FullscreenBox(Window* pWindow);
+    FullscreenBox(Window *pWindow);
     virtual ~FullscreenBox() override;
 
     //控件类型
@@ -26,13 +26,14 @@ public:
     * @param [in] pFullscreenControl 需要全屏的控件接口
     * @param [in] exitButtonClass 退出全屏按钮的Class名称，如果为空表示不显示退出全屏按钮
     */
-    bool EnterControlFullscreen(Box* pOldRoot, Control* pFullscreenControl, const DString& exitButtonClass);
+    bool EnterControlFullscreen(
+        Box *pOldRoot, Control *pFullscreenControl, const DString &exitButtonClass);
 
     /** 更新全屏控件(在已经是控件全屏的状态下)
     * @param [in] pFullscreenControl 需要全屏的控件接口
     * @param [in] exitButtonClass 退出全屏按钮的Class名称，如果为空表示不显示退出全屏按钮
     */
-    bool UpdateControlFullscreen(Control* pFullscreenControl, const DString& exitButtonClass);
+    bool UpdateControlFullscreen(Control *pFullscreenControl, const DString &exitButtonClass);
 
     /** 退出控件全屏
     */
@@ -41,16 +42,16 @@ public:
     /** 处理全屏按钮的动态显示
     * @param [in] pt 当前鼠标所在位置，客户区坐标
     */
-    void ProcessFullscreenButtonMouseMove(const UiPoint& pt);
+    void ProcessFullscreenButtonMouseMove(const UiPoint &pt);
 
     /** 获取全屏显示的控件
     * @return 返回全屏显示的控件接口，如果无全屏显示的控件返回nullptr
     */
-    Control* GetFullscreenControl() const;
+    Control *GetFullscreenControl() const;
 
     /** 获取原来的Root容器
     */
-    Box* GetOldRoot() const;
+    Box *GetOldRoot() const;
 
     /** 获取窗口原来的状态是最大化
     */
@@ -63,7 +64,7 @@ public:
 private:
     /** 将控件从原来的容器中提取出来
     */
-    void RemoveControlFromBox(Control* pFullscreenControl);
+    void RemoveControlFromBox(Control *pFullscreenControl);
 
     /**还原全屏控件到原来的容器
     */
@@ -71,7 +72,7 @@ private:
 
     /** 更新"退出全屏"按钮
     */
-    void UpdateExitFullscreenBtn(const DString& exitButtonClass);
+    void UpdateExitFullscreenBtn(const DString &exitButtonClass);
 
 private:
     /** 原来的Root容器

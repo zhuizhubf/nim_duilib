@@ -4,8 +4,7 @@
 #include "duilib/Image/ImageDecoder.h"
 #include "duilib/Image/ImageUtil.h"
 
-namespace ui 
-{
+namespace ui {
 /** 图片格式解码工程类
 */
 class DUILIB_API ImageDecoderFactory
@@ -17,12 +16,12 @@ public:
     /** 添加一个图片格式解码器
     * @param [in] pImageDecoder 需要添加的图片解码器
     */
-    bool AddImageDecoder(const std::shared_ptr<IImageDecoder>& pImageDecoder);
+    bool AddImageDecoder(const std::shared_ptr<IImageDecoder> &pImageDecoder);
 
     /** 移除一个图片格式解码器
     * @param [in] pImageDecoder 需要添加的图片解码器
     */
-    bool RemoveImageDecoder(const std::shared_ptr<IImageDecoder>& pImageDecoder);
+    bool RemoveImageDecoder(const std::shared_ptr<IImageDecoder> &pImageDecoder);
 
     /** 清除所有的图片格式解码器
     */
@@ -32,12 +31,12 @@ public:
     /** 加载解码图片数据，返回解码后的图像数据
     * @param [in] decodeParam 图片解码的相关参数
     */
-    std::unique_ptr<IImage> LoadImageData(const ImageDecodeParam& decodeParam);
+    std::unique_ptr<IImage> LoadImageData(const ImageDecodeParam &decodeParam);
 
     /** 解码一个文件数据为位图(不支持多帧图片，如果图片为多帧，则只解码第一帧)
     * @param [in] decodeParam 图片解码的相关参数
     */
-    std::shared_ptr<IBitmap> DecodeImageData(const ImageDecodeParam& decodeParam);
+    std::shared_ptr<IBitmap> DecodeImageData(const ImageDecodeParam &decodeParam);
 
 private:
     /** 图片解码器

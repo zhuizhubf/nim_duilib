@@ -1,21 +1,18 @@
 #include "LangManager.h"
-#include "duilib/Utils/StringUtil.h"
-#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/FileUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
-namespace ui 
-{
-LangManager::LangManager()
-{
-}
+namespace ui {
+LangManager::LangManager() {}
 
 LangManager::~LangManager()
 {
     m_stringTable.clear();
 }
 
-bool LangManager::LoadStringTable(const FilePath& strFilePath)
+bool LangManager::LoadStringTable(const FilePath &strFilePath)
 {
     PerformanceUtil perfStat(_T("LangManager::LoadStringTable"));
     std::vector<uint8_t> fileData;
@@ -28,33 +25,30 @@ bool LangManager::LoadStringTable(const FilePath& strFilePath)
     return LoadStringTable(fileData);
 }
 
-bool LangManager::LoadStringTable(const std::vector<uint8_t>& fileData)
+bool LangManager::LoadStringTable(const std::vector<uint8_t> &fileData)
 {
     std::vector<DString> string_list;
     if (fileData.empty()) {
         return false;
     }
     size_t bomSize = 0;
-    if ((fileData.size() >= 3)   &&
-        (fileData.at(0) == 0xEF) &&
-        (fileData.at(1) == 0xBB) &&
-        (fileData.at(2) == 0xBF) ) {
+    if ((fileData.size() >= 3) && (fileData.at(0) == 0xEF) && (fileData.at(1) == 0xBB)
+        && (fileData.at(2) == 0xBF)) {
         //跳过UTF8的BOM头
         bomSize = 3;
     }
     if (fileData[fileData.size() - 1] == '\0') {
         //数据有尾0，无需拷贝
-        return LoadStringTableFromFileData((const char*)fileData.data() + bomSize);
-    }
-    else {
+        return LoadStringTableFromFileData((const char *) fileData.data() + bomSize);
+    } else {
         //数据无尾0, 拷贝一份再处理
         std::vector<uint8_t> fileDataStr(fileData);
         fileDataStr.push_back('\0');
-        return LoadStringTableFromFileData((const char*)fileDataStr.data() + bomSize);
+        return LoadStringTableFromFileData((const char *) fileDataStr.data() + bomSize);
     }
 }
 
-bool LangManager::LoadStringTableFromFileData(const char* utf8String)
+bool LangManager::LoadStringTableFromFileData(const char *utf8String)
 {
     if (utf8String == nullptr) {
         return false;
@@ -62,28 +56,29 @@ bool LangManager::LoadStringTableFromFileData(const char* utf8String)
 #ifdef DUILIB_UNICODE
     //Unicode字符串(需要先转码)
     DString stringData = StringConvert::UTF8ToT(utf8String, StringUtil::StringLen(utf8String));
-    return LoadStringTableFromStringData(stringData.c_str(), (int32_t)stringData.size());
+    return LoadStringTableFromStringData(stringData.c_str(), (int32_t) stringData.size());
 #else
     //UTF8字符串, 无需转码
     return LoadStringTableFromStringData(utf8String, -1);
 #endif
 }
 
-bool LangManager::LoadStringTableFromStringData(const DString::value_type* stringData, int32_t nStringSize)
+bool LangManager::LoadStringTableFromStringData(
+    const DString::value_type *stringData, int32_t nStringSize)
 {
     if ((stringData == nullptr) || (*stringData == _T('\0'))) {
         return false;
     }
     if (nStringSize < 0) {
-        nStringSize = (int32_t)StringUtil::StringLen(stringData);
+        nStringSize = (int32_t) StringUtil::StringLen(stringData);
     }
     if (nStringSize <= 0) {
         return true;
     }
     // 直接操作原始字符数组指针，减少开销
-    const DString::value_type* ptr = stringData;
-    const DString::value_type* start = ptr;       // 当前行的起始位置
-    const DString::value_type* const end = ptr + nStringSize; // 文本结束位置（const避免意外修改）
+    const DString::value_type *ptr = stringData;
+    const DString::value_type *start = ptr;                   // 当前行的起始位置
+    const DString::value_type *const end = ptr + nStringSize; // 文本结束位置（const避免意外修改）
 
     while (ptr < end) {
         // 遇到换行符时处理当前行
@@ -91,7 +86,7 @@ bool LangManager::LoadStringTableFromStringData(const DString::value_type* strin
             // 计算当前行长度，仅当长度>0时添加（过滤空行）
             const size_t line_len = ptr - start;
             if (line_len > 0) {
-                LoadStringTableLine(start, (int32_t)line_len);
+                LoadStringTableLine(start, (int32_t) line_len);
             }
 
             // 跳过当前换行符，并处理Windows风格的\r\n
@@ -101,8 +96,7 @@ bool LangManager::LoadStringTableFromStringData(const DString::value_type* strin
             }
             // 更新下一行的起始位置
             start = ptr;
-        }
-        else {
+        } else {
             // 非换行符，指针后移
             ++ptr;
         }
@@ -111,7 +105,7 @@ bool LangManager::LoadStringTableFromStringData(const DString::value_type* strin
     // 处理文本末尾无换行符的最后一行（过滤空行）
     const size_t last_line_len = ptr - start;
     if (last_line_len > 0) {
-        LoadStringTableLine(start, (int32_t)last_line_len);
+        LoadStringTableLine(start, (int32_t) last_line_len);
     }
     return true;
 }
@@ -119,25 +113,24 @@ bool LangManager::LoadStringTableFromStringData(const DString::value_type* strin
 // 自定义返回结构体：存储分割后的子串指针和长度
 struct SplitEqualsResult
 {
-    const DString::value_type* first_ptr;   // 等号前部分指针
-    int32_t first_len;                      // 等号前部分长度
-    const DString::value_type* second_ptr;  // 等号后部分指针
-    int32_t second_len;                     // 等号后部分长度
+    const DString::value_type *first_ptr;  // 等号前部分指针
+    int32_t first_len;                     // 等号前部分长度
+    const DString::value_type *second_ptr; // 等号后部分指针
+    int32_t second_len;                    // 等号后部分长度
 
     // 构造函数：初始化空值（避免野指针）
-    SplitEqualsResult():
-        first_ptr(nullptr),
-        first_len(0),
-        second_ptr(nullptr),
-        second_len(0)
-    {
-    }
+    SplitEqualsResult()
+        : first_ptr(nullptr)
+        , first_len(0)
+        , second_ptr(nullptr)
+        , second_len(0)
+    {}
 
     //判断是否为合法的资源字符串
     bool IsValidLanguageString() const
     {
-        return (first_ptr != nullptr) && (*first_ptr != _T('\0')) && (first_len > 0) &&
-               (second_ptr != nullptr) && (*second_ptr != _T('\0')) && (second_len > 0);
+        return (first_ptr != nullptr) && (*first_ptr != _T('\0')) && (first_len > 0)
+               && (second_ptr != nullptr) && (*second_ptr != _T('\0')) && (second_len > 0);
     }
 };
 
@@ -152,7 +145,7 @@ struct SplitEqualsResult
  *         - 等号在结尾：前半部分=完整字符串（除等号）指针+长度，后半部分=nullptr+0
  *         - 空输入：双nullptr+双0
  */
-SplitEqualsResult split_string_by_equals(const DString::value_type* lineData, int32_t nLineDataLen)
+SplitEqualsResult split_string_by_equals(const DString::value_type *lineData, int32_t nLineDataLen)
 {
     SplitEqualsResult result; // 初始化默认空值
 
@@ -174,8 +167,7 @@ SplitEqualsResult split_string_by_equals(const DString::value_type* lineData, in
         // 无等号：前半部分=完整字符串，后半部分为空
         result.first_ptr = lineData;
         result.first_len = nLineDataLen;
-    }
-    else {
+    } else {
         // 有等号：分割前半部分和后半部分
         if (equal_index > 0) {
             // 等号前有内容
@@ -192,21 +184,25 @@ SplitEqualsResult split_string_by_equals(const DString::value_type* lineData, in
 }
 
 // 自定义返回结构体：trim后的字符串指针+长度
-struct TrimStringResult {
-    const DString::value_type* ptr;  // trim后的起始指针
-    int32_t len;                     // trim后的有效长度
+struct TrimStringResult
+{
+    const DString::value_type *ptr; // trim后的起始指针
+    int32_t len;                    // trim后的有效长度
 
     // 默认构造：空值初始化，避免野指针
-    TrimStringResult() : ptr(nullptr), len(0) {}
+    TrimStringResult()
+        : ptr(nullptr)
+        , len(0)
+    {}
 
     // 便捷构造：直接初始化指针和长度
-    TrimStringResult(const DString::value_type* p, int32_t l) : ptr(p), len(l) {}
+    TrimStringResult(const DString::value_type *p, int32_t l)
+        : ptr(p)
+        , len(l)
+    {}
 
     //是否为有效的字符串
-    bool IsValidString() const
-    {
-        return (ptr != nullptr) && (*ptr != _T('\0')) && (len > 0);
-    }
+    bool IsValidString() const { return (ptr != nullptr) && (*ptr != _T('\0')) && (len > 0); }
 };
 
 /**
@@ -216,7 +212,7 @@ struct TrimStringResult {
  * @return TrimResult：trim后的起始指针 + 有效长度
  *         边界处理：全空格/空字符串返回 ptr=nullptr + len=0
  */
-TrimStringResult trim_lang_string(const DString::value_type* lineData, int32_t nLineDataLen)
+TrimStringResult trim_lang_string(const DString::value_type *lineData, int32_t nLineDataLen)
 {
     // 1. 空输入处理：指针为空 或 长度<=0
     if (lineData == nullptr || nLineDataLen <= 0) {
@@ -251,7 +247,7 @@ TrimStringResult trim_lang_string(const DString::value_type* lineData, int32_t n
     return TrimStringResult(lineData + start, valid_len);
 }
 
-bool LangManager::LoadStringTableLine(const DString::value_type* lineData, int32_t nLineDataLen)
+bool LangManager::LoadStringTableLine(const DString::value_type *lineData, int32_t nLineDataLen)
 {
     if ((lineData == nullptr) || (*lineData == _T('\0')) || (nLineDataLen <= 0)) {
         return true;
@@ -282,7 +278,8 @@ bool LangManager::LoadStringTableLine(const DString::value_type* lineData, int32
     }
 
     TrimStringResult stringIdTrim = trim_lang_string(splitResult.first_ptr, splitResult.first_len);
-    TrimStringResult stringValueTrim = trim_lang_string(splitResult.second_ptr, splitResult.second_len);
+    TrimStringResult stringValueTrim
+        = trim_lang_string(splitResult.second_ptr, splitResult.second_len);
     if (!stringIdTrim.IsValidString()) {
         ASSERT(!"LangManager::LoadStringTableLine failed: invalid line data");
         return false;
@@ -304,13 +301,12 @@ bool LangManager::LoadStringTableLine(const DString::value_type* lineData, int32
             StringUtil::ReplaceAll(_T("\\n"), _T("\n"), stringValue);
             StringUtil::ReplaceAll(_T("\\s"), _T(" "), stringValue);
             m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = std::move(stringValue);
-        }
-        else {
+        } else {
             //无转义字符
-            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = DString(stringValueTrim.ptr, stringValueTrim.len);
+            m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)]
+                = DString(stringValueTrim.ptr, stringValueTrim.len);
         }
-    }
-    else {
+    } else {
         //有字符串ID，但值为空
         m_stringTable[DString(stringIdTrim.ptr, stringIdTrim.len)] = DString();
     }
@@ -322,10 +318,9 @@ void LangManager::ClearStringTable(bool bBackup)
     m_oldStringTable.clear();
     if (bBackup) {
         m_oldStringTable.swap(m_stringTable);
-    }
-    else {
+    } else {
         m_stringTable.clear();
-    }    
+    }
 }
 
 void LangManager::RestoreStringTable()
@@ -333,7 +328,7 @@ void LangManager::RestoreStringTable()
     m_oldStringTable.swap(m_stringTable);
 }
 
-DString LangManager::GetStringByID(const DString& id) const
+DString LangManager::GetStringByID(const DString &id) const
 {
     DString text;
     if (id.empty()) {
@@ -343,17 +338,16 @@ DString LangManager::GetStringByID(const DString& id) const
     if (it == m_stringTable.end()) {
         ASSERT(!"LangManager::GetStringByID failed!");
         return text;
-    }
-    else {
+    } else {
         text = it->second;
     }
     return text;
 }
 
-bool LangManager::HasStringByID(const DString& id) const
+bool LangManager::HasStringByID(const DString &id) const
 {
     auto it = m_stringTable.find(id);
     return it != m_stringTable.end();
 }
 
-}//namespace ui 
+} //namespace ui

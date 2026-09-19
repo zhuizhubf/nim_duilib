@@ -2,8 +2,7 @@
 #include "duilib/Core/Box.h"
 #include <unordered_map>
 
-namespace ui 
-{
+namespace ui {
 
 HLayout::HLayout()
 {
@@ -28,7 +27,7 @@ HLayout::HLayout()
        均需缩减超出部分，确保总宽度不超过容器范围（补充规则，与代码中 “空间超出缩减” 逻辑对应）。
     9. 如果控件的宽度为0，则忽略布局，控件的外边距（左边距 + 右边距）不计入布局。
 */
-UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly)
+UiSize64 HLayout::ArrangeChildren(const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly)
 {
     if (items.empty()) {
         return UiSize64();
@@ -37,15 +36,15 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
     const UiSize szAvailable(rc.Width(), rc.Height());
 
     // 存储需要布局的控件尺寸（key：控件，value：宽高信息）
-    std::unordered_map<Control*, UiEstSize> itemsMap;       // 非拉伸子控件
-    std::vector<Control*> stretchControls;                  // 按顺序存储拉伸控件
-    std::unordered_map<Control*, UiEstSize> stretchItemsMap;// 拉伸控件尺寸临时存储
+    std::unordered_map<Control *, UiEstSize> itemsMap;        // 非拉伸子控件
+    std::vector<Control *> stretchControls;                   // 按顺序存储拉伸控件
+    std::unordered_map<Control *, UiEstSize> stretchItemsMap; // 拉伸控件尺寸临时存储
 
-    int32_t cxStretchPercentageTotal = 0;  // 拉伸控件总百分比
-    int32_t cxFixedSelfTotal = 0;          // 固定控件自身总宽度（不含边距、不含间距）
-    int32_t cxFixedTotal = 0;              // 固定控件总宽度（含边距，不含间距）
-    int32_t totalAllControlsCount = 0;     // 参与布局的总控件数（固定+拉伸，非浮动、可见）
-    int64_t totalAllMargin = 0;            // 所有参与布局控件的边距总和（左+右）—— 使用 int64_t 避免累加溢出
+    int32_t cxStretchPercentageTotal = 0; // 拉伸控件总百分比
+    int32_t cxFixedSelfTotal = 0;         // 固定控件自身总宽度（不含边距、不含间距）
+    int32_t cxFixedTotal = 0;             // 固定控件总宽度（含边距，不含间距）
+    int32_t totalAllControlsCount = 0;    // 参与布局的总控件数（固定+拉伸，非浮动、可见）
+    int64_t totalAllMargin = 0; // 所有参与布局控件的边距总和（左+右）—— 使用 int64_t 避免累加溢出
 
     // 计算每个控件的基础尺寸，分类存储 + 统计关键参数
     for (auto pControl : items) {
@@ -53,9 +52,9 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
             continue;
         }
 
-        totalAllControlsCount++;  // 统计参与布局的总控件数
+        totalAllControlsCount++; // 统计参与布局的总控件数
         UiMargin rcMargin = pControl->GetMargin();
-        totalAllMargin += rcMargin.left + rcMargin.right;  // 统计所有控件边距总和
+        totalAllMargin += rcMargin.left + rcMargin.right; // 统计所有控件边距总和
 
         UiEstSize estSize = pControl->EstimateSize(szAvailable);
         UiSize sz = UiSize(estSize.cx.GetInt32(), estSize.cy.GetInt32());
@@ -74,14 +73,13 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
             cxStretchPercentageTotal += estSize.cx.GetStretchPercentValue();
             stretchControls.push_back(pControl);
             stretchItemsMap[pControl] = estSize;
-        }
-        else {
+        } else {
             // 限制宽度在最小/最大值范围内（固定控件自身宽度）
             sz.cx = std::clamp(sz.cx, pControl->GetMinWidth(), pControl->GetMaxWidth());
             sz.cx = std::max(sz.cx, 0);
             estSize.cx.SetInt32(sz.cx);
 
-            cxFixedSelfTotal += sz.cx;  // 累加固定控件自身总宽度（不含边距）
+            cxFixedSelfTotal += sz.cx; // 累加固定控件自身总宽度（不含边距）
             // 累加固定控件总宽度（含边距，不含间距）
             if (sz.cx > 0) {
                 cxFixedTotal += (sz.cx + rcMargin.left + rcMargin.right);
@@ -95,58 +93,60 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
 
     // 处理拉伸控件的宽度分配
     if ((cxFixedTotal < rc.Width()) && !stretchControls.empty()) {
-        const int32_t totalSpacing = (totalAllControlsCount - 1) * GetChildMarginX();  // 总间距（所有参与布局控件）
+        const int32_t totalSpacing = (totalAllControlsCount - 1)
+                                     * GetChildMarginX(); // 总间距（所有参与布局控件）
 
         // 一、计算总可分配空间（严格按公式）
         // 总可分配空间 = 总宽度 - 固定控件自身总宽度 - 所有控件边距总和 - 总间距
         // 使用 int64_t 中间计算避免溢出，最后 clamp 到 int32_t
-        int64_t totalUsableSpace64 = (int64_t)rc.Width() - (int64_t)cxFixedSelfTotal - totalAllMargin - (int64_t)totalSpacing;
-        int32_t totalUsableSpace = (int32_t)std::max<int64_t>(totalUsableSpace64, 0);
+        int64_t totalUsableSpace64 = (int64_t) rc.Width() - (int64_t) cxFixedSelfTotal
+                                     - totalAllMargin - (int64_t) totalSpacing;
+        int32_t totalUsableSpace = (int32_t) std::max<int64_t>(totalUsableSpace64, 0);
 
         // 收集拉伸控件的最小/最大宽度需求
-        struct StretchInfo {
-            Control* pCtrl;
+        struct StretchInfo
+        {
+            Control *pCtrl;
             UiEstSize estSize;
             UiMargin margin;
-            int32_t minWidth;    // 控件自身最小宽
-            int32_t maxWidth;    // 控件自身最大宽
-            int32_t finalWidth;  // 最终宽度（自身）
+            int32_t minWidth;   // 控件自身最小宽
+            int32_t maxWidth;   // 控件自身最大宽
+            int32_t finalWidth; // 最终宽度（自身）
         };
         std::vector<StretchInfo> stretchInfos;
-        int32_t totalStretchMin = 0;  // 拉伸控件最小宽度总和（自身）
+        int32_t totalStretchMin = 0; // 拉伸控件最小宽度总和（自身）
 
         for (auto pControl : stretchControls) {
-            auto& estSize = stretchItemsMap[pControl];
+            auto &estSize = stretchItemsMap[pControl];
             UiMargin margin = pControl->GetMargin();
             int32_t minW = pControl->GetMinWidth();
             int32_t maxW = pControl->GetMaxWidth();
 
-            stretchInfos.push_back({
-                pControl, estSize, margin,
-                minW, maxW, 0
-                });
+            stretchInfos.push_back({pControl, estSize, margin, minW, maxW, 0});
             totalStretchMin += minW;
         }
 
         // 二、分场景分配宽度（遵循所有规则）
         if (totalUsableSpace == 0) {
             // 场景0：总可分配空间为0，所有拉伸控件宽度设为0（避免布局溢出）
-            for (auto& info : stretchInfos) {
+            for (auto &info : stretchInfos) {
                 info.finalWidth = 0;
             }
-        }
-        else if (totalStretchMin <= totalUsableSpace) {
+        } else if (totalStretchMin <= totalUsableSpace) {
             // 场景1：可用空间满足所有拉伸控件最小宽度需求
             // 1. 按总可分配空间×比例计算目标宽度（规则2）
-            for (auto& info : stretchInfos) {
-                int32_t targetWidth = static_cast<int32_t>((float)info.estSize.cx.GetStretchPercentValue() * totalUsableSpace / cxStretchPercentBase + 0.5f);
+            for (auto &info : stretchInfos) {
+                int32_t targetWidth = static_cast<int32_t>(
+                    (float) info.estSize.cx.GetStretchPercentValue() * totalUsableSpace
+                        / cxStretchPercentBase
+                    + 0.5f);
                 // 2. 受min/max限制（规则3）
                 info.finalWidth = std::clamp(targetWidth, info.minWidth, info.maxWidth);
             }
 
             // 3. 计算当前拉伸控件总宽度，处理剩余/超出空间（规则6、7、8）
             int32_t currentStretchTotal = 0;
-            for (auto& info : stretchInfos) {
+            for (auto &info : stretchInfos) {
                 currentStretchTotal += info.finalWidth;
             }
 
@@ -156,24 +156,26 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
                 if (cxStretchPercentageTotal >= 100) {
                     // 计算总可分配的额外空间（所有控件的maxWidth - finalWidth之和）
                     int64_t totalAdjustableSpace = 0;
-                    for (auto& info : stretchInfos) {
+                    for (auto &info : stretchInfos) {
                         totalAdjustableSpace += (info.maxWidth - info.finalWidth);
                     }
                     if (totalAdjustableSpace <= 0) {
                         // 无可用调整空间，直接退出
-                    }
-                    else {
+                    } else {
                         int32_t remainingDiff = diff;
                         // 批量分配：按比例分配大部分diff
-                        for (auto& info : stretchInfos) {
-                            if (remainingDiff <= 0) break;
+                        for (auto &info : stretchInfos) {
+                            if (remainingDiff <= 0)
+                                break;
                             int64_t ctrlAdjustable = info.maxWidth - info.finalWidth;
-                            if (ctrlAdjustable <= 0) continue;
+                            if (ctrlAdjustable <= 0)
+                                continue;
 
                             // 按比例分配当前控件可调整的空间（避免浮点精度问题，用整数运算优化）
-                            int64_t batchAdd = (ctrlAdjustable * remainingDiff) / totalAdjustableSpace;
+                            int64_t batchAdd = (ctrlAdjustable * remainingDiff)
+                                               / totalAdjustableSpace;
                             // 修正计算偏差（确保不超出剩余diff和控件可调整空间）
-                            batchAdd = std::min({ batchAdd, (int64_t)remainingDiff, ctrlAdjustable });
+                            batchAdd = std::min({batchAdd, (int64_t) remainingDiff, ctrlAdjustable});
                             if (batchAdd > 0) {
                                 // 校验batchAdd是否在int32_t范围内
                                 ASSERT(batchAdd <= static_cast<int64_t>(INT32_MAX));
@@ -187,42 +189,44 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
                         // 剩余少量diff（通常0-总控件数），逐像素分配
                         while (remainingDiff > 0) {
                             bool allocated = false;
-                            for (auto& info : stretchInfos) {
+                            for (auto &info : stretchInfos) {
                                 if (info.finalWidth < info.maxWidth) {
                                     info.finalWidth += 1;
                                     remainingDiff -= 1;
                                     allocated = true;
-                                    if (remainingDiff <= 0) break;
+                                    if (remainingDiff <= 0)
+                                        break;
                                 }
                             }
-                            if (!allocated) break; // 无可用调整空间
+                            if (!allocated)
+                                break; // 无可用调整空间
                         }
                     }
                 }
-            }
-            else if (diff < 0) {
+            } else if (diff < 0) {
                 // 空间超出：无论比例是否≥100，均需缩减（规则8）
                 int32_t reduceDiff = -diff; // 避免负数值操作
                 // 计算总可缩减的空间（所有控件的finalWidth - minWidth之和）
                 int64_t totalAdjustableSpace = 0;
-                for (auto& info : stretchInfos) {
+                for (auto &info : stretchInfos) {
                     totalAdjustableSpace += (info.finalWidth - info.minWidth);
                 }
                 if (totalAdjustableSpace <= 0) {
                     // 无可用调整空间，直接退出
-                }
-                else {
+                } else {
                     int32_t remainingDiff = reduceDiff;
                     // 批量缩减：按比例缩减大部分diff
-                    for (auto& info : stretchInfos) {
-                        if (remainingDiff <= 0) break;
+                    for (auto &info : stretchInfos) {
+                        if (remainingDiff <= 0)
+                            break;
                         int64_t ctrlAdjustable = info.finalWidth - info.minWidth;
-                        if (ctrlAdjustable <= 0) continue;
+                        if (ctrlAdjustable <= 0)
+                            continue;
 
                         // 按比例缩减当前控件可调整的空间（整数运算避免精度问题）
                         int64_t batchSub = (ctrlAdjustable * remainingDiff) / totalAdjustableSpace;
                         // 修正计算偏差（确保不超出剩余diff和控件可调整空间）
-                        batchSub = std::min({ batchSub, (int64_t)remainingDiff, ctrlAdjustable });
+                        batchSub = std::min({batchSub, (int64_t) remainingDiff, ctrlAdjustable});
                         if (batchSub > 0) {
                             // 校验batchSub是否在int32_t范围内
                             ASSERT(batchSub <= static_cast<int64_t>(INT32_MAX));
@@ -236,24 +240,26 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
                     // 剩余少量diff（通常0-总控件数），逐像素缩减
                     while (remainingDiff > 0) {
                         bool reduced = false;
-                        for (auto& info : stretchInfos) {
+                        for (auto &info : stretchInfos) {
                             if (info.finalWidth > info.minWidth) {
                                 info.finalWidth -= 1;
                                 remainingDiff -= 1;
                                 reduced = true;
-                                if (remainingDiff <= 0) break;
+                                if (remainingDiff <= 0)
+                                    break;
                             }
                         }
-                        if (!reduced) break; // 无可用调整空间
+                        if (!reduced)
+                            break; // 无可用调整空间
                     }
                 }
             }
-        }
-        else {
+        } else {
             // 场景2：可用空间不足，优先显示前面控件（规则4）
             int32_t remainingSpace = totalUsableSpace;
-            for (auto& info : stretchInfos) {
-                if (remainingSpace <= 0) break;
+            for (auto &info : stretchInfos) {
+                if (remainingSpace <= 0)
+                    break;
 
                 // 优先分配最小宽度
                 int32_t allocWidth = std::min(info.minWidth, remainingSpace);
@@ -263,15 +269,18 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
 
             // 若仍有剩余空间，分配给前面的控件（按比例，不特殊处理<100%场景）
             if (remainingSpace > 0) {
-                for (auto& info : stretchInfos) {
-                    if (remainingSpace <= 0) break;
-                    if (info.finalWidth >= info.maxWidth) continue;
+                for (auto &info : stretchInfos) {
+                    if (remainingSpace <= 0)
+                        break;
+                    if (info.finalWidth >= info.maxWidth)
+                        continue;
 
                     int32_t maxAdd = info.maxWidth - info.finalWidth;
                     int32_t addWidth = static_cast<int32_t>(
-                        1.0f * info.estSize.cx.GetStretchPercentValue() * remainingSpace / cxStretchPercentBase + 0.5f
-                        );
-                    addWidth = std::min({ addWidth, maxAdd, remainingSpace });
+                        1.0f * info.estSize.cx.GetStretchPercentValue() * remainingSpace
+                            / cxStretchPercentBase
+                        + 0.5f);
+                    addWidth = std::min({addWidth, maxAdd, remainingSpace});
 
                     info.finalWidth += addWidth;
                     remainingSpace -= addWidth;
@@ -280,7 +289,7 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
         }
 
         // 更新拉伸控件尺寸到itemsMap
-        for (auto& info : stretchInfos) {
+        for (auto &info : stretchInfos) {
             info.estSize.cx.SetInt32(info.finalWidth);
             itemsMap[info.pCtrl] = info.estSize;
         }
@@ -298,7 +307,7 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
     stretchControls.clear();
 
     // 计算子控件的最终位置（按：左边距 + 控件宽度 + 右边距 + 间距 的顺序）
-    std::vector<Control*> childrenControlList;  // 控件列表
+    std::vector<Control *> childrenControlList; // 控件列表
     std::vector<UiRect> childrenControlRects;   // 控件的位置和大小
     UiRect childrenRect;                        // 子控件原始范围（未对齐前）
     int32_t nPosX = rc.left;
@@ -314,11 +323,10 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
         auto estSizeIter = itemsMap.find(pControl);
         if ((estSizeIter == itemsMap.end()) || (estSizeIter->second.cx.GetInt32() <= 0)) {
             // 宽度为0，忽略布局
-            rcChild = { nPosX, nPosY, nPosX, nPosY };
-        }
-        else {
+            rcChild = {nPosX, nPosY, nPosX, nPosY};
+        } else {
             // 对一个控件进行布局（严格按布局方案）
-            const UiEstSize& estSize = estSizeIter->second;
+            const UiEstSize &estSize = estSizeIter->second;
             UiMargin rcMargin = pControl->GetMargin();
 
             // 统一处理间距（非第一个控件前添加）
@@ -328,10 +336,10 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
             isFirstControl = false;
 
             // 水平位置计算（含边距）
-            nPosX += rcMargin.left;          // 左边距
+            nPosX += rcMargin.left; // 左边距
             rcChild.left = nPosX;
             rcChild.right = rcChild.left + estSize.cx.GetInt32(); // 控件自身宽度
-            nPosX = rcChild.right + rcMargin.right; // 右边距
+            nPosX = rcChild.right + rcMargin.right;               // 右边距
 
             // 垂直位置计算（处理对齐）
             rcChild.top = nPosY + rcMargin.top;
@@ -350,8 +358,7 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
                 if (nOffset > 0) {
                     if (vAlign == VerAlignType::kAlignCenter) {
                         rcChild.Offset(0, nOffset / 2);
-                    }
-                    else if (vAlign == VerAlignType::kAlignBottom) {
+                    } else if (vAlign == VerAlignType::kAlignBottom) {
                         rcChild.Offset(0, nOffset);
                     }
                 }
@@ -371,27 +378,24 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
     }
 
     // 处理子控件总体水平对齐（居中/靠右）
-    UiRect fullChildrenRect = childrenRect;     // 子控件总体范围（含对齐偏移）
-    UiRect alignedChildrenRect = childrenRect;  // 子控件对齐后实际范围
+    UiRect fullChildrenRect = childrenRect;    // 子控件总体范围（含对齐偏移）
+    UiRect alignedChildrenRect = childrenRect; // 子控件对齐后实际范围
     const HorAlignType hAlign = GetChildHAlignType();
     int32_t containerWidth = rc.Width();
 
-    if (((hAlign == HorAlignType::kAlignCenter) || (hAlign == HorAlignType::kAlignRight)) &&
-        childrenRect.Width() > 0 &&
-        childrenRect.Width() < containerWidth) {
-
+    if (((hAlign == HorAlignType::kAlignCenter) || (hAlign == HorAlignType::kAlignRight))
+        && childrenRect.Width() > 0 && childrenRect.Width() < containerWidth) {
         int32_t nOffsetX = 0;
         if (hAlign == HorAlignType::kAlignCenter) {
             nOffsetX = (containerWidth - childrenRect.Width()) / 2;
-        }
-        else if (hAlign == HorAlignType::kAlignRight) {
+        } else if (hAlign == HorAlignType::kAlignRight) {
             nOffsetX = containerWidth - childrenRect.Width();
         }
 
         // 应用水平偏移
         if (nOffsetX != 0) {
             alignedChildrenRect.Offset(nOffsetX, 0);
-            for (UiRect& rcChild : childrenControlRects) {
+            for (UiRect &rcChild : childrenControlRects) {
                 rcChild.Offset(nOffsetX, 0);
             }
             fullChildrenRect.Union(alignedChildrenRect);
@@ -405,7 +409,7 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
         if (childrenControlList.size() == childrenControlRects.size()) {
             const size_t nCount = childrenControlList.size();
             for (size_t i = 0; i < nCount; ++i) {
-                Control* pControl = childrenControlList[i];
+                Control *pControl = childrenControlList[i];
                 pControl->SetPos(childrenControlRects[i]);
             }
         }
@@ -421,21 +425,20 @@ UiSize64 HLayout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc,
     // 计算最终返回的尺寸（含父容器内边距）
     UiPadding rcPadding = (GetOwner() != nullptr) ? GetOwner()->GetPadding() : UiPadding();
     UiSize64 resultSize(
-        (int64_t)std::max(fullChildrenRect.Width() + rcPadding.left + rcPadding.right, 0),
-        (int64_t)std::max(fullChildrenRect.Height() + rcPadding.top + rcPadding.bottom, 0)
-    );
+        (int64_t) std::max(fullChildrenRect.Width() + rcPadding.left + rcPadding.right, 0),
+        (int64_t) std::max(fullChildrenRect.Height() + rcPadding.top + rcPadding.bottom, 0));
     return resultSize;
 }
 
-UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable)
+UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control *> &items, UiSize szAvailable)
 {
     // 宽度：所有有效子控件宽度之和（含边距）+ 子控件间隔 + 容器内边距
     // 高度：所有有效子控件高度的最大值（含边距）+ 容器内边距
     // 有效子控件：可见、非浮动，拉伸控件取最小尺寸参与计算
-    UiSize64 totalSize(0, 0);  // 64位计算避免溢出
-    int32_t validCount = 0;    // 统计参与间隔计算的有效控件（有宽度或边距）
+    UiSize64 totalSize(0, 0); // 64位计算避免溢出
+    int32_t validCount = 0;   // 统计参与间隔计算的有效控件（有宽度或边距）
 
-    for (Control* pControl : items) {
+    for (Control *pControl : items) {
         if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
             continue;
         }
@@ -450,9 +453,8 @@ UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize 
         // 处理宽度（含拉伸逻辑和边界限制）
         int32_t itemWidth = 0;
         if (estSize.cx.IsStretch()) {
-            itemWidth = std::max(minWidth, 0);  // 拉伸控件取最小宽度（至少0）
-        }
-        else {
+            itemWidth = std::max(minWidth, 0); // 拉伸控件取最小宽度（至少0）
+        } else {
             // 非拉伸控件：用std::clamp限制在[minWidth, maxWidth]范围内
             itemWidth = std::clamp(estSize.cx.GetInt32(), minWidth, maxWidth);
         }
@@ -460,16 +462,15 @@ UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize 
         // 处理高度（含拉伸逻辑和边界限制）
         int32_t itemHeight = 0;
         if (estSize.cy.IsStretch()) {
-            itemHeight = std::max(minHeight, 0);  // 拉伸控件取最小高度（至少0）
-        }
-        else {
+            itemHeight = std::max(minHeight, 0); // 拉伸控件取最小高度（至少0）
+        } else {
             // 非拉伸控件：用std::clamp限制在[minHeight, maxHeight]范围内
             itemHeight = std::clamp(estSize.cy.GetInt32(), minHeight, maxHeight);
         }
 
         // 累加宽度（含控件宽度和左右边距，无条件计入）
         if (itemWidth > 0) {
-            int64_t widthWithMargin = (int64_t)itemWidth + rcMargin.left + rcMargin.right;
+            int64_t widthWithMargin = (int64_t) itemWidth + rcMargin.left + rcMargin.right;
             totalSize.cx += widthWithMargin;
 
             // 统计有效控件（有宽度或边距时，参与间隔计算）
@@ -478,7 +479,7 @@ UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize 
 
         // 计算最大高度（含控件高度和上下边距，无条件参与比较）
         if (itemHeight > 0) {
-            int64_t heightWithMargin = (int64_t)itemHeight + rcMargin.top + rcMargin.bottom;
+            int64_t heightWithMargin = (int64_t) itemHeight + rcMargin.top + rcMargin.bottom;
             if (heightWithMargin > totalSize.cy) {
                 totalSize.cy = heightWithMargin;
             }
@@ -487,7 +488,7 @@ UiSize64 HLayout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize 
 
     // 累加子控件间隔（有效控件数>1时）
     if (validCount > 1) {
-        totalSize.cx += (int64_t)(validCount - 1) * GetChildMarginX();
+        totalSize.cx += (int64_t) (validCount - 1) * GetChildMarginX();
     }
 
     // 累加容器内边距（无条件计入）

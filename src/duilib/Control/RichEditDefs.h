@@ -6,8 +6,7 @@
 #include "duilib/Box/ScrollBox.h"
 #include "duilib/Image/Image.h"
 
-namespace ui
-{
+namespace ui {
 /** 字符的索引号范围
 */
 struct TextCharRange

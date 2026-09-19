@@ -3,15 +3,14 @@
 
 #include "duilib/Core/UiTypes.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 //使用Windows的ITextHost实现
+#include <RichOle.h>
 #include <Richedit.h>
 #include <TextServ.h>
-#include <RichOle.h>
 
-namespace ui
-{
+namespace ui {
 
 class RichEdit;
 class DpiManager;
@@ -20,9 +19,9 @@ class DUILIB_API RichEditHost : public ITextHost
 public:
     /** 构造函数，构造后引用计数为1，外部可以通过AddRef和Release控制对象的生命周期
     */
-    explicit RichEditHost(RichEdit* pRichEdit);
-    RichEditHost(const RichEditHost& r) = delete;
-    RichEditHost& operator=(const RichEditHost& r) = delete;
+    explicit RichEditHost(RichEdit *pRichEdit);
+    RichEditHost(const RichEditHost &r) = delete;
+    RichEditHost &operator=(const RichEditHost &r) = delete;
 
 private:
     virtual ~RichEditHost();
@@ -30,14 +29,14 @@ private:
 public:
     /** 获取ITextServices接口
     */
-    ITextServices* GetTextServices(void) const;
+    ITextServices *GetTextServices(void) const;
 
     /** 释放资源
     */
     void ShutdownTextServices();
 
-    void SetClientRect(const UiRect& rc);
-    void GetControlRect(UiRect* prc);
+    void SetClientRect(const UiRect &rc);
+    void GetControlRect(UiRect *prc);
     UiRect GetControlRect();
 
     //是否自动换行（仅在单行文本模式下有效，多行文本模式时无效）
@@ -56,7 +55,7 @@ public:
     void SetPassword(bool bPassword);
     bool IsPassword() const;
     void SetShowPassword(bool bShow); //设置是否显示密码
-    bool IsShowPassword() const;//是否显示密码
+    bool IsShowPassword() const;      //是否显示密码
     void SetFlashPasswordChar(bool bFlash);
     bool IsFlashPasswordChar() const;
     DString GetPasswordText() const;
@@ -75,7 +74,7 @@ public:
 
     //横向和纵向滚动条设置
     void SetVScrollBar(bool bEnable);
-    void SetHScrollBar(bool bEnable);    
+    void SetHScrollBar(bool bEnable);
 
     //当用户在最后一行按 ENTER 时，自动将文本向上滚动一页。
     void SetAutoVScroll(bool bEnable);
@@ -90,8 +89,8 @@ public:
     bool SetSaveSelection(bool fSaveSelection);
     void SetHideSelection(bool fHideSelection);
     bool IsHideSelection() const;
-    bool SetCursor(const UiRect* prc, const UiPoint* pt);
-    void SetTransparent(bool fTransparent);    
+    bool SetCursor(const UiRect *prc, const UiPoint *pt);
+    void SetTransparent(bool fTransparent);
     void SetSelBarWidth(LONG lSelBarWidth);
 
     HRESULT OnTxInPlaceDeactivate();
@@ -101,7 +100,7 @@ public:
     // -----------------------------
     //    IUnknown interface
     // -----------------------------
-    virtual HRESULT _stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+    virtual HRESULT _stdcall QueryInterface(REFIID riid, void **ppvObject) override;
     virtual ULONG _stdcall AddRef(void) override;
     virtual ULONG _stdcall Release(void) override;
 
@@ -121,10 +120,7 @@ public:
     virtual BOOL TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags) override;
 
     //@cmember Set the scroll range
-    virtual BOOL TxSetScrollRange( INT fnBar,
-                                   LONG nMinPos,
-                                   INT nMaxPos,
-                                   BOOL fRedraw) override;
+    virtual BOOL TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw) override;
 
     //@cmember Set the scroll position
     virtual BOOL TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw) override;
@@ -151,13 +147,14 @@ public:
     virtual void TxKillTimer(UINT idTimer) override;
 
     //@cmember Scroll the content of the specified window's client area
-    virtual void TxScrollWindowEx( INT dx,
-                                   INT dy,
-                                   LPCRECT lprcScroll,
-                                   LPCRECT lprcClip,
-                                   HRGN hrgnUpdate,
-                                   LPRECT lprcUpdate,
-                                   UINT fuScroll) override;
+    virtual void TxScrollWindowEx(
+        INT dx,
+        INT dy,
+        LPCRECT lprcScroll,
+        LPCRECT lprcClip,
+        HRGN hrgnUpdate,
+        LPRECT lprcUpdate,
+        UINT fuScroll) override;
 
     //@cmember Get mouse capture
     virtual void TxSetCapture(BOOL fCapture) override;
@@ -168,14 +165,14 @@ public:
     //@cmember Establish a new cursor shape
     virtual void TxSetCursor(HCURSOR hcur, BOOL fText) override;
 
-    //@cmember Converts screen coordinates of a specified point to the client coordinates 
+    //@cmember Converts screen coordinates of a specified point to the client coordinates
     virtual BOOL TxScreenToClient(LPPOINT lppt) override;
 
     //@cmember Converts the client coordinates of a specified point to screen coordinates
     virtual BOOL TxClientToScreen(LPPOINT lppt) override;
 
     //@cmember Request host to activate text services
-    virtual HRESULT TxActivate(LONG* plOldState) override;
+    virtual HRESULT TxActivate(LONG *plOldState) override;
 
     //@cmember Request host to deactivate text services
     virtual HRESULT TxDeactivate(LONG lNewState) override;
@@ -187,50 +184,50 @@ public:
     virtual HRESULT TxGetViewInset(LPRECT prc) override;
 
     //@cmember Get the default character format for the text
-    virtual HRESULT TxGetCharFormat(const CHARFORMATW** ppCF) override;
+    virtual HRESULT TxGetCharFormat(const CHARFORMATW **ppCF) override;
 
     //@cmember Get the default paragraph format for the text
-    virtual HRESULT TxGetParaFormat(const PARAFORMAT** ppPF) override;
+    virtual HRESULT TxGetParaFormat(const PARAFORMAT **ppPF) override;
 
     //@cmember Get the background color for the window
     virtual COLORREF TxGetSysColor(int nIndex) override;
 
     //@cmember Get the background (either opaque or transparent)
-    virtual HRESULT TxGetBackStyle(TXTBACKSTYLE* pstyle) override;
+    virtual HRESULT TxGetBackStyle(TXTBACKSTYLE *pstyle) override;
 
     //@cmember Get the maximum length for the text
-    virtual HRESULT TxGetMaxLength(DWORD* plength) override;
+    virtual HRESULT TxGetMaxLength(DWORD *plength) override;
 
     //@cmember Get the bits representing requested scroll bars for the window
-    virtual HRESULT TxGetScrollBars(DWORD* pdwScrollBar) override;
+    virtual HRESULT TxGetScrollBars(DWORD *pdwScrollBar) override;
 
     //@cmember Get the character to display for password input
-    virtual HRESULT TxGetPasswordChar(_Out_ TCHAR* pch) override;
+    virtual HRESULT TxGetPasswordChar(_Out_ TCHAR *pch) override;
 
     //@cmember Get the accelerator character
-    virtual HRESULT TxGetAcceleratorPos(LONG* pcp) override;
+    virtual HRESULT TxGetAcceleratorPos(LONG *pcp) override;
 
     //@cmember Get the native size
     virtual HRESULT TxGetExtent(LPSIZEL lpExtent) override;
 
     //@cmember Notify host that default character format has changed
-    virtual HRESULT OnTxCharFormatChange(const CHARFORMATW* pCF) override;
+    virtual HRESULT OnTxCharFormatChange(const CHARFORMATW *pCF) override;
 
     //@cmember Notify host that default paragraph format has changed
-    virtual HRESULT OnTxParaFormatChange(const PARAFORMAT* pPF) override;
+    virtual HRESULT OnTxParaFormatChange(const PARAFORMAT *pPF) override;
 
     //@cmember Bulk access to bit properties
-    virtual HRESULT TxGetPropertyBits(DWORD dwMask, DWORD* pdwBits) override;
+    virtual HRESULT TxGetPropertyBits(DWORD dwMask, DWORD *pdwBits) override;
 
     //@cmember Notify host of events
-    virtual HRESULT TxNotify(DWORD iNotify, void* pv) override;
+    virtual HRESULT TxNotify(DWORD iNotify, void *pv) override;
 
     // East Asia Methods for getting the Input Context
     virtual HIMC TxImmGetContext() override;
     virtual void TxImmReleaseContext(HIMC himc) override;
 
     //@cmember Returns HIMETRIC size of the control bar.
-    virtual HRESULT TxGetSelectionBarWidth(LONG* lSelBarWidth) override;
+    virtual HRESULT TxGetSelectionBarWidth(LONG *lSelBarWidth) override;
 
 private:
     /** 通知OnTxPropertyBitsChange接口
@@ -241,7 +238,7 @@ private:
     void Init();
 
     //转换矩形格式
-    UiRect MakeUiRect(const RECT& rc);
+    UiRect MakeUiRect(const RECT &rc);
 
     // Convert Pixels on the X axis to Himetric
     LONG DXtoHimetricX(LONG dx, LONG xPerInch);
@@ -254,30 +251,29 @@ private:
     ULONG m_cRefs;
 
     //RichEdit控件的UI层接口
-    RichEdit* m_pRichEdit;
+    RichEdit *m_pRichEdit;
 
     // pointer to Text Services object
-    ITextServices* m_pTextServices;
+    ITextServices *m_pTextServices;
 
-    uint16_t m_dwStyle;         // style bits
-    bool m_fEnableAutoWordSel;  // enable Word style auto word selection?
-    bool m_fWordWrap;           // Whether control should word wrap
-    bool m_fAllowBeep;          // Whether beep is allowed
-    bool m_fSaveSelection;      // Whether to save the selection when inactive
-    bool m_fInplaceActive;      // Whether control is inplace active
-    bool m_fTransparent;        // Whether control is transparent
+    uint16_t m_dwStyle;        // style bits
+    bool m_fEnableAutoWordSel; // enable Word style auto word selection?
+    bool m_fWordWrap;          // Whether control should word wrap
+    bool m_fAllowBeep;         // Whether beep is allowed
+    bool m_fSaveSelection;     // Whether to save the selection when inactive
+    bool m_fInplaceActive;     // Whether control is inplace active
+    bool m_fTransparent;       // Whether control is transparent
 
-    LONG m_lSelBarWidth;        // Width of the selection bar
-    UiRect m_rcClient;          // Client Rect for this control
-    SIZEL m_sizelExtent;        // Extent array
-    
-    WCHAR m_chPasswordChar;     // Password character
-    bool m_bShowPassword;       //是否显示密码
-    bool m_bFlashPasswordChar;  //短暂的显示密码字符，然后再隐藏
+    LONG m_lSelBarWidth; // Width of the selection bar
+    UiRect m_rcClient;   // Client Rect for this control
+    SIZEL m_sizelExtent; // Extent array
+
+    WCHAR m_chPasswordChar;    // Password character
+    bool m_bShowPassword;      //是否显示密码
+    bool m_bFlashPasswordChar; //短暂的显示密码字符，然后再隐藏
 };
 
-
-}//name space ui
+} // namespace ui
 
 #endif // DUILIB_BUILD_FOR_WIN
 

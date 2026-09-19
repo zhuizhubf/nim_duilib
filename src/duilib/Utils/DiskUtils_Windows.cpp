@@ -2,15 +2,14 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/DllManager_Windows.h"
-#include <shellapi.h>
+#include "duilib/Utils/StringConvert.h"
 #include <memory>
+#include <shellapi.h>
 
-namespace ui
-{
+namespace ui {
 
-bool DiskUtils::GetLogicalDriveList(std::vector<DString>& driveList)
+bool DiskUtils::GetLogicalDriveList(std::vector<DString> &driveList)
 {
     const int32_t maxBufLen = 1022;
     DStringW::value_type tempBuf[maxBufLen + 2];
@@ -18,23 +17,21 @@ bool DiskUtils::GetLogicalDriveList(std::vector<DString>& driveList)
     if (dwSize == 0) {
         return false;
     }
-    const DStringW::value_type* driveStr = tempBuf;
+    const DStringW::value_type *driveStr = tempBuf;
     std::unique_ptr<DStringW::value_type> spBuf;
     if (dwSize > maxBufLen) {
-        DStringW::value_type* szBuf = new DStringW::value_type[dwSize + 2];
+        DStringW::value_type *szBuf = new DStringW::value_type[dwSize + 2];
         spBuf.reset(szBuf);
         DWORD dwRetSize = ::GetLogicalDriveStringsW(dwSize, szBuf);
-        if ( (dwRetSize == 0) || (dwRetSize > dwSize) )
-        {
+        if ((dwRetSize == 0) || (dwRetSize > dwSize)) {
             return false;
         }
         szBuf[dwRetSize] = 0;
         szBuf[dwRetSize + 1] = 0;
-        
+
         dwSize = dwRetSize;
         driveStr = szBuf;
-    }
-    else {
+    } else {
         tempBuf[dwSize] = 0;
         tempBuf[dwSize + 1] = 0;
     }
@@ -51,7 +48,7 @@ bool DiskUtils::GetLogicalDriveList(std::vector<DString>& driveList)
     return true;
 }
 
-bool DiskUtils::GetLogicalDriveInfo(const DString& driveString, DiskInfo& diskInfo)
+bool DiskUtils::GetLogicalDriveInfo(const DString &driveString, DiskInfo &diskInfo)
 {
     HMODULE hShell32Dll = DllManager::Instance().LoadDll(_T("Shell32.dll"));
     ASSERT(hShell32Dll != nullptr);
@@ -59,10 +56,11 @@ bool DiskUtils::GetLogicalDriveInfo(const DString& driveString, DiskInfo& diskIn
         return false;
     }
 
-    typedef DWORD_PTR (__stdcall *PFNSHGetFileInfo)( LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFOW * psfi,
-                                           UINT cbFileInfo, UINT uFlags);
+    typedef DWORD_PTR(__stdcall * PFNSHGetFileInfo)(
+        LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFOW * psfi, UINT cbFileInfo, UINT uFlags);
 
-    PFNSHGetFileInfo pfnSHGetFileInfo = (PFNSHGetFileInfo)::GetProcAddress(hShell32Dll, "SHGetFileInfoW");
+    PFNSHGetFileInfo pfnSHGetFileInfo
+        = (PFNSHGetFileInfo)::GetProcAddress(hShell32Dll, "SHGetFileInfoW");
     ASSERT(pfnSHGetFileInfo != nullptr);
     if (pfnSHGetFileInfo == nullptr) {
         return false;
@@ -70,14 +68,21 @@ bool DiskUtils::GetLogicalDriveInfo(const DString& driveString, DiskInfo& diskIn
     DStringW driveStringW = ui::StringConvert::TToWString(driveString);
 
     DiskInfo currentDiskInfo;
-    SHFILEINFOW shellInfo = {0, };
-    DWORD_PTR result = pfnSHGetFileInfo(driveStringW.c_str(),  0, &shellInfo, sizeof(shellInfo), SHGFI_USEFILEATTRIBUTES | SHGFI_DISPLAYNAME| SHGFI_TYPENAME);
+    SHFILEINFOW shellInfo = {
+        0,
+    };
+    DWORD_PTR result = pfnSHGetFileInfo(
+        driveStringW.c_str(),
+        0,
+        &shellInfo,
+        sizeof(shellInfo),
+        SHGFI_USEFILEATTRIBUTES | SHGFI_DISPLAYNAME | SHGFI_TYPENAME);
     if (result == 0) {
         return false;
     }
     currentDiskInfo.m_volumeName = ui::StringConvert::WStringToT(shellInfo.szDisplayName);
     currentDiskInfo.m_volumeType = ui::StringConvert::WStringToT(shellInfo.szTypeName);
-    
+
     DStringW::value_type volumeNameBuffer[MAX_PATH + 1] = {0};
     DWORD volumeNameSize = MAX_PATH;
     DWORD volumeSerialNumber = 0;
@@ -86,29 +91,37 @@ bool DiskUtils::GetLogicalDriveInfo(const DString& driveString, DiskInfo& diskIn
     DStringW::value_type fileSystemNameBuffer[MAX_PATH + 1] = {0};
     DWORD fileSystemNameSize = MAX_PATH;
 
-    if (::GetVolumeInformationW(driveStringW.c_str(), 
-                                volumeNameBuffer, 
-                                volumeNameSize, 
-                                &volumeSerialNumber, 
-                                &maximumComponentLength, 
-                                &fileSystemFlags, 
-                                fileSystemNameBuffer, 
-                                fileSystemNameSize) != FALSE) {
+    if (::GetVolumeInformationW(
+            driveStringW.c_str(),
+            volumeNameBuffer,
+            volumeNameSize,
+            &volumeSerialNumber,
+            &maximumComponentLength,
+            &fileSystemFlags,
+            fileSystemNameBuffer,
+            fileSystemNameSize)
+        != FALSE) {
         fileSystemNameBuffer[MAX_PATH] = 0;
         currentDiskInfo.m_fileSystem = ui::StringConvert::WStringToT(fileSystemNameBuffer);
         currentDiskInfo.m_hasFileSystem = true;
-        
+
         DWORD dSectorsPerCluster = 0;
         DWORD dBytesPerSector = 0;
         DWORD dNumberOfFreeClusters = 0;
         DWORD dTotalNumberOfClusters = 0;
-        if (::GetDiskFreeSpaceW(driveStringW.c_str(), &dSectorsPerCluster, &dBytesPerSector, &dNumberOfFreeClusters, &dTotalNumberOfClusters)) {
+        if (::GetDiskFreeSpaceW(
+                driveStringW.c_str(),
+                &dSectorsPerCluster,
+                &dBytesPerSector,
+                &dNumberOfFreeClusters,
+                &dTotalNumberOfClusters)) {
             currentDiskInfo.m_clusterBytes = dSectorsPerCluster * dBytesPerSector;
-            currentDiskInfo.m_totalBytes   = ((uint64_t)dTotalNumberOfClusters) * dSectorsPerCluster * dBytesPerSector;
-            currentDiskInfo.m_freeBytes    = ((uint64_t)dNumberOfFreeClusters)  * dSectorsPerCluster * dBytesPerSector;
+            currentDiskInfo.m_totalBytes = ((uint64_t) dTotalNumberOfClusters) * dSectorsPerCluster
+                                           * dBytesPerSector;
+            currentDiskInfo.m_freeBytes = ((uint64_t) dNumberOfFreeClusters) * dSectorsPerCluster
+                                          * dBytesPerSector;
         }
-    }
-    else {
+    } else {
         currentDiskInfo.m_clusterBytes = 0;
         currentDiskInfo.m_totalBytes = 0;
         currentDiskInfo.m_freeBytes = 0;
@@ -118,14 +131,14 @@ bool DiskUtils::GetLogicalDriveInfo(const DString& driveString, DiskInfo& diskIn
     return true;
 }
 
-DString DiskUtils::GetDriveFromDirectoryPath(const DString& path) 
+DString DiskUtils::GetDriveFromDirectoryPath(const DString &path)
 {
-    if ( (path.size() < 2)) {
+    if ((path.size() < 2)) {
         return DString();
     }
-    if ( (path[1] != _T(':'))) {
+    if ((path[1] != _T(':'))) {
         return DString();
-    }    
+    }
     return path.substr(0, 3);
 }
 
@@ -157,7 +170,7 @@ DString DiskUtils::GetMaxFreeSpaceLocalDisk()
     return maxFreedrive;
 }
 
-uint64_t DiskUtils::GetFreeDiskSpace(const DString& fullDirectory)
+uint64_t DiskUtils::GetFreeDiskSpace(const DString &fullDirectory)
 {
     uint64_t freeSize = 0;
     DString drive = GetDriveFromDirectoryPath(fullDirectory);
@@ -169,6 +182,6 @@ uint64_t DiskUtils::GetFreeDiskSpace(const DString& fullDirectory)
     return freeSize;
 }
 
-}//namespace ui
+} //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

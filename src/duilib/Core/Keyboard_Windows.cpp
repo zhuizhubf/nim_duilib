@@ -1,9 +1,8 @@
 #include "Keyboard.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-namespace ui
-{
+namespace ui {
 bool Keyboard::IsKeyDown(VirtualKeyCode nVirtKey)
 {
     return (::GetKeyState(nVirtKey) & 0x8000) != 0;
@@ -27,8 +26,7 @@ bool Keyboard::IsCapsLockOn()
 DString Keyboard::GetKeyName(VirtualKeyCode nVirtKey, bool fExtended)
 {
     UINT nScanCode = ::MapVirtualKeyEx(nVirtKey, 0, ::GetKeyboardLayout(0));
-    switch (nVirtKey)
-    {
+    switch (nVirtKey) {
     // Keys which are "extended" (except for Return which is Numeric Enter as extended)
     case kVK_INSERT:
     case kVK_DELETE:
@@ -49,7 +47,7 @@ DString Keyboard::GetKeyName(VirtualKeyCode nVirtKey, bool fExtended)
         nScanCode |= 0x01000000L;
     }
 
-    TCHAR szStr[MAX_PATH] = { 0 };
+    TCHAR szStr[MAX_PATH] = {0};
     ::GetKeyNameText(nScanCode << 16, szStr, MAX_PATH);
     return DString(szStr);
 }

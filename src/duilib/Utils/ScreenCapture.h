@@ -1,12 +1,11 @@
 #ifndef UI_UTILS_SCREEN_CAPTURE_H_
 #define UI_UTILS_SCREEN_CAPTURE_H_
 
-#include "render/IRender.h"
 #include "duilib/Core/Window.h"
+#include "render/IRender.h"
 #include <memory>
 
-namespace ui
-{
+namespace ui {
 /** 屏幕截图
 */
 class DUILIB_API ScreenCapture
@@ -15,7 +14,7 @@ public:
     /** 抓一张窗口所在屏幕的截图
     * @param [in] pWindow 窗口
     */
-    static std::shared_ptr<IBitmap> CaptureBitmap(const Window* pWindow);
+    static std::shared_ptr<IBitmap> CaptureBitmap(const Window *pWindow);
 };
 
 } // namespace ui

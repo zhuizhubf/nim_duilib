@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiPoint.h"
 
-namespace ui
-{
+namespace ui {
 class Window;
 
 /** 窗口点击穿透功能的实现封装
@@ -20,9 +19,9 @@ public:
     * @param [in] pWindow 当前窗口
     * @param [in] ptMouse 鼠标点击的点（屏幕坐标）
     */
-    bool ClickThroughWindow(Window* pWindow, const UiPoint& ptMouse);
+    bool ClickThroughWindow(Window *pWindow, const UiPoint &ptMouse);
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CORE_CLICK_THROUGH_H_

@@ -1,16 +1,15 @@
 #ifndef UI_IMAGE_IMAGE_INFO_H_
 #define UI_IMAGE_IMAGE_INFO_H_
 
-#include "render/IRender.h"
 #include "duilib/Core/UiTypes.h"
 #include "duilib/Image/ImageDecoder.h"
 #include "duilib/Image/ImageLoadParam.h"
+#include "render/IRender.h"
 
-namespace ui 
-{
-    class IRender;
-    class Control;
-    class DpiManager;
+namespace ui {
+class IRender;
+class Control;
+class DpiManager;
 
 /** 图片信息
 */
@@ -20,8 +19,8 @@ public:
     ImageInfo();
     ~ImageInfo();
 
-    ImageInfo(const ImageInfo&) = delete;
-    ImageInfo& operator = (const ImageInfo&) = delete;
+    ImageInfo(const ImageInfo &) = delete;
+    ImageInfo &operator=(const ImageInfo &) = delete;
 
 public:
     /** 获取图片加载时的DPI界面缩放比（举例：100代表缩放百分比为100% ，无缩放）
@@ -56,7 +55,7 @@ public:
     * @param [in] rcSource 图片源区域
     * @param [in] pControl 该图片管理的控件接口
     */
-    std::shared_ptr<IBitmap> GetSvgBitmap(const UiRect& rcDest, UiRect& rcSource, Control* pControl);
+    std::shared_ptr<IBitmap> GetSvgBitmap(const UiRect &rcDest, UiRect &rcSource, Control *pControl);
 
 public:
     /** 获取一个位图图片数据（单帧图片）
@@ -65,7 +64,7 @@ public:
      * @return 返回位图的接口指针，如果返回nullptr并且bDecodeError为false表示图片尚未完成解码（多线程解码的情况下）
      *                          如果返回nullptr并且bDecodeError为true代表图片解码出现错误
      */
-    std::shared_ptr<IBitmap> GetBitmap(bool* bDecodeError, Control* pControl);
+    std::shared_ptr<IBitmap> GetBitmap(bool *bDecodeError, Control *pControl);
 
 public:
     /** 查询是某帧的图片数据是否有准备完成（多线程解码时，帧数据在后台线程解码）
@@ -77,7 +76,7 @@ public:
     * @param [in] nFrameIndex 图片帧的索引号，从0开始编号的下标值，取值范围:[0, GetFrameCount())
     * @param [in] szDestRectSize 目标区域的大小，用于矢量图的缩放
     */
-    AnimationFramePtr GetFrame(uint32_t nFrameIndex, const UiSize& szDestRectSize);
+    AnimationFramePtr GetFrame(uint32_t nFrameIndex, const UiSize &szDestRectSize);
 
     /** 获取一个图片帧的播放持续时间，单位为毫秒
     * @param [in] nFrameIndex 图片帧的索引号，从0开始编号的下标值，取值范围:[0, GetFrameCount())
@@ -106,7 +105,7 @@ public:
     /** 设置实际图片的KEY, 用于图片的生命周期管理
     * @param [in] imageKey 实际图片时的KEY
     */
-    void SetImageKey(const DString& imageKey);
+    void SetImageKey(const DString &imageKey);
 
     /** 获取实际图片的KEY
     */
@@ -118,10 +117,11 @@ public:
     * @param [in] bImageDpiScaleEnabled 该图片是否支持DPI自适应
     * @param [in] nImageFileDpiScale DPI自适应图片的DPI缩放比
     */
-    bool SetImageData(const ImageLoadParam& loadParam,
-                      const std::shared_ptr<IImage>& pImageData,
-                      bool bImageDpiScaleEnabled,
-                      uint32_t nImageFileDpiScale);
+    bool SetImageData(
+        const ImageLoadParam &loadParam,
+        const std::shared_ptr<IImage> &pImageData,
+        bool bImageDpiScaleEnabled,
+        uint32_t nImageFileDpiScale);
 
     /** 获取关联的原图的图片数据接口
     */
@@ -133,8 +133,9 @@ public:
     * @param [in/out] rcSource 图片区域（传入值未作DPI缩放）
     * @param [in/out] rcSourceCorners 图片区域的圆角信息（传入值未作DPI缩放）
     */
-    void ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcDestCorners, UiRect& rcSource, UiRect& rcSourceCorners);
-    void ScaleImageSourceRect(const DpiManager& dpi, UiRect& rcSource);
+    void ScaleImageSourceRect(
+        const DpiManager &dpi, UiRect &rcDestCorners, UiRect &rcSource, UiRect &rcSourceCorners);
+    void ScaleImageSourceRect(const DpiManager &dpi, UiRect &rcSource);
 
 private:
     /** 释放图片资源（延迟释放，以便于共享）
@@ -147,19 +148,19 @@ private:
 
     /** 计算ImageInfo的大小(该大小与图片本身的大小可能会不同)
     */
-    void CalcImageInfoSize(const ImageLoadParam& loadParam,
-                           const std::shared_ptr<IImage>& pImageData,
-                           bool bImageDpiScaleEnabled,
-                           uint32_t nImageFileDpiScale,
-                           int32_t& nImageInfoWidth,
-                           int32_t& nImageInfoHeight) const;
+    void CalcImageInfoSize(
+        const ImageLoadParam &loadParam,
+        const std::shared_ptr<IImage> &pImageData,
+        bool bImageDpiScaleEnabled,
+        uint32_t nImageFileDpiScale,
+        int32_t &nImageInfoWidth,
+        int32_t &nImageInfoHeight) const;
 
     /** 获取Svg图片的位图，支持矢量缩放
     * @param [in] fImageSizeScale 图片缩放的比例
     * @param [in] pControl 该图片管理的控件接口
     */
-    std::shared_ptr<IBitmap> GetSvgBitmap(float fImageSizeScale, Control* pControl);
-
+    std::shared_ptr<IBitmap> GetSvgBitmap(float fImageSizeScale, Control *pControl);
 
 private:
     /** 实际图片的KEY, 用于图片的生命周期管理（多个DPI的图片，实际可能指向同一个文件）

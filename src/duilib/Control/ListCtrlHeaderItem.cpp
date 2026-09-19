@@ -3,22 +3,21 @@
 #include "duilib/Core/GlobalManager.h"
 #include "render/IRender.h"
 
-namespace ui
-{
-ListCtrlHeaderItem::ListCtrlHeaderItem(Window* pWindow) :
-    ControlDragableT<CheckBoxHBox>(pWindow),
-    m_pSortedDownImage(nullptr),
-    m_pSortedUpImage(nullptr),
-    m_sortMode(SortMode::kDown),
-    m_pSplitBox(nullptr),
-    m_bColumnResizeable(true),
-    m_nColumnWidth(0),
-    m_bShowIconAtTop(true),
-    m_bColumnVisible(true),
-    m_imageId(-1),
-    m_pHeaderCtrl(nullptr),
-    m_nIconSpacing(0),
-    m_bShowSortImage(false)
+namespace ui {
+ListCtrlHeaderItem::ListCtrlHeaderItem(Window *pWindow)
+    : ControlDragableT<CheckBoxHBox>(pWindow)
+    , m_pSortedDownImage(nullptr)
+    , m_pSortedUpImage(nullptr)
+    , m_sortMode(SortMode::kDown)
+    , m_pSplitBox(nullptr)
+    , m_bColumnResizeable(true)
+    , m_nColumnWidth(0)
+    , m_bShowIconAtTop(true)
+    , m_bColumnVisible(true)
+    , m_imageId(-1)
+    , m_pHeaderCtrl(nullptr)
+    , m_nIconSpacing(0)
+    , m_bShowSortImage(false)
 {
     SetIconSpacing(6, true);
 }
@@ -34,25 +33,24 @@ ListCtrlHeaderItem::~ListCtrlHeaderItem()
         m_pSortedUpImage = nullptr;
     }
 }
- 
-DString ListCtrlHeaderItem::GetType() const { return _T("ListCtrlHeaderItem"); }
 
-void ListCtrlHeaderItem::SetAttribute(const DString& strName, const DString& strValue2)
+DString ListCtrlHeaderItem::GetType() const
+{
+    return _T("ListCtrlHeaderItem");
+}
+
+void ListCtrlHeaderItem::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("sorted_up_image")) {
         SetSortedUpImage(strValue);
-    }
-    else if (strName == _T("sorted_down_image")) {
+    } else if (strName == _T("sorted_down_image")) {
         SetSortedDownImage(strValue);
-    }
-    else if (strName == _T("icon_spacing")) {
+    } else if (strName == _T("icon_spacing")) {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
-    }
-    else if (strName == _T("show_icon_at_top")) {
+    } else if (strName == _T("show_icon_at_top")) {
         SetShowIconAtTop(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -74,7 +72,7 @@ void ListCtrlHeaderItem::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiS
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-void ListCtrlHeaderItem::PaintText(IRender* pRender)
+void ListCtrlHeaderItem::PaintText(IRender *pRender)
 {
     //需要绘制的内容包括：图标、文字、排序图标
     if (pRender == nullptr) {
@@ -84,7 +82,7 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
     ImagePtr pItemImage;
     UiSize itemImageSize;
     if ((m_imageId >= 0) && (m_pHeaderCtrl != nullptr)) {
-        ListCtrl* pListCtrl = m_pHeaderCtrl->GetListCtrl();
+        ListCtrl *pListCtrl = m_pHeaderCtrl->GetListCtrl();
         if (pListCtrl != nullptr) {
             ImageListPtr pImageList = pListCtrl->GetImageList(ListCtrlType::Report);
             if (pImageList != nullptr) {
@@ -101,10 +99,8 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
         if (pItemImageCache == nullptr) {
             pItemImage = nullptr;
             pItemImageCache.reset();
-        }
-        else {
-            if ((pItemImageCache->GetWidth() <= 0) ||
-                (pItemImageCache->GetHeight() <= 0)) {
+        } else {
+            if ((pItemImageCache->GetWidth() <= 0) || (pItemImageCache->GetHeight() <= 0)) {
                 pItemImage = nullptr;
                 pItemImageCache.reset();
             }
@@ -112,13 +108,12 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
     }
 
     //排序图标
-    Image* pSortImage = nullptr;
+    Image *pSortImage = nullptr;
     if (IsShowSortImage()) {
         if (m_sortMode == SortMode::kUp) {
             //升序
             pSortImage = m_pSortedUpImage;
-        }
-        else if (m_sortMode == SortMode::kDown) {
+        } else if (m_sortMode == SortMode::kDown) {
             //降序
             pSortImage = m_pSortedDownImage;
         }
@@ -131,10 +126,8 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
         if (pSortImageCache == nullptr) {
             pSortImage = nullptr;
             pSortImageCache.reset();
-        }
-        else {
-            if ((pSortImageCache->GetWidth() <= 0) ||
-                (pSortImageCache->GetHeight() <= 0)) {
+        } else {
+            if ((pSortImageCache->GetWidth() <= 0) || (pSortImageCache->GetHeight() <= 0)) {
                 pSortImage = nullptr;
                 pSortImageCache.reset();
             }
@@ -151,8 +144,7 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
         rc.right = rc.left + nImageWidth;
         if (!(GetTextStyle() & TEXT_VCENTER) && !(GetTextStyle() & TEXT_BOTTOM)) {
             rc.top = rc.bottom - nImageHeight;
-        }
-        else {
+        } else {
             rc.bottom = rc.top + nImageHeight;
         }
 
@@ -200,13 +192,13 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
         rcItemRect.left += nCheckBoxWidth;
         rcItemRect.Validate();
     }
-    
+
     if ((sortImageSize.cx + itemImageSize.cx + measureRect.Width()) > rcItemRect.Width()) {
         //横向的空间不足，按左对齐绘制
         nIconTextSpacing = 0;
         textStyle = TEXT_LEFT;
     }
-    
+
     UiRect rc = GetRect();
     rc.Deflate(GetControlPadding());
     if (nCheckBoxWidth > 0) {
@@ -240,8 +232,7 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
         }
 
         DoPaintText(textRect, pRender);
-    }
-    else if (textStyle & TEXT_RIGHT) {
+    } else if (textStyle & TEXT_RIGHT) {
         //靠右对齐
         if (pSortImage != nullptr) {
             UiRect sortRect = rc;
@@ -276,8 +267,7 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
             VAlignRect(itemRect, GetTextStyle(), itemImageSize.cy);
             PaintImage(pRender, pItemImage.get(), _T(""), -1, nullptr, &itemRect, nullptr);
         }
-    }
-    else {
+    } else {
         //靠左对齐：图标、文字、排序图标依次绘制
         if (pItemImage != nullptr) {
             UiRect itemRect = rc;
@@ -308,27 +298,25 @@ void ListCtrlHeaderItem::PaintText(IRender* pRender)
     }
 }
 
-void ListCtrlHeaderItem::VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageHeight)
+void ListCtrlHeaderItem::VAlignRect(UiRect &rc, uint32_t textStyle, int32_t nImageHeight)
 {
-    if ((nImageHeight <= 0) || (nImageHeight >= rc.Height())){
+    if ((nImageHeight <= 0) || (nImageHeight >= rc.Height())) {
         return;
     }
     if (textStyle & TEXT_VCENTER) {
         //居中对齐
         rc.top = rc.CenterY() - nImageHeight / 2;
         rc.bottom = rc.top + nImageHeight;
-    }
-    else if (textStyle & TEXT_BOTTOM) {
+    } else if (textStyle & TEXT_BOTTOM) {
         //底部对齐
         rc.top = rc.bottom - nImageHeight;
-    }
-    else {
+    } else {
         //顶部对齐
         rc.bottom = rc.top + nImageHeight;
     }
 }
 
-void ListCtrlHeaderItem::Activate(const EventArgs* pMsg)
+void ListCtrlHeaderItem::Activate(const EventArgs *pMsg)
 {
     if (IsInDraggingOrder() || IsInDraggingOut()) {
         //处于拖动改变列顺序的状态
@@ -343,15 +331,14 @@ void ListCtrlHeaderItem::Activate(const EventArgs* pMsg)
         m_sortMode = SortMode::kDown;
         bSortChanged = true;
         Invalidate();
-    }
-    else if (m_sortMode == SortMode::kDown) {
+    } else if (m_sortMode == SortMode::kDown) {
         m_sortMode = SortMode::kUp;
         bSortChanged = true;
-        Invalidate();        
+        Invalidate();
     }
 
     if (bSortChanged) {
-        ListCtrlHeader* pHeader = GetHeaderCtrl();
+        ListCtrlHeader *pHeader = GetHeaderCtrl();
         if (pHeader != nullptr) {
             pHeader->OnHeaderColumnSorted(this);
         }
@@ -375,11 +362,11 @@ void ListCtrlHeaderItem::SetSortMode(SortMode sortMode, bool bTriggerEvent)
         m_sortMode = sortMode;
         Invalidate();
         if (bTriggerEvent && (m_sortMode != SortMode::kNone)) {
-            ListCtrlHeader* pHeader = GetHeaderCtrl();
+            ListCtrlHeader *pHeader = GetHeaderCtrl();
             if (pHeader != nullptr) {
                 pHeader->OnHeaderColumnSorted(this);
             }
-        } 
+        }
     }
 }
 
@@ -388,7 +375,7 @@ ListCtrlHeaderItem::SortMode ListCtrlHeaderItem::GetSortMode() const
     return m_sortMode;
 }
 
-void ListCtrlHeaderItem::SetSortedDownImage(const DString& sImageString)
+void ListCtrlHeaderItem::SetSortedDownImage(const DString &sImageString)
 {
     if (m_pSortedDownImage == nullptr) {
         m_pSortedDownImage = new Image;
@@ -397,7 +384,7 @@ void ListCtrlHeaderItem::SetSortedDownImage(const DString& sImageString)
     Invalidate();
 }
 
-void ListCtrlHeaderItem::SetSortedUpImage(const DString& sImageString)
+void ListCtrlHeaderItem::SetSortedUpImage(const DString &sImageString)
 {
     if (m_pSortedUpImage == nullptr) {
         m_pSortedUpImage = new Image;
@@ -421,10 +408,10 @@ bool ListCtrlHeaderItem::IsShowSortImage() const
 
 size_t ListCtrlHeaderItem::GetColumnId() const
 {
-    return (size_t)this;
+    return (size_t) this;
 }
 
-void ListCtrlHeaderItem::SetSplitBox(SplitBox* pSplitBox)
+void ListCtrlHeaderItem::SetSplitBox(SplitBox *pSplitBox)
 {
     m_pSplitBox = pSplitBox;
     if (pSplitBox != nullptr) {
@@ -436,7 +423,7 @@ void ListCtrlHeaderItem::SetSplitBox(SplitBox* pSplitBox)
     }
 }
 
-SplitBox* ListCtrlHeaderItem::GetSplitBox() const
+SplitBox *ListCtrlHeaderItem::GetSplitBox() const
 {
     return m_pSplitBox;
 }
@@ -499,7 +486,7 @@ void ListCtrlHeaderItem::SetIconSpacing(int32_t nIconSpacing, bool bNeedDpiScale
             m_nIconSpacing = 0;
         }
         Invalidate();
-    }    
+    }
 }
 
 int32_t ListCtrlHeaderItem::GetIconSpacing() const
@@ -512,7 +499,7 @@ void ListCtrlHeaderItem::SetShowIconAtTop(bool bShowIconAtTop)
     if (m_bShowIconAtTop != bShowIconAtTop) {
         m_bShowIconAtTop = bShowIconAtTop;
         Invalidate();
-    }    
+    }
 }
 
 bool ListCtrlHeaderItem::IsShowIconAtTop() const
@@ -527,13 +514,11 @@ void ListCtrlHeaderItem::SetTextHorAlign(HorAlignType alignType)
         //文本：居中对齐
         textStyle &= ~TEXT_HALIGN_ALL;
         textStyle |= TEXT_HCENTER;
-    }
-    else if (alignType == HorAlignType::kAlignRight) {
+    } else if (alignType == HorAlignType::kAlignRight) {
         //文本：右对齐
         textStyle &= ~TEXT_HALIGN_ALL;
         textStyle |= TEXT_RIGHT;
-    }
-    else {
+    } else {
         //文本：左对齐
         textStyle &= ~TEXT_HALIGN_ALL;
         textStyle |= TEXT_LEFT;
@@ -543,13 +528,12 @@ void ListCtrlHeaderItem::SetTextHorAlign(HorAlignType alignType)
 
 HorAlignType ListCtrlHeaderItem::GetTextHorAlign() const
 {
-    HorAlignType alignType = HorAlignType::kAlignLeft;//文本：左对齐
+    HorAlignType alignType = HorAlignType::kAlignLeft; //文本：左对齐
     uint32_t textStyle = GetTextStyle();
     if (textStyle & TEXT_HCENTER) {
         //文本：居中对齐
         alignType = HorAlignType::kAlignCenter;
-    }
-    else if (textStyle & TEXT_RIGHT) {
+    } else if (textStyle & TEXT_RIGHT) {
         //文本：右对齐
         alignType = HorAlignType::kAlignRight;
     }
@@ -561,7 +545,7 @@ void ListCtrlHeaderItem::SetImageId(int32_t imageId)
     if (m_imageId != imageId) {
         m_imageId = imageId;
         Invalidate();
-    }    
+    }
 }
 
 int32_t ListCtrlHeaderItem::GetImageId() const
@@ -571,7 +555,7 @@ int32_t ListCtrlHeaderItem::GetImageId() const
 
 bool ListCtrlHeaderItem::IsEnableDragOrder() const
 {
-    ListCtrlHeader* pHeader = GetHeaderCtrl();
+    ListCtrlHeader *pHeader = GetHeaderCtrl();
     if (pHeader != nullptr) {
         if (!pHeader->IsEnableHeaderDragOrder()) {
             //不支持拖动调整顺序
@@ -583,7 +567,7 @@ bool ListCtrlHeaderItem::IsEnableDragOrder() const
 
 bool ListCtrlHeaderItem::SetShowCheckBox(bool bShow)
 {
-    ListCtrlHeader* pHeader = GetHeaderCtrl();
+    ListCtrlHeader *pHeader = GetHeaderCtrl();
     if (pHeader == nullptr) {
         return false;
     }
@@ -592,7 +576,7 @@ bool ListCtrlHeaderItem::SetShowCheckBox(bool bShow)
         if (IsShowCheckBox()) {
             return true;
         }
-        ListCtrl* pListCtrl = pHeader->GetListCtrl();
+        ListCtrl *pListCtrl = pHeader->GetListCtrl();
         if (pListCtrl != nullptr) {
             DString checkBoxClass = pListCtrl->GetCheckBoxClass();
             if (!checkBoxClass.empty()) {
@@ -614,19 +598,18 @@ bool ListCtrlHeaderItem::SetShowCheckBox(bool bShow)
                     if (pListCtrl != nullptr) {
                         pListCtrl->UpdateHeaderColumnCheckBox(GetColumnId());
                     }
-                    this->AttachCheck([this, pHeader](const EventArgs& /*args*/) {
+                    this->AttachCheck([this, pHeader](const EventArgs & /*args*/) {
                         pHeader->OnHeaderColumnCheckStateChanged(this, true);
                         return true;
-                        });
-                    this->AttachUnCheck([this, pHeader](const EventArgs& /*args*/) {
+                    });
+                    this->AttachUnCheck([this, pHeader](const EventArgs & /*args*/) {
                         pHeader->OnHeaderColumnCheckStateChanged(this, false);
                         return true;
-                        });
+                    });
                 }
             }
         }
-    }
-    else {
+    } else {
         if (!IsShowCheckBox()) {
             return true;
         }
@@ -650,7 +633,8 @@ bool ListCtrlHeaderItem::SetShowCheckBox(bool bShow)
 bool ListCtrlHeaderItem::IsShowCheckBox() const
 {
     //如果有CheckBox图片资源，则认为显示了CheckBox
-    return !GetStateImage(kControlStateNormal).empty() && !GetSelectedStateImage(kControlStateNormal).empty();
+    return !GetStateImage(kControlStateNormal).empty()
+           && !GetSelectedStateImage(kControlStateNormal).empty();
 }
 
 int32_t ListCtrlHeaderItem::GetCheckBoxImageWidth()
@@ -674,11 +658,11 @@ bool ListCtrlHeaderItem::SetCheckBoxCheck(bool bChecked, bool bPartChecked)
     }
     if (bChanged) {
         this->Invalidate();
-    }            
+    }
     return true;
 }
 
-bool ListCtrlHeaderItem::GetCheckBoxCheck(bool& bChecked, bool& bPartChecked) const
+bool ListCtrlHeaderItem::GetCheckBoxCheck(bool &bChecked, bool &bPartChecked) const
 {
     bChecked = false;
     bPartChecked = false;
@@ -701,7 +685,7 @@ void ListCtrlHeaderItem::SetColumnVisible(bool bColumnVisible)
     if (m_pSplitBox != nullptr) {
         m_pSplitBox->SetVisible(bColumnVisible);
     }
-    ListCtrlHeader* pHeader = GetHeaderCtrl();
+    ListCtrlHeader *pHeader = GetHeaderCtrl();
     if (pHeader != nullptr) {
         pHeader->OnHeaderColumnVisibleChanged();
     }
@@ -713,24 +697,24 @@ bool ListCtrlHeaderItem::IsColumnVisible() const
     return m_bColumnVisible;
 }
 
-void ListCtrlHeaderItem::SetHeaderCtrl(ListCtrlHeader* pHeaderCtrl)
+void ListCtrlHeaderItem::SetHeaderCtrl(ListCtrlHeader *pHeaderCtrl)
 {
     m_pHeaderCtrl = pHeaderCtrl;
 }
 
-ListCtrlHeader* ListCtrlHeaderItem::GetHeaderCtrl() const
+ListCtrlHeader *ListCtrlHeaderItem::GetHeaderCtrl() const
 {
     ASSERT(m_pHeaderCtrl != nullptr);
     return m_pHeaderCtrl;
 }
 
-void ListCtrlHeaderItem::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouseDown,
-                                       const std::vector<ItemStatus>& rcItemList) const
+void ListCtrlHeaderItem::AdjustItemPos(
+    const UiPoint &pt, const UiPoint &ptMouseDown, const std::vector<ItemStatus> &rcItemList) const
 {
-    Control* pMouseItem = nullptr;
+    Control *pMouseItem = nullptr;
     size_t nMouseItemIndex = Box::InvalidIndex;
     size_t nMouseDownItemIndex = Box::InvalidIndex;
-    for (const ItemStatus& itemStatus : rcItemList) {
+    for (const ItemStatus &itemStatus : rcItemList) {
         if (itemStatus.m_rcPos.ContainsPt(pt)) {
             pMouseItem = itemStatus.m_pItem;
             nMouseItemIndex = itemStatus.m_index;
@@ -739,12 +723,11 @@ void ListCtrlHeaderItem::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouse
             nMouseDownItemIndex = itemStatus.m_index;
         }
     }
-    if ((pMouseItem == nullptr) ||
-        (nMouseItemIndex == Box::InvalidIndex) ||
-        (nMouseDownItemIndex == Box::InvalidIndex)) {
+    if ((pMouseItem == nullptr) || (nMouseItemIndex == Box::InvalidIndex)
+        || (nMouseDownItemIndex == Box::InvalidIndex)) {
         return;
     }
-    ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(pMouseItem);
+    ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(pMouseItem);
     if (pHeaderItem == nullptr) {
         //鼠标不在表头控件上
         return;
@@ -758,7 +741,7 @@ void ListCtrlHeaderItem::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouse
     int32_t xOffset = pt.x - ptMouseDown.x;
     if (pMouseItem == this) {
         //当前鼠标位置：在自身的位置，恢复各个控件的实际位置
-        for (const ItemStatus& item : rcItemList) {
+        for (const ItemStatus &item : rcItemList) {
             if (item.m_pItem == this) {
                 continue;
             }
@@ -766,68 +749,60 @@ void ListCtrlHeaderItem::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouse
                 item.m_pItem->SetPos(item.m_rcPos);
             }
         }
-    }
-    else if (xOffset < 0) {
+    } else if (xOffset < 0) {
         //当前鼠标位置：在按下点的左侧，向右侧移动控件
         for (size_t index = 0; index < itemCount; ++index) {
-            const ItemStatus& item = rcItemList[index];
+            const ItemStatus &item = rcItemList[index];
             if (item.m_pItem == this) {
                 //恢复关联的Split控件位置
                 if ((index + 1) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index + 1];
+                    const ItemStatus &nextItem = rcItemList[index + 1];
                     if ((nextItem.m_pItem->GetRect() != nextItem.m_rcPos)) {
                         nextItem.m_pItem->SetPos(nextItem.m_rcPos);
                     }
                 }
                 continue;
-            }
-            else if ((item.m_index >= nMouseItemIndex) && (item.m_index < nMouseDownItemIndex)) {
+            } else if ((item.m_index >= nMouseItemIndex) && (item.m_index < nMouseDownItemIndex)) {
                 //向右侧移动
                 if ((index + 2) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index + 2];
+                    const ItemStatus &nextItem = rcItemList[index + 2];
                     item.m_pItem->SetPos(nextItem.m_rcPos);
-                }
-                else {
+                } else {
                     if (item.m_pItem->GetRect() != item.m_rcPos) {
                         item.m_pItem->SetPos(item.m_rcPos);
                     }
                 }
-            }
-            else {
+            } else {
                 //恢复原位置
                 if (item.m_pItem->GetRect() != item.m_rcPos) {
                     item.m_pItem->SetPos(item.m_rcPos);
                 }
             }
         }
-    }
-    else {
+    } else {
         //当前鼠标位置：在按下点的右侧，向左侧移动控件
         for (size_t index = 0; index < itemCount; ++index) {
-            const ItemStatus& item = rcItemList[index];
+            const ItemStatus &item = rcItemList[index];
             if (item.m_pItem == this) {
                 //恢复关联的Split控件位置
                 if ((index + 1) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index + 1];
+                    const ItemStatus &nextItem = rcItemList[index + 1];
                     if ((nextItem.m_pItem->GetRect() != nextItem.m_rcPos)) {
                         nextItem.m_pItem->SetPos(nextItem.m_rcPos);
                     }
                 }
                 continue;
-            }
-            else if ((item.m_index > nMouseDownItemIndex) && (item.m_index <= nMouseItemIndex)) {
+            } else if ((item.m_index > nMouseDownItemIndex) && (item.m_index <= nMouseItemIndex)) {
                 //向左侧移动
                 if ((index - 2) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index - 2];
+                    const ItemStatus &nextItem = rcItemList[index - 2];
                     item.m_pItem->SetPos(nextItem.m_rcPos);
-                }
-                else {
+                } else {
                     if (item.m_pItem->GetRect() != item.m_rcPos) {
                         item.m_pItem->SetPos(item.m_rcPos);
                     }
                 }
-            }
-            else {
+            } else {
                 //恢复原位置
                 if (item.m_pItem->GetRect() != item.m_rcPos) {
                     item.m_pItem->SetPos(item.m_rcPos);
@@ -837,14 +812,15 @@ void ListCtrlHeaderItem::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouse
     }
 }
 
-bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
-                                          const std::vector<ItemStatus>& rcItemList,
-                                          size_t& nOldItemIndex,
-                                          size_t& nNewItemIndex)
+bool ListCtrlHeaderItem::AdjustItemOrders(
+    const UiPoint &pt,
+    const std::vector<ItemStatus> &rcItemList,
+    size_t &nOldItemIndex,
+    size_t &nNewItemIndex)
 {
     nOldItemIndex = Box::InvalidIndex;
     nNewItemIndex = Box::InvalidIndex;
-    Box* pHeader = GetParent();
+    Box *pHeader = GetParent();
     if (pHeader == nullptr) {
         return false;
     }
@@ -852,10 +828,10 @@ bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
     const size_t itemCount = pHeader->GetItemCount();
     size_t nMouseItemIndex = Box::InvalidIndex;
     size_t nCurrentItemIndex = Box::InvalidIndex;
-    for (const ItemStatus& itemStatus : rcItemList) {
+    for (const ItemStatus &itemStatus : rcItemList) {
         if (itemStatus.m_rcPos.ContainsPt(pt)) {
             nMouseItemIndex = itemStatus.m_index;
-            ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(itemStatus.m_pItem);
+            ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(itemStatus.m_pItem);
             if ((pHeaderItem != nullptr) && !pHeaderItem->IsEnableDragOrder()) {
                 //当前列为固定列，不允许调整顺序
                 nMouseItemIndex = Box::InvalidIndex;
@@ -865,10 +841,8 @@ bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
             nCurrentItemIndex = itemStatus.m_index;
         }
     }
-    if ((nMouseItemIndex != Box::InvalidIndex) &&
-        (nCurrentItemIndex != Box::InvalidIndex) &&
-        (nMouseItemIndex < itemCount) &&
-        (nCurrentItemIndex < itemCount)) {
+    if ((nMouseItemIndex != Box::InvalidIndex) && (nCurrentItemIndex != Box::InvalidIndex)
+        && (nMouseItemIndex < itemCount) && (nCurrentItemIndex < itemCount)) {
         //交换控件的位置
         if (nMouseItemIndex < nCurrentItemIndex) {
             //向左侧交换
@@ -881,8 +855,7 @@ bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
                     pHeader->SetItemIndex(m_pSplitBox, nNewIndex + 1);
                 }
             }
-        }
-        else {
+        } else {
             //向右侧交换
             nMouseItemIndex += 1;
             if (nMouseItemIndex >= itemCount) {
@@ -906,14 +879,15 @@ bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
 
         //交换后，对所有的项进行校验
         for (size_t index = 0; index < itemCount; index += 2) {
-            ASSERT(dynamic_cast<ListCtrlHeaderItem*>(pHeader->GetItemAt(index)) != nullptr);
+            ASSERT(dynamic_cast<ListCtrlHeaderItem *>(pHeader->GetItemAt(index)) != nullptr);
             ASSERT((index + 1) < itemCount);
             if ((index + 1) >= itemCount) {
                 break;
             }
-            ASSERT(dynamic_cast<SplitBox*>(pHeader->GetItemAt(index + 1)) != nullptr);
-            ASSERT(dynamic_cast<SplitBox*>(pHeader->GetItemAt(index + 1)) ==
-                   dynamic_cast<ListCtrlHeaderItem*>(pHeader->GetItemAt(index))->m_pSplitBox);
+            ASSERT(dynamic_cast<SplitBox *>(pHeader->GetItemAt(index + 1)) != nullptr);
+            ASSERT(
+                dynamic_cast<SplitBox *>(pHeader->GetItemAt(index + 1))
+                == dynamic_cast<ListCtrlHeaderItem *>(pHeader->GetItemAt(index))->m_pSplitBox);
         }
     }
 
@@ -922,11 +896,10 @@ bool ListCtrlHeaderItem::AdjustItemOrders(const UiPoint& pt,
 
 void ListCtrlHeaderItem::OnItemOrdersChanged(size_t /*nOldItemIndex*/, size_t /*nNewItemIndex*/)
 {
-    ListCtrlHeader* pHeader = GetHeaderCtrl();
+    ListCtrlHeader *pHeader = GetHeaderCtrl();
     if (pHeader != nullptr) {
         pHeader->OnHeaderColumnOrderChanged();
     }
 }
 
-}//namespace ui
-
+} //namespace ui

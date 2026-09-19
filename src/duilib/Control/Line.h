@@ -3,20 +3,20 @@
 
 #include "duilib/Core/Control.h"
 
-namespace ui
-{
+namespace ui {
 /** 画线控件
 */
-class DUILIB_API Line: public Control
+class DUILIB_API Line : public Control
 {
     typedef Control BaseClass;
+
 public:
-    explicit Line(Window* pWindow);
+    explicit Line(Window *pWindow);
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -44,7 +44,7 @@ public:
 
     /** 设置线条颜色
     */
-    void SetLineColor(const DString& lineColor);
+    void SetLineColor(const DString &lineColor);
 
     /** 获取线条颜色
     */
@@ -52,7 +52,7 @@ public:
 
     /** 设置线条类型
     */
-    void SetLineDashStyle(const DString& dashStyle);
+    void SetLineDashStyle(const DString &dashStyle);
 
     /** 获取线条类型
     */
@@ -63,7 +63,7 @@ protected:
     * @param [in] pRender 指定绘制区域
     * @param [in] rcPaint 指定绘制坐标
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
 
 private:
     /** 水平还是垂直(true表示垂直)
@@ -83,6 +83,6 @@ private:
     int8_t m_dashStyle;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LINE_H_

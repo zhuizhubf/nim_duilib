@@ -6,14 +6,14 @@
 #include "SkiaHeaderBegin.h"
 
 #include "include/core/SkCanvas.h"
-#include "include/core/SkSurface.h"
 #include "include/core/SkRegion.h"
+#include "include/core/SkSurface.h"
 
 #include "SkiaHeaderEnd.h"
 
 #ifdef DUILIB_BUILD_FOR_WIN
-    #include "WindowRgn_Windows.h"
-    #include "SDL3/SDL.h"
+#include "SDL3/SDL.h"
+#include "WindowRgn_Windows.h"
 #endif
 
 namespace ui {
@@ -22,9 +22,11 @@ namespace ui {
 * @param [in] hWnd 关联的窗口句柄，可以为nullptr
 * @param [in] params 显示相关的参数
 */
-std::unique_ptr<skwindow::WindowContext> MakeRasterForSDL(SDL_Window* sdlWindow, std::unique_ptr<const skwindow::DisplayParams> params)
+std::unique_ptr<skwindow::WindowContext> MakeRasterForSDL(
+    SDL_Window *sdlWindow, std::unique_ptr<const skwindow::DisplayParams> params)
 {
-    std::unique_ptr<skwindow::WindowContext> ctx(new SkRasterWindowContext_SDL(sdlWindow, std::move(params)));
+    std::unique_ptr<skwindow::WindowContext> ctx(
+        new SkRasterWindowContext_SDL(sdlWindow, std::move(params)));
     return ctx;
 }
 
@@ -41,9 +43,9 @@ std::unique_ptr<skwindow::WindowContext> MakeRasterForSDL(SDL_Window* sdlWindow,
 //    return ctx;
 //}
 
-Render_Skia_SDL::Render_Skia_SDL(SDL_Window* sdlWindow, RenderBackendType backendType):
-    m_sdlWindow(sdlWindow),
-    m_backendType(backendType)
+Render_Skia_SDL::Render_Skia_SDL(SDL_Window *sdlWindow, RenderBackendType backendType)
+    : m_sdlWindow(sdlWindow)
+    , m_backendType(backendType)
 {
     if (backendType == RenderBackendType::kNativeGL_BackendType) {
         //GPU的绘制，必须绑定窗口
@@ -59,22 +61,21 @@ Render_Skia_SDL::Render_Skia_SDL(SDL_Window* sdlWindow, RenderBackendType backen
     //    ASSERT(m_pWindowContext != nullptr);
     //    if (m_pWindowContext != nullptr) {
     //        m_backendType = RenderBackendType::kNativeGL_BackendType;
-    //    }        
+    //    }
     //}
     //如果GL不成功，则创建CPU绘制的上下文
     if (m_pWindowContext == nullptr) {
         //CPU绘制
-        m_pWindowContext = MakeRasterForSDL(m_sdlWindow, std::make_unique<skwindow::DisplayParams>());
+        m_pWindowContext
+            = MakeRasterForSDL(m_sdlWindow, std::make_unique<skwindow::DisplayParams>());
         ASSERT(m_pWindowContext != nullptr);
         if (m_pWindowContext != nullptr) {
             m_backendType = RenderBackendType::kRaster_BackendType;
-        }        
+        }
     }
 }
 
-Render_Skia_SDL::~Render_Skia_SDL()
-{
-}
+Render_Skia_SDL::~Render_Skia_SDL() {}
 
 RenderBackendType Render_Skia_SDL::GetRenderBackendType() const
 {
@@ -118,14 +119,15 @@ int32_t Render_Skia_SDL::GetHeight() const
 
 std::unique_ptr<ui::IRender> Render_Skia_SDL::Clone()
 {
-    std::unique_ptr<ui::IRender> pClone = std::make_unique<ui::Render_Skia_SDL>(m_sdlWindow, m_backendType);
+    std::unique_ptr<ui::IRender> pClone
+        = std::make_unique<ui::Render_Skia_SDL>(m_sdlWindow, m_backendType);
     pClone->Resize(GetWidth(), GetHeight());
     pClone->SetRenderDpi(GetRenderDpi());
     pClone->BitBlt(0, 0, GetWidth(), GetHeight(), this, 0, 0, RopMode::kSrcCopy);
     return pClone;
 }
 
-bool Render_Skia_SDL::PaintAndSwapBuffers(IRenderPaint* pRenderPaint)
+bool Render_Skia_SDL::PaintAndSwapBuffers(IRenderPaint *pRenderPaint)
 {
     ASSERT(pRenderPaint != nullptr);
     ASSERT(m_pWindowContext != nullptr);
@@ -136,22 +138,21 @@ bool Render_Skia_SDL::PaintAndSwapBuffers(IRenderPaint* pRenderPaint)
             if (pWindowContext != nullptr) {
                 return pWindowContext->PaintAndSwapBuffers(this, pRenderPaint);
             }*/
-        }
-        else if (m_backendType == RenderBackendType::kRaster_BackendType) {
-            SkRasterWindowContext_SDL* pWindowContext = dynamic_cast<SkRasterWindowContext_SDL*>(m_pWindowContext.get());
+        } else if (m_backendType == RenderBackendType::kRaster_BackendType) {
+            SkRasterWindowContext_SDL *pWindowContext = dynamic_cast<SkRasterWindowContext_SDL *>(
+                m_pWindowContext.get());
             ASSERT(pWindowContext != nullptr);
             if (pWindowContext != nullptr) {
                 return pWindowContext->PaintAndSwapBuffers(this, pRenderPaint);
             }
-        }
-        else {
+        } else {
             ASSERT(false);
         }
     }
     return false;
 }
 
-SkSurface* Render_Skia_SDL::GetSkSurface() const
+SkSurface *Render_Skia_SDL::GetSkSurface() const
 {
     ASSERT(m_pWindowContext != nullptr);
     if (m_pWindowContext == nullptr) {
@@ -163,7 +164,7 @@ SkSurface* Render_Skia_SDL::GetSkSurface() const
     return backbuffer.get();
 }
 
-SkCanvas* Render_Skia_SDL::GetSkCanvas() const
+SkCanvas *Render_Skia_SDL::GetSkCanvas() const
 {
     ASSERT(m_pWindowContext != nullptr);
     if (m_pWindowContext == nullptr) {
@@ -178,40 +179,42 @@ SkCanvas* Render_Skia_SDL::GetSkCanvas() const
     return backbuffer->getCanvas();
 }
 
-bool Render_Skia_SDL::SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw)
+bool Render_Skia_SDL::SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw)
 {
 #ifdef DUILIB_BUILD_FOR_WIN
     if (m_sdlWindow != nullptr) {
         SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-        HWND hWnd = (HWND)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+        HWND hWnd
+            = (HWND) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
         if (::IsWindow(hWnd)) {
             return WindowRgn::SetWindowRoundRectRgn(hWnd, rcWnd, rx, ry, bRedraw);
         }
     }
 #else
     //不需要支持，使用SDL时，可以设置窗口为支持透明，可以规避RGN的设置
-    (void)rcWnd;
-    (void)rx;
-    (void)ry;
-    (void)bRedraw;
+    (void) rcWnd;
+    (void) rx;
+    (void) ry;
+    (void) bRedraw;
 #endif
     return false;
 }
 
-bool Render_Skia_SDL::SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw)
+bool Render_Skia_SDL::SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw)
 {
 #ifdef DUILIB_BUILD_FOR_WIN
     if (m_sdlWindow != nullptr) {
         SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-        HWND hWnd = (HWND)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+        HWND hWnd
+            = (HWND) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
         if (::IsWindow(hWnd)) {
             return WindowRgn::SetWindowRectRgn(hWnd, rcWnd, bRedraw);
         }
     }
 #else
     //不需要支持，使用SDL时，可以设置窗口为支持透明，可以规避RGN的设置
-    (void)rcWnd;
-    (void)bRedraw;
+    (void) rcWnd;
+    (void) bRedraw;
 #endif
     return false;
 }
@@ -221,14 +224,15 @@ void Render_Skia_SDL::ClearWindowRgn(bool bRedraw)
 #ifdef DUILIB_BUILD_FOR_WIN
     if (m_sdlWindow != nullptr) {
         SDL_PropertiesID propID = SDL_GetWindowProperties(m_sdlWindow);
-        HWND hWnd = (HWND)SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+        HWND hWnd
+            = (HWND) SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
         if (::IsWindow(hWnd)) {
             return WindowRgn::ClearWindowRgn(hWnd, bRedraw);
         }
     }
 #else
     //不需要支持，使用SDL时，可以设置窗口为支持透明，可以规避RGN的设置
-    (void)bRedraw;
+    (void) bRedraw;
 #endif
 }
 

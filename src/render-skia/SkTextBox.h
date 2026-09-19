@@ -14,8 +14,7 @@
 //基于原始文件，有修改，以兼容最新版本的skia代码（2023-06-25）
 //原始文件从chrome 68以后就删除了。
 
-namespace ui
-{
+namespace ui {
 
 /** SkTextBox 文字排版类
  *
@@ -47,9 +46,9 @@ public:
     /** 文字纵向对齐方式
     */
     enum SpacingAlign {
-        kStart_SpacingAlign,     //上对齐，相当于：top 对齐(默认)
-        kCenter_SpacingAlign,    //中对齐，相当于：vcenter 对齐
-        kEnd_SpacingAlign,       //下对齐，相当于：bottom 对齐
+        kStart_SpacingAlign,  //上对齐，相当于：top 对齐(默认)
+        kCenter_SpacingAlign, //中对齐，相当于：vcenter 对齐
+        kEnd_SpacingAlign,    //下对齐，相当于：bottom 对齐
 
         kSpacingAlignCount
     };
@@ -57,7 +56,7 @@ public:
     /** 获取纵向对齐方式
      * @return 纵向对齐方式
      */
-    SpacingAlign GetSpacingAlign() const { return (SpacingAlign)m_spacingAlign; }
+    SpacingAlign GetSpacingAlign() const { return (SpacingAlign) m_spacingAlign; }
 
     /** 设置纵向对齐方式
      * @param [in] align 纵向对齐方式
@@ -67,9 +66,9 @@ public:
     /** 文字横向对齐方式
     */
     enum TextAlign {
-        kLeft_Align,     //左对齐(默认)
-        kCenter_Align,   //中对齐
-        kRight_Align,    //右对齐
+        kLeft_Align,   //左对齐(默认)
+        kCenter_Align, //中对齐
+        kRight_Align,  //右对齐
 
         kAlignCount
     };
@@ -77,7 +76,7 @@ public:
     /** 获取横向对齐方式
      * @return 横向对齐方式
      */
-    TextAlign GetTextAlign() const { return (TextAlign)m_textAlign; }
+    TextAlign GetTextAlign() const { return (TextAlign) m_textAlign; }
 
     /** 设置横向对齐方式
      * @param [in] align 横向对齐方式
@@ -131,12 +130,12 @@ public:
     /** 获取绘制区域
      * @param [out] pBox 绘制区域
      */
-    void GetBox(SkRect* pBox) const;
+    void GetBox(SkRect *pBox) const;
 
     /** 设置绘制区域
      * @param [in] box 绘制区域
      */
-    void SetBox(const SkRect& box);
+    void SetBox(const SkRect &box);
 
     /** 设置绘制区域
      * @param [in] left 左边距
@@ -163,7 +162,7 @@ public:
      * @param [out] pAdd 行间距附加量
      * @note 实际行间距 = fontHeight * mul + add
      */
-    void GetSpacing(SkScalar* pMul, SkScalar* pAdd) const;
+    void GetSpacing(SkScalar *pMul, SkScalar *pAdd) const;
 
     /** 设置行间距
      * @param [in] mul 行间距倍数
@@ -182,10 +181,12 @@ public:
      *       SetText(textData, font, paint);
      *       Draw(canvas);
      */
-    void Draw(SkCanvas* pSkCanvas,
-              const SkiaTextData& textData,
-              const SkFont& skFont, const SkPaint& skPaint,
-              FallbackFontCreator fallbackFontCreator);
+    void Draw(
+        SkCanvas *pSkCanvas,
+        const SkiaTextData &textData,
+        const SkFont &skFont,
+        const SkPaint &skPaint,
+        FallbackFontCreator fallbackFontCreator);
 
     /** 设置待绘制的文字
      * @param [in] textData 文本数据
@@ -193,14 +194,16 @@ public:
      * @param [in] skPaint 绘制属性
      * @param [in] fallbackFontCreator 回退字体管理器
      */
-    void SetText(const SkiaTextData& textData,
-                 const SkFont& skFont, const SkPaint& skPaint,
-                 FallbackFontCreator fallbackFontCreator);
+    void SetText(
+        const SkiaTextData &textData,
+        const SkFont &skFont,
+        const SkPaint &skPaint,
+        FallbackFontCreator fallbackFontCreator);
 
     /** 执行文字绘制
      * @param [in] pSkCanvas 绘制画布
      */
-    void Draw(SkCanvas* pSkCanvas);
+    void Draw(SkCanvas *pSkCanvas);
 
     /** 获取行数
      * @return 行数
@@ -215,15 +218,20 @@ public:
     /** 文字绘制访客器接口
      * @note 用于遍历每一行文字的绘制回调
      */
-    class Visitor {
+    class Visitor
+    {
     public:
         virtual ~Visitor() {}
-        virtual void operator()(const SkiaTextData& textData,
-                                SkScalar x, SkScalar y,
-                                const SkFont& skFont, const SkPaint& skPaint,
-                                bool bHasMoreText, bool bIsLastLine,
-                                FallbackFontCreator fallbackFontCreator,
-                                MeasureTextTempData& measureTempData) = 0;
+        virtual void operator()(
+            const SkiaTextData &textData,
+            SkScalar x,
+            SkScalar y,
+            const SkFont &skFont,
+            const SkPaint &skPaint,
+            bool bHasMoreText,
+            bool bIsLastLine,
+            FallbackFontCreator fallbackFontCreator,
+            MeasureTextTempData &measureTempData) = 0;
     };
 
 public:
@@ -248,7 +256,7 @@ private:
      * @param [in] visitor 访客器
      * @return 绘制后的Y坐标
      */
-    SkScalar Visit(Visitor& visitor) const;
+    SkScalar Visit(Visitor &visitor) const;
 
 private:
     /** 文字绘制区域
@@ -285,11 +293,11 @@ private:
 
     /** 绘制属性
      */
-    const SkPaint* m_pPaint;
+    const SkPaint *m_pPaint;
 
     /** 绘制字体
      */
-    const SkFont* m_pFont;
+    const SkFont *m_pFont;
 
     /** 回退字体管理器
      */

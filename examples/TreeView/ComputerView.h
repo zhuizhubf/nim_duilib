@@ -9,14 +9,14 @@ class MainForm;
 
 /** "计算机"视图，显示磁盘列表
 */
-class ComputerView: public ui::SupportWeakCallback
+class ComputerView : public ui::SupportWeakCallback
 {
 public:
     /** 构造函数
     * @param [in] pMainForm 关联窗口的接口
     * @param [in] pListCtrl 关联的列表控件接口
     */
-    ComputerView(MainForm* pMainForm, ui::ListCtrl* pListCtrl);
+    ComputerView(MainForm *pMainForm, ui::ListCtrl *pListCtrl);
 
     /** 析构函数
     */
@@ -26,7 +26,7 @@ public:
     /** 显示"计算机"节点的内容
     * @param [in] diskInfoList 所有磁盘的信息列表
     */
-    void ShowMyComputerContents(const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList);
+    void ShowMyComputerContents(const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList);
 
 private:
     /** 初始化
@@ -39,7 +39,7 @@ private:
 
     /** 在"计算机"视图中双击
     */
-    bool OnComuterViewDoubleClick(const ui::EventArgs& msg);    
+    bool OnComuterViewDoubleClick(const ui::EventArgs &msg);
 
     /** 图标被移除时，同步Image List中也要移除（不移除的话，会存在加载不到图标的情况）
     * @param [in] nIconId 图标ID（在IconManager中）
@@ -54,7 +54,7 @@ private:
     */
     DString FormatUsedPercent(uint64_t nTotalSpace, uint64_t nFreeSpace) const;
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     /** 初始化表头
     */
     void InitComputerViewHeader_Win();
@@ -62,9 +62,10 @@ private:
     /** 显示"计算机"节点的内容
     * @param [in] diskInfoList 所有磁盘的信息列表
     */
-    void ShowMyComputerContents_Win(ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList);
+    void ShowMyComputerContents_Win(
+        ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList);
 
-#elif defined (DUILIB_BUILD_FOR_LINUX)
+#elif defined(DUILIB_BUILD_FOR_LINUX)
     /** 初始化表头
     */
     void InitComputerViewHeader_Linux();
@@ -72,7 +73,8 @@ private:
     /** 显示"计算机"节点的内容
     * @param [in] diskInfoList 所有磁盘的信息列表
     */
-    void ShowMyComputerContents_Linux(ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo>& diskInfoList);
+    void ShowMyComputerContents_Linux(
+        ui::ImageListPtr pImageList, const std::vector<ui::DirectoryTree::DiskInfo> &diskInfoList);
 
     /** 设备类型转换为字符串（返回资源字符串Id，支持多国语言版）
     */
@@ -83,15 +85,14 @@ private:
 private:
     /** 计算机视图的表头
     */
-    enum class ComputerViewColumn
-    {
-        kName,         //名称
-        kType,         //类型
-        kPartitionType,//分区类型
-        kTotalSpace,   //总大小
-        kFreeSpace,    //可用空间
-        kUsedPercent,  //已用百分比
-        kMountOn       //挂载点
+    enum class ComputerViewColumn {
+        kName,          //名称
+        kType,          //类型
+        kPartitionType, //分区类型
+        kTotalSpace,    //总大小
+        kFreeSpace,     //可用空间
+        kUsedPercent,   //已用百分比
+        kMountOn        //挂载点
     };
 
     /** 获取真实的列索引号
@@ -101,7 +102,7 @@ private:
 private:
     /** 关联的MainForm
     */
-    MainForm* m_pMainForm;
+    MainForm *m_pMainForm;
 
 private:
     /** 计算机视图的数据

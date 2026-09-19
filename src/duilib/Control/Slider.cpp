@@ -1,22 +1,24 @@
 #include "Slider.h"
-#include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Utils/AttributeUtil.h"
 
-namespace ui
-{
+namespace ui {
 
-Slider::Slider(Window* pWindow) :
-    Progress(pWindow),
-    m_szThumb(0, 0),
-    m_nStep(1),
-    m_sImageModify(),
-    m_thumbStateImage(),
-    m_rcProgressBarPadding()
+Slider::Slider(Window *pWindow)
+    : Progress(pWindow)
+    , m_szThumb(0, 0)
+    , m_nStep(1)
+    , m_sImageModify()
+    , m_thumbStateImage()
+    , m_rcProgressBarPadding()
 {
     SetTextStyle(TEXT_SINGLELINE | TEXT_HCENTER, false);
 }
 
-DString Slider::GetType() const { return DUI_CTR_SLIDER; }
+DString Slider::GetType() const
+{
+    return DUI_CTR_SLIDER;
+}
 
 UiRect Slider::GetProgressPos()
 {
@@ -38,14 +40,17 @@ UiRect Slider::GetProgressPos()
     UiRect rc;
     if (IsHorizontal()) {
         // 使用 double 计算避免 int32 溢出，再通过 TruncateToInt32 安全转为 int32_t
-        const double fValueScale = (GetRect().right - GetRect().left - szThumb.cx) / static_cast<double>(nMax - nMin);
-        const int64_t nRight64 = static_cast<int64_t>((fValue - nMin) * fValueScale + szThumb.cx / 2.0 + 0.5);
+        const double fValueScale = (GetRect().right - GetRect().left - szThumb.cx)
+                                   / static_cast<double>(nMax - nMin);
+        const int64_t nRight64 = static_cast<int64_t>(
+            (fValue - nMin) * fValueScale + szThumb.cx / 2.0 + 0.5);
         rc.right = TruncateToInt32(nRight64);
         rc.bottom = GetRect().bottom - GetRect().top;
-    }
-    else {
-        const double fValueScale = (GetRect().bottom - GetRect().top - szThumb.cy) / static_cast<double>(nMax - nMin);
-        const int64_t nTop64 = static_cast<int64_t>((nMax - fValue) * fValueScale + szThumb.cy / 2.0 + 0.5);
+    } else {
+        const double fValueScale = (GetRect().bottom - GetRect().top - szThumb.cy)
+                                   / static_cast<double>(nMax - nMin);
+        const int64_t nTop64 = static_cast<int64_t>(
+            (nMax - fValue) * fValueScale + szThumb.cy / 2.0 + 0.5);
         rc.top = TruncateToInt32(nTop64);
         rc.right = GetRect().right - GetRect().left;
         rc.bottom = GetRect().bottom - GetRect().top;
@@ -54,15 +59,14 @@ UiRect Slider::GetProgressPos()
     return rc;
 }
 
-void Slider::HandleEvent(const EventArgs& msg)
+void Slider::HandleEvent(const EventArgs &msg)
 {
     if (IsDisabledEvents(msg)) {
         //如果是鼠标键盘消息，并且控件是Disabled的，转发给上层控件
-        Box* pParent = GetParent();
+        Box *pParent = GetParent();
         if (pParent != nullptr) {
             pParent->SendEventMsg(msg);
-        }
-        else {
+        } else {
             BaseClass::HandleEvent(msg);
         }
         return;
@@ -79,7 +83,7 @@ void Slider::HandleEvent(const EventArgs& msg)
     if (msg.eventType == kEventMouseButtonUp) {
         UiSize szThumb = GetThumbSize();
         const double oldValue = GetValue();
-        if(IsMouseFocused()) {
+        if (IsMouseFocused()) {
             SetMouseFocused(false);
         }
         const int32_t nMin = GetMinValue();
@@ -89,31 +93,32 @@ void Slider::HandleEvent(const EventArgs& msg)
             ptMouse.Offset(GetScrollOffsetInScrollBox());
             if (ptMouse.x >= GetRect().right - szThumb.cx / 2) {
                 SetValue(nMax);
-            }
-            else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
+            } else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
                 SetValue(nMin);
-            }
-            else {
-                double newValue = nMin + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
+            } else {
+                double newValue
+                    = nMin
+                      + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2))
+                            / (GetRect().right - GetRect().left - szThumb.cx);
                 SetValue(newValue);
             }
-        }
-        else {
+        } else {
             UiPoint ptMouse(msg.ptMouse);
             ptMouse.Offset(GetScrollOffsetInScrollBox());
             if (ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
                 SetValue(nMin);
-            }
-            else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
+            } else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
                 SetValue(nMax);
-            }
-            else {
-                double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
+            } else {
+                double newValue
+                    = nMin
+                      + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2))
+                            / (GetRect().bottom - GetRect().top - szThumb.cy);
                 SetValue(newValue);
             }
         }
         if (GetValue() != oldValue) {
-            SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+            SendEvent(kEventValueChanged, (WPARAM) GetValue(), (LPARAM) oldValue);
             Invalidate();
         }
         return;
@@ -124,14 +129,13 @@ void Slider::HandleEvent(const EventArgs& msg)
         if (detaValue > 0) {
             SetValue(GetValue() + GetChangeStep());
             if (GetValue() != oldValue) {
-                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
-            }            
+                SendEvent(kEventValueChanged, (WPARAM) GetValue(), (LPARAM) oldValue);
+            }
             return;
-        }
-        else {
+        } else {
             SetValue(GetValue() - GetChangeStep());
             if (GetValue() != oldValue) {
-                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+                SendEvent(kEventValueChanged, (WPARAM) GetValue(), (LPARAM) oldValue);
             }
             return;
         }
@@ -147,29 +151,30 @@ void Slider::HandleEvent(const EventArgs& msg)
             if (IsHorizontal()) {
                 if (ptMouse.x >= GetRect().right - szThumb.cx / 2) {
                     SetValue(nMax);
-                }
-                else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
+                } else if (ptMouse.x <= GetRect().left + szThumb.cx / 2) {
                     SetValue(nMin);
-                }
-                else {
-                    double newValue = nMin + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2)) / (GetRect().right - GetRect().left - szThumb.cx);
+                } else {
+                    double newValue
+                        = nMin
+                          + double((nMax - nMin) * (ptMouse.x - GetRect().left - szThumb.cx / 2))
+                                / (GetRect().right - GetRect().left - szThumb.cx);
                     SetValue(newValue);
                 }
-            }
-            else {
+            } else {
                 if (ptMouse.y >= GetRect().bottom - szThumb.cy / 2) {
                     SetValue(nMin);
-                }
-                else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
+                } else if (ptMouse.y <= GetRect().top + szThumb.cy / 2) {
                     SetValue(nMax);
-                }
-                else {
-                    double newValue = nMin + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2)) / (GetRect().bottom - GetRect().top - szThumb.cy);
+                } else {
+                    double newValue
+                        = nMin
+                          + double((nMax - nMin) * (GetRect().bottom - ptMouse.y - szThumb.cy / 2))
+                                / (GetRect().bottom - GetRect().top - szThumb.cy);
                     SetValue(newValue);
                 }
             }
             if (GetValue() != oldValue) {
-                SendEvent(kEventValueChanged, (WPARAM)GetValue(), (LPARAM)oldValue);
+                SendEvent(kEventValueChanged, (WPARAM) GetValue(), (LPARAM) oldValue);
                 Invalidate();
             }
         }
@@ -179,35 +184,32 @@ void Slider::HandleEvent(const EventArgs& msg)
     Progress::HandleEvent(msg);
 }
 
-void Slider::SetAttribute(const DString& strName, const DString& strValue2)
+void Slider::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("step")) {
         SetChangeStep(StringUtil::StringToInt32(strValue));
-    }
-    else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
+    } else if ((strName == _T("thumb_normal_image")) || (strName == _T("thumbnormalimage"))) {
         SetThumbStateImage(kControlStateNormal, strValue);
-    }
-    else if ((strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image")) || (strName == _T("thumbhotimage"))) {
+    } else if (
+        (strName == _T("thumb_hovered_image")) || (strName == _T("thumb_hot_image"))
+        || (strName == _T("thumbhotimage"))) {
         SetThumbStateImage(kControlStateHovered, strValue);
-    }
-    else if ((strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image")) || (strName == _T("thumbpushedimage"))) {
+    } else if (
+        (strName == _T("thumb_pressed_image")) || (strName == _T("thumb_pushed_image"))
+        || (strName == _T("thumbpushedimage"))) {
         SetThumbStateImage(kControlStatePressed, strValue);
-    }
-    else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
+    } else if ((strName == _T("thumb_disabled_image")) || (strName == _T("thumbdisabledimage"))) {
         SetThumbStateImage(kControlStateDisabled, strValue);
-    }
-    else if ((strName == _T("thumb_size")) || (strName == _T("thumbsize"))) {
+    } else if ((strName == _T("thumb_size")) || (strName == _T("thumbsize"))) {
         UiSize szXY;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szXY);
         SetThumbSize(szXY, true);
-    }
-    else if ((strName == _T("progress_bar_padding")) || (strName == _T("progressbarpadding"))) {
+    } else if ((strName == _T("progress_bar_padding")) || (strName == _T("progressbarpadding"))) {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetProgressBarPadding(rcPadding, true);
-    }
-    else {
+    } else {
         Progress::SetAttribute(strName, strValue);
     }
 }
@@ -224,13 +226,13 @@ void Slider::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-void Slider::PaintBkColor(IRender* pRender)
+void Slider::PaintBkColor(IRender *pRender)
 {
     const UiRect rcOldPaintRect = GetPaintRect();
     const UiRect rcOldRect = GetRect();
 
     UiRect rc = GetRect();
-    const UiPadding& padding = m_rcProgressBarPadding;
+    const UiPadding &padding = m_rcProgressBarPadding;
     rc.Deflate(padding);
     SetRect(rc);
 
@@ -249,13 +251,13 @@ void Slider::PaintBkColor(IRender* pRender)
     SetPaintRect(rcOldPaintRect);
 }
 
-void Slider::PaintStateImages(IRender* pRender)
+void Slider::PaintStateImages(IRender *pRender)
 {
     const UiRect rcOldPaintRect = GetPaintRect();
     const UiRect rcOldRect = GetRect();
 
     UiRect rc = GetRect();
-    const UiPadding& padding = m_rcProgressBarPadding;
+    const UiPadding &padding = m_rcProgressBarPadding;
     rc.Deflate(padding);
     SetRect(rc);
 
@@ -273,21 +275,41 @@ void Slider::PaintStateImages(IRender* pRender)
 
     if (IsMouseFocused()) {
         m_sImageModify.clear();
-        m_sImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rcThumb.left, rcThumb.top, rcThumb.right, rcThumb.bottom);
-        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStatePressed), m_sImageModify.c_str())) {
+        m_sImageModify = StringUtil::Printf(
+            _T("destscale='false' dest='%d,%d,%d,%d'"),
+            rcThumb.left,
+            rcThumb.top,
+            rcThumb.right,
+            rcThumb.bottom);
+        if (PaintImage(
+                pRender,
+                m_thumbStateImage.GetStateImage(kControlStatePressed),
+                m_sImageModify.c_str())) {
             return;
         }
-    }
-    else if (GetState() == kControlStateHovered) {
+    } else if (GetState() == kControlStateHovered) {
         m_sImageModify.clear();
-        m_sImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rcThumb.left, rcThumb.top, rcThumb.right, rcThumb.bottom);
-        if (PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStateHovered), m_sImageModify.c_str())) {
+        m_sImageModify = StringUtil::Printf(
+            _T("destscale='false' dest='%d,%d,%d,%d'"),
+            rcThumb.left,
+            rcThumb.top,
+            rcThumb.right,
+            rcThumb.bottom);
+        if (PaintImage(
+                pRender,
+                m_thumbStateImage.GetStateImage(kControlStateHovered),
+                m_sImageModify.c_str())) {
             return;
         }
     }
 
     m_sImageModify.clear();
-    m_sImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rcThumb.left, rcThumb.top, rcThumb.right, rcThumb.bottom);
+    m_sImageModify = StringUtil::Printf(
+        _T("destscale='false' dest='%d,%d,%d,%d'"),
+        rcThumb.left,
+        rcThumb.top,
+        rcThumb.right,
+        rcThumb.bottom);
     PaintImage(pRender, m_thumbStateImage.GetStateImage(kControlStateNormal), m_sImageModify.c_str());
 }
 
@@ -311,7 +333,7 @@ void Slider::SetThumbSize(UiSize szXY, bool bNeedDpiScale)
 {
     if (bNeedDpiScale) {
         Dpi().ScaleSize(szXY);
-    }    
+    }
     m_szThumb = szXY;
 }
 
@@ -342,14 +364,17 @@ UiRect Slider::GetThumbRect() const
     }
 
     UiSize szThumb = GetThumbSize();
-    if(IsHorizontal()) {
-        int32_t left = int32_t(GetRect().left + (GetRect().right - GetRect().left - szThumb.cx) * (fValue - nMin) / (nMax - nMin));
+    if (IsHorizontal()) {
+        int32_t left = int32_t(
+            GetRect().left
+            + (GetRect().right - GetRect().left - szThumb.cx) * (fValue - nMin) / (nMax - nMin));
         int32_t top = (GetRect().bottom + GetRect().top - szThumb.cy) / 2;
         return UiRect(left, top, left + szThumb.cx, top + szThumb.cy);
-    }
-    else {
+    } else {
         int32_t left = (GetRect().right + GetRect().left - szThumb.cx) / 2;
-        int32_t top = int32_t(GetRect().bottom - szThumb.cy - (GetRect().bottom - GetRect().top - szThumb.cy) * (fValue - nMin) / (nMax - nMin));
+        int32_t top = int32_t(
+            GetRect().bottom - szThumb.cy
+            - (GetRect().bottom - GetRect().top - szThumb.cy) * (fValue - nMin) / (nMax - nMin));
         return UiRect(left, top, left + szThumb.cx, top + szThumb.cy);
     }
 }
@@ -359,13 +384,13 @@ DString Slider::GetThumbStateImage(ControlStateType stateType) const
     return m_thumbStateImage.GetImageString(stateType);
 }
 
-void Slider::SetThumbStateImage(ControlStateType stateType, const DString& pStrImage)
+void Slider::SetThumbStateImage(ControlStateType stateType, const DString &pStrImage)
 {
     m_thumbStateImage.SetImageString(stateType, pStrImage, Dpi());
     Invalidate();
 }
 
-const UiPadding& Slider::GetProgressBarPadding() const
+const UiPadding &Slider::GetProgressBarPadding() const
 {
     return m_rcProgressBarPadding;
 }
@@ -378,7 +403,7 @@ void Slider::SetProgressBarPadding(UiPadding padding, bool bNeedDpiScale)
     if (!m_rcProgressBarPadding.Equals(padding)) {
         m_rcProgressBarPadding = padding;
         RelayoutOrRedraw();
-    }    
+    }
 }
 
-}
+} // namespace ui

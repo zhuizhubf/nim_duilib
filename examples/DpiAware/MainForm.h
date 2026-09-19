@@ -33,7 +33,8 @@ public:
     * @param [in] nOldScaleFactor 旧的DPI缩放百分比
     * @param [in] nNewScaleFactor 新的DPI缩放百分比，与Dpi().GetDisplayScaleFactor()的值一致，该值可能与nOldScaleFactor相同
     */
-    virtual void OnWindowDisplayScaleChanged(uint32_t nOldScaleFactor, uint32_t nNewScaleFactor) override;
+    virtual void OnWindowDisplayScaleChanged(
+        uint32_t nOldScaleFactor, uint32_t nNewScaleFactor) override;
 
 protected:
     /** 窗口大小发生改变(WM_SIZE)
@@ -43,7 +44,11 @@ protected:
     * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
-    virtual LRESULT OnSizeMsg(ui::WindowSizeType sizeType, const ui::UiSize& newWindowSize, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnSizeMsg(
+        ui::WindowSizeType sizeType,
+        const ui::UiSize &newWindowSize,
+        const ui::NativeMsg &nativeMsg,
+        bool &bHandled) override;
 
 private:
     /** 刷新界面

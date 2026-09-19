@@ -1,38 +1,38 @@
 #ifndef UI_CORE_CONTROL_DRAGABLE_H_
 #define UI_CORE_CONTROL_DRAGABLE_H_
 
-#include "duilib/Core/Control.h"
-#include "duilib/Core/Box.h"
-#include "duilib/Core/GlobalManager.h"
-#include "duilib/Core/DragWindow.h"
-#include "duilib/Box/VBox.h"
 #include "duilib/Box/HBox.h"
 #include "duilib/Box/ScrollBox.h"
-#include "duilib/Utils/StringUtil.h"
+#include "duilib/Box/VBox.h"
+#include "duilib/Core/Box.h"
+#include "duilib/Core/Control.h"
+#include "duilib/Core/DragWindow.h"
+#include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/WindowCreateParam.h"
+#include "duilib/Utils/StringUtil.h"
 
 #ifdef DUILIB_BUILD_FOR_SDL
-    #include "duilib/Core/DragWindowFilter_SDL.h"
+#include "duilib/Core/DragWindowFilter_SDL.h"
 #endif
 
 //拖动操作，最短的像素距离
 #define DRAG_OPERATION_MIN_PT 5
 
-namespace ui
-{
+namespace ui {
 /** 主要功能：支持相同Box内的子控件通过拖动来调整顺序
 */
 template<typename T = Control>
-class ControlDragableT: public T
+class ControlDragableT : public T
 {
     typedef T BaseClass;
+
 public:
-    explicit ControlDragableT(Window* pWindow);
+    explicit ControlDragableT(Window *pWindow);
     virtual ~ControlDragableT() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
-    virtual DString GetType() const override;    
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual DString GetType() const override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** 设置是否支持拖动改变控件的顺序
     */
@@ -74,18 +74,18 @@ protected:
     /** @name 拖动相关的成员函数
     * @{ */
 
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
-    virtual bool MouseMove(const EventArgs& msg) override;
-    virtual bool OnWindowKillFocus(const EventArgs& msg) override;//控件所属的窗口失去焦点
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
+    virtual bool OnWindowKillFocus(const EventArgs &msg) override; //控件所属的窗口失去焦点
+    virtual void HandleEvent(const EventArgs &msg) override;
 
 protected:
     /** 子控件的状态
     */
     struct ItemStatus
     {
-        Control* m_pItem = nullptr;
+        Control *m_pItem = nullptr;
         UiRect m_rcPos;
         uint8_t m_nPaintOrder = 0;
         size_t m_index = Box::InvalidIndex;
@@ -96,8 +96,10 @@ protected:
     * @param [in] ptMouseDown 鼠标按下时的位置
     * @param [in] rcItemList 子控件的列表
     */
-    virtual void AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouseDown,
-                               const std::vector<ItemStatus>& rcItemList) const;
+    virtual void AdjustItemPos(
+        const UiPoint &pt,
+        const UiPoint &ptMouseDown,
+        const std::vector<ItemStatus> &rcItemList) const;
 
     /** 交换两个控件的位置，完成顺序调整
     * @param [in] pt 当前鼠标的位置
@@ -106,10 +108,11 @@ protected:
     * @param [in] nNewItemIndex 最新的子项索引号
     * @return 如果有顺序调整，返回true；否则返回false
     */
-    virtual bool AdjustItemOrders(const UiPoint& pt,
-                                  const std::vector<ItemStatus>& rcItemList,
-                                  size_t& nOldItemIndex,
-                                  size_t& nNewItemIndex);
+    virtual bool AdjustItemOrders(
+        const UiPoint &pt,
+        const std::vector<ItemStatus> &rcItemList,
+        size_t &nOldItemIndex,
+        size_t &nNewItemIndex);
 
     /** 控件位置拖动完成事件（在同一个容器内）
     * @param [in] nOldItemIndex 原来的子项索引号
@@ -123,7 +126,7 @@ protected:
 
     /** 获取子项所在区域的有效的范围
     */
-    virtual bool GetItemsValidRect(UiRect& itemsValidRect) const;
+    virtual bool GetItemsValidRect(UiRect &itemsValidRect) const;
 
     /** @} */
 
@@ -135,16 +138,16 @@ protected:
     * @param [in] ptMouse 当前鼠标所在位置
     * @return 返回true表示匹配到拖入的控件，返回false表示未找到拖入的控件位置
     */
-    virtual bool OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox, const UiPoint& ptMouse);
+    virtual bool OnDragOutMouseOver(Box *pTargetBox, Box *pOldTargetBox, const UiPoint &ptMouse);
 
     /** 创建拖出操作时，显示的跟随窗口
     */
-    virtual DragWindow* CreateDragWindow();
+    virtual DragWindow *CreateDragWindow();
 
     /** 目标位置指示控件
     * @param [in] pTargetBox 即将拖入的目标Box控件接口
     */
-    virtual Control* CreateDestControl(Box* pTargetBox);
+    virtual Control *CreateDestControl(Box *pTargetBox);
 
     /** 生成控件拖出时的位图
     */
@@ -152,7 +155,7 @@ protected:
 
     /** 判断鼠标位置是否在控件的矩形范围内
     */
-    virtual bool IsPtInControlRect(Control* pControl, const UiPoint& pt) const;
+    virtual bool IsPtInControlRect(Control *pControl, const UiPoint &pt) const;
 
     /** 控件所属容器拖动完成事件（在同一个容器/或者不同容器内）
     * @param [in] pOldBox 控件原来所属的容器接口
@@ -160,8 +163,8 @@ protected:
     * @param [in] pNewBox 控件最新所属的容器接口
     * @param [in] nNewItemIndex 最新的子项索引号
     */
-    virtual void OnItemBoxChanged(Box* pOldBox, size_t nOldItemIndex, 
-                                  Box* pNewBox, size_t nNewItemIndex);
+    virtual void OnItemBoxChanged(
+        Box *pOldBox, size_t nOldItemIndex, Box *pNewBox, size_t nNewItemIndex);
 
     /** @} */
 
@@ -169,25 +172,25 @@ private:
     /** 鼠标移动时执行的拖出操作
     * @return 返回true表示处于拖出操作中，返回false表示未执行拖出操作
     */
-    bool DragOutMouseMove(const EventArgs& msg);
+    bool DragOutMouseMove(const EventArgs &msg);
 
     /** 鼠标弹起时执行的拖出操作
     * @return 返回true表示执行了拖出操作，返回false表示未执行拖出操作
     */
-    bool DragOutMouseUp(const EventArgs& msg);
+    bool DragOutMouseUp(const EventArgs &msg);
 
     /** 鼠标按下时执行的拖动调整顺序操作
     */
-    void DragOrderMouseDown(const EventArgs& msg);
+    void DragOrderMouseDown(const EventArgs &msg);
 
     /** 鼠标移动时执行的拖动调整顺序操作
     * @return 返回true表示处于拖动调序操作中，返回false表示未执行拖动调序操作
     */
-    bool DragOrderMouseMove(const EventArgs& msg);
+    bool DragOrderMouseMove(const EventArgs &msg);
 
     /** 鼠标弹起时执行的拖出操作
     */
-    void DragOrderMouseUp(const EventArgs& msg);
+    void DragOrderMouseUp(const EventArgs &msg);
 
 private:
     /** @name 在相同窗口内同一个Box内拖动相关的成员变量
@@ -232,15 +235,15 @@ private:
 
     /** 目标Box
     */
-    Box* m_pTargetBox;
+    Box *m_pTargetBox;
 
     /** 目标位置指示控件
     */
-    Control* m_pDestControl;
+    Control *m_pDestControl;
 
     /** 拖拽的状态窗口
     */
-    DragWindow* m_pDragWindow;
+    DragWindow *m_pDragWindow;
 
 #ifdef DUILIB_BUILD_FOR_SDL
     /** 拖拽窗口的消息过滤器
@@ -264,54 +267,61 @@ private:
 };
 
 template<typename T>
-ControlDragableT<T>::ControlDragableT(Window* pWindow):
-    T(pWindow),
-    m_bEnableDragOrder(true),
-    m_bEnableDragOut(true),
-    m_bInDraggingOrder(false),
-    m_bMouseDown(false),
-    m_nDragAlpha(216),
-    m_nOldAlpha(255),    
-    m_pTargetBox(nullptr),
-    m_pDestControl(nullptr),
-    m_pDragWindow(nullptr),
-    m_bDraggingOut(false)
-{
-}
+ControlDragableT<T>::ControlDragableT(Window *pWindow)
+    : T(pWindow)
+    , m_bEnableDragOrder(true)
+    , m_bEnableDragOut(true)
+    , m_bInDraggingOrder(false)
+    , m_bMouseDown(false)
+    , m_nDragAlpha(216)
+    , m_nOldAlpha(255)
+    , m_pTargetBox(nullptr)
+    , m_pDestControl(nullptr)
+    , m_pDragWindow(nullptr)
+    , m_bDraggingOut(false)
+{}
 
 template<typename T>
 ControlDragableT<T>::~ControlDragableT()
+{}
+
+template<typename T>
+inline DString ControlDragableT<T>::GetType() const
 {
+    return DUI_CTR_CONTROL_DRAGABLE;
+}
+
+template<>
+inline DString ControlDragableT<Box>::GetType() const
+{
+    return DUI_CTR_BOX_DRAGABLE;
+}
+
+template<>
+inline DString ControlDragableT<HBox>::GetType() const
+{
+    return DUI_CTR_HBOX_DRAGABLE;
+}
+
+template<>
+inline DString ControlDragableT<VBox>::GetType() const
+{
+    return DUI_CTR_VBOX_DRAGABLE;
 }
 
 template<typename T>
-inline DString ControlDragableT<T>::GetType() const { return DUI_CTR_CONTROL_DRAGABLE; }
-
-template<>
-inline DString ControlDragableT<Box>::GetType() const { return DUI_CTR_BOX_DRAGABLE; }
-
-template<>
-inline DString ControlDragableT<HBox>::GetType() const { return DUI_CTR_HBOX_DRAGABLE; }
-
-template<>
-inline DString ControlDragableT<VBox>::GetType() const { return DUI_CTR_VBOX_DRAGABLE; }
-
-template<typename T>
-void ControlDragableT<T>::SetAttribute(const DString& strName, const DString& strValue2)
+void ControlDragableT<T>::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("drag_order")) {
         //是否支持拖动调整顺序（在同一个容器内）
         SetEnableDragOrder(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("drag_alpha")) {
-        SetDragAlpha((uint8_t)StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("drag_out")) {
+    } else if (strName == _T("drag_alpha")) {
+        SetDragAlpha((uint8_t) StringUtil::StringToInt32(strValue));
+    } else if (strName == _T("drag_out")) {
         //是否支持拖出操作（在相同窗口的不同容器内）
         SetEnableDragOut(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -371,7 +381,7 @@ void ControlDragableT<T>::CancelDragOperation()
 }
 
 template<typename T>
-bool ControlDragableT<T>::ButtonDown(const EventArgs& msg)
+bool ControlDragableT<T>::ButtonDown(const EventArgs &msg)
 {
     m_bMouseDown = false;
     bool bRet = BaseClass::ButtonDown(msg);
@@ -381,11 +391,11 @@ bool ControlDragableT<T>::ButtonDown(const EventArgs& msg)
     if (!IsEnableDragOrder() && !IsEnableDragOut()) {
         return bRet;
     }
-    const Box* pParent = this->GetParent();
+    const Box *pParent = this->GetParent();
     if (pParent == nullptr) {
         return bRet;
     }
-    const Layout* pLayout = pParent->GetLayout();
+    const Layout *pLayout = pParent->GetLayout();
     if ((pLayout == nullptr) || (!pLayout->IsHLayout() && !pLayout->IsVLayout())) {
         return bRet;
     }
@@ -396,12 +406,12 @@ bool ControlDragableT<T>::ButtonDown(const EventArgs& msg)
     m_ptMouseDown = pt;
     m_rcMouseDown = this->GetRect();
 
-    DragOrderMouseDown(msg); 
+    DragOrderMouseDown(msg);
     return bRet;
 }
 
 template<typename T>
-bool ControlDragableT<T>::MouseMove(const EventArgs& msg)
+bool ControlDragableT<T>::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     if (m_bMouseDown) {
@@ -414,7 +424,7 @@ bool ControlDragableT<T>::MouseMove(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlDragableT<T>::ButtonUp(const EventArgs& msg)
+bool ControlDragableT<T>::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     if (msg.IsSenderExpired()) {
@@ -428,7 +438,7 @@ bool ControlDragableT<T>::ButtonUp(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlDragableT<T>::OnWindowKillFocus(const EventArgs& msg)
+bool ControlDragableT<T>::OnWindowKillFocus(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnWindowKillFocus(msg);
     ClearDragStatus();
@@ -436,36 +446,35 @@ bool ControlDragableT<T>::OnWindowKillFocus(const EventArgs& msg)
 }
 
 template<typename T>
-void ControlDragableT<T>::HandleEvent(const EventArgs& msg)
+void ControlDragableT<T>::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
-    if ((msg.eventType == kEventMouseClickChanged) ||
-        (msg.eventType == kEventMouseClickEsc) ||
-        (msg.eventType == kEventMouseRButtonDown)) {
+    if ((msg.eventType == kEventMouseClickChanged) || (msg.eventType == kEventMouseClickEsc)
+        || (msg.eventType == kEventMouseRButtonDown)) {
         //取消拖动调序或者拖出操作
         ClearDragStatus();
     }
 }
 
 template<typename T>
-bool ControlDragableT<T>::GetItemsValidRect(UiRect& itemsValidRect) const
+bool ControlDragableT<T>::GetItemsValidRect(UiRect &itemsValidRect) const
 {
-    const Box* pParent = this->GetParent();
+    const Box *pParent = this->GetParent();
     ASSERT(pParent != nullptr);
     if (pParent == nullptr) {
         return false;
     }
 
-    UiRect boxRect = pParent->GetRect();//父容器所在的区域
+    UiRect boxRect = pParent->GetRect(); //父容器所在的区域
     UiPoint offsetParent = pParent->GetScrollOffsetInScrollBox();
-    boxRect.Offset(-offsetParent.x, -offsetParent.y);//转换为窗口的客户区坐标
-    UiRect rcItemRects = boxRect;//子项所占的总区域
+    boxRect.Offset(-offsetParent.x, -offsetParent.y); //转换为窗口的客户区坐标
+    UiRect rcItemRects = boxRect;                     //子项所占的总区域
     for (size_t nIndex = 0; nIndex < m_rcItemList.size(); ++nIndex) {
-        const ItemStatus& itemStatus = m_rcItemList[nIndex];
+        const ItemStatus &itemStatus = m_rcItemList[nIndex];
         if ((itemStatus.m_pItem != nullptr) && !itemStatus.m_pItem->IsFloat()) {
             UiRect rcPos = itemStatus.m_rcPos;
             UiPoint offsetItem = itemStatus.m_pItem->GetScrollOffsetInScrollBox();
-            rcPos.Offset(-offsetItem.x, -offsetItem.y);//转换为窗口的客户区坐标
+            rcPos.Offset(-offsetItem.x, -offsetItem.y); //转换为窗口的客户区坐标
             if (rcPos.left > rcItemRects.left) {
                 rcItemRects.left = rcPos.left;
             }
@@ -475,12 +484,12 @@ bool ControlDragableT<T>::GetItemsValidRect(UiRect& itemsValidRect) const
             break;
         }
     }
-    for (int32_t nIndex = (int32_t)m_rcItemList.size() - 1; nIndex >= 0; --nIndex) {
-        const ItemStatus& itemStatus = m_rcItemList[nIndex];
+    for (int32_t nIndex = (int32_t) m_rcItemList.size() - 1; nIndex >= 0; --nIndex) {
+        const ItemStatus &itemStatus = m_rcItemList[nIndex];
         if ((itemStatus.m_pItem != nullptr) && !itemStatus.m_pItem->IsFloat()) {
             UiRect rcPos = itemStatus.m_rcPos;
             UiPoint offsetItem = itemStatus.m_pItem->GetScrollOffsetInScrollBox();
-            rcPos.Offset(-offsetItem.x, -offsetItem.y);//转换为窗口的客户区坐标
+            rcPos.Offset(-offsetItem.x, -offsetItem.y); //转换为窗口的客户区坐标
             if (rcPos.right < rcItemRects.right) {
                 rcItemRects.right = rcPos.right;
             }
@@ -492,19 +501,19 @@ bool ControlDragableT<T>::GetItemsValidRect(UiRect& itemsValidRect) const
     }
 
     UiPoint offset = this->GetScrollOffsetInScrollBox();
-    rcItemRects.Offset(offset);//转换为控件位置坐标
+    rcItemRects.Offset(offset); //转换为控件位置坐标
     itemsValidRect = rcItemRects;
     return true;
 }
 
 template<typename T>
-void ControlDragableT<T>::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouseDown,
-                                        const std::vector<ItemStatus>& rcItemList) const
+void ControlDragableT<T>::AdjustItemPos(
+    const UiPoint &pt, const UiPoint &ptMouseDown, const std::vector<ItemStatus> &rcItemList) const
 {
-    Control* pMouseItem = nullptr;
+    Control *pMouseItem = nullptr;
     size_t nMouseItemIndex = Box::InvalidIndex;
     size_t nMouseDownItemIndex = Box::InvalidIndex;
-    for (const ItemStatus& itemStatus : rcItemList) {
+    for (const ItemStatus &itemStatus : rcItemList) {
         if (itemStatus.m_rcPos.ContainsPt(pt)) {
             pMouseItem = itemStatus.m_pItem;
             nMouseItemIndex = itemStatus.m_index;
@@ -513,12 +522,11 @@ void ControlDragableT<T>::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMous
             nMouseDownItemIndex = itemStatus.m_index;
         }
     }
-    if ((pMouseItem == nullptr) ||
-        (nMouseItemIndex == Box::InvalidIndex) ||
-        (nMouseDownItemIndex == Box::InvalidIndex)) {
+    if ((pMouseItem == nullptr) || (nMouseItemIndex == Box::InvalidIndex)
+        || (nMouseDownItemIndex == Box::InvalidIndex)) {
         return;
     }
-    ControlDragableT<T>* pItem = dynamic_cast<ControlDragableT<T>*>(pMouseItem);
+    ControlDragableT<T> *pItem = dynamic_cast<ControlDragableT<T> *>(pMouseItem);
     if (pItem == nullptr) {
         //鼠标不在可拖动控件上
         return;
@@ -532,7 +540,7 @@ void ControlDragableT<T>::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMous
     int32_t xOffset = pt.x - ptMouseDown.x;
     if (pMouseItem == this) {
         //当前鼠标位置：在自身的位置，恢复各个控件的实际位置
-        for (const ItemStatus& item : rcItemList) {
+        for (const ItemStatus &item : rcItemList) {
             if (item.m_pItem == this) {
                 continue;
             }
@@ -540,48 +548,42 @@ void ControlDragableT<T>::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMous
                 item.m_pItem->SetPos(item.m_rcPos);
             }
         }
-    }
-    else if (xOffset < 0) {
+    } else if (xOffset < 0) {
         //当前鼠标位置：在按下点的左侧，向右侧移动控件
         for (size_t index = 0; index < itemCount; ++index) {
-            const ItemStatus& item = rcItemList[index];
+            const ItemStatus &item = rcItemList[index];
             if ((item.m_index >= nMouseItemIndex) && (item.m_index < nMouseDownItemIndex)) {
                 //向右侧移动
                 if ((index + 1) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index + 1];
+                    const ItemStatus &nextItem = rcItemList[index + 1];
                     item.m_pItem->SetPos(nextItem.m_rcPos);
-                }
-                else {
+                } else {
                     if (item.m_pItem->GetRect() != item.m_rcPos) {
                         item.m_pItem->SetPos(item.m_rcPos);
                     }
                 }
-            }
-            else {
+            } else {
                 //恢复原位置
                 if (item.m_pItem->GetRect() != item.m_rcPos) {
                     item.m_pItem->SetPos(item.m_rcPos);
                 }
             }
         }
-    }
-    else {
+    } else {
         //当前鼠标位置：在按下点的右侧，向左侧移动控件
         for (size_t index = 0; index < itemCount; ++index) {
-            const ItemStatus& item = rcItemList[index];
+            const ItemStatus &item = rcItemList[index];
             if ((item.m_index > nMouseDownItemIndex) && (item.m_index <= nMouseItemIndex)) {
                 //向左侧移动
                 if ((index - 1) < itemCount) {
-                    const ItemStatus& nextItem = rcItemList[index - 1];
+                    const ItemStatus &nextItem = rcItemList[index - 1];
                     item.m_pItem->SetPos(nextItem.m_rcPos);
-                }
-                else {
+                } else {
                     if (item.m_pItem->GetRect() != item.m_rcPos) {
                         item.m_pItem->SetPos(item.m_rcPos);
                     }
                 }
-            }
-            else {
+            } else {
                 //恢复原位置
                 if (item.m_pItem->GetRect() != item.m_rcPos) {
                     item.m_pItem->SetPos(item.m_rcPos);
@@ -592,14 +594,15 @@ void ControlDragableT<T>::AdjustItemPos(const UiPoint& pt, const UiPoint& ptMous
 }
 
 template<typename T>
-bool ControlDragableT<T>::AdjustItemOrders(const UiPoint& pt,
-                                           const std::vector<ItemStatus>& rcItemList,
-                                           size_t& nOldItemIndex,
-                                           size_t& nNewItemIndex)
+bool ControlDragableT<T>::AdjustItemOrders(
+    const UiPoint &pt,
+    const std::vector<ItemStatus> &rcItemList,
+    size_t &nOldItemIndex,
+    size_t &nNewItemIndex)
 {
     nOldItemIndex = Box::InvalidIndex;
     nNewItemIndex = Box::InvalidIndex;
-    Box* pParent = this->GetParent();
+    Box *pParent = this->GetParent();
     if (pParent == nullptr) {
         return false;
     }
@@ -608,10 +611,11 @@ bool ControlDragableT<T>::AdjustItemOrders(const UiPoint& pt,
     const size_t itemCount = pParent->GetItemCount();
     size_t nMouseItemIndex = Box::InvalidIndex;
     size_t nCurrentItemIndex = Box::InvalidIndex;
-    for (const ItemStatus& itemStatus : rcItemList) {
+    for (const ItemStatus &itemStatus : rcItemList) {
         if (itemStatus.m_rcPos.ContainsPt(pt)) {
             nMouseItemIndex = itemStatus.m_index;
-            const ControlDragableT<T>* pItem = dynamic_cast<const ControlDragableT<T>*>(itemStatus.m_pItem);
+            const ControlDragableT<T> *pItem = dynamic_cast<const ControlDragableT<T> *>(
+                itemStatus.m_pItem);
             if ((pItem != nullptr) && !pItem->IsEnableDragOrder()) {
                 //当前控件为固定，不允许调整顺序
                 nMouseItemIndex = Box::InvalidIndex;
@@ -633,8 +637,7 @@ bool ControlDragableT<T>::AdjustItemOrders(const UiPoint& pt,
 
 template<typename T>
 void ControlDragableT<T>::OnItemOrdersChanged(size_t /*nOldItemIndex*/, size_t /*nNewItemIndex*/)
-{
-}
+{}
 
 template<typename T>
 void ControlDragableT<T>::ClearDragStatus()
@@ -671,7 +674,7 @@ void ControlDragableT<T>::ClearDragStatus()
     if (bInDraggingOut) {
         //只有执行了拖出操作，才恢复可见，避免产生副作用
         this->SetVisible(true);
-    }    
+    }
 
     //恢复拖动调序操作的状态
     if (m_bInDraggingOrder) {
@@ -682,15 +685,15 @@ void ControlDragableT<T>::ClearDragStatus()
     m_bMouseDown = false;
     if (!m_rcItemList.empty()) {
         //恢复子控件的绘制顺序
-        for (const ItemStatus& itemStatus : m_rcItemList) {
-            if ((itemStatus.m_pItem != nullptr) &&
-                (itemStatus.m_nPaintOrder != itemStatus.m_pItem->GetPaintOrder())) {
+        for (const ItemStatus &itemStatus : m_rcItemList) {
+            if ((itemStatus.m_pItem != nullptr)
+                && (itemStatus.m_nPaintOrder != itemStatus.m_pItem->GetPaintOrder())) {
                 itemStatus.m_pItem->SetPaintOrder(itemStatus.m_nPaintOrder);
             }
         }
         m_rcItemList.clear();
         //对父控件重绘
-        Control* pParent = this->GetParent();
+        Control *pParent = this->GetParent();
         if (pParent != nullptr) {
             pParent->Invalidate();
             pParent->SetPos(pParent->GetPos());
@@ -699,13 +702,13 @@ void ControlDragableT<T>::ClearDragStatus()
 }
 
 template<typename T>
-bool ControlDragableT<T>::DragOutMouseUp(const EventArgs& msg)
+bool ControlDragableT<T>::DragOutMouseUp(const EventArgs &msg)
 {
     if (!IsInDraggingOut() || !IsEnableDragOut() || (m_pTargetBox == nullptr)) {
         return false;
     }
     //控件拖出操作
-    Box* pParent = this->GetParent();
+    Box *pParent = this->GetParent();
     UiPoint pt(msg.ptMouse);
     pt.Offset(m_pTargetBox->GetScrollOffsetInScrollBox());
     if ((pParent == nullptr) || !m_pTargetBox->GetRect().ContainsPt(pt)) {
@@ -718,7 +721,7 @@ bool ControlDragableT<T>::DragOutMouseUp(const EventArgs& msg)
     if (nIndex == Box::InvalidIndex) {
         const size_t nCount = m_pTargetBox->GetItemCount();
         for (size_t nItem = 0; nItem < nCount; ++nItem) {
-            Control* pControl = m_pTargetBox->GetItemAt(nItem);
+            Control *pControl = m_pTargetBox->GetItemAt(nItem);
             if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
                 continue;
             }
@@ -734,9 +737,9 @@ bool ControlDragableT<T>::DragOutMouseUp(const EventArgs& msg)
             m_pDestControl = nullptr;
         }
 
-        Box* pOldBox = pParent;
+        Box *pOldBox = pParent;
         size_t nOldItemIndex = pParent->GetItemIndex(this);
-        Box* pNewBox = m_pTargetBox;
+        Box *pNewBox = m_pTargetBox;
         size_t nNewItemIndex = nIndex;
 
         bool bAutoDestroyChild = pParent->IsAutoDestroyChild();
@@ -757,13 +760,12 @@ bool ControlDragableT<T>::DragOutMouseUp(const EventArgs& msg)
 }
 
 template<typename T>
-void ControlDragableT<T>::OnItemBoxChanged(Box* /*pOldBox*/, size_t /*nOldItemIndex*/,
-                                           Box* /*pNewBox*/, size_t /*nNewItemIndex*/)
-{
-}
+void ControlDragableT<T>::OnItemBoxChanged(
+    Box * /*pOldBox*/, size_t /*nOldItemIndex*/, Box * /*pNewBox*/, size_t /*nNewItemIndex*/)
+{}
 
 template<typename T>
-void ControlDragableT<T>::DragOrderMouseUp(const EventArgs& msg)
+void ControlDragableT<T>::DragOrderMouseUp(const EventArgs &msg)
 {
     if (!IsEnableDragOrder() || !IsInDraggingOrder()) {
         return;
@@ -797,7 +799,8 @@ void ControlDragableT<T>::DragOrderMouseUp(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlDragableT<T>::OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox, const UiPoint& ptMouse)
+bool ControlDragableT<T>::OnDragOutMouseOver(
+    Box *pTargetBox, Box *pOldTargetBox, const UiPoint &ptMouse)
 {
     bool bDropped = false;
     if ((pTargetBox == nullptr) || (pTargetBox->GetLayout() == nullptr)) {
@@ -817,7 +820,7 @@ bool ControlDragableT<T>::OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox
     pt.Offset(pTargetBox->GetScrollOffsetInScrollBox());
     const size_t nCount = pTargetBox->GetItemCount();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        Control* pControl = pTargetBox->GetItemAt(nIndex);
+        Control *pControl = pTargetBox->GetItemAt(nIndex);
         if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
             continue;
         }
@@ -848,14 +851,12 @@ bool ControlDragableT<T>::OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox
                     if (nOldIndex != nNewIndex) {
                         pTargetBox->SetItemIndex(m_pDestControl, nNewIndex);
                     }
-                }
-                else {
+                } else {
                     if (nOldIndex != (nNewIndex - 1)) {
                         pTargetBox->SetItemIndex(m_pDestControl, nNewIndex);
                     }
                 }
-            }
-            else {
+            } else {
                 size_t nNewIndex = nIndex;
                 if ((pt.y - rc.top) > rc.Height() / 2) {
                     if (nNewIndex < (pTargetBox->GetItemCount() - 1)) {
@@ -864,8 +865,7 @@ bool ControlDragableT<T>::OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox
                     if (nOldIndex != nNewIndex) {
                         pTargetBox->SetItemIndex(m_pDestControl, nNewIndex);
                     }
-                }
-                else {
+                } else {
                     if (nOldIndex != (nNewIndex - 1)) {
                         pTargetBox->SetItemIndex(m_pDestControl, nNewIndex);
                     }
@@ -888,20 +888,20 @@ bool ControlDragableT<T>::OnDragOutMouseOver(Box* pTargetBox, Box* pOldTargetBox
 }
 
 template<typename T>
-DragWindow* ControlDragableT<T>::CreateDragWindow()
+DragWindow *ControlDragableT<T>::CreateDragWindow()
 {
     return new DragWindow;
 }
 
 template<typename T>
-Control* ControlDragableT<T>::CreateDestControl(Box* pTargetBox)
+Control *ControlDragableT<T>::CreateDestControl(Box *pTargetBox)
 {
-    Control* pDestControl = new Control(this->GetWindow());
+    Control *pDestControl = new Control(this->GetWindow());
     pDestControl->SetAttribute(_T("bkcolor"), _T("#FF5D6B99"));
     pDestControl->SetAttribute(_T("valign"), _T("center"));
     pDestControl->SetAttribute(_T("halign"), _T("center"));
 
-    Layout* pLayout = nullptr;
+    Layout *pLayout = nullptr;
     if (pTargetBox != nullptr) {
         pLayout = pTargetBox->GetLayout();
     }
@@ -917,12 +917,11 @@ Control* ControlDragableT<T>::CreateDestControl(Box* pTargetBox)
             bInited = true;
         }
     }
-    if (!bInited) {        
+    if (!bInited) {
         if ((pLayout != nullptr) && pLayout->IsVLayout()) {
             pDestControl->SetAttribute(_T("height"), _T("4"));
             pDestControl->SetAttribute(_T("width"), _T("80%"));
-        }
-        else {
+        } else {
             pDestControl->SetAttribute(_T("width"), _T("4"));
             pDestControl->SetAttribute(_T("height"), _T("80%"));
         }
@@ -938,7 +937,7 @@ std::shared_ptr<IBitmap> ControlDragableT<T>::CreateDragoutImage()
         return nullptr;
     }
     std::unique_ptr<IRender> render;
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory != nullptr) {
         ASSERT(this->GetWindow() != nullptr);
@@ -949,7 +948,7 @@ std::shared_ptr<IBitmap> ControlDragableT<T>::CreateDragoutImage()
         render.reset(pRenderFactory->CreateRender(spRenderDpi));
     }
     ASSERT(render != nullptr);
-    if(render == nullptr) {
+    if (render == nullptr) {
         return nullptr;
     }
     const int32_t kDragImageWidth = rc.Width();
@@ -957,26 +956,32 @@ std::shared_ptr<IBitmap> ControlDragableT<T>::CreateDragoutImage()
     if (render->Resize(kDragImageWidth, kDragImageHeight)) {
         int32_t destWidth = 0;
         int32_t destHeight = 0;
-        float scale = (float)rc.Width() / (float)rc.Height();
+        float scale = (float) rc.Width() / (float) rc.Height();
         if (scale >= 1.0) {
             destWidth = kDragImageWidth;
-            destHeight = (int32_t)(kDragImageWidth * (float)rc.Height() / (float)rc.Width());
-        }
-        else {
+            destHeight = (int32_t) (kDragImageWidth * (float) rc.Height() / (float) rc.Width());
+        } else {
             destHeight = kDragImageHeight;
-            destWidth = (int32_t)(kDragImageHeight * (float)rc.Width() / (float)rc.Height());
+            destWidth = (int32_t) (kDragImageHeight * (float) rc.Width() / (float) rc.Height());
         }
         UiPoint ptScrollOffset = this->GetScrollOffsetInScrollBox();
-        render->AlphaBlend((kDragImageWidth - destWidth) / 2, 0, destWidth, destHeight,
+        render->AlphaBlend(
+            (kDragImageWidth - destWidth) / 2,
+            0,
+            destWidth,
+            destHeight,
             this->GetWindow()->GetRender(),
-            rc.left - ptScrollOffset.x, rc.top - ptScrollOffset.y, rc.Width(), rc.Height());
+            rc.left - ptScrollOffset.x,
+            rc.top - ptScrollOffset.y,
+            rc.Width(),
+            rc.Height());
     }
     std::shared_ptr<IBitmap> pDragImage(render->MakeImageSnapshot());
     return pDragImage;
 }
 
 template<typename T>
-bool ControlDragableT<T>::IsPtInControlRect(Control* pControl, const UiPoint& pt) const
+bool ControlDragableT<T>::IsPtInControlRect(Control *pControl, const UiPoint &pt) const
 {
     if (pControl == nullptr) {
         return false;
@@ -990,8 +995,8 @@ bool ControlDragableT<T>::IsPtInControlRect(Control* pControl, const UiPoint& pt
     if (rc.ContainsPt(pt)) {
         return true;
     }
-    Layout* pLayout = nullptr;
-    const Box* pBox = pControl->GetParent();
+    Layout *pLayout = nullptr;
+    const Box *pBox = pControl->GetParent();
     if (pBox != nullptr) {
         pLayout = pBox->GetLayout();
     }
@@ -1013,13 +1018,13 @@ bool ControlDragableT<T>::IsPtInControlRect(Control* pControl, const UiPoint& pt
 }
 
 template<typename T>
-void ControlDragableT<T>::DragOrderMouseDown(const EventArgs& /*msg*/)
+void ControlDragableT<T>::DragOrderMouseDown(const EventArgs & /*msg*/)
 {
     m_rcItemList.clear();
     if (!IsEnableDragOrder()) {
         return;
     }
-    const Box* pParent = this->GetParent();
+    const Box *pParent = this->GetParent();
     if (pParent == nullptr) {
         return;
     }
@@ -1043,19 +1048,20 @@ void ControlDragableT<T>::DragOrderMouseDown(const EventArgs& /*msg*/)
 }
 
 template<typename T>
-bool ControlDragableT<T>::DragOrderMouseMove(const EventArgs& msg)
+bool ControlDragableT<T>::DragOrderMouseMove(const EventArgs &msg)
 {
     bool bRet = false;
     if (!IsEnableDragOrder()) {
         //该控件禁止拖动调序
         return bRet;
-    }    
-    const Box* pParent = this->GetParent();
+    }
+    const Box *pParent = this->GetParent();
     if (pParent == nullptr) {
         return bRet;
     }
-    const Layout* pLayout = pParent->GetLayout();
-    if ((pLayout == nullptr) || pLayout->IsTileLayout() || (!pLayout->IsHLayout() && !pLayout->IsVLayout())) {
+    const Layout *pLayout = pParent->GetLayout();
+    if ((pLayout == nullptr) || pLayout->IsTileLayout()
+        || (!pLayout->IsHLayout() && !pLayout->IsVLayout())) {
         return bRet;
     }
     UiPoint pt(msg.ptMouse);
@@ -1090,19 +1096,17 @@ bool ControlDragableT<T>::DragOrderMouseMove(const EventArgs& msg)
 
         this->SetPos(rect);
 
-        ScrollBox* pScrollBox = dynamic_cast<ScrollBox*>(this->GetParent());
+        ScrollBox *pScrollBox = dynamic_cast<ScrollBox *>(this->GetParent());
         if ((pScrollBox != nullptr) && (pScrollBox->GetScrollRange().cx > 0)) {
             if (ptNow.x <= itemsValidRect.left) {
                 //向左滚动
                 pScrollBox->LineLeft();
-            }
-            else if (ptNow.x >= itemsValidRect.right) {
+            } else if (ptNow.x >= itemsValidRect.right) {
                 //向右滚动
                 pScrollBox->LineRight();
             }
         }
-    }
-    else {
+    } else {
         int32_t yOffset = pt.y - m_ptMouseDown.y;
         if (std::abs(yOffset) < this->Dpi().GetScaleInt(DRAG_OPERATION_MIN_PT)) {
             return bRet;
@@ -1115,13 +1119,12 @@ bool ControlDragableT<T>::DragOrderMouseMove(const EventArgs& msg)
         rect.bottom += yOffset;
         this->SetPos(rect);
 
-        ScrollBox* pScrollBox = dynamic_cast<ScrollBox*>(this->GetParent());
+        ScrollBox *pScrollBox = dynamic_cast<ScrollBox *>(this->GetParent());
         if ((pScrollBox != nullptr) && (pScrollBox->GetScrollRange().cy > 0)) {
             if (ptNow.y <= itemsValidRect.top) {
                 //向上滚动
                 pScrollBox->LineUp();
-            }
-            else if (ptNow.y >= itemsValidRect.bottom) {
+            } else if (ptNow.y >= itemsValidRect.bottom) {
                 //向下滚动
                 pScrollBox->LineDown();
             }
@@ -1139,15 +1142,15 @@ bool ControlDragableT<T>::DragOrderMouseMove(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlDragableT<T>::DragOutMouseMove(const EventArgs& msg)
+bool ControlDragableT<T>::DragOutMouseMove(const EventArgs &msg)
 {
     bool bRet = false;
     if (!IsEnableDragOut()) {
         //该控件禁止拖出操作
         return bRet;
     }
-    const Window* pWindow = this->GetWindow();
-    const Box* pParent = this->GetParent();
+    const Window *pWindow = this->GetWindow();
+    const Box *pParent = this->GetParent();
     if ((pParent == nullptr) || (pWindow == nullptr)) {
         return bRet;
     }
@@ -1155,7 +1158,7 @@ bool ControlDragableT<T>::DragOutMouseMove(const EventArgs& msg)
         //父容器不支持拖出操作
         return bRet;
     }
-    const Layout* pLayout = pParent->GetLayout();
+    const Layout *pLayout = pParent->GetLayout();
     if ((pLayout == nullptr) || (!pLayout->IsHLayout() && !pLayout->IsVLayout())) {
         return bRet;
     }
@@ -1177,7 +1180,7 @@ bool ControlDragableT<T>::DragOutMouseMove(const EventArgs& msg)
     }
 
     bool bDropped = false;
-    Box* pOldTargetBox = m_pTargetBox;
+    Box *pOldTargetBox = m_pTargetBox;
     m_pTargetBox = pWindow->FindDroppableBox(msg.ptMouse, pParent->GetDragOutId());
     if (m_pTargetBox != nullptr) {
         bDropped = OnDragOutMouseOver(m_pTargetBox, pOldTargetBox, msg.ptMouse);
@@ -1234,7 +1237,8 @@ bool ControlDragableT<T>::DragOutMouseMove(const EventArgs& msg)
             m_pDragWindow->ShowWindow(kSW_SHOW_NA);
 
 #ifdef DUILIB_BUILD_FOR_SDL
-            m_pDragWindowFilter = std::make_unique<DragWindowFilter>(this->GetWindow(), m_pDragWindow);
+            m_pDragWindowFilter
+                = std::make_unique<DragWindowFilter>(this->GetWindow(), m_pDragWindow);
             m_pDragWindow->AddMessageFilter(m_pDragWindowFilter.get());
             //减缓显示时黑屏现象
             m_pDragWindow->InvalidateAll();
@@ -1246,7 +1250,7 @@ bool ControlDragableT<T>::DragOutMouseMove(const EventArgs& msg)
     }
     if (this->IsVisible()) {
         this->SetVisible(false);
-    }    
+    }
     bRet = true;
     return bRet;
 }
@@ -1256,6 +1260,6 @@ typedef ControlDragableT<Box> BoxDragable;
 typedef ControlDragableT<HBox> HBoxDragable;
 typedef ControlDragableT<VBox> VBoxDragable;
 
-}
+} // namespace ui
 
 #endif // UI_CORE_CONTROL_DRAGABLE_H_

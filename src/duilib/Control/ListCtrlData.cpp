@@ -1,34 +1,32 @@
 #include "ListCtrlData.h"
 #include "duilib/Control/ListCtrl.h"
 #include "duilib/Core/GlobalManager.h"
-#include <set>
 #include <algorithm>
+#include <set>
 
-namespace ui
-{
-ListCtrlData::ListCtrlData() :
-    m_pListView(nullptr),
-    m_pfnCompareFunc(nullptr),
-    m_pUserData(nullptr),
-    m_hideRowCount(0),
-    m_heightRowCount(0),
-    m_atTopRowCount(0),
-    m_bMultiSelect(true),
-    m_nSelectedIndex(Box::InvalidIndex),
-    m_nDefaultTextStyle(0),
-    m_nDefaultItemHeight(-1),
-    m_bAutoCheckSelect(false)
-{
-}
+namespace ui {
+ListCtrlData::ListCtrlData()
+    : m_pListView(nullptr)
+    , m_pfnCompareFunc(nullptr)
+    , m_pUserData(nullptr)
+    , m_hideRowCount(0)
+    , m_heightRowCount(0)
+    , m_atTopRowCount(0)
+    , m_bMultiSelect(true)
+    , m_nSelectedIndex(Box::InvalidIndex)
+    , m_nDefaultTextStyle(0)
+    , m_nDefaultItemHeight(-1)
+    , m_bAutoCheckSelect(false)
+{}
 
-Control* ListCtrlData::CreateElement(ui::VirtualListBox* pVirtualListBox)
+Control *ListCtrlData::CreateElement(ui::VirtualListBox *pVirtualListBox)
 {
     ASSERT(pVirtualListBox != nullptr);
     if (pVirtualListBox == nullptr) {
         return nullptr;
     }
     ASSERT(pVirtualListBox->GetWindow() != nullptr);
-    Control* pItem = nullptr;
+    Control *pItem = nullptr;
     ASSERT(m_pListView != nullptr);
     if (m_pListView != nullptr) {
         pItem = m_pListView->CreateDataItem();
@@ -36,14 +34,14 @@ Control* ListCtrlData::CreateElement(ui::VirtualListBox* pVirtualListBox)
     return pItem;
 }
 
-bool ListCtrlData::FillElement(Control* pControl, size_t nElementIndex)
+bool ListCtrlData::FillElement(Control *pControl, size_t nElementIndex)
 {
     ASSERT(pControl != nullptr);
     ASSERT(nElementIndex < m_rowDataList.size());
     if ((nElementIndex >= m_rowDataList.size()) || (pControl == nullptr)) {
         return false;
     }
-    const ListCtrlItemData& itemData = m_rowDataList[nElementIndex];
+    const ListCtrlItemData &itemData = m_rowDataList[nElementIndex];
     std::vector<ListCtrlSubItemData2Pair> subItemList;
     if (!GetSubItemStorageList(nElementIndex, subItemList)) {
         return false;
@@ -64,7 +62,7 @@ int32_t ListCtrlData::GetMaxColumnWidth(size_t columnId) const
     auto iter = m_dataMap.find(columnId);
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
-        const StoragePtrList& storageList = iter->second;
+        const StoragePtrList &storageList = iter->second;
         const size_t nCount = storageList.size();
         for (size_t index = 0; index < nCount; ++index) {
             if (storageList[index] != nullptr) {
@@ -77,7 +75,7 @@ int32_t ListCtrlData::GetMaxColumnWidth(size_t columnId) const
         if (m_pListView != nullptr) {
             nMaxWidth = m_pListView->GetMaxDataItemWidth(subItemList);
         }
-    }    
+    }
     return nMaxWidth;
 }
 
@@ -94,9 +92,9 @@ void ListCtrlData::SetElementSelected(size_t nElementIndex, bool bSelected)
     }
     ASSERT(nElementIndex < m_rowDataList.size());
     if (nElementIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[nElementIndex];
+        ListCtrlItemData &rowData = m_rowDataList[nElementIndex];
         if (rowData.bSelected != bSelected) {
-            rowData.bSelected = bSelected;//多选或者单选的情况下，都更新
+            rowData.bSelected = bSelected; //多选或者单选的情况下，都更新
         }
         if (IsAutoCheckSelect() && (rowData.bChecked != rowData.bSelected)) {
             rowData.bChecked = rowData.bSelected;
@@ -107,11 +105,10 @@ void ListCtrlData::SetElementSelected(size_t nElementIndex, bool bSelected)
         //单选的情况
         if (bSelected) {
             m_nSelectedIndex = nElementIndex;
-        }
-        else if (m_nSelectedIndex == nElementIndex) {
+        } else if (m_nSelectedIndex == nElementIndex) {
             m_nSelectedIndex = Box::InvalidIndex;
         }
-    }    
+    }
 }
 
 bool ListCtrlData::IsElementSelected(size_t nElementIndex) const
@@ -125,30 +122,28 @@ bool ListCtrlData::IsElementSelected(size_t nElementIndex) const
         //多选
         ASSERT(nElementIndex < m_rowDataList.size());
         if (nElementIndex < m_rowDataList.size()) {
-            const ListCtrlItemData& rowData = m_rowDataList[nElementIndex];
+            const ListCtrlItemData &rowData = m_rowDataList[nElementIndex];
             bSelected = rowData.bSelected;
         }
-    }
-    else {
+    } else {
         //单选
         bSelected = (m_nSelectedIndex == nElementIndex);
     }
     return bSelected;
 }
 
-void ListCtrlData::GetSelectedElements(std::vector<size_t>& selectedIndexs) const
+void ListCtrlData::GetSelectedElements(std::vector<size_t> &selectedIndexs) const
 {
     selectedIndexs.clear();
     if (m_bMultiSelect) {
         size_t nCount = m_rowDataList.size();
         for (size_t nElementIndex = 0; nElementIndex < nCount; ++nElementIndex) {
-            const ListCtrlItemData& rowData = m_rowDataList[nElementIndex];
+            const ListCtrlItemData &rowData = m_rowDataList[nElementIndex];
             if (rowData.bSelected) {
                 selectedIndexs.push_back(nElementIndex);
             }
         }
-    }
-    else {
+    } else {
         if (m_nSelectedIndex < m_rowDataList.size()) {
             selectedIndexs.push_back(m_nSelectedIndex);
         }
@@ -168,7 +163,7 @@ void ListCtrlData::SetMultiSelect(bool bMultiSelect)
         //从单选变多选，需要清空选项，只保留一个单选项
         const size_t nItemCount = m_rowDataList.size();
         for (size_t itemIndex = 0; itemIndex < nItemCount; ++itemIndex) {
-            ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+            ListCtrlItemData &rowData = m_rowDataList[itemIndex];
             if (rowData.bSelected) {
                 if (m_nSelectedIndex != itemIndex) {
                     rowData.bSelected = false;
@@ -178,10 +173,10 @@ void ListCtrlData::SetMultiSelect(bool bMultiSelect)
                 rowData.bChecked = rowData.bSelected;
             }
         }
-    }    
+    }
 }
 
-void ListCtrlData::SetListView(IListCtrlView* pListView)
+void ListCtrlData::SetListView(IListCtrlView *pListView)
 {
     m_pListView = pListView;
 }
@@ -206,22 +201,22 @@ void ListCtrlData::SetDefaultItemHeight(int32_t nItemHeight)
     m_nDefaultItemHeight = nItemHeight;
 }
 
-void ListCtrlData::ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale)
+void ListCtrlData::ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale)
 {
-    for (ListCtrlItemData& data : m_rowDataList) {
+    for (ListCtrlItemData &data : m_rowDataList) {
         if (data.nItemHeight > 0) {
-            data.nItemHeight = ui::TruncateToUInt16(dpiManager.GetScaleInt((int32_t)data.nItemHeight, nOldDpiScale));
+            data.nItemHeight = ui::TruncateToUInt16(
+                dpiManager.GetScaleInt((int32_t) data.nItemHeight, nOldDpiScale));
         }
     }
 }
 
-void ListCtrlData::SubItemToStorage(const ListCtrlSubItemData& item, Storage& storage) const
+void ListCtrlData::SubItemToStorage(const ListCtrlSubItemData &item, Storage &storage) const
 {
     storage.text = item.text;
     if (item.nTextFormat >= 0) {
         storage.nTextFormat = TruncateToUInt16(item.nTextFormat);
-    }
-    else {
+    } else {
         storage.nTextFormat = 0;
     }
     storage.nImageId = item.nImageId;
@@ -236,13 +231,12 @@ void ListCtrlData::SubItemToStorage(const ListCtrlSubItemData& item, Storage& st
     storage.nSortGroup = item.nSortGroup;
 }
 
-void ListCtrlData::StorageToSubItem(const Storage& storage, ListCtrlSubItemData& item) const
+void ListCtrlData::StorageToSubItem(const Storage &storage, ListCtrlSubItemData &item) const
 {
     item.text = storage.text.c_str();
     if (storage.nTextFormat == 0) {
         item.nTextFormat = -1;
-    }
-    else {
+    } else {
         item.nTextFormat = storage.nTextFormat;
     }
     item.nImageId = storage.nImageId;
@@ -273,7 +267,7 @@ bool ListCtrlData::AddColumn(size_t columnId)
     if ((columnId == Box::InvalidIndex) || (columnId == 0)) {
         return false;
     }
-    StoragePtrList& storageList = m_dataMap[columnId];
+    StoragePtrList &storageList = m_dataMap[columnId];
     //列的长度与行保持一致
     storageList.resize(m_rowDataList.size());
     EmitCountChanged();
@@ -305,7 +299,7 @@ bool ListCtrlData::SetColumnCheck(size_t columnId, bool bChecked, bool bRefresh)
     auto iter = m_dataMap.find(columnId);
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         const size_t nCount = storageList.size();
         for (size_t index = 0; index < nCount; ++index) {
             if (storageList[index] == nullptr) {
@@ -321,14 +315,13 @@ bool ListCtrlData::SetColumnCheck(size_t columnId, bool bChecked, bool bRefresh)
     return bRet;
 }
 
-ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorage(
-    size_t itemIndex, size_t nColumnId) const
+ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorage(size_t itemIndex, size_t nColumnId) const
 {
     StoragePtr pStorage;
     auto iter = m_dataMap.find(nColumnId);
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
-        const StoragePtrList& storageList = iter->second;
+        const StoragePtrList &storageList = iter->second;
         ASSERT(itemIndex < storageList.size());
         if (itemIndex < storageList.size()) {
             //关联列：获取数据
@@ -338,14 +331,13 @@ ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorage(
     return pStorage;
 }
 
-ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorageForWrite(
-    size_t itemIndex, size_t nColumnId)
+ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorageForWrite(size_t itemIndex, size_t nColumnId)
 {
     StoragePtr pStorage;
     auto iter = m_dataMap.find(nColumnId);
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         ASSERT(itemIndex < storageList.size());
         if (itemIndex < storageList.size()) {
             //关联列：获取数据
@@ -359,7 +351,8 @@ ListCtrlData::StoragePtr ListCtrlData::GetSubItemStorageForWrite(
     return pStorage;
 }
 
-bool ListCtrlData::GetSubItemStorageList(size_t itemIndex, std::vector<ListCtrlSubItemData2Pair>& subItemList) const
+bool ListCtrlData::GetSubItemStorageList(
+    size_t itemIndex, std::vector<ListCtrlSubItemData2Pair> &subItemList) const
 {
     subItemList.clear();
     ASSERT(itemIndex < m_rowDataList.size());
@@ -368,13 +361,12 @@ bool ListCtrlData::GetSubItemStorageList(size_t itemIndex, std::vector<ListCtrlS
     }
     ListCtrlSubItemData2Pair dataPair;
     for (auto iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
-        dataPair.nColumnId = iter->first;        
-        const StoragePtrList& dataList = iter->second;
+        dataPair.nColumnId = iter->first;
+        const StoragePtrList &dataList = iter->second;
         ASSERT(itemIndex < dataList.size());
         if (itemIndex < dataList.size()) {
             dataPair.pSubItemData = dataList.at(itemIndex);
-        }
-        else {
+        } else {
             dataPair.pSubItemData = nullptr;
         }
         subItemList.push_back(dataPair);
@@ -382,7 +374,7 @@ bool ListCtrlData::GetSubItemStorageList(size_t itemIndex, std::vector<ListCtrlS
     return true;
 }
 
-const ListCtrlData::RowDataList& ListCtrlData::GetItemDataList() const
+const ListCtrlData::RowDataList &ListCtrlData::GetItemDataList() const
 {
     return m_rowDataList;
 }
@@ -415,7 +407,7 @@ bool ListCtrlData::SetDataItemCount(size_t itemCount)
         return true;
     }
     size_t nOldCount = m_rowDataList.size();
-    m_rowDataList.resize(itemCount); 
+    m_rowDataList.resize(itemCount);
     if (m_nSelectedIndex >= m_rowDataList.size()) {
         m_nSelectedIndex = Box::InvalidIndex;
     }
@@ -437,7 +429,7 @@ void ListCtrlData::UpdateNormalMode()
     m_hideRowCount = 0;
     m_heightRowCount = 0;
     m_atTopRowCount = 0;
-    for (const ListCtrlItemData& data : m_rowDataList) {
+    for (const ListCtrlItemData &data : m_rowDataList) {
         if (!data.bVisible) {
             m_hideRowCount += 1;
         }
@@ -450,7 +442,7 @@ void ListCtrlData::UpdateNormalMode()
     }
 }
 
-size_t ListCtrlData::AddDataItem(size_t columnId, const ListCtrlSubItemData& dataItem)
+size_t ListCtrlData::AddDataItem(size_t columnId, const ListCtrlSubItemData &dataItem)
 {
     ASSERT(IsValidDataColumnId(columnId));
     if (!IsValidDataColumnId(columnId)) {
@@ -463,13 +455,12 @@ size_t ListCtrlData::AddDataItem(size_t columnId, const ListCtrlSubItemData& dat
     size_t nDataItemIndex = Box::InvalidIndex;
     for (auto iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
         size_t id = iter->first;
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         if (id == columnId) {
             //关联列：保存数据
             storageList.push_back(std::make_shared<Storage>(storage));
             nDataItemIndex = storageList.size() - 1;
-        }
-        else {
+        } else {
             //其他列：插入空数据
             storageList.push_back(nullptr);
         }
@@ -482,7 +473,8 @@ size_t ListCtrlData::AddDataItem(size_t columnId, const ListCtrlSubItemData& dat
     return nDataItemIndex;
 }
 
-bool ListCtrlData::InsertDataItem(size_t itemIndex, size_t columnId, const ListCtrlSubItemData& dataItem)
+bool ListCtrlData::InsertDataItem(
+    size_t itemIndex, size_t columnId, const ListCtrlSubItemData &dataItem)
 {
     ASSERT(IsValidDataColumnId(columnId));
     if (!IsValidDataColumnId(columnId)) {
@@ -498,12 +490,11 @@ bool ListCtrlData::InsertDataItem(size_t itemIndex, size_t columnId, const ListC
 
     for (auto iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
         size_t id = iter->first;
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         if (id == columnId) {
             //关联列：保存数据
             storageList.insert(storageList.begin() + itemIndex, std::make_shared<Storage>(storage));
-        }
-        else {
+        } else {
             //其他列：插入空数据
             storageList.insert(storageList.begin() + itemIndex, nullptr);
         }
@@ -528,7 +519,7 @@ bool ListCtrlData::DeleteDataItem(size_t itemIndex)
     }
 
     for (auto iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         if (itemIndex < storageList.size()) {
             storageList.erase(storageList.begin() + itemIndex);
         }
@@ -540,8 +531,7 @@ bool ListCtrlData::DeleteDataItem(size_t itemIndex)
         if (m_nSelectedIndex < m_rowDataList.size()) {
             if (m_nSelectedIndex == itemIndex) {
                 m_nSelectedIndex = Box::InvalidIndex;
-            }
-            else if (m_nSelectedIndex > itemIndex) {
+            } else if (m_nSelectedIndex > itemIndex) {
                 m_nSelectedIndex -= 1;
             }
         }
@@ -567,7 +557,7 @@ bool ListCtrlData::DeleteAllDataItems()
 {
     bool bDeleted = false;
     for (auto iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         if (!storageList.empty()) {
             bDeleted = true;
         }
@@ -590,8 +580,8 @@ bool ListCtrlData::DeleteAllDataItems()
     return bDeleted;
 }
 
-bool ListCtrlData::SetDataItemData(size_t itemIndex, const ListCtrlItemData& itemData,
-                                   bool& bChanged, bool& bCheckChanged)
+bool ListCtrlData::SetDataItemData(
+    size_t itemIndex, const ListCtrlItemData &itemData, bool &bChanged, bool &bCheckChanged)
 {
     bChanged = false;
     bCheckChanged = false;
@@ -606,53 +596,45 @@ bool ListCtrlData::SetDataItemData(size_t itemIndex, const ListCtrlItemData& ite
             //如果等于默认高度，则设置为标志值
             m_rowDataList[itemIndex].nItemHeight = -1;
         }
-        const ListCtrlItemData& newItemData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &newItemData = m_rowDataList[itemIndex];
         if (newItemData.bSelected != oldItemData.bSelected) {
             bChanged = true;
             bItemChanged = true;
-        }
-        else if (newItemData.bChecked != oldItemData.bChecked) {
+        } else if (newItemData.bChecked != oldItemData.bChecked) {
             bCheckChanged = true;
             bChanged = true;
             bItemChanged = true;
-        }
-        else if (newItemData.bVisible != oldItemData.bVisible) {
+        } else if (newItemData.bVisible != oldItemData.bVisible) {
             bChanged = true;
             bCountChanged = true;
-        }
-        else if (newItemData.nAlwaysAtTop != oldItemData.nAlwaysAtTop) {
+        } else if (newItemData.nAlwaysAtTop != oldItemData.nAlwaysAtTop) {
             bChanged = true;
             bCountChanged = true;
-        }
-        else if (newItemData.nItemHeight != oldItemData.nItemHeight) {
+        } else if (newItemData.nItemHeight != oldItemData.nItemHeight) {
             bChanged = true;
             bCountChanged = true;
-        }
-        else if (newItemData.nUserData != oldItemData.nUserData) {
+        } else if (newItemData.nUserData != oldItemData.nUserData) {
             bChanged = true;
         }
 
         //更新计数
         if (!oldItemData.bVisible && newItemData.bVisible) {
-            m_hideRowCount -= 1;            
-        }
-        else if (oldItemData.bVisible && !newItemData.bVisible) {
+            m_hideRowCount -= 1;
+        } else if (oldItemData.bVisible && !newItemData.bVisible) {
             m_hideRowCount += 1;
         }
         ASSERT(m_hideRowCount >= 0);
 
         if ((oldItemData.nItemHeight >= 0) && (newItemData.nItemHeight < 0)) {
             m_heightRowCount -= 1;
-        }
-        else if ((oldItemData.nItemHeight < 0) && (newItemData.nItemHeight >= 0)) {
+        } else if ((oldItemData.nItemHeight < 0) && (newItemData.nItemHeight >= 0)) {
             m_heightRowCount += 1;
         }
         ASSERT(m_heightRowCount >= 0);
 
         if ((oldItemData.nAlwaysAtTop >= 0) && (newItemData.nAlwaysAtTop < 0)) {
             m_atTopRowCount -= 1;
-        }
-        else if ((oldItemData.nAlwaysAtTop < 0) && (newItemData.nAlwaysAtTop >= 0)) {
+        } else if ((oldItemData.nAlwaysAtTop < 0) && (newItemData.nAlwaysAtTop >= 0)) {
             m_atTopRowCount += 1;
         }
         ASSERT(m_atTopRowCount >= 0);
@@ -660,14 +642,13 @@ bool ListCtrlData::SetDataItemData(size_t itemIndex, const ListCtrlItemData& ite
     }
     if (bCountChanged) {
         EmitCountChanged();
-    }
-    else if (bItemChanged) {
+    } else if (bItemChanged) {
         EmitDataChanged(itemIndex, itemIndex);
     }
     return bRet;
 }
 
-bool ListCtrlData::GetDataItemData(size_t itemIndex, ListCtrlItemData& itemData) const
+bool ListCtrlData::GetDataItemData(size_t itemIndex, ListCtrlItemData &itemData) const
 {
     bool bRet = false;
     itemData = ListCtrlItemData();
@@ -679,21 +660,20 @@ bool ListCtrlData::GetDataItemData(size_t itemIndex, ListCtrlItemData& itemData)
     return bRet;
 }
 
-bool ListCtrlData::SetDataItemVisible(size_t itemIndex, bool bVisible, bool& bChanged)
+bool ListCtrlData::SetDataItemVisible(size_t itemIndex, bool bVisible, bool &bChanged)
 {
     bChanged = false;
     bool bRet = false;
     ASSERT(itemIndex < m_rowDataList.size());
-    if (itemIndex < m_rowDataList.size()) {        
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+    if (itemIndex < m_rowDataList.size()) {
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         bool bOldVisible = rowData.bVisible;
         bChanged = rowData.bVisible != bVisible;
         rowData.bVisible = bVisible;
 
         if (!bOldVisible && bVisible) {
             m_hideRowCount -= 1;
-        }
-        else if (bOldVisible && !bVisible) {
+        } else if (bOldVisible && !bVisible) {
             m_hideRowCount += 1;
         }
         ASSERT(m_hideRowCount >= 0);
@@ -710,13 +690,13 @@ bool ListCtrlData::IsDataItemVisible(size_t itemIndex) const
     bool bValue = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         bValue = rowData.bVisible;
     }
     return bValue;
 }
 
-bool ListCtrlData::SetDataItemSelected(size_t itemIndex, bool bSelected, bool& bChanged)
+bool ListCtrlData::SetDataItemSelected(size_t itemIndex, bool bSelected, bool &bChanged)
 {
     bChanged = false;
     if (itemIndex >= m_rowDataList.size()) {
@@ -735,17 +715,17 @@ bool ListCtrlData::IsDataItemSelected(size_t itemIndex) const
     return IsElementSelected(itemIndex);
 }
 
-bool ListCtrlData::SetDataItemChecked(size_t itemIndex, bool bChecked, bool& bChanged)
+bool ListCtrlData::SetDataItemChecked(size_t itemIndex, bool bChecked, bool &bChanged)
 {
     bChanged = false;
     bool bRet = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (rowData.bChecked != bChecked) {
             bChanged = true;
             rowData.bChecked = bChecked;
-        }        
+        }
         bRet = true;
     }
     //不刷新，由外部判断是否需要刷新
@@ -757,7 +737,7 @@ bool ListCtrlData::IsDataItemChecked(size_t itemIndex) const
     bool bChecked = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         bChecked = rowData.bChecked;
     }
     return bChecked;
@@ -768,7 +748,7 @@ bool ListCtrlData::SetAllDataItemsCheck(bool bChecked)
     bool bChanged = false;
     size_t nCount = m_rowDataList.size();
     for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (rowData.bChecked != bChecked) {
             rowData.bChecked = bChecked;
             bChanged = true;
@@ -780,24 +760,22 @@ bool ListCtrlData::SetAllDataItemsCheck(bool bChecked)
     return bChanged;
 }
 
-void ListCtrlData::SetCheckedDataItems(const std::vector<size_t>& itemIndexs,
-                                               bool bClearOthers,
-                                               std::vector<size_t>& refreshIndexs)
+void ListCtrlData::SetCheckedDataItems(
+    const std::vector<size_t> &itemIndexs, bool bClearOthers, std::vector<size_t> &refreshIndexs)
 {
     refreshIndexs.clear();
     const size_t nCount = m_rowDataList.size();
     if (!bClearOthers) {
         for (size_t itemIndex : itemIndexs) {
             if (itemIndex < nCount) {
-                ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+                ListCtrlItemData &rowData = m_rowDataList[itemIndex];
                 if (!rowData.bChecked) {
                     rowData.bChecked = true;
                     refreshIndexs.push_back(itemIndex);
                 }
             }
         }
-    }
-    else {
+    } else {
         std::set<size_t> indexSet;
         for (size_t itemIndex : itemIndexs) {
             if (itemIndex < nCount) {
@@ -806,14 +784,13 @@ void ListCtrlData::SetCheckedDataItems(const std::vector<size_t>& itemIndexs,
         }
 
         for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-            ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+            ListCtrlItemData &rowData = m_rowDataList[itemIndex];
             if (indexSet.find(itemIndex) != indexSet.end()) {
                 if (!rowData.bChecked) {
                     rowData.bChecked = true;
                     refreshIndexs.push_back(itemIndex);
                 }
-            }
-            else if (rowData.bChecked) {
+            } else if (rowData.bChecked) {
                 rowData.bChecked = false;
                 refreshIndexs.push_back(itemIndex);
             }
@@ -821,19 +798,19 @@ void ListCtrlData::SetCheckedDataItems(const std::vector<size_t>& itemIndexs,
     }
 }
 
-void ListCtrlData::GetCheckedDataItems(std::vector<size_t>& itemIndexs) const
+void ListCtrlData::GetCheckedDataItems(std::vector<size_t> &itemIndexs) const
 {
     itemIndexs.clear();
     const size_t nCount = m_rowDataList.size();
     for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (rowData.bChecked) {
             itemIndexs.push_back(itemIndex);
         }
     }
 }
 
-void ListCtrlData::GetDataItemsCheckStatus(bool& bChecked, bool& bPartChecked) const
+void ListCtrlData::GetDataItemsCheckStatus(bool &bChecked, bool &bPartChecked) const
 {
     bChecked = false;
     bPartChecked = false;
@@ -844,17 +821,16 @@ void ListCtrlData::GetDataItemsCheckStatus(bool& bChecked, bool& bPartChecked) c
         return;
     }
     for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (!rowData.bVisible) {
             continue;
         }
         if (rowData.bChecked) {
             nCheckCount++;
-        }
-        else {
+        } else {
             nUnCheckCount++;
         }
-        if ((nCheckCount > 0) && (nUnCheckCount > 0)){
+        if ((nCheckCount > 0) && (nUnCheckCount > 0)) {
             //确认是部分选择
             bChecked = true;
             bPartChecked = true;
@@ -863,16 +839,14 @@ void ListCtrlData::GetDataItemsCheckStatus(bool& bChecked, bool& bPartChecked) c
     }
     if ((nCheckCount > 0) && (nUnCheckCount == 0)) {
         bChecked = true;
-    }
-    else if ((nCheckCount == 0) && (nUnCheckCount > 0)) {
+    } else if ((nCheckCount == 0) && (nUnCheckCount > 0)) {
         bChecked = false;
-    }
-    else {
+    } else {
         ASSERT(0);
     }
 }
 
-void ListCtrlData::GetDataItemsSelectStatus(bool& bSelected, bool& bPartSelected) const
+void ListCtrlData::GetDataItemsSelectStatus(bool &bSelected, bool &bPartSelected) const
 {
     bSelected = false;
     bPartSelected = false;
@@ -883,14 +857,13 @@ void ListCtrlData::GetDataItemsSelectStatus(bool& bSelected, bool& bPartSelected
         return;
     }
     for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (!rowData.bVisible) {
             continue;
         }
         if (rowData.bSelected) {
             nSelectCount++;
-        }
-        else {
+        } else {
             nUnSelectCount++;
         }
         if ((nSelectCount > 0) && (nUnSelectCount > 0)) {
@@ -902,16 +875,14 @@ void ListCtrlData::GetDataItemsSelectStatus(bool& bSelected, bool& bPartSelected
     }
     if ((nSelectCount > 0) && (nUnSelectCount == 0)) {
         bSelected = true;
-    }
-    else if ((nSelectCount == 0) && (nUnSelectCount > 0)) {
+    } else if ((nSelectCount == 0) && (nUnSelectCount > 0)) {
         bSelected = false;
-    }
-    else {
+    } else {
         ASSERT(0);
     }
 }
 
-void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& bPartChecked) const
+void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool &bChecked, bool &bPartChecked) const
 {
     bChecked = false;
     bPartChecked = false;
@@ -919,7 +890,7 @@ void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& b
     if (iter == m_dataMap.end()) {
         return;
     }
-    const StoragePtrList& sortStorageList = iter->second;
+    const StoragePtrList &sortStorageList = iter->second;
     size_t nCheckCount = 0;
     size_t nUnCheckCount = 0;
     const size_t nCount = sortStorageList.size();
@@ -932,11 +903,11 @@ void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& b
     }
 
     for (size_t itemIndex = 0; itemIndex < nCount; ++itemIndex) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (!rowData.bVisible) {
             continue;
         }
-        const StoragePtr& pStorage = sortStorageList[itemIndex];
+        const StoragePtr &pStorage = sortStorageList[itemIndex];
         if (pStorage == nullptr) {
             continue;
         }
@@ -945,8 +916,7 @@ void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& b
         }
         if (pStorage->bChecked) {
             nCheckCount++;
-        }
-        else {
+        } else {
             nUnCheckCount++;
         }
         if ((nCheckCount > 0) && (nUnCheckCount > 0)) {
@@ -958,13 +928,12 @@ void ListCtrlData::GetColumnCheckStatus(size_t columnId, bool& bChecked, bool& b
     }
     if ((nCheckCount > 0) && (nUnCheckCount == 0)) {
         bChecked = true;
-    }
-    else if ((nCheckCount == 0) && (nUnCheckCount > 0)) {
+    } else if ((nCheckCount == 0) && (nUnCheckCount > 0)) {
         bChecked = false;
     }
 }
 
-bool ListCtrlData::SetDataItemImageId(size_t itemIndex, int32_t imageId, bool& bChanged)
+bool ListCtrlData::SetDataItemImageId(size_t itemIndex, int32_t imageId, bool &bChanged)
 {
     bChanged = false;
     bool bRet = false;
@@ -973,7 +942,7 @@ bool ListCtrlData::SetDataItemImageId(size_t itemIndex, int32_t imageId, bool& b
     }
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         if (rowData.nImageId != imageId) {
             rowData.nImageId = imageId;
             bChanged = true;
@@ -989,26 +958,25 @@ int32_t ListCtrlData::GetDataItemImageId(size_t itemIndex) const
     int32_t imageId = -1;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         imageId = rowData.nImageId;
     }
     return imageId;
 }
 
-bool ListCtrlData::SetDataItemAlwaysAtTop(size_t itemIndex, int8_t nAlwaysAtTop, bool& bChanged)
+bool ListCtrlData::SetDataItemAlwaysAtTop(size_t itemIndex, int8_t nAlwaysAtTop, bool &bChanged)
 {
     bChanged = false;
     bool bRet = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         int8_t nOldAlwaysAtTop = rowData.nAlwaysAtTop;
         bChanged = rowData.nAlwaysAtTop != nAlwaysAtTop;
         rowData.nAlwaysAtTop = nAlwaysAtTop;
         if ((nOldAlwaysAtTop >= 0) && (nAlwaysAtTop < 0)) {
             m_atTopRowCount -= 1;
-        }
-        else if ((nOldAlwaysAtTop < 0) && (nAlwaysAtTop >= 0)) {
+        } else if ((nOldAlwaysAtTop < 0) && (nAlwaysAtTop >= 0)) {
             m_atTopRowCount += 1;
         }
         ASSERT(m_atTopRowCount >= 0);
@@ -1023,13 +991,13 @@ int8_t ListCtrlData::GetDataItemAlwaysAtTop(size_t itemIndex) const
     int8_t nValue = -1;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         nValue = rowData.nAlwaysAtTop;
     }
     return nValue;
 }
 
-bool ListCtrlData::SetDataItemHeight(size_t itemIndex, int32_t nItemHeight, bool& bChanged)
+bool ListCtrlData::SetDataItemHeight(size_t itemIndex, int32_t nItemHeight, bool &bChanged)
 {
     bChanged = false;
     if (nItemHeight < 0) {
@@ -1043,15 +1011,14 @@ bool ListCtrlData::SetDataItemHeight(size_t itemIndex, int32_t nItemHeight, bool
     bool bRet = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         int16_t nOldItemHeight = rowData.nItemHeight;
         bChanged = rowData.nItemHeight != nItemHeight;
         ASSERT(nItemHeight <= INT16_MAX);
-        rowData.nItemHeight = (int16_t)nItemHeight;
+        rowData.nItemHeight = (int16_t) nItemHeight;
         if ((nOldItemHeight >= 0) && (nItemHeight < 0)) {
             m_heightRowCount -= 1;
-        }
-        else if ((nOldItemHeight < 0) && (nItemHeight >= 0)) {
+        } else if ((nOldItemHeight < 0) && (nItemHeight >= 0)) {
             m_heightRowCount += 1;
         }
         ASSERT(m_heightRowCount >= 0);
@@ -1066,10 +1033,10 @@ int32_t ListCtrlData::GetDataItemHeight(size_t itemIndex) const
     int32_t nValue = 0;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         nValue = rowData.nItemHeight;
         if ((nValue < 0) && (m_nDefaultItemHeight > 0)) {
-            //取默认高度            
+            //取默认高度
             nValue = m_nDefaultItemHeight;
         }
     }
@@ -1081,7 +1048,7 @@ bool ListCtrlData::SetDataItemUserData(size_t itemIndex, size_t itemData)
     bool bRet = false;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         rowData.nUserData = itemData;
         bRet = true;
     }
@@ -1093,15 +1060,14 @@ size_t ListCtrlData::GetDataItemUserData(size_t itemIndex) const
     size_t nItemData = 0;
     ASSERT(itemIndex < m_rowDataList.size());
     if (itemIndex < m_rowDataList.size()) {
-        const ListCtrlItemData& rowData = m_rowDataList[itemIndex];
+        const ListCtrlItemData &rowData = m_rowDataList[itemIndex];
         nItemData = rowData.nUserData;
     }
     return nItemData;
 }
 
-
-bool ListCtrlData::SetSubItemData(size_t itemIndex, size_t columnId,
-                                  const ListCtrlSubItemData& subItemData, bool& bCheckChanged)
+bool ListCtrlData::SetSubItemData(
+    size_t itemIndex, size_t columnId, const ListCtrlSubItemData &subItemData, bool &bCheckChanged)
 {
     bCheckChanged = false;
     Storage storage;
@@ -1112,7 +1078,7 @@ bool ListCtrlData::SetSubItemData(size_t itemIndex, size_t columnId,
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
         //关联列：更新数据
-        StoragePtrList& storageList = iter->second;
+        StoragePtrList &storageList = iter->second;
         ASSERT(itemIndex < storageList.size());
         if (itemIndex < storageList.size()) {
             StoragePtr pStorage = storageList[itemIndex];
@@ -1121,8 +1087,7 @@ bool ListCtrlData::SetSubItemData(size_t itemIndex, size_t columnId,
                 if (storage.bChecked) {
                     bCheckChanged = true;
                 }
-            }
-            else {
+            } else {
                 if (storage.bChecked != pStorage->bChecked) {
                     bCheckChanged = true;
                 }
@@ -1138,7 +1103,8 @@ bool ListCtrlData::SetSubItemData(size_t itemIndex, size_t columnId,
     return bRet;
 }
 
-bool ListCtrlData::GetSubItemData(size_t itemIndex, size_t columnId, ListCtrlSubItemData& subItemData) const
+bool ListCtrlData::GetSubItemData(
+    size_t itemIndex, size_t columnId, ListCtrlSubItemData &subItemData) const
 {
     subItemData = ListCtrlSubItemData();
 
@@ -1146,7 +1112,7 @@ bool ListCtrlData::GetSubItemData(size_t itemIndex, size_t columnId, ListCtrlSub
     auto iter = m_dataMap.find(columnId);
     ASSERT(iter != m_dataMap.end());
     if (iter != m_dataMap.end()) {
-        const StoragePtrList& storageList = iter->second;
+        const StoragePtrList &storageList = iter->second;
         ASSERT(itemIndex < storageList.size());
         if (itemIndex < storageList.size()) {
             StoragePtr pStorage = storageList[itemIndex];
@@ -1159,7 +1125,7 @@ bool ListCtrlData::GetSubItemData(size_t itemIndex, size_t columnId, ListCtrlSub
     return bRet;
 }
 
-bool ListCtrlData::SetSubItemText(size_t itemIndex, size_t columnId, const DString& text)
+bool ListCtrlData::SetSubItemText(size_t itemIndex, size_t columnId, const DString &text)
 {
     StoragePtr pStorage = GetSubItemStorageForWrite(itemIndex, columnId);
     ASSERT(pStorage != nullptr);
@@ -1170,7 +1136,7 @@ bool ListCtrlData::SetSubItemText(size_t itemIndex, size_t columnId, const DStri
     if (pStorage->text != text) {
         pStorage->text = text;
         EmitDataChanged(itemIndex, itemIndex);
-    }    
+    }
     return true;
 }
 
@@ -1237,7 +1203,7 @@ uint64_t ListCtrlData::GetSubItemUserDataN(size_t itemIndex, size_t columnId) co
     return pStorage->userDataN;
 }
 
-bool ListCtrlData::SetSubItemUserDataS(size_t itemIndex, size_t columnId, const DString& userDataS)
+bool ListCtrlData::SetSubItemUserDataS(size_t itemIndex, size_t columnId, const DString &userDataS)
 {
     StoragePtr pStorage = GetSubItemStorageForWrite(itemIndex, columnId);
     ASSERT(pStorage != nullptr);
@@ -1263,7 +1229,7 @@ DString ListCtrlData::GetSubItemUserDataS(size_t itemIndex, size_t columnId) con
     return pStorage->userDataS.c_str();
 }
 
-bool ListCtrlData::SetSubItemTextColor(size_t itemIndex, size_t columnId, const UiColor& textColor)
+bool ListCtrlData::SetSubItemTextColor(size_t itemIndex, size_t columnId, const UiColor &textColor)
 {
     StoragePtr pStorage = GetSubItemStorageForWrite(itemIndex, columnId);
     ASSERT(pStorage != nullptr);
@@ -1274,11 +1240,11 @@ bool ListCtrlData::SetSubItemTextColor(size_t itemIndex, size_t columnId, const 
     if (pStorage->textColor != textColor) {
         pStorage->textColor = textColor;
         EmitDataChanged(itemIndex, itemIndex);
-    }    
+    }
     return true;
 }
 
-bool ListCtrlData::GetSubItemTextColor(size_t itemIndex, size_t columnId, UiColor& textColor) const
+bool ListCtrlData::GetSubItemTextColor(size_t itemIndex, size_t columnId, UiColor &textColor) const
 {
     textColor = UiColor();
     StoragePtr pStorage = GetSubItemStorage(itemIndex, columnId);
@@ -1299,7 +1265,7 @@ bool ListCtrlData::SetSubItemTextFormat(size_t itemIndex, size_t columnId, int32
         //索引号无效
         return false;
     }
-    int32_t nValidTextFormat = (int32_t)Label::GetValidTextStyle(nTextFormat);
+    int32_t nValidTextFormat = (int32_t) Label::GetValidTextStyle(nTextFormat);
     if (pStorage->nTextFormat != nValidTextFormat) {
         pStorage->nTextFormat = ui::TruncateToUInt16(nValidTextFormat);
         EmitDataChanged(itemIndex, itemIndex);
@@ -1317,11 +1283,11 @@ int32_t ListCtrlData::GetSubItemTextFormat(size_t itemIndex, size_t columnId) co
         if (nTextFormat <= 0) {
             nTextFormat = m_nDefaultTextStyle;
         }
-    }    
+    }
     return nTextFormat;
 }
 
-bool ListCtrlData::SetSubItemBkColor(size_t itemIndex, size_t columnId, const UiColor& bkColor)
+bool ListCtrlData::SetSubItemBkColor(size_t itemIndex, size_t columnId, const UiColor &bkColor)
 {
     StoragePtr pStorage = GetSubItemStorageForWrite(itemIndex, columnId);
     ASSERT(pStorage != nullptr);
@@ -1332,11 +1298,11 @@ bool ListCtrlData::SetSubItemBkColor(size_t itemIndex, size_t columnId, const Ui
     if (pStorage->bkColor != bkColor) {
         pStorage->bkColor = bkColor;
         EmitDataChanged(itemIndex, itemIndex);
-    }    
+    }
     return true;
 }
 
-bool ListCtrlData::GetSubItemBkColor(size_t itemIndex, size_t columnId, UiColor& bkColor) const
+bool ListCtrlData::GetSubItemBkColor(size_t itemIndex, size_t columnId, UiColor &bkColor) const
 {
     bkColor = UiColor();
     StoragePtr pStorage = GetSubItemStorage(itemIndex, columnId);
@@ -1371,7 +1337,7 @@ bool ListCtrlData::SetSubItemShowCheckBox(size_t itemIndex, size_t columnId, boo
     if (pStorage->bShowCheckBox != bShowCheckBox) {
         pStorage->bShowCheckBox = bShowCheckBox;
         EmitDataChanged(itemIndex, itemIndex);
-    }    
+    }
     return true;
 }
 
@@ -1389,14 +1355,14 @@ bool ListCtrlData::SetSubItemCheck(size_t itemIndex, size_t columnId, bool bChec
             pStorage->bChecked = bChecked;
             if (bRefresh) {
                 EmitDataChanged(itemIndex, itemIndex);
-            }            
-        }        
+            }
+        }
         return true;
     }
     return false;
 }
 
-bool ListCtrlData::GetSubItemCheck(size_t itemIndex, size_t columnId, bool& bChecked) const
+bool ListCtrlData::GetSubItemCheck(size_t itemIndex, size_t columnId, bool &bChecked) const
 {
     bChecked = false;
     StoragePtr pStorage = GetSubItemStorage(itemIndex, columnId);
@@ -1468,9 +1434,13 @@ bool ListCtrlData::IsSubItemEditable(size_t itemIndex, size_t columnId) const
     return bEditable;
 }
 
-bool ListCtrlData::SortDataItems(size_t nColumnId, size_t nColumnIndex,
-                                 bool bSortedUp, uint8_t nSortFlag,
-                                 ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData)
+bool ListCtrlData::SortDataItems(
+    size_t nColumnId,
+    size_t nColumnIndex,
+    bool bSortedUp,
+    uint8_t nSortFlag,
+    ListCtrlDataCompareFunc pfnCompareFunc,
+    void *pUserData)
 {
     StorageMap::iterator iter = m_dataMap.find(nColumnId);
     ASSERT(iter != m_dataMap.end());
@@ -1484,22 +1454,23 @@ bool ListCtrlData::SortDataItems(size_t nColumnId, size_t nColumnIndex,
     std::vector<StorageData> sortedDataList;
     const size_t dataCount = sortStorageList.size();
     for (size_t index = 0; index < dataCount; ++index) {
-        sortedDataList.push_back({index, sortStorageList[index] });
-    }    
-    SortStorageData(sortedDataList, nColumnId, nColumnIndex, bSortedUp, nSortFlag, pfnCompareFunc, pUserData);
+        sortedDataList.push_back({index, sortStorageList[index]});
+    }
+    SortStorageData(
+        sortedDataList, nColumnId, nColumnIndex, bSortedUp, nSortFlag, pfnCompareFunc, pUserData);
 
     //对原数据进行顺序调整
     const size_t sortedDataCount = sortedDataList.size();
     StoragePtrList orgStorageList; //副本数据
     for (iter = m_dataMap.begin(); iter != m_dataMap.end(); ++iter) {
-        orgStorageList = iter->second; 
-        StoragePtrList& storageList = iter->second;   //修改目标
+        orgStorageList = iter->second;
+        StoragePtrList &storageList = iter->second; //修改目标
         ASSERT(storageList.size() == sortedDataList.size());
         if (storageList.size() != sortedDataList.size()) {
             return false;
         }
         for (size_t index = 0; index < sortedDataCount; ++index) {
-            const StorageData& sortedData = sortedDataList[index];
+            const StorageData &sortedData = sortedDataList[index];
             storageList[index] = orgStorageList[sortedData.index]; //赋值原数据
         }
     }
@@ -1509,7 +1480,7 @@ bool ListCtrlData::SortDataItems(size_t nColumnId, size_t nColumnIndex,
     ASSERT(sortedDataCount == m_rowDataList.size());
     RowDataList rowDataList = m_rowDataList;
     for (size_t index = 0; index < sortedDataCount; ++index) {
-        const StorageData& sortedData = sortedDataList[index];
+        const StorageData &sortedData = sortedDataList[index];
         m_rowDataList[index] = rowDataList[sortedData.index]; //赋值原数据
         if (!bFoundSelectedIndex && (m_nSelectedIndex == sortedData.index)) {
             m_nSelectedIndex = index;
@@ -1521,9 +1492,14 @@ bool ListCtrlData::SortDataItems(size_t nColumnId, size_t nColumnIndex,
     return true;
 }
 
-bool ListCtrlData::SortStorageData(std::vector<StorageData>& dataList, size_t nColumnId, size_t nColumnIndex,
-                                   bool bSortedUp, uint8_t nSortFlag,
-                                   ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData)
+bool ListCtrlData::SortStorageData(
+    std::vector<StorageData> &dataList,
+    size_t nColumnId,
+    size_t nColumnIndex,
+    bool bSortedUp,
+    uint8_t nSortFlag,
+    ListCtrlDataCompareFunc pfnCompareFunc,
+    void *pUserData)
 {
     if (dataList.empty()) {
         return false;
@@ -1542,7 +1518,10 @@ bool ListCtrlData::SortStorageData(std::vector<StorageData>& dataList, size_t nC
         param.nColumnIndex = nColumnIndex;
         param.nSortFlag = nSortFlag;
         param.pUserData = pUserData;
-        std::sort(dataList.begin(), dataList.end(), [this, pfnCompareFunc, &param](const StorageData& a, const StorageData& b) {
+        std::sort(
+            dataList.begin(),
+            dataList.end(),
+            [this, pfnCompareFunc, &param](const StorageData &a, const StorageData &b) {
                 //实现(a < b)的比较逻辑
                 if (b.pStorage == nullptr) {
                     return false;
@@ -1550,14 +1529,16 @@ bool ListCtrlData::SortStorageData(std::vector<StorageData>& dataList, size_t nC
                 if (a.pStorage == nullptr) {
                     return true;
                 }
-                const Storage& storageA = *a.pStorage;
-                const Storage& storageB = *b.pStorage;
+                const Storage &storageA = *a.pStorage;
+                const Storage &storageB = *b.pStorage;
                 return pfnCompareFunc(storageA, storageB, param);
             });
-    }
-    else {
+    } else {
         //排序：升序，使用默认的排序函数
-        std::sort(dataList.begin(), dataList.end(), [this, nSortFlag](const StorageData& a, const StorageData& b) {
+        std::sort(
+            dataList.begin(),
+            dataList.end(),
+            [this, nSortFlag](const StorageData &a, const StorageData &b) {
                 //实现(a < b)的比较逻辑
                 if (b.pStorage == nullptr) {
                     return false;
@@ -1565,8 +1546,8 @@ bool ListCtrlData::SortStorageData(std::vector<StorageData>& dataList, size_t nC
                 if (a.pStorage == nullptr) {
                     return true;
                 }
-                const Storage& storageA = *a.pStorage;
-                const Storage& storageB = *b.pStorage;
+                const Storage &storageA = *a.pStorage;
+                const Storage &storageB = *b.pStorage;
                 return SortDataCompareFunc(storageA, storageB, nSortFlag);
             });
     }
@@ -1577,7 +1558,8 @@ bool ListCtrlData::SortStorageData(std::vector<StorageData>& dataList, size_t nC
     return true;
 }
 
-bool ListCtrlData::SortDataCompareFunc(const ListCtrlSubItemData2& a, const ListCtrlSubItemData2& b, uint8_t nSortFlag) const
+bool ListCtrlData::SortDataCompareFunc(
+    const ListCtrlSubItemData2 &a, const ListCtrlSubItemData2 &b, uint8_t nSortFlag) const
 {
     if (nSortFlag & ListCtrlSubItemSortFlag::kSortByGroup) {
         //支持分组排序
@@ -1588,40 +1570,35 @@ bool ListCtrlData::SortDataCompareFunc(const ListCtrlSubItemData2& a, const List
     if (nSortFlag & ListCtrlSubItemSortFlag::kSortByUserDataN) {
         //按 .userDataN 字段排序(整型值)
         return a.userDataN < b.userDataN;
-    }
-    else if (nSortFlag & ListCtrlSubItemSortFlag::kSortByUserDataS) {
+    } else if (nSortFlag & ListCtrlSubItemSortFlag::kSortByUserDataS) {
         //按 .userDataS 字段排序(字符串值)
         if (nSortFlag & ListCtrlSubItemSortFlag::kSortNoCase) {
             //不区分大小写
             return StringUtil::StringICompare(a.userDataS.c_str(), b.userDataS.c_str()) < 0;
-        }
-        else {
+        } else {
             //区分大小写
             return StringUtil::StringCompare(a.userDataS.c_str(), b.userDataS.c_str()) < 0;
         }
-    }
-    else {
+    } else {
         //按 .text 字段排序(字符串值)
         if (nSortFlag & ListCtrlSubItemSortFlag::kSortNoCase) {
             //不区分大小写
             return StringUtil::StringICompare(a.text.c_str(), b.text.c_str()) < 0;
-        }
-        else {
+        } else {
             //区分大小写
             return StringUtil::StringCompare(a.text.c_str(), b.text.c_str()) < 0;
         }
     }
 }
 
-void ListCtrlData::SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void* pUserData)
+void ListCtrlData::SetSortCompareFunction(ListCtrlDataCompareFunc pfnCompareFunc, void *pUserData)
 {
     m_pfnCompareFunc = pfnCompareFunc;
     m_pUserData = pUserData;
 }
 
-void ListCtrlData::SetSelectedElements(const std::vector<size_t>& selectedIndexs,
-                                       bool bClearOthers,
-                                       std::vector<size_t>& refreshIndexs)
+void ListCtrlData::SetSelectedElements(
+    const std::vector<size_t> &selectedIndexs, bool bClearOthers, std::vector<size_t> &refreshIndexs)
 {
     refreshIndexs.clear();
     ASSERT(IsMultiSelect());
@@ -1659,7 +1636,7 @@ void ListCtrlData::SetSelectedElements(const std::vector<size_t>& selectedIndexs
     }
 }
 
-bool ListCtrlData::SelectAll(std::vector<size_t>& refreshIndexs)
+bool ListCtrlData::SelectAll(std::vector<size_t> &refreshIndexs)
 {
     ASSERT(IsMultiSelect());
     if (!IsMultiSelect()) {
@@ -1677,7 +1654,7 @@ bool ListCtrlData::SelectAll(std::vector<size_t>& refreshIndexs)
     return !refreshIndexs.empty();
 }
 
-bool ListCtrlData::IsSelectableRowData(const ListCtrlItemData& rowData) const
+bool ListCtrlData::IsSelectableRowData(const ListCtrlItemData &rowData) const
 {
     //可见，并且不置顶显示
     return rowData.bVisible && (rowData.nAlwaysAtTop < 0);
@@ -1686,21 +1663,21 @@ bool ListCtrlData::IsSelectableRowData(const ListCtrlItemData& rowData) const
 bool ListCtrlData::IsSelectableElement(size_t nElementIndex) const
 {
     bool bSelectable = true;
-    const ListCtrlData::RowDataList& itemDataList = GetItemDataList();
+    const ListCtrlData::RowDataList &itemDataList = GetItemDataList();
     if (nElementIndex < itemDataList.size()) {
-        const ListCtrlItemData& rowData = itemDataList[nElementIndex];
+        const ListCtrlItemData &rowData = itemDataList[nElementIndex];
         bSelectable = IsSelectableRowData(rowData);
     }
     return bSelectable;
 }
 
-void ListCtrlData::SelectNone(std::vector<size_t>& refreshIndexs)
+void ListCtrlData::SelectNone(std::vector<size_t> &refreshIndexs)
 {
     SelectNoneExclude(std::vector<size_t>(), refreshIndexs);
 }
 
-void ListCtrlData::SelectNoneExclude(const std::vector<size_t>& excludeIndexs,
-                                     std::vector<size_t>& refreshIndexs)
+void ListCtrlData::SelectNoneExclude(
+    const std::vector<size_t> &excludeIndexs, std::vector<size_t> &refreshIndexs)
 {
     refreshIndexs.clear();
     std::vector<size_t> selectedIndexs;
@@ -1723,5 +1700,4 @@ void ListCtrlData::SelectNoneExclude(const std::vector<size_t>& excludeIndexs,
     }
 }
 
-}//namespace ui
-
+} //namespace ui

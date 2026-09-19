@@ -1,20 +1,20 @@
 #include "CheckCombo.h"
+#include "duilib/Box/ListBox.h"
+#include "duilib/Box/VBox.h"
 #include "duilib/Core/Keyboard.h"
 #include "duilib/Core/WindowCreateParam.h"
-#include "duilib/Box/VBox.h"
-#include "duilib/Box/ListBox.h"
-#include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/AttributeUtil.h"
+#include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
+namespace ui {
 class CCheckComboWnd : public Window
 {
     typedef Window BaseClass;
+
 public:
     /** 创建并显示下拉窗口
     */
-    void InitComboWnd(CheckCombo* pOwner);
+    void InitComboWnd(CheckCombo *pOwner);
 
     /** 更新下拉窗口的位置和大小
     */
@@ -30,8 +30,13 @@ public:
     virtual void OnFinalMessage() override;
     virtual void OnWindowShadowTypeChanged() override;
 
-    virtual LRESULT OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled) override;
-    virtual LRESULT OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnKeyDownMsg(
+        VirtualKeyCode vkCode,
+        uint32_t modifierKey,
+        const NativeMsg &nativeMsg,
+        bool &bHandled) override;
+    virtual LRESULT OnKillFocusMsg(
+        WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled) override;
 
 private:
     /** 计算下拉框的显示矩形
@@ -44,7 +49,7 @@ private:
     bool m_bIsClosed = false;
 };
 
-void CCheckComboWnd::InitComboWnd(CheckCombo* pOwner)
+void CCheckComboWnd::InitComboWnd(CheckCombo *pOwner)
 {
     ASSERT(pOwner != nullptr);
     if (pOwner == nullptr) {
@@ -74,7 +79,7 @@ void CCheckComboWnd::InitComboWnd(CheckCombo* pOwner)
 
 UiRect CCheckComboWnd::GetComboWndRect() const
 {
-    CheckCombo* pOwner = m_pOwner;
+    CheckCombo *pOwner = m_pOwner;
     if (pOwner == nullptr) {
         return UiRect();
     }
@@ -91,24 +96,26 @@ UiRect CCheckComboWnd::GetComboWndRect() const
     rcOwner.Offset(-scrollBoxOffset.x, -scrollBoxOffset.y);
 
     UiRect rc = rcOwner;
-    rc.top = rc.bottom + Dpi().GetScaleInt(1);  // 父窗口left、bottom位置作为弹出窗口起点
-    rc.bottom = rc.top + szDrop.cy;             // 计算弹出窗口高度
+    rc.top = rc.bottom + Dpi().GetScaleInt(1); // 父窗口left、bottom位置作为弹出窗口起点
+    rc.bottom = rc.top + szDrop.cy;            // 计算弹出窗口高度
     if (szDrop.cx > 0) {
-        rc.right = rc.left + szDrop.cx;         // 计算弹出窗口宽度
+        rc.right = rc.left + szDrop.cx; // 计算弹出窗口宽度
     }
 
     //如果子容器里面的都是拉伸类型，就不需要估算大小（会报错，无法估算），而是按照下拉框的设置大小来显示
     bool bCanEstimateSize = true;
-    if (pOwner->GetListBox()->GetFixedHeight().IsStretch() && pOwner->GetListBox()->GetFixedWidth().IsStretch()) {
+    if (pOwner->GetListBox()->GetFixedHeight().IsStretch()
+        && pOwner->GetListBox()->GetFixedWidth().IsStretch()) {
         size_t nItemCount = pOwner->GetListBox()->GetItemCount();
         if (nItemCount > 0) {
             bCanEstimateSize = false;
             for (size_t nItemIndex = 0; nItemIndex < nItemCount; nItemIndex++) {
-                Control* pControl = pOwner->GetListBox()->GetItemAt(nItemIndex);
+                Control *pControl = pOwner->GetListBox()->GetItemAt(nItemIndex);
                 if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
                     continue;
                 }
-                if (!pControl->GetFixedHeight().IsStretch() || !pControl->GetFixedWidth().IsStretch()) {
+                if (!pControl->GetFixedHeight().IsStretch()
+                    || !pControl->GetFixedWidth().IsStretch()) {
                     bCanEstimateSize = true;
                     break;
                 }
@@ -154,7 +161,8 @@ void CCheckComboWnd::UpdateComboWnd()
     if (rc.IsEmpty()) {
         return;
     }
-    SetWindowPos(InsertAfterWnd(), rc.left, rc.top, rc.Width(), rc.Height(), kSWP_NOZORDER | kSWP_NOACTIVATE);
+    SetWindowPos(
+        InsertAfterWnd(), rc.left, rc.top, rc.Width(), rc.Height(), kSWP_NOZORDER | kSWP_NOACTIVATE);
 }
 
 void CCheckComboWnd::CloseComboWnd()
@@ -163,18 +171,18 @@ void CCheckComboWnd::CloseComboWnd()
         return;
     }
     m_bIsClosed = true;
-    Box* pRootBox = GetRoot();
+    Box *pRootBox = GetRoot();
     if ((pRootBox != nullptr) && (pRootBox->GetItemCount() > 0)) {
         m_pOwner->GetListBox()->SetWindow(nullptr);
         m_pOwner->GetListBox()->SetParent(nullptr);
         pRootBox->RemoveAllItems();
     }
     //先将前端窗口切换为父窗口，避免前端窗口关闭后，切换到其他窗口
-    CheckCombo* pOwner = m_pOwner;
+    CheckCombo *pOwner = m_pOwner;
     if ((pOwner != nullptr) && (pOwner->GetWindow() != nullptr)) {
         if (IsWindowForeground()) {
             pOwner->GetWindow()->SetWindowForeground();
-        }        
+        }
     }
     CloseWnd();
 }
@@ -191,7 +199,7 @@ void CCheckComboWnd::OnFinalMessage()
             m_pOwner->SetState(kControlStateNormal);
             m_pOwner->Invalidate();
         }
-    }    
+    }
     BaseClass::OnFinalMessage();
 }
 
@@ -208,7 +216,7 @@ void CCheckComboWnd::OnInitWindow()
     SetResourcePath(m_pOwner->GetWindow()->GetResourcePath());
     SetShadowType(m_pOwner->GetComboWndShadowType());
 
-    Box* pRoot = new Box(this);
+    Box *pRoot = new Box(this);
     pRoot->SetAutoDestroyChild(false);
     pRoot->AddItem(m_pOwner->GetListBox());
     AttachBox(AttachShadow(pRoot));
@@ -219,7 +227,7 @@ void CCheckComboWnd::OnInitWindow()
 
 void CCheckComboWnd::OnCloseWindow()
 {
-    Box* pRootBox = GetRoot();
+    Box *pRootBox = GetRoot();
     if ((pRootBox != nullptr) && (pRootBox->GetItemCount() > 0)) {
         m_pOwner->GetListBox()->SetWindow(nullptr);
         m_pOwner->GetListBox()->SetParent(nullptr);
@@ -230,7 +238,8 @@ void CCheckComboWnd::OnCloseWindow()
     BaseClass::OnCloseWindow();
 }
 
-LRESULT CCheckComboWnd::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT CCheckComboWnd::OnKeyDownMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     LRESULT lResult = BaseClass::OnKeyDownMsg(vkCode, modifierKey, nativeMsg, bHandled);
     if (vkCode == kVK_ESCAPE) {
@@ -240,7 +249,8 @@ LRESULT CCheckComboWnd::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey
     return lResult;
 }
 
-LRESULT CCheckComboWnd::OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT CCheckComboWnd::OnKillFocusMsg(
+    WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     LRESULT lResult = BaseClass::OnKillFocusMsg(pSetFocusWindow, nativeMsg, bHandled);
     //失去焦点，关闭窗口，正常关闭
@@ -252,15 +262,15 @@ LRESULT CCheckComboWnd::OnKillFocusMsg(WindowBase* pSetFocusWindow, const Native
 
 ////////////////////////////////////////////////////////
 
-#define CHECK_COMBO_DEFAULT_HEIGHT 20 
+#define CHECK_COMBO_DEFAULT_HEIGHT 20
 
-CheckCombo::CheckCombo(Window* pWindow) :
-    Box(pWindow),
-    m_pCheckComboWnd(nullptr),
-    m_szDropBox(0, 0),
-    m_bPopupTop(false),
-    m_iOrgHeight(CHECK_COMBO_DEFAULT_HEIGHT),
-    m_nShadowType(ShadowType::kShadowMenu)
+CheckCombo::CheckCombo(Window *pWindow)
+    : Box(pWindow)
+    , m_pCheckComboWnd(nullptr)
+    , m_szDropBox(0, 0)
+    , m_bPopupTop(false)
+    , m_iOrgHeight(CHECK_COMBO_DEFAULT_HEIGHT)
+    , m_nShadowType(ShadowType::kShadowMenu)
 {
     SetDropBoxSize({0, 150}, true);
     SetMaxHeight(m_iOrgHeight * 3, true);
@@ -268,7 +278,7 @@ CheckCombo::CheckCombo(Window* pWindow) :
 
     m_pDropList.reset(new ui::ListBox(pWindow, new ui::VLayout));
     m_pDropList->EnableScrollBar();
-    
+
     m_pList.reset(new ui::ListBox(pWindow, new ui::VTileLayout));
     m_pList->AttachButtonDown(UiBind(&CheckCombo::OnListButtonDown, this, std::placeholders::_1));
     m_pList->SetMouseChildEnabled(false);
@@ -286,31 +296,28 @@ CheckCombo::~CheckCombo()
     m_pDropList.reset();
 }
 
-DString CheckCombo::GetType() const { return DUI_CTR_CHECK_COMBO; }
+DString CheckCombo::GetType() const
+{
+    return DUI_CTR_CHECK_COMBO;
+}
 
-void CheckCombo::SetAttribute(const DString& strName, const DString& strValue2)
+void CheckCombo::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("dropbox")) {
         SetDropBoxAttributeList(strValue);
-    }
-    else if (strName == _T("dropbox_item_class")) {
+    } else if (strName == _T("dropbox_item_class")) {
         SetDropboxItemClass(strValue);
-    }
-    else if (strName == _T("selected_item_class")) {
+    } else if (strName == _T("selected_item_class")) {
         SetSelectedItemClass(strValue);
-    }
-    else if (strName == _T("vscrollbar")) {
-    }
-    else if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
+    } else if (strName == _T("vscrollbar")) {
+    } else if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
-    }
-    else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
+    } else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
         SetPopupTop(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("height")) {
+    } else if (strName == _T("height")) {
         BaseClass::SetAttribute(strName, strValue);
         if (strValue != _T("stretch") && strValue != _T("auto")) {
             m_iOrgHeight = StringUtil::StringToInt32(strValue);
@@ -318,33 +325,31 @@ void CheckCombo::SetAttribute(const DString& strName, const DString& strValue2)
             SetMaxHeight(m_iOrgHeight * 3, true);
             SetMinHeight(m_iOrgHeight, true);
         }
-    }
-    else if (strName == _T("shadow_type")) {
+    } else if (strName == _T("shadow_type")) {
         //设置下拉窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
 
-bool CheckCombo::AddItem(Control* pControl)
+bool CheckCombo::AddItem(Control *pControl)
 {
-    ui::CheckBox* pCheckBox = dynamic_cast<ui::CheckBox*>(pControl);
+    ui::CheckBox *pCheckBox = dynamic_cast<ui::CheckBox *>(pControl);
     if (pCheckBox) {
         pCheckBox->AttachSelect(UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
         pCheckBox->AttachUnSelect(UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
-    }
-    else    {
-        ui::CheckBoxBox* pCheckBoxBox = dynamic_cast<ui::CheckBoxBox*>(pControl);
+    } else {
+        ui::CheckBoxBox *pCheckBoxBox = dynamic_cast<ui::CheckBoxBox *>(pControl);
         if (pCheckBoxBox) {
-            pCheckBoxBox->AttachSelect(UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
-            pCheckBoxBox->AttachUnSelect(UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
-        }
-        else {
+            pCheckBoxBox->AttachSelect(
+                UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
+            pCheckBoxBox->AttachUnSelect(
+                UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
+        } else {
             ASSERT(0);
             return false;
         }
@@ -352,20 +357,20 @@ bool CheckCombo::AddItem(Control* pControl)
     return m_pDropList->AddItem(pControl);
 }
 
-bool CheckCombo::AddItemAt(Control* pControl, size_t iIndex)
+bool CheckCombo::AddItemAt(Control *pControl, size_t iIndex)
 {
-    ui::CheckBox* pCheckBox = dynamic_cast<ui::CheckBox*>(pControl);
+    ui::CheckBox *pCheckBox = dynamic_cast<ui::CheckBox *>(pControl);
     if (pCheckBox) {
         pCheckBox->AttachSelect(UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
         pCheckBox->AttachUnSelect(UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
-    }
-    else {
-        ui::CheckBoxBox* pCheckBoxBox = dynamic_cast<ui::CheckBoxBox*>(pControl);
+    } else {
+        ui::CheckBoxBox *pCheckBoxBox = dynamic_cast<ui::CheckBoxBox *>(pControl);
         if (pCheckBoxBox) {
-            pCheckBoxBox->AttachSelect(UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
-            pCheckBoxBox->AttachUnSelect(UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
-        }
-        else {
+            pCheckBoxBox->AttachSelect(
+                UiBind(&CheckCombo::OnSelectItem, this, std::placeholders::_1));
+            pCheckBoxBox->AttachUnSelect(
+                UiBind(&CheckCombo::OnUnSelectItem, this, std::placeholders::_1));
+        } else {
             ASSERT(0);
             return false;
         }
@@ -373,7 +378,7 @@ bool CheckCombo::AddItemAt(Control* pControl, size_t iIndex)
     return m_pDropList->AddItemAt(pControl, iIndex);
 }
 
-bool CheckCombo::RemoveItem(Control* pControl)
+bool CheckCombo::RemoveItem(Control *pControl)
 {
     return m_pDropList->RemoveItem(pControl);
 }
@@ -388,17 +393,17 @@ void CheckCombo::RemoveAllItems()
     m_pDropList->RemoveAllItems();
 }
 
-Control* CheckCombo::GetItemAt(size_t iIndex) const
+Control *CheckCombo::GetItemAt(size_t iIndex) const
 {
     return m_pDropList->GetItemAt(iIndex);
 }
 
-size_t CheckCombo::GetItemIndex(Control* pControl) const
+size_t CheckCombo::GetItemIndex(Control *pControl) const
 {
     return m_pDropList->GetItemIndex(pControl);
 }
 
-bool CheckCombo::SetItemIndex(Control* pControl, size_t iIndex)
+bool CheckCombo::SetItemIndex(Control *pControl, size_t iIndex)
 {
     return m_pDropList->SetItemIndex(pControl, iIndex);
 }
@@ -408,7 +413,7 @@ size_t CheckCombo::GetItemCount() const
     return m_pDropList->GetItemCount();
 }
 
-bool CheckCombo::AddTextItem(const DString& itemText)
+bool CheckCombo::AddTextItem(const DString &itemText)
 {
     if (itemText.empty()) {
         return false;
@@ -416,7 +421,7 @@ bool CheckCombo::AddTextItem(const DString& itemText)
     //避免重复名称
     const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        CheckBox *pCheckBox = dynamic_cast<CheckBox *>(GetItemAt(index));
         if (pCheckBox != nullptr) {
             if (itemText == pCheckBox->GetText()) {
                 return false;
@@ -424,13 +429,13 @@ bool CheckCombo::AddTextItem(const DString& itemText)
         }
     }
 
-    CheckBox* item = new CheckBox(GetWindow());
+    CheckBox *item = new CheckBox(GetWindow());
     SetAttributeList(item, m_dropboxItemClass.c_str());
     item->SetText(itemText);
     return AddItem(item);
 }
 
-bool CheckCombo::AddTextIdItem(const DString& itemTextId)
+bool CheckCombo::AddTextIdItem(const DString &itemTextId)
 {
     if (itemTextId.empty()) {
         return false;
@@ -438,7 +443,7 @@ bool CheckCombo::AddTextIdItem(const DString& itemTextId)
     //避免重复名称
     const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        CheckBox *pCheckBox = dynamic_cast<CheckBox *>(GetItemAt(index));
         if (pCheckBox != nullptr) {
             if (itemTextId == pCheckBox->GetTextId()) {
                 return false;
@@ -446,20 +451,20 @@ bool CheckCombo::AddTextIdItem(const DString& itemTextId)
         }
     }
 
-    CheckBox* item = new CheckBox(GetWindow());
+    CheckBox *item = new CheckBox(GetWindow());
     SetAttributeList(item, m_dropboxItemClass.c_str());
     item->SetTextId(itemTextId);
     return AddItem(item);
 }
 
-bool CheckCombo::SelectTextItem(const DString& itemText, bool bSelect)
+bool CheckCombo::SelectTextItem(const DString &itemText, bool bSelect)
 {
     if (itemText.empty()) {
         return false;
     }
     const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        CheckBox *pCheckBox = dynamic_cast<CheckBox *>(GetItemAt(index));
         if (pCheckBox != nullptr) {
             if (itemText == pCheckBox->GetText()) {
                 pCheckBox->Selected(bSelect, true);
@@ -470,14 +475,14 @@ bool CheckCombo::SelectTextItem(const DString& itemText, bool bSelect)
     return false;
 }
 
-bool CheckCombo::SelectTextIdItem(const DString& itemTextId, bool bSelect)
+bool CheckCombo::SelectTextIdItem(const DString &itemTextId, bool bSelect)
 {
     if (itemTextId.empty()) {
         return false;
     }
     const size_t itemCount = GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        CheckBox* pCheckBox = dynamic_cast<CheckBox*>(GetItemAt(index));
+        CheckBox *pCheckBox = dynamic_cast<CheckBox *>(GetItemAt(index));
         if (pCheckBox != nullptr) {
             if (itemTextId == pCheckBox->GetTextId()) {
                 pCheckBox->Selected(bSelect, true);
@@ -488,7 +493,7 @@ bool CheckCombo::SelectTextIdItem(const DString& itemTextId, bool bSelect)
     return false;
 }
 
-void CheckCombo::Activate(const EventArgs* /*pMsg*/)
+void CheckCombo::Activate(const EventArgs * /*pMsg*/)
 {
     if (!IsActivatable()) {
         return;
@@ -498,16 +503,16 @@ void CheckCombo::Activate(const EventArgs* /*pMsg*/)
     }
 
     m_pCheckComboWnd = new CCheckComboWnd();
-    m_pCheckComboWnd->AttachWindowCreateMsg(ToWeakCallback([this](const ui::EventArgs& /*args*/) {
+    m_pCheckComboWnd->AttachWindowCreateMsg(ToWeakCallback([this](const ui::EventArgs & /*args*/) {
         //触发消息到应用层(下拉窗口创建)
         EventArgs msg;
         msg.SetSender(this);
         msg.eventType = kEventWindowCreate;
         FireNormalEvents(msg);
         return true;
-        }));
+    }));
     m_pCheckComboWnd->InitComboWnd(this);
-    m_pCheckComboWnd->AttachWindowCloseMsg(ToWeakCallback([this](const ui::EventArgs& /*args*/) {
+    m_pCheckComboWnd->AttachWindowCloseMsg(ToWeakCallback([this](const ui::EventArgs & /*args*/) {
         //触发消息到应用层(下拉窗口销毁)
         EventArgs msg;
         msg.SetSender(this);
@@ -547,17 +552,17 @@ void CheckCombo::SetPos(UiRect rc)
     UpdateSelectedListHeight();
 }
 
-void CheckCombo::SetDropBoxAttributeList(const DString& pstrList)
+void CheckCombo::SetDropBoxAttributeList(const DString &pstrList)
 {
     SetAttributeList(m_pDropList.get(), pstrList);
 }
 
-void CheckCombo::SetDropboxItemClass(const DString& classValue)
+void CheckCombo::SetDropboxItemClass(const DString &classValue)
 {
     m_dropboxItemClass = classValue;
 }
 
-void CheckCombo::SetSelectedItemClass(const DString& classValue)
+void CheckCombo::SetSelectedItemClass(const DString &classValue)
 {
     m_selectedItemClass = classValue;
 }
@@ -569,7 +574,7 @@ void CheckCombo::UpdateComboWndPos()
     }
 }
 
-Window* CheckCombo::GetCheckComboWnd() const
+Window *CheckCombo::GetCheckComboWnd() const
 {
     return m_pCheckComboWnd;
 }
@@ -587,7 +592,7 @@ ShadowType CheckCombo::GetComboWndShadowType() const
     return m_nShadowType;
 }
 
-void CheckCombo::SetAttributeList(Control* pControl, const DString& classValue)
+void CheckCombo::SetAttributeList(Control *pControl, const DString &classValue)
 {
     ASSERT(pControl != nullptr);
     if (pControl == nullptr) {
@@ -597,17 +602,16 @@ void CheckCombo::SetAttributeList(Control* pControl, const DString& classValue)
     AttributeUtil::ParseAttributeList(classValue, attributeList);
     if (!attributeList.empty()) {
         //按属性列表设置
-        for (const auto& attribute : attributeList) {
+        for (const auto &attribute : attributeList) {
             pControl->SetAttribute(attribute.first, attribute.second);
         }
-    }
-    else if (!classValue.empty()) {
+    } else if (!classValue.empty()) {
         //按Class名称设置
         pControl->SetClass(classValue);
     }
 }
 
-const UiSize& CheckCombo::GetDropBoxSize() const
+const UiSize &CheckCombo::GetDropBoxSize() const
 {
     return m_szDropBox;
 }
@@ -625,12 +629,12 @@ void CheckCombo::SetDropBoxSize(UiSize szDropBox, bool bNeedScaleDpi)
     m_szDropBox = szDropBox;
 }
 
-bool CheckCombo::OnSelectItem(const ui::EventArgs& args)
+bool CheckCombo::OnSelectItem(const ui::EventArgs &args)
 {
     if (args.GetSender() == nullptr) {
         return true;
     }
-    CheckBox* pCheckBox = dynamic_cast<CheckBox*>(args.GetSender());
+    CheckBox *pCheckBox = dynamic_cast<CheckBox *>(args.GetSender());
     if (pCheckBox == nullptr) {
         return true;
     }
@@ -640,25 +644,24 @@ bool CheckCombo::OnSelectItem(const ui::EventArgs& args)
     }
     DString itemTextId = pCheckBox->GetTextId();
 
-    Label* item = new Label(m_pList->GetWindow());
+    Label *item = new Label(m_pList->GetWindow());
     SetAttributeList(item, m_selectedItemClass.c_str());
     if (!itemTextId.empty()) {
         item->SetTextId(itemTextId);
-    }
-    else {
+    } else {
         item->SetText(itemText);
-    }    
+    }
     m_pList->AddItem(item);
     UpdateSelectedListHeight();
     return true;
 }
 
-bool CheckCombo::OnUnSelectItem(const ui::EventArgs& args)
+bool CheckCombo::OnUnSelectItem(const ui::EventArgs &args)
 {
     if (args.GetSender() == nullptr) {
         return true;
     }
-    CheckBox* pCheckBox = dynamic_cast<CheckBox*>(args.GetSender());
+    CheckBox *pCheckBox = dynamic_cast<CheckBox *>(args.GetSender());
     if (pCheckBox == nullptr) {
         return true;
     }
@@ -669,7 +672,7 @@ bool CheckCombo::OnUnSelectItem(const ui::EventArgs& args)
 
     size_t itemCount = m_pList->GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        Label* pLabel = dynamic_cast<Label*>(m_pList->GetItemAt(index));
+        Label *pLabel = dynamic_cast<Label *>(m_pList->GetItemAt(index));
         if (pLabel != nullptr) {
             if (pLabel->GetText() == itemText) {
                 m_pList->RemoveItem(pLabel);
@@ -690,17 +693,16 @@ void CheckCombo::UpdateSelectedListHeight()
     m_pList->SetFixedHeight(oldFixedHeight, false, false);
     if (estSize.cy.IsInt32()) {
         SetFixedHeight(ui::UiFixedInt(estSize.cy.GetInt32()), true, false);
-    }
-    else {
-        SetFixedHeight(ui::UiFixedInt((int)m_pList->GetItemCount() * m_iOrgHeight), true, true);
+    } else {
+        SetFixedHeight(ui::UiFixedInt((int) m_pList->GetItemCount() * m_iOrgHeight), true, true);
     }
 }
 
-void CheckCombo::GetSelectedText(std::vector<DString>& selectedText) const
+void CheckCombo::GetSelectedText(std::vector<DString> &selectedText) const
 {
     size_t itemCount = m_pList->GetItemCount();
     for (size_t index = 0; index < itemCount; ++index) {
-        Label* pLabel = dynamic_cast<Label*>(m_pList->GetItemAt(index));
+        Label *pLabel = dynamic_cast<Label *>(m_pList->GetItemAt(index));
         if (pLabel != nullptr) {
             selectedText.push_back(pLabel->GetText());
         }
@@ -714,7 +716,7 @@ void CheckCombo::ClearAll()
     SetFixedHeight(ui::UiFixedInt(m_iOrgHeight), true, true);
 }
 
-bool CheckCombo::OnListButtonDown(const EventArgs& args)
+bool CheckCombo::OnListButtonDown(const EventArgs &args)
 {
     Activate(&args);
     return true;

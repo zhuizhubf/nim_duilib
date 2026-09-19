@@ -2,13 +2,12 @@
 #define UI_CORE_FONTMANAGER_H_
 
 #include "duilib/Core/UiFont.h"
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-namespace ui 
-{
+namespace ui {
 class IFont;
 class IFallbackFontMgr;
 class DpiManager;
@@ -29,8 +28,8 @@ class DUILIB_API FontManager
 public:
     FontManager();
     ~FontManager();
-    FontManager(const FontManager&) = delete;
-    FontManager& operator = (const FontManager&) = delete;
+    FontManager(const FontManager &) = delete;
+    FontManager &operator=(const FontManager &) = delete;
 
 public:
     /** 添加一个字体信息，字体大小未经DPI处理
@@ -38,37 +37,37 @@ public:
      * @param [in] fontInfo 字体属性信息, 字体大小为原始大小，未经DPI缩放
      * @param [in] bDefault 是否设置为默认字体
      */
-    bool AddFont(const DString& fontId, const UiFont& fontInfo, bool bDefault);
+    bool AddFont(const DString &fontId, const UiFont &fontInfo, bool bDefault);
 
     /** 获取字体接口, 如果通过fontId找不到字体接口，那么会继续查找m_defaultFontId字体接口
     * @param [in] fontId 字体ID
     * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
     * @return 成功返回字体接口，外部调用不需要释放资源；如果失败则返回nullptr
     */
-    IFont* GetIFont(const DString& fontId, const DpiManager& dpi);
+    IFont *GetIFont(const DString &fontId, const DpiManager &dpi);
 
     /** 获取字体接口, 如果通过fontId找不到字体接口，那么会继续查找m_defaultFontId字体接口
     * @param [in] fontId 字体ID
     * @param [in] nZoomPercent 字体大小缩放百分比，用于对字体大小进行缩放，举例：100代表100%，200代表200%
     * @return 成功返回字体接口，外部调用不需要释放资源；如果失败则返回nullptr
     */
-    IFont* GetIFont(const DString& fontId, uint32_t nZoomPercent);
+    IFont *GetIFont(const DString &fontId, uint32_t nZoomPercent);
 
     /** 是否包含该字体ID
     * @param [in] fontId 指定字体的ID标记
     */
-    bool HasFontId(const DString& fontId) const;
+    bool HasFontId(const DString &fontId) const;
 
     /** 删除一个字体ID
     * @param [in] fontId 指定字体的ID标记
     */
-    bool RemoveFontId(const DString& fontId);
+    bool RemoveFontId(const DString &fontId);
 
     /** 删除一个字体缓存，以释放内存
     * @param [in] fontId 字体ID
     * @param [in] nZoomPercent 字体大小缩放百分比，用于对字体大小进行缩放，举例：100代表100%，200代表200%
     */
-    bool RemoveIFont(const DString& fontId, uint32_t nZoomPercent);
+    bool RemoveIFont(const DString &fontId, uint32_t nZoomPercent);
 
     /** 删除所有字体, 不包含已经加载的字体文件
      */
@@ -76,22 +75,22 @@ public:
 
     /** 字体回退管理器（当支持的字体无法显示字符时，会查询回退字体管理器，以正确显示文字）
     */
-    IFallbackFontMgr* GetFallbackFontMgr() const;
+    IFallbackFontMgr *GetFallbackFontMgr() const;
 
 public:
     /** 获取默认字体ID
     */
-    const DString& GetDefaultFontId() const;
+    const DString &GetDefaultFontId() const;
 
     /** 设置默认字体列表
     * @param [in] defaultFontFamilyNames 字体列表，不同字体用逗号分割，比如："Microsoft YaHei,SimSun"
     */
-    void SetDefaultFontFamilyNames(const DString& defaultFontFamilyNames);
+    void SetDefaultFontFamilyNames(const DString &defaultFontFamilyNames);
 
     /** 设置默认回退字体列表，用于显示Emoji字符/扩展汉字（2个UTF16字符表示的汉字）等
     * @param [in] fallbackFontFamilyNames 回退字体列表，不同字体用逗号分割，比如："Segoe UI Emoji,Noto Color Emoji, MingLiU-ExtB"
     */
-    void SetFallbackFontFamilyNames(const DString& fallbackFontFamilyNames);
+    void SetFallbackFontFamilyNames(const DString &fallbackFontFamilyNames);
 
 public:
     /** @brief 添加一个字体文件, 添加后可以按照正常字体使用
@@ -99,7 +98,7 @@ public:
       * @param[in] strFontDesc 字体描述信息
       * @return 无返回值
       */
-    bool AddFontFile(const DString& strFontFile, const DString& strFontDesc);
+    bool AddFontFile(const DString &strFontFile, const DString &strFontDesc);
 
     /** @brief 清理所有添加的字体文件
       * @return 无返回值
@@ -115,33 +114,33 @@ public:
     /** 获取可用的字体名称列表
     * @param [out] fontNameList 返回可用的字体名称列表
     */
-    void GetFontNameList(std::vector<DString>& fontNameList) const;
+    void GetFontNameList(std::vector<DString> &fontNameList) const;
 
     /** 设置默认的字体大小列表（可以覆盖内置的默认列表），字体大小值未进行DPI缩放
     */
-    void SetFontSizeList(const std::vector<FontSizeInfo>& fontSizeList);
+    void SetFontSizeList(const std::vector<FontSizeInfo> &fontSizeList);
 
     /** 获取默认的字体大小列表，字体大小值未进行DPI缩放
     * @param [out] fontSizeList 字体大小信息
     */
-    void GetFontSizeList(std::vector<FontSizeInfo>& fontSizeList) const;
+    void GetFontSizeList(std::vector<FontSizeInfo> &fontSizeList) const;
 
     /** 获取默认的字体大小列表(执行DPI缩放)
     * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
     * @param [in,out] fontSizeList 字体大小信息
     */
-    void GetDpiFontSizeList(const DpiManager& dpi, std::vector<FontSizeInfo>& fontSizeList) const;
+    void GetDpiFontSizeList(const DpiManager &dpi, std::vector<FontSizeInfo> &fontSizeList) const;
 
     /** 对字体列表执行DPI缩放
     * @param [in,out] fontSizeList 字体大小信息
     * @param [in] dpi DPI缩放管理器，用于对字体大小进行缩放
     */
-    void DpiScaleFontSizeList(std::vector<FontSizeInfo>& fontSizeList, const DpiManager& dpi) const;
+    void DpiScaleFontSizeList(std::vector<FontSizeInfo> &fontSizeList, const DpiManager &dpi) const;
 
 private:
     /** 获取DPI缩放后实际的字体ID
     */
-    DString GetDpiFontId(const DString& fontId, uint32_t nZoomPercent) const;
+    DString GetDpiFontId(const DString &fontId, uint32_t nZoomPercent) const;
 
     /** 初始化默认字体
     */
@@ -149,7 +148,7 @@ private:
 
     /** 一个IFont字体数据被移除了
     */
-    void OnIFontDataRemoved(IFont* pIFont);
+    void OnIFontDataRemoved(IFont *pIFont);
 
 private:
     /** 自定义字体数据：Key时FontID，Value是字体描述信息
@@ -158,7 +157,7 @@ private:
 
     /** 自定义字体信息：Key是FontId
     */
-    std::unordered_map<DString, IFont*> m_fontMap;
+    std::unordered_map<DString, IFont *> m_fontMap;
 
     /** 回退字体管理器
     */
@@ -168,7 +167,7 @@ private:
 
     /** 回退字体信息：Key是IFont*
     */
-    std::unordered_map<const IFont*, std::vector<IFont*>> m_fallbackFontMap;
+    std::unordered_map<const IFont *, std::vector<IFont *>> m_fallbackFontMap;
 
     /** 默认字体ID
     */
@@ -195,5 +194,5 @@ private:
     bool m_bFallbackFontInited;
 };
 
-}
+} // namespace ui
 #endif //UI_CORE_FONTMANAGER_H_

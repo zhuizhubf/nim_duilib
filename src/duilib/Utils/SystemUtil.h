@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui
-{
+namespace ui {
 class Window;
 
 /** 系统相关的辅助操作
@@ -15,14 +14,14 @@ public:
     /** 打开URL
     * @param [in] url 需要打开的URL
     */
-    static bool OpenUrl(const DString& url);
+    static bool OpenUrl(const DString &url);
 
     /** 显示一个简单的MessageBox
     * @param [in] pWindow 父窗口
     * @param [in] content 需要显示的内容
     * @param [in] title 标题
     */
-    static bool ShowMessageBox(const Window* pWindow, const DString& content, const DString& title);
+    static bool ShowMessageBox(const Window *pWindow, const DString &content, const DString &title);
 };
 
 } //namespace ui

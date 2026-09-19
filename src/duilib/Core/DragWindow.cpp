@@ -1,22 +1,21 @@
 #include "DragWindow.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 /** 位图显示控件
 */
-class DragWindowBitmap: public Control
+class DragWindowBitmap : public Control
 {
     typedef Control BaseClass;
+
 public:
-    explicit DragWindowBitmap(Window* pWindow):
-        Control(pWindow)
-    {
-    }
+    explicit DragWindowBitmap(Window *pWindow)
+        : Control(pWindow)
+    {}
 
     /** 绘制函数
     */
-    virtual void Paint(ui::IRender* pRender, const ui::UiRect& rcPaint) override
+    virtual void Paint(ui::IRender *pRender, const ui::UiRect &rcPaint) override
     {
         BaseClass::Paint(pRender, rcPaint);
         if ((pRender != nullptr) && (m_pBitmap != nullptr)) {
@@ -40,10 +39,7 @@ public:
 
     /** 设置绘制的位图
     */
-    void SetBitmap(const std::shared_ptr<IBitmap>& pBitmap)
-    {
-        m_pBitmap = pBitmap;
-    }
+    void SetBitmap(const std::shared_ptr<IBitmap> &pBitmap) { m_pBitmap = pBitmap; }
 
 private:
     /** 显示的位图
@@ -51,14 +47,11 @@ private:
     std::shared_ptr<IBitmap> m_pBitmap;
 };
 
-DragWindow::DragWindow():
-    m_nRefCount(0)
-{
-}
+DragWindow::DragWindow()
+    : m_nRefCount(0)
+{}
 
-DragWindow::~DragWindow()
-{
-}
+DragWindow::~DragWindow() {}
 
 void DragWindow::AddRef()
 {
@@ -84,7 +77,8 @@ DString DragWindow::GetSkinFile()
 {
     return _T("<?xml version = \"1.0\" encoding=\"utf-8\"?>")
            _T("<Window size=\"90,90\" shadow_snap=\"false\">")
-           _T("    <VBox width=\"stretch\" height=\"stretch\" visible=\"true\" bkcolor=\"bg_window_card\"/>")
+           _T("    <VBox width=\"stretch\" height=\"stretch\" visible=\"true\" ")
+           _T("bkcolor=\"bg_window_card\"/>")
            _T("</Window>");
 }
 
@@ -93,9 +87,9 @@ void DragWindow::OnFinalMessage()
     Release();
 }
 
-void DragWindow::SetDragImage(const std::shared_ptr<IBitmap>& pBitmap)
+void DragWindow::SetDragImage(const std::shared_ptr<IBitmap> &pBitmap)
 {
-    Box* pBox = GetXmlRoot();
+    Box *pBox = GetXmlRoot();
     ASSERT(pBox != nullptr);
     if (pBox == nullptr) {
         return;
@@ -105,24 +99,25 @@ void DragWindow::SetDragImage(const std::shared_ptr<IBitmap>& pBitmap)
     if (pBitmap == nullptr) {
         const size_t nCount = pBox->GetItemCount();
         if (nCount > 0) {
-            DragWindowBitmap* pBitmapControl = dynamic_cast<DragWindowBitmap*>(pBox->GetItemAt(nCount - 1));
+            DragWindowBitmap *pBitmapControl = dynamic_cast<DragWindowBitmap *>(
+                pBox->GetItemAt(nCount - 1));
             if (pBitmapControl != nullptr) {
                 pBitmapControl->SetBitmap(nullptr);
             }
         }
         return;
-    }
-    else {
+    } else {
         const size_t nCount = pBox->GetItemCount();
         for (size_t nItem = 0; nItem < nCount; ++nItem) {
-            Control* pControl = pBox->GetItemAt(nItem);
+            Control *pControl = pBox->GetItemAt(nItem);
             if (pControl != nullptr) {
                 if (pControl->GetFixedHeight().IsAuto()) {
                     UiRect rcClient;
                     GetClientRect(rcClient);
-                    nExtraHeight = pControl->EstimateSize(UiSize(rcClient.Width(), rcClient.Height())).cy.GetInt32();
-                }
-                else {
+                    nExtraHeight = pControl
+                                       ->EstimateSize(UiSize(rcClient.Width(), rcClient.Height()))
+                                       .cy.GetInt32();
+                } else {
                     nExtraHeight = pControl->GetFixedHeight().GetInt32();
                 }
             }
@@ -131,7 +126,7 @@ void DragWindow::SetDragImage(const std::shared_ptr<IBitmap>& pBitmap)
     const int32_t nImageWidth = pBitmap->GetWidth();
     const int32_t nImageHeight = pBitmap->GetHeight();
 
-    DragWindowBitmap* pBitmapControl = new DragWindowBitmap(this);
+    DragWindowBitmap *pBitmapControl = new DragWindowBitmap(this);
     pBitmapControl->SetBitmap(pBitmap);
     pBitmapControl->SetAttribute(_T("width"), _T("100%"));
     pBitmapControl->SetAttribute(_T("height"), _T("100%"));
@@ -157,12 +152,18 @@ void DragWindow::AdjustPos()
     UiRect rc;
     GetWindowRect(rc);
     ptCursor.x -= (rc.right - rc.left - rcCorner.left - rcCorner.right) / 2;
-   
+
     rc.left = ptCursor.x;
     rc.top = ptCursor.y;
     rc.right = rc.left;
     rc.bottom = rc.top;
-    SetWindowPos(InsertAfterWnd(), rc.left, rc.top, rc.Width(), rc.Height(), kSWP_NOSIZE | kSWP_SHOWWINDOW | kSWP_NOACTIVATE);
+    SetWindowPos(
+        InsertAfterWnd(),
+        rc.left,
+        rc.top,
+        rc.Width(),
+        rc.Height(),
+        kSWP_NOSIZE | kSWP_SHOWWINDOW | kSWP_NOACTIVATE);
 }
 
-}
+} // namespace ui

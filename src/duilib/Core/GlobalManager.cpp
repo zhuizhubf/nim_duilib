@@ -1,37 +1,36 @@
 #include "GlobalManager.h"
-#include "duilib/Utils/StringUtil.h"
-#include "duilib/Utils/StringConvert.h"
+#include "duilib/Core/Box.h"
+#include "duilib/Core/Control.h"
+#include "duilib/Core/Window.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
-#include "duilib/Core/Window.h"
-#include "duilib/Core/Control.h"
-#include "duilib/Core/Box.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
 //渲染引擎接口
 #include "render/IRenderBackend.h"
 
 //图片解码接口
+#include "duilib/Image/ImageDecoder_Common.h"
+#include "duilib/Image/ImageDecoder_GIF.h"
 #include "duilib/Image/ImageDecoder_ICO.h"
 #include "duilib/Image/ImageDecoder_Icon.h"
-#include "duilib/Image/ImageDecoder_GIF.h"
-#include "duilib/Image/ImageDecoder_PNG.h"
-#include "duilib/Image/ImageDecoder_PAG.h"
-#include "duilib/Image/ImageDecoder_WEBP.h"
 #include "duilib/Image/ImageDecoder_JPEG.h"
-#include "duilib/Image/ImageDecoder_Common.h"
+#include "duilib/Image/ImageDecoder_PAG.h"
+#include "duilib/Image/ImageDecoder_PNG.h"
+#include "duilib/Image/ImageDecoder_WEBP.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN)
-    //ToolTip/日期时间等标准控件，需要初始化commctrl
-    #include <commctrl.h>
-    #include <Objbase.h>
+#if defined(DUILIB_BUILD_FOR_WIN)
+//ToolTip/日期时间等标准控件，需要初始化commctrl
+#include <Objbase.h>
+#include <commctrl.h>
 #endif
 
+#include <cstdlib>
 #include <filesystem>
 #include <unordered_set>
-#include <cstdlib>
 
-namespace ui 
-{
+namespace ui {
 /** 库内部的工作线程
 */
 class UiWorkerThread : public ui::FrameworkThread
@@ -42,10 +41,11 @@ public:
         DString name;
         int32_t nIdentifier;
     };
+
 public:
-    UiWorkerThread(const DString& threadName, int32_t nThreadIdentifier):
-        FrameworkThread(threadName, nThreadIdentifier)
-    { }
+    UiWorkerThread(const DString &threadName, int32_t nThreadIdentifier)
+        : FrameworkThread(threadName, nThreadIdentifier)
+    {}
     virtual ~UiWorkerThread() override {}
 
 private:
@@ -53,7 +53,7 @@ private:
     */
     virtual bool OnInit() override
     {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
         HRESULT hr = ::CoInitialize(nullptr);
         ASSERT_UNUSED_VARIABLE((hr == S_OK) || (hr == S_FALSE));
 #endif
@@ -64,29 +64,29 @@ private:
     */
     virtual void OnCleanup() override
     {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
         ::CoUninitialize();
 #endif
     }
 };
 
-GlobalManager::GlobalManager():
-#if defined (DUILIB_RENDER_DEFAULT_GDI) && (DUILIB_RENDER_DEFAULT_GDI != 0)
-    m_renderType(RenderType::kRenderType_GDI),
+GlobalManager::GlobalManager()
+    :
+#if defined(DUILIB_RENDER_DEFAULT_GDI) && (DUILIB_RENDER_DEFAULT_GDI != 0)
+    m_renderType(RenderType::kRenderType_GDI)
+    ,
 #else
-    m_renderType(RenderType::kRenderType_Skia),
+    m_renderType(RenderType::kRenderType_Skia)
+    ,
 #endif
-    m_platformData(nullptr),
-    m_bAnimationEnabled(true),
-    m_bStartup(false)
-{
-}
+    m_platformData(nullptr)
+    , m_bAnimationEnabled(true)
+    , m_bStartup(false)
+{}
 
-GlobalManager::~GlobalManager()
-{
-}
+GlobalManager::~GlobalManager() {}
 
-GlobalManager& GlobalManager::Instance()
+GlobalManager &GlobalManager::Instance()
 {
     static GlobalManager self;
     return self;
@@ -126,21 +126,20 @@ FilePath GlobalManager::GetResourceZipPath()
     return resourcePath;
 }
 
-DString GlobalManager::GetTextById(const DString& textId)
+DString GlobalManager::GetTextById(const DString &textId)
 {
     return Instance().Lang().GetStringByID(textId);
 }
 
-namespace
-{
+namespace {
 bool IsRenderTypeCompiled(RenderType renderType)
 {
-#if defined (DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
+#if defined(DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
     if (renderType == RenderType::kRenderType_Skia) {
         return true;
     }
 #endif
-#if defined (DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
+#if defined(DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
     if (renderType == RenderType::kRenderType_GDI) {
         return true;
     }
@@ -148,20 +147,20 @@ bool IsRenderTypeCompiled(RenderType renderType)
     return false;
 }
 
-IRenderFactory* CreateRenderFactoryByType(RenderType renderType)
+IRenderFactory *CreateRenderFactoryByType(RenderType renderType)
 {
-#if defined (DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
+#if defined(DUILIB_RENDER_SKIA) && (DUILIB_RENDER_SKIA != 0)
     if (renderType == RenderType::kRenderType_Skia) {
-        const IRenderBackend* pRenderBackend = GetRenderBackend_Skia();
+        const IRenderBackend *pRenderBackend = GetRenderBackend_Skia();
         ASSERT(pRenderBackend != nullptr);
         if (pRenderBackend != nullptr) {
             return pRenderBackend->CreateRenderFactory();
         }
     }
 #endif
-#if defined (DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
+#if defined(DUILIB_RENDER_GDI) && (DUILIB_RENDER_GDI != 0)
     if (renderType == RenderType::kRenderType_GDI) {
-        const IRenderBackend* pRenderBackend = GetRenderBackend_GDI();
+        const IRenderBackend *pRenderBackend = GetRenderBackend_GDI();
         ASSERT(pRenderBackend != nullptr);
         if (pRenderBackend != nullptr) {
             return pRenderBackend->CreateRenderFactory();
@@ -172,29 +171,29 @@ IRenderFactory* CreateRenderFactoryByType(RenderType renderType)
     return nullptr;
 }
 
-void RegisterImageDecoderModules(ImageDecoderFactory& imageDecoderFactory)
+void RegisterImageDecoderModules(ImageDecoderFactory &imageDecoderFactory)
 {
-#if defined (DUILIB_IMAGE_SVG_NANOSVG) && (DUILIB_IMAGE_SVG_NANOSVG != 0)
+#if defined(DUILIB_IMAGE_SVG_NANOSVG) && (DUILIB_IMAGE_SVG_NANOSVG != 0)
     {
-        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_SvgNanoSvg();
+        const IImageDecoderModule *pImageDecoderModule = GetImageDecoderModule_SvgNanoSvg();
         ASSERT(pImageDecoderModule != nullptr);
         if (pImageDecoderModule != nullptr) {
             pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
         }
     }
 #endif
-#if defined (DUILIB_IMAGE_SVG_SKIA) && (DUILIB_IMAGE_SVG_SKIA != 0)
+#if defined(DUILIB_IMAGE_SVG_SKIA) && (DUILIB_IMAGE_SVG_SKIA != 0)
     {
-        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_SvgSkia();
+        const IImageDecoderModule *pImageDecoderModule = GetImageDecoderModule_SvgSkia();
         ASSERT(pImageDecoderModule != nullptr);
         if (pImageDecoderModule != nullptr) {
             pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
         }
     }
 #endif
-#if defined (DUILIB_IMAGE_LOTTIE_SKIA) && (DUILIB_IMAGE_LOTTIE_SKIA != 0)
+#if defined(DUILIB_IMAGE_LOTTIE_SKIA) && (DUILIB_IMAGE_LOTTIE_SKIA != 0)
     {
-        const IImageDecoderModule* pImageDecoderModule = GetImageDecoderModule_LottieSkia();
+        const IImageDecoderModule *pImageDecoderModule = GetImageDecoderModule_LottieSkia();
         ASSERT(pImageDecoderModule != nullptr);
         if (pImageDecoderModule != nullptr) {
             pImageDecoderModule->RegisterImageDecoders(imageDecoderFactory);
@@ -202,23 +201,22 @@ void RegisterImageDecoderModules(ImageDecoderFactory& imageDecoderFactory)
     }
 #endif
 }
-}
+} // namespace
 
-bool GlobalManager::Startup(const ResourceParam& resParam,
-                            DpiInitParam dpiInitParam,
-                            const CreateControlCallback& callback)
+bool GlobalManager::Startup(
+    const ResourceParam &resParam, DpiInitParam dpiInitParam, const CreateControlCallback &callback)
 {
-    PerformanceUtilHelper::Instance().BeginStat(_T("Application Startup"));//程序启动时间统计
+    PerformanceUtilHelper::Instance().BeginStat(_T("Application Startup")); //程序启动时间统计
     ASSERT(!m_bStartup);
     if (m_bStartup) {
-        return false;//禁止重复初始化
+        return false; //禁止重复初始化
     }
     ASSERT(m_renderFactory == nullptr);
     if (m_renderFactory != nullptr) {
         return false;
     }
     //初始化COM/OLE
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     HRESULT hr = ::CoInitialize(nullptr);
     ASSERT_UNUSED_VARIABLE((hr == S_OK) || (hr == S_FALSE));
 
@@ -233,7 +231,7 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
     m_dwUiThreadId = std::this_thread::get_id();
 
     //初始化DPI感知模式，//初始化DPI值
-    DpiManager& dpiManager = Dpi();
+    DpiManager &dpiManager = Dpi();
     dpiManager.InitDpiAwareness(dpiInitParam);
 
     //初始化图片格式解码器
@@ -257,7 +255,6 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
 
     //通用解码器，放在最后
     m_imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_Common>());
-    
 
     //初始化定时器
     m_timerManager.Initialize(m_platformData);
@@ -292,25 +289,27 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
     }
 
     //挂载主题变化事件
-    m_themeManager.AddThemeChangeCallback([this](const ThemeInfo&) {
-        //刷新界面显示
-        std::vector<WindowPtr> windowList = Windows().GetAllWindowList();
-        for (const WindowPtr& pWindow : windowList) {
-            if (pWindow != nullptr) {
-                pWindow->NotifyThemeChanged();
-            }
-            if (pWindow != nullptr) {
-                Box* pBox = pWindow->GetRoot();
-                if (pBox != nullptr) {
-                    pBox->OnThemeChanged(false);
-                    pBox->SetPos(pBox->GetPos());
+    m_themeManager.AddThemeChangeCallback(
+        [this](const ThemeInfo &) {
+            //刷新界面显示
+            std::vector<WindowPtr> windowList = Windows().GetAllWindowList();
+            for (const WindowPtr &pWindow : windowList) {
+                if (pWindow != nullptr) {
+                    pWindow->NotifyThemeChanged();
+                }
+                if (pWindow != nullptr) {
+                    Box *pBox = pWindow->GetRoot();
+                    if (pBox != nullptr) {
+                        pBox->OnThemeChanged(false);
+                        pBox->SetPos(pBox->GetPos());
+                    }
+                }
+                if (pWindow != nullptr) {
+                    pWindow->InvalidateAll();
                 }
             }
-            if (pWindow != nullptr) {
-                pWindow->InvalidateAll();
-            }
-        }
-        }, (size_t)this);
+        },
+        (size_t) this);
 
     return true;
 }
@@ -318,7 +317,7 @@ bool GlobalManager::Startup(const ResourceParam& resParam,
 void GlobalManager::Shutdown()
 {
     //终止线程池
-    for (std::shared_ptr<FrameworkThread> pThread: m_threadList) {
+    for (std::shared_ptr<FrameworkThread> pThread : m_threadList) {
         if (pThread != nullptr) {
             pThread->Stop();
         }
@@ -338,15 +337,15 @@ void GlobalManager::Shutdown()
     m_fontManager.RemoveAllFonts();
     m_fontManager.RemoveAllFontFiles();
     m_imageManager.RemoveAllImages();
-    m_zipManager.CloseResZip();    
+    m_zipManager.CloseResZip();
     m_langManager.ClearStringTable(false);
     m_windowManager.Clear();
     m_themeManager.Clear();
-    
+
     m_renderFactory.reset();
     m_renderFactory = nullptr;
     m_pfnCreateControlCallbackList.clear();
-    m_globalClass.clear();    
+    m_globalClass.clear();
     m_dwUiThreadId = std::thread::id();
     m_languagePath.Clear();
     m_fontFilePath.Clear();
@@ -364,7 +363,7 @@ void GlobalManager::Shutdown()
     }
     m_atExitFunctions.clear();
 
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     ::CoUninitialize();
     ::OleUninitialize();
 #endif
@@ -374,14 +373,11 @@ void GlobalManager::Shutdown()
 bool GlobalManager::StopInnerThread(int32_t nThreadIdentifier)
 {
     AssertUIThread();
-    ASSERT((nThreadIdentifier == ui::kThreadWorker)  ||
-           (nThreadIdentifier == ui::kThreadNetwork) ||
-           (nThreadIdentifier == ui::kThreadImage1)  ||
-           (nThreadIdentifier == ui::kThreadImage2));
-    if ((nThreadIdentifier != ui::kThreadWorker)  &&
-        (nThreadIdentifier != ui::kThreadNetwork) &&
-        (nThreadIdentifier != ui::kThreadImage1)  &&
-        (nThreadIdentifier != ui::kThreadImage2)) {
+    ASSERT(
+        (nThreadIdentifier == ui::kThreadWorker) || (nThreadIdentifier == ui::kThreadNetwork)
+        || (nThreadIdentifier == ui::kThreadImage1) || (nThreadIdentifier == ui::kThreadImage2));
+    if ((nThreadIdentifier != ui::kThreadWorker) && (nThreadIdentifier != ui::kThreadNetwork)
+        && (nThreadIdentifier != ui::kThreadImage1) && (nThreadIdentifier != ui::kThreadImage2)) {
         return false;
     }
     bool bRet = false;
@@ -400,14 +396,11 @@ bool GlobalManager::StopInnerThread(int32_t nThreadIdentifier)
 bool GlobalManager::StartInnerThread(int32_t nThreadIdentifier)
 {
     AssertUIThread();
-    ASSERT((nThreadIdentifier == ui::kThreadWorker)  ||
-           (nThreadIdentifier == ui::kThreadNetwork) ||
-           (nThreadIdentifier == ui::kThreadImage1)  ||
-           (nThreadIdentifier == ui::kThreadImage2));
-    if ((nThreadIdentifier != ui::kThreadWorker)  &&
-        (nThreadIdentifier != ui::kThreadNetwork) &&
-        (nThreadIdentifier != ui::kThreadImage1)  &&
-        (nThreadIdentifier != ui::kThreadImage2)) {
+    ASSERT(
+        (nThreadIdentifier == ui::kThreadWorker) || (nThreadIdentifier == ui::kThreadNetwork)
+        || (nThreadIdentifier == ui::kThreadImage1) || (nThreadIdentifier == ui::kThreadImage2));
+    if ((nThreadIdentifier != ui::kThreadWorker) && (nThreadIdentifier != ui::kThreadNetwork)
+        && (nThreadIdentifier != ui::kThreadImage1) && (nThreadIdentifier != ui::kThreadImage2)) {
         return false;
     }
     bool bRet = false;
@@ -420,11 +413,12 @@ bool GlobalManager::StartInnerThread(int32_t nThreadIdentifier)
     }
     if (!bRet) {
         //初始化线程池
-        std::vector<UiWorkerThread::Param> threadParams = { {_T("Worker"), ThreadIdentifier::kThreadWorker},
-                                                            {_T("Network"), ThreadIdentifier::kThreadNetwork},
-                                                            {_T("Image1"), ThreadIdentifier::kThreadImage1},
-                                                            {_T("Image2"), ThreadIdentifier::kThreadImage2} };
-        for (const UiWorkerThread::Param& param : threadParams) {
+        std::vector<UiWorkerThread::Param> threadParams
+            = {{_T("Worker"), ThreadIdentifier::kThreadWorker},
+               {_T("Network"), ThreadIdentifier::kThreadNetwork},
+               {_T("Image1"), ThreadIdentifier::kThreadImage1},
+               {_T("Image2"), ThreadIdentifier::kThreadImage2}};
+        for (const UiWorkerThread::Param &param : threadParams) {
             if (param.nIdentifier != nThreadIdentifier) {
                 continue;
             }
@@ -438,12 +432,12 @@ bool GlobalManager::StartInnerThread(int32_t nThreadIdentifier)
     return bRet;
 }
 
-void GlobalManager::SetPlatformData(void* pPlatformData)
+void GlobalManager::SetPlatformData(void *pPlatformData)
 {
     m_platformData = pPlatformData;
 }
 
-void* GlobalManager::GetPlatformData() const
+void *GlobalManager::GetPlatformData() const
 {
     return m_platformData;
 }
@@ -453,34 +447,34 @@ FilePath GlobalManager::GetResourceRootPath() const
     return m_resourceRootPath;
 }
 
-void GlobalManager::SetFontFilePath(const FilePath& strPath)
+void GlobalManager::SetFontFilePath(const FilePath &strPath)
 {
-     m_fontFilePath = strPath;
-     m_fontFilePath.NormalizeDirectoryPath();
+    m_fontFilePath = strPath;
+    m_fontFilePath.NormalizeDirectoryPath();
 }
 
-const FilePath& GlobalManager::GetFontFilePath() const
+const FilePath &GlobalManager::GetFontFilePath() const
 {
     return m_fontFilePath;
 }
 
-void GlobalManager::SetLanguagePath(const FilePath& strPath)
+void GlobalManager::SetLanguagePath(const FilePath &strPath)
 {
     m_languagePath = strPath;
     m_languagePath.NormalizeDirectoryPath();
 }
 
-const FilePath& GlobalManager::GetLanguagePath() const
+const FilePath &GlobalManager::GetLanguagePath() const
 {
     return m_languagePath;
 }
 
-const DString& GlobalManager::GetLanguageFileName() const
+const DString &GlobalManager::GetLanguageFileName() const
 {
     return m_languageFileName;
 }
 
-bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
+bool GlobalManager::LoadGlobalResource(const ResourceParam &resParam)
 {
     AssertUIThread();
     //校验输入参数
@@ -497,15 +491,18 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
         return false;
     }
 
-    m_resourceRootPath = resParam.resourcePath; //资源根目录: resources（使用zip时是相对路径，使用文件系统是是本地绝对路径）
+    m_resourceRootPath
+        = resParam
+              .resourcePath; //资源根目录: resources（使用zip时是相对路径，使用文件系统是是本地绝对路径）
     const FilePath resourcePath = resParam.resourcePath;
     FilePath themeRootFullPath = resourcePath;
-    themeRootFullPath /= resParam.themeRootPath;                        //主题根目录：resources/themes
+    themeRootFullPath /= resParam.themeRootPath; //主题根目录：resources/themes
 
-    FilePath globalXmlFileNameFullPath = themeRootFullPath;             //主题根目录：resources/themes
-    globalXmlFileNameFullPath /= resParam.defaultThemePath;             //默认主题目录：resources/themes/default
-    globalXmlFileNameFullPath /= FilePath(resParam.globalXmlFileName);  //配置文件：resources/themes/default/global.xml
-    globalXmlFileNameFullPath.NormalizeFilePath();                      //默认取值示例：resources/themes/default/global.xml
+    FilePath globalXmlFileNameFullPath = themeRootFullPath; //主题根目录：resources/themes
+    globalXmlFileNameFullPath /= resParam.defaultThemePath; //默认主题目录：resources/themes/default
+    globalXmlFileNameFullPath /= FilePath(
+        resParam.globalXmlFileName);               //配置文件：resources/themes/default/global.xml
+    globalXmlFileNameFullPath.NormalizeFilePath(); //默认取值示例：resources/themes/default/global.xml
 
     if (resParam.GetResType() == ResourceType::kLocalFiles) {
         //本地文件的形式，所有资源都已本地文件的形式存在
@@ -518,10 +515,9 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
             ASSERT(!"global xml file not exists!");
             return false;
         }
-    }
-    else if (resParam.GetResType() == ResourceType::kZipFile) {
+    } else if (resParam.GetResType() == ResourceType::kZipFile) {
         //资源文件打包为zip压缩包，然后以本地文件的形式存在
-        const ZipFileResParam& param = static_cast<const ZipFileResParam&>(resParam);
+        const ZipFileResParam &param = static_cast<const ZipFileResParam &>(resParam);
         bool bZipOpenOk = Zip().OpenZipFile(param.zipFilePath, param.zipPassword);
         if (!bZipOpenOk) {
             ASSERT(!"OpenZipFile failed!");
@@ -535,8 +531,9 @@ bool GlobalManager::LoadGlobalResource(const ResourceParam& resParam)
 #ifdef DUILIB_BUILD_FOR_WIN
     else if (resParam.GetResType() == ResourceType::kResZipFile) {
         //资源文件打包为zip压缩包，然后放在exe/dll的资源文件中
-        const ResZipFileResParam& param = static_cast<const ResZipFileResParam&>(resParam);
-        bool bZipOpenOk = Zip().OpenResZip(param.hResModule, param.resourceName, param.resourceType, param.zipPassword);
+        const ResZipFileResParam &param = static_cast<const ResZipFileResParam &>(resParam);
+        bool bZipOpenOk = Zip().OpenResZip(
+            param.hResModule, param.resourceName, param.resourceType, param.zipPassword);
         if (!bZipOpenOk) {
             ASSERT(!"OpenResZip failed!");
             return false;
@@ -616,18 +613,19 @@ void GlobalManager::ClearThemeCache()
 
 /** 读取包含的语言文件列表
 */
-static void ReadIncludeLanguageFiles(const LangManager& langManager, std::list<DString>& includeLangFileList)
+static void ReadIncludeLanguageFiles(
+    const LangManager &langManager, std::list<DString> &includeLangFileList)
 {
     includeLangFileList.clear();
     DString includeLangFiles;
     const DString includeLangId = _T("INCLUDE_LANGUAGE_FILES");
     if (langManager.HasStringByID(includeLangId)) {
         includeLangFiles = langManager.GetStringByID(includeLangId);
-    }    
+    }
     if (!includeLangFiles.empty()) {
         includeLangFileList = StringUtil::Split(includeLangFiles, _T(";"));
     }
-    for (DString& includeLangFileName : includeLangFileList) {
+    for (DString &includeLangFileName : includeLangFileList) {
         StringUtil::Trim(includeLangFileName);
     }
     //移除空的数据
@@ -635,16 +633,14 @@ static void ReadIncludeLanguageFiles(const LangManager& langManager, std::list<D
     while (iter != includeLangFileList.end()) {
         if (iter->empty()) {
             iter = includeLangFileList.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
 }
 
-bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
-                                   const DString& languageFileName,
-                                   bool bInvalidate)
+bool GlobalManager::ReloadLanguage(
+    const FilePath &languagePath, const DString &languageFileName, bool bInvalidate)
 {
     AssertUIThread();
     ASSERT(!languageFileName.empty());
@@ -658,14 +654,14 @@ bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
         newLanguagePath.NormalizeDirectoryPath();
     }
 
-    //加载多语言文件，如果使用了资源压缩包则从内存中加载语言文件    
-    m_langManager.ClearStringTable(true);//需要备份，切换失败后应该保证能用
+    //加载多语言文件，如果使用了资源压缩包则从内存中加载语言文件
+    m_langManager.ClearStringTable(true); //需要备份，切换失败后应该保证能用
     bool bReadOk = LoadLanguageFile(newLanguagePath, languageFileName);
     if (bReadOk) {
         //加载包含的语言文件
         std::list<DString> includeLangFileList;
         ReadIncludeLanguageFiles(m_langManager, includeLangFileList);
-        for (DString& includeLangFileName : includeLangFileList) {
+        for (DString &includeLangFileName : includeLangFileList) {
             if (!LoadLanguageFile(newLanguagePath, includeLangFileName)) {
                 ASSERT(!"LoadLanguageFile failed!");
                 bReadOk = false;
@@ -681,8 +677,7 @@ bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
         }
         //保存语言文件名
         m_languageFileName = languageFileName;
-    }
-    else {
+    } else {
         //失败后，恢复原来的语言文件
         m_langManager.RestoreStringTable();
     }
@@ -691,11 +686,11 @@ bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
     if (bReadOk && bInvalidate) {
         //刷新界面显示
         std::vector<WindowPtr> windowList = Windows().GetAllWindowList();
-        for (const WindowPtr& pWindow : windowList) {
+        for (const WindowPtr &pWindow : windowList) {
             if (pWindow == nullptr) {
                 continue;
             }
-            Box* pBox = pWindow->GetRoot();
+            Box *pBox = pWindow->GetRoot();
             //支持多语言时，TextId优先
             if (!pWindow->GetTextId().empty()) {
                 //更新窗口标题栏文本
@@ -716,7 +711,7 @@ bool GlobalManager::ReloadLanguage(const FilePath& languagePath,
     return bReadOk;
 }
 
-bool GlobalManager::LoadLanguageFile(const FilePath& languagePath, const DString& languageFileName)
+bool GlobalManager::LoadLanguageFile(const FilePath &languagePath, const DString &languageFileName)
 {
     if (languageFileName.empty()) {
         return false;
@@ -729,12 +724,10 @@ bool GlobalManager::LoadLanguageFile(const FilePath& languagePath, const DString
         if (m_zipManager.GetZipData(filePath, fileData)) {
             fileData.push_back('\0');
             bLoadOk = m_langManager.LoadStringTable(fileData);
-        }
-        else {
+        } else {
             ASSERT(!"GetZipData failed!");
         }
-    }
-    else {
+    } else {
         //使用本地资源的情况
         FilePath filePath = FilePathUtil::JoinFilePath(languagePath, FilePath(languageFileName));
         bLoadOk = m_langManager.LoadStringTable(filePath);
@@ -744,18 +737,20 @@ bool GlobalManager::LoadLanguageFile(const FilePath& languagePath, const DString
 
 /** 对语言文件名排序(将主语言文件放在最前面)
 */
-void static SortLanguageFileNameList(std::vector<std::pair<DString, DString>>& languageList)
+void static SortLanguageFileNameList(std::vector<std::pair<DString, DString>> &languageList)
 {
     if (!languageList.empty()) {
-        std::sort(languageList.begin(), languageList.end(), [](const std::pair<DString, DString>& l,
-            const std::pair<DString, DString>& r) {
+        std::sort(
+            languageList.begin(),
+            languageList.end(),
+            [](const std::pair<DString, DString> &l, const std::pair<DString, DString> &r) {
                 return l.first.size() < r.first.size();
             });
     }
 }
 
-bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& languageList,
-                                    const DString& languageNameID) const
+bool GlobalManager::GetLanguageList(
+    std::vector<std::pair<DString, DString>> &languageList, const DString &languageNameID) const
 {
     FilePath languagePath = GetLanguagePath();
     ASSERT(!languagePath.IsEmpty());
@@ -770,28 +765,28 @@ bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& la
     languageList.clear();
 #ifdef DUILIB_BUILD_FOR_WIN
     //Windows: 路径字符串用的是DStringW::value_type，UTF16
-    const std::filesystem::path path{ languagePath.ToStringW()};
+    const std::filesystem::path path{languagePath.ToStringW()};
 #else
     //Windows: 路径字符串用的是char，UTF8
-    const std::filesystem::path path{ languagePath.ToStringA() };
+    const std::filesystem::path path{languagePath.ToStringA()};
 #endif
     std::unordered_set<DString> includeLangFileSet; //被包含的语言文件，不需要加载
     if (path.is_absolute()) {
         //绝对路径，语言文件在本地磁盘中
-        for (auto const& dir_entry : std::filesystem::directory_iterator{ path }) {
+        for (auto const &dir_entry : std::filesystem::directory_iterator{path}) {
             if (dir_entry.is_regular_file()) {
-                languageList.push_back({ FilePath(dir_entry.path().filename()).ToString(), _T("")});
+                languageList.push_back({FilePath(dir_entry.path().filename()).ToString(), _T("")});
             }
         }
         //排序: 对语言文件名排序(将主语言文件放在最前面)
         SortLanguageFileNameList(languageList);
-        for (auto& lang : languageList) {
-            const DString& fileName = lang.first;
+        for (auto &lang : languageList) {
+            const DString &fileName = lang.first;
             if (includeLangFileSet.find(fileName) != includeLangFileSet.end()) {
                 //不是主语言文件，不加载
                 continue;
             }
-            DString& displayName = lang.second;
+            DString &displayName = lang.second;
             FilePath filePath = FilePathUtil::JoinFilePath(languagePath, FilePath(fileName));
             LangManager langManager;
             if (langManager.LoadStringTable(filePath)) {
@@ -800,28 +795,27 @@ bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& la
                 }
                 std::list<DString> includeLangFileList;
                 ReadIncludeLanguageFiles(langManager, includeLangFileList);
-                for (DString& includeLangFileName : includeLangFileList) {
+                for (DString &includeLangFileName : includeLangFileList) {
                     includeLangFileSet.insert(includeLangFileName);
                 }
             }
         }
-    }
-    else if(m_zipManager.IsUseZip()){
+    } else if (m_zipManager.IsUseZip()) {
         //相对路径，语言文件应该都在压缩包内
         std::vector<DString> fileList;
         m_zipManager.GetZipFileList(languagePath, &fileList, nullptr);
-        for (auto const& file : fileList) {
-            languageList.push_back({ file, _T("") });
+        for (auto const &file : fileList) {
+            languageList.push_back({file, _T("")});
         }
         //排序: 对语言文件名排序(将主语言文件放在最前面)
         SortLanguageFileNameList(languageList);
-        for (auto& lang : languageList) {
-            const DString& fileName = lang.first;
+        for (auto &lang : languageList) {
+            const DString &fileName = lang.first;
             if (includeLangFileSet.find(fileName) != includeLangFileSet.end()) {
                 //不是主语言文件，不加载
                 continue;
             }
-            DString& displayName = lang.second;
+            DString &displayName = lang.second;
             FilePath filePath = FilePathUtil::JoinFilePath(languagePath, FilePath(fileName));
             std::vector<uint8_t> fileData;
             if (m_zipManager.GetZipData(filePath, fileData)) {
@@ -832,14 +826,13 @@ bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& la
                     }
                     std::list<DString> includeLangFileList;
                     ReadIncludeLanguageFiles(langManager, includeLangFileList);
-                    for (DString& includeLangFileName : includeLangFileList) {
+                    for (DString &includeLangFileName : includeLangFileList) {
                         includeLangFileSet.insert(includeLangFileName);
                     }
                 }
             }
         }
-    }
-    else {
+    } else {
         ASSERT(false);
         return false;
     }
@@ -848,8 +841,7 @@ bool GlobalManager::GetLanguageList(std::vector<std::pair<DString, DString>>& la
     while (iter != languageList.end()) {
         if (iter->second.empty()) {
             iter = languageList.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
@@ -874,8 +866,7 @@ DString GlobalManager::GetDefaultLanguageFileName() const
         langFilePrefixList.push_back(_T("zh_CN"));
         langFilePrefixList.push_back(_T("en_US"));
         defaultLangFileName = _T("zh_CN");
-    }
-    else {
+    } else {
         langFilePrefixList.push_back(_T("en_US"));
         langFilePrefixList.push_back(_T("zh_CN"));
     }
@@ -891,7 +882,7 @@ DString GlobalManager::GetDefaultLanguageFileName() const
         return defaultLangFileName;
     }
 
-    for (const DString& langFilePrefix : langFilePrefixList) {
+    for (const DString &langFilePrefix : langFilePrefixList) {
         const DString fileName = langFilePrefix + langFileExt;
         FilePath filePath = FilePathUtil::JoinFilePath(languagePath, FilePath(fileName));
         if (filePath.IsAbsolutePath()) {
@@ -899,8 +890,7 @@ DString GlobalManager::GetDefaultLanguageFileName() const
                 defaultLangFileName = fileName;
                 break;
             }
-        }
-        else if (m_zipManager.IsUseZip()) {
+        } else if (m_zipManager.IsUseZip()) {
             if (m_zipManager.IsZipResExist(filePath)) {
                 defaultLangFileName = fileName;
                 break;
@@ -914,15 +904,14 @@ DString GlobalManager::GetSystemLanguage() const
 {
     DString systemLang;
 #ifdef _WIN32
-    wchar_t locale_buf[LOCALE_NAME_MAX_LENGTH] = { 0 };
+    wchar_t locale_buf[LOCALE_NAME_MAX_LENGTH] = {0};
     BOOL success = ::GetUserDefaultLocaleName(locale_buf, LOCALE_NAME_MAX_LENGTH);
     if (success) {
         systemLang = StringConvert::WStringToT(locale_buf);
-    }
-    else {
+    } else {
         // API 调用失败，降级获取备用语言
         LCID lcid = GetUserDefaultLCID();
-        wchar_t lang_buf[64] = { 0 };
+        wchar_t lang_buf[64] = {0};
         if (GetLocaleInfoW(lcid, LOCALE_SNAME, lang_buf, 64)) {
             systemLang = StringConvert::WStringToT(locale_buf);
         }
@@ -930,7 +919,7 @@ DString GlobalManager::GetSystemLanguage() const
 
 #elif __APPLE__ || __linux__ || __FreeBSD__
     // Linux/macOS/FreeBSD：读取环境变量（优先级 LC_ALL > LC_MESSAGES > LANG）
-    const char* lang = getenv("LC_ALL");
+    const char *lang = getenv("LC_ALL");
     if (!lang || strlen(lang) == 0) {
         lang = getenv("LC_MESSAGES");
     }
@@ -954,30 +943,34 @@ DString GlobalManager::GetSystemLanguage() const
     return systemLang;
 }
 
-FilePath GlobalManager::GetExistsResFullPath(const FilePath& windowResPath, const FilePath& windowXmlPath, const FilePath& resPath)
+FilePath GlobalManager::GetExistsResFullPath(
+    const FilePath &windowResPath, const FilePath &windowXmlPath, const FilePath &resPath)
 {
     bool bLocalPath = false;
     bool bResPath = false;
     return GetExistsResFullPath(windowResPath, windowXmlPath, resPath, nullptr, bLocalPath, bResPath);
 }
 
-FilePath GlobalManager::GetExistsResFullPath(const FilePath& windowResPath,
-                                             const FilePath& windowXmlPath,
-                                             const FilePath& resPath,
-                                             const Control* pControl,
-                                             bool& bLocalPath,
-                                             bool& bResPath)
+FilePath GlobalManager::GetExistsResFullPath(
+    const FilePath &windowResPath,
+    const FilePath &windowXmlPath,
+    const FilePath &resPath,
+    const Control *pControl,
+    bool &bLocalPath,
+    bool &bResPath)
 {
-    FilePath imageFullPath = Theme().FindExistsResFullPath(windowResPath, windowXmlPath, resPath, bLocalPath, bResPath);
+    FilePath imageFullPath
+        = Theme().FindExistsResFullPath(windowResPath, windowXmlPath, resPath, bLocalPath, bResPath);
     if (imageFullPath.IsEmpty()) {
         //图片资源加载失败，通过回调函数给出修正一次的机会
         std::vector<ResNotFoundCallbackData> resNotFoundCallbacks = m_resNotFoundCallbacks;
-        for (const ResNotFoundCallbackData& callbackData : resNotFoundCallbacks) {
+        for (const ResNotFoundCallbackData &callbackData : resNotFoundCallbacks) {
             FilePath newWindowResPath = windowResPath;
             FilePath newWindowXmlPath = windowXmlPath;
             if (callbackData.m_callback(pControl, resPath, newWindowResPath, newWindowXmlPath)) {
                 if ((newWindowResPath != windowResPath) || (newWindowXmlPath != windowXmlPath)) {
-                    imageFullPath = Theme().FindExistsResFullPath(newWindowResPath, newWindowXmlPath, resPath, bLocalPath, bResPath);
+                    imageFullPath = Theme().FindExistsResFullPath(
+                        newWindowResPath, newWindowXmlPath, resPath, bLocalPath, bResPath);
                     if (!imageFullPath.IsEmpty()) {
                         //查找资源成功，终止尝试
                         break;
@@ -1006,8 +999,7 @@ void GlobalManager::RemoveResNotFoundCallback(size_t callbackId)
     while (iter != m_resNotFoundCallbacks.end()) {
         if (iter->m_callbackId == callbackId) {
             iter = m_resNotFoundCallbacks.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
@@ -1017,9 +1009,9 @@ void GlobalManager::RemoveAllImages()
 {
     AssertUIThread();
     std::vector<WindowPtr> windowList = Windows().GetAllWindowList();
-    for (const WindowPtr& pWindow : windowList) {
+    for (const WindowPtr &pWindow : windowList) {
         if (pWindow != nullptr) {
-            Box* pBox = pWindow->GetRoot();
+            Box *pBox = pWindow->GetRoot();
             if (pBox != nullptr) {
                 pBox->ClearImageCache();
             }
@@ -1028,7 +1020,7 @@ void GlobalManager::RemoveAllImages()
     m_imageManager.RemoveAllImages();
 }
 
-IRenderFactory* GlobalManager::GetRenderFactory()
+IRenderFactory *GlobalManager::GetRenderFactory()
 {
     return m_renderFactory.get();
 }
@@ -1057,7 +1049,7 @@ bool GlobalManager::IsRenderTypeAvailable(RenderType renderType) const
     return IsRenderTypeCompiled(renderType);
 }
 
-void GlobalManager::AddClass(const DString& strClassName, const DString& strControlAttrList)
+void GlobalManager::AddClass(const DString &strClassName, const DString &strControlAttrList)
 {
     AssertUIThread();
     ASSERT(!strClassName.empty() && !strControlAttrList.empty());
@@ -1076,7 +1068,7 @@ void GlobalManager::AddClass(const DString& strClassName, const DString& strCont
     }
 }
 
-DString GlobalManager::GetClassAttributes(const DString& strClassName) const
+DString GlobalManager::GetClassAttributes(const DString &strClassName) const
 {
     AssertUIThread();
     auto it = m_globalClass.find(strClassName);
@@ -1092,7 +1084,7 @@ void GlobalManager::RemoveAllClasss()
     m_globalClass.clear();
 }
 
-ColorManager& GlobalManager::Color()
+ColorManager &GlobalManager::Color()
 {
     if (m_pColorManager == nullptr) {
         m_pColorManager = std::make_unique<ColorManager>();
@@ -1100,76 +1092,77 @@ ColorManager& GlobalManager::Color()
     return *m_pColorManager.get();
 }
 
-FontManager& GlobalManager::Font()
+FontManager &GlobalManager::Font()
 {
     return m_fontManager;
 }
 
-ImageManager& GlobalManager::Image()
+ImageManager &GlobalManager::Image()
 {
     return m_imageManager;
 }
 
-ImageDecoderFactory& GlobalManager::ImageDecoders()
+ImageDecoderFactory &GlobalManager::ImageDecoders()
 {
     return m_imageDecoderFactory;
 }
 
-IconManager& GlobalManager::Icon()
+IconManager &GlobalManager::Icon()
 {
     return m_iconManager;
 }
 
-ZipManager& GlobalManager::Zip()
+ZipManager &GlobalManager::Zip()
 {
     return m_zipManager;
 }
 
-DpiManager& GlobalManager::Dpi()
+DpiManager &GlobalManager::Dpi()
 {
     return m_dpiManager;
 }
 
-TimerManager& GlobalManager::Timer()
+TimerManager &GlobalManager::Timer()
 {
     return m_timerManager;
 }
 
-ThreadManager& GlobalManager::Thread()
+ThreadManager &GlobalManager::Thread()
 {
     return m_threadManager;
 }
 
-LangManager& GlobalManager::Lang()
+LangManager &GlobalManager::Lang()
 {
     return m_langManager;
 }
 
-CursorManager& GlobalManager::Cursor()
+CursorManager &GlobalManager::Cursor()
 {
     return m_cursorManager;
 }
 
-WindowManager& GlobalManager::Windows()
+WindowManager &GlobalManager::Windows()
 {
     return m_windowManager;
 }
 
-ThemeManager& GlobalManager::Theme()
+ThemeManager &GlobalManager::Theme()
 {
     return m_themeManager;
 }
 
-Box* GlobalManager::CreateBox(Window* pWindow, const FilePath& strXmlPath, CreateControlCallback callback)
+Box *GlobalManager::CreateBox(
+    Window *pWindow, const FilePath &strXmlPath, CreateControlCallback callback)
 {
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return nullptr;
     }
-    Box* pBox = nullptr;
+    Box *pBox = nullptr;
     WindowBuilder builder;
     if (builder.ParseXmlFile(strXmlPath, pWindow->GetResourcePath())) {
-        Control* pControl = builder.CreateControls(pWindow, callback);
+        Control *pControl = builder.CreateControls(pWindow, callback);
         ASSERT(pControl != nullptr);
         if (pControl != nullptr) {
             pBox = builder.ToBox(pControl);
@@ -1183,18 +1176,19 @@ Box* GlobalManager::CreateBox(Window* pWindow, const FilePath& strXmlPath, Creat
     return pBox;
 }
 
-Box* GlobalManager::CreateBoxWithCache(Window* pWindow, const FilePath& strXmlPath, CreateControlCallback callback)
+Box *GlobalManager::CreateBoxWithCache(
+    Window *pWindow, const FilePath &strXmlPath, CreateControlCallback callback)
 {
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return nullptr;
     }
-    Box* pBox = nullptr;
+    Box *pBox = nullptr;
     auto it = m_builderMap.find(strXmlPath);
     if (it == m_builderMap.end()) {
-        WindowBuilder* builder = new WindowBuilder();
+        WindowBuilder *builder = new WindowBuilder();
         if (builder->ParseXmlFile(strXmlPath, pWindow->GetResourcePath())) {
-            Control* pControl = builder->CreateControls(pWindow, callback);
+            Control *pControl = builder->CreateControls(pWindow, callback);
             ASSERT(pControl != nullptr);
             if (pControl != nullptr) {
                 pBox = builder->ToBox(pControl);
@@ -1203,18 +1197,16 @@ Box* GlobalManager::CreateBoxWithCache(Window* pWindow, const FilePath& strXmlPa
                     delete pControl;
                     pControl = nullptr;
                 }
-            }            
-        }        
+            }
+        }
         if (pBox != nullptr) {
             m_builderMap[strXmlPath].reset(builder);
-        }
-        else {
+        } else {
             delete builder;
             builder = nullptr;
         }
-    }
-    else {
-        Control* pControl = it->second->CreateControls(pWindow, callback);
+    } else {
+        Control *pControl = it->second->CreateControls(pWindow, callback);
         ASSERT(pControl != nullptr);
         if (pControl != nullptr) {
             pBox = it->second->ToBox(pControl);
@@ -1229,43 +1221,47 @@ Box* GlobalManager::CreateBoxWithCache(Window* pWindow, const FilePath& strXmlPa
     return pBox;
 }
 
-bool GlobalManager::FillBox(Box* pUserDefinedBox, const FilePath& strXmlPath, CreateControlCallback callback)
+bool GlobalManager::FillBox(
+    Box *pUserDefinedBox, const FilePath &strXmlPath, CreateControlCallback callback)
 {
     bool bRet = false;
     ASSERT(pUserDefinedBox != nullptr);
     if (pUserDefinedBox != nullptr) {
-        Window* pWindow = pUserDefinedBox->GetWindow();
+        Window *pWindow = pUserDefinedBox->GetWindow();
         ASSERT(pWindow != nullptr);
         if (pWindow == nullptr) {
             return false;
         }
         WindowBuilder winBuilder;
         if (winBuilder.ParseXmlFile(strXmlPath, pWindow->GetResourcePath())) {
-            Control* pControl = winBuilder.CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
-            Box* box = winBuilder.ToBox(pControl);
+            Control *pControl
+                = winBuilder.CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
+            Box *box = winBuilder.ToBox(pControl);
             bRet = box != nullptr;
         }
     }
     return bRet;
 }
 
-bool GlobalManager::FillBoxWithCache(Box* pUserDefinedBox, const FilePath& strXmlPath, CreateControlCallback callback)
+bool GlobalManager::FillBoxWithCache(
+    Box *pUserDefinedBox, const FilePath &strXmlPath, CreateControlCallback callback)
 {
     ASSERT(pUserDefinedBox != nullptr);
     if (pUserDefinedBox == nullptr) {
         return false;
     }
-    Window* pWindow = pUserDefinedBox->GetWindow();
+    Window *pWindow = pUserDefinedBox->GetWindow();
     ASSERT(pWindow != nullptr); //DPI感知功能要求，必须先关联窗口
     if (pWindow == nullptr) {
         return false;
-    }    
-    Box* pBox = nullptr;
+    }
+    Box *pBox = nullptr;
     auto it = m_builderMap.find(strXmlPath);
     if (it == m_builderMap.end()) {
-        WindowBuilder* winBuilder = new WindowBuilder();
+        WindowBuilder *winBuilder = new WindowBuilder();
         if (winBuilder->ParseXmlFile(strXmlPath, pWindow->GetResourcePath())) {
-            Control* pControl = winBuilder->CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
+            Control *pControl
+                = winBuilder->CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
             ASSERT(pControl != nullptr);
             if (pControl != nullptr) {
                 pBox = winBuilder->ToBox(pControl);
@@ -1274,17 +1270,15 @@ bool GlobalManager::FillBoxWithCache(Box* pUserDefinedBox, const FilePath& strXm
                     pControl = nullptr;
                 }
             }
-        }        
+        }
         if (pBox != nullptr) {
             m_builderMap[strXmlPath].reset(winBuilder);
-        }
-        else {
+        } else {
             delete winBuilder;
             winBuilder = nullptr;
         }
-    }
-    else {
-        Control* pControl = it->second->CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
+    } else {
+        Control *pControl = it->second->CreateControls(pWindow, callback, nullptr, pUserDefinedBox);
         ASSERT(pControl != nullptr);
         if (pControl != nullptr) {
             pBox = it->second->ToBox(pControl);
@@ -1293,15 +1287,15 @@ bool GlobalManager::FillBoxWithCache(Box* pUserDefinedBox, const FilePath& strXm
                 delete pControl;
                 pControl = nullptr;
             }
-        }        
+        }
     }
     ASSERT(pUserDefinedBox == pBox);
     return (pBox != nullptr);
 }
 
-Control* GlobalManager::CreateControl(const DString& strControlName)
+Control *GlobalManager::CreateControl(const DString &strControlName)
 {
-    Control* pControl = nullptr;
+    Control *pControl = nullptr;
     for (CreateControlCallback pfnCreateControlCallback : m_pfnCreateControlCallbackList) {
         if (pfnCreateControlCallback != nullptr) {
             pControl = pfnCreateControlCallback(strControlName);
@@ -1313,43 +1307,44 @@ Control* GlobalManager::CreateControl(const DString& strControlName)
     return pControl;
 }
 
-void GlobalManager::AddCreateControlCallback(const CreateControlCallback& pfnCreateControlCallback)
+void GlobalManager::AddCreateControlCallback(const CreateControlCallback &pfnCreateControlCallback)
 {
     if (pfnCreateControlCallback != nullptr) {
         m_pfnCreateControlCallbackList.push_back(pfnCreateControlCallback);
     }
 }
 
-Box* GlobalManager::CreateBoxForXmlPreview(Window* pWindow, const FilePath& xmlFilePath, XmlPreviewAttributes& xmlPreviewAttributes)
+Box *GlobalManager::CreateBoxForXmlPreview(
+    Window *pWindow, const FilePath &xmlFilePath, XmlPreviewAttributes &xmlPreviewAttributes)
 {
     const std::vector<unsigned char> xmlFileData;
     return CreateBoxForXmlPreview(pWindow, xmlFileData, xmlPreviewAttributes, xmlFilePath);
 }
 
-Box* GlobalManager::CreateBoxForXmlPreview(Window* pWindow,
-                                           const std::vector<unsigned char>& xmlFileData,
-                                           XmlPreviewAttributes& xmlPreviewAttributes,
-                                           const FilePath& xmlFilePath)
+Box *GlobalManager::CreateBoxForXmlPreview(
+    Window *pWindow,
+    const std::vector<unsigned char> &xmlFileData,
+    XmlPreviewAttributes &xmlPreviewAttributes,
+    const FilePath &xmlFilePath)
 {
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return nullptr;
     }
     bool bParseXmlResult = false;
-    Box* pBox = nullptr;
+    Box *pBox = nullptr;
     WindowBuilder builder;
     if (!xmlFileData.empty()) {
         if (builder.ParseXmlData(xmlFileData, xmlFilePath)) {
             bParseXmlResult = true;
         }
-    }
-    else if (!xmlFilePath.IsEmpty()) {
+    } else if (!xmlFilePath.IsEmpty()) {
         if (builder.ParseXmlFile(xmlFilePath, pWindow->GetResourcePath())) {
             bParseXmlResult = true;
         }
     }
     if (bParseXmlResult) {
-        Control* pControl = builder.CreateControls(pWindow, nullptr);
+        Control *pControl = builder.CreateControls(pWindow, nullptr);
         ASSERT(pControl != nullptr);
         if (pControl != nullptr) {
             pBox = builder.ToBox(pControl);
@@ -1398,21 +1393,21 @@ bool GlobalManager::IsAnimationEnabled() const
     return m_bAnimationEnabled;
 }
 
-void GlobalManager::AddAlias(const DString& name, const DString& value)
+void GlobalManager::AddAlias(const DString &name, const DString &value)
 {
     if (!name.empty() && !value.empty()) {
         m_aliasMap[name] = value;
     }
 }
 
-void GlobalManager::RemoveAlias(const DString& name)
+void GlobalManager::RemoveAlias(const DString &name)
 {
     if (!m_aliasMap.empty() && !name.empty()) {
         m_aliasMap.erase(name);
     }
 }
 
-bool GlobalManager::HasAliasValue(const DString& name) const
+bool GlobalManager::HasAliasValue(const DString &name) const
 {
     if (!m_aliasMap.empty()) {
         auto iter = m_aliasMap.find(name);
@@ -1423,7 +1418,7 @@ bool GlobalManager::HasAliasValue(const DString& name) const
     return false;
 }
 
-DString GlobalManager::GetAliasValue(const DString& name) const
+DString GlobalManager::GetAliasValue(const DString &name) const
 {
     if (!m_aliasMap.empty()) {
         auto iter = m_aliasMap.find(name);
@@ -1439,21 +1434,21 @@ void GlobalManager::ClearAlias()
     m_aliasMap.clear();
 }
 
-void GlobalManager::AddVar(const DString& name, const DString& value)
+void GlobalManager::AddVar(const DString &name, const DString &value)
 {
     if (!name.empty() && !value.empty()) {
         m_defineMap[name] = value;
     }
 }
 
-void GlobalManager::RemoveVar(const DString& name)
+void GlobalManager::RemoveVar(const DString &name)
 {
     if (!m_defineMap.empty() && !name.empty()) {
         m_defineMap.erase(name);
     }
 }
 
-DString GlobalManager::GetVarValue(const DString& name) const
+DString GlobalManager::GetVarValue(const DString &name) const
 {
     if (!m_defineMap.empty()) {
         auto iter = m_defineMap.find(name);
@@ -1469,7 +1464,7 @@ void GlobalManager::ClearVars()
     m_defineMap.clear();
 }
 
-DString& GlobalManager::ExpandVarStrings(DString& varValue) const
+DString &GlobalManager::ExpandVarStrings(DString &varValue) const
 {
     if (m_defineMap.empty() || varValue.empty()) {
         return varValue;
@@ -1497,14 +1492,13 @@ DString& GlobalManager::ExpandVarStrings(DString& varValue) const
         auto it = m_defineMap.find(varName);
         if (it != m_defineMap.end()) {
             // 4. 执行替换（支持空值替换）
-            const DString& replaceValue = it->second;
+            const DString &replaceValue = it->second;
             varValue.replace(start, end - start + 1, replaceValue);
 
             // 5. 重置查找位置：替换后从当前start位置继续查找（处理新插入的占位符）
             currentPos = start;
             hasPlaceholder = true; // 标记有替换，继续循环
-        }
-        else {
+        } else {
             // 6. 未找到变量 → 跳过当前占位符，从end+1开始查找下一个
             currentPos = end + 1;
             hasPlaceholder = true; // 仍有占位符未处理，继续循环
@@ -1513,7 +1507,7 @@ DString& GlobalManager::ExpandVarStrings(DString& varValue) const
     return varValue;
 }
 
-DString GlobalManager::GetExpandVarStrings(const DString& varValue) const
+DString GlobalManager::GetExpandVarStrings(const DString &varValue) const
 {
     DString tempValue = varValue;
     ExpandVarStrings(tempValue);

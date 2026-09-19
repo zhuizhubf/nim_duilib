@@ -1,26 +1,26 @@
 #include "Menu.h"
 #include "MenuListBox.h"
 #include "duilib/Control/MenuBar.h"
+#include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Keyboard.h"
 #include "duilib/Core/WindowCreateParam.h"
-#include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/FilePathUtil.h"
 
 namespace ui {
 
 //TODO: 静态对象集中管理
-ContextMenuObserver& Menu::GetMenuObserver()
+ContextMenuObserver &Menu::GetMenuObserver()
 {
     static ContextMenuObserver s_context_menu_observer;
     return s_context_menu_observer;
 }
 
 //二级或者多级子菜单的托管类
-class SubMenu: public ui::ListBoxItem
+class SubMenu : public ui::ListBoxItem
 {
 public:
-    explicit SubMenu(Window* pWindow):
-        ListBoxItem(pWindow)
+    explicit SubMenu(Window *pWindow)
+        : ListBoxItem(pWindow)
     {
         //默认宽度和高度均设置为auto类型
         SetFixedHeight(UiFixedInt::MakeAuto(), false, false);
@@ -28,15 +28,13 @@ public:
     }
 };
 
-ui::Control* Menu::CreateControl(const DString& pstrClass)
+ui::Control *Menu::CreateControl(const DString &pstrClass)
 {
-    if (pstrClass == DUI_CTR_MENU_ITEM){
+    if (pstrClass == DUI_CTR_MENU_ITEM) {
         return new MenuItem(this);
-    }
-    else if (pstrClass == DUI_CTR_SUB_MENU) {
+    } else if (pstrClass == DUI_CTR_SUB_MENU) {
         return new SubMenu(this);
-    }
-    else if (pstrClass == DUI_CTR_MENU_LISTBOX) {
+    } else if (pstrClass == DUI_CTR_MENU_LISTBOX) {
         return new MenuListBox(this);
     }
     return nullptr;
@@ -44,23 +42,20 @@ ui::Control* Menu::CreateControl(const DString& pstrClass)
 
 bool Menu::Receive(ContextMenuParam param)
 {
-    switch (param.wParam)
-    {
+    switch (param.wParam) {
     case MenuCloseType::eMenuCloseAll:
         CloseMenu();
         break;
-        case MenuCloseType::eMenuCloseThis:
-        {
-            Window* pParentWindow = GetParentWindow();
-            while (pParentWindow != nullptr) {
-                if (pParentWindow == param.pWindow) {
-                    CloseMenu();
-                    break;
-                }
-                pParentWindow = pParentWindow->GetParentWindow();
+    case MenuCloseType::eMenuCloseThis: {
+        Window *pParentWindow = GetParentWindow();
+        while (pParentWindow != nullptr) {
+            if (pParentWindow == param.pWindow) {
+                CloseMenu();
+                break;
             }
+            pParentWindow = pParentWindow->GetParentWindow();
         }
-        break;
+    } break;
     default:
         break;
     }
@@ -68,33 +63,38 @@ bool Menu::Receive(ContextMenuParam param)
     return true;
 }
 
-Menu::Menu(Window* pParentWindow, Control* pRelatedControl, MenuBar* pMenuBar):
-    m_pParentWindow(pParentWindow),
-    m_pRelatedControl(pRelatedControl),
-    m_pMenuBar(pMenuBar),
-    m_menuPoint({ 0, 0 }),
-    m_popupPosType(MenuPopupPosType::RIGHT_TOP),
-    m_noFocus(false),
-    m_pOwner(nullptr),
-    m_pListBox(nullptr)
+Menu::Menu(Window *pParentWindow, Control *pRelatedControl, MenuBar *pMenuBar)
+    : m_pParentWindow(pParentWindow)
+    , m_pRelatedControl(pRelatedControl)
+    , m_pMenuBar(pMenuBar)
+    , m_menuPoint({0, 0})
+    , m_popupPosType(MenuPopupPosType::RIGHT_TOP)
+    , m_noFocus(false)
+    , m_pOwner(nullptr)
+    , m_pListBox(nullptr)
 {
     m_skinFolder = DString(DUILIB_PUBLIC_RES_DIR) + DString(_T("/menu/"));
     m_submenuXml = DString(_T("submenu.xml"));
     m_submenuNodeName = DString(_T("submenu"));
 }
 
-void Menu::SetSkinFolder(const DString& skinFolder)
+void Menu::SetSkinFolder(const DString &skinFolder)
 {
     m_skinFolder = skinFolder;
 }
 
-void Menu::SetSubMenuXml(const DString& submenuXml, const DString& submenuNodeName)
+void Menu::SetSubMenuXml(const DString &submenuXml, const DString &submenuNodeName)
 {
     m_submenuXml = submenuXml;
     m_submenuNodeName = submenuNodeName;
 }
 
-void Menu::ShowMenu(const DString& xml, const UiPoint& point, MenuPopupPosType popupPosType, bool noFocus, MenuItem* pOwner)
+void Menu::ShowMenu(
+    const DString &xml,
+    const UiPoint &point,
+    MenuPopupPosType popupPosType,
+    bool noFocus,
+    MenuItem *pOwner)
 {
     m_menuPoint = point;
     m_popupPosType = popupPosType;
@@ -122,31 +122,29 @@ void Menu::ShowMenu(const DString& xml, const UiPoint& point, MenuPopupPosType p
         rcShadowCorner.top = 0;
         SetShadowCorner(rcShadowCorner);
     }
-    
+
     bool bShown = false;
     if (m_pOwner) {
         bShown = ResizeSubMenu();
-    }
-    else {
+    } else {
         bShown = ResizeMenu();
     }
     if (!bShown) {
         if (noFocus) {
             ShowWindow(kSW_SHOW_NA);
-        }
-        else {
+        } else {
             ShowWindow(kSW_SHOW_NORMAL);
         }
     }
     KeepParentActive();
     //修正菜单项的宽度，保持一致
     UpdateWindow();
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     if (pLayoutListBox != nullptr) {
-        std::vector<MenuItem*> allMenuItems;
+        std::vector<MenuItem *> allMenuItems;
         const size_t nItemCount = pLayoutListBox->GetItemCount();
         for (size_t i = 0; i < nItemCount; ++i) {
-            MenuItem* pMenuItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(i));
+            MenuItem *pMenuItem = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(i));
             if (pMenuItem != nullptr) {
                 allMenuItems.push_back(pMenuItem);
             }
@@ -158,8 +156,7 @@ void Menu::ShowMenu(const DString& xml, const UiPoint& point, MenuPopupPosType p
             }
             if (pMenuItem->GetFixedWidth().IsInt32()) {
                 nMaxWidth = std::max(nMaxWidth, pMenuItem->GetFixedWidth().GetInt32());
-            }
-            else if (pMenuItem->GetFixedWidth().IsAuto()) {
+            } else if (pMenuItem->GetFixedWidth().IsAuto()) {
                 nMaxWidth = std::max(nMaxWidth, pMenuItem->GetWidth());
             }
         }
@@ -172,7 +169,7 @@ void Menu::ShowMenu(const DString& xml, const UiPoint& point, MenuPopupPosType p
                     pMenuItem->SetFixedWidth(UiFixedInt(nMaxWidth), true, false);
                 }
             }
-        }        
+        }
     }
 }
 
@@ -185,13 +182,13 @@ void Menu::CloseMenu()
 void Menu::DetachOwner()
 {
     if (m_pOwner != nullptr) {
-        ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+        ListBox *pLayoutListBox = Menu::GetLayoutListBox();
         if (pLayoutListBox != nullptr) {
             pLayoutListBox->SelectItem(Box::InvalidIndex, false, false);
         }
 
         //将在OnInitWindow中，添加到Layout上的节点，解除关联关系
-        std::vector<Control*> submenuControls;
+        std::vector<Control *> submenuControls;
         MenuItem::GetAllSubMenuControls(m_pOwner, submenuControls);
         for (auto pItem : submenuControls) {
             if (pItem != nullptr) {
@@ -214,21 +211,21 @@ DString Menu::GetSkinFolder()
     return m_skinFolder.c_str();
 }
 
-DString Menu::GetSkinFile() 
+DString Menu::GetSkinFile()
 {
     return m_xml.c_str();
 }
 
-LRESULT Menu::OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT Menu::OnKillFocusMsg(WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     LRESULT lResult = BaseClass::OnKillFocusMsg(pSetFocusWindow, nativeMsg, bHandled);
     bHandled = true;
     bool bInMenuWindowList = false;
     if (pSetFocusWindow != nullptr) {
         ContextMenuObserver::Iterator<bool, ContextMenuParam> iterator(GetMenuObserver());
-        ReceiverImplBase<bool, ContextMenuParam>* pReceiver = iterator.next();
+        ReceiverImplBase<bool, ContextMenuParam> *pReceiver = iterator.next();
         while (pReceiver != nullptr) {
-            Menu* pContextMenu = dynamic_cast<Menu*>(pReceiver);
+            Menu *pContextMenu = dynamic_cast<Menu *>(pReceiver);
             if ((pContextMenu != nullptr) && (pContextMenu == pSetFocusWindow)) {
                 bInMenuWindowList = true;
                 break;
@@ -246,31 +243,29 @@ LRESULT Menu::OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativ
     return lResult;
 }
 
-LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT Menu::OnKeyDownMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     if (vkCode == kVK_ESCAPE) {
         bHandled = true;
         CloseMenu();
-    }
-    else if (vkCode == kVK_LEFT) {
+    } else if (vkCode == kVK_LEFT) {
         if (m_pOwner != nullptr) {
             //关闭子菜单
             bHandled = true;
             CloseMenu();
-        }
-        else {
+        } else {
             //拦截该事件，并通知MenuBar
             bHandled = true;
             if (m_pMenuBar != nullptr) {
                 m_pMenuBar->OnMenuKeyDownMsg(this, vkCode, modifierKey);
             }
         }
-    }
-    else if (vkCode == kVK_RIGHT) {        
-        ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    } else if (vkCode == kVK_RIGHT) {
+        ListBox *pLayoutListBox = Menu::GetLayoutListBox();
         if (pLayoutListBox != nullptr) {
             size_t index = pLayoutListBox->GetCurSel();
-            MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(index));
+            MenuItem *pItem = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(index));
             if (pItem != nullptr) {
                 if (pItem->CheckSubMenuItem()) {
                     //展开了子菜单
@@ -285,13 +280,12 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                 m_pMenuBar->OnMenuKeyDownMsg(this, vkCode, modifierKey);
             }
         }
-    }
-    else if (vkCode == kVK_RETURN || vkCode == kVK_SPACE) {
+    } else if (vkCode == kVK_RETURN || vkCode == kVK_SPACE) {
         bHandled = true;
-        ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+        ListBox *pLayoutListBox = Menu::GetLayoutListBox();
         if (pLayoutListBox != nullptr) {
             size_t index = pLayoutListBox->GetCurSel();
-            MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(index));
+            MenuItem *pItem = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(index));
             if (pItem != nullptr) {
                 if (!pItem->CheckSubMenuItem()) {
                     ContextMenuParam param;
@@ -303,18 +297,17 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                 }
             }
         }
-    }
-    else if (vkCode == kVK_DOWN || vkCode == kVK_UP) {
+    } else if (vkCode == kVK_DOWN || vkCode == kVK_UP) {
         bHandled = true;
         //支持键盘上下键切换当前菜单项
-        ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+        ListBox *pLayoutListBox = Menu::GetLayoutListBox();
         if ((pLayoutListBox != nullptr) && (pLayoutListBox->GetItemCount() > 0)) {
             //默认选中当前处于hot状态的菜单项，以支持键盘操作
             size_t nCurSel = pLayoutListBox->GetCurSel();
             if (!Box::IsValidItemIndex(nCurSel)) {
                 bool bFoundItem = false;
                 for (size_t nIndex = 0; nIndex < pLayoutListBox->GetItemCount(); ++nIndex) {
-                    MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(nIndex));
+                    MenuItem *pItem = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(nIndex));
                     if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
                         if (pItem->GetState() == ControlStateType::kControlStateHovered) {
                             pLayoutListBox->SelectItem(nIndex, false, false);
@@ -328,18 +321,19 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                     if (vkCode == kVK_DOWN) {
                         //选中第一个
                         for (size_t nIndex = 0; nIndex < pLayoutListBox->GetItemCount(); ++nIndex) {
-                            MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(nIndex));
+                            MenuItem *pItem = dynamic_cast<MenuItem *>(
+                                pLayoutListBox->GetItemAt(nIndex));
                             if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
                                 pLayoutListBox->SelectItem(nIndex, false, false);
                                 break;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         //选中最后一个
-                        int32_t nIndex = (int32_t)pLayoutListBox->GetItemCount() - 1;
+                        int32_t nIndex = (int32_t) pLayoutListBox->GetItemCount() - 1;
                         for (; nIndex >= 0; --nIndex) {
-                            MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(nIndex));
+                            MenuItem *pItem = dynamic_cast<MenuItem *>(
+                                pLayoutListBox->GetItemAt(nIndex));
                             if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
                                 pLayoutListBox->SelectItem(nIndex, false, false);
                                 break;
@@ -347,14 +341,13 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 //控制选中下一个菜单项
                 size_t nStartItemIndex = 0;
                 std::vector<size_t> validMenuItemIndexList;
                 for (size_t nIndex = 0; nIndex < pLayoutListBox->GetItemCount(); ++nIndex) {
-                    MenuItem* pItem = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(nIndex));
-                    if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {                        
+                    MenuItem *pItem = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(nIndex));
+                    if ((pItem != nullptr) && pItem->IsVisible() && pItem->IsEnabled()) {
                         if (nCurSel == nIndex) {
                             nStartItemIndex = validMenuItemIndexList.size();
                         }
@@ -368,10 +361,10 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                         nNextMenuItemIndex = 0;
                     }
                     if (nNextMenuItemIndex < validMenuItemIndexList.size()) {
-                        pLayoutListBox->SelectItem(validMenuItemIndexList[nNextMenuItemIndex], false, false);
+                        pLayoutListBox
+                            ->SelectItem(validMenuItemIndexList[nNextMenuItemIndex], false, false);
                     }
-                }
-                else {
+                } else {
                     size_t nNextMenuItemIndex = nStartItemIndex - 1;
                     if (nStartItemIndex == 0) {
                         nNextMenuItemIndex = validMenuItemIndexList.size() - 1;
@@ -380,7 +373,8 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
                         nNextMenuItemIndex = 0;
                     }
                     if (nNextMenuItemIndex < validMenuItemIndexList.size()) {
-                        pLayoutListBox->SelectItem(validMenuItemIndexList[nNextMenuItemIndex], false, false);
+                        pLayoutListBox
+                            ->SelectItem(validMenuItemIndexList[nNextMenuItemIndex], false, false);
                     }
                 }
             }
@@ -389,31 +383,43 @@ LRESULT Menu::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const Na
     if (bHandled) {
         //已经处理
         return 0;
-    }
-    else {
+    } else {
         return BaseClass::OnKeyDownMsg(vkCode, modifierKey, nativeMsg, bHandled);
     }
 }
 
-LRESULT Menu::OnContextMenuMsg(const UiPoint& /*pt*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT Menu::OnContextMenuMsg(
+    const UiPoint & /*pt*/, const NativeMsg & /*nativeMsg*/, bool &bHandled)
 {
     bHandled = true;
     return 0;
 }
 
-LRESULT Menu::OnMouseRButtonDownMsg(const UiPoint& /*pt*/, uint32_t /*modifierKey*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT Menu::OnMouseRButtonDownMsg(
+    const UiPoint & /*pt*/,
+    uint32_t /*modifierKey*/,
+    const NativeMsg & /*nativeMsg*/,
+    bool &bHandled)
 {
     bHandled = true;
     return 0;
 }
 
-LRESULT Menu::OnMouseRButtonUpMsg(const UiPoint& /*pt*/, uint32_t /*modifierKey*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT Menu::OnMouseRButtonUpMsg(
+    const UiPoint & /*pt*/,
+    uint32_t /*modifierKey*/,
+    const NativeMsg & /*nativeMsg*/,
+    bool &bHandled)
 {
     bHandled = true;
     return 0;
 }
 
-LRESULT Menu::OnMouseRButtonDbClickMsg(const UiPoint& /*pt*/, uint32_t /*modifierKey*/, const NativeMsg& /*nativeMsg*/, bool& bHandled)
+LRESULT Menu::OnMouseRButtonDbClickMsg(
+    const UiPoint & /*pt*/,
+    uint32_t /*modifierKey*/,
+    const NativeMsg & /*nativeMsg*/,
+    bool &bHandled)
 {
     bHandled = true;
     return 0;
@@ -421,7 +427,7 @@ LRESULT Menu::OnMouseRButtonDbClickMsg(const UiPoint& /*pt*/, uint32_t /*modifie
 
 bool Menu::ResizeMenu()
 {
-    ui::Control* pRoot = GetRoot();
+    ui::Control *pRoot = GetRoot();
     ASSERT(pRoot != nullptr);
     if (pRoot == nullptr) {
         return false;
@@ -432,8 +438,8 @@ bool Menu::ResizeMenu()
     Dpi().WindowSizeToClientSize(rcWork);
     Dpi().WindowSizeToClientSize(m_menuPoint);
 
-    ui::UiSize szMenuWindow = { rcWork.Width(), rcWork.Height()};
-    UiEstSize estSize = pRoot->EstimateSize(szMenuWindow);   //这里返回的大小包含了阴影的大小
+    ui::UiSize szMenuWindow = {rcWork.Width(), rcWork.Height()};
+    UiEstSize estSize = pRoot->EstimateSize(szMenuWindow); //这里返回的大小包含了阴影的大小
     if (estSize.cx.IsInt32()) {
         szMenuWindow.cx = estSize.cx.GetInt32();
     }
@@ -444,34 +450,32 @@ bool Menu::ResizeMenu()
     UiPadding rcShadowCorner = pRoot->GetPadding(); //窗口阴影所占区域
     ui::UiSize szMenuClient = szMenuWindow;
     szMenuClient.cx -= rcShadowCorner.left + rcShadowCorner.right;
-    szMenuClient.cy -= rcShadowCorner.top + rcShadowCorner.bottom; //这里去掉阴影窗口，即用户的视觉有效面积
+    szMenuClient.cy -= rcShadowCorner.top
+                       + rcShadowCorner.bottom; //这里去掉阴影窗口，即用户的视觉有效面积
 
-    ui::UiPoint point(m_menuPoint);  //这里有个bug，由于坐标点与包含在窗口内，会直接出发mouseenter导致出来子菜单，偏移1个像素
+    ui::UiPoint point(
+        m_menuPoint); //这里有个bug，由于坐标点与包含在窗口内，会直接出发mouseenter导致出来子菜单，偏移1个像素
     if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Right)) {
         point.x += -szMenuWindow.cx + rcShadowCorner.right + rcShadowCorner.left;
         point.x -= 1;
-    }
-    else if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Left)) {
+    } else if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Left)) {
         point.x += 1;
     }
-    if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Bottom))    {
+    if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Bottom)) {
         point.y += -szMenuWindow.cy + rcShadowCorner.bottom + rcShadowCorner.top;
         point.y += 1;
-    }
-    else if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Top)) {
+    } else if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Top)) {
         point.y += 1;
     }
     if (static_cast<int>(m_popupPosType) & static_cast<int>(eMenuAlignment_Intelligent)) {
         if (point.x < rcWork.left) {
             point.x = rcWork.left;
-        }
-        else if (point.x + szMenuClient.cx> rcWork.right) {
+        } else if (point.x + szMenuClient.cx > rcWork.right) {
             point.x = rcWork.right - szMenuClient.cx;
         }
         if (point.y < rcWork.top) {
-            point.y = rcWork.top ;
-        }
-        else if (point.y + szMenuClient.cy > rcWork.bottom) {
+            point.y = rcWork.top;
+        } else if (point.y + szMenuClient.cy > rcWork.bottom) {
             point.y = rcWork.bottom - szMenuClient.cy;
         }
     }
@@ -482,14 +486,17 @@ bool Menu::ResizeMenu()
     Dpi().ClientSizeToWindowSize(y);
     Dpi().ClientSizeToWindowSize(szMenuWindow);
     Dpi().ClientSizeToWindowSize(m_menuPoint);
-    SetWindowPos(InsertAfterWnd(InsertAfterFlag::kHWND_TOPMOST),
-                 x, y,
-                 szMenuWindow.cx, szMenuWindow.cy,
-                 kSWP_SHOWWINDOW | (m_noFocus ? kSWP_NOACTIVATE : 0));
+    SetWindowPos(
+        InsertAfterWnd(InsertAfterFlag::kHWND_TOPMOST),
+        x,
+        y,
+        szMenuWindow.cx,
+        szMenuWindow.cy,
+        kSWP_SHOWWINDOW | (m_noFocus ? kSWP_NOACTIVATE : 0));
 
     if (!m_noFocus) {
         SetWindowForeground();
-        ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+        ListBox *pLayoutListBox = Menu::GetLayoutListBox();
         SetFocusControl(pLayoutListBox);
     }
     return true;
@@ -506,7 +513,7 @@ bool Menu::ResizeSubMenu()
     // Position the popup window in absolute space
     UiRect rcOwner = m_pOwner->GetPos();
     UiRect rc = rcOwner;
-   
+
     UiPadding rcCorner = GetCurrentShadowCorner();
     UiRect rcWindow;
     m_pOwner->GetWindow()->GetWindowRect(rcWindow);
@@ -520,7 +527,7 @@ bool Menu::ResizeSubMenu()
     rcClient.Inflate(rcCorner);
     if (rcClient.Width() < (rcCorner.left + rcCorner.right)) {
         //窗口大小还没有生效，需要估算
-        Box* pRoot = GetRoot();
+        Box *pRoot = GetRoot();
         if (pRoot != nullptr) {
             UiSize maxSize(999999, 999999);
             UiEstSize estSize = pRoot->EstimateSize(maxSize);
@@ -549,7 +556,7 @@ bool Menu::ResizeSubMenu()
 
     m_pOwner->GetWindow()->ClientToScreen(rc);
     Dpi().WindowSizeToClientSize(rc);
-   
+
     rc.left = rcWindow.right;
     rc.right = rc.left + cxFixed;
     rc.bottom = rc.top + cyFixed;
@@ -559,11 +566,11 @@ bool Menu::ResizeSubMenu()
 
     UiRect rcPreWindow;
     ContextMenuObserver::Iterator<bool, ContextMenuParam> iterator(GetMenuObserver());
-    ReceiverImplBase<bool, ContextMenuParam>* pReceiver = iterator.next();
+    ReceiverImplBase<bool, ContextMenuParam> *pReceiver = iterator.next();
     while (pReceiver != nullptr) {
-        Menu* pContextMenu = dynamic_cast<Menu*>(pReceiver);
+        Menu *pContextMenu = dynamic_cast<Menu *>(pReceiver);
         if (pContextMenu != nullptr) {
-            pContextMenu->GetWindowRect(rcPreWindow);  //需要减掉阴影
+            pContextMenu->GetWindowRect(rcPreWindow); //需要减掉阴影
             Dpi().WindowSizeToClientSize(rcPreWindow);
 
             bReachRight = (rcPreWindow.left + rcCorner.left) >= rcWindow.right;
@@ -621,10 +628,13 @@ bool Menu::ResizeSubMenu()
     Dpi().ClientSizeToWindowSize(y);
     Dpi().ClientSizeToWindowSize(nNewWidth);
     Dpi().ClientSizeToWindowSize(nNewHeight);
-    SetWindowPos(InsertAfterWnd(InsertAfterFlag::kHWND_TOPMOST),
-                 x, y,
-                 nNewWidth, nNewHeight,
-                 kSWP_SHOWWINDOW | kSWP_NOSIZE | (m_noFocus ? kSWP_NOACTIVATE : 0));
+    SetWindowPos(
+        InsertAfterWnd(InsertAfterFlag::kHWND_TOPMOST),
+        x,
+        y,
+        nNewWidth,
+        nNewHeight,
+        kSWP_SHOWWINDOW | kSWP_NOSIZE | (m_noFocus ? kSWP_NOACTIVATE : 0));
 
     if (!m_noFocus) {
         SetWindowForeground();
@@ -637,7 +647,7 @@ void Menu::PostInitWindow()
 {
     ASSERT(m_pListBox == nullptr);
     if (m_pOwner != nullptr) {
-        m_pListBox = dynamic_cast<ui::ListBox*>(FindControl(m_submenuNodeName.c_str()));
+        m_pListBox = dynamic_cast<ui::ListBox *>(FindControl(m_submenuNodeName.c_str()));
         ASSERT(m_pListBox != nullptr);
         if (m_pListBox == nullptr) {
             return;
@@ -646,7 +656,7 @@ void Menu::PostInitWindow()
         m_pListBox->SetAutoDestroyChild(false);
 
         //获取子菜单项需要绘制的控件，并添加到Layout
-        std::vector<Control*> submenuControls;
+        std::vector<Control *> submenuControls;
         MenuItem::GetAllSubMenuControls(m_pOwner, submenuControls);
         for (auto pControl : submenuControls) {
             if (pControl != nullptr) {
@@ -654,13 +664,12 @@ void Menu::PostInitWindow()
                 continue;
             }
         }
-    }
-    else {
-        m_pListBox = dynamic_cast<ui::ListBox*>(GetRoot());
+    } else {
+        m_pListBox = dynamic_cast<ui::ListBox *>(GetRoot());
         if (m_pListBox == nullptr) {
             //允许外面套层阴影
             if ((GetRoot() != nullptr) && (GetRoot()->GetItemCount() > 0)) {
-                m_pListBox = dynamic_cast<ui::ListBox*>(GetRoot()->GetItemAt(0));
+                m_pListBox = dynamic_cast<ui::ListBox *>(GetRoot()->GetItemAt(0));
             }
         }
         ASSERT(m_pListBox != nullptr);
@@ -675,27 +684,26 @@ void Menu::PostInitWindow()
     BaseClass::PostInitWindow();
 }
 
-Control* Menu::GetRelatedControl() const
+Control *Menu::GetRelatedControl() const
 {
     return m_pRelatedControl.get();
 }
 
-ListBox* Menu::GetLayoutListBox() const
+ListBox *Menu::GetLayoutListBox() const
 {
     return m_pListBox.get();
 }
 
-void Menu::OnMenuItemActivated(const DString& menuName, int32_t nMenuLevel,
-                               const DString& itemName, size_t nItemIndex)
+void Menu::OnMenuItemActivated(
+    const DString &menuName, int32_t nMenuLevel, const DString &itemName, size_t nItemIndex)
 {
-    Menu* pParentMenu = nullptr;
+    Menu *pParentMenu = nullptr;
     if (GetParentWindow() != nullptr) {
-        pParentMenu = dynamic_cast<Menu*>(GetParentWindow());
+        pParentMenu = dynamic_cast<Menu *>(GetParentWindow());
     }
     if (pParentMenu != nullptr) {
         pParentMenu->OnMenuItemActivated(menuName, nMenuLevel + 1, itemName, nItemIndex);
-    }
-    else {
+    } else {
         //已经是顶级菜单
         m_pActiveMenuItem = std::make_unique<ActiveMenuItem>();
         m_pActiveMenuItem->m_itemIndex = nItemIndex;
@@ -725,8 +733,11 @@ void Menu::OnFinalMessage()
         std::vector<MenuItemActivatedEvent> callbackList(m_callbackList);
         for (MenuItemActivatedEvent callback : callbackList) {
             if (callback) {
-                callback(activeData.m_menuName, activeData.m_menuLevel,
-                         activeData.m_itemName, activeData.m_itemIndex);
+                callback(
+                    activeData.m_menuName,
+                    activeData.m_menuLevel,
+                    activeData.m_itemName,
+                    activeData.m_itemIndex);
             }
         }
     }
@@ -747,9 +758,8 @@ void Menu::OnCloseWindow()
         if (m_pRelatedControl->GetRect().ContainsPt(pt)) {
             if (m_pRelatedControl->GetState() != ui::kControlStateHovered) {
                 m_pRelatedControl->SetState(ui::kControlStateHovered);
-            }            
-        }
-        else {
+            }
+        } else {
             if (m_pRelatedControl->GetState() != ui::kControlStateNormal) {
                 m_pRelatedControl->SetState(ui::kControlStateNormal);
             }
@@ -758,11 +768,11 @@ void Menu::OnCloseWindow()
     BaseClass::OnCloseWindow();
 }
 
-bool Menu::AddMenuItem(MenuItem* pMenuItem)
+bool Menu::AddMenuItem(MenuItem *pMenuItem)
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     ASSERT(pLayoutListBox != nullptr);
     if (pLayoutListBox != nullptr) {
         return pLayoutListBox->AddItem(pMenuItem);
@@ -770,22 +780,22 @@ bool Menu::AddMenuItem(MenuItem* pMenuItem)
     return false;
 }
 
-bool Menu::AddMenuItemAt(MenuItem* pMenuItem, size_t iIndex)
+bool Menu::AddMenuItemAt(MenuItem *pMenuItem, size_t iIndex)
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     ASSERT(pLayoutListBox != nullptr);
     if (pLayoutListBox == nullptr) {
         return false;
     }
-    
+
     size_t itemIndex = 0;
-    MenuItem* pElementUI = nullptr;
+    MenuItem *pElementUI = nullptr;
     const size_t count = pLayoutListBox->GetItemCount();
     for (size_t i = 0; i < count; ++i) {
-        Control* pControl = pLayoutListBox->GetItemAt(i);
-        pElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = pLayoutListBox->GetItemAt(i);
+        pElementUI = dynamic_cast<MenuItem *>(pControl);
         if (pElementUI != nullptr) {
             if (itemIndex == iIndex) {
                 return pLayoutListBox->AddItemAt(pMenuItem, i);
@@ -797,17 +807,17 @@ bool Menu::AddMenuItemAt(MenuItem* pMenuItem, size_t iIndex)
     return false;
 }
 
-bool Menu::RemoveMenuItem(MenuItem* pMenuItem)
+bool Menu::RemoveMenuItem(MenuItem *pMenuItem)
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     ASSERT(pLayoutListBox != nullptr);
-    MenuItem* pElementUI = nullptr;
+    MenuItem *pElementUI = nullptr;
     if (pLayoutListBox != nullptr) {
         const size_t count = pLayoutListBox->GetItemCount();
         for (size_t i = 0; i < count; ++i) {
-            pElementUI = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(i));
+            pElementUI = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(i));
             if (pMenuItem == pElementUI) {
                 pLayoutListBox->RemoveItemAt(i);
             }
@@ -821,7 +831,7 @@ bool Menu::RemoveMenuItemAt(size_t iIndex)
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    MenuItem* pMenuElementUI = GetMenuItemAt(iIndex);
+    MenuItem *pMenuElementUI = GetMenuItemAt(iIndex);
     if (pMenuElementUI != nullptr) {
         return RemoveMenuItem(pMenuElementUI);
     }
@@ -832,35 +842,35 @@ size_t Menu::GetMenuItemCount() const
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     if (pLayoutListBox == nullptr) {
         return 0;
     }
     size_t itemCount = 0;
     const size_t count = pLayoutListBox->GetItemCount();
     for (size_t i = 0; i < count; ++i) {
-        if (dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(i)) != nullptr) {
+        if (dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(i)) != nullptr) {
             ++itemCount;
         }
     }
     return itemCount;
 }
 
-MenuItem* Menu::GetMenuItemAt(size_t iIndex) const
+MenuItem *Menu::GetMenuItemAt(size_t iIndex) const
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     ASSERT(pLayoutListBox != nullptr);
     if (pLayoutListBox == nullptr) {
         return nullptr;
     }
     size_t itemIndex = 0;
-    MenuItem* pElementUI = nullptr;
+    MenuItem *pElementUI = nullptr;
     const size_t count = pLayoutListBox->GetItemCount();
     for (size_t i = 0; i < count; ++i) {
-        Control* pControl = pLayoutListBox->GetItemAt(i);
-        pElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = pLayoutListBox->GetItemAt(i);
+        pElementUI = dynamic_cast<MenuItem *>(pControl);
         if (pElementUI != nullptr) {
             if (itemIndex == iIndex) {
                 break;
@@ -872,17 +882,17 @@ MenuItem* Menu::GetMenuItemAt(size_t iIndex) const
     return pElementUI;
 }
 
-MenuItem* Menu::GetMenuItemByName(const DString& name) const
+MenuItem *Menu::GetMenuItemByName(const DString &name) const
 {
     //目前只有一级菜单可以访问这个接口
     ASSERT(m_pOwner == nullptr);
-    ListBox* pLayoutListBox = Menu::GetLayoutListBox();
+    ListBox *pLayoutListBox = Menu::GetLayoutListBox();
     ASSERT(pLayoutListBox != nullptr);
-    MenuItem* pElementUI = nullptr;
+    MenuItem *pElementUI = nullptr;
     if (pLayoutListBox != nullptr) {
         const size_t count = pLayoutListBox->GetItemCount();
         for (size_t i = 0; i < count; ++i) {
-            pElementUI = dynamic_cast<MenuItem*>(pLayoutListBox->GetItemAt(i));
+            pElementUI = dynamic_cast<MenuItem *>(pLayoutListBox->GetItemAt(i));
             if ((pElementUI != nullptr) && (pElementUI->IsNameEquals(name))) {
                 break;
             }
@@ -892,16 +902,16 @@ MenuItem* Menu::GetMenuItemByName(const DString& name) const
     return pElementUI;
 }
 
-MenuItem::MenuItem(Window* pWindow):
-    ListBoxItem(pWindow),
-    m_pSubWindow(nullptr)
+MenuItem::MenuItem(Window *pWindow)
+    : ListBoxItem(pWindow)
+    , m_pSubWindow(nullptr)
 {
     //在菜单元素上，不让子控件响应鼠标消息
     SetMouseChildEnabled(false);
 }
 
-void MenuItem::GetAllSubMenuItem(const MenuItem* pParentElementUI,
-                                       std::vector<MenuItem*>& submenuItems)
+void MenuItem::GetAllSubMenuItem(
+    const MenuItem *pParentElementUI, std::vector<MenuItem *> &submenuItems)
 {
     submenuItems.clear();
     ASSERT(pParentElementUI != nullptr);
@@ -910,19 +920,19 @@ void MenuItem::GetAllSubMenuItem(const MenuItem* pParentElementUI,
     }
     const size_t itemCount = pParentElementUI->GetItemCount();
     for (size_t i = 0; i < itemCount; ++i) {
-        Control* pControl = pParentElementUI->GetItemAt(i);
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = pParentElementUI->GetItemAt(i);
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
         if (menuElementUI != nullptr) {
             submenuItems.push_back(menuElementUI);
             continue;
         }
 
         menuElementUI = nullptr;
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             const size_t count = subMenu->GetItemCount();
             for (size_t j = 0; j < count; ++j) {
-                menuElementUI = dynamic_cast<MenuItem*>(subMenu->GetItemAt(j));
+                menuElementUI = dynamic_cast<MenuItem *>(subMenu->GetItemAt(j));
                 if (menuElementUI != nullptr) {
                     submenuItems.push_back(menuElementUI);
                     continue;
@@ -932,8 +942,8 @@ void MenuItem::GetAllSubMenuItem(const MenuItem* pParentElementUI,
     }
 }
 
-void MenuItem::GetAllSubMenuControls(const MenuItem* pParentElementUI,
-                                           std::vector<Control*>& submenuControls)
+void MenuItem::GetAllSubMenuControls(
+    const MenuItem *pParentElementUI, std::vector<Control *> &submenuControls)
 {
     submenuControls.clear();
     ASSERT(pParentElementUI != nullptr);
@@ -942,18 +952,18 @@ void MenuItem::GetAllSubMenuControls(const MenuItem* pParentElementUI,
     }
     const size_t itemCount = pParentElementUI->GetItemCount();
     for (size_t i = 0; i < itemCount; ++i) {
-        Control* pControl = pParentElementUI->GetItemAt(i);
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = pParentElementUI->GetItemAt(i);
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
         if (menuElementUI != nullptr) {
             submenuControls.push_back(menuElementUI);
             continue;
         }
 
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             const size_t count = subMenu->GetItemCount();
             for (size_t j = 0; j < count; ++j) {
-                Control* pSubControl = subMenu->GetItemAt(j);
+                Control *pSubControl = subMenu->GetItemAt(j);
                 if (pSubControl != nullptr) {
                     submenuControls.push_back(pSubControl);
                 }
@@ -962,24 +972,24 @@ void MenuItem::GetAllSubMenuControls(const MenuItem* pParentElementUI,
     }
 }
 
-bool MenuItem::AddSubMenuItem(MenuItem* pMenuItem)
+bool MenuItem::AddSubMenuItem(MenuItem *pMenuItem)
 {
     return AddItem(pMenuItem);
 }
 
-bool MenuItem::AddSubMenuItemAt(MenuItem* pMenuItem, size_t iIndex)
+bool MenuItem::AddSubMenuItemAt(MenuItem *pMenuItem, size_t iIndex)
 {
     const size_t subMenuCount = GetSubMenuItemCount();
     ASSERT(iIndex <= subMenuCount);
     if (iIndex > subMenuCount) {
         return false;
     }
-    
+
     size_t itemIndex = 0;
     const size_t itemCount = GetItemCount();
     for (size_t i = 0; i < itemCount; ++i) {
-        Control* pControl = GetItemAt(i);
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = GetItemAt(i);
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
         if (menuElementUI != nullptr) {
             if (itemIndex == iIndex) {
                 //在当前节点下匹配到
@@ -990,11 +1000,11 @@ bool MenuItem::AddSubMenuItemAt(MenuItem* pMenuItem, size_t iIndex)
         }
 
         menuElementUI = nullptr;
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             const size_t count = subMenu->GetItemCount();
             for (size_t j = 0; j < count; ++j) {
-                menuElementUI = dynamic_cast<MenuItem*>(subMenu->GetItemAt(j));
+                menuElementUI = dynamic_cast<MenuItem *>(subMenu->GetItemAt(j));
                 if (menuElementUI != nullptr) {
                     if (itemIndex == iIndex) {
                         //在当前节点下的SubMenu中匹配到
@@ -1010,12 +1020,12 @@ bool MenuItem::AddSubMenuItemAt(MenuItem* pMenuItem, size_t iIndex)
     return AddItem(pMenuItem);
 }
 
-bool MenuItem::RemoveSubMenuItem(MenuItem* pMenuItem)
+bool MenuItem::RemoveSubMenuItem(MenuItem *pMenuItem)
 {
     const size_t itemCount = GetItemCount();
     for (size_t i = 0; i < itemCount; ++i) {
-        Control* pControl = GetItemAt(i);
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = GetItemAt(i);
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
         if (menuElementUI != nullptr) {
             if (pMenuItem == menuElementUI) {
                 //在当前节点下匹配到
@@ -1025,11 +1035,11 @@ bool MenuItem::RemoveSubMenuItem(MenuItem* pMenuItem)
         }
 
         menuElementUI = nullptr;
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             const size_t count = subMenu->GetItemCount();
             for (size_t j = 0; j < count; ++j) {
-                menuElementUI = dynamic_cast<MenuItem*>(subMenu->GetItemAt(j));
+                menuElementUI = dynamic_cast<MenuItem *>(subMenu->GetItemAt(j));
                 if (menuElementUI != nullptr) {
                     if (menuElementUI == pMenuItem) {
                         //在当前节点下的SubMenu中匹配到
@@ -1047,8 +1057,8 @@ bool MenuItem::RemoveSubMenuItemAt(size_t iIndex)
     size_t itemIndex = 0;
     const size_t itemCount = GetItemCount();
     for (size_t i = 0; i < itemCount; ++i) {
-        Control* pControl = GetItemAt(i);
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
+        Control *pControl = GetItemAt(i);
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
         if (menuElementUI != nullptr) {
             if (itemIndex == iIndex) {
                 //在当前节点下匹配到
@@ -1059,11 +1069,11 @@ bool MenuItem::RemoveSubMenuItemAt(size_t iIndex)
         }
 
         menuElementUI = nullptr;
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             const size_t count = subMenu->GetItemCount();
             for (size_t j = 0; j < count; ++j) {
-                menuElementUI = dynamic_cast<MenuItem*>(subMenu->GetItemAt(j));
+                menuElementUI = dynamic_cast<MenuItem *>(subMenu->GetItemAt(j));
                 if (menuElementUI != nullptr) {
                     if (itemIndex == iIndex) {
                         //在当前节点下的SubMenu中匹配到
@@ -1085,15 +1095,15 @@ void MenuItem::RemoveAllSubMenuItem()
 
 size_t MenuItem::GetSubMenuItemCount() const
 {
-    std::vector<MenuItem*> submenuItems;
+    std::vector<MenuItem *> submenuItems;
     GetAllSubMenuItem(this, submenuItems);
     return submenuItems.size();
 };
 
-MenuItem* MenuItem::GetSubMenuItemAt(size_t iIndex) const
+MenuItem *MenuItem::GetSubMenuItemAt(size_t iIndex) const
 {
-    MenuItem* foundItem = nullptr;
-    std::vector<MenuItem*> submenuItems;
+    MenuItem *foundItem = nullptr;
+    std::vector<MenuItem *> submenuItems;
     GetAllSubMenuItem(this, submenuItems);
     if (iIndex < submenuItems.size()) {
         foundItem = submenuItems.at(iIndex);
@@ -1101,11 +1111,11 @@ MenuItem* MenuItem::GetSubMenuItemAt(size_t iIndex) const
     return foundItem;
 }
 
-MenuItem* MenuItem::GetSubMenuItemByName(const DString& name) const
+MenuItem *MenuItem::GetSubMenuItemByName(const DString &name) const
 {
-    std::vector<MenuItem*> submenuItems;
+    std::vector<MenuItem *> submenuItems;
     GetAllSubMenuItem(this, submenuItems);
-    MenuItem* subMenuItem = nullptr;
+    MenuItem *subMenuItem = nullptr;
     for (auto item : submenuItems) {
         if ((item != nullptr) && (item->GetName() == name)) {
             subMenuItem = item;
@@ -1115,9 +1125,9 @@ MenuItem* MenuItem::GetSubMenuItemByName(const DString& name) const
     return subMenuItem;
 }
 
-bool MenuItem::ButtonUp(const ui::EventArgs& msg)
+bool MenuItem::ButtonUp(const ui::EventArgs &msg)
 {
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return false;
@@ -1126,7 +1136,7 @@ bool MenuItem::ButtonUp(const ui::EventArgs& msg)
     bool ret = BaseClass::ButtonUp(msg);
     if (ret && !weakFlag.expired() && !msg.IsSenderExpired()) {
         //这里处理下如果有子菜单则显示子菜单
-        if (!CheckSubMenuItem()){
+        if (!CheckSubMenuItem()) {
             ContextMenuParam param;
             param.pWindow = pWindow;
             param.wParam = MenuCloseType::eMenuCloseAll;
@@ -1136,9 +1146,9 @@ bool MenuItem::ButtonUp(const ui::EventArgs& msg)
     return ret;
 }
 
-bool MenuItem::MouseEnter(const ui::EventArgs& msg)
+bool MenuItem::MouseEnter(const ui::EventArgs &msg)
 {
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return BaseClass::MouseEnter(msg);
@@ -1161,7 +1171,7 @@ bool MenuItem::MouseEnter(const ui::EventArgs& msg)
     return ret;
 }
 
-void MenuItem::PaintChild(ui::IRender* pRender, const ui::UiRect& rcPaint)
+void MenuItem::PaintChild(ui::IRender *pRender, const ui::UiRect &rcPaint)
 {
     UiRect rcTemp;
     if (!UiRect::Intersect(rcTemp, rcPaint, GetRect())) {
@@ -1169,21 +1179,21 @@ void MenuItem::PaintChild(ui::IRender* pRender, const ui::UiRect& rcPaint)
     }
 
     for (auto item : m_items) {
-        Control* pControl = item;
+        Control *pControl = item;
         if (pControl == nullptr) {
             continue;
         }
 
         //对于多级菜单项的内容，不绘制
-        MenuItem* menuElementUI = dynamic_cast<MenuItem*>(pControl);
-        if (menuElementUI != nullptr){
+        MenuItem *menuElementUI = dynamic_cast<MenuItem *>(pControl);
+        if (menuElementUI != nullptr) {
             continue;
         }
-        SubMenu* subMenu = dynamic_cast<SubMenu*>(pControl);
+        SubMenu *subMenu = dynamic_cast<SubMenu *>(pControl);
         if (subMenu != nullptr) {
             continue;
         }
-        
+
         if (!pControl->IsVisible()) {
             continue;
         }
@@ -1195,8 +1205,8 @@ bool MenuItem::CheckSubMenuItem()
 {
     bool hasSubMenu = false;
     for (auto item : m_items) {
-        if ((dynamic_cast<MenuItem*>(item) != nullptr) ||
-            (dynamic_cast<SubMenu*>(item) != nullptr)) {
+        if ((dynamic_cast<MenuItem *>(item) != nullptr)
+            || (dynamic_cast<SubMenu *>(item) != nullptr)) {
             hasSubMenu = true;
             break;
         }
@@ -1207,8 +1217,7 @@ bool MenuItem::CheckSubMenuItem()
         }
         if (m_pSubWindow == nullptr) {
             CreateMenuWnd();
-        }
-        else {
+        } else {
             //上次展示的子菜单窗口，尚未消失，不再展示
             hasSubMenu = false;
         }
@@ -1223,7 +1232,7 @@ void MenuItem::CreateMenuWnd()
         return;
     }
 
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     m_pSubWindow = new Menu(pWindow, nullptr);
     ContextMenuParam param;
     param.pWindow = pWindow;
@@ -1231,7 +1240,7 @@ void MenuItem::CreateMenuWnd()
     Menu::GetMenuObserver().RBroadcast(param);
 
     //上级级菜单窗口接口，用于同步配置信息
-    Menu* pParentWindow = dynamic_cast<Menu*>(pWindow);
+    Menu *pParentWindow = dynamic_cast<Menu *>(pWindow);
     ASSERT(pParentWindow != nullptr);
     if (pParentWindow != nullptr) {
         const DString skinFolder = pParentWindow->GetSkinFolder();
@@ -1241,7 +1250,8 @@ void MenuItem::CreateMenuWnd()
         //约定：子菜单的XML与父菜单的XML文件，在相同的目录中
         bool bSubMenuXmlChecked = false;
         if (!xmlPath.IsEmpty()) {
-            if (GlobalManager::Instance().Theme().IsResFileExists(FilePathUtil::JoinFilePath(xmlPath, subXmlFile), FilePath(skinFolder))) {
+            if (GlobalManager::Instance().Theme().IsResFileExists(
+                    FilePathUtil::JoinFilePath(xmlPath, subXmlFile), FilePath(skinFolder))) {
                 subXmlFile = FilePathUtil::JoinFilePath(xmlPath, subXmlFile);
                 bSubMenuXmlChecked = true;
             }
@@ -1249,14 +1259,17 @@ void MenuItem::CreateMenuWnd()
         if (!bSubMenuXmlChecked) {
             if (!GlobalManager::Instance().Theme().IsResFileExists(subXmlFile, FilePath(skinFolder))) {
                 //在公共资源目录的public/menu目录中查找submenu.xml文件
-                const FilePath publicMenuPath(DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu")); //"public/menu"
-                if (GlobalManager::Instance().Theme().IsResFileExists(FilePathUtil::JoinFilePath(publicMenuPath, subXmlFile), FilePath())) {
+                const FilePath publicMenuPath(
+                    DString(DUILIB_PUBLIC_RES_DIR) + _T("/menu")); //"public/menu"
+                if (GlobalManager::Instance().Theme().IsResFileExists(
+                        FilePathUtil::JoinFilePath(publicMenuPath, subXmlFile), FilePath())) {
                     subXmlFile = FilePathUtil::JoinFilePath(publicMenuPath, subXmlFile);
                     bSubMenuXmlChecked = true;
                 }
             }
         }
-        m_pSubWindow->SetSubMenuXml(pParentWindow->m_submenuXml.c_str(), pParentWindow->m_submenuNodeName.c_str());
+        m_pSubWindow->SetSubMenuXml(
+            pParentWindow->m_submenuXml.c_str(), pParentWindow->m_submenuNodeName.c_str());
 
         //设置子菜单窗口的左上角坐标(避免子菜单弹出时出现闪黑屏现象)
         UiPoint subMenuPt;
@@ -1273,11 +1286,12 @@ void MenuItem::CreateMenuWnd()
             subMenuPt.x = rc.left - rcCorner.left;
             subMenuPt.y = rc.top - rcCorner.top;
         }
-        m_pSubWindow->ShowMenu(subXmlFile.ToString(), subMenuPt, MenuPopupPosType::RIGHT_BOTTOM, false, this);
+        m_pSubWindow
+            ->ShowMenu(subXmlFile.ToString(), subMenuPt, MenuPopupPosType::RIGHT_BOTTOM, false, this);
     }
 }
 
-void MenuItem::Activate(const EventArgs* pMsg)
+void MenuItem::Activate(const EventArgs *pMsg)
 {
     std::weak_ptr<WeakFlag> weakFlag = GetWeakFlag();
     BaseClass::Activate(pMsg);
@@ -1287,7 +1301,7 @@ void MenuItem::Activate(const EventArgs* pMsg)
     }
     DString itemName = GetName();
     size_t nItemIndex = GetListBoxIndex();
-    Menu* pMenu = dynamic_cast<Menu*>(GetWindow());
+    Menu *pMenu = dynamic_cast<Menu *>(GetWindow());
     if (pMenu != nullptr) {
         DString menuName;
         if (pMenu->GetLayoutListBox() != nullptr) {
@@ -1301,14 +1315,13 @@ UiEstSize MenuItem::EstimateSize(UiSize szAvailable)
 {
     //代码与Box::EstimateSize函数一致，但将m_items里面的SubMenu过滤掉
     bool bRemoved = false;
-    std::vector<Control*> items = m_items;
+    std::vector<Control *> items = m_items;
     auto iter = m_items.begin();
     while (iter != m_items.end()) {
-        if (dynamic_cast<SubMenu*>(*iter) != nullptr) {
+        if (dynamic_cast<SubMenu *>(*iter) != nullptr) {
             iter = m_items.erase(iter);
             bRemoved = true;
-        }
-        else {
+        } else {
             ++iter;
         }
     }

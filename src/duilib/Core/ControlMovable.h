@@ -1,28 +1,28 @@
 #ifndef UI_CORE_CONTROL_MOVABLE_H_
 #define UI_CORE_CONTROL_MOVABLE_H_
 
-#include "duilib/Core/Control.h"
-#include "duilib/Core/Box.h"
-#include "duilib/Box/VBox.h"
 #include "duilib/Box/HBox.h"
-#include "duilib/Utils/StringUtil.h"
+#include "duilib/Box/VBox.h"
+#include "duilib/Core/Box.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Utils/AttributeUtil.h"
+#include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
+namespace ui {
 /** 主要功能：支持通过鼠标左键按下来调整控件的位置
 */
 template<typename T = Control>
-class ControlMovableT: public T
+class ControlMovableT : public T
 {
     typedef T BaseClass;
+
 public:
-    explicit ControlMovableT(Window* pWindow);
+    explicit ControlMovableT(Window *pWindow);
     virtual ~ControlMovableT() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
-    virtual DString GetType() const override;    
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual DString GetType() const override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** 设置是否支持鼠标拖动改变控件的位置
     */
@@ -51,19 +51,19 @@ public:
 
     /** 设置控件可移动矩形的外边距（外边距定义的四周区域不可点击拖动，仅中心区域可拖动，未经DPI缩放）
     */
-    void SetNonDraggableMargin(const UiMargin& rcNonDraggableMargin);
+    void SetNonDraggableMargin(const UiMargin &rcNonDraggableMargin);
 
     /** 获取控件可移动矩形的外边距（外边距定义的四周区域不可点击拖动，仅中心区域可拖动，未经DPI缩放）
     */
-    const UiMargin& GetNonDraggableMargin() const;
+    const UiMargin &GetNonDraggableMargin() const;
 
     /** 设置控件可移动矩形的边框范围（四周可点击拖动，但中心区域不可拖动，未经DPI缩放）
     */
-    void SetDraggableBorder(const UiPadding& rcDraggableBorder);
+    void SetDraggableBorder(const UiPadding &rcDraggableBorder);
 
     /** 获取控件可移动矩形的边框范围（四周可点击拖动，但中心区域不可拖动，未经DPI缩放）
     */
-    const UiPadding& GetDraggableBorder() const;
+    const UiPadding &GetDraggableBorder() const;
 
     /** 设置横向移动时，在父容器内保留的高度，避免控件溢出父容器(未经DPI缩放)
     */
@@ -102,11 +102,11 @@ protected:
     /** @name 拖动相关的成员函数
     * @{ */
 
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
-    virtual bool MouseMove(const EventArgs& msg) override;
-    virtual bool OnWindowKillFocus(const EventArgs& msg) override;//控件所属的窗口失去焦点
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
+    virtual bool OnWindowKillFocus(const EventArgs &msg) override; //控件所属的窗口失去焦点
+    virtual void HandleEvent(const EventArgs &msg) override;
 
 protected:
     /** 清除拖动调整位置的状态，恢复原状态
@@ -119,7 +119,8 @@ protected:
     * @param [in] yOffset Y方向的移动距离
     * @param [in] rcNewPos 控件新的位置
     */
-    void AdjustRectInParentBox(Control* pControl, int32_t xOffset, int32_t yOffset, UiRect& rcNewPos) const;
+    void AdjustRectInParentBox(
+        Control *pControl, int32_t xOffset, int32_t yOffset, UiRect &rcNewPos) const;
 
     /** @} */
 
@@ -127,23 +128,23 @@ private:
     /** 鼠标移动时执行的拖动调整控件位置操作
     * @return 返回true表示处于拖动调整位置操作操作中，返回false表示未执行拖动调整位置操作
     */
-    bool MovePosMouseMove(const EventArgs& msg);
+    bool MovePosMouseMove(const EventArgs &msg);
 
     /** 鼠标弹起时执行的操作
     */
-    void MovePosMouseUp(const EventArgs& msg);
+    void MovePosMouseUp(const EventArgs &msg);
 
     /** 将控件移动到鼠标所在位置
     */
-    void MoveControlToPoint(const UiPoint& ptMouse);
+    void MoveControlToPoint(const UiPoint &ptMouse);
 
     /** 获取调整控件的接口
     */
-    Control* GetMovePosControl();
+    Control *GetMovePosControl();
 
     /** 当前点击点是否处于可拖动区域
     */
-    bool IsInDraggableArea(const UiPoint& ptMouse) const;
+    bool IsInDraggableArea(const UiPoint &ptMouse) const;
 
 private:
     /** 是否支持拖动改变控件的位置(功能开关)
@@ -200,17 +201,17 @@ private:
 };
 
 template<typename T>
-ControlMovableT<T>::ControlMovableT(Window* pWindow):
-    T(pWindow),
-    m_bEnableMovePos(true),
-    m_bMoveParentPos(false),
-    m_bMovingPos(false),
-    m_bMouseDown(false),
-    m_bKeepWithinParent(false),
-    m_nMovePosAlpha(216),
-    m_nOldAlpha(255),
-    m_nMovePosReserveWidth(20),
-    m_nMovePosReserveHeight(20)
+ControlMovableT<T>::ControlMovableT(Window *pWindow)
+    : T(pWindow)
+    , m_bEnableMovePos(true)
+    , m_bMoveParentPos(false)
+    , m_bMovingPos(false)
+    , m_bMouseDown(false)
+    , m_bKeepWithinParent(false)
+    , m_nMovePosAlpha(216)
+    , m_nOldAlpha(255)
+    , m_nMovePosReserveWidth(20)
+    , m_nMovePosReserveHeight(20)
 {
     //默认应为浮动控件，并保存控件位置
     this->SetKeepFloatPos(true);
@@ -219,54 +220,57 @@ ControlMovableT<T>::ControlMovableT(Window* pWindow):
 
 template<typename T>
 ControlMovableT<T>::~ControlMovableT()
+{}
+
+template<typename T>
+inline DString ControlMovableT<T>::GetType() const
 {
+    return DUI_CTR_CONTROL_MOVABLE;
+}
+
+template<>
+inline DString ControlMovableT<Box>::GetType() const
+{
+    return DUI_CTR_BOX_MOVABLE;
+}
+
+template<>
+inline DString ControlMovableT<HBox>::GetType() const
+{
+    return DUI_CTR_HBOX_MOVABLE;
+}
+
+template<>
+inline DString ControlMovableT<VBox>::GetType() const
+{
+    return DUI_CTR_VBOX_MOVABLE;
 }
 
 template<typename T>
-inline DString ControlMovableT<T>::GetType() const { return DUI_CTR_CONTROL_MOVABLE; }
-
-template<>
-inline DString ControlMovableT<Box>::GetType() const { return DUI_CTR_BOX_MOVABLE; }
-
-template<>
-inline DString ControlMovableT<HBox>::GetType() const { return DUI_CTR_HBOX_MOVABLE; }
-
-template<>
-inline DString ControlMovableT<VBox>::GetType() const { return DUI_CTR_VBOX_MOVABLE; }
-
-template<typename T>
-void ControlMovableT<T>::SetAttribute(const DString& strName, const DString& strValue2)
+void ControlMovableT<T>::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
     if (strName == _T("enable_move_pos")) {
         SetEnableMovePos(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("move_parent_pos")) {
+    } else if (strName == _T("move_parent_pos")) {
         SetMoveParentPos(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("move_pos_alpha")) {
-        SetMovePosAlpha((uint8_t)StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("move_pos_non_draggable_margin")) {
+    } else if (strName == _T("move_pos_alpha")) {
+        SetMovePosAlpha((uint8_t) StringUtil::StringToInt32(strValue));
+    } else if (strName == _T("move_pos_non_draggable_margin")) {
         UiMargin rcNonDraggableMargin;
         AttributeUtil::ParseMarginValue(strValue.c_str(), rcNonDraggableMargin);
         SetNonDraggableMargin(rcNonDraggableMargin);
-    }
-    else if (strName == _T("move_pos_draggable_border")) {
+    } else if (strName == _T("move_pos_draggable_border")) {
         UiPadding rcDraggableBorder;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcDraggableBorder);
         SetDraggableBorder(rcDraggableBorder);
-    }
-    else if (strName == _T("move_pos_reserve_width")) {
+    } else if (strName == _T("move_pos_reserve_width")) {
         SetMovePosReserveWidth(StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("move_pos_reserve_height")) {
+    } else if (strName == _T("move_pos_reserve_height")) {
         SetMovePosReserveHeight(StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("move_pos_keep_within_parent")) {
+    } else if (strName == _T("move_pos_keep_within_parent")) {
         SetMovePosKeepWithinParent(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -308,7 +312,7 @@ uint8_t ControlMovableT<T>::GetMovePosAlpha() const
 }
 
 template<typename T>
-void ControlMovableT<T>::SetNonDraggableMargin(const UiMargin& rcNonDraggableMargin)
+void ControlMovableT<T>::SetNonDraggableMargin(const UiMargin &rcNonDraggableMargin)
 {
     m_rcNonDraggableMargin = rcNonDraggableMargin;
     m_rcNonDraggableMargin.left = std::max(m_rcNonDraggableMargin.left, 0);
@@ -318,13 +322,13 @@ void ControlMovableT<T>::SetNonDraggableMargin(const UiMargin& rcNonDraggableMar
 }
 
 template<typename T>
-const UiMargin& ControlMovableT<T>::GetNonDraggableMargin() const
+const UiMargin &ControlMovableT<T>::GetNonDraggableMargin() const
 {
     return m_rcNonDraggableMargin;
 }
 
 template<typename T>
-void ControlMovableT<T>::SetDraggableBorder(const UiPadding& rcDraggableBorder)
+void ControlMovableT<T>::SetDraggableBorder(const UiPadding &rcDraggableBorder)
 {
     m_rcDraggableBorder = rcDraggableBorder;
     m_rcDraggableBorder.left = std::max(m_rcDraggableBorder.left, 0);
@@ -334,7 +338,7 @@ void ControlMovableT<T>::SetDraggableBorder(const UiPadding& rcDraggableBorder)
 }
 
 template<typename T>
-const UiPadding& ControlMovableT<T>::GetDraggableBorder() const
+const UiPadding &ControlMovableT<T>::GetDraggableBorder() const
 {
     return m_rcDraggableBorder;
 }
@@ -394,7 +398,7 @@ void ControlMovableT<T>::CancelMovePosOperation()
 }
 
 template<typename T>
-Control* ControlMovableT<T>::GetMovePosControl()
+Control *ControlMovableT<T>::GetMovePosControl()
 {
     if (IsMoveParentPos() && (this->GetParent() != nullptr)) {
         return this->GetParent();
@@ -403,7 +407,7 @@ Control* ControlMovableT<T>::GetMovePosControl()
 }
 
 template<typename T>
-bool ControlMovableT<T>::IsInDraggableArea(const UiPoint& ptMouse) const
+bool ControlMovableT<T>::IsInDraggableArea(const UiPoint &ptMouse) const
 {
     UiPoint pt(ptMouse);
     pt.Offset(this->GetScrollOffsetInScrollBox());
@@ -432,16 +436,15 @@ bool ControlMovableT<T>::IsInDraggableArea(const UiPoint& ptMouse) const
                 return false;
             }
             return true;
-        }        
+        }
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
 
 template<typename T>
-bool ControlMovableT<T>::ButtonDown(const EventArgs& msg)
+bool ControlMovableT<T>::ButtonDown(const EventArgs &msg)
 {
     m_bMouseDown = false;
     bool bRet = BaseClass::ButtonDown(msg);
@@ -469,7 +472,7 @@ bool ControlMovableT<T>::ButtonDown(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlMovableT<T>::MouseMove(const EventArgs& msg)
+bool ControlMovableT<T>::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     if (msg.IsSenderExpired()) {
@@ -482,7 +485,7 @@ bool ControlMovableT<T>::MouseMove(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlMovableT<T>::ButtonUp(const EventArgs& msg)
+bool ControlMovableT<T>::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     if (msg.IsSenderExpired()) {
@@ -496,7 +499,7 @@ bool ControlMovableT<T>::ButtonUp(const EventArgs& msg)
 }
 
 template<typename T>
-bool ControlMovableT<T>::OnWindowKillFocus(const EventArgs& msg)
+bool ControlMovableT<T>::OnWindowKillFocus(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnWindowKillFocus(msg);
     ClearMovePosStatus();
@@ -504,15 +507,14 @@ bool ControlMovableT<T>::OnWindowKillFocus(const EventArgs& msg)
 }
 
 template<typename T>
-void ControlMovableT<T>::HandleEvent(const EventArgs& msg)
+void ControlMovableT<T>::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
     if (msg.IsSenderExpired()) {
         return;
     }
-    if ((msg.eventType == kEventMouseClickChanged) ||
-        (msg.eventType == kEventMouseClickEsc) ||
-        (msg.eventType == kEventMouseRButtonDown)) {
+    if ((msg.eventType == kEventMouseClickChanged) || (msg.eventType == kEventMouseClickEsc)
+        || (msg.eventType == kEventMouseRButtonDown)) {
         //取消操作
         ClearMovePosStatus();
     }
@@ -523,7 +525,7 @@ void ControlMovableT<T>::ClearMovePosStatus()
 {
     //恢复状态
     if (m_bMovingPos) {
-        Control* pControl = GetMovePosControl();
+        Control *pControl = GetMovePosControl();
         pControl->SetAlpha(m_nOldAlpha);
         m_nOldAlpha = 255;
         m_bMovingPos = false;
@@ -532,7 +534,7 @@ void ControlMovableT<T>::ClearMovePosStatus()
 }
 
 template<typename T>
-bool ControlMovableT<T>::MovePosMouseMove(const EventArgs& msg)
+bool ControlMovableT<T>::MovePosMouseMove(const EventArgs &msg)
 {
     if (!IsEnableMovePos()) {
         //该控件禁止拖动调整大小
@@ -546,7 +548,7 @@ bool ControlMovableT<T>::MovePosMouseMove(const EventArgs& msg)
     MoveControlToPoint(msg.ptMouse);
 
     if (!m_bMovingPos) {
-        Control* pControl = GetMovePosControl();
+        Control *pControl = GetMovePosControl();
         pControl->SetKeepFloatPos(true);
         if (!pControl->IsFloat()) {
             pControl->SetFloat(true);
@@ -562,7 +564,7 @@ bool ControlMovableT<T>::MovePosMouseMove(const EventArgs& msg)
 }
 
 template<typename T>
-void ControlMovableT<T>::MovePosMouseUp(const EventArgs& msg)
+void ControlMovableT<T>::MovePosMouseUp(const EventArgs &msg)
 {
     if (!IsEnableMovePos() || !IsMovingPos()) {
         return;
@@ -572,7 +574,7 @@ void ControlMovableT<T>::MovePosMouseUp(const EventArgs& msg)
 }
 
 template<typename T>
-void ControlMovableT<T>::MoveControlToPoint(const UiPoint& ptMouse)
+void ControlMovableT<T>::MoveControlToPoint(const UiPoint &ptMouse)
 {
     UiPoint pt(ptMouse);
     pt.Offset(this->GetScrollOffsetInScrollBox());
@@ -580,7 +582,7 @@ void ControlMovableT<T>::MoveControlToPoint(const UiPoint& ptMouse)
     int32_t xOffset = pt.x - m_ptMouseDown.x;
     int32_t yOffset = pt.y - m_ptMouseDown.y;
 
-    Control* pControl = GetMovePosControl();
+    Control *pControl = GetMovePosControl();
     UiRect rcNewPos = m_rcMouseDown;
     rcNewPos.left += xOffset;
     rcNewPos.right += xOffset;
@@ -596,9 +598,10 @@ void ControlMovableT<T>::MoveControlToPoint(const UiPoint& ptMouse)
 }
 
 template<typename T>
-void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffset, int32_t yOffset, UiRect& rcNewPos) const
+void ControlMovableT<T>::AdjustRectInParentBox(
+    Control *pControl, int32_t xOffset, int32_t yOffset, UiRect &rcNewPos) const
 {
-    Control* pParent = nullptr;
+    Control *pParent = nullptr;
     if (pControl != nullptr) {
         pParent = pControl->GetParent();
     }
@@ -606,7 +609,7 @@ void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffse
         return;
     }
     UiRect rcParent = pParent->GetRect();
-    rcParent.Deflate(pParent->GetPadding());// 剪去内边距
+    rcParent.Deflate(pParent->GetPadding()); // 剪去内边距
 
     if (IsMovePosKeepWithinParent()) {
         //将控件完全限制在父容器范围内，避免溢出
@@ -616,8 +619,7 @@ void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffse
                 int32_t offset = rcParent.left - rcNewPos.left;
                 rcNewPos.Offset(offset, 0);
             }
-        }
-        else if (xOffset > 0) {
+        } else if (xOffset > 0) {
             //向右移动
             if (rcNewPos.right > rcParent.right) {
                 int32_t offset = rcNewPos.right - rcParent.right;
@@ -630,16 +632,14 @@ void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffse
                 int32_t offset = rcParent.top - rcNewPos.top;
                 rcNewPos.Offset(0, offset);
             }
-        }
-        else if (yOffset > 0) {
+        } else if (yOffset > 0) {
             //向下移动
             if (rcNewPos.bottom > rcParent.bottom) {
                 int32_t offset = rcNewPos.bottom - rcParent.bottom;
                 rcNewPos.Offset(0, -offset);
             }
         }
-    }
-    else {
+    } else {
         //允许部分溢出，但不允许完全溢出
         int32_t nReserveValueX = GetMovePosReserveWidth();
         this->Dpi().ScaleInt(nReserveValueX);
@@ -650,8 +650,7 @@ void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffse
                     int32_t offset = (rcParent.left + nReserveValueX) - rcNewPos.right;
                     rcNewPos.Offset(offset, 0);
                 }
-            }
-            else if (xOffset > 0) {
+            } else if (xOffset > 0) {
                 //向右移动
                 if (rcNewPos.left > (rcParent.right - nReserveValueX)) {
                     int32_t offset = rcNewPos.left - (rcParent.right - nReserveValueX);
@@ -668,8 +667,7 @@ void ControlMovableT<T>::AdjustRectInParentBox(Control* pControl, int32_t xOffse
                 int32_t offset = (rcParent.top + nReserveValueY) - rcNewPos.bottom;
                 rcNewPos.Offset(0, offset);
             }
-        }
-        else if (yOffset > 0) {
+        } else if (yOffset > 0) {
             //向下移动
             if (rcNewPos.top > (rcParent.bottom - nReserveValueY)) {
                 int32_t offset = rcNewPos.top - (rcParent.bottom - nReserveValueY);
@@ -684,6 +682,6 @@ typedef ControlMovableT<Box> BoxMovable;
 typedef ControlMovableT<HBox> HBoxMovable;
 typedef ControlMovableT<VBox> VBoxMovable;
 
-}
+} // namespace ui
 
 #endif // UI_CORE_CONTROL_MOVABLE_H_

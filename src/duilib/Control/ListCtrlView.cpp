@@ -1,18 +1,14 @@
-#include "ListCtrlView.h" 
+#include "ListCtrlView.h"
 #include "duilib/Control/ListCtrl.h"
 #include "duilib/Control/ListCtrlData.h"
 #include "duilib/Core/Keyboard.h"
 
-namespace ui
-{
-ListCtrlView::ListCtrlView(Window* pWindow, Layout* pLayout):
-    VirtualListBox(pWindow, pLayout)
-{
-}
+namespace ui {
+ListCtrlView::ListCtrlView(Window *pWindow, Layout *pLayout)
+    : VirtualListBox(pWindow, pLayout)
+{}
 
-ListCtrlView::~ListCtrlView()
-{
-}
+ListCtrlView::~ListCtrlView() {}
 
 size_t ListCtrlView::GetTopElementIndex() const
 {
@@ -20,8 +16,7 @@ size_t ListCtrlView::GetTopElementIndex() const
     GetDisplayElements(itemIndexList);
     if (itemIndexList.empty()) {
         return Box::InvalidIndex;
-    }
-    else {
+    } else {
         return itemIndexList.front();
     }
 }
@@ -33,7 +28,7 @@ bool ListCtrlView::IsDataItemDisplay(size_t itemIndex) const
     return std::find(itemIndexList.begin(), itemIndexList.end(), itemIndex) != itemIndexList.end();
 }
 
-void ListCtrlView::GetDisplayDataItems(std::vector<size_t>& itemIndexList) const
+void ListCtrlView::GetDisplayDataItems(std::vector<size_t> &itemIndexList) const
 {
     itemIndexList.clear();
     GetDisplayElements(itemIndexList);
@@ -56,15 +51,14 @@ void ListCtrlView::OnInit()
     SetScrollSelect(false);
 }
 
-void ListCtrlView::HandleEvent(const EventArgs& msg)
+void ListCtrlView::HandleEvent(const EventArgs &msg)
 {
     if (IsDisabledEvents(msg)) {
         //如果是鼠标键盘消息，并且控件是Disabled的，转发给上层控件
-        Box* pParent = GetParent();
+        Box *pParent = GetParent();
         if (pParent != nullptr) {
             pParent->SendEventMsg(msg);
-        }
-        else {
+        } else {
             BaseClass::HandleEvent(msg);
         }
         return;
@@ -85,5 +79,4 @@ bool ListCtrlView::SelectItem(size_t iIndex, bool bTakeFocus, bool bTriggerEvent
     return ListCtrlSelectItem(iIndex, bTakeFocus, bTriggerEvent, vkFlag);
 }
 
-}//namespace ui
-
+} //namespace ui

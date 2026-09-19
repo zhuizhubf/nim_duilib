@@ -1,11 +1,10 @@
 #ifndef UI_CONTROL_RICHEDIT_SDL_H_
 #define UI_CONTROL_RICHEDIT_SDL_H_
 
-#include "duilib/Control/RichEditDefs.h"
 #include "duilib/Control/RichEditData.h"
+#include "duilib/Control/RichEditDefs.h"
 
-namespace ui 
-{
+namespace ui {
 
 class VBox;
 class DrawRichTextCache;
@@ -15,40 +14,43 @@ class DrawRichTextCache;
 class DUILIB_API RichEdit2 : public ScrollBox, protected IRichTextData
 {
     typedef ScrollBox BaseClass;
+
 public:
-    explicit RichEdit2(Window* pWindow);
-    RichEdit2(const RichEdit2& r) = delete;
-    RichEdit2& operator=(const RichEdit2& r) = delete;
+    explicit RichEdit2(Window *pWindow);
+    RichEdit2(const RichEdit2 &r) = delete;
+    RichEdit2 &operator=(const RichEdit2 &r) = delete;
     virtual ~RichEdit2() override;
+
 public:
     //基类的虚函数重写
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& pstrName, const DString& pstrValue) override;
-    virtual void HandleEvent(const EventArgs& msg) override; 
-    virtual void SetWindow(Window* pWindow) override;
+    virtual void SetAttribute(const DString &pstrName, const DString &pstrValue) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
+    virtual void SetWindow(Window *pWindow) override;
     virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;
-    virtual void PaintStateImages(IRender* pRender) override;
+    virtual void PaintStateImages(IRender *pRender) override;
     virtual void ClearImageCache() override;
     virtual UiSize EstimateText(UiSize szAvailable) override;
-    virtual UiSize64 CalcRequiredSize(const UiRect& rc, bool bEstimateOnly) override;
-    virtual void OnScrollOffsetChanged(const UiSize& oldScrollOffset, const UiSize& newScrollOffset) override;
+    virtual UiSize64 CalcRequiredSize(const UiRect &rc, bool bEstimateOnly) override;
+    virtual void OnScrollOffsetChanged(
+        const UiSize &oldScrollOffset, const UiSize &newScrollOffset) override;
 
 public:
     /** 设置控件的文本, 会触发文本变化事件
      * @param [in] strText 要设置的文本内容
      */
-    void SetText(const DStringW& strText);
-    void SetText(const DStringA& strText);
+    void SetText(const DStringW &strText);
+    void SetText(const DStringA &strText);
 
     /** 设置控件的文本，不触发文本变化事件
      * @param [in] strText 要设置的文本内容
      */
-    void SetTextNoEvent(const DString& strText);
+    void SetTextNoEvent(const DString &strText);
 
     /** 设置控件的文本对应 ID
      * @param[in] strTextId 要设置的 ID，该 ID 必须在加载的语言文件中存在
      */
-    void SetTextId(const DString& strTextId);
+    void SetTextId(const DString &strTextId);
 
     /** 获取控件中的文本
      * @return 返回控件中的文本内容
@@ -68,7 +70,7 @@ public:
      * @param[in] bCanUndo 是否可以撤销，true 为可以，否则为 false，默认为 false
      * @return 返回插入后的文本位置
      */
-    int32_t InsertText(int32_t nInsertAfterChar, const DString& text, bool bCanUndo = false);
+    int32_t InsertText(int32_t nInsertAfterChar, const DString &text, bool bCanUndo = false);
 
     /** 追加文字
      * @param [in] text 要追加的文字
@@ -76,7 +78,7 @@ public:
      * @param [in] bScrollBottom 是否将视图滚动到底部
      * @return 返回追加后的文字位置
      */
-    int32_t AppendText(const DString& text, bool bCanUndo = false, bool bScrollBottom = true);
+    int32_t AppendText(const DString &text, bool bCanUndo = false, bool bScrollBottom = true);
 
     /** 是否为空
     */
@@ -85,7 +87,7 @@ public:
     /** 设置字体Id
      * @param[in] index 要设置的字体Id（对应 global.xml 中字体的ID）
      */
-    void SetFontId(const DString& strFontId);
+    void SetFontId(const DString &strFontId);
 
     /** 获取当前设置的字体Id（通过SetFontId设置的字体ID）
      * @return 返回字体Id（对应 global.xml 中字体的ID）
@@ -99,7 +101,7 @@ public:
     /** 设置字体信息（优先级高，会覆盖通过SetFontId设置的字体）
     * @param [in] fontInfo 字体信息，字体大小是进行过DPI缩放处理的
     */
-    bool SetFontInfo(const UiFont& fontInfo);
+    bool SetFontInfo(const UiFont &fontInfo);
 
     /** 获取当前使用的字体ID
     * @return 如果调用SetFontInfo函数设置过字体，返回内部使用的字体ID；如果未调用过SetFontInfo函数设置字体，则返回通过SetFontId设置的字体ID
@@ -109,7 +111,7 @@ public:
     /** 设置正常文本颜色
      * @param[in] dwTextColor 要设置的文本颜色
      */
-    void SetTextColor(const DString& dwTextColor);
+    void SetTextColor(const DString &dwTextColor);
 
     /** 获取正常文本颜色
      */
@@ -122,12 +124,12 @@ public:
     /** 设置所选文本的颜色(不支持)
      * @param[in] textColor 要设置的文本颜色
      */
-    void SetSelectionTextColor(const DString& textColor);
+    void SetSelectionTextColor(const DString &textColor);
 
     /** 设置Disabled状态的文本颜色
      * @param[in] dwTextColor 要设置的文本颜色
      */
-    void SetDisabledTextColor(const DString& dwTextColor);
+    void SetDisabledTextColor(const DString &dwTextColor);
 
     /** 获取Disabled状态的文本颜色
      */
@@ -135,7 +137,7 @@ public:
 
     /** 设置选择文本的背景色（焦点状态）
     */
-    void SetSelectionBkColor(const DString& selectionBkColor);
+    void SetSelectionBkColor(const DString &selectionBkColor);
 
     /** 获取选择文本的背景颜色（焦点状态）
     */
@@ -143,7 +145,7 @@ public:
 
     /** 设置选择文本的背景色（非焦点状态）
     */
-    void SetInactiveSelectionBkColor(const DString& selectionBkColor);
+    void SetInactiveSelectionBkColor(const DString &selectionBkColor);
 
     /** 获取选择文本的背景颜色（非焦点状态）
     */
@@ -151,7 +153,7 @@ public:
 
     /** 设置当前行的背景颜色（光标所在行，焦点状态）
     */
-    void SetCurrentRowBkColor(const DString& currentRowBkColor);
+    void SetCurrentRowBkColor(const DString &currentRowBkColor);
 
     /** 获取当前行的背景颜色（焦点状态）
     */
@@ -159,7 +161,7 @@ public:
 
     /** 设置当前行的背景颜色（光标所在行，非焦点状态）
     */
-    void SetInactiveCurrentRowBkColor(const DString& currentRowBkColor);
+    void SetInactiveCurrentRowBkColor(const DString &currentRowBkColor);
 
     /** 获取当前行的背景颜色（非焦点状态）
     */
@@ -198,16 +200,16 @@ public:
     /** 设置提示文字
      * @param[in] strText 要设置的提示文字
      */
-    void SetPromptText(const DString& strText);
+    void SetPromptText(const DString &strText);
 
     /** 设置提示文字 ID
      * @param[in] strText 要设置的提示文字 ID，该 ID 必须在加载的语言文件中存在
      */
-    void SetPromptTextId(const DString& strTextId);
+    void SetPromptTextId(const DString &strTextId);
 
     /** 设置提示文字的颜色
     */
-    void SetPromptTextColor(const DString& promptColor);
+    void SetPromptTextColor(const DString &promptColor);
 
     /** 获取提示文字的颜色
     */
@@ -342,7 +344,7 @@ public:
 
     /** 获取数字的格式（64位有符号整型的格式, 比如"%I64d"等）
     */
-    void SetNumberFormat64(const DString& numberFormat);
+    void SetNumberFormat64(const DString &numberFormat);
 
     /** 获取数字的格式（64位有符号整型的格式）
     */
@@ -365,7 +367,7 @@ public:
     /** 设置允许输入哪些字符，比如颜色值可以设置：limit_chars="#0123456789ABCDEFabcdef"
     * @param [in] limitChars 允许输入的字符列表
     */
-    void SetLimitChars(const DString& limitChars);
+    void SetLimitChars(const DString &limitChars);
 
     /** 获取焦点状态下的图片
     * @return 返回焦点状态下的图片
@@ -375,7 +377,7 @@ public:
     /** 设置焦点状态下的图片
      * @param[in] strImage 要设置的图片位置
      */
-    void SetFocusedImage(const DString& strImage);
+    void SetFocusedImage(const DString &strImage);
 
     /** 设置缩放百分比
     * @param [in] fZoomRatio 缩放比例，比如"100"表示100%, 无缩放; "200"表示缩放比例为200%
@@ -409,7 +411,7 @@ public:
     * @param [in] nMin 表示设置数字的最小值
     * @param [in] nMax 表示设置数字的最大值，如果 nMin和nMax同时为0, 表示不设置数字的最小值和最大值
     */
-    bool SetEnableSpin(bool bEnable, const DString& spinClass, int32_t nMin = 0, int32_t nMax = 0);
+    bool SetEnableSpin(bool bEnable, const DString &spinClass, int32_t nMin = 0, int32_t nMax = 0);
 
     /** 设置是否允许拖放功能
     */
@@ -422,12 +424,12 @@ public:
     /** 获取拖放接口
     * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
     */
-    virtual ControlDropTarget_Windows* GetControlDropTarget() override;
+    virtual ControlDropTarget_Windows *GetControlDropTarget() override;
 
     /** 获取拖放接口（SDL）
     * @return 返回拖放目标接口，如果返回nullptr表示不支持拖放操作
     */
-    virtual ControlDropTarget_SDL* GetControlDropTarget_SDL() override;
+    virtual ControlDropTarget_SDL *GetControlDropTarget_SDL() override;
 
     /** 设置是否允许拖出功能（作为拖放源）
     * @param [in] bEnable true表示允许拖出，false表示不允许
@@ -443,7 +445,7 @@ public:
     /** 检查是否可以在当前鼠标位置执行拖放操作
     * @param [in] ptMouse 当前鼠标位置, 客户区坐标
     */
-    bool CanDropTextOnMousePosition(const UiPoint& ptMouse);
+    bool CanDropTextOnMousePosition(const UiPoint &ptMouse);
 
     /** 设置拖放操作的字符位置（以支持RichEdit内部拖放操作）
     * @param [in] nDropPos 拖放的字符位置
@@ -475,7 +477,7 @@ public:
 
     /** 获取光标的宽度和高度
     */
-    void GetCaretSize(int32_t& xWidth, int32_t& yHeight) const;
+    void GetCaretSize(int32_t &xWidth, int32_t &yHeight) const;
 
     /** 设置是否显示光标
      * @param [in] fShow 设置 true 为显示，false 为不显示
@@ -485,7 +487,7 @@ public:
     /** 设置光标颜色
      * @param[in] dwColor 要设置的颜色值，该值必须在 global.xml 中存在
      */
-    void SetCaretColor(const DString& dwColor);
+    void SetCaretColor(const DString &dwColor);
 
     /** 获取光标颜色
      * @return 返回光标颜色
@@ -507,7 +509,7 @@ public:
      * @param [out] xPos X 轴坐标
      * @param [out] yPos Y 轴坐标
     */
-    void GetCaretPos(int32_t& xPos, int32_t& yPos) const;
+    void GetCaretPos(int32_t &xPos, int32_t &yPos) const;
 
     /** 设置只读模式不显示光标
     */
@@ -522,42 +524,60 @@ public:
      * @param [in] callback 回车被按下的自定义回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachReturn(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventReturn, callback, callbackID); }
+    void AttachReturn(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventReturn, callback, callbackID);
+    }
 
     /** 监听ESC按键按下事件
      * @param [in] callback 回车被按下的自定义回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachEsc(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventEsc, callback, callbackID); }
+    void AttachEsc(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventEsc, callback, callbackID);
+    }
 
     /** 监听 TAB 按键按下事件
      * @param [in] callback TAB 被按下的自定义回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachTab(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventTab, callback, callbackID); }
+    void AttachTab(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventTab, callback, callbackID);
+    }
 
     /* 监听缩放比例变化事件
      * @param [in] callback 文本被修改后的自定义回调函数
      */
-    void AttachZoom(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventZoom, callback, callbackID); }
+    void AttachZoom(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventZoom, callback, callbackID);
+    }
 
     /* 监听文本被修改事件
      * @param [in] callback 文本被修改后的自定义回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachTextChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventTextChanged, callback, callbackID); }
+    void AttachTextChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventTextChanged, callback, callbackID);
+    }
 
     /* 监听文本选择变化事件
      * @param [in] callback 文本选择变化后的自定义回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachSelChanged(const EventCallback& callback, EventCallbackID callbackID = 0);
+    void AttachSelChanged(const EventCallback &callback, EventCallbackID callbackID = 0);
 
     /** 监听超级链接被点击事件
      * @param [in] callback 超级链接被点击后的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLinkClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventLinkClick, callback, callbackID); }
+    void AttachLinkClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventLinkClick, callback, callbackID);
+    }
 
 public:
     /** 获取修改标志
@@ -593,7 +613,7 @@ public:
      * @param[in] nStartChar 返回选择文本的起始字符位置，字符串中从0开始的下标值，如果没有选择文本，返回-1
      * @param[in] nEndChar 返回选择文本的最后一个字符的下一个字符下标值，如果没有选择文本，返回0
      */
-    void GetSel(int32_t& nStartChar, int32_t& nEndChar) const;
+    void GetSel(int32_t &nStartChar, int32_t &nEndChar) const;
 
     /** 选择一部分内容
      * @param[in] nStartChar 要选择的起始位置
@@ -606,7 +626,7 @@ public:
      * @param [in] newText 要替换的目标文字
      * @param [in] bCanUndo 是否可以撤销，true 为可以，否则为 false
      */
-    bool ReplaceSel(const DString& newText, bool bCanUndo);
+    bool ReplaceSel(const DString &newText, bool bCanUndo);
 
     /** 获取所选文字内容
      * @return 返回所选文字内容
@@ -646,7 +666,7 @@ public:
 
     /** 设置焦点状态时，底部边框的颜色
     */
-    void SetFocusedBottomBorderColor(const DString& bottomBorderColor);
+    void SetFocusedBottomBorderColor(const DString &bottomBorderColor);
 
     /** 获取焦点状态时，底部边框的颜色
     */
@@ -756,7 +776,7 @@ public:
     * @param [in] findParam 查找参数
     * @param [out] chrgText 匹配的文本，字符的索引号范围
     */
-    bool FindRichText(const FindTextParam& findParam, TextCharRange& chrgText) const;
+    bool FindRichText(const FindTextParam &findParam, TextCharRange &chrgText) const;
 
     /** 是否是富文本模式
      * @return 始终返回 false，为纯文本模式，不支持富文本模式
@@ -840,18 +860,17 @@ public:
     virtual void EndRight() override;
 
 protected:
-
     //一些基类的虚函数
     virtual bool CanPlaceCaptionBar() const override;
     virtual void OnInit() override;
     virtual uint32_t GetControlFlags() const override;
 
     //消息处理函数
-    virtual bool OnSetCursor(const EventArgs& msg) override;
-    virtual bool OnSetFocus(const EventArgs& msg) override;
-    virtual bool OnKillFocus(const EventArgs& msg) override;
-    virtual bool OnImeStartComposition(const EventArgs& msg) override;
-    virtual bool OnImeEndComposition(const EventArgs& msg) override;
+    virtual bool OnSetCursor(const EventArgs &msg) override;
+    virtual bool OnSetFocus(const EventArgs &msg) override;
+    virtual bool OnKillFocus(const EventArgs &msg) override;
+    virtual bool OnImeStartComposition(const EventArgs &msg) override;
+    virtual bool OnImeEndComposition(const EventArgs &msg) override;
 
     /** 文本字符输入消息
     * @param msg 文本输入的具体参数信息，参数取值详细内容如下
@@ -865,24 +884,24 @@ protected:
     *                   text = (DStringW::value_type*)msg.wParam;
     *               }
     */
-    virtual bool OnChar(const EventArgs& msg) override;
-    virtual bool OnKeyDown(const EventArgs& msg) override;
-    virtual bool OnKeyUp(const EventArgs& msg) override;
+    virtual bool OnChar(const EventArgs &msg) override;
+    virtual bool OnKeyDown(const EventArgs &msg) override;
+    virtual bool OnKeyUp(const EventArgs &msg) override;
 
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
-    virtual bool ButtonDoubleClick(const EventArgs& msg) override;
-    virtual bool RButtonDown(const EventArgs& msg) override;
-    virtual bool RButtonUp(const EventArgs& msg) override;
-    virtual bool MouseMove(const EventArgs& msg) override;
-    virtual bool MouseWheel(const EventArgs& msg) override;
-    virtual bool OnWindowKillFocus(const EventArgs& msg) override;//控件所属的窗口失去焦点
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
+    virtual bool ButtonDoubleClick(const EventArgs &msg) override;
+    virtual bool RButtonDown(const EventArgs &msg) override;
+    virtual bool RButtonUp(const EventArgs &msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
+    virtual bool MouseWheel(const EventArgs &msg) override;
+    virtual bool OnWindowKillFocus(const EventArgs &msg) override; //控件所属的窗口失去焦点
 
     //绘制相关函数
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) override;
-    virtual void PaintBorder(IRender* pRender) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
+    virtual void PaintBorder(IRender *pRender) override;
 
     /** 将文本生成可绘制的格式
     * @param [in] textView 按行组织切分后的文本视图，每行一条数据（以'\n'切分的行）
@@ -890,10 +909,11 @@ protected:
     * @param [in] nStartLine 重新计算的起始行号（增量计算时使用）
     * @param [in] modifiedLines 有修改的行号（增量计算时使用）
     */
-    virtual bool GetRichTextForDraw(const std::vector<std::wstring_view>& textView,
-                                    std::vector<RichTextData>& richTextDataList,
-                                    size_t nStartLine = (size_t)-1,
-                                    const std::vector<size_t>& modifiedLines = std::vector<size_t>()) const override;
+    virtual bool GetRichTextForDraw(
+        const std::vector<std::wstring_view> &textView,
+        std::vector<RichTextData> &richTextDataList,
+        size_t nStartLine = (size_t) -1,
+        const std::vector<size_t> &modifiedLines = std::vector<size_t>()) const override;
 
     /** 获取文本绘制矩形范围（需要时，随时调用该接口获取绘制文本的矩形范围）
     * @return 返回当前文本绘制的矩形范围，该范围需要去除内边距，滚动条所占空间
@@ -922,7 +942,7 @@ protected:
 
     /** 处理密码模式下的显示字符
     */
-    virtual void ReplacePasswordChar(DStringW& text) const override;
+    virtual void ReplacePasswordChar(DStringW &text) const override;
 
     /** 获取文本限制长度
     */
@@ -949,12 +969,12 @@ protected:
     virtual bool IsScrollBoxLayoutByActualAreaSize() const override;
 
 private:
-    void OnLButtonDown(const UiPoint& ptMouse, Control* pSender, bool bShiftDown);
-    void OnLButtonUp(const UiPoint& ptMouse, Control* pSender);
-    void OnLButtonDoubleClick(const UiPoint& ptMouse, Control* pSender);
-    void OnRButtonDown(const UiPoint& ptMouse, Control* pSender);
-    void OnRButtonUp(const UiPoint& ptMouse, Control* pSender);
-    void OnMouseMove(const UiPoint& ptMouse, Control* pSender);
+    void OnLButtonDown(const UiPoint &ptMouse, Control *pSender, bool bShiftDown);
+    void OnLButtonUp(const UiPoint &ptMouse, Control *pSender);
+    void OnLButtonDoubleClick(const UiPoint &ptMouse, Control *pSender);
+    void OnRButtonDown(const UiPoint &ptMouse, Control *pSender);
+    void OnRButtonUp(const UiPoint &ptMouse, Control *pSender);
+    void OnMouseMove(const UiPoint &ptMouse, Control *pSender);
     void OnMouseWheel(int32_t wheelDelta, bool bCtrlDown);
     void OnWindowKillFocus();
 
@@ -962,7 +982,7 @@ private:
     /** 显示RichEdit上的菜单
     * @param [in] point 客户区的坐标
     */
-    void ShowPopupMenu(const ui::UiPoint& point);
+    void ShowPopupMenu(const ui::UiPoint &point);
 
     /** 判断一个字符，是否在限制字符列表中
     */
@@ -980,7 +1000,7 @@ private:
 
     /** 设置Spin功能的Class名称
     */
-    bool SetSpinClass(const DString& spinClass);
+    bool SetSpinClass(const DString &spinClass);
 
     /** 开始启动调整文本数字值的定时器
     */
@@ -997,19 +1017,19 @@ private:
 private:
     /** 设置清除按钮功能的Class名称
     */
-    void SetClearBtnClass(const DString& btnClass);
+    void SetClearBtnClass(const DString &btnClass);
 
     /** 设置显示密码按钮功能的Class名称
     */
-    void SetShowPasswordBtnClass(const DString& btnClass);
+    void SetShowPasswordBtnClass(const DString &btnClass);
 
     /** 设置字体ID
     */
-    void SetFontIdInternal(const DString& fontId);
+    void SetFontIdInternal(const DString &fontId);
 
     /** 获取字体接口
     */
-    IFont* GetIFontInternal(const DString& fontId) const;
+    IFont *GetIFontInternal(const DString &fontId) const;
 
     /** 获取本控件内部的字体ID
     */
@@ -1019,15 +1039,15 @@ private:
      * @param[in] pRender 绘制引擎
      * @param[in] rcPaint 绘制位置
      */
-    void PaintCaret(IRender* pRender, const UiRect& rcPaint);
+    void PaintCaret(IRender *pRender, const UiRect &rcPaint);
 
     /** 绘制当前编辑行的背景色
     */
-    void PaintCurrentRowBkColor(IRender* pRender, const UiRect& rcPaint);
+    void PaintCurrentRowBkColor(IRender *pRender, const UiRect &rcPaint);
 
     /** 绘制选择背景色
     */
-    void PaintSelectionColor(IRender* pRender, const UiRect& rcPaint);
+    void PaintSelectionColor(IRender *pRender, const UiRect &rcPaint);
 
     /** 切换光标是否显示
     */
@@ -1036,7 +1056,7 @@ private:
     /** 绘制提示文字
      * @param[in] pRender 绘制引擎
      */
-    void PaintPromptText(IRender* pRender);
+    void PaintPromptText(IRender *pRender);
 
     /** 停止密码字符闪现
     */
@@ -1054,11 +1074,10 @@ private:
 
     /** 字体发生变化
     */
-    void OnFontChanged(const DString& fontId);
+    void OnFontChanged(const DString &fontId);
 
 private:
-
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     /** 获取关联的窗口局部
     */
     HWND GetWindowHWND() const;
@@ -1068,7 +1087,7 @@ private:
     /** 调整光标的位置（按点的坐标）
     * @param [in] pt 需要设置调整的位置（客户区坐标）
     */
-    void SetCaretPos(const UiPoint& pt);
+    void SetCaretPos(const UiPoint &pt);
 
     /** 调整光标的位置（按字符位置）
     */
@@ -1086,13 +1105,13 @@ private:
 
     /** 将文本生成可绘制的格式
     */
-    bool GetRichTextForDraw(std::vector<RichTextData>& richTextDataList) const;
+    bool GetRichTextForDraw(std::vector<RichTextData> &richTextDataList) const;
 
     /** 获取文本绘制区域
     * @param [in] rc 当前控件的矩形区域
     * @return 返回文本绘制区域（减去内边距，减去滚动条所占的宽度和高度）
     */
-    UiRect GetTextDrawRect(const UiRect& rc) const;
+    UiRect GetTextDrawRect(const UiRect &rc) const;
 
     /** 重绘（但不会重新计算布局）
     */
@@ -1114,15 +1133,15 @@ private:
 
     /** 在当前光标位置，插入一个字符（文本输入模式）
     */
-    void OnInputChar(const EventArgs& msg);
+    void OnInputChar(const EventArgs &msg);
 
     /** 检查Shift和Ctrl按键的标志
     */
-    void CheckKeyDownStartIndex(const EventArgs& msg);
+    void CheckKeyDownStartIndex(const EventArgs &msg);
 
     /** 处理视图滚动的方向键的快捷键（Ctrl + 方向键）
     */
-    bool OnCtrlArrowKeyDownScrollView(const EventArgs& msg);
+    bool OnCtrlArrowKeyDownScrollView(const EventArgs &msg);
 
     /** 获取纵向滚动一行的距离，按行对齐
     */
@@ -1134,7 +1153,7 @@ private:
 
     /** 方向键的快捷键处理
     */
-    bool OnArrowKeyDown(const EventArgs& msg);
+    bool OnArrowKeyDown(const EventArgs &msg);
 
     /** 选择一部分内容(内部函数)
      * @param[in] nStartChar 要选择的起始位置
@@ -1145,8 +1164,8 @@ private:
 
     /** 移除不支持的密码字符
     */
-    bool RemoveInvalidPasswordChar(DStringA& text);
-    bool RemoveInvalidPasswordChar(DStringW& text);
+    bool RemoveInvalidPasswordChar(DStringA &text);
+    bool RemoveInvalidPasswordChar(DStringW &text);
 
     /** 更新滚动条的范围
     */
@@ -1165,76 +1184,76 @@ private:
     /** 检查是否可以开始拖放操作
     * @param [in] ptMouse 当前鼠标位置, 客户区坐标
     */
-    void CheckDragOutStart(const UiPoint& ptMouse);
+    void CheckDragOutStart(const UiPoint &ptMouse);
 
     /** 判断当前鼠标位置是否在所选的文本上
     * @param [in] ptMouse 当前鼠标位置, 客户区坐标
     */
-    bool IsMouseOnSelectionText(const UiPoint& ptMouse);
+    bool IsMouseOnSelectionText(const UiPoint &ptMouse);
 
     /** 检查是否开始执行拖放操作
     * @param [in] ptMouse 当前鼠标位置, 客户区坐标
     */
-    void CheckDoDragDrop(const UiPoint& ptMouse);
+    void CheckDoDragDrop(const UiPoint &ptMouse);
 
     /** 执行拖放操作
     * @param [in] text 要拖放的文本内容
     * @return 返回拖放效果：DROPEFFECT_NONE表示取消，DROPEFFECT_COPY表示复制，DROPEFFECT_MOVE表示移动
     * @note 仅Windows平台支持
     */
-    uint32_t DoDragDrop(const DStringW& text);
+    uint32_t DoDragDrop(const DStringW &text);
 
 private:
-    bool m_bWantTab;            //是否接收TAB键，如果为true的时候，TAB键会当作文本输入，否则过滤掉TAB键
-    bool m_bWantReturn;         //是否接收回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
-    bool m_bWantCtrlReturn;     //是否接收Ctrl + 回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
-     
-    bool m_bSelAllEver;         //只在获取焦点后的第一次鼠标弹起全选
+    bool m_bWantTab;    //是否接收TAB键，如果为true的时候，TAB键会当作文本输入，否则过滤掉TAB键
+    bool m_bWantReturn; //是否接收回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
+    bool m_bWantCtrlReturn; //是否接收Ctrl + 回车键，如果为true的时候，回车键会当作文本输入，否则过滤掉回车键
 
-    bool m_bNoSelOnKillFocus;   //失去焦点的时候，取消文本选择（针对 m_bEnabled && IsReadOnly()）
-    bool m_bSelAllOnFocus;      //获取焦点的时候，全选文本（针对 m_bEnabled && !IsReadOnly()）
+    bool m_bSelAllEver; //只在获取焦点后的第一次鼠标弹起全选
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    bool m_bIsComposition;      //输入法合成窗口是否可见    
-    #ifdef DUILIB_UNICODE
-        WCHAR m_chHighSurrogate;          //文字输入字符的第一部分
-    #else
-        std::vector<BYTE> m_pendingChars; // MBCS时，输入的字符
-        DWORD m_dwLastCharTime;           // 上次输入的时间
-    #endif
+    bool m_bNoSelOnKillFocus; //失去焦点的时候，取消文本选择（针对 m_bEnabled && IsReadOnly()）
+    bool m_bSelAllOnFocus;    //获取焦点的时候，全选文本（针对 m_bEnabled && !IsReadOnly()）
+
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+    bool m_bIsComposition; //输入法合成窗口是否可见
+#ifdef DUILIB_UNICODE
+    WCHAR m_chHighSurrogate; //文字输入字符的第一部分
+#else
+    std::vector<BYTE> m_pendingChars; // MBCS时，输入的字符
+    DWORD m_dwLastCharTime;           // 上次输入的时间
+#endif
 #endif
 
-    bool m_bReadOnly;           //是否为只读模式
-    bool m_bPasswordMode;       //是否为密码模式
-    bool m_bShowPassword;       //是否显示密码
-    DStringW::value_type m_chPasswordChar;   //密码字符
-    bool m_bFlashPasswordChar;  //是否短暂的显示密码字符，然后再隐藏
-    bool m_bInputPasswordChar;  //当前是否存在输入密码
+    bool m_bReadOnly;                      //是否为只读模式
+    bool m_bPasswordMode;                  //是否为密码模式
+    bool m_bShowPassword;                  //是否显示密码
+    DStringW::value_type m_chPasswordChar; //密码字符
+    bool m_bFlashPasswordChar;             //是否短暂的显示密码字符，然后再隐藏
+    bool m_bInputPasswordChar;             //当前是否存在输入密码
 
-    bool m_bNumberOnly;         //是否只允许输入数字
-    bool m_bWordWrap;           //当显示超出边界时，是否自动换行
+    bool m_bNumberOnly; //是否只允许输入数字
+    bool m_bWordWrap;   //当显示超出边界时，是否自动换行
 
-    int32_t m_nLimitText;       //最大文本字符数（仅当为正数的时候代表有限制）
-    bool m_bModified;           //文本内容是否有修改
-
-private:
-    bool m_bNoCaretReadonly;    //只读模式下，不显示光标
-    bool m_bIsCaretVisible;     //光标是否可见
-    int32_t m_iCaretPosX;       //光标X坐标
-    int32_t m_iCaretPosY;       //光标Y坐标
-    int32_t m_iCaretWidth;      //光标宽度
-    int32_t m_iCaretHeight;     //光标高度
-    UiString m_sCaretColor;     //光标颜色
-
-    int32_t m_nRowHeight;       //行高(逻辑行)，与字体有关
-
-    WeakCallbackFlag m_drawCaretFlag;   //绘制光标的定时器生命周期
+    int32_t m_nLimitText; //最大文本字符数（仅当为正数的时候代表有限制）
+    bool m_bModified;     //文本内容是否有修改
 
 private:
-    UiString m_sFontId;                 //字体ID
-    UiString m_sTextColor;              //正常文本颜色
-    UiString m_sDisabledTextColor;      //Disabled状态的文本颜色
-    UiPadding16 m_rcTextPadding;        //文本内边距
+    bool m_bNoCaretReadonly; //只读模式下，不显示光标
+    bool m_bIsCaretVisible;  //光标是否可见
+    int32_t m_iCaretPosX;    //光标X坐标
+    int32_t m_iCaretPosY;    //光标Y坐标
+    int32_t m_iCaretWidth;   //光标宽度
+    int32_t m_iCaretHeight;  //光标高度
+    UiString m_sCaretColor;  //光标颜色
+
+    int32_t m_nRowHeight; //行高(逻辑行)，与字体有关
+
+    WeakCallbackFlag m_drawCaretFlag; //绘制光标的定时器生命周期
+
+private:
+    UiString m_sFontId;            //字体ID
+    UiString m_sTextColor;         //正常文本颜色
+    UiString m_sDisabledTextColor; //Disabled状态的文本颜色
+    UiPadding16 m_rcTextPadding;   //文本内边距
 
     UiString m_sFocusBottomBorderColor; //焦点状态时，底部边框的颜色
 
@@ -1243,14 +1262,14 @@ private:
     UiString m_sSelectionBkColor;          //选择文本的背景颜色（焦点状态）
     UiString m_sInactiveSelectionBkColor;  //选择文本的背景颜色（非焦点状态）
 
-    UiString m_sPromptColor;            //提示文字颜色
-    UiString m_sPromptText;             //提示文本内容（只有编辑框为空的时候显示）
-    UiString m_sPromptTextId;           //提示文字ID
-    bool m_bAllowPrompt;                //是否支持提示文字
+    UiString m_sPromptColor;  //提示文字颜色
+    UiString m_sPromptText;   //提示文本内容（只有编辑框为空的时候显示）
+    UiString m_sPromptTextId; //提示文字ID
+    bool m_bAllowPrompt;      //是否支持提示文字
 
-    uint8_t m_nFocusBottomBorderSize;   //焦点状态时，底部边框的大小
-    float m_fRowSpacingMul;             //行间距倍数
-    float m_fRowSpacingAdd;             //行间距附加量
+    uint8_t m_nFocusBottomBorderSize; //焦点状态时，底部边框的大小
+    float m_fRowSpacingMul;           //行间距倍数
+    float m_fRowSpacingAdd;           //行间距附加量
 
 private:
     /** 是否使用Control设置的光标
@@ -1294,7 +1313,7 @@ private:
 
     /** Spin功能的容器
     */
-    VBox* m_pSpinBox;
+    VBox *m_pSpinBox;
 
     /** 自动调整文本数字值的定时器生命周期管理
     */
@@ -1302,15 +1321,15 @@ private:
 
     /** 获取焦点时，显示的图片
     */
-    Image* m_pFocusedImage;
+    Image *m_pFocusedImage;
 
     /** 清除功能的按钮(仅当非只读模式有效)
     */
-    Control* m_pClearButton;
+    Control *m_pClearButton;
 
     /** 显示/隐藏密码按钮(仅当密码模式有效)
     */
-    Control* m_pShowPasswordButton;
+    Control *m_pShowPasswordButton;
 
     /** 当控件处于非激活状态时，是否隐藏选择内容(显示时：选择的文本背景色与正常文本不同)
     */
@@ -1327,7 +1346,7 @@ private:
 private:
     /** 文本内容管理接口
     */
-    RichEditData* m_pTextData;
+    RichEditData *m_pTextData;
 
 private:
     /** 选择的起始字符
@@ -1381,7 +1400,7 @@ private:
 
     /** 鼠标按下时的控件接口
     */
-    Control* m_pMouseSender;
+    Control *m_pMouseSender;
 
     /** 定时器滚动视图时的取消机制
     */
@@ -1394,10 +1413,10 @@ private:
 private:
     /** 拖放功能的实现接口, 如果不为空表示功能已经开启
     */
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    ControlDropTarget_Windows* m_pControlDropTarget;
-#elif defined (DUILIB_BUILD_FOR_SDL)
-    ControlDropTarget_SDL* m_pControlDropTarget;
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+    ControlDropTarget_Windows *m_pControlDropTarget;
+#elif defined(DUILIB_BUILD_FOR_SDL)
+    ControlDropTarget_SDL *m_pControlDropTarget;
 #endif
 
 private:
@@ -1422,24 +1441,26 @@ private:
     int32_t m_nDropTextPos;
 };
 
-#if defined (DUILIB_BUILD_FOR_WIN)
-    #if defined(DUILIB_BUILD_FOR_SDL)
-        #define DUILIB_NO_RICHEDIT 1
-    #endif
+#if defined(DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_SDL)
+#define DUILIB_NO_RICHEDIT 1
+#endif
 #else
-    #define DUILIB_NO_RICHEDIT 1
+#define DUILIB_NO_RICHEDIT 1
 #endif
 
 #ifdef DUILIB_NO_RICHEDIT
-    class DUILIB_API RichEdit : public RichEdit2
-    {
-    public:
-        explicit RichEdit(Window* pWindow) : RichEdit2(pWindow) {}
-        RichEdit(const RichEdit2& r) = delete;
-        RichEdit& operator=(const RichEdit& r) = delete;
-        virtual ~RichEdit() override {};
-        virtual DString GetType() const override { return DUI_CTR_RICHEDIT; }
-    };
+class DUILIB_API RichEdit : public RichEdit2
+{
+public:
+    explicit RichEdit(Window *pWindow)
+        : RichEdit2(pWindow)
+    {}
+    RichEdit(const RichEdit2 &r) = delete;
+    RichEdit &operator=(const RichEdit &r) = delete;
+    virtual ~RichEdit() override {};
+    virtual DString GetType() const override { return DUI_CTR_RICHEDIT; }
+};
 #endif // ! DUILIB_NO_RICHEDIT
 
 } // namespace ui

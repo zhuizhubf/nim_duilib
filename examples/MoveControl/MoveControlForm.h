@@ -6,7 +6,7 @@
 class MoveControlForm : public ui::WindowImplBase
 {
 public:
-    MoveControlForm(const DString& theme_directory, const DString& layout_xml);
+    MoveControlForm(const DString &theme_directory, const DString &layout_xml);
     virtual ~MoveControlForm() override;
 
     /** 资源相关接口
@@ -24,7 +24,7 @@ private:
     DString m_theme_directory;
     DString m_layout_xml;
 
-    ui::Box* m_frequent_app=nullptr;
-    ui::Box* m_my_app = nullptr;
+    ui::Box *m_frequent_app = nullptr;
+    ui::Box *m_my_app = nullptr;
 };
 #endif //EXAMPLES_MOVE_CONTROL_FORM_H_

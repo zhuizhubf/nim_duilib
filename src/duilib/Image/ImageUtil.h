@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui
-{
+namespace ui {
 /** 位图接口
 */
 class IBitmap;
@@ -44,7 +43,8 @@ public:
     * @param [in] nNewDpiScale 新的DPI缩放百分比，100为原值，200表示缩放200%
     * @param [in] nOrgDpiScale nImageSize值对应的DPI缩放百分比
     */
-    static uint32_t GetScaledImageSize(uint32_t nImageSize, uint32_t nNewDpiScale, uint32_t nOrgDpiScale = 100);
+    static uint32_t GetScaledImageSize(
+        uint32_t nImageSize, uint32_t nNewDpiScale, uint32_t nOrgDpiScale = 100);
 
     /** 获取最佳的加载缩放比例
     * @param [in] rcMaxDestRectSize 绘制目标大小
@@ -53,11 +53,12 @@ public:
     * @param [in] fMaxScale 最大的比例（避免占用过多内存）
     * @param [out] fScale 返回最佳的加载缩放比
     */
-    static bool GetBestImageScale(const UiSize& rcMaxDestRectSize,
-                                  int32_t nImageWidth,
-                                  int32_t nImageHeight,
-                                  float fMaxScale,
-                                  float& fScale);
+    static bool GetBestImageScale(
+        const UiSize &rcMaxDestRectSize,
+        int32_t nImageWidth,
+        int32_t nImageHeight,
+        float fMaxScale,
+        float &fScale);
 
     /** 对 32 位像素格式（RGBA/ARGB 等，4 字节/像素）的图像进行高度翻转（上下翻转）
     * @param [in] pPixelBits 图像数据的起始地址（需可写）
@@ -66,7 +67,8 @@ public:
     * @param [in] nHeight 图像数据的高度
     * @return 成功返回 true，参数无效返回 false
     */
-    static bool FlipPixelBits(uint8_t* pPixelBits, size_t nPixelBitsLen, uint32_t nWidth, uint32_t nHeight);
+    static bool FlipPixelBits(
+        uint8_t *pPixelBits, size_t nPixelBitsLen, uint32_t nWidth, uint32_t nHeight);
 
     /** 对图片大小进行调整
     * @param [in] pPixelBits 图像数据的起始地址
@@ -78,9 +80,15 @@ public:
     * @param [out] nNewWidth 调整后的图像宽度
     * @param [out] nNewHeight 调整后的图像高度
     */
-    static bool ResizeImageData(const uint8_t* pPixelBits, size_t nPixelBitsLen, uint32_t nWidth, uint32_t nHeight,
-                                float fImageSizeScale,
-                                std::vector<uint8_t>& outPixelBits, uint32_t& nNewWidth, uint32_t& nNewHeight);
+    static bool ResizeImageData(
+        const uint8_t *pPixelBits,
+        size_t nPixelBitsLen,
+        uint32_t nWidth,
+        uint32_t nHeight,
+        float fImageSizeScale,
+        std::vector<uint8_t> &outPixelBits,
+        uint32_t &nNewWidth,
+        uint32_t &nNewHeight);
 
     /** 对图片大小进行调整
     * @param [in] pPixelBits 图像数据的起始地址
@@ -91,15 +99,23 @@ public:
     * @param [in] nNewWidth 调整后的图像宽度
     * @param [in] nNewHeight 调整后的图像高度
     */
-    static bool ResizeImageData(const uint8_t* pPixelBits, size_t nPixelBitsLen, uint32_t nWidth, uint32_t nHeight,
-                                uint8_t* pOutPixelBits, size_t nOutPixelBitsLen, uint32_t nNewWidth, uint32_t nNewHeight);
+    static bool ResizeImageData(
+        const uint8_t *pPixelBits,
+        size_t nPixelBitsLen,
+        uint32_t nWidth,
+        uint32_t nHeight,
+        uint8_t *pOutPixelBits,
+        size_t nOutPixelBitsLen,
+        uint32_t nNewWidth,
+        uint32_t nNewHeight);
 
     /** 对位图调整大小
     * @param [in] pBitmap 需要调整大小的位图接口
     * @param [in] nNewWidth 调整后的图像宽度
     * @param [in] nNewHeight 调整后的图像高度
     */
-    static std::unique_ptr<IBitmap> ResizeImageBitmap(IBitmap* pBitmap, int32_t nNewWidth, int32_t nNewHeight);
+    static std::unique_ptr<IBitmap> ResizeImageBitmap(
+        IBitmap *pBitmap, int32_t nNewWidth, int32_t nNewHeight);
 };
 
 } //namespace ui

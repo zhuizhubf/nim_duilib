@@ -4,24 +4,23 @@
 #ifdef DUILIB_BUILD_FOR_SDL
 #include <SDL3/SDL.h>
 
-namespace ui
-{
-DragWindowFilter::DragWindowFilter(Window* pOwner, Window* pWindow) :
-    m_pOwner(pOwner),
-    m_pWindow(pWindow)
-{
-}
+namespace ui {
+DragWindowFilter::DragWindowFilter(Window *pOwner, Window *pWindow)
+    : m_pOwner(pOwner)
+    , m_pWindow(pWindow)
+{}
 
-LRESULT DragWindowFilter::FilterMessage(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, bool& bHandled)
+LRESULT DragWindowFilter::FilterMessage(UINT uMsg, WPARAM wParam, LPARAM /*lParam*/, bool &bHandled)
 {
     if ((m_pOwner != nullptr) && (m_pWindow != nullptr)) {
-        if ((uMsg == SDL_EVENT_MOUSE_MOTION) || (uMsg == SDL_EVENT_MOUSE_BUTTON_DOWN) || (uMsg == SDL_EVENT_MOUSE_BUTTON_UP)) {
+        if ((uMsg == SDL_EVENT_MOUSE_MOTION) || (uMsg == SDL_EVENT_MOUSE_BUTTON_DOWN)
+            || (uMsg == SDL_EVENT_MOUSE_BUTTON_UP)) {
             //鼠标事件，转接给父窗口
-            SDL_Window* sdlWindow = (SDL_Window*)m_pWindow->GetWindowHandle();
-            SDL_Window* sdlOwnerWindow = (SDL_Window*)m_pOwner->GetWindowHandle();
+            SDL_Window *sdlWindow = (SDL_Window *) m_pWindow->GetWindowHandle();
+            SDL_Window *sdlOwnerWindow = (SDL_Window *) m_pOwner->GetWindowHandle();
             if ((sdlWindow != nullptr) && (sdlOwnerWindow != nullptr)) {
                 bHandled = true;
-                SDL_Event sdlEvent = *((const SDL_Event*)wParam);
+                SDL_Event sdlEvent = *((const SDL_Event *) wParam);
 
                 int nXPos = 0;
                 int nYPos = 0;
@@ -36,8 +35,7 @@ LRESULT DragWindowFilter::FilterMessage(UINT uMsg, WPARAM wParam, LPARAM /*lPara
                     sdlEvent.motion.x = sdlEvent.motion.x + nXPos - nOwnerXPos;
                     sdlEvent.motion.y = sdlEvent.motion.y + nYPos - nOwnerYPos;
                     SDL_PushEvent(&sdlEvent);
-                }
-                else {
+                } else {
                     sdlEvent.button.windowID = SDL_GetWindowID(sdlOwnerWindow);
                     sdlEvent.button.x = sdlEvent.button.x + nXPos - nOwnerXPos;
                     sdlEvent.button.y = sdlEvent.button.y + nYPos - nOwnerYPos;
@@ -49,6 +47,6 @@ LRESULT DragWindowFilter::FilterMessage(UINT uMsg, WPARAM wParam, LPARAM /*lPara
     return 0;
 }
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_SDL

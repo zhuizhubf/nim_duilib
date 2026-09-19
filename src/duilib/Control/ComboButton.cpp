@@ -1,27 +1,32 @@
 #include "ComboButton.h"
-#include "duilib/Core/Window.h"
-#include "duilib/Core/Keyboard.h"
-#include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Box/HBox.h"
+#include "duilib/Core/Keyboard.h"
+#include "duilib/Core/Window.h"
+#include "duilib/Core/WindowCreateParam.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 下拉列表窗口
 */
-class ComboButtonWnd: public Window
+class ComboButtonWnd : public Window
 {
     typedef Window BaseClass;
+
 public:
-    void InitComboWnd(ComboButton* pOwner, bool bActivated);
+    void InitComboWnd(ComboButton *pOwner, bool bActivated);
     void UpdateComboWnd();
     virtual void OnInitWindow() override;
     virtual void OnCloseWindow() override;
     virtual void OnFinalMessage() override;
     virtual void OnWindowShadowTypeChanged() override;
 
-    virtual LRESULT OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled) override;
-    virtual LRESULT OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnKeyDownMsg(
+        VirtualKeyCode vkCode,
+        uint32_t modifierKey,
+        const NativeMsg &nativeMsg,
+        bool &bHandled) override;
+    virtual LRESULT OnKillFocusMsg(
+        WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled) override;
 
     /** 关闭下拉框
     * @param [in] bCanceled true表示取消，否则表示正常关闭
@@ -30,13 +35,13 @@ public:
 
 private:
     //关联的Combo接口
-    ComboButton* m_pOwner = nullptr;
+    ComboButton *m_pOwner = nullptr;
 
     //是否已经关闭
     bool m_bIsClosed = false;
 };
 
-void ComboButtonWnd::InitComboWnd(ComboButton* pOwner, bool bActivated)
+void ComboButtonWnd::InitComboWnd(ComboButton *pOwner, bool bActivated)
 {
     ASSERT(pOwner != nullptr);
     if (pOwner == nullptr) {
@@ -53,8 +58,7 @@ void ComboButtonWnd::InitComboWnd(ComboButton* pOwner, bool bActivated)
         ShowWindow(ui::kSW_SHOW_NORMAL);
         KeepParentActive();
         pOwner->SetState(kControlStateHovered);
-    }
-    else {
+    } else {
         ShowWindow(ui::kSW_SHOW_NA);
     }
 
@@ -64,11 +68,11 @@ void ComboButtonWnd::InitComboWnd(ComboButton* pOwner, bool bActivated)
 
 void ComboButtonWnd::UpdateComboWnd()
 {
-    ComboButton* pOwner = m_pOwner;
+    ComboButton *pOwner = m_pOwner;
     if (pOwner == nullptr) {
         return;
     }
-    ui::Box* pComboBox = pOwner->GetComboBox();
+    ui::Box *pComboBox = pOwner->GetComboBox();
     if (pComboBox == nullptr) {
         return;
     }
@@ -85,10 +89,10 @@ void ComboButtonWnd::UpdateComboWnd()
     rcOwner.Offset(-scrollBoxOffset.x, -scrollBoxOffset.y);
 
     UiRect rc = rcOwner;
-    rc.top = rc.bottom + Dpi().GetScaleInt(1);  // 父窗口left、bottom位置作为弹出窗口起点
-    rc.bottom = rc.top + szDrop.cy;             // 计算弹出窗口高度
+    rc.top = rc.bottom + Dpi().GetScaleInt(1); // 父窗口left、bottom位置作为弹出窗口起点
+    rc.bottom = rc.top + szDrop.cy;            // 计算弹出窗口高度
     if (szDrop.cx > 0) {
-        rc.right = rc.left + szDrop.cx;         // 计算弹出窗口宽度
+        rc.right = rc.left + szDrop.cx; // 计算弹出窗口宽度
     }
 
     //如果子容器里面的都是拉伸类型，就不需要估算大小（会报错，无法估算），而是按照下拉框的设置大小来显示
@@ -98,11 +102,12 @@ void ComboButtonWnd::UpdateComboWnd()
         if (nItemCount > 0) {
             bCanEstimateSize = false;
             for (size_t nItemIndex = 0; nItemIndex < nItemCount; nItemIndex++) {
-                Control* pControl = pComboBox->GetItemAt(nItemIndex);
+                Control *pControl = pComboBox->GetItemAt(nItemIndex);
                 if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
                     continue;
                 }
-                if (!pControl->GetFixedHeight().IsStretch() || !pControl->GetFixedWidth().IsStretch()) {
+                if (!pControl->GetFixedHeight().IsStretch()
+                    || !pControl->GetFixedWidth().IsStretch()) {
                     bCanEstimateSize = true;
                     break;
                 }
@@ -140,7 +145,8 @@ void ComboButtonWnd::UpdateComboWnd()
         rc.Inflate(rcPadding);
         pOwner->GetWindow()->ClientToScreen(rc);
     }
-    SetWindowPos(InsertAfterWnd(), rc.left, rc.top, rc.Width(), rc.Height(), kSWP_NOZORDER | kSWP_NOACTIVATE);
+    SetWindowPos(
+        InsertAfterWnd(), rc.left, rc.top, rc.Width(), rc.Height(), kSWP_NOZORDER | kSWP_NOACTIVATE);
 }
 
 void ComboButtonWnd::OnFinalMessage()
@@ -150,7 +156,7 @@ void ComboButtonWnd::OnFinalMessage()
             m_pOwner->GetComboBox()->SetWindow(nullptr);
             m_pOwner->GetComboBox()->SetParent(nullptr);
         }
-        if (m_pOwner->m_pWindow == this) {            
+        if (m_pOwner->m_pWindow == this) {
             m_pOwner->m_pWindow = nullptr;
             m_pOwner->SetState(kControlStateNormal);
             m_pOwner->Invalidate();
@@ -172,14 +178,14 @@ void ComboButtonWnd::CloseComboWnd(bool bCanceled)
         return;
     }
     m_bIsClosed = true;
-    Box* pRootBox = GetRoot();
+    Box *pRootBox = GetRoot();
     if ((pRootBox != nullptr) && (pRootBox->GetItemCount() > 0)) {
         m_pOwner->GetComboBox()->SetWindow(nullptr);
         m_pOwner->GetComboBox()->SetParent(nullptr);
         pRootBox->RemoveAllItems();
     }
     //先将前端窗口切换为父窗口，避免前端窗口关闭后，切换到其他窗口
-    ComboButton* pOwner = m_pOwner;
+    ComboButton *pOwner = m_pOwner;
     if ((pOwner != nullptr) && (pOwner->GetWindow() != nullptr)) {
         if (IsWindowForeground()) {
             pOwner->GetWindow()->SetWindowForeground();
@@ -197,7 +203,7 @@ void ComboButtonWnd::OnInitWindow()
     SetResourcePath(m_pOwner->GetWindow()->GetResourcePath());
     SetShadowType(m_pOwner->GetComboWndShadowType());
 
-    Box* pRoot = new Box(this);
+    Box *pRoot = new Box(this);
     pRoot->SetAutoDestroyChild(false);
     pRoot->AddItem(m_pOwner->GetComboBox());
     AttachBox(AttachShadow(pRoot));
@@ -208,7 +214,7 @@ void ComboButtonWnd::OnInitWindow()
 
 void ComboButtonWnd::OnCloseWindow()
 {
-    Box* pRootBox = GetRoot();
+    Box *pRootBox = GetRoot();
     if ((pRootBox != nullptr) && (pRootBox->GetItemCount() > 0)) {
         m_pOwner->GetComboBox()->SetWindow(nullptr);
         m_pOwner->GetComboBox()->SetParent(nullptr);
@@ -219,21 +225,22 @@ void ComboButtonWnd::OnCloseWindow()
     BaseClass::OnCloseWindow();
 }
 
-LRESULT ComboButtonWnd::OnKeyDownMsg(VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ComboButtonWnd::OnKeyDownMsg(
+    VirtualKeyCode vkCode, uint32_t modifierKey, const NativeMsg &nativeMsg, bool &bHandled)
 {
     LRESULT lResult = BaseClass::OnKeyDownMsg(vkCode, modifierKey, nativeMsg, bHandled);
     if (vkCode == kVK_ESCAPE) {
         //按住ESC键，取消
         CloseComboWnd(true);
-    }
-    else if (vkCode == kVK_RETURN) {
+    } else if (vkCode == kVK_RETURN) {
         //按回车键，关闭窗口，正常关闭
         CloseComboWnd(false);
     }
     return lResult;
 }
 
-LRESULT ComboButtonWnd::OnKillFocusMsg(WindowBase* pSetFocusWindow, const NativeMsg& nativeMsg, bool& bHandled)
+LRESULT ComboButtonWnd::OnKillFocusMsg(
+    WindowBase *pSetFocusWindow, const NativeMsg &nativeMsg, bool &bHandled)
 {
     LRESULT lResult = BaseClass::OnKillFocusMsg(pSetFocusWindow, nativeMsg, bHandled);
     //失去焦点，关闭窗口，正常关闭
@@ -245,17 +252,17 @@ LRESULT ComboButtonWnd::OnKillFocusMsg(WindowBase* pSetFocusWindow, const Native
 
 ////////////////////////////////////////////////////////
 
-ComboButton::ComboButton(Window* pWindow) :
-    Box(pWindow),
-    m_pWindow(nullptr),
-    m_bPopupTop(false),
-    m_pComboBox(nullptr),
-    m_pLeftButton(nullptr),
-    m_pLabelTop(nullptr),
-    m_pLabelBottom(nullptr),
-    m_pRightButton(nullptr),
-    m_bDropListShown(false),
-    m_nShadowType(ShadowType::kShadowMenu)
+ComboButton::ComboButton(Window *pWindow)
+    : Box(pWindow)
+    , m_pWindow(nullptr)
+    , m_bPopupTop(false)
+    , m_pComboBox(nullptr)
+    , m_pLeftButton(nullptr)
+    , m_pLabelTop(nullptr)
+    , m_pLabelBottom(nullptr)
+    , m_pRightButton(nullptr)
+    , m_bDropListShown(false)
+    , m_nShadowType(ShadowType::kShadowMenu)
 {
     m_pComboBox = new Box(pWindow);
     SetDropBoxSize({0, 150}, true);
@@ -287,64 +294,55 @@ ComboButton::~ComboButton()
     }
 }
 
-DString ComboButton::GetType() const { return DUI_CTR_COMBO_BUTTON; }
+DString ComboButton::GetType() const
+{
+    return DUI_CTR_COMBO_BUTTON;
+}
 
-void ComboButton::SetAttribute(const DString& strName, const DString& strValue2)
+void ComboButton::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize")) ) {
+    if ((strName == _T("dropbox_size")) || (strName == _T("dropboxsize"))) {
         //设置下拉列表的大小（宽度和高度）
         UiSize szDropBoxSize;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szDropBoxSize);
         SetDropBoxSize(szDropBoxSize, true);
-    }
-    else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
+    } else if ((strName == _T("popup_top")) || (strName == _T("popuptop"))) {
         //下拉列表是否向上弹出
         SetPopupTop(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("combo_box_class")) {
+    } else if (strName == _T("combo_box_class")) {
         SetComboBoxClass(strValue);
-    }
-    else if (strName == _T("left_button_class")) {
+    } else if (strName == _T("left_button_class")) {
         SetLeftButtonClass(strValue);
-    }
-    else if (strName == _T("left_button_top_label_class")) {
+    } else if (strName == _T("left_button_top_label_class")) {
         SetLeftButtonTopLabelClass(strValue);
-    }
-    else if (strName == _T("left_button_bottom_label_class")) {
+    } else if (strName == _T("left_button_bottom_label_class")) {
         SetLeftButtonBottomLabelClass(strValue);
-    }
-    else if (strName == _T("left_button_top_label_text")) {
+    } else if (strName == _T("left_button_top_label_text")) {
         if (m_pLabelTop != nullptr) {
             m_pLabelTop->SetText(strValue);
         }
-    }
-    else if (strName == _T("left_button_bottom_label_text")) {
+    } else if (strName == _T("left_button_bottom_label_text")) {
         if (m_pLabelBottom != nullptr) {
             m_pLabelBottom->SetText(strValue);
         }
-    }
-    else if (strName == _T("left_button_top_label_bkcolor")) {
+    } else if (strName == _T("left_button_top_label_bkcolor")) {
         if (m_pLabelTop != nullptr) {
             m_pLabelTop->SetBkColor(strValue);
         }
-    }
-    else if (strName == _T("left_button_bottom_label_bkcolor")) {
+    } else if (strName == _T("left_button_bottom_label_bkcolor")) {
         if (m_pLabelBottom != nullptr) {
             m_pLabelBottom->SetBkColor(strValue);
         }
-    }
-    else if (strName == _T("right_button_class")) {
+    } else if (strName == _T("right_button_class")) {
         SetRightButtonClass(strValue);
-    }
-    else if (strName == _T("shadow_type")) {
+    } else if (strName == _T("shadow_type")) {
         //设置下拉窗口的阴影类型
         ShadowType nShadowType = ShadowType::kShadowDefault;
         if (Shadow::GetShadowType(strValue, nShadowType)) {
             SetComboWndShadowType(nShadowType);
         }
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -375,13 +373,13 @@ void ComboButton::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-void ComboButton::SetLeftButtonClass(const DString& classValue)
+void ComboButton::SetLeftButtonClass(const DString &classValue)
 {
-    if (classValue.empty()) {        
+    if (classValue.empty()) {
         if (m_pLeftButton != nullptr) {
             RemoveControl(m_pLeftButton);
             m_pLeftButton->SetAutoDestroyChild(false);
-        
+
             delete m_pLeftButton;
             m_pLeftButton = nullptr;
         }
@@ -393,8 +391,7 @@ void ComboButton::SetLeftButtonClass(const DString& classValue)
             delete m_pLabelBottom;
             m_pLabelBottom = nullptr;
         }
-    }
-    else {
+    } else {
         if (m_pLeftButton == nullptr) {
             m_pLeftButton = new ButtonVBox(GetWindow());
         }
@@ -402,7 +399,7 @@ void ComboButton::SetLeftButtonClass(const DString& classValue)
     }
 }
 
-void ComboButton::SetLeftButtonTopLabelClass(const DString& classValue)
+void ComboButton::SetLeftButtonTopLabelClass(const DString &classValue)
 {
     if (classValue.empty()) {
         if ((m_pLeftButton != nullptr) && (m_pLabelTop != nullptr)) {
@@ -412,8 +409,7 @@ void ComboButton::SetLeftButtonTopLabelClass(const DString& classValue)
             delete m_pLabelTop;
             m_pLabelTop = nullptr;
         }
-    }
-    else {
+    } else {
         if (m_pLabelTop == nullptr) {
             m_pLabelTop = new Label(GetWindow());
         }
@@ -421,7 +417,7 @@ void ComboButton::SetLeftButtonTopLabelClass(const DString& classValue)
     }
 }
 
-void ComboButton::SetLeftButtonBottomLabelClass(const DString& classValue)
+void ComboButton::SetLeftButtonBottomLabelClass(const DString &classValue)
 {
     if (classValue.empty()) {
         if ((m_pLeftButton != nullptr) && (m_pLabelBottom != nullptr)) {
@@ -431,8 +427,7 @@ void ComboButton::SetLeftButtonBottomLabelClass(const DString& classValue)
             delete m_pLabelBottom;
             m_pLabelBottom = nullptr;
         }
-    }
-    else {
+    } else {
         if (m_pLabelBottom == nullptr) {
             m_pLabelBottom = new Label(GetWindow());
         }
@@ -440,7 +435,7 @@ void ComboButton::SetLeftButtonBottomLabelClass(const DString& classValue)
     }
 }
 
-void ComboButton::SetRightButtonClass(const DString& classValue)
+void ComboButton::SetRightButtonClass(const DString &classValue)
 {
     if (classValue.empty()) {
         RemoveControl(m_pRightButton);
@@ -448,8 +443,7 @@ void ComboButton::SetRightButtonClass(const DString& classValue)
             delete m_pRightButton;
             m_pRightButton = nullptr;
         }
-    }
-    else {
+    } else {
         if (m_pRightButton == nullptr) {
             m_pRightButton = new Button(GetWindow());
         }
@@ -457,7 +451,7 @@ void ComboButton::SetRightButtonClass(const DString& classValue)
     }
 }
 
-void ComboButton::SetComboBoxClass(const DString& classValue)
+void ComboButton::SetComboBoxClass(const DString &classValue)
 {
     ASSERT(m_pComboBox != nullptr);
     ASSERT(!classValue.empty());
@@ -466,7 +460,7 @@ void ComboButton::SetComboBoxClass(const DString& classValue)
     }
 }
 
-void ComboButton::SetAttributeList(Control* pControl, const DString& classValue)
+void ComboButton::SetAttributeList(Control *pControl, const DString &classValue)
 {
     ASSERT(pControl != nullptr);
     if (pControl == nullptr) {
@@ -476,20 +470,19 @@ void ComboButton::SetAttributeList(Control* pControl, const DString& classValue)
     AttributeUtil::ParseAttributeList(classValue, attributeList);
     if (!attributeList.empty()) {
         //按属性列表设置
-        for (const auto& attribute : attributeList) {
+        for (const auto &attribute : attributeList) {
             pControl->SetAttribute(attribute.first, attribute.second);
         }
-    }
-    else if(!classValue.empty()) {
+    } else if (!classValue.empty()) {
         //按Class名称设置
         pControl->SetClass(classValue);
     }
 }
 
-void ComboButton::RemoveControl(Control* pControl)
+void ComboButton::RemoveControl(Control *pControl)
 {
     if (IsInited() && (GetItemCount() > 0)) {
-        HBox* pBox = dynamic_cast<HBox*>(GetItemAt(0));
+        HBox *pBox = dynamic_cast<HBox *>(GetItemAt(0));
         if (pBox != nullptr) {
             pBox->RemoveItem(pControl);
         }
@@ -505,12 +498,14 @@ DString ComboButton::GetBorderColor(ControlStateType stateType) const
 {
     DString borderColor;
     if (borderColor.empty() && (m_pLeftButton != nullptr)) {
-        if (m_pLeftButton->IsFocused() || m_pLeftButton->IsMouseFocused() || m_pLeftButton->IsHoveredState()) {
+        if (m_pLeftButton->IsFocused() || m_pLeftButton->IsMouseFocused()
+            || m_pLeftButton->IsHoveredState()) {
             borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
     if (borderColor.empty() && (m_pRightButton != nullptr)) {
-        if (m_pRightButton->IsFocused() || m_pRightButton->IsMouseFocused() || m_pRightButton->IsHoveredState()) {
+        if (m_pRightButton->IsFocused() || m_pRightButton->IsMouseFocused()
+            || m_pRightButton->IsHoveredState()) {
             borderColor = BaseClass::GetBorderColor(kControlStateHovered);
         }
     }
@@ -530,7 +525,7 @@ void ComboButton::OnInit()
     }
     BaseClass::OnInit();
 
-    HBox* pBox = new HBox(GetWindow());
+    HBox *pBox = new HBox(GetWindow());
     AddItem(pBox);
     pBox->SetNoFocus();
 
@@ -543,8 +538,7 @@ void ComboButton::OnInit()
             delete m_pLabelBottom;
             m_pLabelBottom = nullptr;
         }
-    }
-    else {
+    } else {
         pBox->AddItem(m_pLeftButton);
         m_pLeftButton->SetNoFocus();
 
@@ -562,40 +556,45 @@ void ComboButton::OnInit()
             m_pLabelBottom->SetNoFocus();
         }
 
-        m_pLeftButton->AttachClick(UiBind(&ComboButton::OnLeftButtonClicked, this, std::placeholders::_1));
-        m_pLeftButton->AttachStateChanged(UiBind(&ComboButton::OnButtonStateChanged, this, std::placeholders::_1));
+        m_pLeftButton->AttachClick(
+            UiBind(&ComboButton::OnLeftButtonClicked, this, std::placeholders::_1));
+        m_pLeftButton->AttachStateChanged(
+            UiBind(&ComboButton::OnButtonStateChanged, this, std::placeholders::_1));
     }
 
     if (m_pRightButton != nullptr) {
         pBox->AddItem(m_pRightButton);
         m_pRightButton->SetNoFocus();
-        m_pRightButton->AttachButtonDown(UiBind(&ComboButton::OnRightButtonDown, this, std::placeholders::_1));
-        m_pRightButton->AttachClick(UiBind(&ComboButton::OnRightButtonClicked, this, std::placeholders::_1));
-        m_pRightButton->AttachStateChanged(UiBind(&ComboButton::OnButtonStateChanged, this, std::placeholders::_1));
+        m_pRightButton->AttachButtonDown(
+            UiBind(&ComboButton::OnRightButtonDown, this, std::placeholders::_1));
+        m_pRightButton->AttachClick(
+            UiBind(&ComboButton::OnRightButtonClicked, this, std::placeholders::_1));
+        m_pRightButton->AttachStateChanged(
+            UiBind(&ComboButton::OnButtonStateChanged, this, std::placeholders::_1));
     }
 }
 
-Box* ComboButton::GetComboBox() const
+Box *ComboButton::GetComboBox() const
 {
     return m_pComboBox;
 }
 
-ButtonVBox* ComboButton::GetLeftButtonBox() const
+ButtonVBox *ComboButton::GetLeftButtonBox() const
 {
     return m_pLeftButton;
 }
 
-Label* ComboButton::GetLabelTop() const
+Label *ComboButton::GetLabelTop() const
 {
     return m_pLabelTop;
 }
 
-Label* ComboButton::GetLabelBottom() const
+Label *ComboButton::GetLabelBottom() const
 {
     return m_pLabelBottom;
 }
 
-Button* ComboButton::GetRightButton() const
+Button *ComboButton::GetRightButton() const
 {
     return m_pRightButton;
 }
@@ -607,7 +606,7 @@ void ComboButton::UpdateComboWndPos()
     }
 }
 
-const UiSize& ComboButton::GetDropBoxSize() const
+const UiSize &ComboButton::GetDropBoxSize() const
 {
     return m_szDropBox;
 }
@@ -637,14 +636,14 @@ void ComboButton::OnComboWndClosed(bool bCanceled)
     Invalidate();
 }
 
-bool ComboButton::OnLeftButtonClicked(const EventArgs& /*args*/)
+bool ComboButton::OnLeftButtonClicked(const EventArgs & /*args*/)
 {
     SendEvent(kEventClick);
     Invalidate();
     return true;
 }
 
-bool ComboButton::OnRightButtonDown(const EventArgs& /*args*/)
+bool ComboButton::OnRightButtonDown(const EventArgs & /*args*/)
 {
     m_bDropListShown = (m_pWindow != nullptr) ? true : false;
     if (m_pWindow != nullptr) {
@@ -654,16 +653,16 @@ bool ComboButton::OnRightButtonDown(const EventArgs& /*args*/)
     return true;
 }
 
-bool ComboButton::OnRightButtonClicked(const EventArgs& /*args*/)
+bool ComboButton::OnRightButtonClicked(const EventArgs & /*args*/)
 {
     //如果鼠标按下的时候，正在显示列表，那么点击后不显示下拉列表
-    if (!m_bDropListShown) {        
+    if (!m_bDropListShown) {
         ShowComboList();
     }
     return true;
 }
 
-bool ComboButton::OnWindowKillFocus(const EventArgs& /*args*/)
+bool ComboButton::OnWindowKillFocus(const EventArgs & /*args*/)
 {
     if (m_pWindow != nullptr) {
         if (m_pWindow->IsWindowFocused()) {
@@ -674,7 +673,7 @@ bool ComboButton::OnWindowKillFocus(const EventArgs& /*args*/)
     return true;
 }
 
-bool ComboButton::OnWindowMove(const EventArgs& /*args*/)
+bool ComboButton::OnWindowMove(const EventArgs & /*args*/)
 {
     UpdateComboList();
     return true;
@@ -691,7 +690,7 @@ void ComboButton::ShowComboList()
 
 void ComboButton::HideComboList()
 {
-    if(m_pWindow != nullptr) {
+    if (m_pWindow != nullptr) {
         m_pWindow->CloseComboWnd(false);
     }
 }
@@ -703,7 +702,7 @@ void ComboButton::UpdateComboList()
     }
 }
 
-bool ComboButton::OnButtonStateChanged(const EventArgs& /*args*/)
+bool ComboButton::OnButtonStateChanged(const EventArgs & /*args*/)
 {
     //刷新当前控件，同步状态
     Invalidate();

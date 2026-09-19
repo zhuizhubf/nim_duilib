@@ -3,10 +3,9 @@
 
 #include "cef/CefManager.h"
 
-#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_MACOS) && defined(DUILIB_BUILD_FOR_CEF)
 
-namespace ui
-{
+namespace ui {
 /** CEF组件管理器（MacOS实现）
  */
 class CefManager_MacOS : public CefManager
@@ -16,8 +15,9 @@ class CefManager_MacOS : public CefManager
 
 protected:
     CefManager_MacOS();
-    CefManager_MacOS(const CefManager_MacOS&) = delete;
-    CefManager_MacOS& operator=(const CefManager_MacOS&) = delete;
+    CefManager_MacOS(const CefManager_MacOS &) = delete;
+    CefManager_MacOS &operator=(const CefManager_MacOS &) = delete;
+
 protected:
     virtual ~CefManager_MacOS() override;
 
@@ -31,17 +31,17 @@ public:
     * @param [in] nExitCode 当函数返回false时，进程的退出码
     * @return bool true 继续运行，false 应该结束程序
     */
-    virtual bool Initialize(bool bEnableOffScreenRendering,
-                            const DString& appName,
-                            int argc,
-                            char** argv,
-                            OnCefSettingsEvent callback,
-                            int32_t& nExitCode) override;
+    virtual bool Initialize(
+        bool bEnableOffScreenRendering,
+        const DString &appName,
+        int argc,
+        char **argv,
+        OnCefSettingsEvent callback,
+        int32_t &nExitCode) override;
 
     /** 当前CEF是否运行在多线程消息循环状态(Windows/Linux平台支持，但MacOS不支持)
     */
     virtual bool IsMultiThreadedMessageLoop() const override;
-
 };
 
 } //namespace ui

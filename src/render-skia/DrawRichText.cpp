@@ -1,24 +1,24 @@
 #include "DrawRichText.h"
-#include "text/DrawRichTextCache.h"
+#include "render-skia/DrawSkiaText.h"
 #include "render-skia/Font_Skia.h"
 #include "render-skia/SkTextBox.h"
-#include "render-skia/DrawSkiaText.h"
+#include "text/DrawRichTextCache.h"
 
-#include "duilib/Utils/StringUtil.h"
-#include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/PerformanceUtil.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
 #include "SkiaHeaderBegin.h"
 
 #include "include/core/SkCanvas.h"
-#include "include/core/SkPaint.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMetrics.h"
+#include "include/core/SkPaint.h"
 
 #include "SkiaHeaderEnd.h"
 
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace ui {
 
@@ -58,7 +58,7 @@ struct TPendingDrawRichText
 
 /** Skia 绘制缓存
 */
-class SkiaDrawRichTextCache: public DrawRichTextCache
+class SkiaDrawRichTextCache : public DrawRichTextCache
 {
 public:
     /** 原始参数
@@ -74,26 +74,27 @@ public:
     std::vector<TPendingDrawRichText> m_pendingTextData;
 };
 
-inline static SkiaDrawRichTextCache* GetSkiaDrawRichTextCache(DrawRichTextCache* pCache)
+inline static SkiaDrawRichTextCache *GetSkiaDrawRichTextCache(DrawRichTextCache *pCache)
 {
-    return dynamic_cast<SkiaDrawRichTextCache*>(pCache);
+    return dynamic_cast<SkiaDrawRichTextCache *>(pCache);
 }
 
-inline static const SkiaDrawRichTextCache* GetSkiaDrawRichTextCache(const DrawRichTextCache* pCache)
+inline static const SkiaDrawRichTextCache *GetSkiaDrawRichTextCache(const DrawRichTextCache *pCache)
 {
-    return dynamic_cast<const SkiaDrawRichTextCache*>(pCache);
+    return dynamic_cast<const SkiaDrawRichTextCache *>(pCache);
 }
 
-DrawRichText::DrawRichText(IRender* pRender, SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg) :
-    m_pRender(pRender),
-    m_pSkCanvas(pSkCanvas),
-    m_pSkPaint(pSkPaint),
-    m_pSkPointOrg(pSkPointOrg)
-{
-}
+DrawRichText::DrawRichText(
+    IRender *pRender, SkCanvas *pSkCanvas, SkPaint *pSkPaint, SkPoint *pSkPointOrg)
+    : m_pRender(pRender)
+    , m_pSkCanvas(pSkCanvas)
+    , m_pSkPaint(pSkPaint)
+    , m_pSkPointOrg(pSkPointOrg)
+{}
 
 //设置行高数据
-inline static void SaveRowHeight(FastVector<int32_t>& rowHeightVector, uint32_t nRowIndex, int32_t nRowHeight)
+inline static void SaveRowHeight(
+    FastVector<int32_t> &rowHeightVector, uint32_t nRowIndex, int32_t nRowHeight)
 {
     if (nRowIndex >= rowHeightVector.size()) {
         rowHeightVector.resize(nRowIndex + 1);
@@ -101,18 +102,22 @@ inline static void SaveRowHeight(FastVector<int32_t>& rowHeightVector, uint32_t 
     rowHeightVector[nRowIndex] = nRowHeight;
 }
 
-void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
-                                        const UiSize& szScrollOffset,
-                                        IRenderFactory* pRenderFactory, 
-                                        const std::vector<RichTextData>& richTextData,
-                                        uint8_t uFade,
-                                        bool bMeasureOnly,
-                                        RichTextLineInfoParam* pLineInfoParam,
-                                        std::shared_ptr<DrawRichTextCache>* pDrawRichTextCache,
-                                        std::vector<std::vector<UiRect>>* pRichTextRects)
+void DrawRichText::InternalDrawRichText(
+    const UiRect &rcTextRect,
+    const UiSize &szScrollOffset,
+    IRenderFactory *pRenderFactory,
+    const std::vector<RichTextData> &richTextData,
+    uint8_t uFade,
+    bool bMeasureOnly,
+    RichTextLineInfoParam *pLineInfoParam,
+    std::shared_ptr<DrawRichTextCache> *pDrawRichTextCache,
+    std::vector<std::vector<UiRect>> *pRichTextRects)
 {
-    ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
-    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
+    ASSERT(
+        (m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr)
+        && (m_pSkPointOrg != nullptr));
+    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr)
+        || (m_pSkPointOrg == nullptr)) {
         return;
     }
 
@@ -152,7 +157,9 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     }
 
     //文本编码：固定为UTF16 或者 UTF32
-    constexpr const SkTextEncoding textEncoding = (sizeof(DStringW::value_type) == sizeof(uint32_t)) ? SkTextEncoding::kUTF32 : SkTextEncoding::kUTF16;
+    constexpr const SkTextEncoding textEncoding = (sizeof(DStringW::value_type) == sizeof(uint32_t))
+                                                      ? SkTextEncoding::kUTF32
+                                                      : SkTextEncoding::kUTF16;
     constexpr const size_t textCharSize = sizeof(DStringW::value_type);
 
     //当绘制超过目标矩形边界时，是否继续绘制
@@ -161,14 +168,16 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     std::vector<TPendingDrawRichText> pendingTextData;
     pendingTextData.reserve(richTextData.size());
 
-    const int32_t nTextRectRightMax = (int32_t)rcTextRect.right;   //绘制区域的最右侧
-    const int32_t nTextRectBottomMax = (int32_t)rcTextRect.bottom; //绘制区域的最底端
+    const int32_t nTextRectRightMax = (int32_t) rcTextRect.right;   //绘制区域的最右侧
+    const int32_t nTextRectBottomMax = (int32_t) rcTextRect.bottom; //绘制区域的最底端
 
-    SkScalar xPos = (SkScalar)rcDrawRect.left;  //水平坐标：字符绘制的时候，是按浮点型坐标，每个字符所占的宽度是浮点型的，不能对齐到像素
-    int32_t yPos = rcDrawRect.top;              //垂直坐标，对齐到像素，所以用整型
-    int32_t nRowHeight = 0;   //行高（本行中，所有字符绘制高度的最大值，对齐到像素）
-    uint32_t nLineNumber = 0; //物理行号
-    uint32_t nRowIndex = 0;   //逻辑行号
+    SkScalar xPos
+        = (SkScalar) rcDrawRect
+              .left; //水平坐标：字符绘制的时候，是按浮点型坐标，每个字符所占的宽度是浮点型的，不能对齐到像素
+    int32_t yPos = rcDrawRect.top; //垂直坐标，对齐到像素，所以用整型
+    int32_t nRowHeight = 0;        //行高（本行中，所有字符绘制高度的最大值，对齐到像素）
+    uint32_t nLineNumber = 0;      //物理行号
+    uint32_t nRowIndex = 0;        //逻辑行号
 
     FastVector<int32_t> rowHeightVector; //每行的实际行高表
     rowHeightVector.reserve(richTextData.size() * 2);
@@ -179,7 +188,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
 
     if (pLineInfoParam != nullptr) {
         //设置起始行号
-        nLineNumber = (uint32_t)pLineInfoParam->m_nStartLineIndex;
+        nLineNumber = (uint32_t) pLineInfoParam->m_nStartLineIndex;
         ASSERT(pLineInfoParam->m_pLineInfoList != nullptr);
         if (pLineInfoParam->m_pLineInfoList == nullptr) {
             return;
@@ -200,8 +209,9 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     }
     UiColor textColor;
 
-    BreakTextTempData breakTextData;            //评估可绘制字符数量的临时变量（外部管理，以减少内存分配，提高性能）
-    MeasureTextTempData measureTempData;        //内部临时变量，为提升执行速度，在外部声明变量
+    BreakTextTempData
+        breakTextData; //评估可绘制字符数量的临时变量（外部管理，以减少内存分配，提高性能）
+    MeasureTextTempData measureTempData; //内部临时变量，为提升执行速度，在外部声明变量
 
     //按换行符进行文本切分
     std::vector<std::wstring_view> lineTextViewList;
@@ -217,26 +227,25 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     // static const size_t statHashBreak = std::hash<DString>{}(statHashBreakName); //2710 ms
 
     for (size_t index = 0; index < richTextData.size(); ++index) {
-        const RichTextData& textData = richTextData[index];
+        const RichTextData &textData = richTextData[index];
         if (textData.m_textView.empty()) {
             continue;
         }
 
         //设置文本颜色
         if (textColor != textData.m_textColor) {
-            const UiColor& color = textData.m_textColor;
+            const UiColor &color = textData.m_textColor;
             skPaint.setARGB(color.GetA(), color.GetR(), color.GetG(), color.GetB());
             textColor = textData.m_textColor;
         }
-        
+
         std::shared_ptr<IFont> spSkiaFont;
-        if ((spLastSkiaFont != nullptr) &&
-            (textData.m_pFontInfo != nullptr) && (lastFont != nullptr) &&
-            ((textData.m_pFontInfo == lastFont) || (*textData.m_pFontInfo == *lastFont))) {
+        if ((spLastSkiaFont != nullptr) && (textData.m_pFontInfo != nullptr)
+            && (lastFont != nullptr)
+            && ((textData.m_pFontInfo == lastFont) || (*textData.m_pFontInfo == *lastFont))) {
             //复用缓存中的字体对象
             spSkiaFont = spLastSkiaFont;
-        }
-        else {
+        } else {
             spSkiaFont.reset(pRenderFactory->CreateIFont());
             ASSERT(spSkiaFont != nullptr);
             if (spSkiaFont == nullptr) {
@@ -252,12 +261,12 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             }
         }
 
-        Font_Skia* pSkiaFont = dynamic_cast<Font_Skia*>(spSkiaFont.get());
+        Font_Skia *pSkiaFont = dynamic_cast<Font_Skia *>(spSkiaFont.get());
         ASSERT(pSkiaFont != nullptr);
         if (pSkiaFont == nullptr) {
             continue;
         }
-        const SkFont* pSkFont = pSkiaFont->GetFontHandle();
+        const SkFont *pSkFont = pSkiaFont->GetFontHandle();
         ASSERT(pSkFont != nullptr);
         if (pSkFont == nullptr) {
             continue;
@@ -268,24 +277,32 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             lastFont = textData.m_pFontInfo;
         }
 
-        FallbackFontCreator fallbackFontCreator = [this, spSkiaFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
-            return DrawSkiaText::CreateFallbackFont(spSkiaFont.get(), unicodeChar, glyphId);
+        FallbackFontCreator fallbackFontCreator =
+            [this, spSkiaFont](SkUnichar unicodeChar, SkGlyphID *glyphId) {
+                return DrawSkiaText::CreateFallbackFont(spSkiaFont.get(), unicodeChar, glyphId);
             };
 
-        const SkFont& skFont = *pSkFont;
+        const SkFont &skFont = *pSkFont;
         SkFontMetrics fontMetrics;
-        SkScalar fFontHeight = skFont.getMetrics(&fontMetrics);     //字体高度，换行时使用
-        const SkScalar textMeasuredHeight = fontMetrics.fDescent - fontMetrics.fAscent; //当前要绘制的文本所需高度(使用字体的高度)
-        fFontHeight = textData.m_fRowSpacingMul * fFontHeight + textData.m_fRowSpacingAdd; //运用行间距倍数和行间距附加量
-        const int32_t nFontHeight = SkScalarCeilToInt(fFontHeight);   //行高对齐到像素
+        SkScalar fFontHeight = skFont.getMetrics(&fontMetrics); //字体高度，换行时使用
+        const SkScalar textMeasuredHeight
+            = fontMetrics.fDescent - fontMetrics.fAscent; //当前要绘制的文本所需高度(使用字体的高度)
+        fFontHeight = textData.m_fRowSpacingMul * fFontHeight
+                      + textData.m_fRowSpacingAdd;                  //运用行间距倍数和行间距附加量
+        const int32_t nFontHeight = SkScalarCeilToInt(fFontHeight); //行高对齐到像素
         nRowHeight = std::max(nRowHeight, nFontHeight);
         if (nRowHeight <= 0) {
             continue;
         }
         const uint32_t uTextStyle = textData.m_textStyle;
-        const bool bSingleLineMode = (uTextStyle & DrawStringFormat::TEXT_SINGLELINE) ? true : false; //是否为单行模式，单行模式下，不换行
-        const bool bWordWrap = bSingleLineMode ? false : ((uTextStyle & DrawStringFormat::TEXT_WORD_WRAP) ? true : false);
-        bool bBreakAll = false;//标记是否终止
+        const bool bSingleLineMode = (uTextStyle & DrawStringFormat::TEXT_SINGLELINE)
+                                         ? true
+                                         : false; //是否为单行模式，单行模式下，不换行
+        const bool bWordWrap = bSingleLineMode
+                                   ? false
+                                   : ((uTextStyle & DrawStringFormat::TEXT_WORD_WRAP) ? true
+                                                                                      : false);
+        bool bBreakAll = false; //标记是否终止
 
         //按换行符进行文本切分
         lineTextViewList.clear();
@@ -294,30 +311,49 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
         //物理行内的逻辑行号(每个物理行中，从0开始编号)
         uint32_t nLineTextRowIndex = 0;
 
-        for (const std::wstring_view& lineTextView : lineTextViewList) {
+        for (const std::wstring_view &lineTextView : lineTextViewList) {
             bDrawTabChar = false;
-            if (lineTextView.size() == 1) {              
+            if (lineTextView.size() == 1) {
                 if (lineTextView[0] == L'\r') {
                     //处理回车
                     if (pLineInfoParam != nullptr) {
-                        OnDrawUnicodeChar(pLineInfoParam, lineTextView[0], 1, 2, nLineNumber, nLineTextRowIndex, xPos, yPos, 0, nRowHeight);
+                        OnDrawUnicodeChar(
+                            pLineInfoParam,
+                            lineTextView[0],
+                            1,
+                            2,
+                            nLineNumber,
+                            nLineTextRowIndex,
+                            xPos,
+                            yPos,
+                            0,
+                            nRowHeight);
                     }
                     continue; //忽略回车
                 }
                 if (lineTextView[0] == L'\t') {
                     //处理TAB键
                     bDrawTabChar = true;
-                }
-                else if (lineTextView[0] == L'\n') {
+                } else if (lineTextView[0] == L'\n') {
                     //处理换行符
                     if (pLineInfoParam != nullptr) {
-                        OnDrawUnicodeChar(pLineInfoParam, lineTextView[0], 1, 2, nLineNumber, nLineTextRowIndex, xPos, yPos, 0, nRowHeight);
+                        OnDrawUnicodeChar(
+                            pLineInfoParam,
+                            lineTextView[0],
+                            1,
+                            2,
+                            nLineNumber,
+                            nLineTextRowIndex,
+                            xPos,
+                            yPos,
+                            0,
+                            nRowHeight);
                     }
 
                     //换行：执行换行操作(物理换行)
                     if (!bSingleLineMode) {
-                        xPos = (SkScalar)rcDrawRect.left;
-                        ASSERT(((int64_t)yPos + (int64_t)nRowHeight) < INT32_MAX);
+                        xPos = (SkScalar) rcDrawRect.left;
+                        ASSERT(((int64_t) yPos + (int64_t) nRowHeight) < INT32_MAX);
                         yPos += nRowHeight;
                         SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                         nRowHeight = nFontHeight;
@@ -333,9 +369,9 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             const size_t textCount = lineTextView.size();
             size_t textStartIndex = 0;
             while (textStartIndex < textCount) {
-                //估算文本绘制区域                
-                size_t byteLength = (textCount - textStartIndex) * textCharSize;                
-                SkScalar maxWidth = SkIntToScalar(rcDrawRect.right) - xPos;//可用宽度
+                //估算文本绘制区域
+                size_t byteLength = (textCount - textStartIndex) * textCharSize;
+                SkScalar maxWidth = SkIntToScalar(rcDrawRect.right) - xPos; //可用宽度
                 if (!bWordWrap || bSingleLineMode) {
                     //不自动换行 或者 单行模式
                     maxWidth = SK_FloatInfinity;
@@ -344,7 +380,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                 //    ASSERT(maxWidth > 0);
                 //}
                 maxWidth = std::max(maxWidth, 0.0f);
-                SkScalar textMeasuredWidth = 0;  //当前要绘制的文本，估算的所需宽度                
+                SkScalar textMeasuredWidth = 0; //当前要绘制的文本，估算的所需宽度
 
                 breakTextData.glyphIDs.clear();
                 breakTextData.glyphChars.clear();
@@ -355,7 +391,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     ASSERT(textCount == 1);
                     // 获取当前字体下一个空格的宽度
                     const DStringW blank = L"0";
-                    SkScalar standardCharWidth = skFont.measureText(blank.c_str(), sizeof(DStringW::value_type), textEncoding, nullptr, &skPaint);
+                    SkScalar standardCharWidth = skFont.measureText(
+                        blank.c_str(), sizeof(DStringW::value_type), textEncoding, nullptr, &skPaint);
                     // 每个制表位 = 4个标准字符宽度
                     const int TAB_COUNT = 4;
                     SkScalar tabStopWidth = standardCharWidth * TAB_COUNT;
@@ -376,29 +413,38 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                         breakTextData.glyphChars.resize(1, sizeof(DStringW::value_type));
                         breakTextData.glyphWidths.resize(1, tabWidth);
                     }
-                }
-                else {
+                } else {
                     //breakText函数执行时间占比约40%
                     //PerformanceStatFast ssStatHashBreak(statHashBreak);
-                    nDrawLength = DrawSkiaText::BreakText(lineTextView.data() + textStartIndex,
-                                                          byteLength, textEncoding,
-                                                          skFont, fallbackFontCreator, skPaint,
-                                                          maxWidth, &textMeasuredWidth, 
-                                                          measureTempData, &breakTextData);
+                    nDrawLength = DrawSkiaText::BreakText(
+                        lineTextView.data() + textStartIndex,
+                        byteLength,
+                        textEncoding,
+                        skFont,
+                        fallbackFontCreator,
+                        skPaint,
+                        maxWidth,
+                        &textMeasuredWidth,
+                        measureTempData,
+                        &breakTextData);
                 }
 
                 //校验
                 bool bBreakTextError = false;
                 if (nDrawLength == 0) {
-                    ASSERT(breakTextData.glyphIDs.empty() && breakTextData.glyphChars.empty() && breakTextData.glyphWidths.empty());
-                    if (!breakTextData.glyphChars.empty() || !breakTextData.glyphChars.empty() || !breakTextData.glyphWidths.empty()) {
+                    ASSERT(
+                        breakTextData.glyphIDs.empty() && breakTextData.glyphChars.empty()
+                        && breakTextData.glyphWidths.empty());
+                    if (!breakTextData.glyphChars.empty() || !breakTextData.glyphChars.empty()
+                        || !breakTextData.glyphWidths.empty()) {
                         bBreakTextError = true;
                     }
-                }
-                else {
-                    ASSERT(!breakTextData.glyphIDs.empty() && !breakTextData.glyphChars.empty() && !breakTextData.glyphWidths.empty());
-                    if ((breakTextData.glyphIDs.size() != breakTextData.glyphChars.size()) ||
-                        (breakTextData.glyphIDs.size() != breakTextData.glyphWidths.size())) {
+                } else {
+                    ASSERT(
+                        !breakTextData.glyphIDs.empty() && !breakTextData.glyphChars.empty()
+                        && !breakTextData.glyphWidths.empty());
+                    if ((breakTextData.glyphIDs.size() != breakTextData.glyphChars.size())
+                        || (breakTextData.glyphIDs.size() != breakTextData.glyphWidths.size())) {
                         bBreakTextError = true;
                     }
                 }
@@ -407,20 +453,21 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     bBreakAll = true;
                     break;
                 }
-                
+
                 if (nDrawLength == 0) {
-                    if (!bWordWrap || bSingleLineMode || (SkScalarTruncToInt(maxWidth) == rcDrawRect.Width())) {
+                    if (!bWordWrap || bSingleLineMode
+                        || (SkScalarTruncToInt(maxWidth) == rcDrawRect.Width())) {
                         //出错了(不能换行，或者换行后依然不够)
                         bBreakAll = true;
                         break;
                     }
-                }
-                else {
-                    TPendingDrawRichText& newPendingTextData = pendingTextData.emplace_back();
-                    newPendingTextData.m_nDataIndex = (uint32_t)index;
+                } else {
+                    TPendingDrawRichText &newPendingTextData = pendingTextData.emplace_back();
+                    newPendingTextData.m_nDataIndex = (uint32_t) index;
                     newPendingTextData.m_nLineNumber = nLineNumber;
                     newPendingTextData.m_nRowIndex = nRowIndex;
-                    newPendingTextData.m_textView = std::wstring_view(lineTextView.data() + textStartIndex, nDrawLength / textCharSize);
+                    newPendingTextData.m_textView = std::wstring_view(
+                        lineTextView.data() + textStartIndex, nDrawLength / textCharSize);
                     newPendingTextData.m_spFont = spSkiaFont;
 
                     newPendingTextData.m_bgColor = textData.m_bgColor;
@@ -428,27 +475,45 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     newPendingTextData.m_textStyle = textData.m_textStyle;
 
                     //绘制文字所需的矩形区域
-                    newPendingTextData.m_destRect.left = SkScalarTruncToInt(xPos); //左值：直接截断，如果有小数部分，直接去掉小数即可
+                    newPendingTextData.m_destRect.left = SkScalarTruncToInt(
+                        xPos); //左值：直接截断，如果有小数部分，直接去掉小数即可
 
-                    SkScalar fRight = xPos + textMeasuredWidth;             //右值：如果有小数，则需要增加1个像素
+                    SkScalar fRight = xPos
+                                      + textMeasuredWidth; //右值：如果有小数，则需要增加1个像素
                     newPendingTextData.m_destRect.right = SkScalarCeilToInt(fRight);
                     newPendingTextData.m_destRect.top = yPos;
-                    newPendingTextData.m_destRect.bottom = yPos + SkScalarCeilToInt(textMeasuredHeight); //记录字符的真实高度
+                    newPendingTextData.m_destRect.bottom
+                        = yPos + SkScalarCeilToInt(textMeasuredHeight); //记录字符的真实高度
 
                     if (pLineInfoParam != nullptr) {
                         //评估每个字符的矩形范围
                         const size_t glyphCount = breakTextData.glyphChars.size();
                         SkScalar glyphWidth = 0;
                         uint8_t glyphCharCount = 0;
-                        SkScalar glyphLeft = (SkScalar)SkScalarTruncToInt(xPos);
+                        SkScalar glyphLeft = (SkScalar) SkScalarTruncToInt(xPos);
                         for (size_t glyphIndex = 0; glyphIndex < glyphCount; ++glyphIndex) {
-                            glyphWidth = breakTextData.glyphWidths[glyphIndex];     //字符宽度
-                            glyphCharCount = breakTextData.glyphChars[glyphIndex];  //该字占几个字节，2或者4
+                            glyphWidth = breakTextData.glyphWidths[glyphIndex]; //字符宽度
+                            glyphCharCount
+                                = breakTextData.glyphChars[glyphIndex]; //该字占几个字节，2或者4
                             ASSERT((glyphCharCount == 2) || (glyphCharCount == 4));
                             ASSERT((glyphCharCount % sizeof(DStringW::value_type)) == 0);
-                            glyphCharCount /= sizeof(DStringW::value_type); //转换为StringW编码字符数，内部使用
-                            ASSERT((glyphCharCount == 1) || (glyphCharCount == 2)); //该字占几个字符（UTF16编码，可能是1或者2）
-                            OnDrawUnicodeChar(pLineInfoParam, 0, glyphCharCount, glyphCount, nLineNumber, nLineTextRowIndex, glyphLeft, yPos, glyphWidth, nRowHeight);
+                            glyphCharCount /= sizeof(
+                                DStringW::value_type); //转换为StringW编码字符数，内部使用
+                            ASSERT(
+                                (glyphCharCount == 1)
+                                || (glyphCharCount
+                                    == 2)); //该字占几个字符（UTF16编码，可能是1或者2）
+                            OnDrawUnicodeChar(
+                                pLineInfoParam,
+                                0,
+                                glyphCharCount,
+                                glyphCount,
+                                nLineNumber,
+                                nLineTextRowIndex,
+                                glyphLeft,
+                                yPos,
+                                glyphWidth,
+                                nRowHeight);
                             glyphLeft += glyphWidth;
                         }
                     }
@@ -459,15 +524,14 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                     //宽度不足，需要换行
                     if (!bSingleLineMode) {
                         bNextRow = true;
-                    }                    
+                    }
                     textStartIndex += nDrawLength / textCharSize;
-                    ASSERT(((int64_t)xPos + (int64_t)textMeasuredWidth) < INT32_MAX);
+                    ASSERT(((int64_t) xPos + (int64_t) textMeasuredWidth) < INT32_MAX);
                     xPos += textMeasuredWidth;
-                }
-                else {
+                } else {
                     //当前行可容纳文本绘制
-                    textStartIndex = textCount;//标记，结束循环
-                    ASSERT(((int64_t)xPos + (int64_t)textMeasuredWidth) < INT32_MAX);
+                    textStartIndex = textCount; //标记，结束循环
+                    ASSERT(((int64_t) xPos + (int64_t) textMeasuredWidth) < INT32_MAX);
                     xPos += textMeasuredWidth;
                     if (xPos >= nTextRectRightMax) {
                         //X坐标右侧已经超出目标矩形的范围
@@ -475,8 +539,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
                             //单行模式，终止绘制
                             bBreakAll = true;
                             break;
-                        }
-                        else if (bWordWrap && !bSingleLineMode) {
+                        } else if (bWordWrap && !bSingleLineMode) {
                             //在自动换行的情况下，换行
                             bNextRow = true;
                         }
@@ -485,8 +548,8 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
 
                 if (bNextRow) {
                     //换行：执行换行操作（逻辑换行，对nLineNumber不增加）
-                    xPos = (SkScalar)rcDrawRect.left;
-                    ASSERT(((int64_t)yPos + (int64_t)nRowHeight) < INT32_MAX);
+                    xPos = (SkScalar) rcDrawRect.left;
+                    ASSERT(((int64_t) yPos + (int64_t) nRowHeight) < INT32_MAX);
                     yPos += nRowHeight;
                     SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
                     nRowHeight = nFontHeight;
@@ -513,27 +576,30 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
     SaveRowHeight(rowHeightVector, nRowIndex, nRowHeight);
 
     //更新每行的行高(只有提前确定行高，才能正确绘制纵向对齐的文本)
-    for (TPendingDrawRichText& textData : pendingTextData) {
+    for (TPendingDrawRichText &textData : pendingTextData) {
         if (textData.m_nRowIndex < rowHeightVector.size()) {
-            textData.m_destRect.bottom = textData.m_destRect.top + rowHeightVector[textData.m_nRowIndex];
+            textData.m_destRect.bottom = textData.m_destRect.top
+                                         + rowHeightVector[textData.m_nRowIndex];
         }
     }
 
     if (pRichTextRects != nullptr) {
         pRichTextRects->clear();
         pRichTextRects->resize(richTextData.size());
-        for (const TPendingDrawRichText& textData : pendingTextData) {
+        for (const TPendingDrawRichText &textData : pendingTextData) {
             //保存绘制的目标区域，同一个文本，可能会有多个区域（换行时）
             ASSERT(textData.m_nDataIndex < pRichTextRects->size());
-            std::vector<UiRect>& textRects = (*pRichTextRects)[textData.m_nDataIndex];
-            textRects.push_back(textData.m_destRect); 
+            std::vector<UiRect> &textRects = (*pRichTextRects)[textData.m_nDataIndex];
+            textRects.push_back(textData.m_destRect);
         }
     }
 
     if (pDrawRichTextCache != nullptr) {
         //生成绘制缓存，但不执行绘制
-        std::shared_ptr<DrawRichTextCache> spDrawRichTextCache = std::make_shared<SkiaDrawRichTextCache>();
-        SkiaDrawRichTextCache* pSkiaCache = static_cast<SkiaDrawRichTextCache*>(spDrawRichTextCache.get());
+        std::shared_ptr<DrawRichTextCache> spDrawRichTextCache
+            = std::make_shared<SkiaDrawRichTextCache>();
+        SkiaDrawRichTextCache *pSkiaCache = static_cast<SkiaDrawRichTextCache *>(
+            spDrawRichTextCache.get());
         *pDrawRichTextCache = spDrawRichTextCache;
         pSkiaCache->m_richTextData = richTextData;
         pSkiaCache->m_textRect = rcTextRect;
@@ -542,12 +608,11 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
         pSkiaCache->m_textCharSize = textCharSize;
 
         pSkiaCache->m_pendingTextData.swap(pendingTextData);
-    }
-    else if (!bMeasureOnly) {
+    } else if (!bMeasureOnly) {
         UiRect rcTemp;
-        for (const TPendingDrawRichText& textData : pendingTextData) {
-            //执行绘制            
-            const UiRect& rcDestRect = textData.m_destRect;
+        for (const TPendingDrawRichText &textData : pendingTextData) {
+            //执行绘制
+            const UiRect &rcDestRect = textData.m_destRect;
             if (!UiRect::Intersect(rcTemp, rcDestRect, rcTextRect)) {
                 continue;
             }
@@ -556,7 +621,7 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             m_pRender->FillRect(UiRectF::MakeFromRect(rcDestRect), textData.m_bgColor, uFade);
 
             if (textColor != textData.m_textColor) {
-                const UiColor& color = textData.m_textColor;
+                const UiColor &color = textData.m_textColor;
                 skPaint.setARGB(color.GetA(), color.GetR(), color.GetG(), color.GetB());
                 textColor = textData.m_textColor;
             }
@@ -564,34 +629,46 @@ void DrawRichText::InternalDrawRichText(const UiRect& rcTextRect,
             //绘制文字
             if ((textData.m_textView.size() == 1) && (textData.m_textView[0] == L'\t')) {
                 //绘制TAB键
-                const char* text = (const char*)" ";
+                const char *text = (const char *) " ";
                 const size_t len = 1; //字节数
-                DrawTextString(rcDestRect, text, len, SkTextEncoding::kUTF8,
-                               textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
-                               skPaint, textData.m_spFont.get());
-            }
-            else {
-                const char* text = (const char*)textData.m_textView.data();
+                DrawTextString(
+                    rcDestRect,
+                    text,
+                    len,
+                    SkTextEncoding::kUTF8,
+                    textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
+                    skPaint,
+                    textData.m_spFont.get());
+            } else {
+                const char *text = (const char *) textData.m_textView.data();
                 const size_t len = textData.m_textView.size() * textCharSize; //字节数
-                DrawTextString(rcDestRect, text, len, textEncoding,
-                               textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
-                               skPaint, textData.m_spFont.get());
+                DrawTextString(
+                    rcDestRect,
+                    text,
+                    len,
+                    textEncoding,
+                    textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
+                    skPaint,
+                    textData.m_spFont.get());
             }
         }
     }
     return;
 }
 
-void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uint32_t>& lineSeprators, std::vector<std::wstring_view>& lineTextViewList)
+void DrawRichText::SplitLines(
+    const std::wstring_view &lineText,
+    std::vector<uint32_t> &lineSeprators,
+    std::vector<std::wstring_view> &lineTextViewList)
 {
     if (lineText.empty()) {
         return;
     }
     lineSeprators.clear();
-    const uint32_t nTextLen = (uint32_t)lineText.size();
-    lineSeprators.reserve(nTextLen/100);
+    const uint32_t nTextLen = (uint32_t) lineText.size();
+    lineSeprators.reserve(nTextLen / 100);
     for (uint32_t nTextIndex = 0; nTextIndex < nTextLen; ++nTextIndex) {
-        const std::wstring_view::value_type& ch = lineText[nTextIndex];
+        const std::wstring_view::value_type &ch = lineText[nTextIndex];
         if ((ch == L'\t') || (ch == L'\r') || (ch == L'\n')) {
             lineSeprators.push_back(nTextIndex);
         }
@@ -599,8 +676,7 @@ void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uin
     if (lineSeprators.empty()) {
         //没有换行分隔符，单行
         lineTextViewList.emplace_back(std::wstring_view(lineText.data(), lineText.size()));
-    }
-    else {
+    } else {
         //有换行分隔符，切分为多行, 并保留换行符
         size_t nLastIndex = 0;
         size_t nCurrentIndex = 0;
@@ -618,8 +694,7 @@ void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uin
                     lineTextViewList.emplace_back(std::wstring_view(lineText.data(), nCharCount));
                 }
                 lineTextViewList.emplace_back(std::wstring_view(lineText.data() + nCurrentIndex, 1));
-            }
-            else {
+            } else {
                 //中间行
                 nLastIndex = lineSeprators[nLine - 1];
                 nCurrentIndex = lineSeprators[nLine];
@@ -627,7 +702,8 @@ void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uin
                 ASSERT(nCurrentIndex < lineText.size());
                 nCharCount = nCurrentIndex - nLastIndex - 1;
                 if (nCharCount > 0) {
-                    lineTextViewList.emplace_back(std::wstring_view(lineText.data() + nLastIndex + 1, nCharCount));
+                    lineTextViewList.emplace_back(
+                        std::wstring_view(lineText.data() + nLastIndex + 1, nCharCount));
                 }
                 lineTextViewList.emplace_back(std::wstring_view(lineText.data() + nCurrentIndex, 1));
             }
@@ -639,28 +715,36 @@ void DrawRichText::SplitLines(const std::wstring_view& lineText, std::vector<uin
                 ASSERT(nCurrentIndex > nLastIndex);
                 nCharCount = nCurrentIndex - nLastIndex - 1;
                 if (nCharCount > 0) {
-                    lineTextViewList.emplace_back(std::wstring_view(lineText.data() + nLastIndex + 1, nCharCount));
+                    lineTextViewList.emplace_back(
+                        std::wstring_view(lineText.data() + nLastIndex + 1, nCharCount));
                 }
             }
         }
     }
 }
 
-void DrawRichText::OnDrawUnicodeChar(RichTextLineInfoParam* pLineInfoParam,
-                                     DStringW::value_type ch, uint8_t glyphChars, size_t glyphCount,
-                                     size_t nLineTextIndex, uint32_t nLineTextRowIndex,
-                                     float xPos, int32_t yPos, float glyphWidth, int32_t nRowHeight)
+void DrawRichText::OnDrawUnicodeChar(
+    RichTextLineInfoParam *pLineInfoParam,
+    DStringW::value_type ch,
+    uint8_t glyphChars,
+    size_t glyphCount,
+    size_t nLineTextIndex,
+    uint32_t nLineTextRowIndex,
+    float xPos,
+    int32_t yPos,
+    float glyphWidth,
+    int32_t nRowHeight)
 {
-    //该函数执行频率非常高，每个字符都会调用一次，性能敏感    
+    //该函数执行频率非常高，每个字符都会调用一次，性能敏感
     if (pLineInfoParam == nullptr) {
         ASSERT(pLineInfoParam != nullptr);
         return;
-    }    
+    }
     if (pLineInfoParam->m_pLineInfoList == nullptr) {
         ASSERT(pLineInfoParam->m_pLineInfoList != nullptr);
         return;
     }
-    size_t nIndex = nLineTextIndex; //外部已经加上了pLineInfoParam->m_nStartLineIndex的值    
+    size_t nIndex = nLineTextIndex; //外部已经加上了pLineInfoParam->m_nStartLineIndex的值
     if (nIndex >= pLineInfoParam->m_pLineInfoList->size()) {
         ASSERT(nIndex < pLineInfoParam->m_pLineInfoList->size());
         return;
@@ -670,45 +754,43 @@ void DrawRichText::OnDrawUnicodeChar(RichTextLineInfoParam* pLineInfoParam,
         return;
     }
 
-    RichTextLineInfo& lineInfo = *(*pLineInfoParam->m_pLineInfoList)[nIndex];
+    RichTextLineInfo &lineInfo = *(*pLineInfoParam->m_pLineInfoList)[nIndex];
     bool bFound = (nLineTextRowIndex < lineInfo.m_rowInfo.size()) ? true : false;
-    if (!bFound) {        
+    if (!bFound) {
         if (nLineTextRowIndex != lineInfo.m_rowInfo.size()) {
             ASSERT(nLineTextRowIndex == lineInfo.m_rowInfo.size());
             return;
         }
-        lineInfo.m_rowInfo.push_back(RichTextRowInfoPtr(new RichTextRowInfo));        
-    }    
+        lineInfo.m_rowInfo.push_back(RichTextRowInfoPtr(new RichTextRowInfo));
+    }
     if (lineInfo.m_rowInfo[nLineTextRowIndex] == nullptr) {
         ASSERT(lineInfo.m_rowInfo[nLineTextRowIndex] != nullptr);
         return;
     }
-    RichTextRowInfo& rowInfo = *lineInfo.m_rowInfo[nLineTextRowIndex];
+    RichTextRowInfo &rowInfo = *lineInfo.m_rowInfo[nLineTextRowIndex];
     if (!bFound) {
         //该行的第一个字符
         rowInfo.m_rowRect.left = xPos;
         rowInfo.m_rowRect.right = xPos + glyphWidth;
-        rowInfo.m_rowRect.top = (SkScalar)yPos;
+        rowInfo.m_rowRect.top = (SkScalar) yPos;
         rowInfo.m_rowRect.bottom = rowInfo.m_rowRect.top + nRowHeight;
         ASSERT(nRowHeight > 0);
 
         rowInfo.m_charInfo.reserve(glyphCount + 2);
-    }
-    else {
+    } else {
         rowInfo.m_rowRect.right += glyphWidth;
-        ASSERT(nRowHeight == (int32_t)rowInfo.m_rowRect.Height());
+        ASSERT(nRowHeight == (int32_t) rowInfo.m_rowRect.Height());
     }
 
     RichTextCharInfo charInfo;
-    charInfo.SetCharWidth(glyphWidth);    
+    charInfo.SetCharWidth(glyphWidth);
     if (ch == '\r') {
         //回车
         charInfo.SetCharFlag(0);
         charInfo.AddCharFlag(RichTextCharFlag::kIsIgnoredChar);
         charInfo.AddCharFlag(RichTextCharFlag::kIsReturn);
         charInfo.SetCharWidth(0);
-    }
-    else if (ch == '\n') {
+    } else if (ch == '\n') {
         //换行
         charInfo.SetCharFlag(0);
         charInfo.AddCharFlag(RichTextCharFlag::kIsNewLine);
@@ -728,24 +810,28 @@ void DrawRichText::OnDrawUnicodeChar(RichTextLineInfoParam* pLineInfoParam,
     ASSERT((glyphChars == 1) || (glyphChars == 2));
 }
 
-bool DrawRichText::IsValidDrawRichTextCache(const UiRect& textRect,
-                                            const std::vector<RichTextData>& richTextData,
-                                            const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache)
+bool DrawRichText::IsValidDrawRichTextCache(
+    const UiRect &textRect,
+    const std::vector<RichTextData> &richTextData,
+    const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache)
 {
-    ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
-    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
+    ASSERT(
+        (m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr)
+        && (m_pSkPointOrg != nullptr));
+    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr)
+        || (m_pSkPointOrg == nullptr)) {
         return false;
     }
     if (spDrawRichTextCache == nullptr) {
         return false;
     }
-    const SkiaDrawRichTextCache* pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
+    const SkiaDrawRichTextCache *pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
     ASSERT(pSkiaCache != nullptr);
     if (pSkiaCache == nullptr) {
         return false;
     }
-    if ((pSkiaCache->m_textRect.Width() != textRect.Width()) ||
-        (pSkiaCache->m_textRect.Height() != textRect.Height())) {
+    if ((pSkiaCache->m_textRect.Width() != textRect.Width())
+        || (pSkiaCache->m_textRect.Height() != textRect.Height())) {
         //矩形大小发生变化，不能使用缓存(位置变化时，可以使用缓存)
         return false;
     }
@@ -755,35 +841,27 @@ bool DrawRichText::IsValidDrawRichTextCache(const UiRect& textRect,
     bool bValid = true;
     const size_t nCount = richTextData.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        const RichTextData& textData = richTextData[nIndex];
-        const RichTextData& textDataCache = pSkiaCache->m_richTextData[nIndex];
+        const RichTextData &textData = richTextData[nIndex];
+        const RichTextData &textDataCache = pSkiaCache->m_richTextData[nIndex];
         if (textData.m_textView.data() != textDataCache.m_textView.data()) {
             bValid = false;
-        }
-        else if (textData.m_textView.size() != textDataCache.m_textView.size()) {
+        } else if (textData.m_textView.size() != textDataCache.m_textView.size()) {
             bValid = false;
-        }
-        else if (textData.m_textColor != textDataCache.m_textColor) {
+        } else if (textData.m_textColor != textDataCache.m_textColor) {
             bValid = false;
-        }
-        else if (textData.m_bgColor != textDataCache.m_bgColor) {
+        } else if (textData.m_bgColor != textDataCache.m_bgColor) {
             bValid = false;
-        }
-        else if (textData.m_pFontInfo != textDataCache.m_pFontInfo) {
+        } else if (textData.m_pFontInfo != textDataCache.m_pFontInfo) {
             if ((textData.m_pFontInfo == nullptr) || (textDataCache.m_pFontInfo == nullptr)) {
                 bValid = false;
-            }
-            else if (*textData.m_pFontInfo != *textDataCache.m_pFontInfo) {
+            } else if (*textData.m_pFontInfo != *textDataCache.m_pFontInfo) {
                 bValid = false;
             }
-        }
-        else if (textData.m_fRowSpacingMul != textDataCache.m_fRowSpacingMul) {
+        } else if (textData.m_fRowSpacingMul != textDataCache.m_fRowSpacingMul) {
             bValid = false;
-        }
-        else if (textData.m_fRowSpacingAdd != textDataCache.m_fRowSpacingAdd) {
+        } else if (textData.m_fRowSpacingAdd != textDataCache.m_fRowSpacingAdd) {
             bValid = false;
-        }
-        else if (textData.m_textStyle != textDataCache.m_textStyle) {
+        } else if (textData.m_textStyle != textDataCache.m_textStyle) {
             bValid = false;
         }
 
@@ -794,18 +872,22 @@ bool DrawRichText::IsValidDrawRichTextCache(const UiRect& textRect,
     return bValid;
 }
 
-bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& spOldDrawRichTextCache,
-                                           const std::shared_ptr<DrawRichTextCache>& spUpdateDrawRichTextCache,
-                                           std::vector<RichTextData>& richTextDataNew,
-                                           size_t nStartLine,
-                                           const std::vector<size_t>& modifiedLines,
-                                           size_t nModifiedRows,
-                                           const std::vector<size_t>& deletedLines,
-                                           size_t nDeletedRows,
-                                           const std::vector<int32_t>& rowRectTopList)
+bool DrawRichText::UpdateDrawRichTextCache(
+    std::shared_ptr<DrawRichTextCache> &spOldDrawRichTextCache,
+    const std::shared_ptr<DrawRichTextCache> &spUpdateDrawRichTextCache,
+    std::vector<RichTextData> &richTextDataNew,
+    size_t nStartLine,
+    const std::vector<size_t> &modifiedLines,
+    size_t nModifiedRows,
+    const std::vector<size_t> &deletedLines,
+    size_t nDeletedRows,
+    const std::vector<int32_t> &rowRectTopList)
 {
-    ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
-    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
+    ASSERT(
+        (m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr)
+        && (m_pSkPointOrg != nullptr));
+    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr)
+        || (m_pSkPointOrg == nullptr)) {
         return false;
     }
     ASSERT(spOldDrawRichTextCache != nullptr);
@@ -830,9 +912,8 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
         if (nStartLine != modifiedLines[0]) {
             ASSERT(modifiedLines.empty() || (nStartLine == modifiedLines[0]));
             return false;
-        }        
-    }
-    else if (!deletedLines.empty()) {
+        }
+    } else if (!deletedLines.empty()) {
         if (nStartLine != deletedLines[0]) {
             ASSERT(deletedLines.empty() || (nStartLine == deletedLines[0]));
             return false;
@@ -840,40 +921,41 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     }
 
     //删除的行数据，对应移除
-    SkiaDrawRichTextCache* pOldData = GetSkiaDrawRichTextCache(spOldDrawRichTextCache.get());
+    SkiaDrawRichTextCache *pOldData = GetSkiaDrawRichTextCache(spOldDrawRichTextCache.get());
     ASSERT(pOldData != nullptr);
     if (pOldData == nullptr) {
         return false;
     }
-    SkiaDrawRichTextCache& oldData = *pOldData;
+    SkiaDrawRichTextCache &oldData = *pOldData;
     oldData.m_richTextData.swap(richTextDataNew);
 
     if (!deletedLines.empty()) {
         std::unordered_set<uint32_t> deletedLineSet;
         for (size_t nLine : deletedLines) {
-            deletedLineSet.insert((uint32_t)nLine);
+            deletedLineSet.insert((uint32_t) nLine);
         }
-        const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
+        const int32_t nCount = (int32_t) oldData.m_pendingTextData.size();
         for (int32_t nIndex = nCount - 1; nIndex >= 0; --nIndex) {
-            const TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
+            const TPendingDrawRichText &pendingData = oldData.m_pendingTextData[nIndex];
             if (deletedLineSet.find(pendingData.m_nLineNumber) != deletedLineSet.end()) {
                 oldData.m_pendingTextData.erase(oldData.m_pendingTextData.begin() + nIndex);
             }
         }
     }
 
-    //更新缓存开始的元素下标值    
-    size_t nUpdateCacheStartIndex = (size_t)-1;
+    //更新缓存开始的元素下标值
+    size_t nUpdateCacheStartIndex = (size_t) -1;
     //是否将修改的内容追加到最后了
     bool bAppendUpdateAtEnd = false;
     if (spUpdateDrawRichTextCache != nullptr) {
-        SkiaDrawRichTextCache* pUpdateData = GetSkiaDrawRichTextCache(spUpdateDrawRichTextCache.get());
+        SkiaDrawRichTextCache *pUpdateData = GetSkiaDrawRichTextCache(
+            spUpdateDrawRichTextCache.get());
         ASSERT(pUpdateData != nullptr);
         if (pUpdateData == nullptr) {
             return false;
         }
-        SkiaDrawRichTextCache& updateData = *pUpdateData;
-        if (!updateData.m_pendingTextData.empty()) {//容器可能为空（当本行为空行时为空）
+        SkiaDrawRichTextCache &updateData = *pUpdateData;
+        if (!updateData.m_pendingTextData.empty()) { //容器可能为空（当本行为空行时为空）
             ASSERT(updateData.m_textRect == oldData.m_textRect);
             if (updateData.m_textRect != oldData.m_textRect) {
                 return false;
@@ -887,41 +969,46 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
                 return false;
             }
             //将新的绘制缓存，合并到原绘制缓存中
-            const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
+            const int32_t nCount = (int32_t) oldData.m_pendingTextData.size();
             for (int32_t nIndex = 0; nIndex < nCount; ++nIndex) {
-                const TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
+                const TPendingDrawRichText &pendingData = oldData.m_pendingTextData[nIndex];
                 if (pendingData.m_nLineNumber > nStartLine) {
-                    oldData.m_pendingTextData.insert(oldData.m_pendingTextData.begin() + nIndex, updateData.m_pendingTextData.begin(), updateData.m_pendingTextData.end());
+                    oldData.m_pendingTextData.insert(
+                        oldData.m_pendingTextData.begin() + nIndex,
+                        updateData.m_pendingTextData.begin(),
+                        updateData.m_pendingTextData.end());
                     nUpdateCacheStartIndex = nIndex + updateData.m_pendingTextData.size();
                     break;
                 }
             }
-            if (nUpdateCacheStartIndex == (size_t)-1) {
+            if (nUpdateCacheStartIndex == (size_t) -1) {
                 //追加在最后, 行号（物理行号，逻辑行号）无需更新，因为增量绘制的时候已经设置了正确的值
                 bAppendUpdateAtEnd = true;
-                oldData.m_pendingTextData.insert(oldData.m_pendingTextData.end(), updateData.m_pendingTextData.begin(), updateData.m_pendingTextData.end());                
+                oldData.m_pendingTextData.insert(
+                    oldData.m_pendingTextData.end(),
+                    updateData.m_pendingTextData.begin(),
+                    updateData.m_pendingTextData.end());
             }
         }
     }
 
-    int32_t nLineNumberDiff = (int32_t)modifiedLines.size() - (int32_t)deletedLines.size();
-    int32_t nRowIndexDiff = (int32_t)nModifiedRows - (int32_t)nDeletedRows;
+    int32_t nLineNumberDiff = (int32_t) modifiedLines.size() - (int32_t) deletedLines.size();
+    int32_t nRowIndexDiff = (int32_t) nModifiedRows - (int32_t) nDeletedRows;
     bool bUpdateIndex = (nLineNumberDiff != 0) || (nRowIndexDiff != 0);
 
     //修正物理行号，逻辑行号，本行的绘制目标区域值
     const size_t nRowRectCount = rowRectTopList.size();
     bool bUpdateLineRows = false;
-    const int32_t nCount = (int32_t)oldData.m_pendingTextData.size();
+    const int32_t nCount = (int32_t) oldData.m_pendingTextData.size();
     for (int32_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        TPendingDrawRichText& pendingData = oldData.m_pendingTextData[nIndex];
+        TPendingDrawRichText &pendingData = oldData.m_pendingTextData[nIndex];
         if (!bUpdateLineRows && bUpdateIndex) {
-            if ((nUpdateCacheStartIndex != (size_t)-1)) {
+            if ((nUpdateCacheStartIndex != (size_t) -1)) {
                 //更新行号(有修改，并且修改点不再最后)
-                if (nIndex >= (int32_t)nUpdateCacheStartIndex) {
+                if (nIndex >= (int32_t) nUpdateCacheStartIndex) {
                     bUpdateLineRows = true;
                 }
-            }
-            else if (!bAppendUpdateAtEnd) {
+            } else if (!bAppendUpdateAtEnd) {
                 //无修改，只有删除；或者新修改的行只是空行的情况
                 if (pendingData.m_nLineNumber >= nStartLine) {
                     bUpdateLineRows = true;
@@ -930,27 +1017,26 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
         }
         if (bUpdateLineRows) {
             if (nLineNumberDiff > 0) {
-                pendingData.m_nLineNumber += (uint32_t)nLineNumberDiff;
-            }
-            else if (nLineNumberDiff < 0) {
-                pendingData.m_nLineNumber -= (uint32_t)-nLineNumberDiff;
+                pendingData.m_nLineNumber += (uint32_t) nLineNumberDiff;
+            } else if (nLineNumberDiff < 0) {
+                pendingData.m_nLineNumber -= (uint32_t) -nLineNumberDiff;
             }
             if (nRowIndexDiff > 0) {
-                pendingData.m_nRowIndex += (uint32_t)nRowIndexDiff;
-            }
-            else if (nRowIndexDiff < 0) {
-                pendingData.m_nRowIndex -= (uint32_t)-nRowIndexDiff;
+                pendingData.m_nRowIndex += (uint32_t) nRowIndexDiff;
+            } else if (nRowIndexDiff < 0) {
+                pendingData.m_nRowIndex -= (uint32_t) -nRowIndexDiff;
             }
         }
 
         if (pendingData.m_nLineNumber >= nStartLine) {
             //对应数据的索引下标更新为无效值，后续不再使用
-            pendingData.m_nDataIndex = (uint32_t)-1;
+            pendingData.m_nDataIndex = (uint32_t) -1;
 
             //更新本行的绘制目标区域
             ASSERT(pendingData.m_nRowIndex < nRowRectCount);
             if (pendingData.m_nRowIndex < nRowRectCount) {
-                pendingData.m_destRect.bottom = rowRectTopList[pendingData.m_nRowIndex] + pendingData.m_destRect.Height();
+                pendingData.m_destRect.bottom = rowRectTopList[pendingData.m_nRowIndex]
+                                                + pendingData.m_destRect.Height();
                 pendingData.m_destRect.top = rowRectTopList[pendingData.m_nRowIndex];
             }
         }
@@ -958,20 +1044,24 @@ bool DrawRichText::UpdateDrawRichTextCache(std::shared_ptr<DrawRichTextCache>& s
     return true;
 }
 
-bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache, const DrawRichTextCache& secondCache) const
+bool DrawRichText::IsDrawRichTextCacheEqual(
+    const DrawRichTextCache &firstCache, const DrawRichTextCache &secondCache) const
 {
-    ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
-    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
+    ASSERT(
+        (m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr)
+        && (m_pSkPointOrg != nullptr));
+    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr)
+        || (m_pSkPointOrg == nullptr)) {
         return false;
     }
-    const SkiaDrawRichTextCache* pFirst = GetSkiaDrawRichTextCache(&firstCache);
-    const SkiaDrawRichTextCache* pSecond = GetSkiaDrawRichTextCache(&secondCache);
+    const SkiaDrawRichTextCache *pFirst = GetSkiaDrawRichTextCache(&firstCache);
+    const SkiaDrawRichTextCache *pSecond = GetSkiaDrawRichTextCache(&secondCache);
     ASSERT((pFirst != nullptr) && (pSecond != nullptr));
     if ((pFirst == nullptr) || (pSecond == nullptr)) {
         return false;
     }
-    const SkiaDrawRichTextCache& first = *pFirst;
-    const SkiaDrawRichTextCache& second = *pSecond;
+    const SkiaDrawRichTextCache &first = *pFirst;
+    const SkiaDrawRichTextCache &second = *pSecond;
 
     ASSERT(first.m_textRect == second.m_textRect);
     if (first.m_textRect != second.m_textRect) {
@@ -994,8 +1084,8 @@ bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache,
     }
     const size_t nDataCount = first.m_richTextData.size();
     for (size_t nIndex = 0; nIndex < nDataCount; ++nIndex) {
-        const RichTextData& v1 = first.m_richTextData[nIndex];
-        const RichTextData& v2 = second.m_richTextData[nIndex];
+        const RichTextData &v1 = first.m_richTextData[nIndex];
+        const RichTextData &v2 = second.m_richTextData[nIndex];
         ASSERT(v1.m_textView == v2.m_textView);
         if (v1.m_textView != v2.m_textView) {
             return false;
@@ -1037,8 +1127,8 @@ bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache,
 
     const size_t nCount = first.m_pendingTextData.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        const TPendingDrawRichText& v1 = first.m_pendingTextData[nIndex];
-        const TPendingDrawRichText& v2 = second.m_pendingTextData[nIndex];
+        const TPendingDrawRichText &v1 = first.m_pendingTextData[nIndex];
+        const TPendingDrawRichText &v2 = second.m_pendingTextData[nIndex];
 
         //m_nDataIndex 此值不需要比较
         ASSERT(v1.m_nLineNumber == v2.m_nLineNumber);
@@ -1086,7 +1176,7 @@ bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache,
         if (v1.m_spFont->IsStrikeOut() != v2.m_spFont->IsStrikeOut()) {
             return false;
         }
-        
+
         ASSERT(v1.m_textColor == v2.m_textColor);
         if (v1.m_textColor != v2.m_textColor) {
             return false;
@@ -1103,15 +1193,19 @@ bool DrawRichText::IsDrawRichTextCacheEqual(const DrawRichTextCache& firstCache,
     return true;
 }
 
-void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache,                                       
-                                         const UiRect& rcNewTextRect,
-                                         const UiSize& szNewScrollOffset,
-                                         const std::vector<int32_t>& rowXOffset,
-                                         uint8_t uFade,
-                                         std::vector<std::vector<UiRect>>* pRichTextRects)
+void DrawRichText::DrawRichTextCacheData(
+    const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache,
+    const UiRect &rcNewTextRect,
+    const UiSize &szNewScrollOffset,
+    const std::vector<int32_t> &rowXOffset,
+    uint8_t uFade,
+    std::vector<std::vector<UiRect>> *pRichTextRects)
 {
-    ASSERT((m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr) && (m_pSkPointOrg != nullptr));
-    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr) || (m_pSkPointOrg == nullptr)) {
+    ASSERT(
+        (m_pRender != nullptr) && (m_pSkCanvas != nullptr) && (m_pSkPaint != nullptr)
+        && (m_pSkPointOrg != nullptr));
+    if ((m_pRender == nullptr) || (m_pSkCanvas == nullptr) || (m_pSkPaint == nullptr)
+        || (m_pSkPointOrg == nullptr)) {
         return;
     }
 
@@ -1119,7 +1213,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     if (spDrawRichTextCache == nullptr) {
         return;
     }
-    const SkiaDrawRichTextCache* pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
+    const SkiaDrawRichTextCache *pSkiaCache = GetSkiaDrawRichTextCache(spDrawRichTextCache.get());
     ASSERT(pSkiaCache != nullptr);
     if (pSkiaCache == nullptr) {
         return;
@@ -1139,7 +1233,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     const SkTextEncoding textEncoding = pSkiaCache->m_textEncoding;
     const size_t textCharSize = pSkiaCache->m_textCharSize;
 
-    const std::vector<TPendingDrawRichText>& pendingTextData = pSkiaCache->m_pendingTextData;
+    const std::vector<TPendingDrawRichText> &pendingTextData = pSkiaCache->m_pendingTextData;
 
     UiRect rcTemp;
     UiRect rcDestRect;
@@ -1156,16 +1250,17 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
     }
 
     UiColor textColor;
-    for (const TPendingDrawRichText& textData : pendingTextData) {
+    for (const TPendingDrawRichText &textData : pendingTextData) {
         //通过缓存绘制的时候，不能使用textData.m_nDataIndex值，此值再增量绘制的情况下是不正确的
-        
-        //执行绘制        
+
+        //执行绘制
         rcDestRect = textData.m_destRect;
         rcDestRect.Offset(rcNewTextRect.left, rcNewTextRect.top);
         rcDestRect.Offset(-szNewScrollOffset.cx, -szNewScrollOffset.cy);
         if (!rowXOffset.empty()) {
             ASSERT(textData.m_nRowIndex < rowXOffset.size());
-            if ((textData.m_nRowIndex < rowXOffset.size()) && (rowXOffset[textData.m_nRowIndex] > 0)) {
+            if ((textData.m_nRowIndex < rowXOffset.size())
+                && (rowXOffset[textData.m_nRowIndex] > 0)) {
                 rcDestRect.Offset(rowXOffset[textData.m_nRowIndex], 0);
             }
         }
@@ -1174,7 +1269,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
         if (pRichTextRects != nullptr) {
             //保存绘制的目标区域，同一个文本，可能会有多个区域（换行时）
             ASSERT(textData.m_nDataIndex < pRichTextRects->size());
-            std::vector<UiRect>& textRects = (*pRichTextRects)[textData.m_nDataIndex];
+            std::vector<UiRect> &textRects = (*pRichTextRects)[textData.m_nDataIndex];
             textRects.push_back(rcDestRect);
         }
 
@@ -1189,7 +1284,7 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
 
         //设置文本颜色
         if (textColor != textData.m_textColor) {
-            const UiColor& color = textData.m_textColor;
+            const UiColor &color = textData.m_textColor;
             skPaint.setARGB(color.GetA(), color.GetR(), color.GetG(), color.GetB());
             textColor = textData.m_textColor;
         }
@@ -1197,57 +1292,75 @@ void DrawRichText::DrawRichTextCacheData(const std::shared_ptr<DrawRichTextCache
         //绘制文字
         if ((textData.m_textView.size() == 1) && (textData.m_textView[0] == L'\t')) {
             //绘制TAB键
-            const char* text = (const char*)" ";
+            const char *text = (const char *) " ";
             const size_t len = 1; //字节数
-            DrawTextString(rcDestRect, text, len, SkTextEncoding::kUTF8,
-                            textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
-                            skPaint, textData.m_spFont.get());
-        }
-        else {
-            const char* text = (const char*)textData.m_textView.data();
+            DrawTextString(
+                rcDestRect,
+                text,
+                len,
+                SkTextEncoding::kUTF8,
+                textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
+                skPaint,
+                textData.m_spFont.get());
+        } else {
+            const char *text = (const char *) textData.m_textView.data();
             size_t len = textData.m_textView.size() * textCharSize; //字节数
-            DrawTextString(rcDestRect, text, len, textEncoding,
-                           textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
-                           skPaint, textData.m_spFont.get());
+            DrawTextString(
+                rcDestRect,
+                text,
+                len,
+                textEncoding,
+                textData.m_textStyle | DrawStringFormat::TEXT_SINGLELINE,
+                skPaint,
+                textData.m_spFont.get());
         }
     }
 }
 
-void DrawRichText::DrawTextString(const UiRect& textRect, const DString& strText, uint32_t uFormat,
-                                 const SkPaint& skPaint, IFont* pFont) const
+void DrawRichText::DrawTextString(
+    const UiRect &textRect,
+    const DString &strText,
+    uint32_t uFormat,
+    const SkPaint &skPaint,
+    IFont *pFont) const
 {
     ASSERT(!strText.empty());
     if (strText.empty()) {
         return;
     }
-    const char* text = (const char*)strText.c_str();
+    const char *text = (const char *) strText.c_str();
     size_t len = strText.size() * sizeof(DString::value_type);
     SkTextEncoding textEncoding = GetTextEncoding();
     DrawTextString(textRect, text, len, textEncoding, uFormat, skPaint, pFont);
 }
 
-void DrawRichText::DrawTextString(const UiRect& textRect,
-                                  const char* text, size_t len, SkTextEncoding textEncoding,
-                                  uint32_t uFormat, const SkPaint& skPaint, IFont* pFont) const
+void DrawRichText::DrawTextString(
+    const UiRect &textRect,
+    const char *text,
+    size_t len,
+    SkTextEncoding textEncoding,
+    uint32_t uFormat,
+    const SkPaint &skPaint,
+    IFont *pFont) const
 {
-    SkCanvas* skCanvas = m_pSkCanvas;
+    SkCanvas *skCanvas = m_pSkCanvas;
     ASSERT(skCanvas != nullptr);
     if (skCanvas == nullptr) {
         return;
     }
-    Font_Skia* pSkiaFont = dynamic_cast<Font_Skia*>(pFont);
+    Font_Skia *pSkiaFont = dynamic_cast<Font_Skia *>(pFont);
     ASSERT(pSkiaFont != nullptr);
     if (pSkiaFont == nullptr) {
         return;
     }
-    const SkFont* pSkFont = pSkiaFont->GetFontHandle();
+    const SkFont *pSkFont = pSkiaFont->GetFontHandle();
     ASSERT(pSkFont != nullptr);
     if (pSkFont == nullptr) {
         return;
     }
 
     //绘制区域
-    SkIRect rcSkDestI = { textRect.left, textRect.top, textRect.right, textRect.bottom };
+    SkIRect rcSkDestI = {textRect.left, textRect.top, textRect.right, textRect.bottom};
     SkRect rcSkDest = SkRect::Make(rcSkDestI);
     rcSkDest.offset(*m_pSkPointOrg);
 
@@ -1284,12 +1397,10 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
     if (uFormat & DrawStringFormat::TEXT_HCENTER) {
         //横向对齐：居中对齐
         skTextBox.SetTextAlign(SkTextBox::kCenter_Align);
-    }
-    else if (uFormat & DrawStringFormat::TEXT_RIGHT) {
+    } else if (uFormat & DrawStringFormat::TEXT_RIGHT) {
         //横向对齐：右对齐
         skTextBox.SetTextAlign(SkTextBox::kRight_Align);
-    }
-    else {
+    } else {
         //横向对齐：左对齐
         skTextBox.SetTextAlign(SkTextBox::kLeft_Align);
     }
@@ -1297,19 +1408,19 @@ void DrawRichText::DrawTextString(const UiRect& textRect,
     if (uFormat & DrawStringFormat::TEXT_VCENTER) {
         //纵向对齐：居中对齐
         skTextBox.SetSpacingAlign(SkTextBox::kCenter_SpacingAlign);
-    }
-    else if (uFormat & DrawStringFormat::TEXT_BOTTOM) {
+    } else if (uFormat & DrawStringFormat::TEXT_BOTTOM) {
         //纵向对齐：下对齐
         skTextBox.SetSpacingAlign(SkTextBox::kEnd_SpacingAlign);
-    }
-    else {
+    } else {
         //纵向对齐：上对齐
         skTextBox.SetSpacingAlign(SkTextBox::kStart_SpacingAlign);
     }
-    FallbackFontCreator fallbackFontCreator = [this, pFont](SkUnichar unicodeChar, SkGlyphID* glyphId) {
+    FallbackFontCreator fallbackFontCreator = [this,
+                                               pFont](SkUnichar unicodeChar, SkGlyphID *glyphId) {
         return DrawSkiaText::CreateFallbackFont(pFont, unicodeChar, glyphId);
-        };
-    skTextBox.Draw(skCanvas, SkiaTextData(text, len, textEncoding), *pSkFont, skPaint, fallbackFontCreator);
+    };
+    skTextBox.Draw(
+        skCanvas, SkiaTextData(text, len, textEncoding), *pSkFont, skPaint, fallbackFontCreator);
 }
 
 SkTextEncoding DrawRichText::GetTextEncoding() const
@@ -1317,14 +1428,11 @@ SkTextEncoding DrawRichText::GetTextEncoding() const
     constexpr const size_t nValueLen = sizeof(DString::value_type);
     if constexpr (nValueLen == 1) {
         return SkTextEncoding::kUTF8;
-    }
-    else if constexpr (nValueLen == 2) {
+    } else if constexpr (nValueLen == 2) {
         return SkTextEncoding::kUTF16;
-    }
-    else if constexpr (nValueLen == 4) {
+    } else if constexpr (nValueLen == 4) {
         return SkTextEncoding::kUTF32;
-    }
-    else {
+    } else {
 #ifdef DUILIB_UNICODE
         return SkTextEncoding::kUTF16;
 #else
@@ -1333,5 +1441,4 @@ SkTextEncoding DrawRichText::GetTextEncoding() const
     }
 }
 
-
-} //namespace ui {
+} // namespace ui

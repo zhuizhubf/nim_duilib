@@ -1,30 +1,28 @@
 #include "StringUtil.h"
-#include <filesystem>
-#include <cstdlib>
-#include <cstdarg>
-#include <vector>
 #include <climits>
+#include <cstdarg>
+#include <cstdlib>
+#include <filesystem>
+#include <vector>
 
-namespace ui
-{
+namespace ui {
 
-#define COUNT_OF(array)            (sizeof(array)/sizeof(array[0]))
+#define COUNT_OF(array) (sizeof(array) / sizeof(array[0]))
 
-namespace
-{
+namespace {
 
 template<typename CharType>
-int StringTokenizeT(const std::basic_string<CharType> &input,
-                    const std::basic_string<CharType> &delimitor,
-                    std::list<std::basic_string<CharType> > &output)
+int StringTokenizeT(
+    const std::basic_string<CharType> &input,
+    const std::basic_string<CharType> &delimitor,
+    std::list<std::basic_string<CharType>> &output)
 {
     size_t token_begin;
     size_t token_end;
 
     output.clear();
 
-    for (token_begin = token_end = 0; token_end != std::basic_string<CharType>::npos;)
-    {
+    for (token_begin = token_end = 0; token_end != std::basic_string<CharType>::npos;) {
         token_begin = input.find_first_not_of(delimitor, token_begin);
         if (token_begin == std::basic_string<CharType>::npos)
             break;
@@ -37,9 +35,10 @@ int StringTokenizeT(const std::basic_string<CharType> &input,
 }
 
 template<typename CharType>
-size_t StringReplaceAllT(const std::basic_string<CharType> &find,
-                         const std::basic_string<CharType> &replace,
-                         std::basic_string<CharType> &output)
+size_t StringReplaceAllT(
+    const std::basic_string<CharType> &find,
+    const std::basic_string<CharType> &replace,
+    std::basic_string<CharType> &output)
 {
     size_t find_length = find.size();
     size_t replace_length = replace.size();
@@ -56,11 +55,9 @@ size_t StringReplaceAllT(const std::basic_string<CharType> &find,
      * we use two passes to finish the task in the case that replace.size() is greater find.size()
      */
 
-    if (find_length < replace_length)
-    {
+    if (find_length < replace_length) {
         /* the first pass, count all available 'find' to be replaced  */
-        for (;;)
-        {
+        for (;;) {
             offset = output.find(find, offset);
             if (offset == std::basic_string<CharType>::npos)
                 break;
@@ -79,47 +76,42 @@ size_t StringReplaceAllT(const std::basic_string<CharType> &find,
         output.resize(newsize);
         data_ptr = &output[0];
 
-        memmove((void*)(data_ptr + offset),
-                (void*)data_ptr,
-                (output.size() - offset) * sizeof(CharType));
-    }
-    else
-    {
+        memmove(
+            (void *) (data_ptr + offset),
+            (void *) data_ptr,
+            (output.size() - offset) * sizeof(CharType));
+    } else {
         endpos = output.size();
         offset = 0;
-        data_ptr = (CharType*)(&output[0]);
+        data_ptr = (CharType *) (&output[0]);
     }
 
     /* the second pass,  the replacement */
-    while (offset < endpos)
-    {
+    while (offset < endpos) {
         found_pos = output.find(find, offset);
-        if (found_pos != std::basic_string<CharType>::npos)
-        {
+        if (found_pos != std::basic_string<CharType>::npos) {
             /* move the content between two targets */
             if (target != found_pos)
-                memmove((void*)(data_ptr + target),
-                        (void*)(data_ptr + offset),
-                        (found_pos - offset) * sizeof(CharType));
+                memmove(
+                    (void *) (data_ptr + target),
+                    (void *) (data_ptr + offset),
+                    (found_pos - offset) * sizeof(CharType));
 
             target += found_pos - offset;
 
             /* replace */
-            memcpy(data_ptr + target,
-                   replace.data(),
-                   replace_length * sizeof(CharType));
+            memcpy(data_ptr + target, replace.data(), replace_length * sizeof(CharType));
 
             target += replace_length;
             offset = find_length + found_pos;
             replaced++;
-        }
-        else
-        {
+        } else {
             /* ending work  */
             if (target != offset)
-                memcpy((void*)(data_ptr + target),
-                       (void*)(data_ptr + offset),
-                       (endpos - offset) * sizeof(CharType));
+                memcpy(
+                    (void *) (data_ptr + target),
+                    (void *) (data_ptr + offset),
+                    (endpos - offset) * sizeof(CharType));
             break;
         }
     }
@@ -147,7 +139,9 @@ inline int vsnprintfT(wchar_t *dst, size_t count, const wchar_t *format, va_list
 template<typename CharType>
 void StringAppendVT(const CharType *format, va_list ap, std::basic_string<CharType> &output)
 {
-    CharType stack_buffer[1024] = {0, };
+    CharType stack_buffer[1024] = {
+        0,
+    };
 
     /* first, we try to finish the task using a fixed-size buffer in the stack */
     va_list ap_copy;
@@ -155,8 +149,7 @@ void StringAppendVT(const CharType *format, va_list ap, std::basic_string<CharTy
 
     int result = vsnprintfT(stack_buffer, COUNT_OF(stack_buffer), format, ap_copy);
     va_end(ap_copy);
-    if (result >= 0 && result < static_cast<int>(COUNT_OF(stack_buffer)))
-    {
+    if (result >= 0 && result < static_cast<int>(COUNT_OF(stack_buffer))) {
         /* It fits */
         output.append(stack_buffer, result);
         return;
@@ -165,23 +158,20 @@ void StringAppendVT(const CharType *format, va_list ap, std::basic_string<CharTy
     /* then, we have to repeatedly increase buffer size until it fits. */
     int buffer_size = COUNT_OF(stack_buffer);
     std::basic_string<CharType> heap_buffer;
-    for (;;)
-    {
-        if (result != -1)
-        {
+    for (;;) {
+        if (result != -1) {
             ASSERT(0);
             return; /* not expected, result should be -1 here */
         }
         // 检查 buffer_size 翻倍是否溢出（防御性）
         if (buffer_size > (INT_MAX / 2)) {
             ASSERT(0);
-            return;    /* too long, would overflow */
+            return; /* too long, would overflow */
         }
         buffer_size <<= 1; /* try doubling the buffer size */
-        if (buffer_size > 32 * 1024 * 1024)
-        {
+        if (buffer_size > 32 * 1024 * 1024) {
             ASSERT(0);
-            return;    /* too long */
+            return; /* too long */
         }
         /* resize */
         heap_buffer.resize(buffer_size);
@@ -217,7 +207,7 @@ void StringTrimT(std::basic_string<CharType> &output)
     }
 
     for (; bound2 > 0; bound2--)
-        if (NOT_SPACE(src[bound2-1]))
+        if (NOT_SPACE(src[bound2 - 1]))
             break;
 
     for (; bound1 < bound2; bound1++)
@@ -225,9 +215,7 @@ void StringTrimT(std::basic_string<CharType> &output)
             break;
 
     if (bound1 < bound2) {
-        memmove((void *)src,
-            src + bound1,
-            sizeof(CharType) * (bound2 - bound1));
+        memmove((void *) src, src + bound1, sizeof(CharType) * (bound2 - bound1));
     }
 
     output.resize(bound2 - bound1);
@@ -260,14 +248,13 @@ void StringTrimRightT(std::basic_string<CharType> &output)
     }
 
     for (; length > 0; length--)
-        if (NOT_SPACE(src[length-1]))
+        if (NOT_SPACE(src[length - 1]))
             break;
 
     output.resize(length);
 }
 
 } // anonymous namespace
-
 
 std::wstring StringUtil::Printf(const wchar_t *format, ...)
 {
@@ -279,7 +266,7 @@ std::wstring StringUtil::Printf(const wchar_t *format, ...)
     return output;
 }
 
-std::string StringUtil::Printf(const char* format, ...)
+std::string StringUtil::Printf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -289,7 +276,8 @@ std::string StringUtil::Printf(const char* format, ...)
     return output;
 }
 
-size_t StringUtil::ReplaceAll(const std::wstring& find, const std::wstring& replace, std::wstring& output)
+size_t StringUtil::ReplaceAll(
+    const std::wstring &find, const std::wstring &replace, std::wstring &output)
 {
     if (output.empty()) {
         return 0;
@@ -297,21 +285,22 @@ size_t StringUtil::ReplaceAll(const std::wstring& find, const std::wstring& repl
     return StringReplaceAllT<wchar_t>(find, replace, output);
 }
 
-size_t StringUtil::ReplaceAll(const std::string& find, const std::string& replace, std::string& output)
+size_t StringUtil::ReplaceAll(
+    const std::string &find, const std::string &replace, std::string &output)
 {
-    if (output.empty())    {
+    if (output.empty()) {
         return 0;
     }
     return StringReplaceAllT<char>(find, replace, output);
 }
 
-void StringUtil::LowerString(std::string& str)
+void StringUtil::LowerString(std::string &str)
 {
     if (str.empty()) {
         return;
     }
-    char* start = str.data();
-    char* end = start + str.size();
+    char *start = str.data();
+    char *end = start + str.size();
     for (; start < end; start++) {
         if (*start >= 'A' && *start <= 'Z') {
             *start += 'a' - 'A';
@@ -319,13 +308,13 @@ void StringUtil::LowerString(std::string& str)
     }
 }
 
-void StringUtil::LowerString(std::wstring& str)
+void StringUtil::LowerString(std::wstring &str)
 {
     if (str.empty()) {
         return;
     }
-    wchar_t* start = str.data();
-    wchar_t* end = start + str.size();
+    wchar_t *start = str.data();
+    wchar_t *end = start + str.size();
     for (; start < end; start++) {
         if (*start >= L'A' && *start <= L'Z') {
             *start += L'a' - L'A';
@@ -333,13 +322,13 @@ void StringUtil::LowerString(std::wstring& str)
     }
 }
 
-void StringUtil::UpperString(std::string& str)
+void StringUtil::UpperString(std::string &str)
 {
     if (str.empty()) {
         return;
     }
-    char* start = str.data();
-    char* end = start + str.size();
+    char *start = str.data();
+    char *end = start + str.size();
     for (; start < end; start++) {
         if (*start >= 'a' && *start <= 'z') {
             *start -= 'a' - 'A';
@@ -347,13 +336,13 @@ void StringUtil::UpperString(std::string& str)
     }
 }
 
-void StringUtil::UpperString(std::wstring& str)
+void StringUtil::UpperString(std::wstring &str)
 {
     if (str.empty()) {
         return;
     }
-    wchar_t* start = str.data();
-    wchar_t* end = start + str.size();
+    wchar_t *start = str.data();
+    wchar_t *end = start + str.size();
     for (; start < end; start++) {
         if (*start >= L'a' && *start <= L'z') {
             *start -= L'a' - L'A';
@@ -361,7 +350,7 @@ void StringUtil::UpperString(std::wstring& str)
     }
 }
 
-std::wstring StringUtil::MakeLowerString(const std::wstring&str)
+std::wstring StringUtil::MakeLowerString(const std::wstring &str)
 {
     std::wstring resStr = str;
     if (resStr.empty()) {
@@ -373,18 +362,18 @@ std::wstring StringUtil::MakeLowerString(const std::wstring&str)
         if (*start >= L'A' && *start <= L'Z') {
             *start += L'a' - L'A';
         }
-    }    
+    }
     return resStr;
 }
 
-std::string StringUtil::MakeLowerString(const std::string& str)
+std::string StringUtil::MakeLowerString(const std::string &str)
 {
     std::string resStr = str;
     if (resStr.empty()) {
         return "";
     }
-    char* start = resStr.data();
-    char* end = start + resStr.size();
+    char *start = resStr.data();
+    char *end = start + resStr.size();
     for (; start < end; start++) {
         if (*start >= 'A' && *start <= 'Z') {
             *start += 'a' - 'A';
@@ -393,7 +382,7 @@ std::string StringUtil::MakeLowerString(const std::string& str)
     return resStr;
 }
 
-std::wstring StringUtil::MakeUpperString(const std::wstring& str)
+std::wstring StringUtil::MakeUpperString(const std::wstring &str)
 {
     std::wstring resStr = str;
     if (resStr.empty()) {
@@ -409,14 +398,14 @@ std::wstring StringUtil::MakeUpperString(const std::wstring& str)
     return resStr;
 }
 
-std::string StringUtil::MakeUpperString(const std::string& str)
+std::string StringUtil::MakeUpperString(const std::string &str)
 {
     std::string resStr = str;
     if (resStr.empty()) {
         return "";
     }
-    char* start = resStr.data();
-    char* end = start + resStr.size();
+    char *start = resStr.data();
+    char *end = start + resStr.size();
     for (; start < end; ++start) {
         if (*start >= 'a' && *start <= 'z') {
             *start -= 'a' - 'A';
@@ -446,19 +435,19 @@ std::string StringUtil::Trim(const char *input) /* both left and right */
     return output;
 }
 
-std::string& StringUtil::TrimLeft(std::string &input)
+std::string &StringUtil::TrimLeft(std::string &input)
 {
     StringTrimLeftT<char>(input);
     return input;
 }
 
-std::string& StringUtil::TrimRight(std::string &input)
+std::string &StringUtil::TrimRight(std::string &input)
 {
     StringTrimRightT<char>(input);
     return input;
 }
 
-std::string& StringUtil::Trim(std::string &input) /* both left and right */
+std::string &StringUtil::Trim(std::string &input) /* both left and right */
 {
     StringTrimT<char>(input);
     return input;
@@ -485,26 +474,25 @@ std::wstring StringUtil::Trim(const wchar_t *input) /* both left and right */
     return output;
 }
 
-std::wstring& StringUtil::TrimLeft(std::wstring&input)
+std::wstring &StringUtil::TrimLeft(std::wstring &input)
 {
     StringTrimLeftT<wchar_t>(input);
     return input;
 }
 
-std::wstring& StringUtil::TrimRight(std::wstring&input)
+std::wstring &StringUtil::TrimRight(std::wstring &input)
 {
     StringTrimRightT<wchar_t>(input);
     return input;
 }
 
-std::wstring& StringUtil::Trim(std::wstring&input) /* both left and right */
+std::wstring &StringUtil::Trim(std::wstring &input) /* both left and right */
 {
     StringTrimT<wchar_t>(input);
     return input;
 }
 
-
-std::list<std::string> StringUtil::Split(const std::string& input, const std::string& delimitor)
+std::list<std::string> StringUtil::Split(const std::string &input, const std::string &delimitor)
 {
     std::list<std::string> output;
     std::string input2(input);
@@ -512,11 +500,11 @@ std::list<std::string> StringUtil::Split(const std::string& input, const std::st
     if (input2.empty())
         return output;
 
-    char* context = nullptr;
+    char *context = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
     char *token = strtok_s(input2.data(), delimitor.c_str(), &context);
 #else
-    char* token = strtok_r(input2.data(), delimitor.c_str(), &context);
+    char *token = strtok_r(input2.data(), delimitor.c_str(), &context);
 #endif
     while (token != nullptr) {
         output.push_back(token);
@@ -529,7 +517,7 @@ std::list<std::string> StringUtil::Split(const std::string& input, const std::st
     return output;
 }
 
-std::list<std::wstring> StringUtil::Split(const std::wstring& input, const std::wstring& delimitor)
+std::list<std::wstring> StringUtil::Split(const std::wstring &input, const std::wstring &delimitor)
 {
     std::list<std::wstring> output;
     std::wstring input2(input);
@@ -538,11 +526,11 @@ std::list<std::wstring> StringUtil::Split(const std::wstring& input, const std::
         return output;
     }
 
-    wchar_t* context = nullptr;
+    wchar_t *context = nullptr;
 #ifdef DUILIB_BUILD_FOR_WIN
-    wchar_t* token = wcstok_s(input2.data(), delimitor.c_str(), &context);
+    wchar_t *token = wcstok_s(input2.data(), delimitor.c_str(), &context);
 #else
-    wchar_t* token = wcstok(input2.data(), delimitor.c_str(), &context);
+    wchar_t *token = wcstok(input2.data(), delimitor.c_str(), &context);
 #endif
     while (token != nullptr) {
         output.push_back(token);
@@ -555,7 +543,7 @@ std::list<std::wstring> StringUtil::Split(const std::wstring& input, const std::
     return output;
 }
 
-static bool IsEqualNoCasePrivate(const wchar_t* lhs, const wchar_t* rhs)
+static bool IsEqualNoCasePrivate(const wchar_t *lhs, const wchar_t *rhs)
 {
     if ((lhs == nullptr) || (rhs == nullptr)) {
         return true;
@@ -578,7 +566,7 @@ static bool IsEqualNoCasePrivate(const wchar_t* lhs, const wchar_t* rhs)
     }
 }
 
-static bool IsEqualNoCasePrivate(const char* lhs, const char* rhs)
+static bool IsEqualNoCasePrivate(const char *lhs, const char *rhs)
 {
     if ((lhs == nullptr) || (rhs == nullptr)) {
         return true;
@@ -601,7 +589,7 @@ static bool IsEqualNoCasePrivate(const char* lhs, const char* rhs)
     }
 }
 
-bool StringUtil::IsEqualNoCase(const std::wstring& lhs, const std::wstring& rhs)
+bool StringUtil::IsEqualNoCase(const std::wstring &lhs, const std::wstring &rhs)
 {
     if (lhs.size() != rhs.size()) {
         return false;
@@ -609,7 +597,7 @@ bool StringUtil::IsEqualNoCase(const std::wstring& lhs, const std::wstring& rhs)
     return IsEqualNoCasePrivate(lhs.c_str(), rhs.c_str());
 }
 
-bool StringUtil::IsEqualNoCase(const wchar_t* lhs, const std::wstring& rhs)
+bool StringUtil::IsEqualNoCase(const wchar_t *lhs, const std::wstring &rhs)
 {
     if (lhs == nullptr) {
         return false;
@@ -617,7 +605,7 @@ bool StringUtil::IsEqualNoCase(const wchar_t* lhs, const std::wstring& rhs)
     return IsEqualNoCasePrivate(lhs, rhs.c_str());
 }
 
-bool StringUtil::IsEqualNoCase(const char* lhs, const std::string& rhs)
+bool StringUtil::IsEqualNoCase(const char *lhs, const std::string &rhs)
 {
     if (lhs == nullptr) {
         return false;
@@ -625,7 +613,7 @@ bool StringUtil::IsEqualNoCase(const char* lhs, const std::string& rhs)
     return IsEqualNoCasePrivate(lhs, rhs.c_str());
 }
 
-bool StringUtil::IsEqualNoCase(const std::wstring& lhs, const wchar_t* rhs)
+bool StringUtil::IsEqualNoCase(const std::wstring &lhs, const wchar_t *rhs)
 {
     if (rhs == nullptr) {
         return false;
@@ -633,7 +621,7 @@ bool StringUtil::IsEqualNoCase(const std::wstring& lhs, const wchar_t* rhs)
     return IsEqualNoCasePrivate(lhs.c_str(), rhs);
 }
 
-bool StringUtil::IsEqualNoCase(const std::string& lhs, const std::string& rhs)
+bool StringUtil::IsEqualNoCase(const std::string &lhs, const std::string &rhs)
 {
     if (lhs.size() != rhs.size()) {
         return false;
@@ -641,7 +629,7 @@ bool StringUtil::IsEqualNoCase(const std::string& lhs, const std::string& rhs)
     return IsEqualNoCasePrivate(lhs.c_str(), rhs.c_str());
 }
 
-bool StringUtil::IsEqualNoCase(const std::string& lhs, const char* rhs)
+bool StringUtil::IsEqualNoCase(const std::string &lhs, const char *rhs)
 {
     if (rhs == nullptr) {
         return false;
@@ -649,71 +637,63 @@ bool StringUtil::IsEqualNoCase(const std::string& lhs, const char* rhs)
     return IsEqualNoCasePrivate(lhs.c_str(), rhs);
 }
 
-bool StringUtil::IsEqualNoCase(const wchar_t* lhs, const wchar_t* rhs)
+bool StringUtil::IsEqualNoCase(const wchar_t *lhs, const wchar_t *rhs)
 {
     if (lhs == nullptr) {
         return (rhs == nullptr) ? true : false;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return true;
     }
     return IsEqualNoCasePrivate(lhs, rhs);
 }
 
-bool StringUtil::IsEqualNoCase(const char* lhs, const char* rhs)
+bool StringUtil::IsEqualNoCase(const char *lhs, const char *rhs)
 {
     if (lhs == nullptr) {
         return (rhs == nullptr) ? true : false;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return true;
     }
     return IsEqualNoCasePrivate(lhs, rhs);
 }
 
-int32_t StringUtil::StringCompare(const std::wstring& lhs, const std::wstring& rhs)
+int32_t StringUtil::StringCompare(const std::wstring &lhs, const std::wstring &rhs)
 {
     return ::wcscmp(lhs.c_str(), rhs.c_str());
 }
 
-int32_t StringUtil::StringCompare(const wchar_t* lhs, const wchar_t* rhs)
+int32_t StringUtil::StringCompare(const wchar_t *lhs, const wchar_t *rhs)
 {
     if ((lhs == nullptr) && (rhs == nullptr)) {
         return 0;
-    }
-    else if (lhs == nullptr) {
+    } else if (lhs == nullptr) {
         return -1;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return 1;
-    }
-    else {
+    } else {
         return ::wcscmp(lhs, rhs);
     }
 }
 
-int32_t StringUtil::StringCompare(const std::string& lhs, const std::string& rhs)
+int32_t StringUtil::StringCompare(const std::string &lhs, const std::string &rhs)
 {
     return ::strcmp(lhs.c_str(), rhs.c_str());
 }
 
-int32_t StringUtil::StringCompare(const char* lhs, const char* rhs)
+int32_t StringUtil::StringCompare(const char *lhs, const char *rhs)
 {
     if ((lhs == nullptr) && (rhs == nullptr)) {
         return 0;
-    }
-    else if (lhs == nullptr) {
+    } else if (lhs == nullptr) {
         return -1;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return 1;
-    }
-    else {
+    } else {
         return ::strcmp(lhs, rhs);
     }
 }
 
-int32_t StringUtil::StringICompare(const std::wstring& lhs, const std::wstring& rhs)
+int32_t StringUtil::StringICompare(const std::wstring &lhs, const std::wstring &rhs)
 {
 #ifdef DUILIB_BUILD_FOR_WIN
     return ::_wcsicmp(lhs.c_str(), rhs.c_str());
@@ -722,18 +702,15 @@ int32_t StringUtil::StringICompare(const std::wstring& lhs, const std::wstring& 
 #endif
 }
 
-int32_t StringUtil::StringICompare(const wchar_t* lhs, const wchar_t* rhs)
+int32_t StringUtil::StringICompare(const wchar_t *lhs, const wchar_t *rhs)
 {
     if ((lhs == nullptr) && (rhs == nullptr)) {
         return 0;
-    }
-    else if (lhs == nullptr) {
+    } else if (lhs == nullptr) {
         return -1;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return 1;
-    }
-    else {
+    } else {
 #ifdef DUILIB_BUILD_FOR_WIN
         return ::_wcsicmp(lhs, rhs);
 #else
@@ -742,7 +719,7 @@ int32_t StringUtil::StringICompare(const wchar_t* lhs, const wchar_t* rhs)
     }
 }
 
-int32_t StringUtil::StringICompare(const std::string& lhs, const std::string& rhs)
+int32_t StringUtil::StringICompare(const std::string &lhs, const std::string &rhs)
 {
 #ifdef DUILIB_BUILD_FOR_WIN
     return ::_stricmp(lhs.c_str(), rhs.c_str());
@@ -751,18 +728,15 @@ int32_t StringUtil::StringICompare(const std::string& lhs, const std::string& rh
 #endif
 }
 
-int32_t StringUtil::StringICompare(const char* lhs, const char* rhs)
+int32_t StringUtil::StringICompare(const char *lhs, const char *rhs)
 {
     if ((lhs == nullptr) && (rhs == nullptr)) {
         return 0;
-    }
-    else if (lhs == nullptr) {
+    } else if (lhs == nullptr) {
         return -1;
-    }
-    else if (rhs == nullptr) {
+    } else if (rhs == nullptr) {
         return 1;
-    }
-    else {
+    } else {
 #ifdef DUILIB_BUILD_FOR_WIN
         return ::_stricmp(lhs, rhs);
 #else
@@ -771,13 +745,14 @@ int32_t StringUtil::StringICompare(const char* lhs, const char* rhs)
     }
 }
 
-
 std::wstring StringUtil::UInt64ToStringW(uint64_t value)
 {
-    wchar_t temp[32] = {0, };
+    wchar_t temp[32] = {
+        0,
+    };
     int pos = 0;
     do {
-        temp[pos++] = (wchar_t)(L'0' + (int)(value % 10));
+        temp[pos++] = (wchar_t) (L'0' + (int) (value % 10));
         value /= 10;
     } while (value != 0);
 
@@ -795,10 +770,10 @@ std::wstring StringUtil::UInt32ToStringW(uint32_t value)
 
 std::string StringUtil::UInt64ToStringA(uint64_t value)
 {
-    char temp[32] = { 0 };
+    char temp[32] = {0};
     int pos = 0;
     do {
-        temp[pos++] = (char)('0' + (int)(value % 10));
+        temp[pos++] = (char) ('0' + (int) (value % 10));
         value /= 10;
     } while (value != 0);
 
@@ -816,7 +791,7 @@ std::string StringUtil::UInt32ToStringA(uint32_t value)
 
 std::wstring StringUtil::Int64ToStringW(int64_t value)
 {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     return StringUtil::Printf(L"%I64d", value);
 #else
     return StringUtil::Printf(L"%lld", value);
@@ -830,7 +805,7 @@ std::wstring StringUtil::Int32ToStringW(int32_t value)
 
 std::string StringUtil::Int64ToStringA(int64_t value)
 {
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
     return StringUtil::Printf("%I64d", value);
 #else
     return StringUtil::Printf("%lld", value);
@@ -885,7 +860,7 @@ std::string StringUtil::Int32ToString(int32_t value)
 }
 #endif
 
-int32_t StringUtil::StringToInt32(const std::wstring& str)
+int32_t StringUtil::StringToInt32(const std::wstring &str)
 {
 #ifdef DUILIB_BUILD_FOR_WIN
     return ::_wtoi(str.c_str());
@@ -894,7 +869,7 @@ int32_t StringUtil::StringToInt32(const std::wstring& str)
 #endif
 }
 
-int32_t StringUtil::StringToInt32(const std::wstring::value_type* str)
+int32_t StringUtil::StringToInt32(const std::wstring::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
@@ -903,29 +878,27 @@ int32_t StringUtil::StringToInt32(const std::wstring::value_type* str)
 #else
         return wcstol(str, nullptr, 10);
 #endif
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-int32_t StringUtil::StringToInt32(const std::string& str)
+int32_t StringUtil::StringToInt32(const std::string &str)
 {
     return ::atoi(str.c_str());
 }
 
-int32_t StringUtil::StringToInt32(const std::string::value_type* str)
+int32_t StringUtil::StringToInt32(const std::string::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
         return ::atoi(str);
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-int32_t StringUtil::StringToInt32(const wchar_t* str, wchar_t** pEndPtr, int32_t nRadix)
+int32_t StringUtil::StringToInt32(const wchar_t *str, wchar_t **pEndPtr, int32_t nRadix)
 {
     if (str == nullptr) {
         return 0;
@@ -933,7 +906,7 @@ int32_t StringUtil::StringToInt32(const wchar_t* str, wchar_t** pEndPtr, int32_t
     return ::wcstol(str, pEndPtr, nRadix);
 }
 
-int32_t StringUtil::StringToInt32(const char* str, char** pEndPtr, int32_t nRadix)
+int32_t StringUtil::StringToInt32(const char *str, char **pEndPtr, int32_t nRadix)
 {
     if (str == nullptr) {
         return 0;
@@ -941,7 +914,7 @@ int32_t StringUtil::StringToInt32(const char* str, char** pEndPtr, int32_t nRadi
     return ::strtol(str, pEndPtr, nRadix);
 }
 
-uint32_t StringUtil::StringToUInt32(const wchar_t* str, wchar_t** pEndPtr, int32_t nRadix)
+uint32_t StringUtil::StringToUInt32(const wchar_t *str, wchar_t **pEndPtr, int32_t nRadix)
 {
     if (str == nullptr) {
         return 0;
@@ -949,7 +922,7 @@ uint32_t StringUtil::StringToUInt32(const wchar_t* str, wchar_t** pEndPtr, int32
     return ::wcstoul(str, pEndPtr, nRadix);
 }
 
-uint32_t StringUtil::StringToUInt32(const char* str, char** pEndPtr, int32_t nRadix)
+uint32_t StringUtil::StringToUInt32(const char *str, char **pEndPtr, int32_t nRadix)
 {
     if (str == nullptr) {
         return 0;
@@ -957,72 +930,67 @@ uint32_t StringUtil::StringToUInt32(const char* str, char** pEndPtr, int32_t nRa
     return ::strtoul(str, pEndPtr, nRadix);
 }
 
-int64_t StringUtil::StringToInt64(const std::wstring& str)
+int64_t StringUtil::StringToInt64(const std::wstring &str)
 {
     return ::wcstoull(str.c_str(), nullptr, 10);
 }
 
-int64_t StringUtil::StringToInt64(const std::wstring::value_type* str)
+int64_t StringUtil::StringToInt64(const std::wstring::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
         return ::wcstoull(str, nullptr, 10);
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-int64_t StringUtil::StringToInt64(const std::string& str)
+int64_t StringUtil::StringToInt64(const std::string &str)
 {
     return ::strtoull(str.c_str(), nullptr, 10);
 }
 
-int64_t StringUtil::StringToInt64(const std::string::value_type* str)
+int64_t StringUtil::StringToInt64(const std::string::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
         return ::strtoull(str, nullptr, 10);
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-
-double StringUtil::StringToDouble(const std::wstring& str)
+double StringUtil::StringToDouble(const std::wstring &str)
 {
     return ::wcstod(str.c_str(), nullptr);
 }
 
-double StringUtil::StringToDouble(const std::wstring::value_type* str)
+double StringUtil::StringToDouble(const std::wstring::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
         return ::wcstod(str, nullptr);
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-double StringUtil::StringToDouble(const std::string& str)
+double StringUtil::StringToDouble(const std::string &str)
 {
     return ::strtod(str.c_str(), nullptr);
 }
 
-double StringUtil::StringToDouble(const std::string::value_type* str)
+double StringUtil::StringToDouble(const std::string::value_type *str)
 {
     ASSERT(str != nullptr);
     if (str != nullptr) {
         return ::strtod(str, nullptr);
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
-float StringUtil::StringToFloat(const wchar_t* str, wchar_t** pEndPtr)
+float StringUtil::StringToFloat(const wchar_t *str, wchar_t **pEndPtr)
 {
     if (str == nullptr) {
         return 0;
@@ -1030,7 +998,7 @@ float StringUtil::StringToFloat(const wchar_t* str, wchar_t** pEndPtr)
     return ::wcstof(str, pEndPtr);
 }
 
-float StringUtil::StringToFloat(const char* str, char** pEndPtr)
+float StringUtil::StringToFloat(const char *str, char **pEndPtr)
 {
     if (str == nullptr) {
         return 0;
@@ -1038,17 +1006,17 @@ float StringUtil::StringToFloat(const char* str, char** pEndPtr)
     return ::strtof(str, pEndPtr);
 }
 
-float StringUtil::StringToFloat(const wchar_t* str)
+float StringUtil::StringToFloat(const wchar_t *str)
 {
     return StringToFloat(str, nullptr);
 }
 
-float StringUtil::StringToFloat(const char* str)
+float StringUtil::StringToFloat(const char *str)
 {
     return StringToFloat(str, nullptr);
 }
 
-int32_t StringUtil::StringCopy(wchar_t* dest, size_t destSize, const wchar_t* src)
+int32_t StringUtil::StringCopy(wchar_t *dest, size_t destSize, const wchar_t *src)
 {
     if ((dest == nullptr) || (destSize == 0) || (src == nullptr)) {
         return 0;
@@ -1056,14 +1024,14 @@ int32_t StringUtil::StringCopy(wchar_t* dest, size_t destSize, const wchar_t* sr
 #ifdef DUILIB_BUILD_FOR_WIN
     return ::wcscpy_s(dest, destSize, src);
 #else
-    size_t nLen = std::min((size_t)wcslen(src), destSize);
+    size_t nLen = std::min((size_t) wcslen(src), destSize);
     ::wcsncpy(dest, src, nLen);
     dest[nLen] = L'\0';
     return 0;
 #endif
 }
 
-int32_t StringUtil::StringNCopy(wchar_t* dest, size_t destSize, const wchar_t* src, size_t srcSize)
+int32_t StringUtil::StringNCopy(wchar_t *dest, size_t destSize, const wchar_t *src, size_t srcSize)
 {
     if ((dest == nullptr) || (destSize == 0) || (src == nullptr) || (srcSize == 0)) {
         return 0;
@@ -1083,7 +1051,7 @@ int32_t StringUtil::StringNCopy(wchar_t* dest, size_t destSize, const wchar_t* s
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
 
-int32_t StringUtil::StringCopy(char* dest, size_t destSize, const char* src)
+int32_t StringUtil::StringCopy(char *dest, size_t destSize, const char *src)
 {
     if ((dest == nullptr) || (destSize == 0) || (src == nullptr)) {
         return 0;
@@ -1102,7 +1070,7 @@ int32_t StringUtil::StringCopy(char* dest, size_t destSize, const char* src)
 #pragma GCC diagnostic pop
 #endif
 
-int32_t StringUtil::StringNCopy(char* dest, size_t destSize, const char* src, size_t srcSize)
+int32_t StringUtil::StringNCopy(char *dest, size_t destSize, const char *src, size_t srcSize)
 {
     if ((dest == nullptr) || (destSize == 0) || (src == nullptr) || (srcSize == 0)) {
         return 0;
@@ -1117,27 +1085,25 @@ int32_t StringUtil::StringNCopy(char* dest, size_t destSize, const char* src, si
 #endif
 }
 
-size_t StringUtil::StringLen(const wchar_t* str)
+size_t StringUtil::StringLen(const wchar_t *str)
 {
     if (str == nullptr) {
         return 0;
-    }
-    else {
+    } else {
         return ::wcslen(str);
     }
 }
 
-size_t StringUtil::StringLen(const char* str)
+size_t StringUtil::StringLen(const char *str)
 {
     if (str == nullptr) {
         return 0;
-    }
-    else {
+    } else {
         return ::strlen(str);
     }
 }
 
-bool StringUtil::IsValueTrue(const DString& value)
+bool StringUtil::IsValueTrue(const DString &value)
 {
     return (value == _T("true")) || (value == _T("1"));
 }

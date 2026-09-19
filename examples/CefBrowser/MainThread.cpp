@@ -1,26 +1,24 @@
 #include "MainThread.h"
-#include "browser/BrowserManager.h"
 #include "browser/BrowserForm.h"
+#include "browser/BrowserManager.h"
 #include <chrono>
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
-const ui::DpiInitParam& MainThread::GetDpiInitParam() const
+const ui::DpiInitParam &MainThread::GetDpiInitParam() const
 {
     return m_dpiInitParam;
 }
 
 bool MainThread::OnInit()
-{   
+{
     //设置控制主进程单例的回调函数
-    ui::CefManager::GetInstance()->SetAlreadyRunningAppRelaunch(UiBind(&MainThread::OnAlreadyRunningAppRelaunch, this, std::placeholders::_1));
+    ui::CefManager::GetInstance()->SetAlreadyRunningAppRelaunch(
+        UiBind(&MainThread::OnAlreadyRunningAppRelaunch, this, std::placeholders::_1));
 
     //创建第一个窗口
     std::string id = BrowserManager::GetInstance()->CreateBrowserID();
@@ -33,11 +31,11 @@ void MainThread::OnCleanup()
     ui::GlobalManager::Instance().Shutdown();
 }
 
-void MainThread::OnAlreadyRunningAppRelaunch(const std::vector<DString>& argumentList)
+void MainThread::OnAlreadyRunningAppRelaunch(const std::vector<DString> &argumentList)
 {
     if (ui::GlobalManager::Instance().IsInUIThread()) {
         //CEF 133版本会调用此接口
-        BrowserForm* pBrowserForm = BrowserManager::GetInstance()->GetLastActiveBrowserForm();
+        BrowserForm *pBrowserForm = BrowserManager::GetInstance()->GetLastActiveBrowserForm();
         if (pBrowserForm != nullptr) {
             pBrowserForm->SetWindowForeground();
             if (!argumentList.empty()) {
@@ -46,9 +44,9 @@ void MainThread::OnAlreadyRunningAppRelaunch(const std::vector<DString>& argumen
                 pBrowserForm->OpenLinkUrl(url, false);
             }
         }
-    }
-    else {
+    } else {
         //转发到UI线程处理
-        ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, UiBind(&MainThread::OnAlreadyRunningAppRelaunch, this, argumentList));
+        ui::GlobalManager::Instance().Thread().PostTask(
+            ui::kThreadUI, UiBind(&MainThread::OnAlreadyRunningAppRelaunch, this, argumentList));
     }
 }

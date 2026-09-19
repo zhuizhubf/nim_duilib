@@ -4,8 +4,7 @@
 #include "duilib/Core/Control.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 class TextDrawer;
 
 /** 获取文本的接口，支持虚函数
@@ -22,7 +21,7 @@ public:
     /** 设置文本内容
     * @param [in] strText 文本内容
     */
-    virtual void SetText(const DString& strText) = 0;
+    virtual void SetText(const DString &strText) = 0;
 
     /** 获取文本内容ID（支持多语言）
     */
@@ -31,7 +30,7 @@ public:
     /** 设置文本内容ID（支持多语言）
     * @param [in] strTextId 文本内容的ID
     */
-    virtual void SetTextId(const DString& strTextId) = 0;
+    virtual void SetTextId(const DString &strTextId) = 0;
 };
 
 /** 标签控件的内部实现，用于显示文本
@@ -39,13 +38,13 @@ public:
 class DUILIB_API LabelImpl
 {
 public:
-    explicit LabelImpl(Control* pOwner);
+    explicit LabelImpl(Control *pOwner);
     ~LabelImpl();
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     bool HasHoveredStateColor();
-    bool OnSetAttribute(const DString& strName, const DString& strValue);
-    void OnPaintText(IRender* pRender);
+    bool OnSetAttribute(const DString &strName, const DString &strValue);
+    void OnPaintText(IRender *pRender);
 
     /** 绑定的窗口发生了变化
     */
@@ -60,7 +59,7 @@ public:
     * @param [in] nNewDpiScale 新的DPI缩放百分比，与Dpi().GetScale()的值一致
     */
     void OnDpiScaleChanged(uint32_t nOldDpiScale, uint32_t nNewDpiScale);
-    
+
     /** 计算文本区域大小（宽和高）
      *  @param [in] szAvailable 可用大小，不包含内边距，不包含外边距
      *  @return 控件的文本估算大小，包含内边距(Box)，不包含外边距
@@ -75,7 +74,7 @@ public:
     /** 设置文本内容
     * @param [in] strText 文本内容
     */
-    void SetText(const DString& strText);
+    void SetText(const DString &strText);
 
     /** 获取文本内容ID（支持多语言）
     */
@@ -84,7 +83,7 @@ public:
     /** 设置文本内容ID（支持多语言）
     * @param [in] strTextId 文本内容的ID
     */
-    void SetTextId(const DString& strTextId);
+    void SetTextId(const DString &strTextId);
 
     /** 获取文本内容（UTF8格式）
     */
@@ -93,7 +92,7 @@ public:
     /** 设置文本内容（UTF8格式）
     * @param [in] strText UTF8格式的文本内容
     */
-    void SetUTF8Text(const std::string& strText);
+    void SetUTF8Text(const std::string &strText);
 
     /** 获取文本内容ID（UTF8格式）
     */
@@ -101,7 +100,7 @@ public:
 
     /** 设置文本内容ID（UTF8格式）
     */
-    void SetUTF8TextId(const std::string& strTextId);
+    void SetUTF8TextId(const std::string &strTextId);
 
     /** 设置文本内容是否为RichText
     */
@@ -113,7 +112,7 @@ public:
 
     /** 判断文本是否相等
     */
-    bool IsTextEquals(const DString& text) const;
+    bool IsTextEquals(const DString &text) const;
 
 public:
     /** 恢复默认的文本样式
@@ -143,14 +142,14 @@ public:
      * @param [in] dwTextColor 要设置的状态颜色字符串，该值必须在 global.xml 中存在
      * @return 无
      */
-    void SetStateTextColor(ControlStateType stateType, const DString& dwTextColor);
+    void SetStateTextColor(ControlStateType stateType, const DString &dwTextColor);
 
     /** 获取指定状态下的实际被渲染文本颜色
      * @param [in] buttonStateType 要获取何种状态下的颜色
      * @param [out] stateType 实际被渲染的状态
      * @return 返回颜色字符串，该值在 global.xml 中定义
      */
-    DString GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType& stateType);
+    DString GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType &stateType);
 
     /** 获取当前字体ID
      * @return 返回字体ID，该字体ID在 global.xml 中标识
@@ -160,7 +159,7 @@ public:
     /** 设置当前字体ID
      * @param[in] strFontId 要设置的字体ID，该字体ID必须在 global.xml 中存在
      */
-    void SetFontId(const DString& strFontId);
+    void SetFontId(const DString &strFontId);
 
     /** 获取文字内边距
      * @return 返回文字的内边距信息
@@ -218,7 +217,7 @@ public:
      * @param [out] mul 返回行间距的倍数
      * @param [out] add 返回行间距附加量(像素, 已经完成DPI缩放)
      */
-    void GetLineSpacing(float* mul, float* add) const;
+    void GetLineSpacing(float *mul, float *add) const;
 
     /** 设置两个相邻的字符之间的间隔（像素）
     */
@@ -281,7 +280,7 @@ public:
     * @param [in] rc 实际绘制区域，不包含内边距（需由调用方剪去内边距）
     * @param [in] pRender 渲染接口
     */
-    void DoPaintText(const UiRect& rc, IRender* pRender);
+    void DoPaintText(const UiRect &rc, IRender *pRender);
 
 private:
     /** 从Owner获取文本（支持虚函数）
@@ -291,7 +290,7 @@ private:
 private:
     /** 关联控件
     */
-    Control* m_pOwner;
+    Control *m_pOwner;
 
     /** 文本绘制的实现（支持RichText文本绘制）
     */
@@ -352,6 +351,6 @@ private:
     bool m_bRichText;
 };
 
-}
+} // namespace ui
 
 #endif // UI_CONTROL_LABEL_IMPL_H_

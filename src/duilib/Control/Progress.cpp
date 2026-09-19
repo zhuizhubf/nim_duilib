@@ -1,25 +1,25 @@
 #include "Progress.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 
-Progress::Progress(Window* pWindow) :
-    LabelTemplate<Control>(pWindow),
-    m_bHorizontal(true),
-    m_bStretchForeImage(true),
-    m_nMaxValue(100),
-    m_nMinValue(0),
-    m_fCurrentValue(0),
-    m_sProgressColor(),
-    m_pProgressImage(nullptr),
-    m_sProgressImageModify(),
-    m_bMarquee(false),
-    m_nMarqueeWidth(0),
-    m_nMarqueeStep(0),
-    m_nMarqueeElapsed(50), // for 1s 25fps,will use 20fps default
-    m_nMarqueePos(0),
-    m_bReverse(false)
+Progress::Progress(Window *pWindow)
+    : LabelTemplate<Control>(pWindow)
+    , m_bHorizontal(true)
+    , m_bStretchForeImage(true)
+    , m_nMaxValue(100)
+    , m_nMinValue(0)
+    , m_fCurrentValue(0)
+    , m_sProgressColor()
+    , m_pProgressImage(nullptr)
+    , m_sProgressImageModify()
+    , m_bMarquee(false)
+    , m_nMarqueeWidth(0)
+    , m_nMarqueeStep(0)
+    , m_nMarqueeElapsed(50)
+    , // for 1s 25fps,will use 20fps default
+    m_nMarqueePos(0)
+    , m_bReverse(false)
 {
     SetTextStyle(TEXT_SINGLELINE | TEXT_HCENTER, false);
     SetFixedHeight(UiFixedInt(12), true, true);
@@ -35,45 +35,39 @@ Progress::~Progress()
     }
 }
 
-DString Progress::GetType() const { return DUI_CTR_PROGRESS; }
+DString Progress::GetType() const
+{
+    return DUI_CTR_PROGRESS;
+}
 
-void Progress::SetAttribute(const DString& srName, const DString& strValue2)
+void Progress::SetAttribute(const DString &srName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if ((srName == _T("horizontal")) || (srName == _T("hor"))) {
         SetHorizontal(StringUtil::IsValueTrue(strValue));
-    }
-    else if (srName == _T("min")) {
+    } else if (srName == _T("min")) {
         SetMinValue(StringUtil::StringToInt32(strValue));
-    }
-    else if (srName == _T("max")) {
+    } else if (srName == _T("max")) {
         SetMaxValue(StringUtil::StringToInt32(strValue));
-    }
-    else if (srName == _T("value")) {
+    } else if (srName == _T("value")) {
         SetValue(StringUtil::StringToInt32(strValue));
-    }
-    else if ((srName == _T("progress_image")) || (srName == _T("progressimage"))) {
+    } else if ((srName == _T("progress_image")) || (srName == _T("progressimage"))) {
         SetProgressImage(strValue);
-    }
-    else if ((srName == _T("stretch_fore_image")) || (srName == _T("is_stretch_fore")) || (srName == _T("isstretchfore"))) {
+    } else if (
+        (srName == _T("stretch_fore_image")) || (srName == _T("is_stretch_fore"))
+        || (srName == _T("isstretchfore"))) {
         SetStretchForeImage(StringUtil::IsValueTrue(strValue));
-    }
-    else if ((srName == _T("progress_color")) || (srName == _T("progresscolor"))) {
+    } else if ((srName == _T("progress_color")) || (srName == _T("progresscolor"))) {
         SetProgressColor(strValue);
-    }
-    else if (srName == _T("marquee")) {
+    } else if (srName == _T("marquee")) {
         SetMarquee(StringUtil::IsValueTrue(strValue));
-    }
-    else if ((srName == _T("marquee_width")) || (srName == _T("marqueewidth"))) {
+    } else if ((srName == _T("marquee_width")) || (srName == _T("marqueewidth"))) {
         SetMarqueeWidth(StringUtil::StringToInt32(strValue), true);
-    }
-    else if ((srName == _T("marquee_step")) || (srName == _T("marqueestep"))) {
+    } else if ((srName == _T("marquee_step")) || (srName == _T("marqueestep"))) {
         SetMarqueeStep(StringUtil::StringToInt32(strValue), true);
-    }
-    else if (srName == _T("reverse")) {
+    } else if (srName == _T("reverse")) {
         SetReverse(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         Label::SetAttribute(srName, strValue);
     }
 }
@@ -88,7 +82,7 @@ void Progress::SetHorizontal(bool bHorizontal)
     if (m_bHorizontal != bHorizontal) {
         m_bHorizontal = bHorizontal;
         Invalidate();
-    }    
+    }
 }
 
 int32_t Progress::GetMinValue() const
@@ -114,7 +108,7 @@ void Progress::SetMaxValue(int32_t nMax)
     if (m_nMaxValue != nMax) {
         m_nMaxValue = nMax;
         Invalidate();
-    }    
+    }
 }
 
 double Progress::GetValue() const
@@ -159,7 +153,7 @@ DString Progress::GetProgressImage() const
     return DString();
 }
 
-void Progress::SetProgressImage(const DString& strImage)
+void Progress::SetProgressImage(const DString &strImage)
 {
     if (m_pProgressImage == nullptr) {
         m_pProgressImage = new Image;
@@ -173,7 +167,7 @@ DString Progress::GetProgressColor() const
     return m_sProgressColor.c_str();
 }
 
-void Progress::SetProgressColor(const DString& strProgressColor)
+void Progress::SetProgressColor(const DString &strProgressColor)
 {
     ASSERT(strProgressColor.empty() || HasUiColor(strProgressColor));
     if (m_sProgressColor == strProgressColor) {
@@ -199,7 +193,7 @@ void Progress::ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale)
     BaseClass::ChangeDpiScale(nOldDpiScale, nNewDpiScale);
 }
 
-void Progress::PaintStateImages(IRender* pRender)
+void Progress::PaintStateImages(IRender *pRender)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
@@ -217,14 +211,14 @@ void Progress::PaintStateImages(IRender* pRender)
             UiRect rcProgressColor = GetRect();
             if (IsHorizontal()) {
                 rcProgressColor.right = rcProgressColor.left + rc.right;
-            }
-            else {
+            } else {
                 rcProgressColor.top = rcProgressColor.top + rc.top;
             }
             pRender->FillRect(UiRectF::MakeFromRect(rcProgressColor), dwProgressColor);
         }
     }
-    if (rc.IsEmpty() || (m_pProgressImage == nullptr) || (m_pProgressImage->GetImageString().empty())) {
+    if (rc.IsEmpty() || (m_pProgressImage == nullptr)
+        || (m_pProgressImage->GetImageString().empty())) {
         return;
     }
     //加载图片资源
@@ -232,9 +226,9 @@ void Progress::PaintStateImages(IRender* pRender)
 
     m_sProgressImageModify.clear();
     if (m_bStretchForeImage) {
-        m_sProgressImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d'"), rc.left, rc.top, rc.right, rc.bottom);
-    }
-    else {
+        m_sProgressImageModify = StringUtil::Printf(
+            _T("destscale='false' dest='%d,%d,%d,%d'"), rc.left, rc.top, rc.right, rc.bottom);
+    } else {
         ui::UiRect m_rcSrc = rc;
         std::shared_ptr<ImageInfo> pProgressImageCache = m_pProgressImage->GetImageInfo();
         if (pProgressImageCache != nullptr) {
@@ -245,9 +239,16 @@ void Progress::PaintStateImages(IRender* pRender)
                 m_rcSrc.bottom = pProgressImageCache->GetHeight();
             }
         }
-        m_sProgressImageModify = StringUtil::Printf(_T("destscale='false' dest='%d,%d,%d,%d' source='%d,%d,%d,%d'")
-            , rc.left, rc.top, rc.right, rc.bottom
-            , m_rcSrc.left, m_rcSrc.top, m_rcSrc.right, m_rcSrc.bottom);
+        m_sProgressImageModify = StringUtil::Printf(
+            _T("destscale='false' dest='%d,%d,%d,%d' source='%d,%d,%d,%d'"),
+            rc.left,
+            rc.top,
+            rc.right,
+            rc.bottom,
+            m_rcSrc.left,
+            m_rcSrc.top,
+            m_rcSrc.right,
+            m_rcSrc.bottom);
     }
 
     // 让corner的值不超过可绘制范围
@@ -255,22 +256,15 @@ void Progress::PaintStateImages(IRender* pRender)
     if (IsHorizontal()) {
         if (corner.left != 0 && corner.left >= rc.right) {
             DString imageModify = m_sProgressImageModify.c_str();
-            imageModify += StringUtil::Printf(_T(" corner='%d,%d,%d,%d'"),
-                rc.right,
-                corner.top,
-                0,
-                corner.bottom);
+            imageModify += StringUtil::Printf(
+                _T(" corner='%d,%d,%d,%d'"), rc.right, corner.top, 0, corner.bottom);
             m_sProgressImageModify = imageModify;
         }
-    }
-    else {
+    } else {
         if (corner.top != 0 && corner.top >= rc.bottom) {
             DString imageModify = m_sProgressImageModify.c_str();
-            imageModify += StringUtil::Printf(_T(" corner='%d,%d,%d,%d'"),
-                corner.left,
-                corner.bottom,
-                corner.right,
-                0);
+            imageModify += StringUtil::Printf(
+                _T(" corner='%d,%d,%d,%d'"), corner.left, corner.bottom, corner.right, 0);
             m_sProgressImageModify = imageModify;
         }
     }
@@ -299,11 +293,14 @@ UiRect Progress::GetProgressPos()
 
     UiRect rc;
     if (IsHorizontal()) {
-        rc.right = static_cast<int>(std::ceil(static_cast<double>((fValue - nMin) * (GetRect().right - GetRect().left)) / static_cast<double>(nMax - nMin)));
+        rc.right = static_cast<int>(std::ceil(
+            static_cast<double>((fValue - nMin) * (GetRect().right - GetRect().left))
+            / static_cast<double>(nMax - nMin)));
         rc.bottom = GetRect().bottom - GetRect().top;
-    }
-    else {
-        rc.top = static_cast<int>(std::ceil(static_cast<double>((nMax - fValue) * (GetRect().bottom - GetRect().top)) / static_cast<double>(nMax - nMin)));
+    } else {
+        rc.top = static_cast<int>(std::ceil(
+            static_cast<double>((nMax - fValue) * (GetRect().bottom - GetRect().top))
+            / static_cast<double>(nMax - nMin)));
         rc.bottom = GetRect().bottom - GetRect().top;
         rc.right = GetRect().right - GetRect().left;
     }
@@ -315,7 +312,7 @@ void Progress::ClearImageCache()
     BaseClass::ClearImageCache();
     if (m_pProgressImage != nullptr) {
         m_pProgressImage->ClearImageCache();
-    }    
+    }
 }
 
 void Progress::Play()
@@ -331,8 +328,7 @@ void Progress::Play()
         if (m_nMarqueePos > rc.right - rc.left) {
             m_nMarqueePos = (m_nMarqueePos - (rc.right - rc.left)) - GetMarqueeWidth();
         }
-    }
-    else {
+    } else {
         if (m_nMarqueePos > rc.bottom - rc.top) {
             m_nMarqueePos = (m_nMarqueePos - (rc.bottom - rc.top) - GetMarqueeWidth());
         }
@@ -341,7 +337,7 @@ void Progress::Play()
     Invalidate();
 }
 
-void Progress::PaintMarquee(IRender* pRender) 
+void Progress::PaintMarquee(IRender *pRender)
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
@@ -353,11 +349,14 @@ void Progress::PaintMarquee(IRender* pRender)
             ui::UiRect rc = GetRect();
             if (IsHorizontal()) {
                 rc.left = std::max(m_nMarqueePos, 0) + rc.left;
-                rc.right = rc.left + (m_nMarqueePos >= 0 ? GetMarqueeWidth() : (GetMarqueeWidth() + m_nMarqueePos));
-            }
-            else {
+                rc.right = rc.left
+                           + (m_nMarqueePos >= 0 ? GetMarqueeWidth()
+                                                 : (GetMarqueeWidth() + m_nMarqueePos));
+            } else {
                 rc.top = std::max(m_nMarqueePos, 0) + rc.top;
-                rc.bottom = rc.top + (m_nMarqueePos >= 0 ? GetMarqueeWidth() : (GetMarqueeWidth() + m_nMarqueePos));
+                rc.bottom = rc.top
+                            + (m_nMarqueePos >= 0 ? GetMarqueeWidth()
+                                                  : (GetMarqueeWidth() + m_nMarqueePos));
             }
             pRender->FillRect(UiRectF::MakeFromRect(rc), dwProgressColor);
         }
@@ -380,9 +379,10 @@ void Progress::SetMarquee(bool bMarquee)
 
     if (m_bMarquee) {
         auto playCallback = UiBind(&Progress::Play, this);
-        GlobalManager::Instance().Timer().AddTimer(m_timer.GetWeakFlag(), playCallback, m_nMarqueeElapsed);
-    }
-    else {
+        GlobalManager::Instance()
+            .Timer()
+            .AddTimer(m_timer.GetWeakFlag(), playCallback, m_nMarqueeElapsed);
+    } else {
         m_timer.Cancel();
     }
     Invalidate();
@@ -423,7 +423,7 @@ void Progress::SetMarqueeStep(int32_t nMarqueeStep, bool bNeedDpiScale)
     if (m_nMarqueeStep != nMarqueeStep) {
         m_nMarqueeStep = nMarqueeStep;
         Invalidate();
-    }    
+    }
 }
 
 int32_t Progress::GetMarqueeElapsed() const
@@ -441,7 +441,9 @@ void Progress::SetMarqueeElapsed(int32_t nMarqueeElapsed)
     m_timer.Cancel();
 
     auto playCallback = UiBind(&Progress::Play, this);
-    GlobalManager::Instance().Timer().AddTimer(m_timer.GetWeakFlag(), playCallback, m_nMarqueeElapsed);
+    GlobalManager::Instance()
+        .Timer()
+        .AddTimer(m_timer.GetWeakFlag(), playCallback, m_nMarqueeElapsed);
 
     Invalidate();
 }
@@ -456,4 +458,4 @@ bool Progress::IsReverse() const
     return m_bReverse;
 }
 
-}
+} // namespace ui

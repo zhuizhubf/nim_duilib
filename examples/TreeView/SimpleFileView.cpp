@@ -5,31 +5,31 @@
 class FileInfoItem : public ui::ListBoxItem
 {
 public:
-    explicit FileInfoItem(ui::Window* pWindow):
-        ui::ListBoxItem(pWindow),
-        m_nElementIndex(ui::Box::InvalidIndex),
-        m_pIconControl(nullptr),
-        m_pTextControl(nullptr)
-    {
-    }
+    explicit FileInfoItem(ui::Window *pWindow)
+        : ui::ListBoxItem(pWindow)
+        , m_nElementIndex(ui::Box::InvalidIndex)
+        , m_pIconControl(nullptr)
+        , m_pTextControl(nullptr)
+    {}
 
-    virtual ~FileInfoItem() override
-    {
-    }
+    virtual ~FileInfoItem() override {}
 
     /** 填充子控件信息
     * @param [in] errorImagePathSet 错误图片路径保存容器
     * @param [in] fileInfo 需要显示的路径信息
     * @param [in] nElementIndex 数据元素下标值
     */
-    void FillSubControls(std::unordered_set<DString>& errorImagePathSet,const ui::DirectoryTree::PathInfo& fileInfo, size_t nElementIndex)
+    void FillSubControls(
+        std::unordered_set<DString> &errorImagePathSet,
+        const ui::DirectoryTree::PathInfo &fileInfo,
+        size_t nElementIndex)
     {
         m_nElementIndex = nElementIndex;
         if (m_pIconControl == nullptr) {
             m_pIconControl = FindSubControl(_T("control_img"));
         }
         if (m_pTextControl == nullptr) {
-            m_pTextControl = dynamic_cast<ui::Label*>(FindSubControl(_T("control_text")));
+            m_pTextControl = dynamic_cast<ui::Label *>(FindSubControl(_T("control_text")));
         }
         if (m_pTextControl != nullptr) {
             m_pTextControl->SetAutoToolTip(true);
@@ -47,56 +47,67 @@ public:
                 Dpi().UnscaleInt(itemWidth);
 
                 //当出现错误（图片加载失败，或者图片解码失败）时，显示一张默认图片
-                const DString defaultImage = ui::StringUtil::Printf(_T("file='image-photo.svg' halign='center' valign='center' width='%d'"), itemWidth);
+                const DString defaultImage = ui::StringUtil::Printf(
+                    _T("file='image-photo.svg' halign='center' valign='center' width='%d'"),
+                    itemWidth);
 
-                if (errorImagePathSet.find(fileInfo.m_filePath.ToString()) == errorImagePathSet.end()) {
+                if (errorImagePathSet.find(fileInfo.m_filePath.ToString())
+                    == errorImagePathSet.end()) {
                     DString imageString = fileInfo.m_filePath.ToString();
                     if (itemWidth > 0) {
-                        imageString = ui::StringUtil::Printf(_T("file='%s' halign='center' valign='center' width='%d' assert='false'"), imageString.c_str(), itemWidth);
-                    }
-                    else {
-                        imageString = ui::StringUtil::Printf(_T("file='%s' halign='center' valign='center'"), imageString.c_str());
+                        imageString = ui::StringUtil::Printf(
+                            _T("file='%s' halign='center' valign='center' width='%d' ")
+                            _T("assert='false'"),
+                            imageString.c_str(),
+                            itemWidth);
+                    } else {
+                        imageString = ui::StringUtil::Printf(
+                            _T("file='%s' halign='center' valign='center'"), imageString.c_str());
                     }
                     m_pIconControl->SetBkImage(imageString);
-                }
-                else {
+                } else {
                     //这是一张有错误的图片, 直接显示错图（避免图片显示时，错误图片的闪烁问题）
                     m_pIconControl->SetBkImage(defaultImage);
                 }
 
                 //图片加载失败时，显示一张默认图片
-                m_pIconControl->AttachImageLoad([this, defaultImage, &errorImagePathSet](const ui::EventArgs& args) {
-                    ui::ImageDecodeResult* pImageDecodeResult = (ui::ImageDecodeResult*)args.wParam;
-                    if ((pImageDecodeResult != nullptr) && pImageDecodeResult->m_bLoadError) {
-                        errorImagePathSet.insert(pImageDecodeResult->m_imageFilePath);
-                        ui::Control* pIconControl = FindSubControl(_T("control_img"));
-                        if (pIconControl != nullptr) {
-                            pIconControl->SetBkImage(defaultImage);
+                m_pIconControl->AttachImageLoad(
+                    [this, defaultImage, &errorImagePathSet](const ui::EventArgs &args) {
+                        ui::ImageDecodeResult *pImageDecodeResult
+                            = (ui::ImageDecodeResult *) args.wParam;
+                        if ((pImageDecodeResult != nullptr) && pImageDecodeResult->m_bLoadError) {
+                            errorImagePathSet.insert(pImageDecodeResult->m_imageFilePath);
+                            ui::Control *pIconControl = FindSubControl(_T("control_img"));
+                            if (pIconControl != nullptr) {
+                                pIconControl->SetBkImage(defaultImage);
+                            }
                         }
-                    }
-                    return true;
+                        return true;
                     });
 
-                m_pIconControl->AttachImageDecode([this, defaultImage, &errorImagePathSet](const ui::EventArgs& args) {
-                    ui::ImageDecodeResult* pImageDecodeResult = (ui::ImageDecodeResult*)args.wParam;
-                    if ((pImageDecodeResult != nullptr) && pImageDecodeResult->m_bDecodeError) {
-                        errorImagePathSet.insert(pImageDecodeResult->m_imageFilePath);
-                        ui::Control* pIconControl = FindSubControl(_T("control_img"));
-                        if (pIconControl != nullptr) {
-                            pIconControl->SetBkImage(defaultImage);
+                m_pIconControl->AttachImageDecode(
+                    [this, defaultImage, &errorImagePathSet](const ui::EventArgs &args) {
+                        ui::ImageDecodeResult *pImageDecodeResult
+                            = (ui::ImageDecodeResult *) args.wParam;
+                        if ((pImageDecodeResult != nullptr) && pImageDecodeResult->m_bDecodeError) {
+                            errorImagePathSet.insert(pImageDecodeResult->m_imageFilePath);
+                            ui::Control *pIconControl = FindSubControl(_T("control_img"));
+                            if (pIconControl != nullptr) {
+                                pIconControl->SetBkImage(defaultImage);
+                            }
                         }
-                    }
-                    return true;
+                        return true;
                     });
-            }
-            else {
+            } else {
                 //非图片文件或者文件夹，显示图标
-                DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(fileInfo.m_nIconID);
+                DString iconString = ui::GlobalManager::Instance().Icon().GetIconString(
+                    fileInfo.m_nIconID);
                 if (!iconString.empty()) {
-                    iconString = ui::StringUtil::Printf(_T("file='%s' width='64' height='64' halign='center' valign='center'"), iconString.c_str());
+                    iconString = ui::StringUtil::Printf(
+                        _T("file='%s' width='64' height='64' halign='center' valign='center'"),
+                        iconString.c_str());
                     m_pIconControl->SetBkImage(iconString);
-                }
-                else {
+                } else {
                     m_pIconControl->SetBkImage(_T(""));
                 }
             }
@@ -106,7 +117,7 @@ public:
 private:
     /** 是否为图片文件
     */
-    bool IsImageFile(const DString& filePath) const
+    bool IsImageFile(const DString &filePath) const
     {
         DString fileExt;
         size_t pos = filePath.rfind(_T('.'));
@@ -117,22 +128,12 @@ private:
         if (fileExt == _T(".svg")) {
             return true;
         }
-        if ((fileExt == _T(".svg")) ||
-            (fileExt == _T(".jpg")) ||
-            (fileExt == _T(".jpeg")) ||
-            (fileExt == _T(".jpe")) ||
-            (fileExt == _T(".jif")) ||
-            (fileExt == _T(".jfif")) ||
-            (fileExt == _T(".jfi")) ||
-            (fileExt == _T(".gif")) ||
-            (fileExt == _T(".png")) ||
-            (fileExt == _T(".bmp")) ||
-            (fileExt == _T(".dib")) ||
-            (fileExt == _T(".webp")) ||
-            (fileExt == _T(".json")) ||
-            (fileExt == _T(".pag")) ||
-            (fileExt == _T(".ico")) ||
-            (fileExt == _T(".cur")) ) {
+        if ((fileExt == _T(".svg")) || (fileExt == _T(".jpg")) || (fileExt == _T(".jpeg"))
+            || (fileExt == _T(".jpe")) || (fileExt == _T(".jif")) || (fileExt == _T(".jfif"))
+            || (fileExt == _T(".jfi")) || (fileExt == _T(".gif")) || (fileExt == _T(".png"))
+            || (fileExt == _T(".bmp")) || (fileExt == _T(".dib")) || (fileExt == _T(".webp"))
+            || (fileExt == _T(".json")) || (fileExt == _T(".pag")) || (fileExt == _T(".ico"))
+            || (fileExt == _T(".cur"))) {
             return true;
         }
         return false;
@@ -143,15 +144,15 @@ private:
     size_t m_nElementIndex;
 
     //图标控件
-    ui::Control* m_pIconControl;
+    ui::Control *m_pIconControl;
 
     //文字控件
-    ui::Label* m_pTextControl;
+    ui::Label *m_pTextControl;
 };
 
-SimpleFileView::SimpleFileView(MainForm* pMainForm, ui::VirtualListBox* pListBox):
-    m_pMainForm(pMainForm),
-    m_pListBox(pListBox)
+SimpleFileView::SimpleFileView(MainForm *pMainForm, ui::VirtualListBox *pListBox)
+    : m_pMainForm(pMainForm)
+    , m_pListBox(pListBox)
 {
     if (m_pListBox != nullptr) {
         m_pListBox->SetDataProvider(this);
@@ -166,28 +167,28 @@ SimpleFileView::~SimpleFileView()
     }
 }
 
-ui::Control* SimpleFileView::CreateElement(ui::VirtualListBox* pVirtualListBox)
+ui::Control *SimpleFileView::CreateElement(ui::VirtualListBox *pVirtualListBox)
 {
     ASSERT(pVirtualListBox != nullptr);
     if (pVirtualListBox == nullptr) {
         return nullptr;
     }
     ASSERT(pVirtualListBox->GetWindow() != nullptr);
-    FileInfoItem* item = new FileInfoItem(pVirtualListBox->GetWindow());
+    FileInfoItem *item = new FileInfoItem(pVirtualListBox->GetWindow());
     item->AttachDoubleClick(UiBind(&SimpleFileView::OnDoubleClickItem, this, std::placeholders::_1));
     ui::GlobalManager::Instance().FillBoxWithCache(item, ui::FilePath(_T("tree_view/tree_node.xml")));
     return item;
 }
 
-bool SimpleFileView::FillElement(ui::Control* pControl, size_t nElementIndex)
+bool SimpleFileView::FillElement(ui::Control *pControl, size_t nElementIndex)
 {
-    FileInfoItem* pItem = dynamic_cast<FileInfoItem*>(pControl);
+    FileInfoItem *pItem = dynamic_cast<FileInfoItem *>(pControl);
     ASSERT(pItem != nullptr);
     ASSERT(nElementIndex < m_pathList.size());
     if ((pItem == nullptr) || (nElementIndex >= m_pathList.size())) {
         return false;
     }
-    const PathInfo& fileInfo = m_pathList[nElementIndex];
+    const PathInfo &fileInfo = m_pathList[nElementIndex];
     pItem->FillSubControls(m_errorImagePathSet, fileInfo, nElementIndex);
     pItem->SetUserDataID(nElementIndex);
     return true;
@@ -213,7 +214,7 @@ bool SimpleFileView::IsElementSelected(size_t nElementIndex) const
     return false;
 }
 
-void SimpleFileView::GetSelectedElements(std::vector<size_t>& selectedIndexs) const
+void SimpleFileView::GetSelectedElements(std::vector<size_t> &selectedIndexs) const
 {
     selectedIndexs.clear();
     for (size_t nElementIndex = 0; nElementIndex < m_pathSelectList.size(); ++nElementIndex) {
@@ -234,7 +235,10 @@ void SimpleFileView::SetMultiSelect(bool /*bMultiSelect*/)
     //禁止切换单选和多选，固定为单选模式
 }
 
-void SimpleFileView::SetFileList(const ui::FilePath& currentPath, const std::vector<PathInfo>& pathList, const ui::FilePath& selectedPath)
+void SimpleFileView::SetFileList(
+    const ui::FilePath &currentPath,
+    const std::vector<PathInfo> &pathList,
+    const ui::FilePath &selectedPath)
 {
     m_errorImagePathSet.clear(); //清除错误图片列表
     m_currentPath = currentPath;
@@ -255,7 +259,7 @@ void SimpleFileView::SetFileList(const ui::FilePath& currentPath, const std::vec
     size_t nSelectedItemIndex = ui::Box::InvalidIndex;
     if (!selectedPath.IsEmpty()) {
         for (size_t nIndex = 0; nIndex < pathList.size(); ++nIndex) {
-            const ui::DirectoryTree::PathInfo& pathInfo = pathList[nIndex];
+            const ui::DirectoryTree::PathInfo &pathInfo = pathList[nIndex];
             if (selectedPath == pathInfo.m_filePath) {
                 //保存选择状态
                 m_pathSelectList[nIndex] = true;
@@ -271,14 +275,14 @@ void SimpleFileView::SetFileList(const ui::FilePath& currentPath, const std::vec
     }
 }
 
-void SimpleFileView::GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selectedPath) const
+void SimpleFileView::GetCurrentPath(ui::FilePath &currentPath, ui::FilePath &selectedPath) const
 {
     currentPath = m_currentPath;
     std::vector<size_t> selectedIndexs;
     GetSelectedElements(selectedIndexs);
     for (size_t nIndex : selectedIndexs) {
         if (nIndex < m_pathList.size()) {
-            const ui::DirectoryTree::PathInfo& pathInfo = m_pathList[nIndex];
+            const ui::DirectoryTree::PathInfo &pathInfo = m_pathList[nIndex];
             if (!pathInfo.m_filePath.IsEmpty()) {
                 //记录当前所选的目录
                 selectedPath = pathInfo.m_filePath;
@@ -288,17 +292,17 @@ void SimpleFileView::GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& sel
     }
 }
 
-bool SimpleFileView::OnDoubleClickItem(const ui::EventArgs& args)
+bool SimpleFileView::OnDoubleClickItem(const ui::EventArgs &args)
 {
     if (m_pMainForm == nullptr) {
         return true;
     }
 
-    FileInfoItem* pItem = dynamic_cast<FileInfoItem*>(args.GetSender());
+    FileInfoItem *pItem = dynamic_cast<FileInfoItem *>(args.GetSender());
     if (pItem != nullptr) {
         size_t nElementIndex = pItem->GetUserDataID();
         if (nElementIndex < m_pathList.size()) {
-            const PathInfo& fileInfo = m_pathList[nElementIndex];
+            const PathInfo &fileInfo = m_pathList[nElementIndex];
             if (fileInfo.m_bFolder) {
                 //双击在一个目录上
                 m_pMainForm->SelectSubPath(fileInfo.m_filePath);

@@ -17,15 +17,16 @@ namespace ui {
 class DUILIB_API CefControlNative : public CefControl
 {
     typedef CefControl BaseClass;
+
 public:
-    explicit CefControlNative(ui::Window* pWindow);
+    explicit CefControlNative(ui::Window *pWindow);
     virtual ~CefControlNative(void) override;
 
     virtual void Init() override;
     virtual void SetPos(ui::UiRect rc) override;
-    virtual bool OnSetFocus(const EventArgs& msg) override;
-    virtual bool OnKillFocus(const EventArgs& msg) override;
-    virtual void SetWindow(ui::Window* pWindow) override;
+    virtual bool OnSetFocus(const EventArgs &msg) override;
+    virtual bool OnKillFocus(const EventArgs &msg) override;
+    virtual void SetWindow(ui::Window *pWindow) override;
 
 protected:
     /** 重新创建Browser对象

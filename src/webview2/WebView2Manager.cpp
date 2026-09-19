@@ -1,51 +1,49 @@
 #include "WebView2Manager.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
-#include "webview2/WebView2Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include "webview2/WebView2Control.h"
 #include <objbase.h>
 
 namespace ui {
 
 //创建WebView控件的回调函数
-static Control* DuilibCreateWebView2Control(const DString& className)
+static Control *DuilibCreateWebView2Control(const DString &className)
 {
-    Control* pControl = nullptr;
+    Control *pControl = nullptr;
     if (className == _T("WebView2Control")) {
         pControl = new WebView2Control(nullptr);
     }
     return pControl;
 }
 
-WebView2Manager::WebView2Manager():
-    m_bScriptEnabled(true),
-    m_bWebMessageEnabled(true),
-    m_bAreDefaultScriptDialogsEnabled(true),
-    m_bAreDefaultContextMenusEnabled(true),
-    m_bZoomControlEnabled(true),
-    m_bAreDevToolsEnabled(true),
-    m_bEnableF12(true),
-    m_bEnableF11(true)
-{
-}
+WebView2Manager::WebView2Manager()
+    : m_bScriptEnabled(true)
+    , m_bWebMessageEnabled(true)
+    , m_bAreDefaultScriptDialogsEnabled(true)
+    , m_bAreDefaultContextMenusEnabled(true)
+    , m_bZoomControlEnabled(true)
+    , m_bAreDevToolsEnabled(true)
+    , m_bEnableF12(true)
+    , m_bEnableF11(true)
+{}
 
-WebView2Manager::~WebView2Manager()
-{
-}
+WebView2Manager::~WebView2Manager() {}
 
-WebView2Manager& WebView2Manager::GetInstance()
+WebView2Manager &WebView2Manager::GetInstance()
 {
     static WebView2Manager self;
     return self;
 }
 
-bool WebView2Manager::Initialize(const DString& userDataFolder,
-                                 const DString& language,
-                                 const DString& userAgent,
-                                 const DString& additionalBrowserArguments,
-                                 const DString& browserExecutableFolder)
+bool WebView2Manager::Initialize(
+    const DString &userDataFolder,
+    const DString &language,
+    const DString &userAgent,
+    const DString &additionalBrowserArguments,
+    const DString &browserExecutableFolder)
 {
     m_userDataFolder = userDataFolder;
     m_language = language;
@@ -58,11 +56,9 @@ bool WebView2Manager::Initialize(const DString& userDataFolder,
     return true;
 }
 
-void WebView2Manager::UnInitialize()
-{
-}
+void WebView2Manager::UnInitialize() {}
 
-DString WebView2Manager::GetDefaultUserDataFolder(const DString& appName) const
+DString WebView2Manager::GetDefaultUserDataFolder(const DString &appName) const
 {
     DString defaultCachePath = _T("webview2_cache");
     defaultCachePath += ui::FilePath::GetPathSeparatorStr();
@@ -75,27 +71,27 @@ DString WebView2Manager::GetDefaultUserDataFolder(const DString& appName) const
     return runPath.ToString();
 }
 
-void WebView2Manager::SetBrowserExecutableFolder(const DString& browserExecutableFolder)
+void WebView2Manager::SetBrowserExecutableFolder(const DString &browserExecutableFolder)
 {
     m_browserExecutableFolder = browserExecutableFolder;
 }
 
-const DString& WebView2Manager::GetBrowserExecutableFolder() const
+const DString &WebView2Manager::GetBrowserExecutableFolder() const
 {
     return m_browserExecutableFolder;
 }
 
-void WebView2Manager::SetUserDataFolder(const DString& userDataFolder)
+void WebView2Manager::SetUserDataFolder(const DString &userDataFolder)
 {
     m_userDataFolder = userDataFolder;
 }
 
-const DString& WebView2Manager::GetUserDataFolder() const
+const DString &WebView2Manager::GetUserDataFolder() const
 {
     return m_userDataFolder;
 }
 
-void WebView2Manager::SetLanguage(const DString& language)
+void WebView2Manager::SetLanguage(const DString &language)
 {
     m_language = language;
 }
@@ -114,22 +110,22 @@ DString WebView2Manager::GetLanguage() const
     return language;
 }
 
-void WebView2Manager::SetUserAgent(const DString& userAgent)
+void WebView2Manager::SetUserAgent(const DString &userAgent)
 {
     m_userAgent = userAgent;
 }
 
-const DString& WebView2Manager::GetUserAgent() const
+const DString &WebView2Manager::GetUserAgent() const
 {
     return m_userAgent;
 }
 
-void WebView2Manager::SetAdditionalBrowserArguments(const DString& additionalBrowserArguments)
+void WebView2Manager::SetAdditionalBrowserArguments(const DString &additionalBrowserArguments)
 {
     m_additionalBrowserArguments = additionalBrowserArguments;
 }
 
-const DString& WebView2Manager::GetAdditionalBrowserArguments() const
+const DString &WebView2Manager::GetAdditionalBrowserArguments() const
 {
     return m_additionalBrowserArguments;
 }

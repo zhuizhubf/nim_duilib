@@ -1,21 +1,17 @@
 #include "DpiAwareness.h"
 
 //仅限Windows平台
-#if defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_WIN)
 
 #include "duilib/Utils/ApiWrapper_Windows.h"
 #include <VersionHelpers.h>
 
-namespace ui
-{
-DpiAwareness::DpiAwareness():
-    m_dpiAwarenessMode(DpiAwarenessMode::kPerMonitorDpiAware_V2)
-{
-}
+namespace ui {
+DpiAwareness::DpiAwareness()
+    : m_dpiAwarenessMode(DpiAwarenessMode::kPerMonitorDpiAware_V2)
+{}
 
-DpiAwareness::~DpiAwareness()
-{
-}
+DpiAwareness::~DpiAwareness() {}
 
 bool DpiAwareness::InitDpiAwareness(DpiAwarenessMode dpiAwarenessMode)
 {
@@ -26,8 +22,7 @@ bool DpiAwareness::InitDpiAwareness(DpiAwarenessMode dpiAwarenessMode)
         DpiAwarenessMode currentAwarenessMode = GetDpiAwareness();
         if (dpiAwarenessMode == DpiAwarenessMode::kDpiUnaware) {
             bRet = (currentAwarenessMode == DpiAwarenessMode::kDpiUnaware) ? true : false;
-        }
-        else {
+        } else {
             bRet = (currentAwarenessMode != DpiAwarenessMode::kDpiUnaware) ? true : false;
         }
     }
@@ -55,11 +50,9 @@ DpiAwarenessMode DpiAwareness::SetDpiAwareness(DpiAwarenessMode dpiAwarenessMode
             PROCESS_DPI_AWARENESS_CONTEXT newValueWin10 = PROCESS_DPI_AWARENESS_CONTEXT_UNAWARE;
             if (dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware_V2) {
                 newValueWin10 = PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
-            }
-            else if (dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware) {
+            } else if (dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware) {
                 newValueWin10 = PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE;
-            }
-            else {
+            } else {
                 newValueWin10 = PROCESS_DPI_AWARENESS_CONTEXT_SYSTEM_AWARE;
             }
             PROCESS_DPI_AWARENESS_CONTEXT oldValueWin10 = PROCESS_DPI_AWARENESS_CONTEXT_UNAWARE;
@@ -82,11 +75,10 @@ DpiAwarenessMode DpiAwareness::SetDpiAwareness(DpiAwarenessMode dpiAwarenessMode
         if (!bSetOk && ::IsWindows8Point1OrGreater()) {
             //Win8.1 及以上
             PROCESS_DPI_AWARENESS newValueWin8 = PROCESS_DPI_UNAWARE;
-            if ((dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware) ||
-                (dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware_V2)) {
+            if ((dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware)
+                || (dpiAwarenessMode == DpiAwarenessMode::kPerMonitorDpiAware_V2)) {
                 newValueWin8 = PROCESS_PER_MONITOR_DPI_AWARE;
-            }
-            else {
+            } else {
                 newValueWin8 = PROCESS_SYSTEM_DPI_AWARE;
             }
             PROCESS_DPI_AWARENESS oldValueWin8 = PROCESS_DPI_UNAWARE;
@@ -129,19 +121,20 @@ DpiAwarenessMode DpiAwareness::GetDpiAwareness() const
         PROCESS_DPI_AWARENESS_CONTEXT value = PROCESS_DPI_AWARENESS_CONTEXT_UNAWARE;
         if (GetProcessDpiAwarenessContextWrapper(value)) {
             bDpiInited = true;
-            if (AreDpiAwarenessContextsEqualWrapper(value, PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)) {
+            if (AreDpiAwarenessContextsEqualWrapper(
+                    value, PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)) {
                 dpiAwarenessMode = DpiAwarenessMode::kPerMonitorDpiAware_V2;
-            }
-            else if (AreDpiAwarenessContextsEqualWrapper(value, PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE)) {
+            } else if (
+                AreDpiAwarenessContextsEqualWrapper(
+                    value, PROCESS_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE)) {
                 dpiAwarenessMode = DpiAwarenessMode::kPerMonitorDpiAware;
-            }
-            else if (AreDpiAwarenessContextsEqualWrapper(value, PROCESS_DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)) {
+            } else if (
+                AreDpiAwarenessContextsEqualWrapper(
+                    value, PROCESS_DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)) {
                 dpiAwarenessMode = DpiAwarenessMode::kSystemDpiAware;
-            }
-            else if (AreDpiAwarenessContextsEqualWrapper(value, PROCESS_DPI_AWARENESS_CONTEXT_UNAWARE)) {
+            } else if (AreDpiAwarenessContextsEqualWrapper(value, PROCESS_DPI_AWARENESS_CONTEXT_UNAWARE)) {
                 dpiAwarenessMode = DpiAwarenessMode::kDpiUnaware;
-            }
-            else {
+            } else {
                 dpiAwarenessMode = DpiAwarenessMode::kDpiUnaware;
             }
         }
@@ -153,11 +146,9 @@ DpiAwarenessMode DpiAwareness::GetDpiAwareness() const
             bDpiInited = true;
             if (value == PROCESS_PER_MONITOR_DPI_AWARE) {
                 dpiAwarenessMode = DpiAwarenessMode::kPerMonitorDpiAware;
-            }
-            else if (value == PROCESS_SYSTEM_DPI_AWARE) {
+            } else if (value == PROCESS_SYSTEM_DPI_AWARE) {
                 dpiAwarenessMode = DpiAwarenessMode::kSystemDpiAware;
-            }
-            else {
+            } else {
                 dpiAwarenessMode = DpiAwarenessMode::kDpiUnaware;
             }
         }
@@ -168,8 +159,7 @@ DpiAwarenessMode DpiAwareness::GetDpiAwareness() const
             bDpiInited = true;
             if (bAware) {
                 dpiAwarenessMode = DpiAwarenessMode::kSystemDpiAware;
-            }
-            else {
+            } else {
                 dpiAwarenessMode = DpiAwarenessMode::kDpiUnaware;
             }
         }
@@ -177,6 +167,6 @@ DpiAwarenessMode DpiAwareness::GetDpiAwareness() const
     return dpiAwarenessMode;
 }
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

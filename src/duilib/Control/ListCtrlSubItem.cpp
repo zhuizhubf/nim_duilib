@@ -1,27 +1,28 @@
 #include "ListCtrlSubItem.h"
 #include "duilib/Control/ListCtrl.h"
 
-namespace ui
-{
-ListCtrlSubItem::ListCtrlSubItem(Window* pWindow):
-    ListCtrlLabel(pWindow),
-    m_pItem(nullptr),
-    m_imageId(-1),
-    m_nIconSpacing(0),
-    m_nColumnId(Box::InvalidIndex)
+namespace ui {
+ListCtrlSubItem::ListCtrlSubItem(Window *pWindow)
+    : ListCtrlLabel(pWindow)
+    , m_pItem(nullptr)
+    , m_imageId(-1)
+    , m_nIconSpacing(0)
+    , m_nColumnId(Box::InvalidIndex)
 {
     SetIconSpacing(2, true);
 }
 
-DString ListCtrlSubItem::GetType() const { return _T("ListCtrlSubItem"); }
+DString ListCtrlSubItem::GetType() const
+{
+    return _T("ListCtrlSubItem");
+}
 
-void ListCtrlSubItem::SetAttribute(const DString& strName, const DString& strValue2)
+void ListCtrlSubItem::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("icon_spacing")) {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -42,12 +43,12 @@ bool ListCtrlSubItem::SupportCheckMode() const
     return true;
 }
 
-void ListCtrlSubItem::SetListCtrlItem(ListCtrlItem* pItem)
+void ListCtrlSubItem::SetListCtrlItem(ListCtrlItem *pItem)
 {
     m_pItem = pItem;
 }
 
-ListCtrlItem* ListCtrlSubItem::GetListCtrlItem() const
+ListCtrlItem *ListCtrlSubItem::GetListCtrlItem() const
 {
     ASSERT(m_pItem != nullptr);
     return m_pItem;
@@ -64,7 +65,7 @@ size_t ListCtrlSubItem::GetDataItemIndex() const
 size_t ListCtrlSubItem::GetDataColumnIndex() const
 {
     if (m_pItem != nullptr) {
-        ListCtrl* pListCtrl = m_pItem->GetListCtrl();
+        ListCtrl *pListCtrl = m_pItem->GetListCtrl();
         if (pListCtrl != nullptr) {
             return pListCtrl->GetColumnIndex(m_nColumnId);
         }
@@ -84,7 +85,7 @@ void ListCtrlSubItem::SetDataColumnId(size_t nColumnId)
 
 bool ListCtrlSubItem::SetShowCheckBox(bool bShow)
 {
-    ListCtrlItem* pItem = GetListCtrlItem();
+    ListCtrlItem *pItem = GetListCtrlItem();
     if (pItem == nullptr) {
         return false;
     }
@@ -93,7 +94,7 @@ bool ListCtrlSubItem::SetShowCheckBox(bool bShow)
         if (IsShowCheckBox()) {
             return true;
         }
-        ListCtrl* pListCtrl = pItem->GetListCtrl();
+        ListCtrl *pListCtrl = pItem->GetListCtrl();
         if (pListCtrl != nullptr) {
             DString checkBoxClass = pListCtrl->GetCheckBoxClass();
             if (!checkBoxClass.empty()) {
@@ -101,8 +102,7 @@ bool ListCtrlSubItem::SetShowCheckBox(bool bShow)
                 bRet = IsShowCheckBox();
             }
         }
-    }
-    else {
+    } else {
         //清除CheckBox图片资源，就不显示了
         ClearStateImages();
         ASSERT(!IsShowCheckBox());
@@ -114,7 +114,8 @@ bool ListCtrlSubItem::SetShowCheckBox(bool bShow)
 bool ListCtrlSubItem::IsShowCheckBox() const
 {
     //如果有CheckBox图片资源，则认为显示了CheckBox
-    return !GetStateImage(kControlStateNormal).empty() && !GetSelectedStateImage(kControlStateNormal).empty();
+    return !GetStateImage(kControlStateNormal).empty()
+           && !GetSelectedStateImage(kControlStateNormal).empty();
 }
 
 bool ListCtrlSubItem::IsCheckBoxChecked() const
@@ -167,7 +168,7 @@ ImagePtr ListCtrlSubItem::LoadItemImage() const
 {
     ImagePtr pItemImage;
     if ((m_imageId >= 0) && (m_pItem != nullptr)) {
-        ListCtrl* pListCtrl = m_pItem->GetListCtrl();
+        ListCtrl *pListCtrl = m_pItem->GetListCtrl();
         if (pListCtrl != nullptr) {
             ImageListPtr pImageList = pListCtrl->GetImageList(ListCtrlType::Report);
             if (pImageList != nullptr) {
@@ -181,10 +182,8 @@ ImagePtr ListCtrlSubItem::LoadItemImage() const
         std::shared_ptr<ImageInfo> pItemImageCache = pItemImage->GetImageInfo();
         if (pItemImageCache == nullptr) {
             pItemImage = nullptr;
-        }
-        else {
-            if ((pItemImageCache->GetWidth() <= 0) ||
-                (pItemImageCache->GetHeight() <= 0)) {
+        } else {
+            if ((pItemImageCache->GetWidth() <= 0) || (pItemImageCache->GetHeight() <= 0)) {
                 pItemImage = nullptr;
             }
         }
@@ -192,7 +191,7 @@ ImagePtr ListCtrlSubItem::LoadItemImage() const
     return pItemImage;
 }
 
-void ListCtrlSubItem::PaintText(IRender* pRender)
+void ListCtrlSubItem::PaintText(IRender *pRender)
 {
     //需要绘制的内容包括：图标、文字
     SetTextRect(UiRect());
@@ -216,7 +215,7 @@ void ListCtrlSubItem::PaintText(IRender* pRender)
     }
 
     UiSize imageSize;
-    ListCtrl* pListCtrl = nullptr;
+    ListCtrl *pListCtrl = nullptr;
     if (m_pItem != nullptr) {
         pListCtrl = m_pItem->GetListCtrl();
     }
@@ -256,7 +255,7 @@ void ListCtrlSubItem::PaintText(IRender* pRender)
     SetTextRect(textRect);
 }
 
-void ListCtrlSubItem::VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageHeight)
+void ListCtrlSubItem::VAlignRect(UiRect &rc, uint32_t textStyle, int32_t nImageHeight)
 {
     if ((nImageHeight <= 0) || (nImageHeight >= rc.Height())) {
         return;
@@ -265,12 +264,10 @@ void ListCtrlSubItem::VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageH
         //居中对齐
         rc.top = rc.CenterY() - nImageHeight / 2;
         rc.bottom = rc.top + nImageHeight;
-    }
-    else if (textStyle & TEXT_BOTTOM) {
+    } else if (textStyle & TEXT_BOTTOM) {
         //底部对齐
         rc.top = rc.bottom - nImageHeight;
-    }
-    else {
+    } else {
         //顶部对齐
         rc.bottom = rc.top + nImageHeight;
     }
@@ -302,7 +299,7 @@ UiSize ListCtrlSubItem::EstimateText(UiSize szAvailable)
     if (pItemImage != nullptr) {
         rc.left += pItemImage->GetImageInfo()->GetWidth();
         rc.left += nIconTextSpacing;
-    }   
+    }
 
     UiRect textRect = GetRect();
     textRect.Deflate(rcPadding);
@@ -313,9 +310,8 @@ UiSize ListCtrlSubItem::EstimateText(UiSize szAvailable)
     if (textRect.left > nPaddingLeft) {
         sz.cx -= nPaddingLeft;
         sz.cx += textRect.left;
-    }    
+    }
     return sz;
 }
 
-}//namespace ui
-
+} //namespace ui

@@ -1,53 +1,48 @@
 #include "WebView2Control.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
 #include "WebView2ControlImpl.h"
-#include "webview2/WebView2Manager.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "render/IRender.h"
+#include "webview2/WebView2Manager.h"
 
 namespace ui {
 
-WebView2Control::WebView2Control(Window* pWindow):
-    Control(pWindow),
-    m_pImpl(std::make_unique<Impl>(this)),
-    m_bUrlIsLocalFile(false)
+WebView2Control::WebView2Control(Window *pWindow)
+    : Control(pWindow)
+    , m_pImpl(std::make_unique<Impl>(this))
+    , m_bUrlIsLocalFile(false)
+{}
+
+WebView2Control::~WebView2Control() {}
+
+DString WebView2Control::GetType() const
 {
+    return DUI_CTR_WEBVIEW2;
 }
 
-WebView2Control::~WebView2Control()
-{
-}
-
-DString WebView2Control::GetType() const { return DUI_CTR_WEBVIEW2; }
-
-void WebView2Control::SetAttribute(const DString& strName, const DString& strValue2)
+void WebView2Control::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("url")) {
         //初始化加载的URL
         SetInitURL(strValue);
-    }
-    else if (strName == _T("url_is_local_file")) {
+    } else if (strName == _T("url_is_local_file")) {
         //初始化加载的URL是否为本地文件
         SetInitUrlIsLocalFile(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("devtools_enabled")) {
+    } else if (strName == _T("devtools_enabled")) {
         //是否允许打开开发者工具
         SetAreDevToolsEnabled(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("F12")) {
+    } else if (strName == _T("F12")) {
         //是否允许按F12打开开发者工具
         SetEnableF12(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("F11")) {
+    } else if (strName == _T("F11")) {
         //是否允许F11快捷键(页面全屏/页面退出全屏)
         SetEnableF11(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -84,7 +79,7 @@ void WebView2Control::OnInit()
     }
 }
 
-void WebView2Control::SetInitURL(const DString& url)
+void WebView2Control::SetInitURL(const DString &url)
 {
     m_initUrl = url;
 }
@@ -95,14 +90,14 @@ DString WebView2Control::GetInitURL() const
     if (IsInitUrlIsLocalFile() && !initUrl.empty()) {
         //该URL是本地路径
         DString url = StringUtil::MakeLowerString(initUrl);
-        if ((url.find(_T("http://")) != 0) && (url.find(_T("https://")) != 0) && (url.find(_T("file:///")) != 0)) {
+        if ((url.find(_T("http://")) != 0) && (url.find(_T("https://")) != 0)
+            && (url.find(_T("file:///")) != 0)) {
             //有明确的协议前缀时，不做任何转换，否则按照本地exe所在路径的资源文件加载
             FilePath cefHtml(initUrl);
             if (cefHtml.IsAbsolutePath() && cefHtml.IsExistsFile()) {
                 //绝对路径, 并且文件存在
                 cefHtml.NormalizeFilePath();
-            }
-            else {
+            } else {
                 //相对路径: 直接拼接
                 cefHtml = GlobalManager::GetResourceRootPath(true);
                 cefHtml.NormalizeDirectoryPath();
@@ -115,8 +110,10 @@ DString WebView2Control::GetInitURL() const
                     }
                     bool bFound = false;
                     std::vector<FilePath> resFileSearchPathList;
-                    GlobalManager::Instance().Theme().GetResFileSearchPath(windowResPath, resFileSearchPathList);
-                    for (const FilePath& searchPath : resFileSearchPathList) {
+                    GlobalManager::Instance()
+                        .Theme()
+                        .GetResFileSearchPath(windowResPath, resFileSearchPathList);
+                    for (const FilePath &searchPath : resFileSearchPathList) {
                         cefHtml = searchPath;
                         cefHtml /= FilePath(initUrl);
                         if (cefHtml.IsExistsFile()) {
@@ -167,13 +164,13 @@ void WebView2Control::SetPos(UiRect rc)
     m_pImpl->Resize(rect);
 }
 
-bool WebView2Control::OnSetFocus(const EventArgs& msg)
+bool WebView2Control::OnSetFocus(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnSetFocus(msg);
     return bRet;
 }
 
-bool WebView2Control::OnKillFocus(const EventArgs& msg)
+bool WebView2Control::OnKillFocus(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnKillFocus(msg);
     return bRet;
@@ -185,9 +182,9 @@ void WebView2Control::OnSetVisible(bool bChanged)
     m_pImpl->SetVisible(IsVisible());
 }
 
-void WebView2Control::SetWindow(Window* pWindow)
+void WebView2Control::SetWindow(Window *pWindow)
 {
-    Window* pOldWindow = BaseClass::GetWindow();
+    Window *pOldWindow = BaseClass::GetWindow();
     BaseClass::SetWindow(pWindow);
     if (pOldWindow != pWindow) {
         m_pImpl->SetWindow(pWindow);
@@ -195,14 +192,15 @@ void WebView2Control::SetWindow(Window* pWindow)
 }
 
 // 其他成员函数实现，转发到Impl类
-bool WebView2Control::InitializeAsync(const DString& userDataFolder, InitializeCompletedCallback callback)
+bool WebView2Control::InitializeAsync(
+    const DString &userDataFolder, InitializeCompletedCallback callback)
 {
     HRESULT hr = m_pImpl->InitializeAsync(userDataFolder, callback);
     m_pImpl->SetLastErrorCode(hr);
     return SUCCEEDED(hr);
 }
 
-bool WebView2Control::Navigate(const DString& url)
+bool WebView2Control::Navigate(const DString &url)
 {
     DString navUrl = url;
     if (navUrl.find(_T("://")) == DString::npos) {
@@ -247,28 +245,29 @@ bool WebView2Control::Stop()
     return SUCCEEDED(hr);
 }
 
-bool WebView2Control::ExecuteScript(const DString& script, std::function<void(const DString& result, HRESULT hr)> callback)
+bool WebView2Control::ExecuteScript(
+    const DString &script, std::function<void(const DString &result, HRESULT hr)> callback)
 {
     HRESULT hr = m_pImpl->ExecuteScript(script, callback);
     m_pImpl->SetLastErrorCode(hr);
     return SUCCEEDED(hr);
 }
 
-bool WebView2Control::PostWebMessageAsJson(const DString& json)
+bool WebView2Control::PostWebMessageAsJson(const DString &json)
 {
     HRESULT hr = m_pImpl->PostWebMessageAsJson(json);
     m_pImpl->SetLastErrorCode(hr);
     return SUCCEEDED(hr);
 }
 
-bool WebView2Control::PostWebMessageAsString(const DString& message)
+bool WebView2Control::PostWebMessageAsString(const DString &message)
 {
     HRESULT hr = m_pImpl->PostWebMessageAsString(message);
     m_pImpl->SetLastErrorCode(hr);
     return SUCCEEDED(hr);
 }
 
-bool WebView2Control::SetUserAgent(const DString& userAgent)
+bool WebView2Control::SetUserAgent(const DString &userAgent)
 {
     HRESULT hr = m_pImpl->SetUserAgent(userAgent);
     m_pImpl->SetLastErrorCode(hr);
@@ -406,8 +405,8 @@ void WebView2Control::SetFavIconChangedCallback(FavIconChangedCallback callback)
     m_pImpl->SetFavIconChangedCallback(callback);
 }
 
-bool WebView2Control::CapturePreview(const DString& filePath,
-    std::function<void(const DString& filePath, HRESULT hr)> callback)
+bool WebView2Control::CapturePreview(
+    const DString &filePath, std::function<void(const DString &filePath, HRESULT hr)> callback)
 {
     HRESULT hr = m_pImpl->CapturePreview(filePath, callback);
     m_pImpl->SetLastErrorCode(hr);
@@ -484,7 +483,8 @@ ui::ComPtr<ICoreWebView2> WebView2Control::GetWebView2() const
     return m_pImpl->GetWebView2();
 }
 
-static bool CaptureWindowBitmap_Win32(HWND hwnd, RECT rect, std::vector<uint8_t>& bitmap, int32_t& width, int32_t& height)
+static bool CaptureWindowBitmap_Win32(
+    HWND hwnd, RECT rect, std::vector<uint8_t> &bitmap, int32_t &width, int32_t &height)
 {
     if (!::IsWindow(hwnd)) {
         return false;
@@ -528,12 +528,12 @@ static bool CaptureWindowBitmap_Win32(HWND hwnd, RECT rect, std::vector<uint8_t>
 
     // 拷贝屏幕内容到位图
     ::BitBlt(hdcMemDC, 0, 0, width, height, hdcWindow, rect.left, rect.top, SRCCOPY);
-    
+
     // 获取位图信息
     BITMAPINFOHEADER bi;
     bi.biSize = sizeof(BITMAPINFOHEADER);
     bi.biWidth = width;
-    bi.biHeight = -height;  // 正数表示从下到上，负数表示从上到下
+    bi.biHeight = -height; // 正数表示从下到上，负数表示从上到下
     bi.biPlanes = 1;
     bi.biBitCount = 32;
     bi.biCompression = BI_RGB;
@@ -545,7 +545,7 @@ static bool CaptureWindowBitmap_Win32(HWND hwnd, RECT rect, std::vector<uint8_t>
 
     // 分配内存并获取位图数据
     bitmap.resize(width * height * 4);
-    ::GetDIBits(hdcMemDC, hBitmap, 0, height, bitmap.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+    ::GetDIBits(hdcMemDC, hBitmap, 0, height, bitmap.data(), (BITMAPINFO *) &bi, DIB_RGB_COLORS);
 
     // 清理资源
     ::SelectObject(hdcMemDC, hOldObj);
@@ -559,12 +559,14 @@ static bool CaptureWindowBitmap_Win32(HWND hwnd, RECT rect, std::vector<uint8_t>
 
 /** 抓取网页的预览图（仅控件显示区域，并不是整个网页）
 */
-static bool CaptureWindowBitmap_Win32(WebView2Control* pWebView2Control, std::vector<uint8_t>& bitmap, int32_t& width, int32_t& height)
+static bool CaptureWindowBitmap_Win32(
+    WebView2Control *pWebView2Control, std::vector<uint8_t> &bitmap, int32_t &width, int32_t &height)
 {
     if (pWebView2Control == nullptr) {
         return false;
     }
-    ui::ComPtr<ICoreWebView2Controller> spWebView2Controller = pWebView2Control->GetWebView2Controller();
+    ui::ComPtr<ICoreWebView2Controller> spWebView2Controller
+        = pWebView2Control->GetWebView2Controller();
     if (spWebView2Controller == nullptr) {
         return false;
     }
@@ -573,7 +575,7 @@ static bool CaptureWindowBitmap_Win32(WebView2Control* pWebView2Control, std::ve
     if (FAILED(spWebView2Controller->get_ParentWindow(&hParentWnd)) || !::IsWindow(hParentWnd)) {
         return false;
     }
-    
+
     UiRect rcControl = pWebView2Control->GetRect();
     if (rcControl.IsEmpty()) {
         return false;
@@ -582,7 +584,7 @@ static bool CaptureWindowBitmap_Win32(WebView2Control* pWebView2Control, std::ve
     UiPoint ptOffset = pWebView2Control->GetScrollOffsetInScrollBox();
     rcControl.Offset(-ptOffset.x, -ptOffset.y);
 
-    UiPoint ptLeftTop = { rcControl.left, rcControl.top};
+    UiPoint ptLeftTop = {rcControl.left, rcControl.top};
     pWebView2Control->ClientToScreen(ptLeftTop);
     RECT rcScreenWebView2Control;
     rcScreenWebView2Control.left = ptLeftTop.x;
@@ -590,23 +592,23 @@ static bool CaptureWindowBitmap_Win32(WebView2Control* pWebView2Control, std::ve
     rcScreenWebView2Control.right = rcScreenWebView2Control.left + rcControl.Width();
     rcScreenWebView2Control.bottom = rcScreenWebView2Control.top + rcControl.Height();
 
-    RECT rcWindow = { 0, 0, 0, 0 };
+    RECT rcWindow = {0, 0, 0, 0};
     ::GetWindowRect(hParentWnd, &rcWindow);
 
-    RECT rcValidWebView2Control = { 0, 0, 0, 0 };
+    RECT rcValidWebView2Control = {0, 0, 0, 0};
     ::IntersectRect(&rcValidWebView2Control, &rcScreenWebView2Control, &rcWindow);
 
     HWND hDesktopWnd = ::GetDesktopWindow();
     if (!::IsWindow(hDesktopWnd)) {
         return false;
     }
-    RECT rcDesktop = { 0 ,0 ,0 ,0 };
+    RECT rcDesktop = {0, 0, 0, 0};
     ::GetWindowRect(hDesktopWnd, &rcDesktop);
 
-    RECT rcWebView2Control = { 0, 0, 0, 0 };
+    RECT rcWebView2Control = {0, 0, 0, 0};
     ::IntersectRect(&rcWebView2Control, &rcScreenWebView2Control, &rcDesktop);
 
-    ::ScreenToClient(hDesktopWnd, (LPPOINT)&rcWebView2Control);
+    ::ScreenToClient(hDesktopWnd, (LPPOINT) &rcWebView2Control);
     return CaptureWindowBitmap_Win32(hDesktopWnd, rcWebView2Control, bitmap, width, height);
 }
 
@@ -616,9 +618,9 @@ std::shared_ptr<IBitmap> WebView2Control::MakeImageSnapshot()
     int32_t width = 0;
     int32_t height = 0;
     bool bRet = CaptureWindowBitmap_Win32(this, bitmap, width, height);
-    if (bRet && (width > 0) && (height > 0) && ((int32_t)bitmap.size() == (width * height * 4))) {
+    if (bRet && (width > 0) && (height > 0) && ((int32_t) bitmap.size() == (width * height * 4))) {
         std::shared_ptr<IBitmap> spBitmap;
-        IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+        IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
         ASSERT(pRenderFactory != nullptr);
         if (pRenderFactory != nullptr) {
             spBitmap.reset(pRenderFactory->CreateBitmap());

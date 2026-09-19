@@ -19,7 +19,7 @@ public:
     * @param [in] pMainForm 关联窗口的接口
     * @param [in] pListCtrl 关联的列表控件接口
     */
-    ExplorerView(MainForm* pMainForm, ui::ListCtrl* pListCtrl);
+    ExplorerView(MainForm *pMainForm, ui::ListCtrl *pListCtrl);
 
     /** 析构函数
     */
@@ -30,24 +30,26 @@ public:
     * @param [in] currentPath 当前显示内容所在路径
     * @param [in] pathList 文件和文件夹列表
     */
-    void SetFileList(const ui::FilePath& currentPath, const std::vector<PathInfo>& pathList, const ui::FilePath& selectedPath);
+    void SetFileList(
+        const ui::FilePath &currentPath,
+        const std::vector<PathInfo> &pathList,
+        const ui::FilePath &selectedPath);
 
     /** 获取当前显示内容所在路径和所选择的路径
     * @param [out] currentPath 当前显示内容所在路径
     * @param [out] selectedPath 当前视图中选择的路径
     * @param [in] selectedPath 需要选择的路径
     */
-    void GetCurrentPath(ui::FilePath& currentPath, ui::FilePath& selectedPath) const;
+    void GetCurrentPath(ui::FilePath &currentPath, ui::FilePath &selectedPath) const;
 
     /** 获取视图的列表接口
     */
-    ui::ListCtrl* GetListCtrl() const;
+    ui::ListCtrl *GetListCtrl() const;
 
 public:
     /** 视图的表头
     */
-    enum class ExplorerViewColumn
-    {
+    enum class ExplorerViewColumn {
         kName,           //文件名称
         kModifyDateTime, //修改日期
         kType,           //文件类型
@@ -58,7 +60,7 @@ public:
     * @param [out] viewColumn 当前排序的列
     * @param [out] bSortUp true表示升序，false表示降序
     */
-    bool GetSortColumnInfo(ExplorerViewColumn& viewColumn, bool& bSortUp) const;
+    bool GetSortColumnInfo(ExplorerViewColumn &viewColumn, bool &bSortUp) const;
 
     /** 排序
     */
@@ -75,7 +77,7 @@ private:
 
     /** 在"计算机"视图中双击
     */
-    bool OnExplorerViewDoubleClick(const ui::EventArgs& msg);
+    bool OnExplorerViewDoubleClick(const ui::EventArgs &msg);
 
     /** 图标被移除时，同步Image List中也要移除（不移除的话，会存在加载不到图标的情况）
     * @param [in] nIconId 图标ID（在IconManager中）
@@ -88,7 +90,7 @@ private:
 
     /** 文件修改时间转换为显示字符串
     */
-    DString FormatFileTime(const ui::FileTime& fileTime) const;
+    DString FormatFileTime(const ui::FileTime &fileTime) const;
 
 private:
     /** 获取真实的列索引号
@@ -97,16 +99,15 @@ private:
 
     /** 列表项排序分组
     */
-    enum SortGroup
-    {
+    enum SortGroup {
         kFolder = 0, //文件夹
-        kFile   = 1, //文件
+        kFile = 1,   //文件
     };
 
 private:
     /** 关联的MainForm
     */
-    MainForm* m_pMainForm;
+    MainForm *m_pMainForm;
 
     /** 视图的列表接口
     */

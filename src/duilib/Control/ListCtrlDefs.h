@@ -1,83 +1,87 @@
 #ifndef UI_CONTROL_LIST_CTRL_DEFS_H_
 #define UI_CONTROL_LIST_CTRL_DEFS_H_
 
-#include "duilib/Control/ListCtrlView.h"
-#include "duilib/Control/ListCtrlLabel.h"
 #include "duilib/Control/ListCtrlIcon.h"
+#include "duilib/Control/ListCtrlLabel.h"
+#include "duilib/Control/ListCtrlView.h"
 
-namespace ui
-{
+namespace ui {
 /** 表格类型
 */
-enum class ListCtrlType: int8_t
-{
+enum class ListCtrlType : int8_t {
     Report = 0, //Report类型
-    Icon   = 1, //Icon类型
-    List   = 2  //List类型
+    Icon = 1,   //Icon类型
+    List = 2    //List类型
 };
 
 /** 列的基本信息（用于添加列）
 */
 struct ListCtrlColumn
 {
-    DString text;                   //表头的文本(静态文本，不支持多国语言版)
-    DString textId;                 //表头的文本Id(支持多国语言版)
-    int32_t nColumnWidth = 100;     //列宽，如果bNeedDpiScale为true，则执行DPI自适应处理
-    int32_t nColumnWidthMin = 0;    //列宽最小值，0表示用默认设置，如果bNeedDpiScale为true，则执行DPI自适应处理
-    int32_t nColumnWidthMax = 0;    //列宽最大值，0表示用默认设置，如果bNeedDpiScale为true，则执行DPI自适应处理
-    int32_t nTextFormat = -1;       //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
-    int32_t nImageId = -1;          //图标资源Id，如果为-1表示不显示图标，图标显示在文本前面
-    bool bSortable = true;          //是否支持排序
-    bool bResizeable = true;        //是否支持通过拖动调整列宽
-    bool bShowCheckBox = false;     //是否显示CheckBox（支持在表头和数据列显示CheckBox）
-    bool bNeedDpiScale = true;      //是否对数值做DPI自适应
+    DString text;               //表头的文本(静态文本，不支持多国语言版)
+    DString textId;             //表头的文本Id(支持多国语言版)
+    int32_t nColumnWidth = 100; //列宽，如果bNeedDpiScale为true，则执行DPI自适应处理
+    int32_t nColumnWidthMin
+        = 0; //列宽最小值，0表示用默认设置，如果bNeedDpiScale为true，则执行DPI自适应处理
+    int32_t nColumnWidthMax
+        = 0; //列宽最大值，0表示用默认设置，如果bNeedDpiScale为true，则执行DPI自适应处理
+    int32_t nTextFormat
+        = -1; //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
+    int32_t nImageId = -1;      //图标资源Id，如果为-1表示不显示图标，图标显示在文本前面
+    bool bSortable = true;      //是否支持排序
+    bool bResizeable = true;    //是否支持通过拖动调整列宽
+    bool bShowCheckBox = false; //是否显示CheckBox（支持在表头和数据列显示CheckBox）
+    bool bNeedDpiScale = true;  //是否对数值做DPI自适应
 };
 
 /** 行的属性数据结构(行数据，每行1条数据，数据存储)
 */
 struct ListCtrlItemData
 {
-    bool bVisible = true;           //是否可见
-    bool bSelected = false;         //是否处于选择状态（是指本行是否被选中）
-    bool bChecked = false;          //是否处于勾选状态（是指本行前面的CheckBox是否被打勾）
-    int8_t nAlwaysAtTop = -1;       //是否置顶显示, -1表示不置顶, 0 或者 正数表示置顶，数值越大优先级越高，优先显示在最上面
-    int16_t nItemHeight = -1;       //行的高度, -1表示使用ListCtrl设置的默认行高，为DPI自适应处理后的值
-    int32_t nImageId = -1;          //图标资源Id，如果为-1表示行首不显示图标
-    size_t nUserData = 0;           //用户自定义数据
+    bool bVisible = true;   //是否可见
+    bool bSelected = false; //是否处于选择状态（是指本行是否被选中）
+    bool bChecked = false;  //是否处于勾选状态（是指本行前面的CheckBox是否被打勾）
+    int8_t nAlwaysAtTop
+        = -1; //是否置顶显示, -1表示不置顶, 0 或者 正数表示置顶，数值越大优先级越高，优先显示在最上面
+    int16_t nItemHeight = -1; //行的高度, -1表示使用ListCtrl设置的默认行高，为DPI自适应处理后的值
+    int32_t nImageId = -1;    //图标资源Id，如果为-1表示行首不显示图标
+    size_t nUserData = 0;     //用户自定义数据
 };
 
 /** 列表数据项的基本信息（列数据，用于添加数据，传递参数）
 */
 struct ListCtrlSubItemData
 {
-    DString text;                   //文本内容
-    int32_t nTextFormat = -1;       //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
-    int32_t nImageId = -1;          //图标资源Id，如果为-1表示不显示图标
-    UiColor textColor;              //文本颜色
-    UiColor bkColor;                //背景颜色
-    uint64_t userDataN = 0;         //用户自定义数据(整型)
-    UiString userDataS;             //用户自定义数据(字符串类型)
-    int32_t nSortGroup = 0;         //所属分组（比如文件夹和文件可分为两组，排序后，文件夹和文件是分开的）
-    bool bShowCheckBox = false;     //是否显示CheckBox
-    bool bChecked = false;          //是否处于勾选状态（CheckBox勾选状态）
-    bool bEditable = false;         //是否可编辑
+    DString text; //文本内容
+    int32_t nTextFormat
+        = -1; //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
+    int32_t nImageId = -1;  //图标资源Id，如果为-1表示不显示图标
+    UiColor textColor;      //文本颜色
+    UiColor bkColor;        //背景颜色
+    uint64_t userDataN = 0; //用户自定义数据(整型)
+    UiString userDataS;     //用户自定义数据(字符串类型)
+    int32_t nSortGroup = 0; //所属分组（比如文件夹和文件可分为两组，排序后，文件夹和文件是分开的）
+    bool bShowCheckBox = false; //是否显示CheckBox
+    bool bChecked = false;      //是否处于勾选状态（CheckBox勾选状态）
+    bool bEditable = false;     //是否可编辑
 };
 
 /** 列表数据项用于内部存储的数据结构(列数据，每<行,列>1条数据，数据存储)
 */
 struct ListCtrlSubItemData2
 {
-    UiString text;                  //文本内容
-    int32_t nImageId = -1;          //图标资源Id，如果为-1表示不显示图标
-    UiColor textColor;              //文本颜色
-    UiColor bkColor;                //背景颜色
-    uint16_t nTextFormat = 0;       //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
-    bool bShowCheckBox = false;     //是否显示CheckBox  
-    bool bChecked = false;          //是否处于勾选状态（CheckBox勾选状态）
-    uint64_t userDataN = 0;         //用户自定义数据(整型)
-    UiString userDataS;             //用户自定义数据(字符串类型)
-    int32_t nSortGroup = 0;         //所属分组（比如文件夹和文件可分为两组，排序后，文件夹和文件是分开的）
-    bool bEditable = false;         //是否可编辑
+    UiString text;         //文本内容
+    int32_t nImageId = -1; //图标资源Id，如果为-1表示不显示图标
+    UiColor textColor;     //文本颜色
+    UiColor bkColor;       //背景颜色
+    uint16_t nTextFormat
+        = 0; //文本对齐方式等属性, 该属性仅应用于Header, 取值可参考：IRender.h中的DrawStringFormat，如果为-1，表示按默认配置的对齐方式
+    bool bShowCheckBox = false; //是否显示CheckBox
+    bool bChecked = false;      //是否处于勾选状态（CheckBox勾选状态）
+    uint64_t userDataN = 0;     //用户自定义数据(整型)
+    UiString userDataS;         //用户自定义数据(字符串类型)
+    int32_t nSortGroup = 0; //所属分组（比如文件夹和文件可分为两组，排序后，文件夹和文件是分开的）
+    bool bEditable = false; //是否可编辑
 };
 
 //列数据的智能指针
@@ -85,19 +89,18 @@ typedef std::shared_ptr<ListCtrlSubItemData2> ListCtrlSubItemData2Ptr;
 
 /** 列表中数据排序标志（按位与操作）
 */
-enum ListCtrlSubItemSortFlag : uint8_t
-{
-    kDefault            = 0,    //空的值
-    kSortByGroup        = 1,    //当排序时，使用分组排序，按照ListCtrlSubItemData2.nSortGroup字段分组
-    kSortNoCase         = 2,    //当排序目标是字符串时，比较字符串不区分大小写
-    kSortByText         = 4,    //按照ListCtrlSubItemData2.text字段排序（默认）
-    kSortByUserDataN    = 8,    //按照ListCtrlSubItemData2.userDataN字段排序
-    kSortByUserDataS    = 16,    //按照ListCtrlSubItemData2.kSortByUserDataS字段排序
+enum ListCtrlSubItemSortFlag : uint8_t {
+    kDefault = 0,          //空的值
+    kSortByGroup = 1,      //当排序时，使用分组排序，按照ListCtrlSubItemData2.nSortGroup字段分组
+    kSortNoCase = 2,       //当排序目标是字符串时，比较字符串不区分大小写
+    kSortByText = 4,       //按照ListCtrlSubItemData2.text字段排序（默认）
+    kSortByUserDataN = 8,  //按照ListCtrlSubItemData2.userDataN字段排序
+    kSortByUserDataS = 16, //按照ListCtrlSubItemData2.kSortByUserDataS字段排序
 };
 
 struct ListCtrlSubItemData2Pair
 {
-    size_t nColumnId = 0; //列的ID
+    size_t nColumnId = 0;                 //列的ID
     ListCtrlSubItemData2Ptr pSubItemData; //列的数据
 };
 
@@ -105,10 +108,11 @@ struct ListCtrlSubItemData2Pair
 */
 struct ListCtrlCompareParam
 {
-    size_t nColumnIndex = 0;   //数据关联第几列，有效范围：[0, GetColumnCount())
-    size_t nColumnId = 0;      //数据关联列的ID
-    uint8_t nSortFlag = ListCtrlSubItemSortFlag::kDefault; //排序标志位，参见ListCtrlSubItemSortFlag的枚举值
-    void* pUserData = nullptr; //用户自定义数据，设置比较函数的时候一同传入
+    size_t nColumnIndex = 0; //数据关联第几列，有效范围：[0, GetColumnCount())
+    size_t nColumnId = 0;    //数据关联列的ID
+    uint8_t nSortFlag
+        = ListCtrlSubItemSortFlag::kDefault; //排序标志位，参见ListCtrlSubItemSortFlag的枚举值
+    void *pUserData = nullptr;               //用户自定义数据，设置比较函数的时候一同传入
 };
 
 /** 存储数据的比较函数的原型, 实现升序的比较(a < b)
@@ -117,9 +121,9 @@ struct ListCtrlCompareParam
 * @param [in] param 数据关联的参数
 * @return 如果 (a < b)，返回true，否则返回false
 */
-typedef std::function<bool(const ListCtrlSubItemData2& a, 
-                           const ListCtrlSubItemData2& b, 
-                           const ListCtrlCompareParam& param)> ListCtrlDataCompareFunc;
+typedef std::function<bool(
+    const ListCtrlSubItemData2 &a, const ListCtrlSubItemData2 &b, const ListCtrlCompareParam &param)>
+    ListCtrlDataCompareFunc;
 
 /** 视图填充数据到UI控件的相关接口
 */
@@ -129,7 +133,7 @@ public:
     /** 创建一个数据项
     * @return 返回创建后的数据项指针
     */
-    virtual Control* CreateDataItem() = 0;
+    virtual Control *CreateDataItem() = 0;
 
     /** 填充指定数据项
     * @param [in] pControl 数据项控件指针
@@ -137,17 +141,17 @@ public:
     * @param [in] itemData 数据项（代表行的属性）
     * @param [in] subItemList 数据子项（代表每一列的数据, 第1个是列的ID，第2个是列的数据）
     */
-    virtual bool FillDataItem(ui::Control* pControl,
-                              size_t nElementIndex,
-                              const ListCtrlItemData& itemData,
-                              const std::vector<ListCtrlSubItemData2Pair>& subItemList) = 0;
-
+    virtual bool FillDataItem(
+        ui::Control *pControl,
+        size_t nElementIndex,
+        const ListCtrlItemData &itemData,
+        const std::vector<ListCtrlSubItemData2Pair> &subItemList) = 0;
 
     /** 获取某列的宽度最大值
     * @param [in] subItemList 数据子项（代表每一列的数据）
     * @return 返回该列宽度的最大值，返回的是DPI自适应后的值； 如果失败返回-1
     */
-    virtual int32_t GetMaxDataItemWidth(const std::vector<ListCtrlSubItemData2Ptr>& subItemList) = 0;
+    virtual int32_t GetMaxDataItemWidth(const std::vector<ListCtrlSubItemData2Ptr> &subItemList) = 0;
 };
 
 /** 编辑状态的输入参数
@@ -155,14 +159,14 @@ public:
 struct ListCtrlEditParam
 {
     ListCtrlType listCtrlType = ListCtrlType::Report;
-    size_t nItemIndex = 0;          //数据项的索引号, 有效范围：[0, GetDataItemCount())
-    size_t nColumnId = 0;           //列的ID
-    size_t nColumnIndex = 0;        //列的序号, 有效范围：[0, GetColumnCount())
-    IListBoxItem* pItem = nullptr;  //数据子项接口
-    ListCtrlLabel* pSubItem = nullptr;    //文本控件接口（含修改前的文本内容）
+    size_t nItemIndex = 0;             //数据项的索引号, 有效范围：[0, GetDataItemCount())
+    size_t nColumnId = 0;              //列的ID
+    size_t nColumnIndex = 0;           //列的序号, 有效范围：[0, GetColumnCount())
+    IListBoxItem *pItem = nullptr;     //数据子项接口
+    ListCtrlLabel *pSubItem = nullptr; //文本控件接口（含修改前的文本内容）
 
-    UiString sNewText;          //修改后的文本内容
-    bool bCancelled = false;    //是否取消操作，如果设置为true，则取消编辑操作
+    UiString sNewText;       //修改后的文本内容
+    bool bCancelled = false; //是否取消操作，如果设置为true，则取消编辑操作
 };
 
 /** Icon视图的列表项类型(垂直布局)
@@ -173,26 +177,26 @@ class ListCtrl;
 class DUILIB_API ListCtrlIconViewItem : public ListCtrlItemBaseV
 {
     typedef ListCtrlItemBaseV BaseClass;
+
 public:
-    explicit ListCtrlIconViewItem(Window* pWindow):
-        ListCtrlItemBaseV(pWindow)
-    {
-    }
+    explicit ListCtrlIconViewItem(Window *pWindow)
+        : ListCtrlItemBaseV(pWindow)
+    {}
     /** 获取控件类型
     */
     virtual DString GetType() const override { return _T("ListCtrlIconViewItem"); }
 
     /** 事件处理函数
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 设置关联的ListCtrl接口
     */
-    void SetListCtrl(ListCtrl* pListCtrl) { m_pListCtrl = pListCtrl; }
+    void SetListCtrl(ListCtrl *pListCtrl) { m_pListCtrl = pListCtrl; }
 
     /** 获取关联的ListCtrl接口
     */
-    ListCtrl* GetListCtrl() const { return m_pListCtrl; }
+    ListCtrl *GetListCtrl() const { return m_pListCtrl; }
 
 public:
     /** 获取关联的数据项索引号, 代表关联哪一行的数据
@@ -202,17 +206,17 @@ public:
 
     /** 获取图标控件的接口
     */
-    ListCtrlIcon* GetListCtrlIcon() const { return dynamic_cast<ListCtrlIcon*>(GetItemAt(0)); }
+    ListCtrlIcon *GetListCtrlIcon() const { return dynamic_cast<ListCtrlIcon *>(GetItemAt(0)); }
 
     /** 获取文字控件的接口
     */
-    ListCtrlLabel* GetListCtrlLabel() const { return dynamic_cast<ListCtrlLabel*>(GetItemAt(1)); }
+    ListCtrlLabel *GetListCtrlLabel() const { return dynamic_cast<ListCtrlLabel *>(GetItemAt(1)); }
 
     /** 获取文字控件内的文本
     */
     DString GetLabelText() const
     {
-        ListCtrlLabel* pLabel = GetListCtrlLabel();
+        ListCtrlLabel *pLabel = GetListCtrlLabel();
         if (pLabel != nullptr) {
             return pLabel->GetText();
         }
@@ -222,14 +226,14 @@ public:
     /** 获取鼠标所在位置的子控件
     * @param [in] ptMouse 鼠标所在的位置，屏幕坐标点
     */
-    Control* GetSubItem(const UiPoint& ptMouse) const
+    Control *GetSubItem(const UiPoint &ptMouse) const
     {
         UiPoint pt(ptMouse);
         pt.Offset(GetScrollOffsetInScrollBox());
-        Control* pFoundSubItem = nullptr;
+        Control *pFoundSubItem = nullptr;
         size_t nItemCount = GetItemCount();
         for (size_t index = 0; index < nItemCount; ++index) {
-            Control* pSubItem = GetItemAt(index);
+            Control *pSubItem = GetItemAt(index);
             if (pSubItem != nullptr) {
                 if (pSubItem->IsVisible() && pSubItem->GetRect().ContainsPt(pt)) {
                     pFoundSubItem = pSubItem;
@@ -243,7 +247,7 @@ public:
 private:
     /** 关联的ListCtrl接口
     */
-    ListCtrl* m_pListCtrl = nullptr;
+    ListCtrl *m_pListCtrl = nullptr;
 };
 
 /** List视图的列表项类型(水平布局)
@@ -253,26 +257,26 @@ private:
 class DUILIB_API ListCtrlListViewItem : public ListCtrlItemBaseH
 {
     typedef ListCtrlItemBaseH BaseClass;
+
 public:
-    explicit ListCtrlListViewItem(Window* pWindow) :
-        ListCtrlItemBaseH(pWindow)
-    {
-    }
+    explicit ListCtrlListViewItem(Window *pWindow)
+        : ListCtrlItemBaseH(pWindow)
+    {}
     /** 获取控件类型
     */
     virtual DString GetType() const override { return _T("ListCtrlListViewItem"); }
 
     /** 事件处理函数
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 设置关联的ListCtrl接口
     */
-    void SetListCtrl(ListCtrl* pListCtrl) { m_pListCtrl = pListCtrl; }
+    void SetListCtrl(ListCtrl *pListCtrl) { m_pListCtrl = pListCtrl; }
 
     /** 获取关联的ListCtrl接口
     */
-    ListCtrl* GetListCtrl() const { return m_pListCtrl; }
+    ListCtrl *GetListCtrl() const { return m_pListCtrl; }
 
 public:
     /** 获取关联的数据项索引号, 代表关联哪一行的数据
@@ -282,17 +286,17 @@ public:
 
     /** 获取图标控件的接口
     */
-    ListCtrlIcon* GetListCtrlIcon() const { return dynamic_cast<ListCtrlIcon*>(GetItemAt(0)); }
+    ListCtrlIcon *GetListCtrlIcon() const { return dynamic_cast<ListCtrlIcon *>(GetItemAt(0)); }
 
     /** 获取文字控件的接口
     */
-    ListCtrlLabel* GetListCtrlLabel() const { return dynamic_cast<ListCtrlLabel*>(GetItemAt(1)); }
+    ListCtrlLabel *GetListCtrlLabel() const { return dynamic_cast<ListCtrlLabel *>(GetItemAt(1)); }
 
     /** 获取文字控件内的文本
     */
     DString GetLabelText() const
     {
-        ListCtrlLabel* pLabel = GetListCtrlLabel();
+        ListCtrlLabel *pLabel = GetListCtrlLabel();
         if (pLabel != nullptr) {
             return pLabel->GetText();
         }
@@ -302,14 +306,14 @@ public:
     /** 获取鼠标所在位置的子控件
     * @param [in] ptMouse 鼠标所在的位置，屏幕坐标点
     */
-    Control* GetSubItem(const UiPoint& ptMouse) const
+    Control *GetSubItem(const UiPoint &ptMouse) const
     {
         UiPoint pt(ptMouse);
         pt.Offset(GetScrollOffsetInScrollBox());
-        Control* pFoundSubItem = nullptr;
+        Control *pFoundSubItem = nullptr;
         size_t nItemCount = GetItemCount();
         for (size_t index = 0; index < nItemCount; ++index) {
-            Control* pSubItem = GetItemAt(index);
+            Control *pSubItem = GetItemAt(index);
             if (pSubItem != nullptr) {
                 if (pSubItem->IsVisible() && pSubItem->GetRect().ContainsPt(pt)) {
                     pFoundSubItem = pSubItem;
@@ -323,9 +327,9 @@ public:
 private:
     /** 关联的ListCtrl接口
     */
-    ListCtrl* m_pListCtrl = nullptr;
+    ListCtrl *m_pListCtrl = nullptr;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_DEFS_H_

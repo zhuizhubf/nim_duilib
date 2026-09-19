@@ -3,27 +3,27 @@
 
 #include "duilib/Core/Box.h"
 
-namespace ui
-{
+namespace ui {
 /** 堆叠布局/卡片布局，内部的多个子控件，只有一个可见，其他是隐藏的，可动态切换，支持切换动画
 */
 class DUILIB_API TabBox : public Box
 {
     typedef Box BaseClass;
+
 public:
-    explicit TabBox(Window* pWindow, Layout* pLayout = new Layout());
+    explicit TabBox(Window *pWindow, Layout *pLayout = new Layout());
 
     // 用于初始化xml属性
     virtual void OnInit() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual bool AddItem(Control* pControl) override;
-    virtual bool AddItemAt(Control* pControl, size_t iIndex) override;
-    virtual bool RemoveItem(Control* pControl) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual bool AddItem(Control *pControl) override;
+    virtual bool AddItemAt(Control *pControl, size_t iIndex) override;
+    virtual bool RemoveItem(Control *pControl) override;
     virtual bool RemoveItemAt(size_t iIndex) override;
-    virtual void RemoveAllItems() override;    
+    virtual void RemoveAllItems() override;
 
 public:
     /** 获取当前选择项
@@ -41,28 +41,30 @@ public:
      * @param [in] pControl 要选择的子项指针
      * @return 成功返回 true，否则返回 false
      */
-    bool SelectItem(Control* pControl);
+    bool SelectItem(Control *pControl);
 
     /** 根据控件名称选择一个子项
      * @param [in] pControlName 要选择的控件名称
      * @return 成功返回 true，否则返回 false
      */
-    bool SelectItem(const DString& pControlName);
-   
+    bool SelectItem(const DString &pControlName);
+
     /** 监听Tab页面选择事件
      * @param [in] callback 事件处理的回调函数，请参考 EventCallback 声明
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachTabSelect(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventTabSelect, callback, callbackID); }
+    void AttachTabSelect(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventTabSelect, callback, callbackID);
+    }
 
 public:
     /** 页面切换动画的类型
     */
-    enum class FadeSwitchType : int8_t
-    {
-        kNone,          //不显示动画效果
-        kFadeInOutX,    //内容区横向滑动（左右切换）
-        kFadeInOut,     //内容区淡入淡出
+    enum class FadeSwitchType : int8_t {
+        kNone,       //不显示动画效果
+        kFadeInOutX, //内容区横向滑动（左右切换）
+        kFadeInOut,  //内容区淡入淡出
     };
 
     /** 设置是否显示动画效果
@@ -125,7 +127,7 @@ protected:
      * @param [in] pNewItemControl 当前新选择的标签页的接口
      * @param [in] pOldItemControl 原来选择的标签页的接口
      */
-    virtual bool StartSwitchItemAnimation(Control* pNewItemControl, Control* pOldItemControl);
+    virtual bool StartSwitchItemAnimation(Control *pNewItemControl, Control *pOldItemControl);
 
 protected:
     /** 设置可见状态事件
@@ -144,19 +146,19 @@ private:
 
     /** 设置页面切换动画的类型
     */
-    void SetFadeSwitchTypeByString(const DString& fadeSwitchType);
+    void SetFadeSwitchTypeByString(const DString &fadeSwitchType);
 
     /** 开始播放动画(动态切换X坐标，内容区横向滑动)
      * @param [in] pNewItemControl 当前新选择的标签页的接口
      * @param [in] pOldItemControl 原来选择的标签页的接口
      */
-    bool StartSwitchItemAnimationFadeInOutX(Control* pNewItemControl, Control* pOldItemControl);
+    bool StartSwitchItemAnimationFadeInOutX(Control *pNewItemControl, Control *pOldItemControl);
 
     /** 开始播放动画(内容区淡入淡出)
      * @param [in] pNewItemControl 当前新选择的标签页的接口
      * @param [in] pOldItemControl 原来选择的标签页的接口
      */
-    bool StartSwitchItemAnimationFadeInOut(Control* pNewItemControl, Control* pOldItemControl);
+    bool StartSwitchItemAnimationFadeInOut(Control *pNewItemControl, Control *pOldItemControl);
 
 private:
     /** 动画的播放接口

@@ -2,17 +2,17 @@
 #include "duilib/Box/VirtualListBox.h"
 #include "duilib/Utils/AttributeUtil.h"
 
-namespace ui 
-{
+namespace ui {
 
-VirtualVLayout::VirtualVLayout():
-    m_bAutoCalcItemWidth(false)
+VirtualVLayout::VirtualVLayout()
+    : m_bAutoCalcItemWidth(false)
 {
     //默认居中对齐
     SetChildHAlignType(HorAlignType::kAlignCenter);
 }
 
-bool VirtualVLayout::SetAttribute(const DString& strName, const DString& strValue, const DpiManager& dpiManager)
+bool VirtualVLayout::SetAttribute(
+    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
     if ((strName == _T("item_size")) || (strName == _T("itemsize"))) {
@@ -20,26 +20,25 @@ bool VirtualVLayout::SetAttribute(const DString& strName, const DString& strValu
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);
         SetItemSize(szItem);
-    }
-    else if (strName == _T("auto_calc_item_size")) {
+    } else if (strName == _T("auto_calc_item_size")) {
         SetAutoCalcItemWidth(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
     }
     return hasAttribute;
 }
 
-VirtualListBox* VirtualVLayout::GetOwnerBox() const
+VirtualListBox *VirtualVLayout::GetOwnerBox() const
 {
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     ASSERT(pList != nullptr);
     return pList;
 }
 
-UiSize64 VirtualVLayout::ArrangeChildren(const std::vector<ui::Control*>& items, ui::UiRect rc, bool bEstimateOnly)
+UiSize64 VirtualVLayout::ArrangeChildren(
+    const std::vector<ui::Control *> &items, ui::UiRect rc, bool bEstimateOnly)
 {
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     if ((pList == nullptr) || !pList->HasDataProvider()) {
         //如果未设置数据接口，则兼容基类的功能
         return BaseClass::ArrangeChildren(items, rc, bEstimateOnly);
@@ -53,19 +52,20 @@ UiSize64 VirtualVLayout::ArrangeChildren(const std::vector<ui::Control*>& items,
     }
     int64_t nTotalHeight = GetElementsHeight(rc, Box::InvalidIndex);
     UiSize64 sz(rc.Width(), rc.Height());
-    sz.cx = std::max((int64_t)GetItemSize().cx, sz.cx);//支持横向滚动条
+    sz.cx = std::max((int64_t) GetItemSize().cx, sz.cx); //支持横向滚动条
     sz.cy = std::max(nTotalHeight, sz.cy);
     if (!bEstimateOnly) {
         LazyArrangeChild(rc);
-    }    
+    }
     return sz;
 }
 
-UiSize64 VirtualVLayout::EstimateLayoutSize(const std::vector<Control*>& items, ui::UiSize szAvailable)
+UiSize64 VirtualVLayout::EstimateLayoutSize(
+    const std::vector<Control *> &items, ui::UiSize szAvailable)
 {
     //估算控件大小时（主要是用于宽高为"auto"类型的情况），只估算容器本身的大小，不包含列表数据的大小
     //因为虚表数据规模较大，不适合用于估算"auto"控件的大小
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     if ((pList == nullptr) || !pList->HasDataProvider()) {
         //如果未设置数据接口，则兼容基类的功能
         return BaseClass::EstimateLayoutSize(items, szAvailable);
@@ -122,7 +122,7 @@ UiSize64 VirtualVLayout::EstimateLayoutSize(const std::vector<Control*>& items, 
     return UiSize64(nTotalWidth, nTotalHeight);
 }
 
-void VirtualVLayout::ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale)
+void VirtualVLayout::ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale)
 {
     UiSize szItem = GetItemSize();
     szItem = dpiManager.GetScaleSize(szItem, nOldDpiScale);
@@ -143,7 +143,7 @@ void VirtualVLayout::SetItemSize(UiSize szItem, bool bArrange)
     }
 }
 
-const UiSize& VirtualVLayout::GetItemSize() const
+const UiSize &VirtualVLayout::GetItemSize() const
 {
     return m_szItem;
 }
@@ -171,10 +171,10 @@ int64_t VirtualVLayout::GetElementsHeight(UiRect /*rc*/, size_t nCount) const
         return 0;
     }
     if (nCount <= 1) {
-        return (int64_t)szItem.cy + GetChildMarginY();
+        return (int64_t) szItem.cy + GetChildMarginY();
     }
     if (!Box::IsValidItemIndex(nCount)) {
-        VirtualListBox* pList = GetOwnerBox();
+        VirtualListBox *pList = GetOwnerBox();
         ASSERT(pList != nullptr);
         if (pList != nullptr) {
             nCount = pList->GetElementCount();
@@ -182,7 +182,7 @@ int64_t VirtualVLayout::GetElementsHeight(UiRect /*rc*/, size_t nCount) const
     }
     if (!Box::IsValidItemIndex(nCount)) {
         ASSERT(0);
-        return (int64_t)szItem.cy + GetChildMarginY();
+        return (int64_t) szItem.cy + GetChildMarginY();
     }
 
     int64_t rows = nCount;
@@ -190,7 +190,7 @@ int64_t VirtualVLayout::GetElementsHeight(UiRect /*rc*/, size_t nCount) const
     if (GetChildMarginY() > 0) {
         iChildMargin = GetChildMarginY();
     }
-    int64_t childMarginTotal = ((int64_t)nCount - 1) * iChildMargin;
+    int64_t childMarginTotal = ((int64_t) nCount - 1) * iChildMargin;
     return szItem.cy * rows + childMarginTotal;
 }
 
@@ -201,7 +201,7 @@ void VirtualVLayout::LazyArrangeChild(UiRect rc) const
     if ((szItem.cx <= 0) || (szItem.cy <= 0)) {
         return;
     }
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -209,7 +209,7 @@ void VirtualVLayout::LazyArrangeChild(UiRect rc) const
         return;
     }
 
-    //子项的左边起始位置 
+    //子项的左边起始位置
     int32_t iPosLeft = rc.left;
 
     //确定对齐方式
@@ -217,8 +217,7 @@ void VirtualVLayout::LazyArrangeChild(UiRect rc) const
         HorAlignType hAlign = GetChildHAlignType();
         if (hAlign == HorAlignType::kAlignCenter) {
             iPosLeft = rc.CenterX() - szItem.cx / 2;
-        }
-        else if (hAlign == HorAlignType::kAlignRight) {
+        } else if (hAlign == HorAlignType::kAlignRight) {
             iPosLeft = rc.right - szItem.cx;
         }
     }
@@ -246,7 +245,7 @@ void VirtualVLayout::LazyArrangeChild(UiRect rc) const
     size_t iCount = 0;
     size_t nItemCount = pOwnerBox->m_items.size();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = pOwnerBox->m_items[nItemIndex];
+        Control *pControl = pOwnerBox->m_items[nItemIndex];
         if (pControl == nullptr) {
             continue;
         }
@@ -265,13 +264,12 @@ void VirtualVLayout::LazyArrangeChild(UiRect rc) const
             refreshData.pControl = pControl;
             refreshData.nElementIndex = nElementIndex;
             refreshDataList.push_back(refreshData);
-        }
-        else {
+        } else {
             if (pControl->IsVisible()) {
                 pControl->SetVisible(false);
             }
             //需要清除ElementIndex
-            IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
             if (pListBoxItem != nullptr) {
                 pListBoxItem->SetElementIndex(Box::InvalidIndex);
             }
@@ -313,7 +311,7 @@ size_t VirtualVLayout::AjustMaxItem(UiRect rc) const
 
 size_t VirtualVLayout::GetTopElementIndex(UiRect rc) const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return 0;
     }
@@ -335,7 +333,7 @@ bool VirtualVLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
     if (!Box::IsValidItemIndex(iIndex)) {
         return false;
     }
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return false;
     }
@@ -345,7 +343,7 @@ bool VirtualVLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
     int64_t nElementHeight = GetElementsHeight(rc, 1);
     if ((nElementPos - nElementHeight) > nScrollPos) { //矩形的top位置
         int64_t nBoxHeight = pOwnerBox->GetHeight();
-        if (nElementPos <= (nScrollPos + nBoxHeight)) {//矩形的bottom位置
+        if (nElementPos <= (nScrollPos + nBoxHeight)) { //矩形的bottom位置
             return true;
         }
     }
@@ -354,7 +352,7 @@ bool VirtualVLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
 
 bool VirtualVLayout::NeedReArrange() const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return false;
     }
@@ -380,10 +378,10 @@ bool VirtualVLayout::NeedReArrange() const
     return nVirtualOffsetY != nScrollPosY;
 }
 
-void VirtualVLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const
+void VirtualVLayout::GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const
 {
     collection.clear();
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -397,16 +395,15 @@ void VirtualVLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collecti
         return;
     }
 
-    size_t min = (size_t)(pOwnerBox->GetScrollPos().cy / nEleHeight);
-    size_t max = min + (size_t)(rc.Height() / nEleHeight);
+    size_t min = (size_t) (pOwnerBox->GetScrollPos().cy / nEleHeight);
+    size_t max = min + (size_t) (rc.Height() / nEleHeight);
 
     size_t nCount = pOwnerBox->GetElementCount();
     if (nCount > 0) {
         if (max >= nCount) {
             max = nCount - 1;
         }
-    }
-    else {
+    } else {
         return;
     }
 
@@ -417,7 +414,7 @@ void VirtualVLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collecti
 
 void VirtualVLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -443,18 +440,16 @@ void VirtualVLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) const
         if (nNewPos >= elementHeight) {
             nNewPos -= elementHeight;
         }
-    }
-    else {
+    } else {
         if (IsElementDisplay(rc, iIndex)) {
             return;
         }
 
-        if ((int64_t)iIndex > nTopIndex) {
+        if ((int64_t) iIndex > nTopIndex) {
             // 向下
             int64_t height = GetElementsHeight(rc, iIndex + 1);
             nNewPos = height - pOwnerBox->GetRect().Height();
-        }
-        else {
+        } else {
             // 向上
             nNewPos = GetElementsHeight(rc, iIndex + 1);
             if (nNewPos >= elementHeight) {

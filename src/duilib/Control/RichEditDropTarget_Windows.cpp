@@ -1,6 +1,6 @@
 #include "RichEditDropTarget_Windows.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 #include "duilib/Control/RichEdit2.h"
 #include "duilib/Control/RichEditDropTargetHelper.h"
@@ -11,15 +11,13 @@
 #include <oleidl.h>
 #include <shellapi.h>
 
-namespace ui 
-{
-RichEditDropTarget_Windows::RichEditDropTarget_Windows(RichEdit2* pRichEdit) :
-    m_pRichEdit(pRichEdit),
-    m_pDataObj(nullptr),
-    m_nStartChar(0),
-    m_nEndChar(0)
-{
-}
+namespace ui {
+RichEditDropTarget_Windows::RichEditDropTarget_Windows(RichEdit2 *pRichEdit)
+    : m_pRichEdit(pRichEdit)
+    , m_pDataObj(nullptr)
+    , m_nStartChar(0)
+    , m_nEndChar(0)
+{}
 
 RichEditDropTarget_Windows::~RichEditDropTarget_Windows()
 {
@@ -29,28 +27,31 @@ RichEditDropTarget_Windows::~RichEditDropTarget_Windows()
 void RichEditDropTarget_Windows::ClearDragStatus()
 {
     if (m_pDataObj != nullptr) {
-        ((IDataObject*)m_pDataObj)->Release();
+        ((IDataObject *) m_pDataObj)->Release();
         m_pDataObj = nullptr;
     }
     m_dropTextList.clear();
     m_dropFileList.clear();
 }
 
-int32_t RichEditDropTarget_Windows::DragEnter(void* pDataObj, uint32_t /*grfKeyState*/, const UiPoint& /*pt*/, uint32_t* /*pdwEffect*/)
+int32_t RichEditDropTarget_Windows::DragEnter(
+    void *pDataObj, uint32_t /*grfKeyState*/, const UiPoint & /*pt*/, uint32_t * /*pdwEffect*/)
 {
     HRESULT hr = S_FALSE;
-    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled()
+        || m_pRichEdit->IsPasswordMode()) {
         return hr;
     }
-    IDataObject* pDataObject = (IDataObject*)pDataObj;
+    IDataObject *pDataObject = (IDataObject *) pDataObj;
     if (pDataObject != nullptr) {
         pDataObject->AddRef();
     }
-    ClearDragStatus();    
+    ClearDragStatus();
     m_pDataObj = pDataObject;
 
     if (pDataObj != nullptr) {
-        ControlDropTargetImpl_Windows::ParseWindowsDataObject(pDataObj, m_dropTextList, m_dropFileList);
+        ControlDropTargetImpl_Windows::ParseWindowsDataObject(
+            pDataObj, m_dropTextList, m_dropFileList);
     }
 
     m_pRichEdit->GetSel(m_nStartChar, m_nEndChar);
@@ -63,18 +64,19 @@ int32_t RichEditDropTarget_Windows::DragEnter(void* pDataObj, uint32_t /*grfKeyS
         }
         //支持文件拖放操作，直接返回
         return S_OK;
-    }
-    else if (!m_dropTextList.empty()) {
+    } else if (!m_dropTextList.empty()) {
         //支持文本拖放操作，直接返回
         return S_OK;
     }
     return hr;
 }
 
-int32_t RichEditDropTarget_Windows::DragOver(uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t RichEditDropTarget_Windows::DragOver(
+    uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     HRESULT hr = S_FALSE;
-    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled()
+        || m_pRichEdit->IsPasswordMode()) {
         return hr;
     }
     if (m_dropFileList.empty() && m_dropTextList.empty()) {
@@ -120,8 +122,7 @@ int32_t RichEditDropTarget_Windows::DragOver(uint32_t grfKeyState, const UiPoint
             //操作：按住Control键时，是复制，否则移动
             if (grfKeyState & MK_CONTROL) {
                 *pdwEffect = DROPEFFECT_COPY;
-            }
-            else {
+            } else {
                 *pdwEffect = DROPEFFECT_MOVE;
             }
         }
@@ -141,7 +142,8 @@ int32_t RichEditDropTarget_Windows::DragLeave(void)
     return S_OK;
 }
 
-int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, const UiPoint& pt, uint32_t* pdwEffect)
+int32_t RichEditDropTarget_Windows::Drop(
+    void *pDataObj, uint32_t grfKeyState, const UiPoint &pt, uint32_t *pdwEffect)
 {
     ASSERT(m_pDataObj == pDataObj);
     if (m_pDataObj != pDataObj) {
@@ -149,7 +151,8 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, c
     }
 
     HRESULT hr = S_FALSE;
-    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled() || m_pRichEdit->IsPasswordMode()) {
+    if ((m_pRichEdit == nullptr) || m_pRichEdit->IsReadOnly() || !m_pRichEdit->IsEnabled()
+        || m_pRichEdit->IsPasswordMode()) {
         ClearDragStatus();
         return hr;
     }
@@ -162,14 +165,14 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, c
         //拖入文件操作
         if (!m_pRichEdit->IsEnableDropFile()) {
             ClearDragStatus();
-			//不支持文件拖放操作
+            //不支持文件拖放操作
             return hr;
         }
         //支持文件拖放操作，判断是否满足过滤条件
         DString fileTypes = m_pRichEdit->GetDropFileTypes();
         if (!ControlDropTargetUtils::IsFilteredFileTypes(fileTypes, m_dropFileList)) {
             ClearDragStatus();
-			//文件类型不满足过滤条件
+            //文件类型不满足过滤条件
             return hr;
         }
 
@@ -195,7 +198,7 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, c
         msg.eventType = EventType::kEventDropData;
         msg.vkCode = VirtualKeyCode::kVK_None;
         msg.wParam = kControlDropTypeWindows;
-        msg.lParam = (LPARAM)&data;
+        msg.lParam = (LPARAM) &data;
         msg.modifierKey = 0;
         msg.eventData = 0;
 
@@ -233,8 +236,7 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, c
         //操作：按住Control键时，是复制，否则移动
         if (grfKeyState & MK_CONTROL) {
             *pdwEffect = DROPEFFECT_COPY;
-        }
-        else {
+        } else {
             *pdwEffect = DROPEFFECT_MOVE;
         }
     }
@@ -242,13 +244,13 @@ int32_t RichEditDropTarget_Windows::Drop(void* pDataObj, uint32_t grfKeyState, c
     return hr;
 }
 
-bool RichEditDropTarget_Windows::CheckDropText(const UiPoint& clientPt) const
+bool RichEditDropTarget_Windows::CheckDropText(const UiPoint &clientPt) const
 {
     RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
     return dropTargetHelper.CheckDropText(clientPt);
 }
 
-void RichEditDropTarget_Windows::CheckTextScroll(const UiPoint& clientPt)
+void RichEditDropTarget_Windows::CheckTextScroll(const UiPoint &clientPt)
 {
     RichEditDropTargetHelper dropTargetHelper(m_pRichEdit, m_dropTextList);
     dropTargetHelper.CheckTextScroll(clientPt);

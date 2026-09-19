@@ -1,8 +1,7 @@
 #include "VirtualHTileLayout.h"
 #include "duilib/Box/VirtualListBox.h"
 
-namespace ui 
-{
+namespace ui {
 
 VirtualHTileLayout::VirtualHTileLayout()
 {
@@ -13,9 +12,9 @@ VirtualHTileLayout::VirtualHTileLayout()
     SetChildVAlignType(VerAlignType::kAlignCenter);
 }
 
-VirtualListBox* VirtualHTileLayout::GetOwnerBox() const
+VirtualListBox *VirtualHTileLayout::GetOwnerBox() const
 {
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     ASSERT(pList != nullptr);
     return pList;
 }
@@ -55,9 +54,10 @@ int32_t VirtualHTileLayout::CalcTileRows(int32_t rcHeight) const
     return nRows;
 }
 
-UiSize64 VirtualHTileLayout::ArrangeChildren(const std::vector<ui::Control*>& items, ui::UiRect rc, bool bEstimateOnly)
+UiSize64 VirtualHTileLayout::ArrangeChildren(
+    const std::vector<ui::Control *> &items, ui::UiRect rc, bool bEstimateOnly)
 {
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     if ((pList == nullptr) || !pList->HasDataProvider()) {
         //如果未设置数据接口，则兼容基类的功能
         return BaseClass::ArrangeChildren(items, rc, bEstimateOnly);
@@ -86,15 +86,16 @@ UiSize64 VirtualHTileLayout::ArrangeChildren(const std::vector<ui::Control*>& it
 
     if (!bEstimateOnly) {
         LazyArrangeChild(rc);
-    }    
+    }
     return sz;
 }
 
-UiSize64 VirtualHTileLayout::EstimateLayoutSize(const std::vector<Control*>& items, ui::UiSize szAvailable)
+UiSize64 VirtualHTileLayout::EstimateLayoutSize(
+    const std::vector<Control *> &items, ui::UiSize szAvailable)
 {
     //估算控件大小时（主要是用于宽高为"auto"类型的情况），只估算容器本身的大小，不包含列表数据的大小
     //因为虚表数据规模较大，不适合用于估算"auto"控件的大小
-    VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+    VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
     if ((pList == nullptr) || !pList->HasDataProvider()) {
         //如果未设置数据接口，则兼容基类的功能
         return BaseClass::EstimateLayoutSize(items, szAvailable);
@@ -122,7 +123,7 @@ UiSize64 VirtualHTileLayout::EstimateLayoutSize(const std::vector<Control*>& ite
     ASSERT((szItem.cx > 0) && (szItem.cy > 0));
     if ((szItem.cx <= 0) || (szItem.cy <= 0)) {
         return UiSize64();
-    }    
+    }
     int32_t nRows = CalcTileRows(szAvailable.cy);
     UiEstSize estSize;
     if (GetOwner() != nullptr) {
@@ -153,7 +154,7 @@ UiSize64 VirtualHTileLayout::EstimateLayoutSize(const std::vector<Control*>& ite
     return UiSize64(nTotalWidth, nTotalHeight);
 }
 
-int64_t VirtualHTileLayout::GetElementsWidth(const UiRect& rc, size_t nCount) const
+int64_t VirtualHTileLayout::GetElementsWidth(const UiRect &rc, size_t nCount) const
 {
     UiSize szItem = GetItemSize();
     ASSERT((szItem.cx > 0) && (szItem.cy > 0));
@@ -161,12 +162,12 @@ int64_t VirtualHTileLayout::GetElementsWidth(const UiRect& rc, size_t nCount) co
         return 0;
     }
     int32_t nRows = CalcTileRows(rc.Height());
-    if (nCount <= (size_t)nRows && nCount != Box::InvalidIndex) {
+    if (nCount <= (size_t) nRows && nCount != Box::InvalidIndex) {
         //不到1列，或者刚好1列
-        return (int64_t)szItem.cx + GetChildMarginX();
+        return (int64_t) szItem.cx + GetChildMarginX();
     }
     if (!Box::IsValidItemIndex(nCount)) {
-        VirtualListBox* pList = dynamic_cast<VirtualListBox*>(GetOwner());
+        VirtualListBox *pList = dynamic_cast<VirtualListBox *>(GetOwner());
         ASSERT(pList != nullptr);
         if (pList != nullptr) {
             nCount = pList->GetElementCount();
@@ -174,7 +175,7 @@ int64_t VirtualHTileLayout::GetElementsWidth(const UiRect& rc, size_t nCount) co
     }
     if (!Box::IsValidItemIndex(nCount)) {
         ASSERT(0);
-        return (int64_t)szItem.cx + GetChildMarginX();
+        return (int64_t) szItem.cx + GetChildMarginX();
     }
 
     int64_t cols = nCount / nRows;
@@ -188,10 +189,9 @@ int64_t VirtualHTileLayout::GetElementsWidth(const UiRect& rc, size_t nCount) co
     if (nCount > 0) {
         int64_t childMarginTotal = 0;
         if (nCount % nRows == 0) {
-            childMarginTotal = ((int64_t)nCount / nRows - 1) * iChildMargin;
-        }
-        else {
-            childMarginTotal = ((int64_t)nCount / nRows) * iChildMargin;
+            childMarginTotal = ((int64_t) nCount / nRows - 1) * iChildMargin;
+        } else {
+            childMarginTotal = ((int64_t) nCount / nRows) * iChildMargin;
         }
         return szItem.cx * cols + childMarginTotal;
     }
@@ -205,7 +205,7 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
     if ((szItem.cx <= 0) || (szItem.cy <= 0)) {
         return;
     }
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -216,7 +216,7 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
     //行数
     int32_t nRows = CalcTileRows(rc.Height());
 
-    //子项的顶部起始位置 
+    //子项的顶部起始位置
     int32_t iPosTop = rc.top;
 
     //确定对齐方式
@@ -229,8 +229,7 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
         if (vAlign == VerAlignType::kAlignCenter) {
             //居中对齐
             iPosTop = rc.CenterY() - cyTotal / 2;
-        }
-        else if (vAlign == VerAlignType::kAlignBottom) {
+        } else if (vAlign == VerAlignType::kAlignBottom) {
             //靠下对齐
             iPosTop = rc.bottom - cyTotal;
         }
@@ -259,7 +258,7 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
     size_t iCount = 0;
     size_t nItemCount = pOwnerBox->m_items.size();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = pOwnerBox->m_items[nItemIndex];
+        Control *pControl = pOwnerBox->m_items[nItemIndex];
         if (pControl == nullptr) {
             continue;
         }
@@ -278,13 +277,12 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
             refreshData.pControl = pControl;
             refreshData.nElementIndex = nElementIndex;
             refreshDataList.push_back(refreshData);
-        }
-        else {
+        } else {
             if (pControl->IsVisible()) {
                 pControl->SetVisible(false);
             }
             //需要清除ElementIndex
-            IListBoxItem* pListBoxItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListBoxItem = dynamic_cast<IListBoxItem *>(pControl);
             if (pListBoxItem != nullptr) {
                 pListBoxItem->SetElementIndex(Box::InvalidIndex);
             }
@@ -293,8 +291,7 @@ void VirtualHTileLayout::LazyArrangeChild(UiRect rc) const
         if ((++iCount % nRows) == 0) {
             ptTile.y = iPosTop;
             ptTile.x += szItem.cx + GetChildMarginX();
-        }
-        else {
+        } else {
             ptTile.y += rcTile.Height() + GetChildMarginY();
         }
     }
@@ -325,12 +322,12 @@ size_t VirtualHTileLayout::AjustMaxItem(UiRect rc) const
     }
     //额外增加1列，确保真实控件填充满整个可显示区域
     nColumns += 1;
-    return (size_t)nRows * nColumns;
+    return (size_t) nRows * nColumns;
 }
 
 size_t VirtualHTileLayout::GetTopElementIndex(UiRect rc) const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return 0;
     }
@@ -339,7 +336,7 @@ size_t VirtualHTileLayout::GetTopElementIndex(UiRect rc) const
         nPos = 0;
     }
 
-    int64_t nRows = (int64_t)CalcTileRows(rc.Height());
+    int64_t nRows = (int64_t) CalcTileRows(rc.Height());
     if (nRows < 0) {
         nRows = 0;
     }
@@ -357,7 +354,7 @@ bool VirtualHTileLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
     if (!Box::IsValidItemIndex(iIndex)) {
         return false;
     }
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return false;
     }
@@ -367,7 +364,7 @@ bool VirtualHTileLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
     UiSize szItem = GetItemSize();
     if ((nElementPos - szItem.cx) > nScrollPos) { //矩形的left位置
         int64_t nBoxWidth = pOwnerBox->GetWidth();
-        if (nElementPos <= (nScrollPos + nBoxWidth)) {//矩形的right位置
+        if (nElementPos <= (nScrollPos + nBoxWidth)) { //矩形的right位置
             //完整显示
             return true;
         }
@@ -377,7 +374,7 @@ bool VirtualHTileLayout::IsElementDisplay(UiRect rc, size_t iIndex) const
 
 bool VirtualHTileLayout::NeedReArrange() const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return false;
     }
@@ -403,10 +400,10 @@ bool VirtualHTileLayout::NeedReArrange() const
     return nVirtualOffsetX != nScrollPosX;
 }
 
-void VirtualHTileLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const
+void VirtualHTileLayout::GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const
 {
     collection.clear();
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -421,16 +418,15 @@ void VirtualHTileLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& coll
     }
 
     int32_t nRows = CalcTileRows(rc.Height());
-    size_t min = (size_t)(pOwnerBox->GetScrollPos().cx / nEleWidth) * nRows;
-    size_t max = min + (size_t)(rc.Width() / nEleWidth) * nRows;
+    size_t min = (size_t) (pOwnerBox->GetScrollPos().cx / nEleWidth) * nRows;
+    size_t max = min + (size_t) (rc.Width() / nEleWidth) * nRows;
 
     size_t nCount = pOwnerBox->GetElementCount();
     if (nCount > 0) {
         if (max >= nCount) {
             max = nCount - 1;
         }
-    }
-    else {
+    } else {
         return;
     }
 
@@ -441,7 +437,7 @@ void VirtualHTileLayout::GetDisplayElements(UiRect rc, std::vector<size_t>& coll
 
 void VirtualHTileLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) const
 {
-    VirtualListBox* pOwnerBox = GetOwnerBox();
+    VirtualListBox *pOwnerBox = GetOwnerBox();
     if (pOwnerBox == nullptr) {
         return;
     }
@@ -468,20 +464,18 @@ void VirtualHTileLayout::EnsureVisible(UiRect rc, size_t iIndex, bool bToTop) co
         if (nNewPos >= elementWidth) {
             nNewPos -= elementWidth;
         }
-    }
-    else {
+    } else {
         if (IsElementDisplay(rc, iIndex)) {
             return;
         }
 
         int64_t nTopColumns = nTopIndex / nRows;
         int64_t nDestColumns = iIndex / nRows;
-        if ((int64_t)nDestColumns > nTopColumns) {
+        if ((int64_t) nDestColumns > nTopColumns) {
             // 向右滚动：确保在最右侧
             int64_t width = GetElementsWidth(rc, iIndex + 1);
             nNewPos = width - pOwnerBox->GetRect().Width();
-        }
-        else {
+        } else {
             // 向左滚动：确保在最左侧
             nNewPos = GetElementsWidth(rc, iIndex + 1);
             if (nNewPos >= elementWidth) {

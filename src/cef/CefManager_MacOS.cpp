@@ -1,28 +1,24 @@
 #include "CefManager_MacOS.h"
 
-#if defined (DUILIB_BUILD_FOR_MACOS) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_MACOS) && defined(DUILIB_BUILD_FOR_CEF)
 
-#include "cef/internal/CefClientApp.h"
 #include "cef/internal/CefBrowserHandler.h"
+#include "cef/internal/CefClientApp.h"
 
 #include "include/wrapper/cef_library_loader.h"
 
-namespace ui
-{
-CefManager_MacOS::CefManager_MacOS()
-{
-}
+namespace ui {
+CefManager_MacOS::CefManager_MacOS() {}
 
-CefManager_MacOS::~CefManager_MacOS()
-{
-}
+CefManager_MacOS::~CefManager_MacOS() {}
 
-bool CefManager_MacOS::Initialize(bool bEnableOffScreenRendering,
-                                  const DString& appName,
-                                  int argc,
-                                  char** argv,
-                                  OnCefSettingsEvent callback,
-                                  int32_t& nExitCode)
+bool CefManager_MacOS::Initialize(
+    bool bEnableOffScreenRendering,
+    const DString &appName,
+    int argc,
+    char **argv,
+    OnCefSettingsEvent callback,
+    int32_t &nExitCode)
 {
     if (!BaseClass::Initialize(bEnableOffScreenRendering, appName, argc, argv, callback, nExitCode)) {
         return false;

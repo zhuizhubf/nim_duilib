@@ -1,14 +1,13 @@
 #ifndef UI_CORE_IMAGE_LIST_H_
 #define UI_CORE_IMAGE_LIST_H_
 
-#include "duilib/Image/Image.h"
 #include "duilib/Core/UiTypes.h"
+#include "duilib/Image/Image.h"
 #include <map>
 #include <string>
 #include <vector>
 
-namespace ui 
-{
+namespace ui {
 /** 图片资源的智能指针
 */
 typedef std::shared_ptr<Image> ImagePtr;
@@ -20,8 +19,8 @@ class DUILIB_API ImageList
 public:
     ImageList();
     ~ImageList();
-    ImageList(const ImageList&) = delete;
-    ImageList& operator = (const ImageList&) = delete;
+    ImageList(const ImageList &) = delete;
+    ImageList &operator=(const ImageList &) = delete;
 
 public:
     /** 设置图片大小（可选设置，如果不设置，则从每个图片获取）
@@ -29,7 +28,7 @@ public:
     * @param [in] dpi DPI缩放管理器
     * @param [in] bNeedDpiScale 是否支持DPI缩放
     */
-    void SetImageSize(UiSize imageSize, const DpiManager& dpi, bool bNeedDpiScale);
+    void SetImageSize(UiSize imageSize, const DpiManager &dpi, bool bNeedDpiScale);
 
     /** 获取图片大小
     * @return 返回设置的图片大小，如果未设置，则返回(0,0)
@@ -41,14 +40,14 @@ public:
     * @param [in] dpi DPI缩放管理接口
     * @return 返回图片资源的ID，如果失败返回-1，否则返回大于等于0的ID
     */
-    int32_t AddImageString(const DString& imageString, const DpiManager& dpi);
+    int32_t AddImageString(const DString &imageString, const DpiManager &dpi);
 
     /** 添加一个图片资源，并附加图片大小信息
     * @param [in] imageString 图片资源字符串，格式同：Image::SetImageString函数
     * @param [in] dpi DPI缩放管理接口
     * @return 返回图片资源的ID，如果失败返回-1，否则返回大于等于0的ID
     */
-    int32_t AddImageStringWithSize(const DString& imageString, const DpiManager& dpi);
+    int32_t AddImageStringWithSize(const DString &imageString, const DpiManager &dpi);
 
     /** 获取图片资源字符串
     * @param [in] imageId 图片资源的ID，由AddImage函数返回的值
@@ -66,7 +65,7 @@ public:
     * @param [in] imageString 图片资源字符串，格式同：Image::SetImageString函数
     * @return 返回关联图片资源的ID，如果没有关联资源，返回-1
     */
-    int32_t GetImageStringId(const DString& imageString) const;
+    int32_t GetImageStringId(const DString &imageString) const;
 
     /** 移除一个图片资源
     * @param [in] imageId 图片资源的ID，由AddImage函数返回的值
@@ -79,7 +78,7 @@ public:
 
     /** 获取所有图片资源的ID
     */
-    void GetImageIdList(std::vector<int32_t>& imageIdList) const;
+    void GetImageIdList(std::vector<int32_t> &imageIdList) const;
 
     /** 清空所有图片资源
     */
@@ -89,8 +88,8 @@ public:
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
     * @param [in] dpi DPI缩放管理器
     */
-    void ChangeDpiScale(const DpiManager& dpi, uint32_t nOldDpiScale);
- 
+    void ChangeDpiScale(const DpiManager &dpi, uint32_t nOldDpiScale);
+
 private:
     /** 下一个ID
     */
@@ -111,6 +110,6 @@ private:
 
 typedef std::shared_ptr<ImageList> ImageListPtr;
 
-} //namespace ui 
+} //namespace ui
 
 #endif //UI_CORE_IMAGE_LIST_H_

@@ -4,40 +4,41 @@
 
 #include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
-bool RenderRegisteredFunctions::AddJsFunction(const CefString& function_name, const CefString& frame_id,
-                                              const CefRefPtr<CefV8Value>& function, bool enable_replace)
+namespace ui {
+bool RenderRegisteredFunctions::AddJsFunction(
+    const CefString &function_name,
+    const CefString &frame_id,
+    const CefRefPtr<CefV8Value> &function,
+    bool enable_replace)
 {
     ASSERT(!function_name.empty() && !frame_id.empty() && (function != nullptr));
     if (function_name.empty() || frame_id.empty() || (function == nullptr)) {
         return false;
     }
     bool bRet = true;
-    FrameFunctionMap& frameFunctionMap = m_renderJsFunctionMap[function_name];
+    FrameFunctionMap &frameFunctionMap = m_renderJsFunctionMap[function_name];
     auto iter = frameFunctionMap.find(frame_id);
     if (iter != frameFunctionMap.end()) {
         //已经存在
         if (enable_replace) {
             frameFunctionMap[frame_id] = function; //允许覆盖
+        } else {
+            bRet = false; //不允许覆盖
         }
-        else {
-            bRet = false;//不允许覆盖
-        }
-    }
-    else {
+    } else {
         //不存在, 添加
         frameFunctionMap[frame_id] = function;
     }
     return bRet;
 }
 
-CefRefPtr<CefV8Value> RenderRegisteredFunctions::FindJsFunction(const CefString& function_name, const CefString& frame_id)
+CefRefPtr<CefV8Value> RenderRegisteredFunctions::FindJsFunction(
+    const CefString &function_name, const CefString &frame_id)
 {
     CefRefPtr<CefV8Value> function = nullptr;
     auto iter = m_renderJsFunctionMap.find(function_name);
     if (iter != m_renderJsFunctionMap.end()) {
-        const FrameFunctionMap& frameFunctionMap = iter->second;
+        const FrameFunctionMap &frameFunctionMap = iter->second;
         auto pos = frameFunctionMap.find(frame_id);
         if (pos != frameFunctionMap.end()) {
             function = pos->second;
@@ -46,7 +47,7 @@ CefRefPtr<CefV8Value> RenderRegisteredFunctions::FindJsFunction(const CefString&
     return function;
 }
 
-void RenderRegisteredFunctions::RemoveJsFunction(const CefString& function_name)
+void RenderRegisteredFunctions::RemoveJsFunction(const CefString &function_name)
 {
     auto iter = m_renderJsFunctionMap.find(function_name);
     if (iter != m_renderJsFunctionMap.end()) {
@@ -54,11 +55,12 @@ void RenderRegisteredFunctions::RemoveJsFunction(const CefString& function_name)
     }
 }
 
-void RenderRegisteredFunctions::RemoveJsFunction(const CefString& function_name, const CefString& frame_id)
+void RenderRegisteredFunctions::RemoveJsFunction(
+    const CefString &function_name, const CefString &frame_id)
 {
     auto iter = m_renderJsFunctionMap.find(function_name);
     if (iter != m_renderJsFunctionMap.end()) {
-        FrameFunctionMap& frameFunctionMap = iter->second;
+        FrameFunctionMap &frameFunctionMap = iter->second;
         auto pos = frameFunctionMap.find(frame_id);
         if (pos != frameFunctionMap.end()) {
             frameFunctionMap.erase(pos);
@@ -69,19 +71,18 @@ void RenderRegisteredFunctions::RemoveJsFunction(const CefString& function_name,
     }
 }
 
-void RenderRegisteredFunctions::RemoveJsFunctionByFrameId(const CefString& frame_id)
+void RenderRegisteredFunctions::RemoveJsFunctionByFrameId(const CefString &frame_id)
 {
     auto iter = m_renderJsFunctionMap.begin();
     while (iter != m_renderJsFunctionMap.end()) {
-        FrameFunctionMap& frameFunctionMap = iter->second;
+        FrameFunctionMap &frameFunctionMap = iter->second;
         auto pos = frameFunctionMap.find(frame_id);
         if (pos != frameFunctionMap.end()) {
             frameFunctionMap.erase(pos);
         }
         if (frameFunctionMap.empty()) {
             iter = m_renderJsFunctionMap.erase(iter);
-        }
-        else {
+        } else {
             ++iter;
         }
     }
@@ -104,7 +105,7 @@ void RenderRegisteredFunctions::RemoveJsFunctionByFrame(CefRefPtr<CefFrame> fram
 
     if (!m_renderJsFunctionMap.empty()) {
         for (auto iter = m_renderJsFunctionMap.begin(); iter != m_renderJsFunctionMap.end();) {
-            FrameFunctionMap& frameFunctionMap = iter->second;            
+            FrameFunctionMap &frameFunctionMap = iter->second;
             for (auto pos = frameFunctionMap.begin(); pos != frameFunctionMap.end();) {
 #if CEF_VERSION_MAJOR <= 109
                 //CEF 109版本
@@ -114,18 +115,17 @@ void RenderRegisteredFunctions::RemoveJsFunctionByFrame(CefRefPtr<CefFrame> fram
                 //CEF 高版本
                 auto child_frame = browser->GetFrameByIdentifier(pos->first);
 #endif
-                if (child_frame.get() && child_frame->GetV8Context()->IsSame(frame->GetV8Context())) {
+                if (child_frame.get()
+                    && child_frame->GetV8Context()->IsSame(frame->GetV8Context())) {
                     pos = frameFunctionMap.erase(pos);
-                }
-                else {
+                } else {
                     ++pos;
                 }
             }
 
             if (frameFunctionMap.empty()) {
                 iter = m_renderJsFunctionMap.erase(iter);
-            }
-            else {
+            } else {
                 ++iter;
             }
         }
@@ -138,38 +138,37 @@ void RenderRegisteredFunctions::ClearAllJsFunctions()
 }
 
 /////////////////////////////////////////////////////////////
-bool BrowserRegisteredFunctions::AddCppFunction(const CefString& function_name, int64_t browser_id,
-                                                CppFunction function, bool enable_replace)
+bool BrowserRegisteredFunctions::AddCppFunction(
+    const CefString &function_name, int64_t browser_id, CppFunction function, bool enable_replace)
 {
     ASSERT(!function_name.empty() && (function != nullptr));
     if (function_name.empty() || (function == nullptr)) {
         return false;
     }
     bool bRet = true;
-    BrowserFunctionMap& browserFunctionMap = m_browserCppFunctionMap[function_name];
+    BrowserFunctionMap &browserFunctionMap = m_browserCppFunctionMap[function_name];
     auto iter = browserFunctionMap.find(browser_id);
     if (iter != browserFunctionMap.end()) {
         //已经存在
         if (enable_replace) {
             browserFunctionMap[browser_id] = function; //允许覆盖
+        } else {
+            bRet = false; //不允许覆盖
         }
-        else {
-            bRet = false;//不允许覆盖
-        }
-    }
-    else {
+    } else {
         //不存在, 添加
         browserFunctionMap[browser_id] = function;
     }
     return bRet;
 }
 
-CppFunction BrowserRegisteredFunctions::FindCppFunction(const CefString& function_name, int64_t browser_id)
+CppFunction BrowserRegisteredFunctions::FindCppFunction(
+    const CefString &function_name, int64_t browser_id)
 {
     CppFunction function = nullptr;
     auto iter = m_browserCppFunctionMap.find(function_name);
     if (iter != m_browserCppFunctionMap.end()) {
-        const BrowserFunctionMap& browserFunctionMap = iter->second;
+        const BrowserFunctionMap &browserFunctionMap = iter->second;
         auto pos = browserFunctionMap.find(browser_id);
         if (pos != browserFunctionMap.end()) {
             function = pos->second;
@@ -178,7 +177,7 @@ CppFunction BrowserRegisteredFunctions::FindCppFunction(const CefString& functio
     return function;
 }
 
-void BrowserRegisteredFunctions::RemoveCppFunction(const CefString& function_name)
+void BrowserRegisteredFunctions::RemoveCppFunction(const CefString &function_name)
 {
     auto iter = m_browserCppFunctionMap.find(function_name);
     if (iter != m_browserCppFunctionMap.end()) {
@@ -186,11 +185,11 @@ void BrowserRegisteredFunctions::RemoveCppFunction(const CefString& function_nam
     }
 }
 
-void BrowserRegisteredFunctions::RemoveCppFunction(const CefString& function_name, int64_t browser_id)
+void BrowserRegisteredFunctions::RemoveCppFunction(const CefString &function_name, int64_t browser_id)
 {
     auto iter = m_browserCppFunctionMap.find(function_name);
     if (iter != m_browserCppFunctionMap.end()) {
-        BrowserFunctionMap& browserFunctionMap = iter->second;
+        BrowserFunctionMap &browserFunctionMap = iter->second;
         auto pos = browserFunctionMap.find(browser_id);
         if (pos != browserFunctionMap.end()) {
             browserFunctionMap.erase(pos);

@@ -16,10 +16,11 @@
 
 namespace ui {
 
-SkGLWindowContext_Windows::SkGLWindowContext_Windows(HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params):
-    skwindow::internal::GLWindowContext(std::move(params)),
-    m_hWnd(hWnd),
-    m_fHGLRC(nullptr)
+SkGLWindowContext_Windows::SkGLWindowContext_Windows(
+    HWND hWnd, std::unique_ptr<const skwindow::DisplayParams> params)
+    : skwindow::internal::GLWindowContext(std::move(params))
+    , m_hWnd(hWnd)
+    , m_fHGLRC(nullptr)
 {
     ASSERT(::IsWindow(hWnd));
     fWidth = 0;
@@ -73,7 +74,7 @@ sk_sp<const GrGLInterface> SkGLWindowContext_Windows::onInitializeContext()
     if (!::IsWindow(m_hWnd)) {
         return nullptr;
     }
-    const skwindow::DisplayParams* pDisplayParams = getDisplayParams();
+    const skwindow::DisplayParams *pDisplayParams = getDisplayParams();
     ASSERT(pDisplayParams != nullptr);
     if (pDisplayParams == nullptr) {
         return nullptr;
@@ -84,8 +85,11 @@ sk_sp<const GrGLInterface> SkGLWindowContext_Windows::onInitializeContext()
     }
 
     HDC dc = ::GetDC(m_hWnd);
-    m_fHGLRC = SkCreateWGLContext(dc, pDisplayParams->msaaSampleCount(), false /* deepColor */,
-                                  kGLPreferCompatibilityProfile_SkWGLContextRequest);
+    m_fHGLRC = SkCreateWGLContext(
+        dc,
+        pDisplayParams->msaaSampleCount(),
+        false /* deepColor */,
+        kGLPreferCompatibilityProfile_SkWGLContextRequest);
     if (nullptr == m_fHGLRC) {
         ::ReleaseDC(m_hWnd, dc);
         return nullptr;
@@ -103,8 +107,11 @@ sk_sp<const GrGLInterface> SkGLWindowContext_Windows::onInitializeContext()
         interface.reset(nullptr);
         if (renderDocAttached) {
             wglDeleteContext(m_fHGLRC);
-            m_fHGLRC = SkCreateWGLContext(dc, pDisplayParams->msaaSampleCount(), false /* deepColor */,
-                                          kGLPreferCoreProfile_SkWGLContextRequest);
+            m_fHGLRC = SkCreateWGLContext(
+                dc,
+                pDisplayParams->msaaSampleCount(),
+                false /* deepColor */,
+                kGLPreferCoreProfile_SkWGLContextRequest);
             if (nullptr == m_fHGLRC) {
                 ::ReleaseDC(m_hWnd, dc);
                 return nullptr;
@@ -120,22 +127,19 @@ sk_sp<const GrGLInterface> SkGLWindowContext_Windows::onInitializeContext()
 
         // use DescribePixelFormat to get the stencil and color bit depth.
         int pixelFormat = ::GetPixelFormat(dc);
-        PIXELFORMATDESCRIPTOR pfd = {0, };
+        PIXELFORMATDESCRIPTOR pfd = {
+            0,
+        };
         DescribePixelFormat(dc, pixelFormat, sizeof(pfd), &pfd);
         fStencilBits = pfd.cStencilBits;
 
         // Get sample count if the MSAA WGL extension is present
         if (extensions.hasExtension(dc, "WGL_ARB_multisample")) {
             static const int kSampleCountAttr = SK_WGL_SAMPLES;
-            extensions.getPixelFormatAttribiv(dc,
-                pixelFormat,
-                0,
-                1,
-                &kSampleCountAttr,
-                &fSampleCount);
+            extensions
+                .getPixelFormatAttribiv(dc, pixelFormat, 0, 1, &kSampleCountAttr, &fSampleCount);
             fSampleCount = std::max(fSampleCount, 1);
-        }
-        else {
+        } else {
             fSampleCount = 1;
         }
 
@@ -159,7 +163,7 @@ void SkGLWindowContext_Windows::onDestroyContext()
     }
 }
 
-bool SkGLWindowContext_Windows::PaintAndSwapBuffers(IRender* /*pRender*/, IRenderPaint* pRenderPaint)
+bool SkGLWindowContext_Windows::PaintAndSwapBuffers(IRender * /*pRender*/, IRenderPaint *pRenderPaint)
 {
     HWND hWnd = m_hWnd;
     ASSERT(::IsWindow(hWnd));
@@ -172,7 +176,9 @@ bool SkGLWindowContext_Windows::PaintAndSwapBuffers(IRender* /*pRender*/, IRende
     }
 
     //设置需要绘制的区域（需要对整个客户区全部绘制，GL不支持局部绘制）
-    RECT rectUpdate = { 0, };
+    RECT rectUpdate = {
+        0,
+    };
     ::GetClientRect(m_hWnd, &rectUpdate);
     UiRect rcPaint;
     rcPaint.left = rectUpdate.left;
@@ -191,7 +197,9 @@ bool SkGLWindowContext_Windows::PaintAndSwapBuffers(IRender* /*pRender*/, IRende
     }
 
     //开始绘制
-    PAINTSTRUCT ps = { 0, };
+    PAINTSTRUCT ps = {
+        0,
+    };
     ::BeginPaint(hWnd, &ps);
     ::EndPaint(hWnd, &ps);
 

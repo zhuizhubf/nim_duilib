@@ -2,21 +2,19 @@
 #define UI_CORE_VBOX_H_
 
 #include "duilib/Core/Box.h"
-#include "duilib/Layout/VLayout.h"
 #include "duilib/Layout/VFlowLayout.h"
+#include "duilib/Layout/VLayout.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 垂直布局的Box(不换行)
 */
 class DUILIB_API VBox : public Box
 {
 public:
-    explicit VBox(Window* pWindow) :
-        Box(pWindow, new VLayout())
-    {
-    }
+    explicit VBox(Window *pWindow)
+        : Box(pWindow, new VLayout())
+    {}
 
     virtual DString GetType() const override { return DUI_CTR_VBOX; }
 };
@@ -26,13 +24,12 @@ public:
 class DUILIB_API VFlowBox : public Box
 {
 public:
-    explicit VFlowBox(Window* pWindow) :
-        Box(pWindow, new VFlowLayout())
-    {
-    }
+    explicit VFlowBox(Window *pWindow)
+        : Box(pWindow, new VFlowLayout())
+    {}
 
     virtual DString GetType() const override { return DUI_CTR_VFLOWBOX; }
 };
 
-}
+} // namespace ui
 #endif // UI_CORE_VBOX_H_

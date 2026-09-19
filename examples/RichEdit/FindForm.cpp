@@ -1,18 +1,15 @@
 #include "FindForm.h"
 #include "MainForm.h"
 
-FindForm::FindForm(MainForm* pMainForm):
-    m_pMainForm(pMainForm),
-    m_pDirectionOption(nullptr),
-    m_pCaseSensitive(nullptr),
-    m_pMatchWholeWord(nullptr),
-    m_pFindText(nullptr)
-{
-}
+FindForm::FindForm(MainForm *pMainForm)
+    : m_pMainForm(pMainForm)
+    , m_pDirectionOption(nullptr)
+    , m_pCaseSensitive(nullptr)
+    , m_pMatchWholeWord(nullptr)
+    , m_pFindText(nullptr)
+{}
 
-FindForm::~FindForm()
-{
-}
+FindForm::~FindForm() {}
 
 DString FindForm::GetSkinFolder()
 {
@@ -26,10 +23,10 @@ DString FindForm::GetSkinFile()
 
 void FindForm::OnInitWindow()
 {
-    m_pFindText = dynamic_cast<ui::RichEdit*>(FindControl(_T("btn_find_text")));
-    m_pDirectionOption = dynamic_cast<ui::Option*>(FindControl(_T("option_direction_down")));
-    m_pCaseSensitive = dynamic_cast<ui::CheckBox*>(FindControl(_T("check_box_case_sensitive")));
-    m_pMatchWholeWord = dynamic_cast<ui::CheckBox*>(FindControl(_T("check_box_match_whole_word")));
+    m_pFindText = dynamic_cast<ui::RichEdit *>(FindControl(_T("btn_find_text")));
+    m_pDirectionOption = dynamic_cast<ui::Option *>(FindControl(_T("option_direction_down")));
+    m_pCaseSensitive = dynamic_cast<ui::CheckBox *>(FindControl(_T("check_box_case_sensitive")));
+    m_pMatchWholeWord = dynamic_cast<ui::CheckBox *>(FindControl(_T("check_box_match_whole_word")));
     ASSERT(m_pFindText != nullptr);
     ASSERT(m_pDirectionOption != nullptr);
     ASSERT(m_pCaseSensitive != nullptr);
@@ -38,7 +35,7 @@ void FindForm::OnInitWindow()
     if (m_pFindText != nullptr) {
         m_pFindText->SetFocus();
 
-        ui::RichEdit* pRichEdit = nullptr;
+        ui::RichEdit *pRichEdit = nullptr;
         if (m_pMainForm != nullptr) {
             pRichEdit = m_pMainForm->GetRichEdit();
         }
@@ -52,23 +49,23 @@ void FindForm::OnInitWindow()
         }
     }
 
-    ui::Button* pButton = dynamic_cast<ui::Button*>(FindControl(_T("btn_cancel")));
+    ui::Button *pButton = dynamic_cast<ui::Button *>(FindControl(_T("btn_cancel")));
     if (pButton != nullptr) {
-        pButton->AttachClick([this, pButton](const ui::EventArgs& args) {
-                if (args.GetSender() == pButton) {
-                    CloseWnd();
-                }
-                return true;
-            });
+        pButton->AttachClick([this, pButton](const ui::EventArgs &args) {
+            if (args.GetSender() == pButton) {
+                CloseWnd();
+            }
+            return true;
+        });
     }
-    pButton = dynamic_cast<ui::Button*>(FindControl(_T("btn_find_next")));
+    pButton = dynamic_cast<ui::Button *>(FindControl(_T("btn_find_next")));
     if (pButton != nullptr) {
-        pButton->AttachClick([this, pButton](const ui::EventArgs& args) {
-                if (args.GetSender() == pButton) {
-                    OnFindNext();
-                }
-                return true;
-            });
+        pButton->AttachClick([this, pButton](const ui::EventArgs &args) {
+            if (args.GetSender() == pButton) {
+                OnFindNext();
+            }
+            return true;
+        });
     }
 }
 

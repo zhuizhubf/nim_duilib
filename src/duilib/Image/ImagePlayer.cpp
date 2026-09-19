@@ -5,28 +5,24 @@
 #include "render/AutoClip.h"
 #include "render/IRender.h"
 
-namespace ui 
-{
-ImagePlayer::ImagePlayer():
-    m_pControl(nullptr),
-    m_pImage(nullptr),
-    m_bAnimationPlaying(false),
-    m_bAutoPlay(true),
-    m_nCycledCount(0),
-    m_nMaxPlayCount(-1)
-{
-}
+namespace ui {
+ImagePlayer::ImagePlayer()
+    : m_pControl(nullptr)
+    , m_pImage(nullptr)
+    , m_bAnimationPlaying(false)
+    , m_bAutoPlay(true)
+    , m_nCycledCount(0)
+    , m_nMaxPlayCount(-1)
+{}
 
-ImagePlayer::~ImagePlayer()
-{
-}
+ImagePlayer::~ImagePlayer() {}
 
-void ImagePlayer::SetControl(Control* pControl)
+void ImagePlayer::SetControl(Control *pControl)
 {
     m_pControl = pControl;
 }
 
-void ImagePlayer::SetImage(Image* pImage)
+void ImagePlayer::SetImage(Image *pImage)
 {
     m_pImage = pImage;
     if (m_pImage != nullptr) {
@@ -45,22 +41,22 @@ void ImagePlayer::SetImage(Image* pImage)
     }
 }
 
-void ImagePlayer::SetImageAnimationRect(const UiRect& rcImageRect)
+void ImagePlayer::SetImageAnimationRect(const UiRect &rcImageRect)
 {
     m_rcImageAnimationRect = rcImageRect;
 }
 
-void ImagePlayer::GetImageAnimationStatus(ImageAnimationStatus& animStatus)
+void ImagePlayer::GetImageAnimationStatus(ImageAnimationStatus &animStatus)
 {
     if ((m_pImage != nullptr) && (m_pControl != nullptr) && (m_pImage->GetImageInfo() != nullptr)) {
         animStatus.m_name = m_pImage->GetImageAttribute().m_sImageName.c_str();
         animStatus.m_bBkImage = m_pControl->GetBkImage() == m_pImage->GetImageString();
         animStatus.m_nFrameCount = m_pImage->GetFrameCount();
         animStatus.m_nFrameIndex = m_pImage->GetCurrentFrameIndex();
-        animStatus.m_nFrameDelayMs = m_pImage->GetImageInfo()->GetFrameDelayMs(animStatus.m_nFrameIndex);
+        animStatus.m_nFrameDelayMs = m_pImage->GetImageInfo()->GetFrameDelayMs(
+            animStatus.m_nFrameIndex);
         animStatus.m_nLoopCount = m_pImage->GetImageInfo()->GetLoopCount();
-    }
-    else {
+    } else {
         animStatus.m_name.clear();
         animStatus.m_bBkImage = false;
         animStatus.m_nFrameCount = 0;
@@ -78,14 +74,12 @@ void ImagePlayer::CheckStartImageAnimation()
     if (IsMultiFrameImage()) {
         if (IsAnimationPlaying()) {
             return;
-        }
-        else {
+        } else {
             int32_t nPlayCount = m_pImage->GetImageAttribute().m_nPlayCount;
             bool bRet = StartImageAnimation(AnimationImagePos::kFrameCurrent, nPlayCount);
             ASSERT_UNUSED_VARIABLE(bRet);
         }
-    }
-    else {
+    } else {
         m_bAnimationPlaying = false;
         m_animWeakFlag.Cancel();
         return;
@@ -106,7 +100,8 @@ bool ImagePlayer::StartImageAnimation(AnimationImagePos nStartFrame, int32_t nPl
         //无限循环播放
         m_nMaxPlayCount = -1;
     }
-    ASSERT((m_pImage != nullptr) && (m_pControl != nullptr) && (m_pImage->GetImageInfo() != nullptr));
+    ASSERT(
+        (m_pImage != nullptr) && (m_pControl != nullptr) && (m_pImage->GetImageInfo() != nullptr));
     if ((m_pImage == nullptr) || (m_pControl == nullptr) || (m_pImage->GetImageInfo() == nullptr)) {
         m_bAnimationPlaying = false;
         return false;
@@ -126,15 +121,16 @@ bool ImagePlayer::StartImageAnimation(AnimationImagePos nStartFrame, int32_t nPl
     m_bAnimationPlaying = true;
     RedrawImage();
     auto animationPlayCallback = UiBind(&ImagePlayer::PlayingImageAnimation, this);
-    bool bRet = GlobalManager::Instance().Timer().AddTimer(m_animWeakFlag.GetWeakFlag(),
-                                                           animationPlayCallback,
-                                                           nTimerInterval) != 0;
+    bool bRet = GlobalManager::Instance()
+                    .Timer()
+                    .AddTimer(m_animWeakFlag.GetWeakFlag(), animationPlayCallback, nTimerInterval)
+                != 0;
     if ((m_pControl != nullptr) && (m_pImage != nullptr)) {
         if (m_pControl->HasEventCallback(kEventImageAnimationStart)) {
             //触发一次动画开始事件
             ImageAnimationStatus animStatus;
             GetImageAnimationStatus(animStatus);
-            m_pControl->SendEvent(kEventImageAnimationStart, (WPARAM)&animStatus);
+            m_pControl->SendEvent(kEventImageAnimationStart, (WPARAM) &animStatus);
         }
     }
     return bRet;
@@ -164,8 +160,7 @@ void ImagePlayer::PlayingImageAnimation()
         //当前帧的数据尚未完成解码，如果未完成解码，应该是还没绘制: 跳过一个帧的时间
         //TODO：（待优化实现方式：等下一帧解码完成后，立即显示）
         return;
-    }    
-    else {
+    } else {
         //检查下一帧图片是否完成解码：下一帧
         uint32_t nNextFrameIndex = nFrameIndex + 1;
         if (nNextFrameIndex >= pImageInfo->GetFrameCount()) {
@@ -198,9 +193,10 @@ void ImagePlayer::PlayingImageAnimation()
         //帧与帧之间的播放时间发生变化，重启定时器，按新的播放时间差启动
         m_animWeakFlag.Cancel();
         auto animationPlayCallback = UiBind(&ImagePlayer::PlayingImageAnimation, this);
-        bRet = GlobalManager::Instance().Timer().AddTimer(m_animWeakFlag.GetWeakFlag(),
-                                                          animationPlayCallback,
-                                                          nNowTimerInterval) != 0;
+        bRet = GlobalManager::Instance()
+                   .Timer()
+                   .AddTimer(m_animWeakFlag.GetWeakFlag(), animationPlayCallback, nNowTimerInterval)
+               != 0;
         ASSERT(bRet);
     }
     if (bRet) {
@@ -213,10 +209,9 @@ void ImagePlayer::PlayingImageAnimation()
             //触发一次动画开始事件
             ImageAnimationStatus animStatus;
             GetImageAnimationStatus(animStatus);
-            m_pControl->SendEvent(kEventImageAnimationPlayFrame, (WPARAM)&animStatus);
+            m_pControl->SendEvent(kEventImageAnimationPlayFrame, (WPARAM) &animStatus);
         }
-    }
-    else {
+    } else {
         //启动定时器失败
         StopImageAnimation(AnimationImagePos::kFrameCurrent, true);
     }
@@ -238,7 +233,7 @@ void ImagePlayer::StopImageAnimation(AnimationImagePos nStopFrame, bool bTrigger
             //触发一次动画停止事件
             ImageAnimationStatus animStatus;
             GetImageAnimationStatus(animStatus);
-            m_pControl->SendEvent(kEventImageAnimationStop, (WPARAM)&animStatus);
+            m_pControl->SendEvent(kEventImageAnimationStop, (WPARAM) &animStatus);
         }
     }
 }
@@ -264,8 +259,7 @@ uint32_t ImagePlayer::GetImageFrameIndex(AnimationImagePos frame) const
         return 0;
     }
     uint32_t ret = 0;
-    switch (frame)
-    {
+    switch (frame) {
     case AnimationImagePos::kFrameCurrent:
         ret = m_pImage->GetCurrentFrameIndex();
         break;
@@ -291,8 +285,7 @@ void ImagePlayer::RedrawImage()
         if (m_rcImageAnimationRect.IsEmpty()) {
             //首次播放，区域为空，重回整个控件
             m_pControl->Invalidate();
-        }
-        else {
+        } else {
             m_pControl->InvalidateRect(m_rcImageAnimationRect);
         }
     }
@@ -300,14 +293,12 @@ void ImagePlayer::RedrawImage()
 
 bool ImagePlayer::IsMultiFrameImage() const
 {
-    if ((m_pControl != nullptr) && 
-        (m_pImage != nullptr) &&
-        (m_pImage->IsImagePaintEnabled()) &&
-        (m_pImage->GetImageInfo() != nullptr) &&
-        (m_pImage->GetImageInfo()->IsMultiFrameImage())) {
+    if ((m_pControl != nullptr) && (m_pImage != nullptr) && (m_pImage->IsImagePaintEnabled())
+        && (m_pImage->GetImageInfo() != nullptr)
+        && (m_pImage->GetImageInfo()->IsMultiFrameImage())) {
         return true;
     }
     return false;
 }
 
-}
+} // namespace ui

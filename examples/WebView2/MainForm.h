@@ -11,6 +11,7 @@
 class MainForm : public ui::WindowImplBase
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
     MainForm();
     virtual ~MainForm() override;
@@ -39,15 +40,19 @@ protected:
     * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
-    virtual LRESULT OnKeyDownMsg(ui::VirtualKeyCode vkCode, uint32_t modifierKey, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnKeyDownMsg(
+        ui::VirtualKeyCode vkCode,
+        uint32_t modifierKey,
+        const ui::NativeMsg &nativeMsg,
+        bool &bHandled) override;
 
 private:
-    bool OnClicked(const ui::EventArgs& msg);
-    bool OnNavigate(const ui::EventArgs& msg);
+    bool OnClicked(const ui::EventArgs &msg);
+    bool OnNavigate(const ui::EventArgs &msg);
 
 private:
-    ui::WebView2Control* m_pWebView2Control;
-    ui::RichEdit* m_pEditUrl;
+    ui::WebView2Control *m_pWebView2Control;
+    ui::RichEdit *m_pEditUrl;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

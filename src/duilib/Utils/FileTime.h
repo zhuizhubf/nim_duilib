@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui
-{
+namespace ui {
 /** 文件时间类
 */
 class DUILIB_API FileTime
@@ -18,7 +17,7 @@ public:
     /** 从Windows FILETIME转换
     * @param [in] ft Windows平台的文件时间，从‌1601年1月1日UTC‌开始计算，单位为100纳秒
     */
-    void FromFileTime(const FILETIME& ft);
+    void FromFileTime(const FILETIME &ft);
 
     /** 转换为Windows FILETIME
     */

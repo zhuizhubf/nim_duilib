@@ -3,12 +3,11 @@
 
 #include "third_party/xml/pugixml.hpp"
 
-#include <sstream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
-namespace ui
-{
+namespace ui {
 
 ThemeGenerator::ThemeGenerator()
     : m_hue(143.24)
@@ -38,12 +37,9 @@ ThemeGenerator::ThemeGenerator()
     , m_bgColored(true)
     , m_fgColored(true)
     , m_surfaceColored(true)
-{
-}
+{}
 
-ThemeGenerator::~ThemeGenerator()
-{
-}
+ThemeGenerator::~ThemeGenerator() {}
 
 void ThemeGenerator::SetBgParams(double bgLightL, double bgDarkL, double bgBaseChroma)
 {
@@ -59,7 +55,8 @@ void ThemeGenerator::SetFgParams(double fgLightL, double fgDarkL, double fgBaseC
     m_fgBaseChroma = fgBaseChroma;
 }
 
-void ThemeGenerator::SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma)
+void ThemeGenerator::SetSurfaceParams(
+    double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma)
 {
     m_surfaceLightOffset = surfaceLightOffset;
     m_surfaceDarkOffset = surfaceDarkOffset;
@@ -73,28 +70,29 @@ void ThemeGenerator::SetAccentParams(double accentLightL, double accentDarkL, do
     m_accentC = accentC;
 }
 
-void ThemeGenerator::GetBgParams(double& bgLightL, double& bgDarkL, double& bgBaseChroma) const
+void ThemeGenerator::GetBgParams(double &bgLightL, double &bgDarkL, double &bgBaseChroma) const
 {
     bgLightL = m_bgLightL;
     bgDarkL = m_bgDarkL;
     bgBaseChroma = m_bgBaseChroma;
 }
 
-void ThemeGenerator::GetFgParams(double& fgLightL, double& fgDarkL, double& fgBaseChroma) const
+void ThemeGenerator::GetFgParams(double &fgLightL, double &fgDarkL, double &fgBaseChroma) const
 {
     fgLightL = m_fgLightL;
     fgDarkL = m_fgDarkL;
     fgBaseChroma = m_fgBaseChroma;
 }
 
-void ThemeGenerator::GetSurfaceParams(double& surfaceLightOffset, double& surfaceDarkOffset, double& surfaceBaseChroma) const
+void ThemeGenerator::GetSurfaceParams(
+    double &surfaceLightOffset, double &surfaceDarkOffset, double &surfaceBaseChroma) const
 {
     surfaceLightOffset = m_surfaceLightOffset;
     surfaceDarkOffset = m_surfaceDarkOffset;
     surfaceBaseChroma = m_surfaceBaseChroma;
 }
 
-void ThemeGenerator::GetAccentParams(double& accentLightL, double& accentDarkL, double& accentC) const
+void ThemeGenerator::GetAccentParams(double &accentLightL, double &accentDarkL, double &accentC) const
 {
     accentLightL = m_accentLightL;
     accentDarkL = m_accentDarkL;
@@ -154,8 +152,7 @@ std::string ThemeGenerator::GetBackgroundColor(double hue, double base, bool isD
     double bgL;
     if (isDark) {
         bgL = m_bgDarkL + base * m_bgDarkLScale;
-    }
-    else {
+    } else {
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
@@ -171,8 +168,7 @@ std::string ThemeGenerator::GetForegroundColor(double hue, double base, bool isD
     double fgL;
     if (isDark) {
         fgL = m_fgDarkL + base * m_fgDarkLScale;
-    }
-    else {
+    } else {
         fgL = m_fgLightL + base * m_fgLightLScale;
     }
 
@@ -188,8 +184,7 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     double bgL;
     if (isDark) {
         bgL = m_bgDarkL + base * m_bgDarkLScale;
-    }
-    else {
+    } else {
         bgL = m_bgLightL + base * m_bgLightLScale;
     }
 
@@ -201,7 +196,8 @@ std::string ThemeGenerator::GetSurfaceColor(double hue, double base, bool isDark
     return ColorConverter::OKLCHToARGB(sfL, surfaceChroma, effectiveHue, 255);
 }
 
-std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const
+std::string ThemeGenerator::GetStateColor(
+    const std::string &baseColor, const std::string &state, bool isDark) const
 {
     if (baseColor.empty()) {
         return baseColor;
@@ -220,49 +216,41 @@ std::string ThemeGenerator::GetStateColor(const std::string& baseColor, const st
     if (state == "hovered") {
         if (!isDark) {
             L = std::max(0.0, std::min(1.0, L - 0.06));
-        }
-        else {
+        } else {
             L = std::max(0.0, std::min(1.0, L + 0.06));
         }
-    }
-    else if (state == "pressed") {
+    } else if (state == "pressed") {
         if (!isDark) {
             L = std::max(0.0, std::min(1.0, L - 0.10));
-        }
-        else {
+        } else {
             L = std::max(0.0, std::min(1.0, L + 0.10));
         }
-    }
-    else if (state == "selected") {
+    } else if (state == "selected") {
         if (!isDark) {
             L = std::max(0.0, std::min(1.0, L - 0.09));
-        }
-        else {
+        } else {
             L = std::max(0.0, std::min(1.0, L + 0.09));
         }
-    }
-    else if ((state == "disabled") || (state == "prompt")) {
+    } else if ((state == "disabled") || (state == "prompt")) {
         if (!isDark) {
             L = std::max(0.0, std::min(1.0, L + 0.05));
             C = std::max(0.0, C - 0.4);
-        }
-        else {
+        } else {
             L = std::max(0.0, std::min(1.0, L - 0.05));
             C = std::max(0.0, C - 0.2);
         }
-    }
-    else if (state == "focused") {
+    } else if (state == "focused") {
         //强调色
         return GetGeneratedColor("--accent");
-    }
-    else {
+    } else {
         return baseColor;
     }
 
     return ColorConverter::OKLCHToARGB(L, C, H, alpha);
 }
 
-std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const
+std::string ThemeGenerator::ApplyAdjustments(
+    const std::string &baseColor, const std::string &adjustStr) const
 {
     // 非法颜色或公式为空时直接返回原颜色
     if (baseColor.empty() || adjustStr.empty()) {
@@ -291,11 +279,13 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
     while (std::getline(adjustStream, adjustment, ',')) {
         // 去除首尾空白
         size_t start = adjustment.find_first_not_of(" \t");
-        if (start == std::string::npos) continue;
+        if (start == std::string::npos)
+            continue;
         size_t end = adjustment.find_last_not_of(" \t");
         adjustment = adjustment.substr(start, end - start + 1);
 
-        if (adjustment.empty()) continue;
+        if (adjustment.empty())
+            continue;
 
         // 解析属性名（lightness / saturation / hue / alpha / invert）
         // 和运算符（+ / - / * / =）以及百分比数值
@@ -335,13 +325,13 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
                     }
                 }
             }
-        }
-        else {
+        } else {
             // 没有冒号，可能是 "invert" 这样的无值属性
             property = adjustment;
         }
 
-        if (property.empty()) continue;
+        if (property.empty())
+            continue;
 
         // invert 是无参数操作，直接反转 RGB 三通道
         if (property == "invert") {
@@ -358,8 +348,7 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
         if (!valueStr.empty()) {
             try {
                 percent = std::stod(valueStr);
-            }
-            catch (...) {
+            } catch (...) {
                 continue;
             }
         }
@@ -372,45 +361,74 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
             // 亮度：0~100% → 内部 0~1
             double newValue = l;
             switch (op) {
-                case '+': newValue = l + delta; break;
-                case '-': newValue = l - delta; break;
-                case '*': newValue = l * delta; break;
-                case '=': newValue = delta; break;
+            case '+':
+                newValue = l + delta;
+                break;
+            case '-':
+                newValue = l - delta;
+                break;
+            case '*':
+                newValue = l * delta;
+                break;
+            case '=':
+                newValue = delta;
+                break;
             }
             l = std::max(0.0, std::min(1.0, newValue));
-        }
-        else if (property == "saturation") {
+        } else if (property == "saturation") {
             // 饱和度：0~100% → 内部 0~1
             double newValue = s;
             switch (op) {
-                case '+': newValue = s + delta; break;
-                case '-': newValue = s - delta; break;
-                case '*': newValue = s * delta; break;
-                case '=': newValue = delta; break;
+            case '+':
+                newValue = s + delta;
+                break;
+            case '-':
+                newValue = s - delta;
+                break;
+            case '*':
+                newValue = s * delta;
+                break;
+            case '=':
+                newValue = delta;
+                break;
             }
             s = std::max(0.0, std::min(1.0, newValue));
-        }
-        else if (property == "alpha") {
+        } else if (property == "alpha") {
             // 透明度：0~100% → 内部 0~1
             double newValue = currentAlpha;
             switch (op) {
-                case '+': newValue = currentAlpha + delta; break;
-                case '-': newValue = currentAlpha - delta; break;
-                case '*': newValue = currentAlpha * delta; break;
-                case '=': newValue = delta; break;
+            case '+':
+                newValue = currentAlpha + delta;
+                break;
+            case '-':
+                newValue = currentAlpha - delta;
+                break;
+            case '*':
+                newValue = currentAlpha * delta;
+                break;
+            case '=':
+                newValue = delta;
+                break;
             }
             currentAlpha = std::max(0.0, std::min(1.0, newValue));
-        }
-        else if (property == "hue") {
+        } else if (property == "hue") {
             // 色相：0~100% → 内部 0~360
             // 公式 0~100% → 内部映射为 0~360°
             double hueNormalized = h / 360.0;
             double newValue = hueNormalized;
             switch (op) {
-                case '+': newValue = hueNormalized + delta; break;
-                case '-': newValue = hueNormalized - delta; break;
-                case '*': newValue = hueNormalized * delta; break;
-                case '=': newValue = delta; break;
+            case '+':
+                newValue = hueNormalized + delta;
+                break;
+            case '-':
+                newValue = hueNormalized - delta;
+                break;
+            case '*':
+                newValue = hueNormalized * delta;
+                break;
+            case '=':
+                newValue = delta;
+                break;
             }
             // 强制夹紧到 [0, 1)
             newValue = std::max(0.0, std::min(0.999999, newValue));
@@ -429,10 +447,19 @@ std::string ThemeGenerator::ApplyAdjustments(const std::string& baseColor, const
     return ColorConverter::RGBToHex(finalAlpha, finalR, finalG, finalB);
 }
 
-std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::string& colorName) const
+std::pair<std::string, std::string> ThemeGenerator::DetectColorState(
+    const std::string &colorName) const
 {
-    std::vector<std::string> states = {"_default", "_normal", "_disabled", "_pressed", "_hovered", "_selected", "_prompt" , "_focused" };
-    for (const auto& state : states) {
+    std::vector<std::string> states
+        = {"_default",
+           "_normal",
+           "_disabled",
+           "_pressed",
+           "_hovered",
+           "_selected",
+           "_prompt",
+           "_focused"};
+    for (const auto &state : states) {
         size_t pos = colorName.rfind(state);
         if (pos != std::string::npos) {
             std::string baseName = colorName.substr(0, pos);
@@ -443,7 +470,8 @@ std::pair<std::string, std::string> ThemeGenerator::DetectColorState(const std::
     return std::make_pair("", colorName);
 }
 
-std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast) const
+std::string ThemeGenerator::EnsureContrast(
+    const std::string &textColor, const std::string &bgColor, double minContrast) const
 {
     uint8_t alpha, r, g, b;
     if (!ColorConverter::ParseHexColor(textColor, alpha, r, g, b)) {
@@ -485,12 +513,16 @@ std::string ThemeGenerator::EnsureContrast(const std::string& textColor, const s
         L = L + LStep;
 
         // 钳制到 [0, 1] 范围
-        if (L < 0.0) L = 0.0;
-        if (L > 1.0) L = 1.0;
+        if (L < 0.0)
+            L = 0.0;
+        if (L > 1.0)
+            L = 1.0;
 
         // 如果已经达到目标方向极端值，停止迭代
-        if (bgIsLight && L <= 0.0) break;
-        if (!bgIsLight && L >= 1.0) break;
+        if (bgIsLight && L <= 0.0)
+            break;
+        if (!bgIsLight && L >= 1.0)
+            break;
 
         std::string testColor = ColorConverter::OKLCHToARGB(L, C, H, alpha);
         contrast = ColorConverter::CalculateContrastRatio(testColor, bgColor);
@@ -569,17 +601,18 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     m_generatedColors["--foreground"] = foregroundColor;         //窗口的前景色
     m_generatedColors["--accent"] = accentColor;                 //强调色
     m_generatedColors["--accent_foreground"] = accentForeground; //强调色的前景色
-    m_generatedColors["--success"] = ColorConverter::OKLCHToARGB(0.65, 0.16, 152, 255);  // 成功色
-    m_generatedColors["--warning"] = ColorConverter::OKLCHToARGB(0.68, 0.18, 80, 255);   // 警告色
-    m_generatedColors["--error"] = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255);     // 失败/错误/危险色
+    m_generatedColors["--success"] = ColorConverter::OKLCHToARGB(0.65, 0.16, 152, 255); // 成功色
+    m_generatedColors["--warning"] = ColorConverter::OKLCHToARGB(0.68, 0.18, 80, 255);  // 警告色
+    m_generatedColors["--error"]
+        = ColorConverter::OKLCHToARGB(0.65, 0.18, 25, 255); // 失败/错误/危险色
 
     // =========================================================================
     // 筛选出需要处理的颜色（去除基础色/派生色/固定色）
     // =========================================================================
     std::map<std::string, ThemeColorConfig> generatedConfigs;
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
-        const ThemeColorConfig& attrs = pair.second;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
+        const ThemeColorConfig &attrs = pair.second;
         if (attrs.fixed) {
             //固定属性，不需要生成颜色
             //continue;
@@ -598,40 +631,35 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
             if ((attrs.m_state == "normal") || (attrs.m_state == "default")) {
                 generatedConfigs[colorName] = attrs; //仅保留正常状态的颜色值
             }
-        }
-        else {
+        } else {
             generatedConfigs[colorName] = attrs;
         }
     }
 
     // 根据规则生成颜色(对于含有状态的颜色，只生成BaseName的颜色值)
-    for (const auto& pair : generatedConfigs) {
-        const std::string& colorName = pair.first;
-        const ThemeColorConfig& attrs = pair.second;
+    for (const auto &pair : generatedConfigs) {
+        const std::string &colorName = pair.first;
+        const ThemeColorConfig &attrs = pair.second;
         std::string colorValue;
         if (attrs.support_accent) {
             //支持强调色的，使用强调色
             colorValue = accentColor;
-        }
-        else if (attrs.category == "bg_color") {
+        } else if (attrs.category == "bg_color") {
             //未明确分类的背景色，默认使用主窗口背景
             colorValue = windowBg;
-        }
-        else if (attrs.category == "border_color") {
+        } else if (attrs.category == "border_color") {
             //未明确分类的边框色，使用等级4
             colorValue = surface4;
-        }
-        else if (attrs.category == "text_color") {
+        } else if (attrs.category == "text_color") {
             //文本颜色使用前景色
             colorValue = foregroundColor;
         }
         if (!colorValue.empty()) {
             if (!attrs.m_state.empty()) {
                 m_generatedColors[attrs.m_baseName] = colorValue;
-            }
-            else {
+            } else {
                 m_generatedColors[colorName] = colorValue;
-            }            
+            }
         }
     }
 
@@ -677,7 +705,6 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     // 等级4：通用容器面板 Panel/Widget, GroupBox内部区域
     m_generatedColors["bg_header"] = surface4;
 
-
     // 等级5：按钮、Switch、Progress、Slider、ComboBox整体、StatusBar
     m_generatedColors["bg_btn_window"] = surface5;
     m_generatedColors["bg_btn"] = surface5;
@@ -710,7 +737,7 @@ void ThemeGenerator::GenerateThemeColors(double hue, double base, bool isDark)
     ASSERT_UNUSED_VARIABLE(nGeneratedColorsCount == m_generatedColors.size());
 }
 
-std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) const
+std::string ThemeGenerator::GetGeneratedColor(const std::string &colorName) const
 {
     auto iter = m_generatedColors.find(colorName);
     if (iter != m_generatedColors.end()) {
@@ -719,7 +746,7 @@ std::string ThemeGenerator::GetGeneratedColor(const std::string& colorName) cons
     return std::string();
 }
 
-bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
+bool ThemeGenerator::LoadConfigFromXml(const std::string &inputXml)
 {
     ASSERT(!inputXml.empty());
     if (inputXml.empty()) {
@@ -732,8 +759,7 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
         //按文件数据加载
         m_originalXmlContent = inputXml; // 保存原始XML内容，用于后续精确替换value值
         result = doc.load_buffer(inputXml.c_str(), inputXml.size());
-    }
-    else {
+    } else {
         //按文件路径加载
         // 保存原始XML内容，用于后续精确替换value值
         std::ifstream file(inputXml, std::ios::binary);
@@ -767,33 +793,43 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string& inputXml)
         DString nodeName = child.name();
 
         if (nodeName == _T("Theme")) {
-            m_themeMeta.properties["theme_name"] = StringConvert::TToUTF8(child.attribute(_T("name")).as_string());
-            m_themeMeta.properties["theme_type"] = StringConvert::TToUTF8(child.attribute(_T("type")).as_string());
-            m_themeMeta.properties["theme_style"] = StringConvert::TToUTF8(child.attribute(_T("style")).as_string());
-        }
-        else if (nodeName == _T("ThemeMeta")) {
+            m_themeMeta.properties["theme_name"] = StringConvert::TToUTF8(
+                child.attribute(_T("name")).as_string());
+            m_themeMeta.properties["theme_type"] = StringConvert::TToUTF8(
+                child.attribute(_T("type")).as_string());
+            m_themeMeta.properties["theme_style"] = StringConvert::TToUTF8(
+                child.attribute(_T("style")).as_string());
+        } else if (nodeName == _T("ThemeMeta")) {
             for (pugi::xml_node prop : child.children()) {
                 if (DString(prop.name()) == _T("Property")) {
-                    std::string propName = StringConvert::TToUTF8(prop.attribute(_T("name")).as_string());
-                    std::string propValue = StringConvert::TToUTF8(prop.attribute(_T("value")).as_string());
+                    std::string propName = StringConvert::TToUTF8(
+                        prop.attribute(_T("name")).as_string());
+                    std::string propValue = StringConvert::TToUTF8(
+                        prop.attribute(_T("value")).as_string());
                     m_themeMeta.properties[propName] = propValue;
                 }
             }
-        }
-        else if (nodeName == _T("ThemeColor")) {
+        } else if (nodeName == _T("ThemeColor")) {
             ThemeColorConfig config;
             config.name = StringConvert::TToUTF8(child.attribute(_T("name")).as_string());
             config.value = StringConvert::TToUTF8(child.attribute(_T("value")).as_string());
             config.type = StringConvert::TToUTF8(child.attribute(_T("type")).as_string());
             config.category = StringConvert::TToUTF8(child.attribute(_T("category")).as_string());
             config.role = StringConvert::TToUTF8(child.attribute(_T("role")).as_string());
-            config.derived_from = StringConvert::TToUTF8(child.attribute(_T("derived_from")).as_string());
+            config.derived_from = StringConvert::TToUTF8(
+                child.attribute(_T("derived_from")).as_string());
             config.adjust = StringConvert::TToUTF8(child.attribute(_T("adjust")).as_string());
-            config.fixed = (DString(child.attribute(_T("fixed")).as_string(_T("false"))) == _T("true"));
-            config.support_accent = (DString(child.attribute(_T("support_accent")).as_string(_T("false"))) == _T("true"));
-            config.contrast_bg = StringConvert::TToUTF8(child.attribute(_T("contrast_bg")).as_string());
-            config.comment_cn = StringConvert::TToUTF8(child.attribute(_T("comment_cn")).as_string());
-            config.comment_en = StringConvert::TToUTF8(child.attribute(_T("comment_en")).as_string());
+            config.fixed
+                = (DString(child.attribute(_T("fixed")).as_string(_T("false"))) == _T("true"));
+            config.support_accent
+                = (DString(child.attribute(_T("support_accent")).as_string(_T("false")))
+                   == _T("true"));
+            config.contrast_bg = StringConvert::TToUTF8(
+                child.attribute(_T("contrast_bg")).as_string());
+            config.comment_cn = StringConvert::TToUTF8(
+                child.attribute(_T("comment_cn")).as_string());
+            config.comment_en = StringConvert::TToUTF8(
+                child.attribute(_T("comment_en")).as_string());
             config.node_order = orderIndex++;
 
             std::pair<std::string, std::string> statePair = DetectColorState(config.name);
@@ -824,8 +860,8 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     std::map<std::string, std::string> processedColors;
 
     // 优先使用生成的核心颜色
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
         auto iter = m_generatedColors.find(colorName);
         if (iter != m_generatedColors.end()) {
             processedColors[colorName] = iter->second;
@@ -833,8 +869,8 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     }
 
     // 第1步：处理所有颜色配置的变体颜色
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
 
         //已经生成的，不重复计算
         auto iter = processedColors.find(colorName);
@@ -845,11 +881,10 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         //处理状态变体颜色
         auto [state, baseName] = DetectColorState(colorName);
         if (!state.empty()) {
-            std::string baseColor;//基准色（用于计算状态变体颜色）
+            std::string baseColor; //基准色（用于计算状态变体颜色）
             if (processedColors.find(baseName) != processedColors.end()) {
                 baseColor = processedColors[baseName];
-            }
-            else if (m_generatedColors.find(baseName) != m_generatedColors.end()) {
+            } else if (m_generatedColors.find(baseName) != m_generatedColors.end()) {
                 baseColor = m_generatedColors.find(baseName)->second;
             }
             if (!baseColor.empty()) {
@@ -859,9 +894,9 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     }
 
     //第2步：处理派生颜色
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
-        const ThemeColorConfig& attrs = pair.second;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
+        const ThemeColorConfig &attrs = pair.second;
 
         std::string derivedFrom = attrs.derived_from;
         if (derivedFrom.empty()) {
@@ -870,11 +905,10 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
         }
 
         //处理派生颜色
-        std::string baseColor;//基准色（用于计算派生颜色）
+        std::string baseColor; //基准色（用于计算派生颜色）
         if (processedColors.find(derivedFrom) != processedColors.end()) {
             baseColor = processedColors[derivedFrom];
-        }
-        else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
+        } else if (m_generatedColors.find(derivedFrom) != m_generatedColors.end()) {
             baseColor = m_generatedColors.find(derivedFrom)->second;
         }
         if (baseColor.empty()) {
@@ -882,8 +916,7 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
             if (!derivedFromState.empty()) {
                 if (processedColors.find(derivedFromBaseName) != processedColors.end()) {
                     baseColor = processedColors[derivedFromBaseName];
-                }
-                else if (m_generatedColors.find(derivedFromBaseName) != m_generatedColors.end()) {
+                } else if (m_generatedColors.find(derivedFromBaseName) != m_generatedColors.end()) {
                     baseColor = m_generatedColors.find(derivedFromBaseName)->second;
                 }
             }
@@ -893,16 +926,15 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
             std::string adjust = attrs.adjust;
             if (!adjust.empty()) {
                 processedColors[colorName] = ApplyAdjustments(baseColor, adjust);
-            }
-            else {
+            } else {
                 processedColors[colorName] = baseColor;
             }
         }
     }
 
     // 第3步：保留原颜色的透明度
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
         auto iter = processedColors.find(colorName);
         if (iter != processedColors.end()) {
             std::string oldColor = pair.second.value;
@@ -923,21 +955,21 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
 
     // 第4步：对比度检查和修正
     // 对所有processedColors中的颜色进行检查（只要在loadedConfigs中配置了contrast_bg）
-    for (const auto& pair : processedColors) {
-        const std::string& colorName = pair.first;
+    for (const auto &pair : processedColors) {
+        const std::string &colorName = pair.first;
 
         auto itLoaded = m_loadedConfigs.find(colorName);
         if (itLoaded == m_loadedConfigs.end()) {
             continue;
         }
 
-        const ThemeColorConfig& attrs = itLoaded->second;
+        const ThemeColorConfig &attrs = itLoaded->second;
         if (attrs.contrast_bg.empty()) {
             continue;
         }
 
         std::list<std::string> contrastBgList = StringUtil::Split(attrs.contrast_bg, ",");
-        for (std::string& contrastBg : contrastBgList) {
+        for (std::string &contrastBg : contrastBgList) {
             StringUtil::Trim(contrastBg);
             if (!contrastBg.empty()) {
                 auto itBg = processedColors.find(contrastBg);
@@ -958,8 +990,8 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     processedColors["bg_split_disabled"] = GetGeneratedColor("--surface_4");
 
     // 第5步：补充缺失的颜色
-    for (const auto& pair : m_loadedConfigs) {
-        const std::string& colorName = pair.first;
+    for (const auto &pair : m_loadedConfigs) {
+        const std::string &colorName = pair.first;
         if (processedColors.find(colorName) == processedColors.end()) {
             processedColors[colorName] = pair.second.value;
         }
@@ -968,9 +1000,9 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     // 第6步：精确替换原始XML中的value值（保持原始格式和顺序）
     std::string result = m_originalXmlContent;
 
-    for (const auto& pair : processedColors) {
-        const std::string& colorName = pair.first;
-        const std::string& newValue = pair.second;
+    for (const auto &pair : processedColors) {
+        const std::string &colorName = pair.first;
+        const std::string &newValue = pair.second;
 
         if (colorName.empty() || newValue.empty()) {
             continue;
@@ -998,4 +1030,4 @@ std::string ThemeGenerator::GenerateThemeXml(bool isDark) const
     return result;
 }
 
-}
+} // namespace ui

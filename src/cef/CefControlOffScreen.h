@@ -10,10 +10,9 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-namespace client
-{
-    class OsrImeHandlerWin;
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+namespace client {
+class OsrImeHandlerWin;
 }
 #endif
 
@@ -23,18 +22,19 @@ class CefMemoryBlock;
 
 /** duilib的CEF控件，离屏渲染模式
 */
-class DUILIB_API CefControlOffScreen :public CefControl
+class DUILIB_API CefControlOffScreen : public CefControl
 {
     typedef CefControl BaseClass;
+
 public:
-    explicit CefControlOffScreen(ui::Window* pWindow);
+    explicit CefControlOffScreen(ui::Window *pWindow);
     virtual ~CefControlOffScreen(void) override;
 
     /// 重写父类接口，提供个性化功能
     virtual void Init() override;
     virtual void SetPos(UiRect rc) override;
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
-    virtual void SetWindow(Window* pWindow) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
+    virtual void SetWindow(Window *pWindow) override;
 
     /** 是否为CEF的离屏渲染控件
     */
@@ -57,45 +57,49 @@ protected:
     /** 重新创建Browser控件
     */
     virtual void ReCreateBrowser() override;
-    virtual void OnImeCompositionRangeChanged(CefRefPtr<CefBrowser> browser, const CefRange& selected_range, const std::vector<CefRect>& character_bounds) override;
+    virtual void OnImeCompositionRangeChanged(
+        CefRefPtr<CefBrowser> browser,
+        const CefRange &selected_range,
+        const std::vector<CefRect> &character_bounds) override;
 
     /** 焦点元素发生变化（在主线程中调用）
     */
-    virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
-                                      CefRefPtr<CefFrame> frame,
-                                      CefDOMNode::Type type,
-                                      bool bText,
-                                      bool bEditable,
-                                      const CefRect& nodeRect) override;
+    virtual void OnFocusedNodeChanged(
+        CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        CefDOMNode::Type type,
+        bool bText,
+        bool bEditable,
+        const CefRect &nodeRect) override;
 
     /** 设置光标(仅离屏渲染模式有效)
     */
     virtual void OnCursorChange(cef_cursor_type_t type) override;
 
     //光标消息
-    virtual bool OnSetCursor(const EventArgs& msg) override;
+    virtual bool OnSetCursor(const EventArgs &msg) override;
 
     //控件所属窗口的鼠标捕获丢失
-    virtual bool OnCaptureChanged(const EventArgs& msg) override;
+    virtual bool OnCaptureChanged(const EventArgs &msg) override;
 
     //鼠标消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
-    virtual bool MouseMove(const EventArgs& msg) override;
-    virtual bool MouseLeave(const EventArgs& msg) override;
-    virtual bool MouseWheel(const EventArgs& msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
+    virtual bool MouseLeave(const EventArgs &msg) override;
+    virtual bool MouseWheel(const EventArgs &msg) override;
 
-    virtual bool ButtonDown(const EventArgs& msg) override;
-    virtual bool ButtonUp(const EventArgs& msg) override;
-    virtual bool ButtonDoubleClick(const EventArgs& msg) override;
-    virtual bool RButtonDown(const EventArgs& msg) override;
-    virtual bool RButtonUp(const EventArgs& msg) override;
-    virtual bool RButtonDoubleClick(const EventArgs& msg) override;
-    virtual bool MButtonDown(const EventArgs& msg) override;
-    virtual bool MButtonUp(const EventArgs& msg) override;
-    virtual bool MButtonDoubleClick(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
+    virtual bool ButtonUp(const EventArgs &msg) override;
+    virtual bool ButtonDoubleClick(const EventArgs &msg) override;
+    virtual bool RButtonDown(const EventArgs &msg) override;
+    virtual bool RButtonUp(const EventArgs &msg) override;
+    virtual bool RButtonDoubleClick(const EventArgs &msg) override;
+    virtual bool MButtonDown(const EventArgs &msg) override;
+    virtual bool MButtonUp(const EventArgs &msg) override;
+    virtual bool MButtonDoubleClick(const EventArgs &msg) override;
 
     //焦点相关消息处理
-    virtual bool OnSetFocus(const EventArgs& msg) override;
-    virtual bool OnKillFocus(const EventArgs& msg) override;
+    virtual bool OnSetFocus(const EventArgs &msg) override;
+    virtual bool OnKillFocus(const EventArgs &msg) override;
 
     //键盘消息（返回true：表示消息已处理；返回false：则表示消息未处理，需转发给父控件）
     /** 文本字符输入消息
@@ -110,40 +114,39 @@ protected:
     *                   text = (DStringW::value_type*)msg.wParam;
     *               }
     */
-    virtual bool OnChar(const EventArgs& msg) override;
-    virtual bool OnKeyDown(const EventArgs& msg) override;
-    virtual bool OnKeyUp(const EventArgs& msg) override;
+    virtual bool OnChar(const EventArgs &msg) override;
+    virtual bool OnKeyDown(const EventArgs &msg) override;
+    virtual bool OnKeyUp(const EventArgs &msg) override;
 
     //输入法相关消息处理
-    virtual bool OnImeSetContext(const EventArgs& msg) override;
-    virtual bool OnImeStartComposition(const EventArgs& msg) override;
-    virtual bool OnImeComposition(const EventArgs& msg) override;
-    virtual bool OnImeEndComposition(const EventArgs& msg) override;
+    virtual bool OnImeSetContext(const EventArgs &msg) override;
+    virtual bool OnImeStartComposition(const EventArgs &msg) override;
+    virtual bool OnImeComposition(const EventArgs &msg) override;
+    virtual bool OnImeEndComposition(const EventArgs &msg) override;
 
     /** 页面获得了焦点
     */
     virtual void OnGotFocus() override;
 
 private:
-    void SendButtonDownEvent(const EventArgs& msg);
-    void SendButtonUpEvent(const EventArgs& msg);
-    void SendButtonDoubleClickEvent(const EventArgs& msg);
+    void SendButtonDownEvent(const EventArgs &msg);
+    void SendButtonUpEvent(const EventArgs &msg);
+    void SendButtonDoubleClickEvent(const EventArgs &msg);
 
     /** @brief 转换普通鼠标消息到 CEF 可识别的鼠标消息
      * @param [in] msg 消息
      * @return 返回转换后的结果
      */
-    int32_t GetCefMouseModifiers(const EventArgs& msg) const;
+    int32_t GetCefMouseModifiers(const EventArgs &msg) const;
 
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
     /** 转发键盘相关消息到 BrowserHost
     */
-    void SendKeyEvent(const EventArgs& msg, cef_key_event_type_t type);
+    void SendKeyEvent(const EventArgs &msg, cef_key_event_type_t type);
 #endif
 
 protected:
-
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     /** 转发键盘相关消息到 BrowserHost
      * @param[in] uMsg 消息
      * @param[in] wParam 消息附加参数
@@ -151,7 +154,7 @@ protected:
      * @param[out] bHandled 是否继续传递消息
      * @return 返回消息处理结果
      */
-    LRESULT SendKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    LRESULT SendKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled);
 
     /** 输入法相关的消息处理
     */
@@ -173,23 +176,28 @@ private:
         并且通知窗体刷新控件，在控件的Paint函数里把内存dc的位图画到窗体上
         由此实现离屏渲染数据画到窗体上
     */
-    virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
-                         const CefRenderHandler::RectList& dirtyRects, const void* buffer,
-                         int width, int height) override;//CefRenderHandler接口
-    virtual void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override;//CefRenderHandler接口
-    virtual void OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) override;//CefRenderHandler接口
+    virtual void OnPaint(
+        CefRefPtr<CefBrowser> browser,
+        CefRenderHandler::PaintElementType type,
+        const CefRenderHandler::RectList &dirtyRects,
+        const void *buffer,
+        int width,
+        int height) override; //CefRenderHandler接口
+    virtual void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override; //CefRenderHandler接口
+    virtual void OnPopupSize(
+        CefRefPtr<CefBrowser> browser, const CefRect &rect) override; //CefRenderHandler接口
 
     /** 客户区坐标转换为控件坐标
     */
-    virtual void ClientToControl(UiPoint& pt) override;
+    virtual void ClientToControl(UiPoint &pt) override;
 
     /** 处理DPI自适应（离屏渲染模式与正常模式不同）
     */
-    void AdaptDpiScale(CefMouseEvent& mouse_event);
+    void AdaptDpiScale(CefMouseEvent &mouse_event);
 
     /** 处理焦点元素变化事件
     */
-    void OnFocusedNodeChanged(bool bEditable, const CefRect& nodeRect);
+    void OnFocusedNodeChanged(bool bEditable, const CefRect &nodeRect);
 
 private:
     // 页面绘制的内存数据,把cef离屏渲染的数据保存到缓存中
@@ -205,7 +213,7 @@ private:
     //焦点元素的属性
     CefRect m_focusNodeRect;
     bool m_bHasFocusNode;
-    bool m_bFocusNodeEditable;    
+    bool m_bFocusNodeEditable;
 
     /** 当前是否处于OnGotFocus回调函数中
     */

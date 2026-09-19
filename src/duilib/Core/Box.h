@@ -1,26 +1,26 @@
 #ifndef UI_CORE_BOX_H_
 #define UI_CORE_BOX_H_
 
-#include "duilib/Layout/Layout.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Layout/Layout.h"
 
-namespace ui 
-{
+namespace ui {
 /** 容器基类(Container)
 */
 class DUILIB_API Box : public Control
 {
     typedef Control BaseClass;
+
 public:
-    explicit Box(Window* pWindow, Layout* pLayout = new Layout());
-    Box(const Box& r) = delete;
-    Box& operator=(const Box& r) = delete;
+    explicit Box(Window *pWindow, Layout *pLayout = new Layout());
+    Box(const Box &r) = delete;
+    Box &operator=(const Box &r) = delete;
     virtual ~Box() override;
 
 public:
     /** 无效的子项索引
     */
-    static constexpr auto InvalidIndex{ static_cast<size_t>(-1) };
+    static constexpr auto InvalidIndex{static_cast<size_t>(-1)};
 
     /** @brief 是否为有效的子控件索引
     */
@@ -29,14 +29,17 @@ public:
 public:
     /// 重写父类接口，提供个性化功能。方法具体说明请查看 Control 控件
     virtual DString GetType() const override;
-    virtual void SetParent(Box* pParent) override;
-    virtual void SetWindow(Window* pWindow) override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) override;
-    virtual void PaintFocusRect(IRender* pRender) override;
-    virtual Control* FindControl(FINDCONTROLPROC Proc, void* pProcData, uint32_t uFlags,
-                                 const UiPoint& ptMouse = UiPoint(),
-                                 const UiPoint& scrollPos = UiPoint()) override;
+    virtual void SetParent(Box *pParent) override;
+    virtual void SetWindow(Window *pWindow) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
+    virtual void PaintFocusRect(IRender *pRender) override;
+    virtual Control *FindControl(
+        FINDCONTROLPROC Proc,
+        void *pProcData,
+        uint32_t uFlags,
+        const UiPoint &ptMouse = UiPoint(),
+        const UiPoint &scrollPos = UiPoint()) override;
     virtual void ClearImageCache() override;
     virtual uint32_t GetControlFlags() const override;
 
@@ -89,39 +92,39 @@ public:
     /** 根据索引查找指定控件
      * @param[in] iIndex 控件索引
      */
-    virtual Control* GetItemAt(size_t iIndex) const;
+    virtual Control *GetItemAt(size_t iIndex) const;
 
     /** 根据控件指针获取索引
      * @param[in] pControl 控件指针
      * @return 返回 pControl 所指向的控件索引, 如果没找到，则返回 Box::InvalidIndex
      */
-    virtual size_t GetItemIndex(Control* pControl) const;
+    virtual size_t GetItemIndex(Control *pControl) const;
 
     /** 设置控件索引（内部会重新排列控件位置）
      * @param[in] pControl 控件指针
      * @param[in] iIndex 要设置的索引值
      * @return 返回 true 设置成功，false 设置失败
      */
-    virtual bool SetItemIndex(Control* pControl, size_t iIndex);
+    virtual bool SetItemIndex(Control *pControl, size_t iIndex);
 
     /** 添加一个控件到容器中
      * @param[in] pControl 控件指针
      * @return 返回 true 添加成功，false 为添加失败
      */
-    virtual bool AddItem(Control* pControl);
+    virtual bool AddItem(Control *pControl);
 
     /** 向指定位置添加一个控件
      * @param[in] pControl 控件指针
      * @param[in] iIndex 在该索引之后插入控件
      * @return 返回 true 为添加成功，false 为添加失败
      */
-    virtual bool AddItemAt(Control* pControl, size_t iIndex);
+    virtual bool AddItemAt(Control *pControl, size_t iIndex);
 
     /** 根据控件指针从容器中移除一个控件
      * @param[in] pControl 控件的指针
      * @return 返回 true 为移除成功，false 为移除失败（控件可能不存在）
      */
-    virtual bool RemoveItem(Control* pControl);
+    virtual bool RemoveItem(Control *pControl);
 
     /** 根据控件索引从容器中移除一个控件
      * @param[in] iIndex 要移除的控件索引
@@ -148,7 +151,7 @@ public:
      * @param[in] pstrSubControlName 子控件名称
      * @return 返回子控件指针
      */
-    Control* FindSubControl(const DString& pstrSubControlName);
+    Control *FindSubControl(const DString &pstrSubControlName);
 
     /**
      * @brief 判断是否自动销毁
@@ -179,18 +182,18 @@ public:
      * @brief 获取容器布局对象指针
      * @return 返回容器关联的布局对象指针
      */
-    Layout* GetLayout() const { return m_pLayout; }
+    Layout *GetLayout() const { return m_pLayout; }
 
     /** 重新关联布局对象, 并返回原来关联的布局对象
      * @param [in] pNewLayout 布局对象指针
      * @return 返回旧的布局对象，如果不再使用，需要用FreeLayout释放对象
      */
-    Layout* ResetLayout(Layout* pNewLayout);
+    Layout *ResetLayout(Layout *pNewLayout);
 
     /** 释放布局对象
     * @param [in] pLayout 布局对象指针
     */
-    void FreeLayout(Layout* pLayout);
+    void FreeLayout(Layout *pLayout);
 
 public:
     /** 设置是否支持拖拽投放进入该容器: 如果不等于0，支持拖入，否则不支持拖入(从DragOutId==DropInId的容器拖入到该容器)
@@ -210,14 +213,15 @@ public:
     uint8_t GetDragOutId() const;
 
 protected:
-
     /** 查找控件, 子控件列表由外部传入
     */
-    Control* FindControlInItems(const std::vector<Control*>& items, 
-                                FINDCONTROLPROC Proc, void* pProcData,
-                                uint32_t uFlags, 
-                                const UiPoint& ptMouse, 
-                                const UiPoint& scrollPos);
+    Control *FindControlInItems(
+        const std::vector<Control *> &items,
+        FINDCONTROLPROC Proc,
+        void *pProcData,
+        uint32_t uFlags,
+        const UiPoint &ptMouse,
+        const UiPoint &scrollPos);
 
 protected:
     /** 设置可见状态事件
@@ -235,21 +239,20 @@ private:
      * @param[in] pControl 控件指针
      * @param[in] iIndex 在该索引之后插入控件
      */
-    bool DoAddItemAt(Control* pControl, size_t iIndex);
+    bool DoAddItemAt(Control *pControl, size_t iIndex);
 
     /**@brief 根据控件指针从容器中移除一个控件
      * @param[in] pControl 控件的指针
      */
-    bool DoRemoveItem(Control* pControl);
+    bool DoRemoveItem(Control *pControl);
 
 protected:
-
     //容器中的子控件列表
-    std::vector<Control*> m_items;
+    std::vector<Control *> m_items;
 
 private:
     //布局管理接口
-    Layout* m_pLayout;
+    Layout *m_pLayout;
 
     //是否自动删除item的对象（如果为true：在从m_items移除元素时，会delete掉这个对象；如果为false，不delete）
     bool m_bAutoDestroyChild;

@@ -5,16 +5,14 @@
 #include "duilib/Core/MessageLoop_SDL.h"
 #include <SDL3/SDL.h>
 
-namespace ui
-{
+namespace ui {
 
-float MonitorUtil::GetWindowDisplayScale(const WindowBase* pWindowBase, float& fWindowPixelDensity)
-{   
+float MonitorUtil::GetWindowDisplayScale(const WindowBase *pWindowBase, float &fWindowPixelDensity)
+{
     if ((pWindowBase != nullptr) && pWindowBase->IsWindow()) {
         fWindowPixelDensity = pWindowBase->NativeWnd()->GetWindowPixelDensity();
         return pWindowBase->NativeWnd()->GetWindowDisplayScale();
-    }
-    else {
+    } else {
         fWindowPixelDensity = 1.0f;
         return GetPrimaryMonitorDisplayScale();
     }

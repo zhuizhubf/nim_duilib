@@ -2,12 +2,11 @@
 #define UI_CORE_THEME_GENERATOR_H_
 
 #include "duilib/Core/ColorConverter.h"
-#include <string>
 #include <map>
+#include <string>
 #include <vector>
 
-namespace ui
-{
+namespace ui {
 
 /** @struct ThemeColorConfig
  *  @brief 主题颜色配置结构体
@@ -15,22 +14,22 @@ namespace ui
  */
 struct ThemeColorConfig
 {
-    std::string name;           ///< 颜色名称，如"bg_window_main"
-    std::string value;          ///< 颜色值，格式为"#AARRGGBB"
-    std::string type;           ///< 颜色类型，如"bg_color"、"border_color"等
-    std::string category;       ///< 颜色分类，如"bg_color"、"text_color"等
-    std::string role;           ///< 颜色角色描述
-    std::string derived_from;   ///< 派生来源，指定基于哪个颜色派生
-    std::string adjust;         ///< 调整参数，如"lightness:-10,saturation:20"
-    bool fixed;                 ///< 是否为固定颜色，固定颜色不会被主题生成器修改
-    bool support_accent;        ///< 是否支持强调色
-    std::string contrast_bg;    ///< 对比度检查的背景色名称
-    std::string comment_cn;     ///< 中文注释
-    std::string comment_en;     ///< 英文注释
-    int node_order;             ///< 节点顺序索引（用于保持输出顺序与输入一致）
+    std::string name;         ///< 颜色名称，如"bg_window_main"
+    std::string value;        ///< 颜色值，格式为"#AARRGGBB"
+    std::string type;         ///< 颜色类型，如"bg_color"、"border_color"等
+    std::string category;     ///< 颜色分类，如"bg_color"、"text_color"等
+    std::string role;         ///< 颜色角色描述
+    std::string derived_from; ///< 派生来源，指定基于哪个颜色派生
+    std::string adjust;       ///< 调整参数，如"lightness:-10,saturation:20"
+    bool fixed;               ///< 是否为固定颜色，固定颜色不会被主题生成器修改
+    bool support_accent;      ///< 是否支持强调色
+    std::string contrast_bg;  ///< 对比度检查的背景色名称
+    std::string comment_cn;   ///< 中文注释
+    std::string comment_en;   ///< 英文注释
+    int node_order;           ///< 节点顺序索引（用于保持输出顺序与输入一致）
 
-    std::string m_baseName;     ///< 颜色名称的基础名称，如"bg_btn_disabled"的基础名称为"bg_btn"
-    std::string m_state;        ///< 颜色名称的状态名称，如"bg_btn_disabled"的状态名称为"disabled"
+    std::string m_baseName; ///< 颜色名称的基础名称，如"bg_btn_disabled"的基础名称为"bg_btn"
+    std::string m_state;    ///< 颜色名称的状态名称，如"bg_btn_disabled"的状态名称为"disabled"
 };
 
 /** @struct ThemeMetaInfo
@@ -39,7 +38,7 @@ struct ThemeColorConfig
  */
 struct ThemeMetaInfo
 {
-    std::map<std::string, std::string> properties;  ///< 元数据属性键值对
+    std::map<std::string, std::string> properties; ///< 元数据属性键值对
 };
 
 /** @class ThemeGenerator
@@ -66,7 +65,7 @@ public:
      *  @return 加载成功返回true，否则返回false
      *  @details 解析XML文件，提取所有ThemeColor节点配置，并保存原始XML内容
      */
-    bool LoadConfigFromXml(const std::string& inputXml);
+    bool LoadConfigFromXml(const std::string &inputXml);
 
     /** @brief 生成主题颜色
      *  @param hue 色调值(0-360)
@@ -106,7 +105,8 @@ public:
      *  @note Surface用于卡片、按钮等元素的背景。浅色模式下offset使表面变暗(L减少)，
      *       深色模式下offset使表面变亮(L增加)，从而形成视觉层次感
      */
-    void SetSurfaceParams(double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma);
+    void SetSurfaceParams(
+        double surfaceLightOffset, double surfaceDarkOffset, double surfaceBaseChroma);
 
     /** @brief 设置Accent颜色参数
      *  @param accentLightL 浅色模式下Accent明度 (范围: 0.0-1.0, 典型值: 0.6204)
@@ -123,28 +123,29 @@ public:
      *  @param bgDarkL 输出深色模式背景明度基准值
      *  @param bgBaseChroma 输出背景色基础色度系数
      */
-    void GetBgParams(double& bgLightL, double& bgDarkL, double& bgBaseChroma) const;
+    void GetBgParams(double &bgLightL, double &bgDarkL, double &bgBaseChroma) const;
 
     /** @brief 获取前景色参数
      *  @param fgLightL 输出浅色模式前景明度基准值
      *  @param fgDarkL 输出深色模式前景明度基准值
      *  @param fgBaseChroma 输出前景色基础色度系数
      */
-    void GetFgParams(double& fgLightL, double& fgDarkL, double& fgBaseChroma) const;
+    void GetFgParams(double &fgLightL, double &fgDarkL, double &fgBaseChroma) const;
 
     /** @brief 获取Surface层参数
      *  @param surfaceLightOffset 输出浅色模式Surface偏移量
      *  @param surfaceDarkOffset 输出深色模式Surface偏移量
      *  @param surfaceBaseChroma 输出Surface基础色度系数
      */
-    void GetSurfaceParams(double& surfaceLightOffset, double& surfaceDarkOffset, double& surfaceBaseChroma) const;
+    void GetSurfaceParams(
+        double &surfaceLightOffset, double &surfaceDarkOffset, double &surfaceBaseChroma) const;
 
     /** @brief 获取Accent颜色参数
      *  @param accentLightL 输出浅色模式Accent明度
      *  @param accentDarkL 输出深色模式Accent明度
      *  @param accentC 输出Accent色度值
      */
-    void GetAccentParams(double& accentLightL, double& accentDarkL, double& accentC) const;
+    void GetAccentParams(double &accentLightL, double &accentDarkL, double &accentC) const;
 
     // ==================== 颜色带彩色/不带彩色选项 ====================
 
@@ -183,7 +184,7 @@ public:
      *  @param colorName 颜色名称
      *  @return 颜色的ARGB字符串，如"#FF123456"
      */
-    std::string GetGeneratedColor(const std::string& colorName) const;
+    std::string GetGeneratedColor(const std::string &colorName) const;
 
     /** @brief 获取已加载的颜色配置
      *  @return 颜色配置映射表
@@ -191,7 +192,6 @@ public:
     std::map<std::string, ThemeColorConfig> GetLoadedConfigs() const { return m_loadedConfigs; }
 
 private:
-
     /** @brief 根据色相获取基础背景颜色
      *  @param hue 色调值(0-360)
      *  @param base 基础亮度值(0-1)
@@ -229,7 +229,8 @@ private:
      *          - selected: 浅色变暗(+0.09L)，深色变亮(-0.09L)
      *          - disabled: 降低饱和度并设置半透明
      */
-    std::string GetStateColor(const std::string& baseColor, const std::string& state, bool isDark) const;
+    std::string GetStateColor(
+        const std::string &baseColor, const std::string &state, bool isDark) const;
 
     /** @brief 应用颜色调整参数
      *  @param baseColor 基础颜色
@@ -241,14 +242,14 @@ private:
      *          - hue: 色相调整（度数）
      *          - alpha: 透明度调整（绝对值或相对值）
      */
-    std::string ApplyAdjustments(const std::string& baseColor, const std::string& adjustStr) const;
+    std::string ApplyAdjustments(const std::string &baseColor, const std::string &adjustStr) const;
 
     /** @brief 检测颜色名称中的状态标识
      *  @param colorName 颜色名称
      *  @return pair<状态, 基础名称>
      *  @details 从颜色名称中提取状态后缀，如"bg_btn_hovered"返回("hovered", "bg_btn")
      */
-    std::pair<std::string, std::string> DetectColorState(const std::string& colorName) const;
+    std::pair<std::string, std::string> DetectColorState(const std::string &colorName) const;
 
     /** @brief 生成主题核心颜色集
      *  @param hue 色调值(0-360)
@@ -269,7 +270,8 @@ private:
      *  @return 调整后的文本颜色
      *  @details 如果对比度不足，通过迭代调整亮度分量直到达到目标对比度
      */
-    std::string EnsureContrast(const std::string& textColor, const std::string& bgColor, double minContrast = 4.5) const;
+    std::string EnsureContrast(
+        const std::string &textColor, const std::string &bgColor, double minContrast = 4.5) const;
 
     /** @brief 生成主题颜色
      *  @param isDark 是否为暗色主题
@@ -280,9 +282,9 @@ private:
     std::string GenerateThemeXml(bool isDark) const;
 
 private:
-    double m_hue;                                            ///< 当前色调值 (0-360)
-    double m_base;                                           ///< 当前基础亮度值 (0.0-1.0，控制颜色鲜艳程度)
-    bool m_isDark;                                           ///< 当前是否为暗色主题
+    double m_hue;  ///< 当前色调值 (0-360)
+    double m_base; ///< 当前基础亮度值 (0.0-1.0，控制颜色鲜艳程度)
+    bool m_isDark; ///< 当前是否为暗色主题
     std::map<std::string, std::string> m_generatedColors;    ///< 生成的核心颜色集
     std::map<std::string, ThemeColorConfig> m_loadedConfigs; ///< 从XML加载的颜色配置
     std::string m_originalXmlContent;                        ///< 原始XML完整内容
@@ -293,18 +295,18 @@ private:
     // ============================================================================
 
     // 背景色参数
-    double m_bgLightL;          ///< 浅色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.97)
-    double m_bgLightLScale;     ///< 浅色模式背景明度随base变化系数 (范围: -2.0到0, 默认: -0.95)
-    double m_bgDarkL;           ///< 深色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.17)
-    double m_bgDarkLScale;      ///< 深色模式背景明度随base变化系数 (范围: 0到2.0, 默认: 0.78)
-    double m_bgBaseChroma;      ///< 背景色度系数 (范围: 0.0-3.0, 默认: 1.0)
+    double m_bgLightL;      ///< 浅色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.97)
+    double m_bgLightLScale; ///< 浅色模式背景明度随base变化系数 (范围: -2.0到0, 默认: -0.95)
+    double m_bgDarkL;       ///< 深色模式背景明度基准值 (范围: 0.0-1.0, 默认: 0.17)
+    double m_bgDarkLScale;  ///< 深色模式背景明度随base变化系数 (范围: 0到2.0, 默认: 0.78)
+    double m_bgBaseChroma;  ///< 背景色度系数 (范围: 0.0-3.0, 默认: 1.0)
 
     // 前景色参数
-    double m_fgLightL;          ///< 浅色模式前景明度基准值 (范围: 0.0-1.0, 默认: 0.22)
-    double m_fgLightLScale;     ///< 浅色模式前景明度随base变化系数 (范围: 0到2.0, 默认: 0.72)
-    double m_fgDarkL;           ///< 深色模式前景明度基准值 (范围: 0.0-1.0, 默认: 0.92)
-    double m_fgDarkLScale;      ///< 深色模式前景明度随base变化系数 (范围: -2.0到0, 默认: -0.75)
-    double m_fgBaseChroma;      ///< 前景色度系数 (范围: 0.0-1.0, 默认: 0.15)
+    double m_fgLightL;      ///< 浅色模式前景明度基准值 (范围: 0.0-1.0, 默认: 0.22)
+    double m_fgLightLScale; ///< 浅色模式前景明度随base变化系数 (范围: 0到2.0, 默认: 0.72)
+    double m_fgDarkL;       ///< 深色模式前景明度基准值 (范围: 0.0-1.0, 默认: 0.92)
+    double m_fgDarkLScale;  ///< 深色模式前景明度随base变化系数 (范围: -2.0到0, 默认: -0.75)
+    double m_fgBaseChroma;  ///< 前景色度系数 (范围: 0.0-1.0, 默认: 0.15)
 
     // Surface层参数
     double m_surfaceLightOffset; ///< 浅色模式Surface偏移量 (范围: 0.0-0.2, 默认: 0.025, 使表面变暗)
@@ -312,16 +314,16 @@ private:
     double m_surfaceBaseChroma;  ///< Surface色度系数 (范围: 0.0-3.0, 默认: 1.5)
 
     // Accent参数
-    double m_accentLightL;      ///< 浅色模式Accent明度 (范围: 0.0-1.0, 默认: 0.6204)
-    double m_accentDarkL;       ///< 深色模式Accent明度 (范围: 0.0-1.0, 默认: 0.68)
-    double m_accentC;           ///< Accent色度 (范围: 0.0-0.4, 默认: 0.195)
+    double m_accentLightL; ///< 浅色模式Accent明度 (范围: 0.0-1.0, 默认: 0.6204)
+    double m_accentDarkL;  ///< 深色模式Accent明度 (范围: 0.0-1.0, 默认: 0.68)
+    double m_accentC;      ///< Accent色度 (范围: 0.0-0.4, 默认: 0.195)
 
     // 带彩色/无彩色选项 (默认全部为true，即带彩色)
-    bool m_bgColored;           ///< 背景色是否带彩色 (true=带彩色, false=无彩色)
-    bool m_fgColored;           ///< 前景色是否带彩色 (true=带彩色, false=无彩色)
-    bool m_surfaceColored;      ///< Surface层是否带彩色 (true=带彩色, false=无彩色)
+    bool m_bgColored;      ///< 背景色是否带彩色 (true=带彩色, false=无彩色)
+    bool m_fgColored;      ///< 前景色是否带彩色 (true=带彩色, false=无彩色)
+    bool m_surfaceColored; ///< Surface层是否带彩色 (true=带彩色, false=无彩色)
 };
 
-}
+} // namespace ui
 
 #endif //UI_CORE_THEME_GENERATOR_H_

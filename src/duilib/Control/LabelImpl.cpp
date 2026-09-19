@@ -1,40 +1,38 @@
 #include "LabelImpl.h"
 #include "TextDrawer.h"
-#include "duilib/Core/GlobalManager.h"
-#include "duilib/Core/DpiManager.h"
-#include "duilib/Core/Box.h"
-#include "duilib/Core/Window.h"
-#include "duilib/Core/StateColorMap.h"
-#include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Animation/AnimationManager.h"
 #include "duilib/Animation/AnimationPlayer.h"
+#include "duilib/Core/Box.h"
+#include "duilib/Core/DpiManager.h"
+#include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/StateColorMap.h"
+#include "duilib/Core/Window.h"
+#include "duilib/Utils/AttributeUtil.h"
+#include "duilib/Utils/StringConvert.h"
 
-namespace ui
+namespace ui {
+LabelImpl::LabelImpl(Control *pOwner)
+    : m_pOwner(pOwner)
+    , m_sFontId()
+    , m_uTextStyle(TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_SINGLELINE)
+    , m_bSingleLine(true)
+    , m_bAutoShowToolTipEnabled(false)
+    , m_bAutoShowTooltip(false)
+    , m_bReplaceNewline(false)
+    , m_fSpacingMul(1.0f)
+    , m_fSpacingAdd(0)
+    , m_fWordSpacing(0)
+    , m_bVerticalText(false)
+    , m_bUseFontHeight(true)
+    , m_bRotate90ForAscii(true)
+    , m_rcTextPadding()
+    , m_bRichText(false)
 {
-LabelImpl::LabelImpl(Control* pOwner):
-    m_pOwner(pOwner),
-    m_sFontId(),
-    m_uTextStyle(TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_SINGLELINE),
-    m_bSingleLine(true),
-    m_bAutoShowToolTipEnabled(false),
-    m_bAutoShowTooltip(false),
-    m_bReplaceNewline(false),
-    m_fSpacingMul(1.0f),
-    m_fSpacingAdd(0),
-    m_fWordSpacing(0),
-    m_bVerticalText(false),
-    m_bUseFontHeight(true),
-    m_bRotate90ForAscii(true),
-    m_rcTextPadding(),
-    m_bRichText(false)
-{
-    Box* pBox = dynamic_cast<Box*>(pOwner);
+    Box *pBox = dynamic_cast<Box *>(pOwner);
     if (pBox != nullptr) {
         pOwner->SetFixedWidth(UiFixedInt::MakeStretch(), false, false);
         pOwner->SetFixedHeight(UiFixedInt::MakeStretch(), false, false);
-    }
-    else {
+    } else {
         pOwner->SetFixedWidth(UiFixedInt::MakeAuto(), false, false);
         pOwner->SetFixedHeight(UiFixedInt::MakeAuto(), false, false);
     }
@@ -46,10 +44,10 @@ LabelImpl::~LabelImpl()
     m_pTextDrawer.reset();
 }
 
-bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
+bool LabelImpl::OnSetAttribute(const DString &strName, const DString &strValue)
 {
     if (strName == _T("text_align")) {
-        bool bHCenter = false;        
+        bool bHCenter = false;
         size_t centerPos = strValue.find(_T("center"));
         if (centerPos != DString::npos) {
             //"center"这个属性有歧义，保留以保持兼容性，新的属性是"hcenter"
@@ -63,25 +61,22 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
         }
 
         //水平对齐方式
-        if (strValue.find(_T("hcenter")) != DString::npos) {            
+        if (strValue.find(_T("hcenter")) != DString::npos) {
             bHCenter = true;
         }
         if (bHCenter) {
             //水平对齐：居中
             m_uTextStyle &= ~TEXT_HALIGN_ALL;
             m_uTextStyle |= TEXT_HCENTER;
-        }
-        else if (strValue.find(_T("right")) != DString::npos) {
+        } else if (strValue.find(_T("right")) != DString::npos) {
             //水平对齐：靠右
             m_uTextStyle &= ~TEXT_HALIGN_ALL;
             m_uTextStyle |= TEXT_RIGHT;
-        }
-        else if (strValue.find(_T("left")) != DString::npos) {
+        } else if (strValue.find(_T("left")) != DString::npos) {
             //水平对齐：靠左
             m_uTextStyle &= ~TEXT_HALIGN_ALL;
             m_uTextStyle |= TEXT_LEFT;
-        }
-        else if (strValue.find(_T("hjustify")) != DString::npos) {
+        } else if (strValue.find(_T("hjustify")) != DString::npos) {
             //水平对齐：两端对齐
             m_uTextStyle &= ~TEXT_HALIGN_ALL;
             m_uTextStyle |= TEXT_HJUSTIFY;
@@ -92,115 +87,94 @@ bool LabelImpl::OnSetAttribute(const DString& strName, const DString& strValue)
             //垂直对齐：靠上
             m_uTextStyle &= ~TEXT_VALIGN_ALL;
             m_uTextStyle |= TEXT_TOP;
-        }
-        else if (strValue.find(_T("vcenter")) != DString::npos) {
+        } else if (strValue.find(_T("vcenter")) != DString::npos) {
             //垂直对齐：居中
             m_uTextStyle &= ~TEXT_VALIGN_ALL;
             m_uTextStyle |= TEXT_VCENTER;
-        }
-        else if (strValue.find(_T("bottom")) != DString::npos) {
+        } else if (strValue.find(_T("bottom")) != DString::npos) {
             //垂直对齐：靠下
             m_uTextStyle &= ~TEXT_VALIGN_ALL;
             m_uTextStyle |= TEXT_BOTTOM;
-        }
-        else if (strValue.find(_T("vjustify")) != DString::npos) {
+        } else if (strValue.find(_T("vjustify")) != DString::npos) {
             //垂直对齐：靠下
             m_uTextStyle &= ~TEXT_VALIGN_ALL;
             m_uTextStyle |= TEXT_VJUSTIFY;
         }
-    }
-    else if ((strName == _T("end_ellipsis")) || (strName == _T("endellipsis"))) {
+    } else if ((strName == _T("end_ellipsis")) || (strName == _T("endellipsis"))) {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_END_ELLIPSIS;
-        }
-        else {
+        } else {
             m_uTextStyle &= ~TEXT_END_ELLIPSIS;
         }
-    }
-    else if ((strName == _T("path_ellipsis")) || (strName == _T("pathellipsis"))) {
+    } else if ((strName == _T("path_ellipsis")) || (strName == _T("pathellipsis"))) {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uTextStyle |= TEXT_PATH_ELLIPSIS;
-        }
-        else {
+        } else {
             m_uTextStyle &= ~TEXT_PATH_ELLIPSIS;
         }
-    }
-    else if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
+    } else if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
         SetSingleLine(StringUtil::IsValueTrue(strValue));
-    }
-    else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
+    } else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
         SetSingleLine(strValue != _T("true"));
-    }
-    else if (strName == _T("text")) {
+    } else if (strName == _T("text")) {
         SetText(strValue);
-    }
-    else if ((strName == _T("text_id")) || (strName == _T("textid"))){
+    } else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
         SetTextId(strValue);
-    }
-    else if ((strName == _T("auto_tooltip")) || (strName == _T("autotooltip"))) {
+    } else if ((strName == _T("auto_tooltip")) || (strName == _T("autotooltip"))) {
         SetAutoShowToolTipEnabled(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("font")) {
+    } else if (strName == _T("font")) {
         SetFontId(strValue);
-    }
-    else if ((strName == _T("text_color")) || (strName == _T("normal_text_color")) || (strName == _T("normaltextcolor"))) {
+    } else if (
+        (strName == _T("text_color")) || (strName == _T("normal_text_color"))
+        || (strName == _T("normaltextcolor"))) {
         SetStateTextColor(kControlStateNormal, strValue);
-    }
-    else if ((strName == _T("hovered_text_color")) || (strName == _T("hot_text_color")) || (strName == _T("hottextcolor"))) {
+    } else if (
+        (strName == _T("hovered_text_color")) || (strName == _T("hot_text_color"))
+        || (strName == _T("hottextcolor"))) {
         SetStateTextColor(kControlStateHovered, strValue);
-    }
-    else if ((strName == _T("pressed_text_color")) || (strName == _T("pushed_text_color")) || (strName == _T("pushedtextcolor"))) {
+    } else if (
+        (strName == _T("pressed_text_color")) || (strName == _T("pushed_text_color"))
+        || (strName == _T("pushedtextcolor"))) {
         SetStateTextColor(kControlStatePressed, strValue);
-    }
-    else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
+    } else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
         SetStateTextColor(kControlStateDisabled, strValue);
-    }
-    else if ((strName == _T("text_padding")) || (strName == _T("textpadding"))) {
+    } else if ((strName == _T("text_padding")) || (strName == _T("textpadding"))) {
         UiPadding rcTextPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
         SetTextPadding(rcTextPadding, true);
-    }
-    else if (strName == _T("replace_newline")) {
+    } else if (strName == _T("replace_newline")) {
         // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
         SetReplaceNewline(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("spacing_mul")) {
+    } else if (strName == _T("spacing_mul")) {
         // 设置行间距倍数
         float mul = 1.0f;
         float add = 0;
         GetLineSpacing(&mul, &add);
         mul = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         SetLineSpacing(mul, add, false);
-    }
-    else if (strName == _T("spacing_add")) {
+    } else if (strName == _T("spacing_add")) {
         // 设置行间距固定的附加像素值
         float mul = 1.0f;
         float add = 0;
         GetLineSpacing(&mul, &add);
         add = StringUtil::StringToFloat(strValue.c_str(), nullptr);
         SetLineSpacing(mul, add, true);
-    }
-    else if (strName == _T("vertical_text")) {
+    } else if (strName == _T("vertical_text")) {
         // 设置是否为纵向文本
         SetVerticalText(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("word_spacing")) {
+    } else if (strName == _T("word_spacing")) {
         // 设置两个相邻的字符之间的间隔（像素）
         SetWordSpacing(StringUtil::StringToFloat(strValue.c_str(), nullptr), true);
-    }
-    else if (strName == _T("use_font_height")) {
+    } else if (strName == _T("use_font_height")) {
         // 设置当纵向绘制文本时，使用字体的默认高度，而不是每个字体的高度（显示时所有字体等高）
         SetUseFontHeight(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("ascii_rotate_90")) {
+    } else if (strName == _T("ascii_rotate_90")) {
         // 设置当纵向绘制文本时，对于字母数字等，顺时针旋转90度显示
         SetRotate90ForAscii(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("rich_text")) {
+    } else if (strName == _T("rich_text")) {
         // 设置文本内容是否为RichText
         SetRichText(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         return false;
     }
     return true;
@@ -245,27 +219,21 @@ uint32_t LabelImpl::GetValidTextStyle(uint32_t nTextFormat)
     uint32_t nValidTextFormat = 0;
     if (nTextFormat & TEXT_HCENTER) {
         nValidTextFormat |= TEXT_HCENTER;
-    }
-    else if (nTextFormat & TEXT_RIGHT) {
+    } else if (nTextFormat & TEXT_RIGHT) {
         nValidTextFormat |= TEXT_RIGHT;
-    }
-    else if (nTextFormat & TEXT_HJUSTIFY) {
+    } else if (nTextFormat & TEXT_HJUSTIFY) {
         nValidTextFormat |= TEXT_HJUSTIFY;
-    }
-    else {
+    } else {
         nValidTextFormat |= TEXT_LEFT;
     }
 
     if (nTextFormat & TEXT_VCENTER) {
         nValidTextFormat |= TEXT_VCENTER;
-    }
-    else if (nTextFormat & TEXT_BOTTOM) {
+    } else if (nTextFormat & TEXT_BOTTOM) {
         nValidTextFormat |= TEXT_BOTTOM;
-    }
-    else if (nTextFormat & TEXT_VJUSTIFY) {
+    } else if (nTextFormat & TEXT_VJUSTIFY) {
         nValidTextFormat |= TEXT_VJUSTIFY;
-    }
-    else {
+    } else {
         nValidTextFormat |= TEXT_TOP;
     }
 
@@ -307,7 +275,7 @@ DString LabelImpl::GetText() const
     return strText;
 }
 
-void LabelImpl::SetText(const DString& strText)
+void LabelImpl::SetText(const DString &strText)
 {
     if (m_sText == strText) {
         return;
@@ -323,7 +291,7 @@ DString LabelImpl::GetTextId() const
     return m_sTextId.c_str();
 }
 
-void LabelImpl::SetTextId(const DString& strTextId)
+void LabelImpl::SetTextId(const DString &strTextId)
 {
     if (m_sTextId == strTextId) {
         return;
@@ -340,38 +308,35 @@ std::string LabelImpl::GetUTF8Text() const
     return StringConvert::TToUTF8(strIn);
 }
 
-void LabelImpl::SetUTF8Text(const std::string& strText)
+void LabelImpl::SetUTF8Text(const std::string &strText)
 {
     DString strOut = StringConvert::UTF8ToT(strText);
-    LabelOwner* pLabelOwner = dynamic_cast<LabelOwner*>(m_pOwner);
+    LabelOwner *pLabelOwner = dynamic_cast<LabelOwner *>(m_pOwner);
     if (pLabelOwner != nullptr) {
         pLabelOwner->SetText(strOut);
-    }
-    else {
+    } else {
         SetText(strOut);
-    }    
+    }
 }
 
-void LabelImpl::SetUTF8TextId(const std::string& strTextId)
+void LabelImpl::SetUTF8TextId(const std::string &strTextId)
 {
     DString strOut = StringConvert::UTF8ToT(strTextId);
-    LabelOwner* pLabelOwner = dynamic_cast<LabelOwner*>(m_pOwner);
+    LabelOwner *pLabelOwner = dynamic_cast<LabelOwner *>(m_pOwner);
     if (pLabelOwner != nullptr) {
         pLabelOwner->SetTextId(strOut);
-    }
-    else {
+    } else {
         SetTextId(strOut);
-    }    
+    }
 }
 
 std::string LabelImpl::GetUTF8TextId() const
 {
     DString textId;
-    LabelOwner* pLabelOwner = dynamic_cast<LabelOwner*>(m_pOwner);
+    LabelOwner *pLabelOwner = dynamic_cast<LabelOwner *>(m_pOwner);
     if (pLabelOwner != nullptr) {
         textId = pLabelOwner->GetTextId();
-    }
-    else {
+    } else {
         textId = GetTextId();
     }
     return StringConvert::TToUTF8(textId);
@@ -390,25 +355,23 @@ bool LabelImpl::IsRichText() const
     return m_bRichText;
 }
 
-bool LabelImpl::IsTextEquals(const DString& text) const
+bool LabelImpl::IsTextEquals(const DString &text) const
 {
     if (m_sText.empty() && !m_sTextId.empty()) {
         return StringUtil::StringCompare(GetText().c_str(), text.c_str()) == 0;
-    }
-    else {
+    } else {
         return StringUtil::StringCompare(m_sText.c_str(), text.c_str()) == 0;
     }
 }
 
 DString LabelImpl::GetOwnerText() const
 {
-    LabelOwner* pLabelOwner = dynamic_cast<LabelOwner*>(m_pOwner);
+    LabelOwner *pLabelOwner = dynamic_cast<LabelOwner *>(m_pOwner);
     if (pLabelOwner != nullptr) {
         return pLabelOwner->GetText();
-    }
-    else {
+    } else {
         return GetText();
-    }    
+    }
 }
 
 void LabelImpl::SetAutoShowToolTipEnabled(bool bAutoShow)
@@ -438,8 +401,7 @@ void LabelImpl::SetVerticalText(bool bVerticalText)
         m_bVerticalText = bVerticalText;
         if (m_bVerticalText) {
             m_uTextStyle |= TEXT_VERTICAL;
-        }
-        else {
+        } else {
             m_uTextStyle &= ~TEXT_VERTICAL;
         }
         m_pOwner->Invalidate();
@@ -469,7 +431,7 @@ void LabelImpl::SetLineSpacing(float mul, float add, bool bNeedDpiScale)
     }
 }
 
-void LabelImpl::GetLineSpacing(float* mul, float* add) const
+void LabelImpl::GetLineSpacing(float *mul, float *add) const
 {
     if (mul != nullptr) {
         *mul = m_fSpacingMul;
@@ -574,7 +536,7 @@ void LabelImpl::CheckShowToolTip()
     auto pRender = m_pOwner->GetWindow()->GetRender();
     if (pRender == nullptr) {
         return;
-    }    
+    }
     const DString sText = GetOwnerText();
     if (sText.empty()) {
         return;
@@ -601,8 +563,7 @@ void LabelImpl::CheckShowToolTip()
             width = rc.Width();
         }
         rectSize = width;
-    }
-    else {
+    } else {
         int32_t height = m_pOwner->GetFixedHeight().GetInt32();
         if (m_pOwner->GetFixedHeight().IsStretch()) {
             height = 0;
@@ -619,7 +580,9 @@ void LabelImpl::CheckShowToolTip()
 
     MeasureStringParam measureParam = GetMeasureParam();
     measureParam.rectSize = rectSize;
-    UiRect rcMessure = m_pTextDrawer->MeasureString(pRender, sText, measureParam, GetFontId(), IsRichText(), m_pOwner);
+    UiRect rcMessure
+        = m_pTextDrawer
+              ->MeasureString(pRender, sText, measureParam, GetFontId(), IsRichText(), m_pOwner);
     if (rc.Width() < rcMessure.Width() || rc.Height() < rcMessure.Height()) {
         m_bAutoShowTooltip = true;
     }
@@ -641,7 +604,7 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
         //文本为空时，宽度和高度估算结果均为0
         return fixedSize;
     }
-    IRender* pRender = nullptr;
+    IRender *pRender = nullptr;
     if (m_pOwner->GetWindow() != nullptr) {
         pRender = m_pOwner->GetWindow()->GetRender();
     }
@@ -651,8 +614,8 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
         return fixedSize;
     }
 
-    int32_t nWidth = szAvailable.cx;    //最终计算结果为最大宽度
-    int32_t nHeight = szAvailable.cy;   //最终计算结果为最大高度
+    int32_t nWidth = szAvailable.cx;  //最终计算结果为最大宽度
+    int32_t nHeight = szAvailable.cy; //最终计算结果为最大高度
     const UiPadding rcTextPadding = this->GetTextPadding();
     const UiPadding rcPadding = m_pOwner->GetControlPadding();
     if (!m_bVerticalText) {
@@ -660,11 +623,9 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
         if (m_pOwner->GetFixedWidth().IsStretch()) {
             //如果是拉伸类型，使用外部宽度
             nWidth = CalcStretchValue(m_pOwner->GetFixedWidth(), szAvailable.cx);
-        }
-        else if (m_pOwner->GetFixedWidth().IsInt32()) {
+        } else if (m_pOwner->GetFixedWidth().IsInt32()) {
             nWidth = m_pOwner->GetFixedWidth().GetInt32();
-        }
-        else if (m_pOwner->GetFixedWidth().IsAuto()) {
+        } else if (m_pOwner->GetFixedWidth().IsAuto()) {
             //宽度为自动时，不限制宽度
             nWidth = m_pOwner->GetMaxWidth();
             if (nWidth != INT32_MAX) {
@@ -697,17 +658,14 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
                 nHeight = INT32_MAX;
             }
         }
-    }
-    else {
+    } else {
         //文本方向：纵向
         if (m_pOwner->GetFixedHeight().IsStretch()) {
             //如果是拉伸类型，使用外部高度
             nHeight = CalcStretchValue(m_pOwner->GetFixedHeight(), szAvailable.cy);
-        }
-        else if (m_pOwner->GetFixedHeight().IsInt32()) {
+        } else if (m_pOwner->GetFixedHeight().IsInt32()) {
             nHeight = m_pOwner->GetFixedHeight().GetInt32();
-        }
-        else if (m_pOwner->GetFixedHeight().IsAuto()) {
+        } else if (m_pOwner->GetFixedHeight().IsAuto()) {
             //高度为自动时，不限制高度
             nHeight = m_pOwner->GetMaxHeight();
             if (nHeight != INT32_MAX) {
@@ -741,10 +699,11 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
             }
         }
     }
-    
+
     MeasureStringParam measureParam = GetMeasureParam();
     measureParam.rectSize = !m_bVerticalText ? nWidth : nHeight;
-    UiRect rect = m_pTextDrawer->MeasureString(pRender, textValue, measureParam, GetFontId(), IsRichText(), m_pOwner);
+    UiRect rect = m_pTextDrawer->MeasureString(
+        pRender, textValue, measureParam, GetFontId(), IsRichText(), m_pOwner);
     fixedSize.cx = std::min(rect.Width(), nWidth);
     fixedSize.cx = std::max(fixedSize.cx, 0);
     if (fixedSize.cx > 0) {
@@ -761,7 +720,7 @@ UiSize LabelImpl::OnEstimateText(UiSize szAvailable)
     return fixedSize;
 }
 
-void LabelImpl::OnPaintText(IRender* pRender)
+void LabelImpl::OnPaintText(IRender *pRender)
 {
     UiRect rc = m_pOwner->GetRect();
     rc.Deflate(m_pOwner->GetControlPadding());
@@ -769,7 +728,7 @@ void LabelImpl::OnPaintText(IRender* pRender)
     DoPaintText(rc, pRender);
 }
 
-void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
+void LabelImpl::DoPaintText(const UiRect &rc, IRender *pRender)
 {
     DString textValue = GetOwnerText();
     if (textValue.empty() || (pRender == nullptr)) {
@@ -777,22 +736,24 @@ void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
     }
 
     ControlStateType stateType = m_pOwner->GetState();
-    UiColor dwClrColor = m_pOwner->GetUiColor(GetPaintStateTextColor(m_pOwner->GetState(), stateType));
+    UiColor dwClrColor = m_pOwner->GetUiColor(
+        GetPaintStateTextColor(m_pOwner->GetState(), stateType));
 
-    DrawStringParam drawParam = GetDrawParam();//绘制参数
+    DrawStringParam drawParam = GetDrawParam(); //绘制参数
     drawParam.textRect = rc;
 
     if (m_pOwner->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
-        if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && 
-            !GetStateTextColor(kControlStateHovered).empty()) {
+        if ((stateType == kControlStateNormal || stateType == kControlStateHovered)
+            && !GetStateTextColor(kControlStateHovered).empty()) {
             //先绘制默认的文本
             const uint8_t nHoveredAlpha = m_pOwner->GetHoveredAlpha();
             bool bPainted = false;
             DString clrColor = GetStateTextColor(kControlStateNormal);
-            if (!clrColor.empty()) {                
+            if (!clrColor.empty()) {
                 drawParam.dwTextColor = m_pOwner->GetUiColor(clrColor);
                 drawParam.uFade = 255 - nHoveredAlpha;
-                m_pTextDrawer->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
+                m_pTextDrawer
+                    ->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
                 bPainted = true;
             }
             //绘制Hovered状态的文本（半透明）
@@ -800,7 +761,8 @@ void LabelImpl::DoPaintText(const UiRect& rc, IRender* pRender)
             if (!textColor.empty()) {
                 drawParam.dwTextColor = m_pOwner->GetUiColor(textColor);
                 drawParam.uFade = nHoveredAlpha;
-                m_pTextDrawer->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
+                m_pTextDrawer
+                    ->DrawString(pRender, textValue, drawParam, GetFontId(), IsRichText(), m_pOwner);
                 bPainted = true;
             }
             if (bPainted) {
@@ -824,28 +786,28 @@ void LabelImpl::SetTextStyle(uint32_t uStyle, bool bRedraw)
     m_uTextStyle = GetValidTextStyle(uStyle);
     if (m_uTextStyle & TEXT_SINGLELINE) {
         m_bSingleLine = true;
-    }
-    else {
+    } else {
         m_bSingleLine = false;
     }
     if (m_uTextStyle & TEXT_VERTICAL) {
         m_bVerticalText = true;
-    }
-    else {
+    } else {
         m_bVerticalText = false;
     }
     if (bRedraw) {
-        bool bChanged = (uOldStyle != m_uTextStyle) || (bOldSingleLine != m_bSingleLine) || (bOldVerticalText != m_bVerticalText);
+        bool bChanged = (uOldStyle != m_uTextStyle) || (bOldSingleLine != m_bSingleLine)
+                        || (bOldVerticalText != m_bVerticalText);
         if (bChanged) {
             //仅在状态变化时重绘
             m_pOwner->Invalidate();
-        }        
+        }
     }
 }
 
 void LabelImpl::SetDefaultTextStyle(bool bRedraw)
 {
-    SetTextStyle(TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_NOCLIP | TEXT_SINGLELINE, bRedraw);
+    SetTextStyle(
+        TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_NOCLIP | TEXT_SINGLELINE, bRedraw);
 }
 
 uint32_t LabelImpl::GetTextStyle() const
@@ -862,23 +824,21 @@ DString LabelImpl::GetStateTextColor(ControlStateType stateType) const
     if (stateColor.empty() && (stateType == kControlStateNormal)) {
         if (m_pOwner->GetWindow() != nullptr) {
             stateColor = m_pOwner->GetWindow()->GetDefaultTextColor();
-        }
-        else {
+        } else {
             stateColor = GlobalManager::Instance().Color().GetDefaultTextColor();
         }
     }
     if (stateColor.empty() && (stateType == kControlStateDisabled)) {
         if (m_pOwner->GetWindow() != nullptr) {
             stateColor = m_pOwner->GetWindow()->GetDefaultDisabledTextColor();
-        }
-        else {
+        } else {
             stateColor = GlobalManager::Instance().Color().GetDefaultDisabledTextColor();
         }
     }
     return stateColor;
 }
 
-void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString& dwTextColor)
+void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString &dwTextColor)
 {
     if (stateType == kControlStateHovered) {
         m_pOwner->SetFadeHovered(true);
@@ -890,7 +850,8 @@ void LabelImpl::SetStateTextColor(ControlStateType stateType, const DString& dwT
     m_pOwner->Invalidate();
 }
 
-DString LabelImpl::GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType& stateType)
+DString LabelImpl::GetPaintStateTextColor(
+    ControlStateType buttonStateType, ControlStateType &stateType)
 {
     stateType = buttonStateType;
     if (stateType == kControlStatePressed && GetStateTextColor(kControlStatePressed).empty()) {
@@ -910,7 +871,7 @@ DString LabelImpl::GetFontId() const
     return m_sFontId.c_str();
 }
 
-void LabelImpl::SetFontId(const DString& strFontId)
+void LabelImpl::SetFontId(const DString &strFontId)
 {
     m_sFontId = strFontId;
     m_pOwner->Invalidate();
@@ -918,26 +879,27 @@ void LabelImpl::SetFontId(const DString& strFontId)
 
 UiPadding LabelImpl::GetTextPadding() const
 {
-    return UiPadding(m_rcTextPadding.left, m_rcTextPadding.top, m_rcTextPadding.right, m_rcTextPadding.bottom);
+    return UiPadding(
+        m_rcTextPadding.left, m_rcTextPadding.top, m_rcTextPadding.right, m_rcTextPadding.bottom);
 }
 
 void LabelImpl::SetTextPadding(UiPadding padding, bool bNeedDpiScale)
 {
-    ASSERT((padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
-    if ((padding.left < 0) || (padding.top < 0) ||
-        (padding.right < 0) || (padding.bottom < 0)) {
+    ASSERT(
+        (padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
+    if ((padding.left < 0) || (padding.top < 0) || (padding.right < 0) || (padding.bottom < 0)) {
         return;
     }
     if (bNeedDpiScale) {
         m_pOwner->Dpi().ScalePadding(padding);
-    }    
+    }
     if (!this->GetTextPadding().Equals(padding)) {
         m_rcTextPadding.left = TruncateToUInt16(padding.left);
         m_rcTextPadding.top = TruncateToUInt16(padding.top);
         m_rcTextPadding.right = TruncateToUInt16(padding.right);
         m_rcTextPadding.bottom = TruncateToUInt16(padding.bottom);
         m_pOwner->RelayoutOrRedraw();
-    }    
+    }
 }
 
 bool LabelImpl::IsSingleLine() const
@@ -951,12 +913,11 @@ void LabelImpl::SetSingleLine(bool bSingleLine)
         m_bSingleLine = bSingleLine;
         if (m_bSingleLine) {
             m_uTextStyle |= TEXT_SINGLELINE;
-        }
-        else {
+        } else {
             m_uTextStyle &= ~TEXT_SINGLELINE;
         }
         m_pOwner->Invalidate();
-    }   
+    }
 }
 
-}
+} // namespace ui

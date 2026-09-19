@@ -3,25 +3,22 @@
 
 #include <mutex>
 
-namespace ui 
-{
+namespace ui {
 /** 自动解锁类的封装
 */
 class DUILIB_API ScopedLock
 {
 public:
     // 构造函数获取锁
-    explicit ScopedLock(std::mutex& mutex)
-        : m_mutex(mutex), m_locked(true)
+    explicit ScopedLock(std::mutex &mutex)
+        : m_mutex(mutex)
+        , m_locked(true)
     {
         m_mutex.lock();
     }
 
     // 析构函数自动释放锁
-    ~ScopedLock()
-    {
-        Unlock();
-    }
+    ~ScopedLock() { Unlock(); }
 
     // 手动解锁方法
     void Unlock()
@@ -33,11 +30,11 @@ public:
     }
 
     // 禁止拷贝
-    ScopedLock(const ScopedLock&) = delete;
-    ScopedLock& operator=(const ScopedLock&) = delete;
+    ScopedLock(const ScopedLock &) = delete;
+    ScopedLock &operator=(const ScopedLock &) = delete;
 
 private:
-    std::mutex& m_mutex;
+    std::mutex &m_mutex;
     bool m_locked;
 };
 

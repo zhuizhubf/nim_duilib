@@ -1,99 +1,82 @@
 #include "Layout.h"
+#include "duilib/Core/Box.h"
+#include "duilib/Core/Control.h"
+#include "duilib/Core/GlobalManager.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Utils/StringUtil.h"
-#include "duilib/Core/GlobalManager.h"
-#include "duilib/Core/Control.h"
-#include "duilib/Core/Box.h"
 
-namespace ui 
-{
-Layout::Layout() :
-    m_pOwner(nullptr),
-    m_nChildMarginX(0),
-    m_nChildMarginY(0),
-    m_hChildAlignType(HorAlignType::kAlignLeft),
-    m_vChildAlignType(VerAlignType::kAlignTop)
-{
-}
+namespace ui {
+Layout::Layout()
+    : m_pOwner(nullptr)
+    , m_nChildMarginX(0)
+    , m_nChildMarginY(0)
+    , m_hChildAlignType(HorAlignType::kAlignLeft)
+    , m_vChildAlignType(VerAlignType::kAlignTop)
+{}
 
-bool Layout::SetAttribute(const DString& strName, const DString& strValue, const DpiManager& dpiManager)
+bool Layout::SetAttribute(
+    const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
     if ((strName == _T("child_margin")) || (strName == _T("childmargin"))) {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMargin(iMargin);
-    }
-    else if ((strName == _T("child_margin_x")) || (strName == _T("childmarginx"))) {
+    } else if ((strName == _T("child_margin_x")) || (strName == _T("childmarginx"))) {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginX(iMargin);
-    }
-    else if ((strName == _T("child_margin_y")) || (strName == _T("childmarginy"))) {
+    } else if ((strName == _T("child_margin_y")) || (strName == _T("childmarginy"))) {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginY(iMargin);
-    }
-    else if (strName == _T("child_valign")) {
+    } else if (strName == _T("child_valign")) {
         //垂直对齐方式
         if (strValue == _T("top")) {
             SetChildVAlignType(VerAlignType::kAlignTop);
-        }
-        else if (strValue == _T("center")) {
+        } else if (strValue == _T("center")) {
             SetChildVAlignType(VerAlignType::kAlignCenter);
-        }
-        else if (strValue == _T("bottom")) {
+        } else if (strValue == _T("bottom")) {
             SetChildVAlignType(VerAlignType::kAlignBottom);
-        }
-        else {
+        } else {
             ASSERT(0);
         }
-    }
-    else if (strName == _T("child_halign")) {
+    } else if (strName == _T("child_halign")) {
         //水平对齐方式
         if (strValue == _T("left")) {
             SetChildHAlignType(HorAlignType::kAlignLeft);
-        }
-        else if (strValue == _T("center")) {
+        } else if (strValue == _T("center")) {
             SetChildHAlignType(HorAlignType::kAlignCenter);
-        }
-        else if (strValue == _T("right")) {
+        } else if (strValue == _T("right")) {
             SetChildHAlignType(HorAlignType::kAlignRight);
-        }
-        else {
+        } else {
             ASSERT(0);
         }
-    }
-    else if (strName == _T("child_align")) {
+    } else if (strName == _T("child_align")) {
         //水平对齐
         if (strValue.find(_T("left")) != DString::npos) {
             SetChildHAlignType(HorAlignType::kAlignLeft);
-        }
-        else if (strValue.find(_T("hcenter")) != DString::npos) {
+        } else if (strValue.find(_T("hcenter")) != DString::npos) {
             SetChildHAlignType(HorAlignType::kAlignCenter);
-        }
-        else if (strValue.find(_T("right")) != DString::npos) {
+        } else if (strValue.find(_T("right")) != DString::npos) {
             SetChildHAlignType(HorAlignType::kAlignRight);
         }
 
         //垂直对齐
         if (strValue.find(_T("top")) != DString::npos) {
             SetChildVAlignType(VerAlignType::kAlignTop);
-        }
-        else if (strValue.find(_T("vcenter")) != DString::npos) {
+        } else if (strValue.find(_T("vcenter")) != DString::npos) {
             SetChildVAlignType(VerAlignType::kAlignCenter);
-        }
-        else if (strValue.find(_T("bottom")) != DString::npos) {
+        } else if (strValue.find(_T("bottom")) != DString::npos) {
             SetChildVAlignType(VerAlignType::kAlignBottom);
         }
-    }
-    else {
+    } else {
         hasAttribute = false;
     }
     return hasAttribute;
 }
 
-void Layout::ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale)
+void Layout::ChangeDpiScale(const DpiManager &dpiManager, uint32_t nOldDpiScale)
 {
     int32_t iMargin = GetChildMarginX();
     iMargin = dpiManager.GetScaleInt(iMargin, nOldDpiScale);
@@ -107,33 +90,30 @@ void Layout::ChangeDpiScale(const DpiManager& dpiManager, uint32_t nOldDpiScale)
 bool Layout::LayoutByActualAreaSize() const
 {
     LayoutType layoutType = GetLayoutType();
-    if ((layoutType == LayoutType::FloatLayout) ||
-        (layoutType == LayoutType::HLayout) ||
-        (layoutType == LayoutType::VLayout) ||
-        (layoutType == LayoutType::HFlowLayout) ||
-        (layoutType == LayoutType::VFlowLayout) ||
-        (layoutType == LayoutType::GridLayout)) {
+    if ((layoutType == LayoutType::FloatLayout) || (layoutType == LayoutType::HLayout)
+        || (layoutType == LayoutType::VLayout) || (layoutType == LayoutType::HFlowLayout)
+        || (layoutType == LayoutType::VFlowLayout) || (layoutType == LayoutType::GridLayout)) {
         return true;
     }
     return false;
 }
 
-void Layout::SetOwner(Box* pOwner)
+void Layout::SetOwner(Box *pOwner)
 {
     m_pOwner = pOwner;
 }
 
-UiSize64 Layout::SetFloatPos(Control* pControl, const UiRect& rcContainer)
+UiSize64 Layout::SetFloatPos(Control *pControl, const UiRect &rcContainer)
 {
     return SetFloatPosInternal(pControl, rcContainer, false);
 }
 
-UiSize64 Layout::SetFloatPosInternal(Control* pControl, const UiRect& rcContainer, bool bEstimateOnly)
+UiSize64 Layout::SetFloatPosInternal(Control *pControl, const UiRect &rcContainer, bool bEstimateOnly)
 {
     ASSERT(pControl != nullptr);
     if ((pControl == nullptr) || (!pControl->IsVisible())) {
         return UiSize64();
-    }    
+    }
     UiRect rc = rcContainer;
     rc.Deflate(pControl->GetMargin());
     UiSize szAvailable(rc.Width(), rc.Height());
@@ -157,7 +137,8 @@ UiSize64 Layout::SetFloatPosInternal(Control* pControl, const UiRect& rcContaine
     UiRect childPos = GetFloatPos(pControl, rcContainer, childSize);
     if (!bEstimateOnly) {
         //调整控件的位置和大小
-        if (pControl->IsFloat() && pControl->IsKeepFloatPos() && (pControl->GetParent() != nullptr)) {
+        if (pControl->IsFloat() && pControl->IsKeepFloatPos()
+            && (pControl->GetParent() != nullptr)) {
             //浮动控件：如果外部调整了其位置，则保持原位置
             UiSize oldFloatPos = pControl->GetFloatPos();
             if ((oldFloatPos.cx != INT32_MIN) && (oldFloatPos.cy != INT32_MIN)) {
@@ -173,7 +154,7 @@ UiSize64 Layout::SetFloatPosInternal(Control* pControl, const UiRect& rcContaine
     return UiSize64(childPos.Width(), childPos.Height());
 }
 
-UiRect Layout::GetFloatPos(const Control* pControl, UiRect rcContainer, UiSize childSize)
+UiRect Layout::GetFloatPos(const Control *pControl, UiRect rcContainer, UiSize childSize)
 {
     rcContainer.Validate();
     ASSERT(pControl != nullptr);
@@ -192,7 +173,7 @@ UiRect Layout::GetFloatPos(const Control* pControl, UiRect rcContainer, UiSize c
     if (iPosBottom < iPosTop) {
         iPosBottom = iPosTop;
     }
-    
+
     childSize.cx = std::max(childSize.cx, 0);
     childSize.cy = std::max(childSize.cy, 0);
 
@@ -213,13 +194,11 @@ UiRect Layout::GetFloatPos(const Control* pControl, UiRect rcContainer, UiSize c
         //靠右
         childRight = iPosRight;
         childLeft = childRight - childWidth;
-    }
-    else if (horAlignType == HorAlignType::kAlignCenter) {
+    } else if (horAlignType == HorAlignType::kAlignCenter) {
         //水平居中
         childLeft = iPosLeft + (iPosRight - iPosLeft - childWidth) / 2;
         childRight = childLeft + childWidth;
-    }
-    else {
+    } else {
         //靠左（默认）
         childLeft = iPosLeft;
         childRight = childLeft + childWidth;
@@ -230,13 +209,11 @@ UiRect Layout::GetFloatPos(const Control* pControl, UiRect rcContainer, UiSize c
         //靠下
         childBottm = iPosBottom;
         childTop = childBottm - childHeight;
-    }
-    else if (verAlignType == VerAlignType::kAlignCenter) {
+    } else if (verAlignType == VerAlignType::kAlignCenter) {
         //垂直居中
         childTop = iPosTop + (iPosBottom - iPosTop - childHeight) / 2;
         childBottm = childTop + childHeight;
-    }
-    else {
+    } else {
         //靠上（默认）
         childTop = iPosTop;
         childBottm = childTop + childHeight;
@@ -246,11 +223,11 @@ UiRect Layout::GetFloatPos(const Control* pControl, UiRect rcContainer, UiSize c
     return childPos;
 }
 
-UiSize64 Layout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly)
-{    
+UiSize64 Layout::ArrangeChildren(const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly)
+{
     DeflatePadding(rc);
     UiSize64 size;
-    for (Control* pControl : items) {
+    for (Control *pControl : items) {
         if ((pControl == nullptr) || (!pControl->IsVisible())) {
             continue;
         }
@@ -263,15 +240,15 @@ UiSize64 Layout::ArrangeChildren(const std::vector<Control*>& items, UiRect rc, 
         rcPadding = m_pOwner->GetPadding();
     }
     if (size.cx > 0) {
-        size.cx += ((int64_t)rcPadding.left + rcPadding.right);
+        size.cx += ((int64_t) rcPadding.left + rcPadding.right);
     }
     if (size.cy > 0) {
-        size.cy += ((int64_t)rcPadding.top + rcPadding.bottom);
+        size.cy += ((int64_t) rcPadding.top + rcPadding.bottom);
     }
     return size;
 }
 
-UiSize64 Layout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable)
+UiSize64 Layout::EstimateLayoutSize(const std::vector<Control *> &items, UiSize szAvailable)
 {
     //宽度：取所有子控件宽度的最大值，加上Margin、Padding等，不含拉伸类型的子控件
     //高度：取所有子控件高度的最大值，加上Margin、Padding等，不含拉伸类型的子控件
@@ -284,7 +261,7 @@ UiSize64 Layout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize s
     szAvailable.Validate();
     UiSize maxSize;
     UiSize itemSize;
-    for (Control* pControl : items) {
+    for (Control *pControl : items) {
         if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
             continue;
         }
@@ -298,16 +275,14 @@ UiSize64 Layout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize s
         if (estSize.cx.IsStretch()) {
             //拉伸类型的子控件，不计入， 如果指定最小值，则按最小值计算
             itemSize.cx = std::max(minWidth, 0);
-        }
-        else {
+        } else {
             // 非拉伸控件：用std::clamp限制在[minWidth, maxWidth]范围内
             itemSize.cx = std::clamp(itemSize.cx, minWidth, maxWidth);
         }
         if (estSize.cy.IsStretch()) {
             //拉伸类型的子控件，不计入， 如果指定最小值，则按最小值计算
             itemSize.cy = std::max(minHeight, 0);
-        }
-        else {
+        } else {
             itemSize.cy = std::clamp(itemSize.cy, minHeight, maxHeight);
         }
         UiMargin rcMargin = pControl->GetMargin();
@@ -316,21 +291,21 @@ UiSize64 Layout::EstimateLayoutSize(const std::vector<Control*>& items, UiSize s
         }
         if (itemSize.cy > 0) {
             maxSize.cy = std::max(itemSize.cy + rcMargin.top + rcMargin.bottom, maxSize.cy);
-        }        
-    }    
+        }
+    }
     if (maxSize.cx > 0) {
         maxSize.cx += rcPadding.left + rcPadding.right;
     }
     if (maxSize.cy > 0) {
         maxSize.cy += rcPadding.top + rcPadding.bottom;
     }
-    if ((maxSize.cx == 0) || (maxSize.cy == 0)){
+    if ((maxSize.cx == 0) || (maxSize.cy == 0)) {
         CheckConfig(items);
     }
     return UiSize64(maxSize.cx, maxSize.cy);
 }
 
-void Layout::CheckConfig(const std::vector<Control*>& items)
+void Layout::CheckConfig(const std::vector<Control *> &items)
 {
     //如果m_pOwner的宽高都是auto，而且子控件的宽高都是stretch，那么得到的结果是零，增加个断言
     if (m_pOwner == nullptr) {
@@ -343,7 +318,7 @@ void Layout::CheckConfig(const std::vector<Control*>& items)
     bool isAllWidthStretch = true;
     bool isAllHeightStretch = true;
     size_t childCount = 0;
-    for (Control* pControl : items) {
+    for (Control *pControl : items) {
         if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
             continue;
         }
@@ -369,9 +344,10 @@ void Layout::SetChildMargin(int32_t nMargin)
 {
     ASSERT(nMargin >= 0);
     nMargin = std::max(nMargin, 0);
-    bool isChanged = ((int32_t)m_nChildMarginX != nMargin) || ((int32_t)m_nChildMarginY != nMargin);
-    m_nChildMarginX = TruncateToUInt16((uint32_t)nMargin);
-    m_nChildMarginY = TruncateToUInt16((uint32_t)nMargin);
+    bool isChanged = ((int32_t) m_nChildMarginX != nMargin)
+                     || ((int32_t) m_nChildMarginY != nMargin);
+    m_nChildMarginX = TruncateToUInt16((uint32_t) nMargin);
+    m_nChildMarginY = TruncateToUInt16((uint32_t) nMargin);
     ASSERT(m_pOwner != nullptr);
     if (isChanged && (m_pOwner != nullptr)) {
         m_pOwner->Arrange();
@@ -382,8 +358,8 @@ void Layout::SetChildMarginX(int32_t nMarginX)
 {
     ASSERT(nMarginX >= 0);
     nMarginX = std::max(nMarginX, 0);
-    bool isChanged = ((int32_t)m_nChildMarginX != nMarginX);
-    m_nChildMarginX = TruncateToUInt16((uint32_t)nMarginX);
+    bool isChanged = ((int32_t) m_nChildMarginX != nMarginX);
+    m_nChildMarginX = TruncateToUInt16((uint32_t) nMarginX);
     ASSERT(m_pOwner != nullptr);
     if (isChanged && (m_pOwner != nullptr)) {
         m_pOwner->Arrange();
@@ -394,8 +370,8 @@ void Layout::SetChildMarginY(int32_t nMarginY)
 {
     ASSERT(nMarginY >= 0);
     nMarginY = std::max(nMarginY, 0);
-    bool isChanged = ((int32_t)m_nChildMarginY != nMarginY);
-    m_nChildMarginY = TruncateToUInt16((uint32_t)nMarginY);
+    bool isChanged = ((int32_t) m_nChildMarginY != nMarginY);
+    m_nChildMarginY = TruncateToUInt16((uint32_t) nMarginY);
     ASSERT(m_pOwner != nullptr);
     if (isChanged && (m_pOwner != nullptr)) {
         m_pOwner->Arrange();
@@ -422,7 +398,7 @@ void Layout::SetChildVAlignType(VerAlignType vAlignType)
     }
 }
 
-void Layout::DeflatePadding(UiRect& rc) const
+void Layout::DeflatePadding(UiRect &rc) const
 {
     ASSERT(m_pOwner != nullptr);
     if (m_pOwner != nullptr) {

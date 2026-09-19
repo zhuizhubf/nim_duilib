@@ -1,22 +1,20 @@
 #include "WindowDropTarget_Windows.h"
 #include "duilib/Core/ControlDropTarget.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-#include "duilib/Core/NativeWindow_Windows.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/NativeWindow_Windows.h"
 
-namespace ui 
-{
+namespace ui {
 
-WindowDropTarget::WindowDropTarget(NativeWindow_Windows* pNativeWindow):
-    m_nRef(0),
-    m_pDataObj(nullptr),
-    m_pHoverDropTarget(nullptr),
-    m_pNativeWindow(pNativeWindow),
-    m_bRegisterDragDrop(false)
-{
-}
+WindowDropTarget::WindowDropTarget(NativeWindow_Windows *pNativeWindow)
+    : m_nRef(0)
+    , m_pDataObj(nullptr)
+    , m_pHoverDropTarget(nullptr)
+    , m_pNativeWindow(pNativeWindow)
+    , m_bRegisterDragDrop(false)
+{}
 
 WindowDropTarget::~WindowDropTarget()
 {
@@ -59,18 +57,17 @@ bool WindowDropTarget::UnregisterDragDrop()
 }
 
 // IUnkown 接口
-HRESULT WindowDropTarget::QueryInterface(REFIID riid, void __RPC_FAR* __RPC_FAR* ppvObject)
+HRESULT WindowDropTarget::QueryInterface(REFIID riid, void __RPC_FAR * __RPC_FAR * ppvObject)
 {
     if (ppvObject == nullptr) {
         return E_INVALIDARG;
     }
     HRESULT hr = E_NOINTERFACE;
     if (riid == IID_IUnknown) {
-        *ppvObject = (IUnknown*)this;
+        *ppvObject = (IUnknown *) this;
         hr = S_OK;
-    }
-    else if (riid == IID_IDropTarget) {
-        *ppvObject = (IDropTarget*)this;
+    } else if (riid == IID_IDropTarget) {
+        *ppvObject = (IDropTarget *) this;
         hr = S_OK;
     }
     if (SUCCEEDED(hr)) {
@@ -94,7 +91,8 @@ ULONG WindowDropTarget::Release(void)
 }
 
 // IDropTarget 接口
-HRESULT WindowDropTarget::DragEnter(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
+HRESULT WindowDropTarget::DragEnter(
+    IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
     if (m_pDataObj != nullptr) {
         m_pDataObj->Release();
@@ -120,7 +118,7 @@ HRESULT WindowDropTarget::DragEnter(IDataObject* pDataObj, DWORD grfKeyState, PO
     return S_OK;
 }
 
-HRESULT WindowDropTarget::DragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
+HRESULT WindowDropTarget::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
     //优先在窗口处理该事件
     if (m_pNativeWindow != nullptr) {
@@ -152,17 +150,17 @@ HRESULT STDMETHODCALLTYPE WindowDropTarget::DragLeave(void)
     return S_OK;
 }
 
-HRESULT WindowDropTarget::OnDragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
+HRESULT WindowDropTarget::OnDragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
     HRESULT hr = S_FALSE;
-    ControlPtrT<ControlDropTarget_Windows> pHoverDropTarget = GetControlDropTarget(UiPoint(pt.x, pt.y));
+    ControlPtrT<ControlDropTarget_Windows> pHoverDropTarget = GetControlDropTarget(
+        UiPoint(pt.x, pt.y));
     if (pHoverDropTarget == nullptr) {
         if (m_pHoverDropTarget != nullptr) {
             m_pHoverDropTarget->DragLeave();
             m_pHoverDropTarget = nullptr;
         }
-    }
-    else if (pHoverDropTarget == m_pHoverDropTarget) {
+    } else if (pHoverDropTarget == m_pHoverDropTarget) {
         uint32_t dwEffect = DROPEFFECT_NONE;
         if (pdwEffect != nullptr) {
             dwEffect = *pdwEffect;
@@ -171,8 +169,7 @@ HRESULT WindowDropTarget::OnDragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEff
         if (pdwEffect != nullptr) {
             *pdwEffect = dwEffect;
         }
-    }
-    else {
+    } else {
         if (m_pHoverDropTarget != nullptr) {
             m_pHoverDropTarget->DragLeave();
         }
@@ -190,15 +187,14 @@ HRESULT WindowDropTarget::OnDragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEff
             if (pdwEffect != nullptr) {
                 *pdwEffect = dwEffect;
             }
-        }
-        else {
+        } else {
             m_pHoverDropTarget = nullptr;
         }
     }
     return hr;
 }
 
-HRESULT WindowDropTarget::Drop(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
+HRESULT WindowDropTarget::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
     //优先在窗口处理该事件
     if (m_pNativeWindow != nullptr) {
@@ -235,7 +231,8 @@ HRESULT WindowDropTarget::Drop(IDataObject* pDataObj, DWORD grfKeyState, POINTL 
     return hr;
 }
 
-ControlPtrT<ControlDropTarget_Windows> WindowDropTarget::GetControlDropTarget(const UiPoint& screenPt) const
+ControlPtrT<ControlDropTarget_Windows> WindowDropTarget::GetControlDropTarget(
+    const UiPoint &screenPt) const
 {
     UiPoint pt = screenPt;
     m_pNativeWindow->ScreenToClient(pt);

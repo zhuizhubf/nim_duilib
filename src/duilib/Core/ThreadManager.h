@@ -1,13 +1,12 @@
 #ifndef UI_CORE_THREAD_MANAGER_H_
 #define UI_CORE_THREAD_MANAGER_H_
 
-#include "duilib/Core/FrameworkThread.h"
 #include "duilib/Core/ControlPtrT.h"
-#include <map>
+#include "duilib/Core/FrameworkThread.h"
 #include <atomic>
+#include <map>
 
-namespace ui 
-{
+namespace ui {
 /** 线程管理器，用以支持线程间通信
 */
 class DUILIB_API ThreadManager
@@ -15,15 +14,15 @@ class DUILIB_API ThreadManager
 public:
     ThreadManager();
     ~ThreadManager();
-    ThreadManager(const ThreadManager&) = delete;
-    ThreadManager& operator = (const ThreadManager&) = delete;
+    ThreadManager(const ThreadManager &) = delete;
+    ThreadManager &operator=(const ThreadManager &) = delete;
 
 public:
     /** 注册一个线程到管理器（只有注册后才能用于线程间通信）
     * @param [in] nThreadIdentifier 线程标识ID
     * @param [in] pThread 线程的接口
     */
-    bool RegisterThread(int32_t nThreadIdentifier, FrameworkThread* pThread);
+    bool RegisterThread(int32_t nThreadIdentifier, FrameworkThread *pThread);
 
     /** 判断是否包含指定标识符的线程
     * @param [in] nThreadIdentifier 线程标识ID
@@ -46,7 +45,7 @@ public:
     * @param [in] task 任务回调函数
     * @return 成功返回任务ID(大于0)，如果失败则返回0
     */
-    size_t PostTask(int32_t nThreadIdentifier, const StdClosure& task);
+    size_t PostTask(int32_t nThreadIdentifier, const StdClosure &task);
 
     /** 向线程发送一个任务，延迟执行
     * @param [in] nThreadIdentifier 线程标识ID
@@ -54,7 +53,7 @@ public:
     * @param [in] nDelayMs 延迟的时间（单位：毫秒）
     * @return 成功返回任务ID(大于0)，如果失败则返回0
     */
-    size_t PostDelayedTask(int32_t nThreadIdentifier, const StdClosure& task, int32_t nDelayMs);
+    size_t PostDelayedTask(int32_t nThreadIdentifier, const StdClosure &task, int32_t nDelayMs);
 
     /** 向线程发送一个任务，可定时重复执行
     * @param [in] nThreadIdentifier 线程标识ID
@@ -63,8 +62,8 @@ public:
     * @param [in] nTimes 重复的次数，如果为-1表示一直执行
     * @return 成功返回任务ID(大于0)，如果失败则返回0
     */
-    size_t PostRepeatedTask(int32_t nThreadIdentifier, const StdClosure& task,
-                            int32_t nIntervalMs, int32_t nTimes = -1);
+    size_t PostRepeatedTask(
+        int32_t nThreadIdentifier, const StdClosure &task, int32_t nIntervalMs, int32_t nTimes = -1);
 
     /** 取消一个任务
     * @param [in] nTaskId 任务ID，即上面的PostXXX函数的返回值
@@ -112,5 +111,5 @@ private:
     std::atomic<bool> m_bMainThreadExit;
 };
 
-}
+} // namespace ui
 #endif //UI_CORE_THREAD_MANAGER_H_

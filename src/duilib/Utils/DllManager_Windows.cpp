@@ -2,13 +2,10 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-namespace ui
-{
-DllManager::DllManager()
-{
-}
+namespace ui {
+DllManager::DllManager() {}
 
-DllManager& DllManager::Instance()
+DllManager &DllManager::Instance()
 {
     static DllManager s_instance;
     return s_instance;
@@ -18,13 +15,13 @@ DllManager::~DllManager()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     // 程序退出时自动释放所有加载的DLL
-    for (auto& pair : m_cache) {
+    for (auto &pair : m_cache) {
         ::FreeLibrary(pair.second);
     }
     m_cache.clear();
 }
 
-HMODULE DllManager::LoadDll(const DString& dllPath)
+HMODULE DllManager::LoadDll(const DString &dllPath)
 {
     if (dllPath.empty()) {
         return nullptr;
@@ -44,7 +41,7 @@ HMODULE DllManager::LoadDll(const DString& dllPath)
     return hMod;
 }
 
-bool DllManager::FreeDll(const DString& dllPath)
+bool DllManager::FreeDll(const DString &dllPath)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cache.find(dllPath);
@@ -58,6 +55,6 @@ bool DllManager::FreeDll(const DString& dllPath)
     return true;
 }
 
-};
+}; // namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

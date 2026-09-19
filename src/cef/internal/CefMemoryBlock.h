@@ -23,13 +23,14 @@ public:
 
     /** 初始化位图的数据
     */
-    bool Init(const void* buffer, const std::vector<UiRect>& dirtyRectList, int32_t width, int32_t height);
+    bool Init(
+        const void *buffer, const std::vector<UiRect> &dirtyRectList, int32_t width, int32_t height);
 
     /** 将位图数据绘制到Render
     * @param [in] pRender 渲染接口
     * @param [in] rc 绘制的目标区域
     */
-    void PaintData(IRender* pRender, const UiRect& rc);
+    void PaintData(IRender *pRender, const UiRect &rc);
 
     /** 判断内存块是否可以使用
     */
@@ -37,7 +38,7 @@ public:
 
     /** 将网页数据绘制到Render，大小和网页保持一致
     */
-    bool MakeImageSnapshot(IRender* pRender);
+    bool MakeImageSnapshot(IRender *pRender);
 
     /** 获取内存位图的宽度
     */
@@ -54,12 +55,12 @@ private:
 
     /** 获取内存位图数据指针，可用于填充位图数据
     */
-    uint8_t* GetBits() const;
+    uint8_t *GetBits() const;
 
 private:
     /** 内存数据
     */
-    uint8_t* m_pBits;
+    uint8_t *m_pBits;
 
     /** 内存位图的宽度
     */

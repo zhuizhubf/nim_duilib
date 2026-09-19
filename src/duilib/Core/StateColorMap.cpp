@@ -1,20 +1,19 @@
 #include "duilib/Core/StateColorMap.h"
+#include "duilib/Animation/AnimationManager.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Animation/AnimationManager.h"
 
-namespace ui 
-{
-StateColorMap::StateColorMap(Control* pControl):
-    m_pControl(pControl)
+namespace ui {
+StateColorMap::StateColorMap(Control *pControl)
+    : m_pControl(pControl)
 {
     ASSERT(kControlStateCount > 0);
     m_stateColors.resize(kControlStateCount);
 }
 
-void StateColorMap::SetStateColor(ControlStateType stateType, const DString& color)
+void StateColorMap::SetStateColor(ControlStateType stateType, const DString &color)
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     ASSERT(nIndex < m_stateColors.size());
     if (nIndex < m_stateColors.size()) {
         m_stateColors[nIndex] = color;
@@ -28,7 +27,7 @@ bool StateColorMap::HasHoveredColor() const
 
 bool StateColorMap::HasStateColors() const
 {
-    for (const UiString& color : m_stateColors) {
+    for (const UiString &color : m_stateColors) {
         if (!color.empty()) {
             return true;
         }
@@ -38,7 +37,7 @@ bool StateColorMap::HasStateColors() const
 
 bool StateColorMap::HasStateColor(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
         return !m_stateColors[nIndex].empty();
     }
@@ -47,30 +46,38 @@ bool StateColorMap::HasStateColor(ControlStateType stateType) const
 
 DString StateColorMap::GetStateColor(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
         return m_stateColors[nIndex].c_str();
     }
     return DString();
 }
 
-void StateColorMap::PaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType) const
+void StateColorMap::PaintStateColor(
+    IRender *pRender, const UiRect &rcPaint, ControlStateType stateType) const
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return;
     }
-    if (m_pControl != nullptr) {        
+    if (m_pControl != nullptr) {
         if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
-            if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && HasStateColor(kControlStateHovered)) {
+            if ((stateType == kControlStateNormal || stateType == kControlStateHovered)
+                && HasStateColor(kControlStateHovered)) {
                 const uint8_t nHoveredAlpha = m_pControl->GetHoveredAlpha();
                 //先绘制默认的颜色
                 DString strColor = GetStateColor(kControlStateNormal);
                 if (!strColor.empty()) {
-                    pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(strColor), 255 - nHoveredAlpha);
+                    pRender->FillRect(
+                        UiRectF::MakeFromRect(rcPaint),
+                        m_pControl->GetUiColor(strColor),
+                        255 - nHoveredAlpha);
                 }
                 //绘制Hovered状态的颜色（半透明）
-                pRender->FillRect(UiRectF::MakeFromRect(rcPaint), m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHoveredAlpha);
+                pRender->FillRect(
+                    UiRectF::MakeFromRect(rcPaint),
+                    m_pControl->GetUiColor(GetStateColor(kControlStateHovered)),
+                    nHoveredAlpha);
                 return;
             }
         }
@@ -87,8 +94,8 @@ void StateColorMap::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Con
     }
     DString strColor = GetStateColor(stateType);
     if (!strColor.empty()) {
-        UiColor color = m_pControl ? m_pControl->GetUiColor(strColor) :
-                                     GlobalManager::Instance().Color().GetColor(strColor);
+        UiColor color = m_pControl ? m_pControl->GetUiColor(strColor)
+                                   : GlobalManager::Instance().Color().GetColor(strColor);
         pRender->FillRect(UiRectF::MakeFromRect(rcPaint), color);
     }
 }

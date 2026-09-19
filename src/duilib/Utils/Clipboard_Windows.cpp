@@ -1,11 +1,10 @@
 #include "Clipboard.h"
 #include "duilib/Utils/StringConvert.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-namespace ui
-{
-bool Clipboard::GetClipboardText(DStringW& text)
+namespace ui {
+bool Clipboard::GetClipboardText(DStringW &text)
 {
     text.clear();
     BOOL ret = ::OpenClipboard(nullptr);
@@ -14,19 +13,18 @@ bool Clipboard::GetClipboardText(DStringW& text)
             HANDLE h = ::GetClipboardData(CF_UNICODETEXT);
             //注意：GetClipboardData 失败时返回 NULL，不是 INVALID_HANDLE_VALUE
             if (h != nullptr) {
-                wchar_t* buf = (wchar_t*)::GlobalLock(h);
+                wchar_t *buf = (wchar_t *) ::GlobalLock(h);
                 if (buf != nullptr) {
                     DStringW str(buf, GlobalSize(h) / sizeof(wchar_t));
-                    text = DStringW(str).c_str();//避免出现字符中包含尾0的情况
+                    text = DStringW(str).c_str(); //避免出现字符中包含尾0的情况
                     ::GlobalUnlock(h);
                 }
             }
-        }
-        else if (::IsClipboardFormatAvailable(CF_TEXT)) {
+        } else if (::IsClipboardFormatAvailable(CF_TEXT)) {
             HANDLE h = ::GetClipboardData(CF_TEXT);
             //注意：GetClipboardData 失败时返回 NULL，不是 INVALID_HANDLE_VALUE
             if (h != nullptr) {
-                char* buf = (char*)::GlobalLock(h);
+                char *buf = (char *) ::GlobalLock(h);
                 if (buf != nullptr) {
                     std::string str(buf, GlobalSize(h));
                     text = StringConvert::MBCSToUnicode(str).c_str();
@@ -39,7 +37,7 @@ bool Clipboard::GetClipboardText(DStringW& text)
     return ret != FALSE;
 }
 
-bool Clipboard::GetClipboardText(DStringA& text)
+bool Clipboard::GetClipboardText(DStringA &text)
 {
     DStringW textW;
     bool bRet = GetClipboardText(textW);
@@ -47,7 +45,7 @@ bool Clipboard::GetClipboardText(DStringA& text)
     return bRet;
 }
 
-bool Clipboard::SetClipboardText(const DStringW& text)
+bool Clipboard::SetClipboardText(const DStringW &text)
 {
     if (!::OpenClipboard(nullptr)) {
         return false;
@@ -65,7 +63,7 @@ bool Clipboard::SetClipboardText(const DStringW& text)
         return false;
     }
 
-    wchar_t* lpStr = (wchar_t*)::GlobalLock(hMem);
+    wchar_t *lpStr = (wchar_t *) ::GlobalLock(hMem);
     ::memcpy(lpStr, text.c_str(), len * sizeof(wchar_t));
     lpStr[len] = wchar_t(0);
     ::GlobalUnlock(hMem);
@@ -74,7 +72,7 @@ bool Clipboard::SetClipboardText(const DStringW& text)
     return true;
 }
 
-bool Clipboard::SetClipboardText(const DStringA& text)
+bool Clipboard::SetClipboardText(const DStringA &text)
 {
     return SetClipboardText(StringConvert::UTF8ToWString(text));
 }

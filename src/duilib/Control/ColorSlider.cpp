@@ -2,20 +2,22 @@
 #include "ColorConvert.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 
-ColorSlider::ColorSlider(Window* pWindow):
-    Slider(pWindow),
-    m_colorMode(ColorMode::kMode_ARGB),
-    m_adjustMode(ColorAdjustMode::kMode_ARGB_R)
+ColorSlider::ColorSlider(Window *pWindow)
+    : Slider(pWindow)
+    , m_colorMode(ColorMode::kMode_ARGB)
+    , m_adjustMode(ColorAdjustMode::kMode_ARGB_R)
 {
     SetColorInfo(UiColor(255, 0, 100, 200), ColorAdjustMode::kMode_ARGB_R);
 }
 
-DString ColorSlider::GetType() const { return DUI_CTR_COLOR_SLIDER; }
+DString ColorSlider::GetType() const
+{
+    return DUI_CTR_COLOR_SLIDER;
+}
 
-void ColorSlider::SetColorInfo(const UiColor& color, ColorAdjustMode adjustMode)
+void ColorSlider::SetColorInfo(const UiColor &color, ColorAdjustMode adjustMode)
 {
     m_colorMode = ColorMode::kMode_ARGB;
     m_argbColor = color;
@@ -24,7 +26,7 @@ void ColorSlider::SetColorInfo(const UiColor& color, ColorAdjustMode adjustMode)
     Invalidate();
 }
 
-void ColorSlider::SetColorInfo(const ColorHSV& color, ColorAdjustMode adjustMode)
+void ColorSlider::SetColorInfo(const ColorHSV &color, ColorAdjustMode adjustMode)
 {
     m_colorMode = ColorMode::kMode_HSV;
     m_hsvColor = color;
@@ -33,7 +35,7 @@ void ColorSlider::SetColorInfo(const ColorHSV& color, ColorAdjustMode adjustMode
     Invalidate();
 }
 
-void ColorSlider::SetColorInfo(const ColorHSL& color, ColorAdjustMode adjustMode)
+void ColorSlider::SetColorInfo(const ColorHSL &color, ColorAdjustMode adjustMode)
 {
     m_colorMode = ColorMode::kMode_HSL;
     m_hslColor = color;
@@ -42,7 +44,7 @@ void ColorSlider::SetColorInfo(const ColorHSL& color, ColorAdjustMode adjustMode
     Invalidate();
 }
 
-void ColorSlider::PaintBkImage(IRender* pRender)
+void ColorSlider::PaintBkImage(IRender *pRender)
 {
     BaseClass::PaintBkImage(pRender);
     if (pRender == nullptr) {
@@ -50,7 +52,7 @@ void ColorSlider::PaintBkImage(IRender* pRender)
     }
     UiRect rc = GetRect();
     UiRect rcPaint = GetPaintRect();
-    IBitmap* pBitmap = GetColorBitmap(rc);
+    IBitmap *pBitmap = GetColorBitmap(rc);
     UiRect rcDest = rc;
     UiRect rcSource;
     rcSource.left = 0;
@@ -58,7 +60,7 @@ void ColorSlider::PaintBkImage(IRender* pRender)
     rcSource.right = rcSource.left + rc.Width();
     rcSource.bottom = rcSource.top + rc.Height();
     uint8_t uFade = 255;
-    IMatrix* pMatrix = nullptr;
+    IMatrix *pMatrix = nullptr;
 
     //绘制透明棋盘的格子
     const int32_t nGridSize = Dpi().GetScaleInt(7);
@@ -72,38 +74,40 @@ void ColorSlider::PaintBkImage(IRender* pRender)
             rect.right = rect.left + nGridSize;
             rect.bottom = rect.top + nGridSize;
             if (j % 2) {
-                pRender->FillRect(UiRectF::MakeFromRect(rect), (i % 2) == 1 ? UiColor(UiColors::DarkGray) : UiColor(UiColors::White));
+                pRender->FillRect(
+                    UiRectF::MakeFromRect(rect),
+                    (i % 2) == 1 ? UiColor(UiColors::DarkGray) : UiColor(UiColors::White));
+            } else {
+                pRender->FillRect(
+                    UiRectF::MakeFromRect(rect),
+                    (i % 2) == 0 ? UiColor(UiColors::DarkGray) : UiColor(UiColors::White));
             }
-            else {
-                pRender->FillRect(UiRectF::MakeFromRect(rect), (i % 2) == 0 ? UiColor(UiColors::DarkGray) : UiColor(UiColors::White));
-            }            
         }
     }
 
     if (pBitmap != nullptr) {
         pRender->DrawImageRect(rcPaint, pBitmap, rcDest, rcSource, uFade, pMatrix);
-    }        
+    }
 }
 
-IBitmap* ColorSlider::GetColorBitmap(const UiRect& rect)
-{        
+IBitmap *ColorSlider::GetColorBitmap(const UiRect &rect)
+{
     const int32_t nHeight = rect.Height();
     const int32_t nWidth = rect.Width();
     if ((nHeight <= 0) || (nWidth <= 0)) {
         return nullptr;
     }
     if (m_spBitmap != nullptr) {
-        if (((int32_t)m_spBitmap->GetWidth() == nWidth) &&
-            ((int32_t)m_spBitmap->GetHeight() == nHeight)) {
+        if (((int32_t) m_spBitmap->GetWidth() == nWidth)
+            && ((int32_t) m_spBitmap->GetHeight() == nHeight)) {
             //宽度和高度没有变化，不需要重新生成
             return m_spBitmap.get();
-        }
-        else {
+        } else {
             m_spBitmap.reset();
         }
     }
 
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory != nullptr) {
         m_spBitmap.reset(pRenderFactory->CreateBitmap());
@@ -115,9 +119,9 @@ IBitmap* ColorSlider::GetColorBitmap(const UiRect& rect)
             alphaType = BitmapAlphaType::kUnpremul_SkAlphaType;
         }
         m_spBitmap->Init(nWidth, nHeight, nullptr, 1.0f, alphaType);
-        void* pPixelBits = m_spBitmap->LockPixelBits();
+        void *pPixelBits = m_spBitmap->LockPixelBits();
         if (pPixelBits != nullptr) {
-            uint32_t* pData = (uint32_t*)pPixelBits;
+            uint32_t *pData = (uint32_t *) pPixelBits;
             if (m_colorMode == ColorMode::kMode_ARGB) {
                 uint8_t A = m_argbColor.GetA();
                 uint8_t R = m_argbColor.GetR();
@@ -129,106 +133,96 @@ IBitmap* ColorSlider::GetColorBitmap(const UiRect& rect)
                     colorStart = UiColor(0, R, G, B);
                     colorEnd = UiColor(255, R, G, B);
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight );
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         GetARGB(pData, nWidth, colorStart, colorEnd);
                         pData += nWidth;
                     }
-                }
-                else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_R) {
+                } else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_R) {
                     colorStart = UiColor(A, 0, G, B);
-                    colorEnd = UiColor(A, 255, G, B);                        
+                    colorEnd = UiColor(A, 255, G, B);
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         GetARGB(pData, nWidth, colorStart, colorEnd);
                         pData += nWidth;
                     }
-                }
-                else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_G) {
+                } else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_G) {
                     colorStart = UiColor(A, R, 0, B);
                     colorEnd = UiColor(A, R, 255, B);
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         GetARGB(pData, nWidth, colorStart, colorEnd);
                         pData += nWidth;
                     }
-                }
-                else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_B) {
+                } else if (m_adjustMode == ColorAdjustMode::kMode_ARGB_B) {
                     colorStart = UiColor(A, R, G, 0);
                     colorEnd = UiColor(A, R, G, 255);
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         GetARGB(pData, nWidth, colorStart, colorEnd);
                         pData += nWidth;
                     }
                 }
-            }
-            else if (m_colorMode == ColorMode::kMode_HSV) {
+            } else if (m_colorMode == ColorMode::kMode_HSV) {
                 double H = m_hsvColor.H * 1.0;
                 double S = m_hsvColor.S / 100.0;
                 double V = m_hsvColor.V / 100.0;
                 if (m_adjustMode == ColorAdjustMode::kMode_HSV_H) {
                     //H
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSV_HUE(pData, nWidth, S, V);
                         pData += nWidth;
                     }
-                }
-                else if (m_adjustMode == ColorAdjustMode::kMode_HSV_S) {
+                } else if (m_adjustMode == ColorAdjustMode::kMode_HSV_S) {
                     //S
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSV_SAT(pData, nWidth, H, V);
                         pData += nWidth;
                     }
-                }
-                else {
+                } else {
                     //V
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSV_VAL(pData, nWidth, H, S);
                         pData += nWidth;
                     }
                 }
-            }
-            else if (m_colorMode == ColorMode::kMode_HSL) {
+            } else if (m_colorMode == ColorMode::kMode_HSL) {
                 double H = m_hslColor.H * 1.0;
                 double S = m_hslColor.S / 100.0;
                 double L = m_hslColor.L / 100.0;
                 if (m_adjustMode == ColorAdjustMode::kMode_HSL_H) {
                     //H
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSL_HUE(pData, nWidth, S, L);
                         pData += nWidth;
                     }
-                }
-                else if (m_adjustMode == ColorAdjustMode::kMode_HSL_S) {
+                } else if (m_adjustMode == ColorAdjustMode::kMode_HSL_S) {
                     //S
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSL_SAT(pData, nWidth, H, L);
                         pData += nWidth;
                     }
-                }
-                else {
+                } else {
                     //L
                     for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
-                        ASSERT((pData - (uint32_t*)pPixelBits) < nWidth * nHeight);
+                        ASSERT((pData - (uint32_t *) pPixelBits) < nWidth * nHeight);
                         ColorConvert::HSL_LIG(pData, nWidth, H, S);
                         pData += nWidth;
                     }
                 }
-            }                
+            }
             m_spBitmap->UnLockPixelBits();
         }
     }
     return m_spBitmap.get();
 }
 
-void ColorSlider::GetARGB(uint32_t* buffer, int32_t samples,
-                          const UiColor& start, 
-                          const UiColor& end) const
+void ColorSlider::GetARGB(
+    uint32_t *buffer, int32_t samples, const UiColor &start, const UiColor &end) const
 {
     ASSERT(buffer != nullptr);
     if (buffer == nullptr) {
@@ -240,21 +234,23 @@ void ColorSlider::GetARGB(uint32_t* buffer, int32_t samples,
     }
     constexpr const int32_t int_extend = 20;
 
-    int32_t alpha = (int32_t)start.GetA() << int_extend;
-    int32_t red   = (int32_t)start.GetR() << int_extend;
-    int32_t green = (int32_t)start.GetG() << int_extend;
-    int32_t blue  = (int32_t)start.GetB() << int_extend;
-    int32_t alpha_adv = (((int32_t)end.GetA() << int_extend) - alpha) / (samples - 1);
-    int32_t red_adv   = (((int32_t)end.GetR() << int_extend) - red) / (samples - 1);
-    int32_t green_adv = (((int32_t)end.GetG() << int_extend) - green) / (samples - 1);
-    int32_t blue_adv  = (((int32_t)end.GetB() << int_extend) - blue) / (samples - 1);
+    int32_t alpha = (int32_t) start.GetA() << int_extend;
+    int32_t red = (int32_t) start.GetR() << int_extend;
+    int32_t green = (int32_t) start.GetG() << int_extend;
+    int32_t blue = (int32_t) start.GetB() << int_extend;
+    int32_t alpha_adv = (((int32_t) end.GetA() << int_extend) - alpha) / (samples - 1);
+    int32_t red_adv = (((int32_t) end.GetR() << int_extend) - red) / (samples - 1);
+    int32_t green_adv = (((int32_t) end.GetG() << int_extend) - green) / (samples - 1);
+    int32_t blue_adv = (((int32_t) end.GetB() << int_extend) - blue) / (samples - 1);
 
-    for(int32_t i = 0; i < samples; ++i) {
+    for (int32_t i = 0; i < samples; ++i) {
         // set current pixel (in DIB bitmap format is BGR, not RGB!)
-        *(buffer + i) = UiColor( (uint8_t)(alpha >> int_extend),
-                                 (uint8_t)(red   >> int_extend),
-                                 (uint8_t)(green >> int_extend),
-                                 (uint8_t)(blue  >> int_extend) ).GetARGB();
+        *(buffer + i) = UiColor(
+                            (uint8_t) (alpha >> int_extend),
+                            (uint8_t) (red >> int_extend),
+                            (uint8_t) (green >> int_extend),
+                            (uint8_t) (blue >> int_extend))
+                            .GetARGB();
         // advance color values to the next pixel
         alpha += alpha_adv;
         red += red_adv;
@@ -263,4 +259,4 @@ void ColorSlider::GetARGB(uint32_t* buffer, int32_t samples,
     }
 }
 
-}//namespace ui
+} //namespace ui

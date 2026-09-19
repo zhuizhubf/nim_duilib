@@ -11,8 +11,7 @@ class SkFont;
 struct SkPoint;
 enum class SkTextEncoding;
 
-namespace ui
-{
+namespace ui {
 /** 横向绘制文本的字符属性
 */
 struct THorizontalChar;
@@ -22,9 +21,9 @@ struct THorizontalChar;
 class HorizontalDrawText
 {
 public:
-    HorizontalDrawText(SkCanvas* pSkCanvas, SkPaint* pSkPaint, SkPoint* pSkPointOrg);
-    HorizontalDrawText(const HorizontalDrawText& r) = delete;
-    HorizontalDrawText& operator = (const HorizontalDrawText& r) = delete;
+    HorizontalDrawText(SkCanvas *pSkCanvas, SkPaint *pSkPaint, SkPoint *pSkPointOrg);
+    HorizontalDrawText(const HorizontalDrawText &r) = delete;
+    HorizontalDrawText &operator=(const HorizontalDrawText &r) = delete;
     ~HorizontalDrawText() = default;
 
 public:
@@ -32,18 +31,18 @@ public:
     * @param [in] strText 需要评估的文本内容
     * @param [in] measureParam 评估所需的参数
     */
-    UiRect MeasureString(const DString& strText, const MeasureStringParam& measureParam);
+    UiRect MeasureString(const DString &strText, const MeasureStringParam &measureParam);
 
     /** 横向绘制文本：文本绘制方向为从左到右，从上到下
     * @param [in] strText 需要绘制的文本内容
     * @param [in] measureParam 绘制所需的参数
     */
-    void DrawString(const DString& strText, const DrawStringParam& drawParam);
+    void DrawString(const DString &strText, const DrawStringParam &drawParam);
 
 private:
     /** 获取UTF32字符串，并做预处理（横向绘制文本）
     */
-    UTF32String GetDrawStringUTF32(const DString& strText, bool bSingleLineMode) const;
+    UTF32String GetDrawStringUTF32(const DString &strText, bool bSingleLineMode) const;
 
     /** 计算每个字符的绘制所占的矩形范围
     * @param [in] textUTF32 字符串
@@ -53,9 +52,13 @@ private:
     * @param [in] fFontHeight 字体高度
     * @param [out] charRects 返回每个字符绘制所占的矩形范围
     */
-    bool CalculateTextCharBounds(const UTF32String& textUTF32, const IFont* pFont,
-                                 const SkFont* pSkFont, const SkPaint* skPaint,
-                                 float fFontHeight, std::vector<THorizontalChar>& charRects) const;
+    bool CalculateTextCharBounds(
+        const UTF32String &textUTF32,
+        const IFont *pFont,
+        const SkFont *pSkFont,
+        const SkPaint *skPaint,
+        float fFontHeight,
+        std::vector<THorizontalChar> &charRects) const;
 
     /** 计算横向文本（从左到右、从上到下）的绘制区域总矩形
      * @param [in] charRects 每个字符的绘制矩形（宽或高为0表示换行）
@@ -71,29 +74,36 @@ private:
      * @param [out] pColumnHeights 返回每列的列高
      * @return 包含所有字符的总绘制矩形（SkRect）
      */
-    SkRect CalculateHorizontalTextBounds(const std::vector<THorizontalChar>& charRects, int32_t width, bool bSingleLineMode,
-                                         float fSpacingMul, float fSpacingAdd, float fWordHorizontalSpacing,
-                                         float fDefaultCharWidth, float fDefaultCharHeight,
-                                         std::vector<std::vector<int32_t>>* pRowColumns,
-                                         std::vector<float>* pRowHeights,
-                                         std::vector<float>* pRowWidths) const;
+    SkRect CalculateHorizontalTextBounds(
+        const std::vector<THorizontalChar> &charRects,
+        int32_t width,
+        bool bSingleLineMode,
+        float fSpacingMul,
+        float fSpacingAdd,
+        float fWordHorizontalSpacing,
+        float fDefaultCharWidth,
+        float fDefaultCharHeight,
+        std::vector<std::vector<int32_t>> *pRowColumns,
+        std::vector<float> *pRowHeights,
+        std::vector<float> *pRowWidths) const;
 
     /** 计算默认字符的宽度(用于空行的宽度计算)
     */
-    float CalculateDefaultCharWidth(const IFont* pFont, const SkFont* pSkFont, const SkPaint* skPaint) const;
+    float CalculateDefaultCharWidth(
+        const IFont *pFont, const SkFont *pSkFont, const SkPaint *skPaint) const;
 
 private:
     /** 绘制的画布
     */
-    SkCanvas* m_pSkCanvas;
+    SkCanvas *m_pSkCanvas;
 
     /** 绘制属性
     */
-    SkPaint* m_pSkPaint;
+    SkPaint *m_pSkPaint;
 
     /** 视图的原点坐标
     */
-    SkPoint* m_pSkPointOrg;
+    SkPoint *m_pSkPointOrg;
 };
 
 } // namespace ui

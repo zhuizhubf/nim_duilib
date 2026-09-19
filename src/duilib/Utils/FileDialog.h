@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace ui
-{
+namespace ui {
 
 /** 文件或者目录选择对话框，支持多选
 */
@@ -19,16 +18,18 @@ public:
     * @param [out] folderPath 返回选择的文件夹路径
     * @param [in] defaultLocation 初始选择的文件夹路径(可选参数)
     */
-    bool BrowseForFolder(Window* pWindow, FilePath& folderPath,
-                         const FilePath& defaultLocation = FilePath());
+    bool BrowseForFolder(
+        Window *pWindow, FilePath &folderPath, const FilePath &defaultLocation = FilePath());
 
     /** 选择文件夹（多选）
     * @param [in] pWindow 父窗口
     * @param [out] folderPaths 返回选择的文件夹路径
     * @param [in] defaultLocation 初始选择的文件夹路径(可选参数)
     */
-    bool BrowseForFolders(Window* pWindow, std::vector<FilePath>& folderPaths,
-                          const FilePath& defaultLocation = FilePath());
+    bool BrowseForFolders(
+        Window *pWindow,
+        std::vector<FilePath> &folderPaths,
+        const FilePath &defaultLocation = FilePath());
 
 public:
     /** 文件类型筛选器
@@ -60,14 +61,15 @@ public:
     * @param [in] defaultLocation 初始的文件夹路径(可选参数)
     * @param [out] filePath 返回选择的文件路径
     */
-    bool BrowseForFile(Window* pWindow, 
-                       FilePath& filePath,
-                       bool bOpenFileDialog, 
-                       const std::vector<FileType>& fileTypes = std::vector<FileType>(),
-                       int32_t nFileTypeIndex = -1,
-                       const DString& defaultExt = _T(""),
-                       const DString& fileName = _T(""),
-                       const FilePath& defaultFilePath = FilePath());
+    bool BrowseForFile(
+        Window *pWindow,
+        FilePath &filePath,
+        bool bOpenFileDialog,
+        const std::vector<FileType> &fileTypes = std::vector<FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""),
+        const DString &fileName = _T(""),
+        const FilePath &defaultFilePath = FilePath());
 
     /** 选择文件（多选）
     * @param [in] pWindow 父窗口
@@ -77,15 +79,15 @@ public:
     * @param [in] defaultLocation 初始的文件夹路径(可选参数)
     * @param [out] filePaths 返回选择的文件路径
     */
-    bool BrowseForFiles(Window* pWindow, 
-                        std::vector<FilePath>& filePaths,
-                        const std::vector<FileType>& fileTypes = std::vector<FileType>(),
-                        int32_t nFileTypeIndex = -1,
-                        const DString& defaultExt = _T(""),
-                        const FilePath& defaultLocation = FilePath());
-
+    bool BrowseForFiles(
+        Window *pWindow,
+        std::vector<FilePath> &filePaths,
+        const std::vector<FileType> &fileTypes = std::vector<FileType>(),
+        int32_t nFileTypeIndex = -1,
+        const DString &defaultExt = _T(""),
+        const FilePath &defaultLocation = FilePath());
 };
 
-}
+} // namespace ui
 
 #endif // UI_UTILS_FILE_DIALOG_H_

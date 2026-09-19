@@ -1,73 +1,63 @@
 #include "AddressBar.h"
-#include "duilib/Control/RichEdit.h"
 #include "duilib/Control/Button.h"
+#include "duilib/Control/RichEdit.h"
 #include "duilib/Utils/FilePath.h"
 #include <numeric>
 
 #ifdef DUILIB_BUILD_FOR_WIN
-    #include "duilib/Utils/DiskUtils_Windows.h"
+#include "duilib/Utils/DiskUtils_Windows.h"
 #endif
 
-namespace ui
-{
+namespace ui {
 
-AddressBar::AddressBar(Window* pWindow):
-    HBox(pWindow),
-    m_pRichEdit(nullptr),
-    m_pBarBox(nullptr),
-    m_bEnableTooltip(true),
-    m_bReturnUpdateUI(true),
-    m_bEscUpdateUI(true),
-    m_bKillFocusUpdateUI(true),
-    m_bUpdatingUI(false),
-    m_editClass(_T("address_bar_edit")),
-    m_editClearBtnClass(_T("rich_edit_clear_btn")),
-    m_subPathHBoxClass(_T("address_bar_sub_path_hbox")),
-    m_subPathBtnClass(_T("address_bar_sub_path_button")),
-    m_subPathRootClass(_T("address_bar_sub_path_root")),
-    m_pathSeparatorClass(_T("address_bar_path_separator"))
+AddressBar::AddressBar(Window *pWindow)
+    : HBox(pWindow)
+    , m_pRichEdit(nullptr)
+    , m_pBarBox(nullptr)
+    , m_bEnableTooltip(true)
+    , m_bReturnUpdateUI(true)
+    , m_bEscUpdateUI(true)
+    , m_bKillFocusUpdateUI(true)
+    , m_bUpdatingUI(false)
+    , m_editClass(_T("address_bar_edit"))
+    , m_editClearBtnClass(_T("rich_edit_clear_btn"))
+    , m_subPathHBoxClass(_T("address_bar_sub_path_hbox"))
+    , m_subPathBtnClass(_T("address_bar_sub_path_button"))
+    , m_subPathRootClass(_T("address_bar_sub_path_root"))
+    , m_pathSeparatorClass(_T("address_bar_path_separator"))
+{}
+
+DString AddressBar::GetType() const
 {
+    return DUI_CTR_ADDRESS_BAR;
 }
 
-DString AddressBar::GetType() const { return DUI_CTR_ADDRESS_BAR; }
-
-void AddressBar::SetAttribute(const DString& strName, const DString& strValue2)
+void AddressBar::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("address_path")) {
         SetAddressPath(strValue);
-    }
-    else if (strName == _T("path_tooltip")) {
+    } else if (strName == _T("path_tooltip")) {
         SetEnablePathTooltip(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("return_update_ui")) {
+    } else if (strName == _T("return_update_ui")) {
         SetReturnUpdateUI(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("esc_update_ui")) {
+    } else if (strName == _T("esc_update_ui")) {
         SetEscUpdateUI(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("kill_focus_update_ui")) {
+    } else if (strName == _T("kill_focus_update_ui")) {
         SetKillFocusUpdateUI(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("rich_edit_class")) {
+    } else if (strName == _T("rich_edit_class")) {
         SetRichEditClass(strValue);
-    }
-    else if (strName == _T("rich_edit_clear_btn_class")) {
+    } else if (strName == _T("rich_edit_clear_btn_class")) {
         SetRichEditClearBtnClass(strValue);
-    }
-    else if (strName == _T("sub_path_hbox_class")) {
+    } else if (strName == _T("sub_path_hbox_class")) {
         SetSubPathHBoxClass(strValue);
-    }
-    else if (strName == _T("sub_path_button_class")) {
+    } else if (strName == _T("sub_path_button_class")) {
         SetSubPathBtnClass(strValue);
-    }
-    else if (strName == _T("sub_path_root_class")) {
+    } else if (strName == _T("sub_path_root_class")) {
         SetSubPathRootClass(strValue);
-    }
-    else if (strName == _T("path_separator_class")) {
+    } else if (strName == _T("path_separator_class")) {
         SetPathSeparatorClass(strValue);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -112,7 +102,7 @@ bool AddressBar::IsKillFocusUpdateUI() const
     return m_bKillFocusUpdateUI;
 }
 
-void AddressBar::SetRichEditClass(const DString& editClass)
+void AddressBar::SetRichEditClass(const DString &editClass)
 {
     m_editClass = editClass;
 }
@@ -122,7 +112,7 @@ DString AddressBar::GetRichEditClass() const
     return m_editClass.c_str();
 }
 
-void AddressBar::SetRichEditClearBtnClass(const DString& clearBtnClass)
+void AddressBar::SetRichEditClearBtnClass(const DString &clearBtnClass)
 {
     m_editClearBtnClass = clearBtnClass;
 }
@@ -132,7 +122,7 @@ DString AddressBar::GetRichEditClearBtnClass() const
     return m_editClearBtnClass.c_str();
 }
 
-void AddressBar::SetSubPathHBoxClass(const DString& hboxClass)
+void AddressBar::SetSubPathHBoxClass(const DString &hboxClass)
 {
     m_subPathHBoxClass = hboxClass;
 }
@@ -142,7 +132,7 @@ DString AddressBar::GetSubPathHBoxClass() const
     return m_subPathHBoxClass.c_str();
 }
 
-void AddressBar::SetSubPathBtnClass(const DString& subPathBtnClass)
+void AddressBar::SetSubPathBtnClass(const DString &subPathBtnClass)
 {
     m_subPathBtnClass = subPathBtnClass;
 }
@@ -152,7 +142,7 @@ DString AddressBar::GetSubPathBtnClass() const
     return m_subPathBtnClass.c_str();
 }
 
-void AddressBar::SetSubPathRootClass(const DString& subPathRootClass)
+void AddressBar::SetSubPathRootClass(const DString &subPathRootClass)
 {
     m_subPathRootClass = subPathRootClass;
 }
@@ -162,7 +152,7 @@ DString AddressBar::GetSubPathRootClass() const
     return m_subPathRootClass.c_str();
 }
 
-void AddressBar::SetPathSeparatorClass(const DString& pathSeparatorClass)
+void AddressBar::SetPathSeparatorClass(const DString &pathSeparatorClass)
 {
     m_pathSeparatorClass = pathSeparatorClass;
 }
@@ -214,23 +204,23 @@ void AddressBar::OnInit()
         m_pRichEdit->SetClass(GetRichEditClearBtnClass());
         m_pRichEdit->SetClass(GetRichEditClass());
 
-        m_pRichEdit->AttachSetFocus([this](const EventArgs&) {
+        m_pRichEdit->AttachSetFocus([this](const EventArgs &) {
             OnAddressBarSetFocus(m_pRichEdit);
             return true;
-            });
-        m_pRichEdit->AttachKillFocus([this](const EventArgs& args) {
+        });
+        m_pRichEdit->AttachKillFocus([this](const EventArgs &args) {
             ShowAddressEdit(false);
-            OnAddressBarKillFocus((Control*)args.wParam);
+            OnAddressBarKillFocus((Control *) args.wParam);
             return true;
-            });
-        m_pRichEdit->AttachReturn([this](const EventArgs&) {
+        });
+        m_pRichEdit->AttachReturn([this](const EventArgs &) {
             OnAddressBarReturn();
             return true;
-            });
-        m_pRichEdit->AttachEsc([this](const EventArgs&) {
+        });
+        m_pRichEdit->AttachEsc([this](const EventArgs &) {
             OnAddressBarEsc();
             return true;
-            });
+        });
     }
 
     if (m_pBarBox == nullptr) {
@@ -238,32 +228,32 @@ void AddressBar::OnInit()
         AddItem(m_pBarBox);
         m_pBarBox->SetPadding(UiPadding(0, 0, 16, 0), true);
 
-        m_pBarBox->AttachSetFocus([this](const EventArgs&) {
+        m_pBarBox->AttachSetFocus([this](const EventArgs &) {
             ShowAddressEdit(true);
             OnAddressBarSetFocus(m_pBarBox);
             return true;
-            });
-        m_pBarBox->AttachKillFocus([this](const EventArgs& args) {
-            OnAddressBarKillFocus((Control*)args.wParam);
+        });
+        m_pBarBox->AttachKillFocus([this](const EventArgs &args) {
+            OnAddressBarKillFocus((Control *) args.wParam);
             return true;
-            });
-        m_pBarBox->AttachButtonDown([this](const EventArgs&) {
+        });
+        m_pBarBox->AttachButtonDown([this](const EventArgs &) {
             ShowAddressEdit(true);
             return true;
-            });
+        });
     }
 
     m_pRichEdit->SetVisible(false);
 
     //获取焦点的时候，切换到编辑框
-    AttachSetFocus([this](const EventArgs&) {
+    AttachSetFocus([this](const EventArgs &) {
         ShowAddressEdit(true);
         return true;
-        });
-    AttachButtonDown([this](const EventArgs&) {
+    });
+    AttachButtonDown([this](const EventArgs &) {
         ShowAddressEdit(true);
         return true;
-        });
+    });
 
     if (!m_addressPath.empty()) {
         SetAddressPath(m_addressPath.c_str());
@@ -279,11 +269,11 @@ void AddressBar::ShowAddressEdit(bool bShow)
         m_pRichEdit->SetVisible(bShow);
         if (bShow) {
             m_pRichEdit->SetFocus();
-        }        
+        }
     }
 }
 
-bool AddressBar::AddSubPath(const DString& displayName, const DString& filePath)
+bool AddressBar::AddSubPath(const DString &displayName, const DString &filePath)
 {
     ASSERT(!filePath.empty());
     if (filePath.empty()) {
@@ -295,19 +285,18 @@ bool AddressBar::AddSubPath(const DString& displayName, const DString& filePath)
         return false;
     }
 
-    HBox* pBox = new HBox(GetWindow());
+    HBox *pBox = new HBox(GetWindow());
     m_pBarBox->AddItem(pBox);
     pBox->SetClass(GetSubPathHBoxClass());
     pBox->SetNoFocus();
 
-    Button* pDisplayNameBtn = new Button(GetWindow());
-    pBox->AddItem(pDisplayNameBtn);    
+    Button *pDisplayNameBtn = new Button(GetWindow());
+    pBox->AddItem(pDisplayNameBtn);
     if (filePath == _T("/")) {
         //根目录
         pDisplayNameBtn->SetClass(GetSubPathBtnClass());
         pDisplayNameBtn->SetClass(GetSubPathRootClass());
-    }
-    else {
+    } else {
         pDisplayNameBtn->SetClass(GetSubPathBtnClass());
         pDisplayNameBtn->SetText(displayName.empty() ? filePath : displayName);
     }
@@ -316,24 +305,24 @@ bool AddressBar::AddSubPath(const DString& displayName, const DString& filePath)
     }
     pDisplayNameBtn->SetNoFocus();
 
-    pDisplayNameBtn->AttachClick([this, filePath](const EventArgs&) {
+    pDisplayNameBtn->AttachClick([this, filePath](const EventArgs &) {
         OnClickedSubPath(filePath);
         return true;
-        });
+    });
 
-    Button* pArrowBtn = new Button(GetWindow());
+    Button *pArrowBtn = new Button(GetWindow());
     pBox->AddItem(pArrowBtn);
     pArrowBtn->SetClass(GetPathSeparatorClass());
     pArrowBtn->SetNoFocus();
     return true;
 }
 
-void AddressBar::OnClickedSubPath(const DString& filePath)
+void AddressBar::OnClickedSubPath(const DString &filePath)
 {
     m_clickedAddressPath = filePath;
     if (!m_clickedAddressPath.empty()) {
         SendEvent(kEventPathClick);
-    }    
+    }
 }
 
 DString AddressBar::GetClickedAddressPath() const
@@ -341,12 +330,12 @@ DString AddressBar::GetClickedAddressPath() const
     return m_clickedAddressPath.c_str();
 }
 
-void AddressBar::OnAddressBarSetFocus(Control* /*pNewFocus*/)
+void AddressBar::OnAddressBarSetFocus(Control * /*pNewFocus*/)
 {
     SendEvent(kEventSetFocus);
 }
 
-void AddressBar::OnAddressBarKillFocus(Control* pNewFocus)
+void AddressBar::OnAddressBarKillFocus(Control *pNewFocus)
 {
     if ((pNewFocus != this) && (pNewFocus != m_pRichEdit) && (pNewFocus != m_pBarBox)) {
         bool bChanged = false;
@@ -359,14 +348,13 @@ void AddressBar::OnAddressBarKillFocus(Control* pNewFocus)
                 }
                 bChanged = UpdateAddressBarControls(addressPath);
             }
-        }
-        else {
+        } else {
             //恢复
             if (m_pRichEdit != nullptr) {
                 m_pRichEdit->SetText(GetAddressPath());
             }
         }
-        SendEvent(kEventKillFocus, (WPARAM)pNewFocus);
+        SendEvent(kEventKillFocus, (WPARAM) pNewFocus);
         if (bChanged && !flag.expired()) {
             SendEvent(kEventPathChanged);
         }
@@ -386,7 +374,7 @@ void AddressBar::OnAddressBarReturn()
         bChanged = UpdateAddressBarControls(addressPath);
         ShowAddressEdit(false);
         m_bUpdatingUI = false;
-    }    
+    }
     SendEvent(kEventReturn);
     if (bChanged && !flag.expired()) {
         SendEvent(kEventPathChanged);
@@ -406,7 +394,7 @@ void AddressBar::OnAddressBarEsc()
     SendEvent(kEventEsc);
 }
 
-void AddressBar::SetAddressPath(const DString& addressPath)
+void AddressBar::SetAddressPath(const DString &addressPath)
 {
     m_addressPath = addressPath;
     if (m_pRichEdit != nullptr) {
@@ -427,7 +415,7 @@ DString AddressBar::GetPreviousAddressPath() const
     return m_prevShowAddressPath.c_str();
 }
 
-bool AddressBar::UpdateAddressBarControls(const DString& addressPath)
+bool AddressBar::UpdateAddressBarControls(const DString &addressPath)
 {
     if (m_showAddressPath == addressPath) {
         return false;
@@ -451,16 +439,15 @@ bool AddressBar::UpdateAddressBarControls(const DString& addressPath)
         if (pathList.back() != filePath) {
             pathList.push_back(filePath);
         }
-    }
-    else {
+    } else {
         pathList.push_back(filePath);
     }
 
     bool bRoot = true;
     DString displayName;
-    for (const FilePath& subPath : pathList) {
+    for (const FilePath &subPath : pathList) {
         displayName = subPath.GetFileName();
-        if (bRoot && displayName.empty()) {            
+        if (bRoot && displayName.empty()) {
 #ifdef DUILIB_BUILD_FOR_WIN
             //Windows盘符
             DiskUtils::DiskInfo diskInfo;
@@ -469,7 +456,8 @@ bool AddressBar::UpdateAddressBarControls(const DString& addressPath)
 #endif
             if (displayName.empty()) {
                 displayName = subPath.ToString();
-                if (!displayName.empty() && displayName[displayName.size() - 1] == FilePath::GetPathSeparator()) {
+                if (!displayName.empty()
+                    && displayName[displayName.size() - 1] == FilePath::GetPathSeparator()) {
                     displayName = displayName.substr(0, displayName.size() - 1);
                 }
             }
@@ -490,7 +478,7 @@ void AddressBar::UpdateAddressBarControlsStatus()
     UiPadding rcBarPadding = GetPadding();
     rc.Deflate(rcBarPadding);
 
-    std::vector<Control*> pathButtonList;    
+    std::vector<Control *> pathButtonList;
     int32_t nKeepWidth = 0; //需要预留的宽度
     UiPadding rcPadding = m_pBarBox->GetPadding();
     UiMargin rcMargin = m_pBarBox->GetMargin();
@@ -499,11 +487,11 @@ void AddressBar::UpdateAddressBarControlsStatus()
 
     size_t nCount = m_pBarBox->GetItemCount();
     for (size_t nItem = 0; nItem < nCount; ++nItem) {
-        Control* pControl = m_pBarBox->GetItemAt(nItem);
+        Control *pControl = m_pBarBox->GetItemAt(nItem);
         if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
             continue;
         }
-        Box* pBox = dynamic_cast<Box*>(pControl);
+        Box *pBox = dynamic_cast<Box *>(pControl);
         if (pBox == nullptr) {
             continue;
         }
@@ -512,7 +500,7 @@ void AddressBar::UpdateAddressBarControlsStatus()
         nKeepWidth += (rcPadding.left + rcPadding.right);
         nKeepWidth += (rcMargin.left + rcMargin.right);
 
-        Control* pPathButton = pBox->GetItemAt(0);
+        Control *pPathButton = pBox->GetItemAt(0);
         if (pPathButton != nullptr) {
             rcPadding = pPathButton->GetPadding();
             rcMargin = pPathButton->GetMargin();
@@ -520,7 +508,7 @@ void AddressBar::UpdateAddressBarControlsStatus()
             nKeepWidth += (rcMargin.left + rcMargin.right);
             pathButtonList.push_back(pPathButton);
         }
-        Control* pPathSepButton = pBox->GetItemAt(1);
+        Control *pPathSepButton = pBox->GetItemAt(1);
         if (pPathSepButton != nullptr) {
             rcMargin = pPathSepButton->GetMargin();
             nKeepWidth += (rcMargin.left + rcMargin.right);
@@ -529,18 +517,23 @@ void AddressBar::UpdateAddressBarControlsStatus()
     }
     std::vector<int32_t> originalWidths; //每个控件占用的实际宽度
     int32_t nPathWidth = nKeepWidth;     //路径控件所占的总宽度
-    for (Control* pPathButton : pathButtonList) {
+    for (Control *pPathButton : pathButtonList) {
         rcPadding = pPathButton->GetPadding();
-        nPathWidth -= (rcPadding.left + rcPadding.right);//因为EstimateSize返回的结果已经包含了内边距，所以需要减去，避免重复计算
+        nPathWidth
+            -= (rcPadding.left
+                + rcPadding
+                      .right); //因为EstimateSize返回的结果已经包含了内边距，所以需要减去，避免重复计算
 
-        int32_t nEstimateSize = pPathButton->EstimateSize(UiSize(rc.Width(), rc.Height())).cx.GetInt32();
+        int32_t nEstimateSize
+            = pPathButton->EstimateSize(UiSize(rc.Width(), rc.Height())).cx.GetInt32();
         nPathWidth += nEstimateSize;
         originalWidths.push_back(nEstimateSize);
     }
 
     bool bUseDefault = true;
     const int32_t nBarWidth = rc.Width();
-    if ((nPathWidth > nBarWidth) && (pathButtonList.size() > 1) && (originalWidths.size() == pathButtonList.size())) {
+    if ((nPathWidth > nBarWidth) && (pathButtonList.size() > 1)
+        && (originalWidths.size() == pathButtonList.size())) {
         //第一个控件：根目录控件保持不变
         pathButtonList[0]->SetMaxWidth(originalWidths[0], false);
         nKeepWidth += originalWidths[0];
@@ -561,20 +554,21 @@ void AddressBar::UpdateAddressBarControlsStatus()
     }
     if (bUseDefault) {
         //恢复原状
-        for (Control* pPathButton : pathButtonList) {
+        for (Control *pPathButton : pathButtonList) {
             pPathButton->SetMaxWidth(INT32_MAX, false);
         }
     }
 }
 
-std::vector<int32_t> AddressBar::AdjustControlsWidth(const std::vector<int32_t>& originalWidths, int32_t totalWidth)
+std::vector<int32_t> AddressBar::AdjustControlsWidth(
+    const std::vector<int32_t> &originalWidths, int32_t totalWidth)
 {
     std::vector<int32_t> adjustedWidths;
     if (originalWidths.empty()) {
         return adjustedWidths;
     }
     const int32_t nMinWidth = 2; //最小宽度
-    if (totalWidth < (int32_t)adjustedWidths.size() * nMinWidth) {
+    if (totalWidth < (int32_t) adjustedWidths.size() * nMinWidth) {
         //控件不足，按最小宽度设置
         adjustedWidths.assign(originalWidths.size(), nMinWidth);
         return adjustedWidths;
@@ -592,9 +586,10 @@ std::vector<int32_t> AddressBar::AdjustControlsWidth(const std::vector<int32_t>&
     }
 
     // 计算需要从大控件中缩减的总宽度
-    int32_t reduceTotal = std::accumulate(originalWidths.begin(), originalWidths.end(), 0) - totalWidth;
+    int32_t reduceTotal = std::accumulate(originalWidths.begin(), originalWidths.end(), 0)
+                          - totalWidth;
     if (reduceTotal <= 0) {
-        return originalWidths;  // 不需要缩减
+        return originalWidths; // 不需要缩减
     }
 
     // 计算大控件的原始总宽度
@@ -603,7 +598,7 @@ std::vector<int32_t> AddressBar::AdjustControlsWidth(const std::vector<int32_t>&
         largeSum += originalWidths[idx];
     }
     if (largeSum <= 0) {
-        return originalWidths;  // 不需要缩减
+        return originalWidths; // 不需要缩减
     }
 
     // 按比例缩减大控件
@@ -614,15 +609,14 @@ std::vector<int32_t> AddressBar::AdjustControlsWidth(const std::vector<int32_t>&
         if (i == adjustIndices.size() - 1) {
             // 最后一个控件吸收舍入误差
             adjustedWidths[idx] = originalWidths[idx] - (reduceTotal - reduced);
-        }
-        else {
+        } else {
             int32_t reduce = (originalWidths[idx] * reduceTotal) / largeSum;
             adjustedWidths[idx] = originalWidths[idx] - reduce;
             reduced += reduce;
         }
     }
 
-    for (int32_t& v : adjustedWidths) {
+    for (int32_t &v : adjustedWidths) {
         //限制最小值，避免出现0或者负值
         if (v < nMinWidth) {
             v = nMinWidth;
@@ -631,4 +625,4 @@ std::vector<int32_t> AddressBar::AdjustControlsWidth(const std::vector<int32_t>&
     return adjustedWidths;
 }
 
-}//namespace ui
+} //namespace ui

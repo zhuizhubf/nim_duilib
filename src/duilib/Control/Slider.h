@@ -4,24 +4,24 @@
 #include "duilib/Control/Progress.h"
 #include <string>
 
-namespace ui
-{
+namespace ui {
 
 /** 滑块控件
 */
 class DUILIB_API Slider : public Progress
 {
     typedef Progress BaseClass;
+
 public:
-    explicit Slider(Window* pWindow);
+    explicit Slider(Window *pWindow);
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
     virtual UiRect GetProgressPos() override;
-    virtual void HandleEvent(const EventArgs& msg) override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void PaintStateImages(IRender* pRender) override;
-    virtual void PaintBkColor(IRender* pRender) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void PaintStateImages(IRender *pRender) override;
+    virtual void PaintBkColor(IRender *pRender) override;
     virtual void ClearImageCache() override;
 
     /** DPI发生变化，更新控件大小和布局
@@ -65,11 +65,11 @@ public:
      * @param[in] stateType 要设置的状态标识，参考 ControlStateType 枚举
      * @param[in] pStrImage 要设置的图片位置
      */
-    void SetThumbStateImage(ControlStateType stateType, const DString& pStrImage);
+    void SetThumbStateImage(ControlStateType stateType, const DString &pStrImage);
 
     /** 获取进度条内边距
      */
-    const UiPadding& GetProgressBarPadding() const;
+    const UiPadding &GetProgressBarPadding() const;
 
     /** 设置进度条内边距
      * @param [in] padding 要设置的内边距信息
@@ -81,7 +81,10 @@ public:
      * @param [in] callback 进度条进度改变后调用的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachValueChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventValueChanged, callback, callbackID);    }
+    void AttachValueChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventValueChanged, callback, callbackID);
+    }
 
 protected:
     int m_nStep;
@@ -91,6 +94,6 @@ protected:
     UiString m_sImageModify;
 };
 
-}
+} // namespace ui
 
 #endif // UI_CONTROL_SLIDER_H_

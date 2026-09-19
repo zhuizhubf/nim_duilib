@@ -1,27 +1,26 @@
 #include "FilterCombo.h"
 
-namespace ui 
-{
+namespace ui {
 
-FilterCombo::FilterCombo(Window* pWindow):
-    Combo(pWindow)
+FilterCombo::FilterCombo(Window *pWindow)
+    : Combo(pWindow)
 {
     SetComboType(kCombo_DropDown);
 }
 
-FilterCombo::~FilterCombo()
+FilterCombo::~FilterCombo() {}
+
+DString FilterCombo::GetType() const
 {
+    return DUI_CTR_FILTER_COMBO;
 }
 
-DString FilterCombo::GetType() const { return DUI_CTR_FILTER_COMBO; }
-
-void FilterCombo::SetAttribute(const DString& strName, const DString& strValue2)
+void FilterCombo::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("combo_type")) {
         //忽略该属性设置
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -35,18 +34,18 @@ void FilterCombo::OnInit()
     SetComboType(kCombo_DropDown);
 }
 
-bool FilterCombo::OnEditButtonDown(const EventArgs& /*args*/)
+bool FilterCombo::OnEditButtonDown(const EventArgs & /*args*/)
 {
     ShowComboList();
     return true;
 }
 
-bool FilterCombo::OnEditButtonUp(const EventArgs& /*args*/)
+bool FilterCombo::OnEditButtonUp(const EventArgs & /*args*/)
 {
     return true;
 }
 
-bool FilterCombo::OnEditTextChanged(const ui::EventArgs& /*args*/)
+bool FilterCombo::OnEditTextChanged(const ui::EventArgs & /*args*/)
 {
     DString editText = GetText();
     //转换成小写，比较的时候，不区分大小写
@@ -56,24 +55,23 @@ bool FilterCombo::OnEditTextChanged(const ui::EventArgs& /*args*/)
     return true;
 }
 
-void FilterCombo::FilterComboList(const DString& filterText)
+void FilterCombo::FilterComboList(const DString &filterText)
 {
-    TreeView* pTreeView = GetTreeView();
+    TreeView *pTreeView = GetTreeView();
     if (pTreeView == nullptr) {
         return;
     }
     size_t itemCount = pTreeView->GetItemCount();
     for (size_t iIndex = 0; iIndex < itemCount; ++iIndex) {
-        Control* pControl = pTreeView->GetItemAt(iIndex);
+        Control *pControl = pTreeView->GetItemAt(iIndex);
         if (pControl != nullptr) {
-            TreeNode* pTreeNode = dynamic_cast<TreeNode*>(pControl);
+            TreeNode *pTreeNode = dynamic_cast<TreeNode *>(pControl);
             ASSERT(pTreeNode != nullptr);
             if (pTreeNode != nullptr) {
                 pTreeNode->SetExpand(true, false);
                 if (IsFilterText(filterText, pTreeNode->GetText())) {
                     pTreeNode->SetVisible(true);
-                }
-                else {
+                } else {
                     pTreeNode->SetVisible(false);
                 }
             }
@@ -82,7 +80,7 @@ void FilterCombo::FilterComboList(const DString& filterText)
     UpdateComboList();
 }
 
-bool FilterCombo::IsFilterText(const DString& filterText, const DString& itemText) const
+bool FilterCombo::IsFilterText(const DString &filterText, const DString &itemText) const
 {
     DString lowerItemText = StringUtil::MakeLowerString(itemText);
     if (filterText.empty()) {
@@ -92,4 +90,3 @@ bool FilterCombo::IsFilterText(const DString& filterText, const DString& itemTex
 }
 
 } // namespace ui
-

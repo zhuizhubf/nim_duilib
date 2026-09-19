@@ -1,20 +1,18 @@
 #include "Image.h"
-#include "duilib/Image/ImageUtil.h"
-#include "duilib/Image/ImagePlayer.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/DpiManager.h"
+#include "duilib/Image/ImagePlayer.h"
+#include "duilib/Image/ImageUtil.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
-namespace ui 
-{
-Image::Image() :
-    m_pControl(nullptr),
-    m_pImagePlayer(nullptr),
-    m_nCurrentFrame(0),
-    m_bImageError(false),
-    m_bDecodeEventFired(false)
-{
-}
+namespace ui {
+Image::Image()
+    : m_pControl(nullptr)
+    , m_pImagePlayer(nullptr)
+    , m_nCurrentFrame(0)
+    , m_bImageError(false)
+    , m_bDecodeEventFired(false)
+{}
 
 Image::~Image()
 {
@@ -28,7 +26,7 @@ void Image::InitImageAttribute()
     m_imageAttribute.Init();
 }
 
-void Image::SetImageString(const DString& strImageString, const DpiManager& dpi)
+void Image::SetImageString(const DString &strImageString, const DpiManager &dpi)
 {
     SetImageError(false);
     SetDecodeEventFired(false);
@@ -36,7 +34,7 @@ void Image::SetImageString(const DString& strImageString, const DpiManager& dpi)
     m_imageAttribute.InitByImageString(strImageString, dpi);
 }
 
-void Image::UpdateImageAttribute(const DString& strImageString, const DpiManager& dpi)
+void Image::UpdateImageAttribute(const DString &strImageString, const DpiManager &dpi)
 {
     //只修改属性，不修改图片资源路径
     DString sImagePath = m_imageAttribute.m_sImagePath.c_str();
@@ -49,7 +47,7 @@ DString Image::GetImageString() const
     return m_imageAttribute.m_sImageString.c_str();
 }
 
-bool Image::EqualToImageString(const DString& imageString) const
+bool Image::EqualToImageString(const DString &imageString) const
 {
     return m_imageAttribute.m_sImageString == imageString;
 }
@@ -59,12 +57,12 @@ DString Image::GetImagePath() const
     return m_imageAttribute.m_sImagePath.c_str();
 }
 
-void Image::SetImageMargin(const UiMargin& newMargin, bool bNeedDpiScale, const DpiManager& dpi)
+void Image::SetImageMargin(const UiMargin &newMargin, bool bNeedDpiScale, const DpiManager &dpi)
 {
     m_imageAttribute.SetImageMargin(newMargin, bNeedDpiScale, dpi);
 }
 
-UiMargin Image::GetImageMargin(const DpiManager& dpi) const
+UiMargin Image::GetImageMargin(const DpiManager &dpi) const
 {
     return m_imageAttribute.GetImageMargin(dpi);
 }
@@ -89,38 +87,40 @@ void Image::SetImageFade(uint8_t nFade)
     m_imageAttribute.m_bFade = nFade;
 }
 
-const ImageAttribute& Image::GetImageAttribute() const
+const ImageAttribute &Image::GetImageAttribute() const
 {
     return m_imageAttribute;
 }
 
 ImageLoadParam Image::GetImageLoadParam() const
 {
-    uint32_t nLoadDpiScale = (m_pControl != nullptr) ? m_pControl->Dpi().GetDisplayScaleFactor() : 100;
+    uint32_t nLoadDpiScale = (m_pControl != nullptr) ? m_pControl->Dpi().GetDisplayScaleFactor()
+                                                     : 100;
     bool bAsyncDecode = m_imageAttribute.m_bAsyncLoad;
     bool bIconAsAnimation = m_imageAttribute.m_bIconAsAnimation;
     uint32_t nIconSize = m_imageAttribute.m_nIconSize;
     int32_t nIconFrameDelayMs = m_imageAttribute.m_nIconFrameDelayMs;
     float fPagMaxFrameRate = m_imageAttribute.m_fPagMaxFrameRate;
-    return ImageLoadParam(m_imageAttribute.m_srcWidth.c_str(),
-                          m_imageAttribute.m_srcHeight.c_str(),
-                          m_imageAttribute.m_bImageDpiScaleEnabled,
-                          nLoadDpiScale,
-                          bAsyncDecode,
-                          bIconAsAnimation,
-                          nIconFrameDelayMs,
-                          nIconSize,
-                          fPagMaxFrameRate,
-                          m_imageAttribute.IsAssertEnabled(),
-                          m_imageAttribute.m_svgReplaceColors.c_str());
+    return ImageLoadParam(
+        m_imageAttribute.m_srcWidth.c_str(),
+        m_imageAttribute.m_srcHeight.c_str(),
+        m_imageAttribute.m_bImageDpiScaleEnabled,
+        nLoadDpiScale,
+        bAsyncDecode,
+        bIconAsAnimation,
+        nIconFrameDelayMs,
+        nIconSize,
+        fPagMaxFrameRate,
+        m_imageAttribute.IsAssertEnabled(),
+        m_imageAttribute.m_svgReplaceColors.c_str());
 }
 
-const std::shared_ptr<ImageInfo>& Image::GetImageInfo() const
+const std::shared_ptr<ImageInfo> &Image::GetImageInfo() const
 {
     return m_imageInfo;
 }
 
-void Image::SetImageInfo(const std::shared_ptr<ImageInfo>& imageInfo)
+void Image::SetImageInfo(const std::shared_ptr<ImageInfo> &imageInfo)
 {
     m_imageInfo = imageInfo;
 }
@@ -177,7 +177,8 @@ bool Image::IsMultiFrameImage() const
     return m_imageInfo->IsMultiFrameImage();
 }
 
-AnimationFramePtr Image::GetCurrentFrame(const UiRect& rcDest, UiRect& rcSource, UiRect& rcSourceCorners) const
+AnimationFramePtr Image::GetCurrentFrame(
+    const UiRect &rcDest, UiRect &rcSource, UiRect &rcSourceCorners) const
 {
 #if DUILIB_PERFORMANCE_STAT_ENABLED
     //性能统计
@@ -197,14 +198,15 @@ AnimationFramePtr Image::GetCurrentFrame(const UiRect& rcDest, UiRect& rcSource,
     //多帧图片
     AnimationFramePtr pAnimationFrame;
     if (m_nCurrentFrame < m_imageInfo->GetFrameCount()) {
-        pAnimationFrame = m_imageInfo->GetFrame(m_nCurrentFrame, UiSize(rcDest.Width(), rcDest.Height()));
-    }
-    else {
+        pAnimationFrame
+            = m_imageInfo->GetFrame(m_nCurrentFrame, UiSize(rcDest.Width(), rcDest.Height()));
+    } else {
         uint32_t nCurrentFrame = 0;
         if (m_imageInfo->GetFrameCount() > 0) {
             nCurrentFrame = m_nCurrentFrame % m_imageInfo->GetFrameCount();
         }
-        pAnimationFrame = m_imageInfo->GetFrame(nCurrentFrame, UiSize(rcDest.Width(), rcDest.Height()));
+        pAnimationFrame
+            = m_imageInfo->GetFrame(nCurrentFrame, UiSize(rcDest.Width(), rcDest.Height()));
     }
     if (pAnimationFrame != nullptr) {
         AdjustImageSourceRect(pAnimationFrame->m_pBitmap, rcSource, rcSourceCorners);
@@ -212,7 +214,8 @@ AnimationFramePtr Image::GetCurrentFrame(const UiRect& rcDest, UiRect& rcSource,
     return pAnimationFrame;
 }
 
-std::shared_ptr<IBitmap> Image::GetBitmapData(UiRect& rcSource, UiRect& rcSourceCorners, bool* bDecodeError) const
+std::shared_ptr<IBitmap> Image::GetBitmapData(
+    UiRect &rcSource, UiRect &rcSourceCorners, bool *bDecodeError) const
 {
 #if DUILIB_PERFORMANCE_STAT_ENABLED
     //性能统计
@@ -235,7 +238,8 @@ std::shared_ptr<IBitmap> Image::GetBitmapData(UiRect& rcSource, UiRect& rcSource
     return pBitmap;
 }
 
-void Image::AdjustImageSourceRect(const std::shared_ptr<IBitmap>& pBitmap, UiRect& rcSource, UiRect& rcSourceCorners) const
+void Image::AdjustImageSourceRect(
+    const std::shared_ptr<IBitmap> &pBitmap, UiRect &rcSource, UiRect &rcSourceCorners) const
 {
     if (pBitmap == nullptr) {
         return;
@@ -249,61 +253,72 @@ void Image::AdjustImageSourceRect(const std::shared_ptr<IBitmap>& pBitmap, UiRec
         return;
     }
     //校验位图大小与ImageInfo大小是否一致，如果不一致，则需要调整绘制区域参数
-    if ((m_imageInfo->GetWidth() == (int32_t)pBitmap->GetWidth()) &&
-        (m_imageInfo->GetHeight() == (int32_t)pBitmap->GetHeight())) {
+    if ((m_imageInfo->GetWidth() == (int32_t) pBitmap->GetWidth())
+        && (m_imageInfo->GetHeight() == (int32_t) pBitmap->GetHeight())) {
         return;
     }
     float fSizeScaleX = static_cast<float>(pBitmap->GetWidth()) / m_imageInfo->GetWidth();
     float fSizeScaleY = static_cast<float>(pBitmap->GetHeight()) / m_imageInfo->GetHeight();
-    const bool bFullImage = (rcSource.left == 0) &&
-                            (rcSource.top == 0) &&
-                            (rcSource.right == m_imageInfo->GetWidth()) &&
-                            (rcSource.bottom == m_imageInfo->GetHeight());
+    const bool bFullImage = (rcSource.left == 0) && (rcSource.top == 0)
+                            && (rcSource.right == m_imageInfo->GetWidth())
+                            && (rcSource.bottom == m_imageInfo->GetHeight());
     if (bFullImage) {
         //完整图片
         rcSource.right = pBitmap->GetWidth();
         rcSource.bottom = pBitmap->GetHeight();
 
         if (ImageUtil::NeedResizeImage(fSizeScaleX)) {
-            rcSourceCorners.left = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.left, fSizeScaleX);
-            rcSourceCorners.right = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.right, fSizeScaleX);
+            rcSourceCorners.left = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.left, fSizeScaleX);
+            rcSourceCorners.right = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.right, fSizeScaleX);
         }
         if (ImageUtil::NeedResizeImage(fSizeScaleY)) {
-            rcSourceCorners.top = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.top, fSizeScaleY);
-            rcSourceCorners.bottom = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.bottom, fSizeScaleY);
+            rcSourceCorners.top = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.top, fSizeScaleY);
+            rcSourceCorners.bottom = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.bottom, fSizeScaleY);
         }
-    }
-    else {
+    } else {
         if (ImageUtil::NeedResizeImage(fSizeScaleX)) {
             //需要对rcSource修改
-            rcSource.left = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSource.left, fSizeScaleX);
-            rcSource.right = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSource.right, fSizeScaleX);
+            rcSource.left
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) rcSource.left, fSizeScaleX);
+            rcSource.right
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) rcSource.right, fSizeScaleX);
             ASSERT(rcSource.right > rcSource.left);
             ASSERT(rcSource.left >= 0);
-            ASSERT(rcSource.right <= (int32_t)pBitmap->GetWidth());
+            ASSERT(rcSource.right <= (int32_t) pBitmap->GetWidth());
 
-            rcSourceCorners.left = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.left, fSizeScaleX);
-            rcSourceCorners.right = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.right, fSizeScaleX);
+            rcSourceCorners.left = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.left, fSizeScaleX);
+            rcSourceCorners.right = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.right, fSizeScaleX);
         }
         if (ImageUtil::NeedResizeImage(fSizeScaleY)) {
             //需要对rcSource修改
-            rcSource.top = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSource.top, fSizeScaleY);
-            rcSource.bottom = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSource.bottom, fSizeScaleY);
+            rcSource.top
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) rcSource.top, fSizeScaleY);
+            rcSource.bottom
+                = (int32_t) ImageUtil::GetScaledImageSize((uint32_t) rcSource.bottom, fSizeScaleY);
             ASSERT(rcSource.bottom > rcSource.top);
             ASSERT(rcSource.top >= 0);
-            ASSERT(rcSource.bottom <= (int32_t)pBitmap->GetHeight());
+            ASSERT(rcSource.bottom <= (int32_t) pBitmap->GetHeight());
 
-            rcSourceCorners.top = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.top, fSizeScaleY);
-            rcSourceCorners.bottom = (int32_t)ImageUtil::GetScaledImageSize((uint32_t)rcSourceCorners.bottom, fSizeScaleY);
+            rcSourceCorners.top = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.top, fSizeScaleY);
+            rcSourceCorners.bottom = (int32_t)
+                ImageUtil::GetScaledImageSize((uint32_t) rcSourceCorners.bottom, fSizeScaleY);
         }
     }
 }
 
-std::shared_ptr<IBitmap> Image::GetCurrentBitmap(bool bImageStretch,
-                                                 const UiRect& rcDest,
-                                                 UiRect& rcSource,
-                                                 UiRect& rcSourceCorners,
-                                                 bool* bDecodeError) const
+std::shared_ptr<IBitmap> Image::GetCurrentBitmap(
+    bool bImageStretch,
+    const UiRect &rcDest,
+    UiRect &rcSource,
+    UiRect &rcSourceCorners,
+    bool *bDecodeError) const
 {
     ASSERT((m_imageInfo != nullptr) && !m_imageInfo->IsMultiFrameImage());
     if (!m_imageInfo || m_imageInfo->IsMultiFrameImage()) {
@@ -317,21 +332,16 @@ std::shared_ptr<IBitmap> Image::GetCurrentBitmap(bool bImageStretch,
     if (!bImageStretch) {
         //绘制时，不支持拉伸
         return GetBitmapData(rcSource, rcSourceCorners, bDecodeError);
-    }
-    else if (!m_imageInfo->IsSvgImage()) {
+    } else if (!m_imageInfo->IsSvgImage()) {
         //不是SVG图片，不支持矢量缩放
         return GetBitmapData(rcSource, rcSourceCorners, bDecodeError);
-    }
-    else if (!rcSourceCorners.IsZero()) {
+    } else if (!rcSourceCorners.IsZero()) {
         //如果设置了九宫格绘制，则按不拉伸处理(如果拉伸图片，四个角会变形)
         return GetBitmapData(rcSource, rcSourceCorners, bDecodeError);
-    }
-    else if ((rcDest.Width() == rcSource.Width()) ||
-             (rcDest.Height() == rcSource.Height())) {
+    } else if ((rcDest.Width() == rcSource.Width()) || (rcDest.Height() == rcSource.Height())) {
         //如果绘制目标区域和图片源区域大小一致，无需拉伸
         return GetBitmapData(rcSource, rcSourceCorners, bDecodeError);
-    }
-    else {
+    } else {
         //SVG图片：支持矢量缩放
         std::shared_ptr<IBitmap> pBitmap = m_imageInfo->GetSvgBitmap(rcDest, rcSource, m_pControl);
         if (pBitmap == nullptr) {
@@ -339,15 +349,14 @@ std::shared_ptr<IBitmap> Image::GetCurrentBitmap(bool bImageStretch,
             if ((pBitmap == nullptr) && (bDecodeError != nullptr)) {
                 *bDecodeError = true;
             }
-        }
-        else {
+        } else {
             AdjustImageSourceRect(pBitmap, rcSource, rcSourceCorners);
         }
         return pBitmap;
-    }    
+    }
 }
 
-void Image::SetControl(Control* pControl)
+void Image::SetControl(Control *pControl)
 {
     if (m_pControl != pControl) {
         m_pControl = pControl;
@@ -357,7 +366,7 @@ void Image::SetControl(Control* pControl)
     }
 }
 
-ImagePlayer* Image::InitImagePlayer()
+ImagePlayer *Image::InitImagePlayer()
 {
     if (!IsMultiFrameImage() || (m_pControl == nullptr)) {
         return nullptr;
@@ -370,11 +379,11 @@ ImagePlayer* Image::InitImagePlayer()
     return m_pImagePlayer.get();
 }
 
-void Image::SetDrawDestRect(const UiRect& rcImageRect)
+void Image::SetDrawDestRect(const UiRect &rcImageRect)
 {
     m_rcDrawDestRect = rcImageRect;
     if (IsMultiFrameImage()) {
-        ImagePlayer* pImagePlayer = InitImagePlayer();
+        ImagePlayer *pImagePlayer = InitImagePlayer();
         ASSERT(pImagePlayer != nullptr);
         if (pImagePlayer != nullptr) {
             pImagePlayer->SetImageAnimationRect(rcImageRect);
@@ -382,7 +391,7 @@ void Image::SetDrawDestRect(const UiRect& rcImageRect)
     }
 }
 
-const UiRect& Image::GetDrawDestRect() const
+const UiRect &Image::GetDrawDestRect() const
 {
     return m_rcDrawDestRect;
 }
@@ -392,16 +401,15 @@ void Image::RedrawImage()
     if (m_pControl != nullptr) {
         if (m_rcDrawDestRect.IsEmpty()) {
             m_pControl->Invalidate();
-        }
-        else {
+        } else {
             m_pControl->InvalidateRect(m_rcDrawDestRect);
-        }        
+        }
     }
 }
 
 void Image::CheckStartImageAnimation()
 {
-    ImagePlayer* pImagePlayer = InitImagePlayer();
+    ImagePlayer *pImagePlayer = InitImagePlayer();
     if (pImagePlayer != nullptr) {
         pImagePlayer->CheckStartImageAnimation();
     }
@@ -419,7 +427,7 @@ void Image::PauseImageAnimation()
 bool Image::StartImageAnimation(AnimationImagePos nStartFrame, int32_t nPlayCount)
 {
     bool bRet = false;
-    ImagePlayer* pImagePlayer = InitImagePlayer();
+    ImagePlayer *pImagePlayer = InitImagePlayer();
     if (pImagePlayer != nullptr) {
         if (pImagePlayer->IsAnimationPlaying()) {
             bool bAutoPlay = pImagePlayer->IsAutoPlay();
@@ -463,4 +471,4 @@ bool Image::IsDecodeEventFired() const
     return m_bDecodeEventFired;
 }
 
-}
+} // namespace ui

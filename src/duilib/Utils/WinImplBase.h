@@ -1,16 +1,16 @@
 #ifndef UI_UTILS_WINIMPLBASE_H_
 #define UI_UTILS_WINIMPLBASE_H_
 
-#include "duilib/duilib_defs.h"
 #include "duilib/Core/Window.h"
+#include "duilib/duilib_defs.h"
 
-namespace ui
-{
+namespace ui {
 /** 实现一个带有自绘标题栏的窗口，支持窗口最小化、还原/最大化、关闭按钮，支持窗口全屏、界面切换语言、切换主题按钮
 */
 class DUILIB_API WindowImplBase : public Window
 {
     typedef Window BaseClass;
+
 public:
     WindowImplBase();
     virtual ~WindowImplBase() override;
@@ -33,7 +33,7 @@ public:
     * @param [in] strClass 控件名称
     * @return 返回一个自定义控件指针，一般情况下根据 strClass 参数创建自定义的控件
     */
-    virtual Control* CreateControl(const DString& strClass) override;
+    virtual Control *CreateControl(const DString &strClass) override;
 
 protected:
     /** 当窗口创建完成以后调用此函数，供子类中做一些初始化的工作
@@ -73,7 +73,8 @@ protected:
     * @param [in] nOldScaleFactor 旧的DPI缩放百分比
     * @param [in] nNewScaleFactor 新的DPI缩放百分比，与Dpi().GetDisplayScaleFactor()的值一致，该值可能与nOldScaleFactor相同
     */
-    virtual void OnWindowDisplayScaleChanged(uint32_t nOldScaleFactor, uint32_t nNewScaleFactor) override;
+    virtual void OnWindowDisplayScaleChanged(
+        uint32_t nOldScaleFactor, uint32_t nNewScaleFactor) override;
 
 protected:
     /** 进入最大化状态
@@ -92,12 +93,12 @@ protected:
     /** 选择语言
     * @param [in] pBtnSelectLanguage 选择语言按钮的接口
     */
-    virtual void OnSelectLanguage(Control* pBtnSelectLanguage);
+    virtual void OnSelectLanguage(Control *pBtnSelectLanguage);
 
     /** 选择主题
     * @param [in] pBtnSelectTheme 选择主题按钮的接口
     */
-    virtual void OnSelectTheme(Control* pBtnSelectTheme);
+    virtual void OnSelectTheme(Control *pBtnSelectTheme);
 
 protected:
     /** 窗口大小发生改变(WM_SIZE)
@@ -107,17 +108,21 @@ protected:
     * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
-    virtual LRESULT OnSizeMsg(WindowSizeType sizeType, const UiSize& newWindowSize, const NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnSizeMsg(
+        WindowSizeType sizeType,
+        const UiSize &newWindowSize,
+        const NativeMsg &nativeMsg,
+        bool &bHandled) override;
 
     /** 判断是否含有最大化和最小化按钮
     * @param [out] bMinimizeBox 返回true表示含有最小化按钮
     * @param [out] bMaximizeBox 返回true表示含有最大化按钮
     */
-    virtual bool HasMinMaxBox(bool& bMinimizeBox, bool& bMaximizeBox) const override;
+    virtual bool HasMinMaxBox(bool &bMinimizeBox, bool &bMaximizeBox) const override;
 
     /** 判断一个点是否在最大化或者还原按钮上
     */
-    virtual bool IsPtInMaximizeRestoreButton(const UiPoint& pt) const override;
+    virtual bool IsPtInMaximizeRestoreButton(const UiPoint &pt) const override;
 
     /** 正在初始化窗口数据（内部函数）
     */
@@ -136,49 +141,49 @@ protected:
 protected:
     /** 获取窗口标题栏控件
     */
-    Control* GetWindowTitleBar() const;
+    Control *GetWindowTitleBar() const;
 
     /** 获取窗口最大化按钮
     */
-    Control* GetBtnWindowMax() const;
+    Control *GetBtnWindowMax() const;
 
     /** 获取窗口还原按钮
     */
-    Control* GetBtnWindowRestore() const;
+    Control *GetBtnWindowRestore() const;
 
     /** 获取窗口最小化按钮
     */
-    Control* GetBtnWindowMin() const;
+    Control *GetBtnWindowMin() const;
 
     /** 获取窗口关闭按钮
     */
-    Control* GetBtnWindowClose() const;
+    Control *GetBtnWindowClose() const;
 
     /** 获取窗口全屏按钮
     */
-    Control* GetBtnWindowFullscreen() const;
+    Control *GetBtnWindowFullscreen() const;
 
     /** 获取选择语言按钮
     */
-    Control* GetBtnSelectLanguage() const;
+    Control *GetBtnSelectLanguage() const;
 
     /** 获取选择主题按钮
     */
-    Control* GetBtnSelectTheme() const;
+    Control *GetBtnSelectTheme() const;
 
 private:
     /** 获取窗口按钮
     * @param [in] newCtrlName 控件最新的名称
     * @param [in] oldCtrlName 控件旧的名称（为了保持兼容性）
     */
-    Control* GetBtnWindowByName(const DString& newCtrlName, const DString& oldCtrlName) const;
+    Control *GetBtnWindowByName(const DString &newCtrlName, const DString &oldCtrlName) const;
 
 private:
     /** 标题栏被双击时调用
     * @param [in] param 携带的参数
     * @return 始终返回 true
     */
-    bool OnTitleBarDoubleClick(const EventArgs& param);
+    bool OnTitleBarDoubleClick(const EventArgs &param);
 
     /** 处理最大化/还原按钮的状态
     */

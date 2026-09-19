@@ -12,10 +12,10 @@
 
 #include <string>
 
-#pragma warning (push)
-#pragma warning (disable:4100)
+#pragma warning(push)
+#pragma warning(disable : 4100)
 #include "include/internal/cef_types_wrappers.h"
-#pragma warning (pop)
+#pragma warning(pop)
 
 namespace client {
 
@@ -23,12 +23,13 @@ namespace client {
 uint64_t GetTimeNow();
 
 // Set the window's user data pointer.
-void SetUserDataPtr(HWND hWnd, void* ptr);
+void SetUserDataPtr(HWND hWnd, void *ptr);
 
 // Return the window's user data pointer.
-template <typename T>
-T GetUserDataPtr(HWND hWnd) {
-  return reinterpret_cast<T>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+template<typename T>
+T GetUserDataPtr(HWND hWnd)
+{
+    return reinterpret_cast<T>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 }
 
 // Set the window's window procedure pointer and return the old value.
@@ -45,8 +46,8 @@ bool IsKeyDown(WPARAM wparam);
 // return 2.0.
 float GetDeviceScaleFactor();
 
-}  // namespace client
+} // namespace client
 
 #endif //DUILIB_BUILD_FOR_CEF
 
-#endif  // UI_CEF_CONTROL_UTIL_WIN_H_
+#endif // UI_CEF_CONTROL_UTIL_WIN_H_

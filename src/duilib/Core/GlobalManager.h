@@ -1,29 +1,28 @@
 #ifndef UI_CORE_GLOBALMANAGER_H_
 #define UI_CORE_GLOBALMANAGER_H_
 
-#include "duilib/Core/WindowBuilder.h"
 #include "duilib/Core/ColorManager.h"
-#include "duilib/Core/FontManager.h"
-#include "duilib/Core/ImageManager.h"
-#include "duilib/Core/ZipManager.h"
-#include "duilib/Core/LangManager.h"
-#include "duilib/Core/DpiManager.h"
-#include "duilib/Core/TimerManager.h"
-#include "duilib/Core/ThreadManager.h"
-#include "duilib/Core/ResourceParam.h"
 #include "duilib/Core/CursorManager.h"
+#include "duilib/Core/DpiManager.h"
+#include "duilib/Core/FontManager.h"
 #include "duilib/Core/IconManager.h"
-#include "duilib/Core/WindowManager.h"
+#include "duilib/Core/ImageManager.h"
+#include "duilib/Core/LangManager.h"
+#include "duilib/Core/ResourceParam.h"
 #include "duilib/Core/ThemeManager.h"
+#include "duilib/Core/ThreadManager.h"
+#include "duilib/Core/TimerManager.h"
+#include "duilib/Core/WindowBuilder.h"
+#include "duilib/Core/WindowManager.h"
+#include "duilib/Core/ZipManager.h"
 #include "duilib/Image/ImageDecoderFactory.h"
 
 #include <string>
-#include <vector>
-#include <unordered_map>
 #include <thread>
+#include <unordered_map>
+#include <vector>
 
-namespace ui 
-{
+namespace ui {
 /** 渲染引擎工厂接口
 */
 class IRenderFactory;
@@ -40,13 +39,13 @@ class DUILIB_API GlobalManager
 private:
     GlobalManager();
     ~GlobalManager();
-    GlobalManager(const GlobalManager&) = delete;
-    GlobalManager& operator = (const GlobalManager&) = delete;
+    GlobalManager(const GlobalManager &) = delete;
+    GlobalManager &operator=(const GlobalManager &) = delete;
 
 public:
     /** 获取单例对象
     */
-    static GlobalManager& Instance();
+    static GlobalManager &Instance();
 
     /** 获取资源目录的根路径（绝对路径）
     * @param [in] bMacOsAppBundle MacOS平台是否使用App Bundle（目前仅在使用CEF模块时需要传入true，其他均传入false）
@@ -63,7 +62,7 @@ public:
     /** 根据语言文件的资源ID获取对应的实际文字（支持多国语言版）
     *   该函数是对GlobalManager::Instance().Lang().GetStringByID(const DString& textId)的二次封装，方便使用
     */
-    static DString GetTextById(const DString& textId);
+    static DString GetTextById(const DString &textId);
 
 public:
     /** 初始化全局设置函数
@@ -77,9 +76,10 @@ public:
      * @param [in] dpiInitParam DPI感知模式和DPI值的设置参数
      * @param [in] callback 创建自定义控件时的全局回调函数
      */
-    bool Startup(const ResourceParam& resParam,
-                 DpiInitParam dpiInitParam = DpiInitParam(),
-                 const CreateControlCallback& callback = nullptr);
+    bool Startup(
+        const ResourceParam &resParam,
+        DpiInitParam dpiInitParam = DpiInitParam(),
+        const CreateControlCallback &callback = nullptr);
 
     /** 释放全局资源
      */
@@ -88,11 +88,11 @@ public:
 public:
     /** 设置平台相关数据，Windows平台使用，当使用动态链接库时，设置为DLL所在模块句柄（HMODULE）
     */
-    void SetPlatformData(void* pPlatformData);
+    void SetPlatformData(void *pPlatformData);
 
     /** 获取平台相关数据，Windows平台使用，当使用动态链接库时，返回DLL所在模块句柄（HMODULE），如果为静态链接库，则返回nullptr
     */
-    void* GetPlatformData() const;
+    void *GetPlatformData() const;
 
     /** 获取资源目录的根路径
      *  如果是使用本地文件系统做资源目录，则为绝对路径
@@ -104,28 +104,28 @@ public:
      *  如果是使用本地文件系统做资源目录，则为绝对路径
      *  如果是使用zip压缩包提供资源，则为相对路径
      */
-    void SetFontFilePath(const FilePath& strPath);
+    void SetFontFilePath(const FilePath &strPath);
 
     /** 获取字体文件所在目录
     * @return 返回字体文件所在目录，详细说明同上
     */
-    const FilePath& GetFontFilePath() const;
+    const FilePath &GetFontFilePath() const;
 
 public:
     /** 设置语言文件所在目录，可以是相对路径或者是绝对路径（多语言版时，所有的语言文件都放在这个目录中）
      *  如果是使用本地文件系统做资源目录，则为绝对路径
      *  如果是使用zip压缩包提供资源，则为相对路径
      */
-    void SetLanguagePath(const FilePath& strPath);
+    void SetLanguagePath(const FilePath &strPath);
 
     /** 获取语言文件所在目录
     * @return 返回语言文件所在目录，详细说明同上
     */
-    const FilePath& GetLanguagePath() const;
+    const FilePath &GetLanguagePath() const;
 
     /** 获取语言文件名，不含路径
     */
-    const DString& GetLanguageFileName() const;
+    const DString &GetLanguageFileName() const;
 
     /** 重新加载语言资源（通过此接口实现多语言动态切换功能）
      * @param [in] languagePath 语言文件所在路径
@@ -135,29 +135,31 @@ public:
      * @param [in] languageFileName 当前使用语言文件的文件名（不含路径）
      * @param [in] bInvalidate 是否刷新界面显示：true表示更新完语言文件后刷新界面显示，false表示不刷新界面显示
      */
-    bool ReloadLanguage(const FilePath& languagePath = FilePath(),
-                        const DString& languageFileName = _T("zh_CN.txt"),
-                        bool bInvalidate = false);
+    bool ReloadLanguage(
+        const FilePath &languagePath = FilePath(),
+        const DString &languageFileName = _T("zh_CN.txt"),
+        bool bInvalidate = false);
 
     /** 获取语言文件列表和显示名称（以支持多语言切换）
     * @param [in] languageNameID 用于读取显示名称的字符串ID，如果为空则不读取显示名称
     * @param [out] languageList 返回语言文件和显示名称的列表
     */
-    bool GetLanguageList(std::vector<std::pair<DString, DString>>& languageList,
-                         const DString& languageNameID = DUILIB_LANGUAGE_DISPLAY_NAME) const;
+    bool GetLanguageList(
+        std::vector<std::pair<DString, DString>> &languageList,
+        const DString &languageNameID = DUILIB_LANGUAGE_DISPLAY_NAME) const;
 
 public:
     /** 添加一个全局 Class 属性
      * @param[in] strClassName 全局 Class 名称
      * @param[in] strControlAttrList 属性列表，需要做 XML 转义
      */
-    void AddClass(const DString& strClassName, const DString& strControlAttrList);
+    void AddClass(const DString &strClassName, const DString &strControlAttrList);
 
     /** 获取一个全局 class 属性的值
      * @param[in] strClassName 全局 class 名称
      * @return 返回字符串形式的 class 属性值
      */
-    DString GetClassAttributes(const DString& strClassName) const;
+    DString GetClassAttributes(const DString &strClassName) const;
 
     /** 从全局属性中删除所有 class 属性
      * @return 返回绘制区域对象
@@ -176,7 +178,7 @@ public:
 public:
     /** 获取绘制接口类对象
     */
-    IRenderFactory* GetRenderFactory();
+    IRenderFactory *GetRenderFactory();
 
     /** 设置渲染后端类型
     *   只能在 Startup 之前，或者 Shutdown 之后调用
@@ -195,55 +197,55 @@ public:
 
     /** 获取颜色管理器
     */
-    ColorManager& Color();
+    ColorManager &Color();
 
     /** 获取字体管理器
     */
-    FontManager& Font();
+    FontManager &Font();
 
     /** 获取图片管理器
     */
-    ImageManager& Image();
+    ImageManager &Image();
 
     /** 图片格式解码器
     */
-    ImageDecoderFactory& ImageDecoders();
+    ImageDecoderFactory &ImageDecoders();
 
     /** 获取ICON资源管理器
     */
-    IconManager& Icon();
+    IconManager &Icon();
 
     /** 获取Zip管理器
     */
-    ZipManager& Zip();
+    ZipManager &Zip();
 
     /** 获取DPI管理器
     */
-    DpiManager& Dpi();
+    DpiManager &Dpi();
 
     /** 获取定时器管理器
     */
-    TimerManager& Timer();
+    TimerManager &Timer();
 
     /** 获取线程管理器
     */
-    ThreadManager& Thread();
+    ThreadManager &Thread();
 
     /** 多语言支持管理器
     */
-    LangManager& Lang();
+    LangManager &Lang();
 
     /** 光标管理器
     */
-    CursorManager& Cursor();
+    CursorManager &Cursor();
 
     /** 窗口管理器
     */
-    WindowManager& Windows();
+    WindowManager &Windows();
 
     /** 主题管理器
     */
-    ThemeManager& Theme();
+    ThemeManager &Theme();
 
 public:
     /** 根据资源加载方式，返回对应的资源路径
@@ -258,10 +260,15 @@ public:
               （1）如果是使用ZIP压缩包，返回："resources\themes\default\public\button\btn_wnd_gray_min_hovered.png"
               （2）如果未使用ZIP压缩包，返回："<程序所在目录>\resources\themes\default\public\button\btn_wnd_gray_min_hovered.png"
      */
-    FilePath GetExistsResFullPath(const FilePath& windowResPath, const FilePath& windowXmlPath, const FilePath& resPath);
-    FilePath GetExistsResFullPath(const FilePath& windowResPath, const FilePath& windowXmlPath,
-                                  const FilePath& resPath, const Control* pControl,
-                                  bool& bLocalPath, bool& bResPath);
+    FilePath GetExistsResFullPath(
+        const FilePath &windowResPath, const FilePath &windowXmlPath, const FilePath &resPath);
+    FilePath GetExistsResFullPath(
+        const FilePath &windowResPath,
+        const FilePath &windowXmlPath,
+        const FilePath &resPath,
+        const Control *pControl,
+        bool &bLocalPath,
+        bool &bResPath);
 
     /** 加载资源失败的回调函数，可以在回调函数中提供新的资源搜索路径，再次尝试查找资源
      * @param [in] pControl 该资源关联的Control控件接口
@@ -270,10 +277,11 @@ public:
      * @param [in,out] windowXmlPath 窗口对应XML所在的相对目录，可返回新的路径     
      * @return true表示已提供新的资源搜索路径，需要再次尝试查找资源，返回false表示不再尝试查找资源
      */
-    using ResNotFoundCallback = std::function<bool(const Control* pControl,
-                                                   const FilePath& resPath,
-                                                   FilePath& windowResPath,
-                                                   FilePath& windowXmlPath)>;
+    using ResNotFoundCallback = std::function<bool(
+        const Control *pControl,
+        const FilePath &resPath,
+        FilePath &windowResPath,
+        FilePath &windowXmlPath)>;
     /** 添加一个加载资源失败的回调函数
     * @param [in] callback 回调函数
     * @param [in] callbackId 回调函数的ID，删除回调函数时使用，由调用方确保ID的唯一性
@@ -314,7 +322,10 @@ public:
      * @param [in] callback 自定义控件的回调处理函数
      * @return 指定布局模块的对象指针
      */
-    Box* CreateBox(Window* pWindow, const FilePath& strXmlPath, CreateControlCallback callback = CreateControlCallback());
+    Box *CreateBox(
+        Window *pWindow,
+        const FilePath &strXmlPath,
+        CreateControlCallback callback = CreateControlCallback());
 
     /** 根据 XML 创建一个 Box（创建二级节点对应的容器，返回的是二级节点对应的容器），XML文件解析结果保存在缓存中，下次调用时不重新解析XML，以改善性能
      * @param [in] pWindow 关联的窗口, 不允许为nullptr, 因DPI自适应需要对控件的大小等进行DPI缩放
@@ -322,7 +333,10 @@ public:
      * @param [in] callback 自定义控件的回调处理函数
      * @return 指定布局模块的对象指针
      */
-    Box* CreateBoxWithCache(Window* pWindow, const FilePath& strXmlPath, CreateControlCallback callback = CreateControlCallback());
+    Box *CreateBoxWithCache(
+        Window *pWindow,
+        const FilePath &strXmlPath,
+        CreateControlCallback callback = CreateControlCallback());
 
     /** 根据 XML 解析结果，将三级节点的内容追加到pUserDefinedBox里面，但不会创建二级节点对应的容器，函数认为三级节点对应的容器就是pUserDefinedBox，由外部创建
      *  (注意事项：该函数会跳过XML文件的根节点和一级子节点，直接将三级节点的内容解析后追加到pUserDefinedBox里面，作为其子节点)
@@ -330,7 +344,10 @@ public:
      * @param [in] strXmlPath XML 文件路径
      * @param [in] callback 自定义控件的回调处理函数
      */
-    bool FillBox(Box* pUserDefinedBox, const FilePath& strXmlPath, CreateControlCallback callback = CreateControlCallback());
+    bool FillBox(
+        Box *pUserDefinedBox,
+        const FilePath &strXmlPath,
+        CreateControlCallback callback = CreateControlCallback());
 
     /** 根据 XML 解析结果，将三级节点的内容追加到pUserDefinedBox里面，但不会创建二级节点对应的容器，函数认为三级节点对应的容器就是pUserDefinedBox，由外部创建
      *  (注意事项：该函数会跳过XML文件的根节点和一级子节点，直接将三级节点的内容解析后追加到pUserDefinedBox里面，作为其子节点)
@@ -339,17 +356,20 @@ public:
      * @param [in] strXmlPath XML 文件路径
      * @param [in] callback 自定义控件的回调处理函数
      */
-    bool FillBoxWithCache(Box* pUserDefinedBox, const FilePath& strXmlPath, CreateControlCallback callback = CreateControlCallback());
+    bool FillBoxWithCache(
+        Box *pUserDefinedBox,
+        const FilePath &strXmlPath,
+        CreateControlCallback callback = CreateControlCallback());
 
     /** 自定义控件创建后的全局回调函数
      * @param [in] strControlName 自定义控件名称
      * @return 返回一个自定义控件的对象指针
      */
-    Control* CreateControl(const DString& strControlName);
+    Control *CreateControl(const DString &strControlName);
 
     /** 添加控件创建函数，用于用户自定义控件的创建
     */
-    void AddCreateControlCallback(const CreateControlCallback& pfnCreateControlCallback);
+    void AddCreateControlCallback(const CreateControlCallback &pfnCreateControlCallback);
 
     /** 根据 XML的路径 创建一个 Box（创建二级节点对应的容器，返回的是二级节点对应的容器），用于生成XML效果的预览
      * @param [in] pWindow 关联的窗口, 不允许为nullptr, 因DPI自适应需要对控件的大小等进行DPI缩放
@@ -357,7 +377,8 @@ public:
      * @param [in] xmlPreviewAttributes 解析XML文件时，新增加的窗口共享属性和全局属性
      * @return 指定布局模块的对象指针
      */
-    Box* CreateBoxForXmlPreview(Window* pWindow, const FilePath& xmlFilePath, XmlPreviewAttributes& xmlPreviewAttributes);
+    Box *CreateBoxForXmlPreview(
+        Window *pWindow, const FilePath &xmlFilePath, XmlPreviewAttributes &xmlPreviewAttributes);
 
     /** 根据 XML的数据 创建一个 Box（创建二级节点对应的容器，返回的是二级节点对应的容器），用于生成XML效果的预览
      * @param [in] pWindow 关联的窗口, 不允许为nullptr, 因DPI自适应需要对控件的大小等进行DPI缩放
@@ -366,10 +387,11 @@ public:
      * @param [in] xmlFilePath 当xmlFileData不为空时为可选参数，提供XML文件路径，当XML数据中含有Include标签时会按XML路径查找被包含的XML文件
      * @return 指定布局模块的对象指针
      */
-    Box* CreateBoxForXmlPreview(Window* pWindow,
-                                const std::vector<unsigned char>& xmlFileData,
-                                XmlPreviewAttributes& xmlPreviewAttributes,
-                                const FilePath& xmlFilePath = FilePath());
+    Box *CreateBoxForXmlPreview(
+        Window *pWindow,
+        const std::vector<unsigned char> &xmlFileData,
+        XmlPreviewAttributes &xmlPreviewAttributes,
+        const FilePath &xmlFilePath = FilePath());
 
 public:
     /** 判断当前是否在UI线程
@@ -400,22 +422,22 @@ public:
     * @param [in] name 名字
     * @param [in] value 别名的实际取值
     */
-    void AddAlias(const DString& name, const DString& value);
+    void AddAlias(const DString &name, const DString &value);
 
     /** 删除别名
     * @param [in] name 名字
     */
-    void RemoveAlias(const DString& name);
+    void RemoveAlias(const DString &name);
 
     /** 判断一个名字是否有别名
     * @param [in] name 名字
     */
-    bool HasAliasValue(const DString& name) const;
+    bool HasAliasValue(const DString &name) const;
 
     /** 获取别名对应的值
     * @param [in] name 名字
     */
-    DString GetAliasValue(const DString& name) const;
+    DString GetAliasValue(const DString &name) const;
 
     /** 清除所有别名
     */
@@ -426,18 +448,18 @@ public:
     * @param [in] name 变量名称
     * @param [in] value 变量对应的取值
     */
-    void AddVar(const DString& name, const DString& value);
+    void AddVar(const DString &name, const DString &value);
 
     /** 删除变量
     * @param [in] name 变量名称
     */
-    void RemoveVar(const DString& name);
+    void RemoveVar(const DString &name);
 
     /** 获取变量定义的值
     * @param [in] name 变量名称
     * @return 返回变量的取值，如果不包含变量则返回空
     */
-    DString GetVarValue(const DString& name) const;
+    DString GetVarValue(const DString &name) const;
 
     /** 清除所有变量定义
     */
@@ -450,11 +472,11 @@ public:
      * @param [in,out] varValue 需要展开变量的字符串
      * @return 返回varValue
      */
-    DString& ExpandVarStrings(DString& varValue) const;
+    DString &ExpandVarStrings(DString &varValue) const;
 
     /** 函数功能：如果varValue中有Var定义的变量，替换为对应的值（功能同上）
     */
-    DString GetExpandVarStrings(const DString& varValue) const;
+    DString GetExpandVarStrings(const DString &varValue) const;
 
 public:
     /** 清除主题相关的缓存（切换主题后，立即生效）
@@ -471,13 +493,13 @@ private:
     *                      3. 资源文件打包为zip压缩包，然后放在exe/dll的资源文件中
     *                         使用 ResZipFileResParam 类型作为参数
     */
-    bool LoadGlobalResource(const ResourceParam& resParam);
+    bool LoadGlobalResource(const ResourceParam &resParam);
 
     /** 加载一个语言文件
     * @param [in] languagePath 语言文件所在目录
     * @param [in] languageFileName 语言文件名（不含路径）
     */
-    bool LoadLanguageFile(const FilePath& languagePath, const DString& languageFileName);
+    bool LoadLanguageFile(const FilePath &languagePath, const DString &languageFileName);
 
     /** 根据系统语言，获取默认的语言文件名
     */
@@ -513,7 +535,7 @@ private:
     /** 平台相关数据（可选参数，如不填写则使用默认值：nullptr）
     *   Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）
     */
-    void* m_platformData;
+    void *m_platformData;
 
     /** 资源根目录（使用本地文件时为绝对路径，使用zip时为相对路）
     */
@@ -530,7 +552,7 @@ private:
     /** 全局语言文件名（不含路径）
     */
     DString m_languageFileName;
-    
+
     /** 窗口构建管理接口，KEY是XML文件路径，VALUE是窗口构建管理接口（已经解析后的XML，可避免重复解析）
     */
     std::unordered_map<FilePath, std::unique_ptr<WindowBuilder>> m_builderMap;
@@ -605,7 +627,7 @@ private:
 
     /** 库内部使用的线程池
     */
-    std::vector <std::shared_ptr<FrameworkThread>> m_threadList;
+    std::vector<std::shared_ptr<FrameworkThread>> m_threadList;
 
     /** 别名管理
     */

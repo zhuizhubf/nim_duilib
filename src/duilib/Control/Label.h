@@ -1,29 +1,29 @@
 #ifndef UI_CONTROL_LABEL_H_
 #define UI_CONTROL_LABEL_H_
 
-#include "duilib/Control/LabelImpl.h"
-#include "duilib/Core/DpiManager.h"
 #include "duilib/Box/HBox.h"
 #include "duilib/Box/VBox.h"
+#include "duilib/Control/LabelImpl.h"
+#include "duilib/Core/DpiManager.h"
 
-namespace ui
-{
+namespace ui {
 /** 标签控件（模板），用于显示文本
 */
 template<typename T = Control>
 class LabelTemplate : public T, public LabelOwner
 {
     typedef T BaseClass;
+
 public:
-    explicit LabelTemplate(Window* pWindow);
+    explicit LabelTemplate(Window *pWindow);
     virtual ~LabelTemplate() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual void SetPos(UiRect rc) override;
-    virtual void SetWindow(Window* pWindow) override;
-    virtual void PaintText(IRender* pRender) override;
+    virtual void SetWindow(Window *pWindow) override;
+    virtual void PaintText(IRender *pRender) override;
     virtual bool HasHoveredState() override;
     virtual DString GetToolTipText() const override;
     virtual void OnLanguageChanged(bool bRedraw) override;
@@ -43,7 +43,7 @@ public:
     /** 设置文本内容
     * @param [in] strText 文本内容
     */
-    virtual void SetText(const DString& strText) override;
+    virtual void SetText(const DString &strText) override;
 
     /** 获取文本内容ID（支持多语言）
     */
@@ -52,7 +52,7 @@ public:
     /** 设置文本内容ID（支持多语言）
     * @param [in] strTextId 文本内容的ID
     */
-    virtual void SetTextId(const DString& strTextId) override;
+    virtual void SetTextId(const DString &strTextId) override;
 
     /** 获取文本内容（UTF8格式）
     */
@@ -61,7 +61,7 @@ public:
     /** 设置文本内容（UTF8格式）
     * @param [in] strText UTF8格式的文本内容
     */
-    void SetUTF8Text(const std::string& strText);
+    void SetUTF8Text(const std::string &strText);
 
     /** 获取文本内容ID（UTF8格式）
     */
@@ -69,7 +69,7 @@ public:
 
     /** 设置文本内容ID（UTF8格式）
     */
-    void SetUTF8TextId(const std::string& strTextId);
+    void SetUTF8TextId(const std::string &strTextId);
 
     /** 设置文本内容是否为RichText
      * @param [in] bRichText 表示支持RichText模式，设置的文本内容可以是RichText格式
@@ -90,7 +90,7 @@ public:
 
     /** 判断文本是否相等
     */
-    bool IsTextEquals(const DString& text) const;
+    bool IsTextEquals(const DString &text) const;
 
 public:
     /** 恢复默认的文本样式
@@ -120,14 +120,14 @@ public:
      * @param [in] dwTextColor 要设置的状态颜色字符串，该值必须在 global.xml 中存在
      * @return 无
      */
-    void SetStateTextColor(ControlStateType stateType, const DString& dwTextColor);
+    void SetStateTextColor(ControlStateType stateType, const DString &dwTextColor);
 
     /** 获取指定状态下的实际被渲染文本颜色
      * @param [in] buttonStateType 要获取何种状态下的颜色
      * @param [out] stateType 实际被渲染的状态
      * @return 返回颜色字符串，该值在 global.xml 中定义
      */
-    DString GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType& stateType);
+    DString GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType &stateType);
 
     /** 获取当前字体ID
      * @return 返回字体ID，该字体ID在 global.xml 中标识
@@ -137,7 +137,7 @@ public:
     /** 设置当前字体ID
      * @param[in] strFontId 要设置的字体ID，该字体ID必须在 global.xml 中存在
      */
-    void SetFontId(const DString& strFontId);
+    void SetFontId(const DString &strFontId);
 
     /** 获取文字内边距
      * @return 返回文字的内边距信息
@@ -191,7 +191,7 @@ public:
      * @param [out] mul 返回行间距的倍数
      * @param [out] add 返回行间距附加量(像素, 已经完成DPI缩放)
      */
-    void GetLineSpacing(float* mul, float* add) const;
+    void GetLineSpacing(float *mul, float *add) const;
 
     /** 设置两个相邻的字符之间的间隔（像素）
     */
@@ -251,7 +251,7 @@ protected:
     * @param [in] rc 实际绘制区域，不包含内边距（需由调用方剪去内边距）
     * @param [in] pRender 渲染接口
     */
-    void DoPaintText(const UiRect& rc, IRender* pRender);
+    void DoPaintText(const UiRect &rc, IRender *pRender);
 
 private:
     //功能内部实现
@@ -259,8 +259,8 @@ private:
 };
 
 template<typename T>
-LabelTemplate<T>::LabelTemplate(Window* pWindow) :
-    T(pWindow)
+LabelTemplate<T>::LabelTemplate(Window *pWindow)
+    : T(pWindow)
 {
     m_impl = std::make_unique<LabelImpl>(this);
 }
@@ -272,19 +272,31 @@ LabelTemplate<T>::~LabelTemplate()
 }
 
 template<typename T>
-inline DString LabelTemplate<T>::GetType() const { return DUI_CTR_LABEL; }
+inline DString LabelTemplate<T>::GetType() const
+{
+    return DUI_CTR_LABEL;
+}
 
 template<>
-inline DString LabelTemplate<Box>::GetType() const { return DUI_CTR_LABELBOX; }
+inline DString LabelTemplate<Box>::GetType() const
+{
+    return DUI_CTR_LABELBOX;
+}
 
 template<>
-inline DString LabelTemplate<HBox>::GetType() const { return DUI_CTR_LABELHBOX; }
+inline DString LabelTemplate<HBox>::GetType() const
+{
+    return DUI_CTR_LABELHBOX;
+}
 
 template<>
-inline DString LabelTemplate<VBox>::GetType() const { return DUI_CTR_LABELVBOX; }
+inline DString LabelTemplate<VBox>::GetType() const
+{
+    return DUI_CTR_LABELVBOX;
+}
 
 template<typename T>
-void LabelTemplate<T>::SetAttribute(const DString& strName, const DString& strValue2)
+void LabelTemplate<T>::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = this->GetExpandVarStrings(strValue2);
     if (!m_impl->OnSetAttribute(strName, strValue)) {
@@ -293,9 +305,9 @@ void LabelTemplate<T>::SetAttribute(const DString& strName, const DString& strVa
 }
 
 template<typename T>
-void LabelTemplate<T>::SetWindow(Window* pWindow)
+void LabelTemplate<T>::SetWindow(Window *pWindow)
 {
-    Window* pOldWindow = this->GetWindow();
+    Window *pOldWindow = this->GetWindow();
     BaseClass::SetWindow(pWindow);
     if (pOldWindow != pWindow) {
         m_impl->OnWindowChanged();
@@ -370,7 +382,7 @@ void LabelTemplate<T>::SetLineSpacing(float mul, float add, bool bNeedDpiScale)
 }
 
 template<typename T>
-void LabelTemplate<T>::GetLineSpacing(float* mul, float* add) const
+void LabelTemplate<T>::GetLineSpacing(float *mul, float *add) const
 {
     m_impl->GetLineSpacing(mul, add);
 }
@@ -447,7 +459,7 @@ DString LabelTemplate<T>::GetText() const
 }
 
 template<typename T>
-void LabelTemplate<T>::SetText(const DString& strText)
+void LabelTemplate<T>::SetText(const DString &strText)
 {
     m_impl->SetText(strText);
 }
@@ -459,7 +471,7 @@ DString LabelTemplate<T>::GetTextId() const
 }
 
 template<typename T>
-void LabelTemplate<T>::SetTextId(const DString& strTextId)
+void LabelTemplate<T>::SetTextId(const DString &strTextId)
 {
     m_impl->SetTextId(strTextId);
 }
@@ -471,13 +483,13 @@ std::string LabelTemplate<T>::GetUTF8Text() const
 }
 
 template<typename T>
-void LabelTemplate<T>::SetUTF8Text(const std::string& strText)
+void LabelTemplate<T>::SetUTF8Text(const std::string &strText)
 {
     m_impl->SetUTF8Text(strText);
 }
 
 template<typename T>
-void LabelTemplate<T>::SetUTF8TextId(const std::string& strTextId)
+void LabelTemplate<T>::SetUTF8TextId(const std::string &strTextId)
 {
     m_impl->SetUTF8TextId(strTextId);
 }
@@ -501,7 +513,7 @@ bool LabelTemplate<T>::IsRichText() const
 }
 
 template<typename T>
-bool LabelTemplate<T>::IsTextEquals(const DString& text) const
+bool LabelTemplate<T>::IsTextEquals(const DString &text) const
 {
     return m_impl->IsTextEquals(text);
 }
@@ -522,7 +534,7 @@ UiSize LabelTemplate<T>::EstimateText(UiSize szAvailable)
 }
 
 template<typename T>
-void LabelTemplate<T>::PaintText(IRender* pRender)
+void LabelTemplate<T>::PaintText(IRender *pRender)
 {
     m_impl->OnPaintText(pRender);
 }
@@ -552,13 +564,14 @@ DString LabelTemplate<T>::GetStateTextColor(ControlStateType stateType) const
 }
 
 template<typename T>
-void LabelTemplate<T>::SetStateTextColor(ControlStateType stateType, const DString& dwTextColor)
+void LabelTemplate<T>::SetStateTextColor(ControlStateType stateType, const DString &dwTextColor)
 {
     m_impl->SetStateTextColor(stateType, dwTextColor);
 }
 
 template<typename T /*= Control*/>
-DString ui::LabelTemplate<T>::GetPaintStateTextColor(ControlStateType buttonStateType, ControlStateType& stateType)
+DString ui::LabelTemplate<T>::GetPaintStateTextColor(
+    ControlStateType buttonStateType, ControlStateType &stateType)
 {
     return m_impl->GetPaintStateTextColor(buttonStateType, stateType);
 }
@@ -570,7 +583,7 @@ DString LabelTemplate<T>::GetFontId() const
 }
 
 template<typename T>
-void LabelTemplate<T>::SetFontId(const DString& strFontId)
+void LabelTemplate<T>::SetFontId(const DString &strFontId)
 {
     m_impl->SetFontId(strFontId);
 }
@@ -584,7 +597,7 @@ UiPadding LabelTemplate<T>::GetTextPadding() const
 template<typename T>
 void LabelTemplate<T>::SetTextPadding(UiPadding padding, bool bNeedDpiScale)
 {
-    m_impl->SetTextPadding(padding, bNeedDpiScale);   
+    m_impl->SetTextPadding(padding, bNeedDpiScale);
 }
 
 template<typename T>
@@ -600,7 +613,7 @@ void LabelTemplate<T>::SetSingleLine(bool bSingleLine)
 }
 
 template<typename T>
-void LabelTemplate<T>::DoPaintText(const UiRect& rc, IRender* pRender)
+void LabelTemplate<T>::DoPaintText(const UiRect &rc, IRender *pRender)
 {
     m_impl->DoPaintText(rc, pRender);
 }
@@ -610,6 +623,6 @@ typedef LabelTemplate<Box> LabelBox;
 typedef LabelTemplate<HBox> LabelHBox;
 typedef LabelTemplate<VBox> LabelVBox;
 
-}
+} // namespace ui
 
 #endif // UI_CONTROL_LABEL_H_

@@ -1,12 +1,8 @@
 #include "MainForm.h"
 
-MainForm::MainForm()
-{
-}
+MainForm::MainForm() {}
 
-MainForm::~MainForm()
-{
-}
+MainForm::~MainForm() {}
 
 DString MainForm::GetSkinFolder()
 {
@@ -18,9 +14,7 @@ DString MainForm::GetSkinFile()
     return _T("layout.xml");
 }
 
-void MainForm::OnInitWindow()
-{
-}
+void MainForm::OnInitWindow() {}
 
 void MainForm::OnCloseWindow()
 {

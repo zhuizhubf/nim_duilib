@@ -4,22 +4,21 @@
 #include "render/IRender.h"
 
 #include "SkiaHeaderBegin.h"
-#include "include/core/SkCanvas.h"
-#include "include/core/SkPaint.h"
-#include "include/core/SkFont.h"
 #include "SkiaHeaderEnd.h"
+#include "include/core/SkCanvas.h"
+#include "include/core/SkFont.h"
+#include "include/core/SkPaint.h"
 
 #include <functional>
 
 class SkFont;
 
-namespace ui
-{
+namespace ui {
 
 /** 枚举字符串的回调函数
 * @return 返回 true 继续枚举，返回 false 停止枚举
 */
-typedef std::function<bool (SkUnichar unicodeChar, size_t charByteLength)> EnumTextCallback;
+typedef std::function<bool(SkUnichar unicodeChar, size_t charByteLength)> EnumTextCallback;
 
 /** 文本数据封装类
 * @note 封装文本的三个核心参数：(const void* text, size_t byteLength, SkTextEncoding textEncoding)
@@ -37,19 +36,19 @@ public:
     * @param [in] byteLength 文本长度（字节数）
     * @param [in] textEncoding 文本编码格式
     */
-    SkiaTextData(const void* text, size_t byteLength, SkTextEncoding textEncoding);
+    SkiaTextData(const void *text, size_t byteLength, SkTextEncoding textEncoding);
 
     /** 设置文本数据
     * @param [in] text 文本数据
     * @param [in] byteLength 文本长度（字节数）
     * @param [in] textEncoding 文本编码格式
     */
-    void SetText(const void* text, size_t byteLength, SkTextEncoding textEncoding);
+    void SetText(const void *text, size_t byteLength, SkTextEncoding textEncoding);
 
     /** 获取文本数据指针
     * @return 文本数据指针
     */
-    const void* GetText() const { return m_text; }
+    const void *GetText() const { return m_text; }
 
     /** 获取文本长度（字节数）
     * @return 文本长度（字节数）
@@ -82,12 +81,12 @@ public:
     * @param [in] text 文本起始位置
     * @return 单个字符的字节数（仅适用于UTF8/UTF16编码，UTF32固定返回4）
     */
-    static size_t GetCharByteLength(const void* text, SkTextEncoding textEncoding);
+    static size_t GetCharByteLength(const void *text, SkTextEncoding textEncoding);
 
 private:
     /** 文本数据指针
     */
-    const void* m_text;
+    const void *m_text;
 
     /** 文本长度（字节数）
     */

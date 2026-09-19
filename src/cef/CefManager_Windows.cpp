@@ -1,32 +1,28 @@
 #include "CefManager_Windows.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_CEF)
 
+#include "cef/internal/CefBrowserHandler.h"
+#include "cef/internal/CefClientApp.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/ProcessSingleton.h"
 #include "duilib/Utils/StringConvert.h"
-#include "cef/internal/CefClientApp.h"
-#include "cef/internal/CefBrowserHandler.h"
 
-#pragma warning (push)
-#pragma warning (disable:4100)
-#include "include/wrapper/cef_closure_task.h"
+#pragma warning(push)
+#pragma warning(disable : 4100)
 #include "include/base/cef_bind.h"
 #include "include/base/cef_callback.h"
-#pragma warning (pop)
+#include "include/wrapper/cef_closure_task.h"
+#pragma warning(pop)
 
-namespace ui
-{
-CefManager_Windows::CefManager_Windows():
-    m_pfnAlreadyRunningAppRelaunch(nullptr),
-    m_bAddedCefDllToPath(false)
-{
-}
+namespace ui {
+CefManager_Windows::CefManager_Windows()
+    : m_pfnAlreadyRunningAppRelaunch(nullptr)
+    , m_bAddedCefDllToPath(false)
+{}
 
-CefManager_Windows::~CefManager_Windows()
-{
-}
+CefManager_Windows::~CefManager_Windows() {}
 
 DString CefManager_Windows::GetCefMoudlePath() const
 {
@@ -34,19 +30,19 @@ DString CefManager_Windows::GetCefMoudlePath() const
     if (cefMoudlePath.empty()) {
         //使用默认规则
 #if CEF_VERSION_MAJOR <= 109
-    //CEF 109版本
-    #ifdef _WIN64
+//CEF 109版本
+#ifdef _WIN64
         cefMoudlePath = _T("libcef_win_109\\x64");
-    #else
-        cefMoudlePath = _T("libcef_win_109\\Win32");
-    #endif
 #else
-    //CEF 高版本
-    #ifdef _WIN64
+        cefMoudlePath = _T("libcef_win_109\\Win32");
+#endif
+#else
+//CEF 高版本
+#ifdef _WIN64
         cefMoudlePath = _T("libcef_win\\x64");
-    #else
+#else
         cefMoudlePath = _T("libcef_win\\Win32");
-    #endif
+#endif
 #endif
     }
     return cefMoudlePath;
@@ -78,12 +74,13 @@ bool CefManager_Windows::InitEnv()
     return true;
 }
 
-bool CefManager_Windows::Initialize(bool bEnableOffScreenRendering,
-                                    const DString& appName,
-                                    int argc,
-                                    char** argv,
-                                    OnCefSettingsEvent callback,
-                                    int32_t& nExitCode)
+bool CefManager_Windows::Initialize(
+    bool bEnableOffScreenRendering,
+    const DString &appName,
+    int argc,
+    char **argv,
+    OnCefSettingsEvent callback,
+    int32_t &nExitCode)
 {
     if (!BaseClass::Initialize(bEnableOffScreenRendering, appName, argc, argv, callback, nExitCode)) {
         return false;
@@ -104,7 +101,8 @@ bool CefManager_Windows::Initialize(bool bEnableOffScreenRendering,
         if (!command_line->HasSwitch("type")) {
             // Browser进程逻辑
             m_pProcessSingleton = ProcessSingleton::Create(appName);
-            if ((m_pProcessSingleton != nullptr) && m_pProcessSingleton->IsAnotherInstanceRunning()) {
+            if ((m_pProcessSingleton != nullptr)
+                && m_pProcessSingleton->IsAnotherInstanceRunning()) {
                 //已经有其他Browser进程在运行, 发送启动参数后，退出
                 std::vector<CefString> cmdLineArgv;
                 command_line->GetArgv(cmdLineArgv);
@@ -143,7 +141,8 @@ bool CefManager_Windows::Initialize(bool bEnableOffScreenRendering,
     }
 
     if (IsEnableOffScreenRendering()) {
-        HWND hwnd = ::CreateWindowW(L"Static", L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
+        HWND hwnd = ::CreateWindowW(
+            L"Static", L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
         CefPostTask(TID_UI, base::BindOnce(&FixContextMenuBug, hwnd));
     }
 
@@ -167,7 +166,8 @@ void CefManager_Windows::UnInitialize()
     BaseClass::UnInitialize();
 }
 
-void CefManager_Windows::SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent& callback)
+void CefManager_Windows::SetAlreadyRunningAppRelaunch(
+    const OnAlreadyRunningAppRelaunchEvent &callback)
 {
     m_pfnAlreadyRunningAppRelaunch = callback;
 }
@@ -184,7 +184,7 @@ void CefManager_Windows::AddCefDllToPath()
         return;
     }
 
-    TCHAR path_envirom[4096] = { 0 };
+    TCHAR path_envirom[4096] = {0};
     ::GetEnvironmentVariable(_T("path"), path_envirom, 4096);
 
     FilePath cefDllDir = ui::FilePathUtil::GetCurrentModuleDirectory();
@@ -206,9 +206,10 @@ void CefManager_Windows::AddCefDllToPath()
 #if CEF_VERSION_MAJOR <= 109
 /** 浏览器单例控制回调函数
 */
-void CefManager_Windows::OnBrowserAlreadyRunningAppRelaunch(const std::vector<DString>& argumentList)
+void CefManager_Windows::OnBrowserAlreadyRunningAppRelaunch(const std::vector<DString> &argumentList)
 {
-    OnAlreadyRunningAppRelaunchEvent pfnAlreadyRunningAppRelaunch = CefManager::GetInstance()->GetAlreadyRunningAppRelaunch();
+    OnAlreadyRunningAppRelaunchEvent pfnAlreadyRunningAppRelaunch
+        = CefManager::GetInstance()->GetAlreadyRunningAppRelaunch();
     if (pfnAlreadyRunningAppRelaunch != nullptr) {
         pfnAlreadyRunningAppRelaunch(argumentList);
     }

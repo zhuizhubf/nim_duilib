@@ -1,24 +1,20 @@
 #include "WindowDropTarget_SDL.h"
 #include "duilib/Core/ControlDropTarget.h"
 
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
 
-#include "duilib/Core/NativeWindow_SDL.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/NativeWindow_SDL.h"
 #include "duilib/Utils/StringConvert.h"
 
-namespace ui 
-{
+namespace ui {
 
-WindowDropTarget::WindowDropTarget(NativeWindow_SDL* pNativeWindow):
-    m_pHoverDropTarget(nullptr),
-    m_pNativeWindow(pNativeWindow)
-{
-}
+WindowDropTarget::WindowDropTarget(NativeWindow_SDL *pNativeWindow)
+    : m_pHoverDropTarget(nullptr)
+    , m_pNativeWindow(pNativeWindow)
+{}
 
-WindowDropTarget::~WindowDropTarget()
-{
-}
+WindowDropTarget::~WindowDropTarget() {}
 
 void WindowDropTarget::OnDropBegin()
 {
@@ -31,7 +27,7 @@ void WindowDropTarget::OnDropBegin()
     m_pNativeWindow->OnDropBegin();
 }
 
-void WindowDropTarget::OnDropPosition(const UiPoint& pt)
+void WindowDropTarget::OnDropPosition(const UiPoint &pt)
 {
     m_dropPt = pt;
 
@@ -48,11 +44,9 @@ void WindowDropTarget::OnDropPosition(const UiPoint& pt)
             m_pHoverDropTarget->OnDropLeave();
             m_pHoverDropTarget = nullptr;
         }
-    }
-    else if (pHoverDropTarget == m_pHoverDropTarget) {
+    } else if (pHoverDropTarget == m_pHoverDropTarget) {
         pHoverDropTarget->OnDropPosition(pt);
-    }
-    else {
+    } else {
         if (m_pHoverDropTarget != nullptr) {
             m_pHoverDropTarget->OnDropLeave();
         }
@@ -60,21 +54,20 @@ void WindowDropTarget::OnDropPosition(const UiPoint& pt)
         int32_t hr = pHoverDropTarget->OnDropBegin(pt);
         if (hr == 0) {
             pHoverDropTarget->OnDropPosition(pt);
-        }
-        else {
+        } else {
             m_pHoverDropTarget = nullptr;
         }
     }
 }
 
-void WindowDropTarget::OnDropText(const DStringA& utf8Text)
+void WindowDropTarget::OnDropText(const DStringA &utf8Text)
 {
     if (!utf8Text.empty()) {
         m_textList.push_back(StringConvert::UTF8ToT(utf8Text));
     }
 }
 
-void WindowDropTarget::OnDropFile(const DStringA& utf8Source, const DStringA& utf8File)
+void WindowDropTarget::OnDropFile(const DStringA &utf8Source, const DStringA &utf8File)
 {
     m_fileSource = StringConvert::UTF8ToT(utf8Source);
     if (!utf8File.empty()) {
@@ -90,7 +83,7 @@ void WindowDropTarget::OnDropComplete()
         bSendDropMsg = true;
         bool bHandled = false;
         DString fileSource = m_fileSource;
-        std::vector<DString> fileList = m_fileList;        
+        std::vector<DString> fileList = m_fileList;
         m_pNativeWindow->OnDropFiles(fileSource, fileList, m_dropPt, bHandled);
         if (!bHandled) {
             if (m_pHoverDropTarget != nullptr) {
@@ -98,8 +91,7 @@ void WindowDropTarget::OnDropComplete()
                 m_pHoverDropTarget = nullptr;
             }
         }
-    }
-    else if (!m_textList.empty()) {
+    } else if (!m_textList.empty()) {
         bSendDropMsg = true;
         bool bHandled = false;
         std::vector<DString> textList = m_textList;
@@ -132,7 +124,8 @@ void WindowDropTarget::ClearDropStatus()
     }
 }
 
-ControlPtrT<ControlDropTarget_SDL> WindowDropTarget::GetControlDropTarget(const UiPoint& clientPt) const
+ControlPtrT<ControlDropTarget_SDL> WindowDropTarget::GetControlDropTarget(
+    const UiPoint &clientPt) const
 {
     ControlPtr pNewHover = ControlPtr(m_pNativeWindow->FindControl(clientPt));
     if (pNewHover != nullptr) {

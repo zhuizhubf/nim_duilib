@@ -1,12 +1,8 @@
 #include "DragForm.h"
 
-DragForm::DragForm()
-{
-}
+DragForm::DragForm() {}
 
-DragForm::~DragForm()
-{
-}
+DragForm::~DragForm() {}
 
 DString DragForm::GetSkinFolder()
 {

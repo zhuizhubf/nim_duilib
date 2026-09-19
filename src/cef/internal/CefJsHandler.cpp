@@ -6,10 +6,14 @@
 #include "cef/internal/CefJSBridge.h"
 #include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
+namespace ui {
 
-bool CefJSHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> /*object*/, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& /*retval*/, CefString& exception)
+bool CefJSHandler::Execute(
+    const CefString &name,
+    CefRefPtr<CefV8Value> /*object*/,
+    const CefV8ValueList &arguments,
+    CefRefPtr<CefV8Value> & /*retval*/,
+    CefString &exception)
 {
     // 当Web中调用了"NimCefWebFunction"函数后，会触发到这里，然后把参数保存，转发到Broswer进程
     // Broswer进程的CefBrowserHandler类在OnProcessMessageReceived接口中处理kJsCallbackMessage消息，就可以收到这个消息
@@ -45,8 +49,8 @@ bool CefJSHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> /*object
     //CEF 高版本
     CefString frameId = frame->GetIdentifier();
 #endif
-    (void)browserId;
-    (void)frameId;
+    (void) browserId;
+    (void) frameId;
 
     if (name == "call") {
         // 允许没有参数列表的调用，第二个参数为回调
@@ -56,26 +60,23 @@ bool CefJSHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> /*object
         CefRefPtr<CefV8Value> callback;
         if (arguments[0]->IsString() && arguments[1]->IsFunction()) {
             callback = arguments[1];
-        }
-        else if (arguments[0]->IsString() && arguments[1]->IsString() && arguments[2]->IsFunction()) {
+        } else if (arguments[0]->IsString() && arguments[1]->IsString() && arguments[2]->IsFunction()) {
             params = arguments[1]->GetStringValue();
             callback = arguments[2];
-        }
-        else {
+        } else {
             exception = "Invalid arguments.";
             return false;
         }
 
         // 执行 C++ 方法
         if (!m_jsBridge->CallCppFunction(function_name, params, callback)) {
-            exception = ui::StringUtil::Printf("Failed to call function %s.", function_name.c_str()).c_str();
+            exception = ui::StringUtil::Printf("Failed to call function %s.", function_name.c_str())
+                            .c_str();
             return false;
         }
         return true;
-    }
-    else if (name == "register") {
-        if (arguments[0]->IsString() && arguments[1]->IsFunction())
-        {
+    } else if (name == "register") {
+        if (arguments[0]->IsString() && arguments[1]->IsFunction()) {
             std::string function_name = arguments[0]->GetStringValue();
             CefRefPtr<CefV8Value> callback = arguments[1];
             if (!m_jsBridge->RegisterJSFunc(function_name, callback)) {
@@ -83,8 +84,7 @@ bool CefJSHandler::Execute(const CefString& name, CefRefPtr<CefV8Value> /*object
                 return false;
             }
             return true;
-        }
-        else {
+        } else {
             exception = "Invalid arguments.";
             return false;
         }

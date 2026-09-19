@@ -25,7 +25,7 @@ private:
 
     /** 主线程：消息循环处于Idle状态
     */
-    virtual void OnMessageLoopIdle()  override;
+    virtual void OnMessageLoopIdle() override;
 
 private:
     /** 主窗口

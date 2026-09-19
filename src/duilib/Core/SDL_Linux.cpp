@@ -1,26 +1,30 @@
 #include "SDL_Linux.h"
 
-#if defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#if defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-namespace ui
-{
+namespace ui {
 /** 封装Linux的SetFocus函数，功能类似于Windows的SetFocus(HWND)
 */
 bool SetFocus_Linux(uint64_t x11WindowNumber)
 {
     // 获取显示连接
-    Display* display = XOpenDisplay(NULL);
+    Display *display = XOpenDisplay(NULL);
     if (!display) {
         return false; // 无法打开显示
     }
     // RAII资源管理
-    struct DisplayCloser {
-        Display* d;
-        ~DisplayCloser() { if (d) ::XCloseDisplay(d); }
-    } closer{ display };
+    struct DisplayCloser
+    {
+        Display *d;
+        ~DisplayCloser()
+        {
+            if (d)
+                ::XCloseDisplay(d);
+        }
+    } closer{display};
 
     // 获取当前窗口句柄
     ::Window hWnd = x11WindowNumber;
@@ -43,6 +47,6 @@ bool SetFocus_Linux(uint64_t x11WindowNumber)
     return true;
 }
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_LINUX

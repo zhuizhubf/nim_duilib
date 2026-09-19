@@ -1,34 +1,33 @@
 #include "duilib/Core/StateColorMap2.h"
+#include "duilib/Animation/AnimationManager.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Animation/AnimationManager.h"
 
-namespace ui 
-{
-StateColorMap2::StateColorMap2(Control* pControl):
-    m_pControl(pControl),
-    m_fStateColorMinWidth(0.0f),
-    m_fStateColorMinHeight(0.0f)
+namespace ui {
+StateColorMap2::StateColorMap2(Control *pControl)
+    : m_pControl(pControl)
+    , m_fStateColorMinWidth(0.0f)
+    , m_fStateColorMinHeight(0.0f)
 {
     ASSERT(kControlStateCount > 0);
     m_stateColors.resize(kControlStateCount);
 }
 
-void StateColorMap2::SetStateColor(ControlStateType stateType, const DString& color)
+void StateColorMap2::SetStateColor(ControlStateType stateType, const DString &color)
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     ASSERT(nIndex < m_stateColors.size());
     if (nIndex < m_stateColors.size()) {
         m_stateColors[nIndex].m_colorStr = color;
     }
 }
 
-void StateColorMap2::SetStateColorMargin(ControlStateType stateType, const UiMargin& colorMargin)
+void StateColorMap2::SetStateColorMargin(ControlStateType stateType, const UiMargin &colorMargin)
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     ASSERT(nIndex < m_stateColors.size());
     if (nIndex < m_stateColors.size()) {
-        UiMargin16& margin16 = m_stateColors[nIndex].m_colorMargin;
+        UiMargin16 &margin16 = m_stateColors[nIndex].m_colorMargin;
         margin16.left = ui::TruncateToInt16(colorMargin.left);
         margin16.top = ui::TruncateToInt16(colorMargin.top);
         margin16.right = ui::TruncateToInt16(colorMargin.right);
@@ -36,12 +35,12 @@ void StateColorMap2::SetStateColorMargin(ControlStateType stateType, const UiMar
     }
 }
 
-void StateColorMap2::SetStateColorRound(ControlStateType stateType, const UiSize& colorRound)
+void StateColorMap2::SetStateColorRound(ControlStateType stateType, const UiSize &colorRound)
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     ASSERT(nIndex < m_stateColors.size());
     if (nIndex < m_stateColors.size()) {
-        UiSize16& size16 = m_stateColors[nIndex].m_colorRound;
+        UiSize16 &size16 = m_stateColors[nIndex].m_colorRound;
         size16.cx = ui::TruncateToInt16(colorRound.cx);
         size16.cy = ui::TruncateToInt16(colorRound.cy);
     }
@@ -54,7 +53,7 @@ bool StateColorMap2::HasHoveredColor() const
 
 bool StateColorMap2::HasStateColors() const
 {
-    for (const TColorProperty& color : m_stateColors) {
+    for (const TColorProperty &color : m_stateColors) {
         if (!color.m_colorStr.empty()) {
             return true;
         }
@@ -64,7 +63,7 @@ bool StateColorMap2::HasStateColors() const
 
 bool StateColorMap2::HasStateColor(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
         return !m_stateColors[nIndex].m_colorStr.empty();
     }
@@ -73,7 +72,7 @@ bool StateColorMap2::HasStateColor(ControlStateType stateType) const
 
 DString StateColorMap2::GetStateColor(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
         return m_stateColors[nIndex].m_colorStr.c_str();
     }
@@ -82,9 +81,9 @@ DString StateColorMap2::GetStateColor(ControlStateType stateType) const
 
 UiMargin StateColorMap2::GetStateColorMargin(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
-        const UiMargin16& margin16 = m_stateColors[nIndex].m_colorMargin;
+        const UiMargin16 &margin16 = m_stateColors[nIndex].m_colorMargin;
         UiMargin rcMargin;
         rcMargin.left = margin16.left;
         rcMargin.top = margin16.top;
@@ -97,9 +96,9 @@ UiMargin StateColorMap2::GetStateColorMargin(ControlStateType stateType) const
 
 UiSize StateColorMap2::GetStateColorRound(ControlStateType stateType) const
 {
-    size_t nIndex = (size_t)stateType;
+    size_t nIndex = (size_t) stateType;
     if (nIndex < m_stateColors.size()) {
-        const UiSize16& size16 = m_stateColors[nIndex].m_colorRound;
+        const UiSize16 &size16 = m_stateColors[nIndex].m_colorRound;
         UiSize rcSize;
         rcSize.cx = size16.cx;
         rcSize.cy = size16.cy;
@@ -108,24 +107,36 @@ UiSize StateColorMap2::GetStateColorRound(ControlStateType stateType) const
     return UiSize();
 }
 
-void StateColorMap2::PaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType) const
+void StateColorMap2::PaintStateColor(
+    IRender *pRender, const UiRect &rcPaint, ControlStateType stateType) const
 {
     ASSERT(pRender != nullptr);
     if (pRender == nullptr) {
         return;
     }
-    if (m_pControl != nullptr) {        
+    if (m_pControl != nullptr) {
         if (m_pControl->IsAnimationPlayerPlaying(AnimationType::kAnimationHovered)) {
-            if ((stateType == kControlStateNormal || stateType == kControlStateHovered) && HasStateColor(kControlStateHovered)) {
+            if ((stateType == kControlStateNormal || stateType == kControlStateHovered)
+                && HasStateColor(kControlStateHovered)) {
                 const uint8_t nHoveredAlpha = m_pControl->GetHoveredAlpha();
                 //先绘制默认的颜色
                 DString strColor = GetStateColor(kControlStateNormal);
                 if (!strColor.empty()) {
-                    DoPaintStateColor(pRender, rcPaint, kControlStateNormal, m_pControl->GetUiColor(strColor), 255 - nHoveredAlpha);
+                    DoPaintStateColor(
+                        pRender,
+                        rcPaint,
+                        kControlStateNormal,
+                        m_pControl->GetUiColor(strColor),
+                        255 - nHoveredAlpha);
                 }
 
                 //绘制Hovered状态的颜色（半透明）
-                DoPaintStateColor(pRender, rcPaint, kControlStateHovered, m_pControl->GetUiColor(GetStateColor(kControlStateHovered)), nHoveredAlpha);
+                DoPaintStateColor(
+                    pRender,
+                    rcPaint,
+                    kControlStateHovered,
+                    m_pControl->GetUiColor(GetStateColor(kControlStateHovered)),
+                    nHoveredAlpha);
                 return;
             }
         }
@@ -142,13 +153,18 @@ void StateColorMap2::PaintStateColor(IRender* pRender, const UiRect& rcPaint, Co
     }
     DString strColor = GetStateColor(stateType);
     if (!strColor.empty()) {
-        UiColor color = m_pControl ? m_pControl->GetUiColor(strColor) :
-                                     GlobalManager::Instance().Color().GetColor(strColor);
+        UiColor color = m_pControl ? m_pControl->GetUiColor(strColor)
+                                   : GlobalManager::Instance().Color().GetColor(strColor);
         DoPaintStateColor(pRender, rcPaint, stateType, color);
     }
 }
 
-void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, ControlStateType stateType, UiColor colorValue, uint8_t nAlpha) const
+void StateColorMap2::DoPaintStateColor(
+    IRender *pRender,
+    const UiRect &rcPaint,
+    ControlStateType stateType,
+    UiColor colorValue,
+    uint8_t nAlpha) const
 {
     if ((pRender == nullptr) || rcPaint.IsEmpty() || (nAlpha == 0) || colorValue.IsEmpty()) {
         return;
@@ -156,7 +172,7 @@ void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, 
     UiRect rcStatePaint = rcPaint;
     const UiMargin rcMargin = GetStateColorMargin(stateType);
     if (!rcMargin.IsEmpty()) {
-        rcStatePaint.Deflate(rcMargin);//剪去外边距        
+        rcStatePaint.Deflate(rcMargin); //剪去外边距
     }
 
     constexpr float fMinSize = 0.1f;
@@ -167,14 +183,12 @@ void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, 
         if (rcStatePaint.IsEmpty()) {
             return;
         }
-    }
-    else if (fConfigStateColorMinWidth < fMinSize) {
+    } else if (fConfigStateColorMinWidth < fMinSize) {
         //未设置最小宽度限制
         if (rcStatePaint.Width() <= 0) {
             return;
         }
-    }
-    else if (fConfigStateColorMinHeight < fMinSize) {
+    } else if (fConfigStateColorMinHeight < fMinSize) {
         //未设置最小高度限制
         if (rcStatePaint.Height() <= 0) {
             return;
@@ -184,8 +198,10 @@ void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, 
     UiRectF rcStatePaintF = UiRectF::MakeFromRect(rcStatePaint);
     if (fConfigStateColorMinWidth >= fMinSize) {
         //设置了最小宽度限制
-        float fStateColorMinWidth = (m_pControl != nullptr) ? m_pControl->Dpi().GetScaleFloat(fConfigStateColorMinWidth) : fConfigStateColorMinWidth;
-        fStateColorMinWidth = std::min(fStateColorMinWidth, (float)rcPaint.Width());
+        float fStateColorMinWidth = (m_pControl != nullptr)
+                                        ? m_pControl->Dpi().GetScaleFloat(fConfigStateColorMinWidth)
+                                        : fConfigStateColorMinWidth;
+        fStateColorMinWidth = std::min(fStateColorMinWidth, (float) rcPaint.Width());
         if (rcStatePaintF.Width() < fStateColorMinWidth) {
             float diff = fStateColorMinWidth - rcStatePaintF.Width();
             rcStatePaintF.left -= diff / 2;
@@ -194,8 +210,10 @@ void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, 
     }
     if (fConfigStateColorMinHeight >= fMinSize) {
         //设置了最小高度限制
-        float fStateColorMinHeight = (m_pControl != nullptr) ? m_pControl->Dpi().GetScaleFloat(fConfigStateColorMinHeight) : fConfigStateColorMinHeight;
-        fStateColorMinHeight = std::min(fStateColorMinHeight, (float)rcPaint.Height());
+        float fStateColorMinHeight = (m_pControl != nullptr) ? m_pControl->Dpi().GetScaleFloat(
+                                                                   fConfigStateColorMinHeight)
+                                                             : fConfigStateColorMinHeight;
+        fStateColorMinHeight = std::min(fStateColorMinHeight, (float) rcPaint.Height());
         if (rcStatePaintF.Height() < fStateColorMinHeight) {
             float diff = fStateColorMinHeight - rcStatePaintF.Height();
             rcStatePaintF.top -= diff / 2;
@@ -206,9 +224,9 @@ void StateColorMap2::DoPaintStateColor(IRender* pRender, const UiRect& rcPaint, 
     UiSize szRound = GetStateColorRound(stateType);
     if (!szRound.IsEmpty()) {
         //圆角矩形
-        pRender->FillRoundRect(rcStatePaintF, (float)szRound.cx, (float)szRound.cy, colorValue, nAlpha);
-    }
-    else {
+        pRender->FillRoundRect(
+            rcStatePaintF, (float) szRound.cx, (float) szRound.cy, colorValue, nAlpha);
+    } else {
         //直角矩形
         pRender->FillRect(rcStatePaintF, colorValue, nAlpha);
     }

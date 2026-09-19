@@ -1,15 +1,14 @@
 #ifndef UI_CONTROL_RICHEDIT_DATA_H_
 #define UI_CONTROL_RICHEDIT_DATA_H_
 
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Core/SharePtr.h"
+#include "duilib/Core/UiTypes.h"
 #include "render/IRender.h"
-#include <unordered_map>
-#include <map>
 #include <list>
+#include <map>
+#include <unordered_map>
 
-namespace ui
-{
+namespace ui {
 /** 生成格式化文本的接口，用于绘制文本
 */
 class DUILIB_API IRichTextData
@@ -21,10 +20,11 @@ public:
     * @param [in] nStartLine 重新计算的起始行号（增量计算时使用）
     * @param [in] modifiedLines 有修改的行号（增量计算时使用）
     */
-    virtual bool GetRichTextForDraw(const std::vector<std::wstring_view>& textView,
-                                    std::vector<RichTextData>& richTextDataList,
-                                    size_t nStartLine = (size_t)-1,
-                                    const std::vector<size_t>& modifiedLines = std::vector<size_t>()) const = 0;
+    virtual bool GetRichTextForDraw(
+        const std::vector<std::wstring_view> &textView,
+        std::vector<RichTextData> &richTextDataList,
+        size_t nStartLine = (size_t) -1,
+        const std::vector<size_t> &modifiedLines = std::vector<size_t>()) const = 0;
 
     /** 获取文本绘制矩形范围（需要时，随时调用该接口获取绘制文本的矩形范围）
     * @return 返回当前文本绘制的矩形范围，该范围需要去除内边距，滚动条所占空间
@@ -53,7 +53,7 @@ public:
 
     /** 处理密码模式下的显示字符
     */
-    virtual void ReplacePasswordChar(DStringW& text) const = 0;
+    virtual void ReplacePasswordChar(DStringW &text) const = 0;
 
     /** 获取文本限制长度
     */
@@ -71,19 +71,19 @@ public:
 class DUILIB_API RichEditData
 {
 public:
-    explicit RichEditData(IRichTextData* pRichTextData);
-    RichEditData(const RichEditData&) = delete;
-    RichEditData& operator=(const RichEditData&) = delete;
+    explicit RichEditData(IRichTextData *pRichTextData);
+    RichEditData(const RichEditData &) = delete;
+    RichEditData &operator=(const RichEditData &) = delete;
     virtual ~RichEditData();
 
 public:
     /** 设置关联的渲染接口
     */
-    void SetRender(IRender* pRender);
+    void SetRender(IRender *pRender);
 
     /** 设置关联的渲染接口工厂
     */
-    void SetRenderFactory(IRenderFactory* pRenderFactory);
+    void SetRenderFactory(IRenderFactory *pRenderFactory);
 
     /** 设置单行文本模式，绘制的时候不分行，忽略换行符('\n')
     */
@@ -111,19 +111,19 @@ public:
 
     /** 文本的滚动条位置
     */
-    void SetScrollOffset(const UiSize& szScrollOffset);
+    void SetScrollOffset(const UiSize &szScrollOffset);
 
     /** 计算显示文本所需要的矩形范围(用于估算控件大小)
     * @param [int] rcAvailable 可用的矩形范围
     */
-    UiRect EstimateTextDisplayBounds(const UiRect& rcAvailable);
+    UiRect EstimateTextDisplayBounds(const UiRect &rcAvailable);
 
 public:
     /** 设置文本，并清空Undo/Redo历史
      * @param [in] text 文本内容
      * @return 返回true表示文本有变化，返回false表示文本无变化
      */
-    bool SetText(const DStringW& text);
+    bool SetText(const DStringW &text);
 
     /** 替换指定范围的文本(文本的添加，修改，删除功能，均通过这个函数完成)
      *  (1) 如果 nStartChar == nEndChar，表示在此位置插入文本
@@ -136,7 +136,12 @@ public:
      * @param [in] bClearRedo 是否清空Redo列表, 仅当bCanUndo为false时生效
      * @return 返回true表示文本有变化，返回false表示文本无变化
      */
-    bool ReplaceText(int32_t nStartChar, int32_t nEndChar, const DStringW& text, bool bCanUndo = true, bool bClearRedo = true);
+    bool ReplaceText(
+        int32_t nStartChar,
+        int32_t nEndChar,
+        const DStringW &text,
+        bool bCanUndo = true,
+        bool bClearRedo = true);
 
     /** 获取文本
     */
@@ -144,7 +149,7 @@ public:
 
     /** 获取文本视图，文本视图是按行组织，每行一条数据（以'\n'切分的行）
     */
-    void GetTextView(std::vector<std::wstring_view>& textView) const;
+    void GetTextView(std::vector<std::wstring_view> &textView) const;
 
     /** 获取内容的长度(按UTF16编码的字符个数)
      * @return 返回文本内容长度
@@ -183,7 +188,7 @@ public:
      * @param [out] nEndCharIndex 返回结束的字符下标
      * @return 成功返回 true，失败返回 false
      */
-    bool Undo(int32_t& nEndCharIndex);
+    bool Undo(int32_t &nEndCharIndex);
 
     /** 是否可以重做
     */
@@ -193,7 +198,7 @@ public:
      * @param [out] nEndCharIndex 返回结束的字符下标
      * @return 成功返回 true，失败返回 false
      */
-    bool Redo(int32_t& nEndCharIndex);
+    bool Redo(int32_t &nEndCharIndex);
 
     /** 清空撤销列表
     */
@@ -212,10 +217,15 @@ public:
     * @param [in] findText 待查找的文本内容
     * @param [out] chrgText 匹配的文本，字符的索引号范围
     */
-    bool FindRichText(bool bMatchCase, bool bMatchWholeWord, bool bFindDown,
-                      int32_t nFindStartChar, int32_t nFindEndChar,
-                      const DStringW& findText,
-                      int32_t& nFoundStartChar, int32_t& nFoundEndChar) const;
+    bool FindRichText(
+        bool bMatchCase,
+        bool bMatchWholeWord,
+        bool bFindDown,
+        int32_t nFindStartChar,
+        int32_t nFindEndChar,
+        const DStringW &findText,
+        int32_t &nFoundStartChar,
+        int32_t &nFoundEndChar) const;
 
 public:
     /** 获取总行数
@@ -275,7 +285,8 @@ public:
      * @param [in] nEndChar 结束下标值
      * @param [out] rowTextRectFs 每行的矩形范围（逻辑行）
      */
-    void GetCharRangeRects(int32_t nStartChar, int32_t nEndChar, std::map<int32_t, UiRectF>& rowTextRectFs);
+    void GetCharRangeRects(
+        int32_t nStartChar, int32_t nEndChar, std::map<int32_t, UiRectF> &rowTextRectFs);
 
 public:
     /** 获取下一个有效字符的索引号(换行符会被跳过)
@@ -307,7 +318,7 @@ public:
     * @param [out] nWordStartIndex 单词的索引开始索引号
     * @param [out] nWordEndIndex 单词的索引结束索引号
     */
-    bool GetCurrentWordIndex(int32_t nCharIndex, int32_t& nWordStartIndex, int32_t& nWordEndIndex);
+    bool GetCurrentWordIndex(int32_t nCharIndex, int32_t &nWordStartIndex, int32_t &nWordEndIndex);
 
     /** 获取本行的行首的字符索引下标值
     * @param [in] nCharIndex 字符的索引下标
@@ -329,11 +340,11 @@ public:
 public:
     /** 设置文本绘制缓存
     */
-    void SetDrawRichTextCache(const std::shared_ptr<DrawRichTextCache>& spDrawRichTextCache);
+    void SetDrawRichTextCache(const std::shared_ptr<DrawRichTextCache> &spDrawRichTextCache);
 
     /** 获取文本绘制缓存
     */
-    const std::shared_ptr<DrawRichTextCache>& GetDrawRichTextCache() const;
+    const std::shared_ptr<DrawRichTextCache> &GetDrawRichTextCache() const;
 
     /** 清除绘制缓存
     */
@@ -345,7 +356,7 @@ public:
 
     /** 获取文本所占的矩形范围
     */
-    const UiRect& GetTextRect() const;
+    const UiRect &GetTextRect() const;
 
     /** 获取纵向对齐的偏移量
     */
@@ -353,7 +364,7 @@ public:
 
     /** 获取横向对齐的偏移量（按逻辑行）
     */
-    const std::vector<int32_t>& GetTextRowXOffset() const;
+    const std::vector<int32_t> &GetTextRowXOffset() const;
 
     /** 检查并按需重新计算文本区域
     */
@@ -361,28 +372,29 @@ public:
 
     /** 按字符数限制，截断文本
     */
-    void TruncateLimitText(DStringW& text, int32_t nLimitLen) const;
+    void TruncateLimitText(DStringW &text, int32_t nLimitLen) const;
 
 private:
     /** 将内部坐标转换为外部坐标
     */
-    const UiPoint& ConvertToExternal(UiPoint& pt) const;
-    const UiRect& ConvertToExternal(UiRect& rect) const;
-    const UiRectF& ConvertToExternal(UiRectF& rect) const;
+    const UiPoint &ConvertToExternal(UiPoint &pt) const;
+    const UiRect &ConvertToExternal(UiRect &rect) const;
+    const UiRectF &ConvertToExternal(UiRectF &rect) const;
 
     /** 将外部坐标转换为内部坐标
     */
-    const UiPoint& ConvertToInternal(UiPoint& pt) const;
-    const UiRect& ConvertToInternal(UiRect& rect) const;
+    const UiPoint &ConvertToInternal(UiPoint &pt) const;
+    const UiRect &ConvertToInternal(UiRect &rect) const;
 
 private:
     /** 设置文本绘制区域
     */
-    void SetTextDrawRect(const UiRect& rcTextDrawRect, bool bCheckDirty);
+    void SetTextDrawRect(const UiRect &rcTextDrawRect, bool bCheckDirty);
 
     /** 将文本按照换行符（'\n'）切分为多行
     */
-    void SplitLines(const std::wstring_view& textView, std::vector<std::wstring_view>& lineTextViewList) const;
+    void SplitLines(
+        const std::wstring_view &textView, std::vector<std::wstring_view> &lineTextViewList) const;
 
     /** 清空撤销列表
     */
@@ -390,19 +402,23 @@ private:
 
     /** 记录操作到撤销列表
     */
-    void AddToUndoList(int32_t nStartChar, const DStringW& newText, const DStringW& oldText);
+    void AddToUndoList(int32_t nStartChar, const DStringW &newText, const DStringW &oldText);
 
     /** 从缓存中计算文本所占的矩形区域
     */
-    void CalcCacheTextRects(UiRect& rcTextRect) const;
+    void CalcCacheTextRects(UiRect &rcTextRect) const;
 
     /** 按对齐方式，更新每行文本的纵坐标
     */
-    void UpdateRowTextOffsetY(RichTextLineInfoList& lineTextInfo, int32_t nOffsetY) const;
+    void UpdateRowTextOffsetY(RichTextLineInfoList &lineTextInfo, int32_t nOffsetY) const;
 
     /** 按对齐方式，更新每行文本的横坐标
     */
-    void UpdateRowTextOffsetX(RichTextLineInfoList& lineTextInfo, HorAlignType hAlignType, std::vector<int32_t>& rowXOffset, bool& bTextRectXOffsetUpdated) const;
+    void UpdateRowTextOffsetX(
+        RichTextLineInfoList &lineTextInfo,
+        HorAlignType hAlignType,
+        std::vector<int32_t> &rowXOffset,
+        bool &bTextRectXOffsetUpdated) const;
 
     /** 计算文本的区域信息（全部重新计算）
     */
@@ -414,22 +430,23 @@ private:
     * @param [in] deletedLines 删除的行
     * @param [in] nDeletedRows 删除了几行
     */
-    void CalcTextRectsPart(size_t nStartLine,
-                           const std::vector<size_t>& modifiedLines,
-                           const std::vector<size_t>& deletedLines,
-                           size_t nDeletedRows);
+    void CalcTextRectsPart(
+        size_t nStartLine,
+        const std::vector<size_t> &modifiedLines,
+        const std::vector<size_t> &deletedLines,
+        size_t nDeletedRows);
 
     /** 在编辑状态下，如果最后的字符是换行符，追加一个空行，从而使得光标可以定位到最后的空行
     */
-    void AppendEmptyLine(RichTextLineInfoList& lineTextInfo) const;
+    void AppendEmptyLine(RichTextLineInfoList &lineTextInfo) const;
 
     /** 删除最后的空行
     */
-    void RemoveEmptyLine(RichTextLineInfoList& lineTextInfo) const;
+    void RemoveEmptyLine(RichTextLineInfoList &lineTextInfo) const;
 
     /** 检查行数据是否合法
     */
-    void CheckLineTextData(const RichTextLineInfoList& lineTextInfo, size_t nIndex) const;
+    void CheckLineTextData(const RichTextLineInfoList &lineTextInfo, size_t nIndex) const;
 
     /** 定位字符范围所属的行和行文本偏移量
     * @param [in] nStartChar 起始下标值
@@ -439,9 +456,13 @@ private:
     * @param [out] nStartCharLineOffset 在起始行中，开始字符的偏移量，有效范围[0, 行文本长度)
     * @param [out] nEndCharLineOffset 在结束行中，结束字符的偏移量，有效范围[0, 行文本长度)
     */
-    bool FindLineTextPos(int32_t nStartChar, int32_t nEndChar,
-                         size_t& nStartLine, size_t& nEndLine,
-                         size_t& nStartCharLineOffset, size_t& nEndCharLineOffset) const;
+    bool FindLineTextPos(
+        int32_t nStartChar,
+        int32_t nEndChar,
+        size_t &nStartLine,
+        size_t &nEndLine,
+        size_t &nStartCharLineOffset,
+        size_t &nEndCharLineOffset) const;
 
     /** 判断一个字符是否为分隔符（空格，标点符号等）
     */
@@ -453,20 +474,21 @@ private:
     * @param [out] nLineRowIndex 在物理行中的逻辑行号（每行中从0开始编号）
     * @param [out] nStartCharRowOffset 在逻辑行中的字符偏移量
     */
-    bool GetCharLineRowIndex(int32_t nCharIndex,
-                             size_t& nLineNumber,
-                             size_t& nLineRowIndex,
-                             size_t& nStartCharRowOffset) const;
+    bool GetCharLineRowIndex(
+        int32_t nCharIndex,
+        size_t &nLineNumber,
+        size_t &nLineRowIndex,
+        size_t &nStartCharRowOffset) const;
 
     /** 获取指定字符的所在行的数据
     * @param [in] nCharIndex 字符索引位置
     * @param [out] nStartCharRowOffset 在逻辑行中的字符偏移量
     */
-    RichTextRowInfoPtr GetCharRowInfo(int32_t nCharIndex, size_t& nStartCharRowOffset) const;
+    RichTextRowInfoPtr GetCharRowInfo(int32_t nCharIndex, size_t &nStartCharRowOffset) const;
 
     /** 获取一个点所在的行
     */
-    RichTextRowInfoPtr GetRowInfoFromPoint(const UiPoint& pt) const;
+    RichTextRowInfoPtr GetRowInfoFromPoint(const UiPoint &pt) const;
 
     /** 获取首行的数据
     */
@@ -478,7 +500,7 @@ private:
 
     /** 获取一行数据的起始字符下标值，如果找不到返回(size_t)-1
     */
-    size_t GetRowInfoStartIndex(const RichTextRowInfoPtr& spRowInfo) const;
+    size_t GetRowInfoStartIndex(const RichTextRowInfoPtr &spRowInfo) const;
 
     /** 更新行高数据（增量绘制后的更新）
     * @param [in] nDrawStartLineIndex 从哪一行数据开始处理
@@ -491,13 +513,13 @@ private:
 
     /** 适合业务逻辑的Union函数
     */
-    void UnionRect(UiRect& rect, const UiRect& r) const;
-    void UnionRectF(UiRectF& rect, const UiRectF& r) const;
+    void UnionRect(UiRect &rect, const UiRect &r) const;
+    void UnionRectF(UiRectF &rect, const UiRectF &r) const;
 
 private:
     /** 将文本生成可绘制的格式的接口
     */
-    IRichTextData* m_pRichText;
+    IRichTextData *m_pRichText;
 
     /** 是否为单行文本模式
     */
@@ -513,11 +535,11 @@ private:
 
     /** 关联的渲染接口
     */
-    IRender* m_pRender;
+    IRender *m_pRender;
 
     /** 关联的渲染接口工厂
     */
-    IRenderFactory* m_pRenderFactory;
+    IRenderFactory *m_pRenderFactory;
 
     /** 文本绘制区域
     */

@@ -1,18 +1,18 @@
 #ifndef UI_CONTROL_LIST_CTRL_LABEL_H_
 #define UI_CONTROL_LIST_CTRL_LABEL_H_
 
-#include "duilib/Control/CheckBox.h"
 #include "duilib/Box/HBox.h"
+#include "duilib/Control/CheckBox.h"
 
-namespace ui
-{
+namespace ui {
 /** 列表中使用的Label控件，用于显示文本，并提供文本编辑功能的事件
 */
-class DUILIB_API ListCtrlLabel: public CheckBoxTemplate<HBox>
+class DUILIB_API ListCtrlLabel : public CheckBoxTemplate<HBox>
 {
     typedef CheckBoxTemplate<HBox> BaseClass;
+
 public:
-    explicit ListCtrlLabel(Window* pWindow);
+    explicit ListCtrlLabel(Window *pWindow);
 
     /** 获取控件类型
     */
@@ -20,7 +20,7 @@ public:
 
     /** 消息处理
     */
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -31,7 +31,7 @@ public:
 public:
     /** 设置文本所在位置的矩形区域
     */
-    void SetTextRect(const UiRect& rect);
+    void SetTextRect(const UiRect &rect);
 
     /** 获取文本所在位置的矩形区域
     */
@@ -39,7 +39,7 @@ public:
 
     /** 设置关联的列表项
     */
-    void SetListBoxItem(Control* pListBoxItem);
+    void SetListBoxItem(Control *pListBoxItem);
 
     /** 设置是否支持文本编辑
     */
@@ -53,7 +53,7 @@ private:
     /** 鼠标事件(来源于子控件的消息转发)
     * @param [in] msg 鼠标事件的内容
     */
-    bool OnMouseEvent(const EventArgs& msg);
+    bool OnMouseEvent(const EventArgs &msg);
 
     /** 进入编辑状态
     */
@@ -62,7 +62,7 @@ private:
 private:
     /** 关联的列表项
     */
-    Control* m_pListBoxItem;
+    Control *m_pListBoxItem;
 
     /** 文本所在位置的矩形区域
     */
@@ -76,6 +76,6 @@ private:
     */
     bool m_bEnableEdit;
 };
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_LABEL_H_

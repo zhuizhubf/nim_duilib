@@ -10,41 +10,39 @@ namespace ui {
 class DUILIB_API HyperLink : public Label
 {
     typedef Label BaseClass;
+
 public:
-    explicit HyperLink(Window* pWindow):
-        Label(pWindow),
-        m_bShowUrlTooltip(true)
-    {
-    }
+    explicit HyperLink(Window *pWindow)
+        : Label(pWindow)
+        , m_bShowUrlTooltip(true)
+    {}
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override { return DUI_CTR_HYPER_LINK; }
-    virtual void SetAttribute(const DString& strName, const DString& strValue2) override
+    virtual void SetAttribute(const DString &strName, const DString &strValue2) override
     {
         DString strValue = GetExpandVarStrings(strValue2);
         if (strName == _T("url")) {
             SetUrl(strValue);
-        }
-        else if (strName == _T("show_url_tooltip")) {
+        } else if (strName == _T("show_url_tooltip")) {
             SetShowUrlTooltip(StringUtil::IsValueTrue(strValue));
-        }
-        else {
+        } else {
             BaseClass::SetAttribute(strName, strValue);
         }
     }
 
-    virtual void Activate(const EventArgs* /*pMsg*/) override
+    virtual void Activate(const EventArgs * /*pMsg*/) override
     {
         if (!IsActivatable()) {
             return;
         }
         DString url = m_url.c_str();
-        SendEvent(kEventLinkClick, (WPARAM)url.c_str());
+        SendEvent(kEventLinkClick, (WPARAM) url.c_str());
     }
 
 public:
     /** 设置URL
     */
-    void SetUrl(const DString& url)
+    void SetUrl(const DString &url)
     {
         m_url = url;
         if (IsShowUrlTooltip()) {
@@ -55,10 +53,7 @@ public:
 
     /** 获取URL
     */
-    DString GetUrl() const
-    {
-        return m_url.c_str();
-    }
+    DString GetUrl() const { return m_url.c_str(); }
 
     /** 是否设置URL为tooltip
     */
@@ -67,25 +62,24 @@ public:
         m_bShowUrlTooltip = bShowUrlTooltip;
         if (bShowUrlTooltip) {
             SetToolTipText(GetUrl());
-        }
-        else {
+        } else {
             SetToolTipText(_T(""));
         }
     }
 
     /** 是否显示URL为tootip
     */
-    bool IsShowUrlTooltip() const
-    {
-        return m_bShowUrlTooltip;
-    }
+    bool IsShowUrlTooltip() const { return m_bShowUrlTooltip; }
 
 public:
     /** 监听超级链接被点击事件
      * @param [in] callback 超级链接被点击后的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachLinkClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventLinkClick, callback, callbackID); }
+    void AttachLinkClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventLinkClick, callback, callbackID);
+    }
 
 private:
     /** URL
@@ -97,6 +91,6 @@ private:
     bool m_bShowUrlTooltip;
 };
 
-}    // namespace ui
+} // namespace ui
 
 #endif // UI_CONTROL_HYPER_LINK_H_

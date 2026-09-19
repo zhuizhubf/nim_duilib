@@ -1,14 +1,12 @@
 #include "ColorManager.h"
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui 
-{
-ColorManager::ColorManager():
-    m_bColorThemeDarkMode(false)
-{
-}
+namespace ui {
+ColorManager::ColorManager()
+    : m_bColorThemeDarkMode(false)
+{}
 
-UiColor ColorManager::ConvertToUiColor(const DString& strColor)
+UiColor ColorManager::ConvertToUiColor(const DString &strColor)
 {
     ASSERT(!strColor.empty());
     if (strColor.empty()) {
@@ -17,8 +15,7 @@ UiColor ColorManager::ConvertToUiColor(const DString& strColor)
     if (strColor.at(0) == _T('#')) {
         //十六位数字表示的颜色值
         return StandardColorMap::HexToColor(strColor);
-    }
-    else {
+    } else {
         //按已定义颜色获取
         UiColor color = GetColor(strColor);
         if (!color.IsEmpty()) {
@@ -34,17 +31,17 @@ UiColor ColorManager::ConvertToUiColor(const DString& strColor)
     }
 }
 
-void ColorManager::AddColor(const DString& strName, const DString& strValue)
+void ColorManager::AddColor(const DString &strName, const DString &strValue)
 {
     m_colorMap.AddColor(strName, strValue);
 }
 
-void ColorManager::AddColor(const DString& strName, UiColor argb)
+void ColorManager::AddColor(const DString &strName, UiColor argb)
 {
     m_colorMap.AddColor(strName, argb);
 }
 
-UiColor ColorManager::GetColor(const DString& strName2) const
+UiColor ColorManager::GetColor(const DString &strName2) const
 {
     //别名优先，由于需要保留历史兼容性问题(比如原代码中使用了"red"这种颜色值，需要被覆盖掉)
     DString strName = GlobalManager::Instance().GetAliasValue(strName2);
@@ -52,7 +49,7 @@ UiColor ColorManager::GetColor(const DString& strName2) const
         strName = strName2;
     }
     UiColor color = m_colorMap.GetColor(strName);
-    if (color.IsEmpty() && (strName != strName2)){
+    if (color.IsEmpty() && (strName != strName2)) {
         color = m_colorMap.GetColor(strName2);
     }
     return color;
@@ -70,22 +67,22 @@ void ColorManager::Clear()
     RemoveAllColors();
 }
 
-const DString& ColorManager::GetDefaultDisabledTextColor()
+const DString &ColorManager::GetDefaultDisabledTextColor()
 {
     return m_defaultDisabledTextColor;
 }
 
-void ColorManager::SetDefaultDisabledTextColor(const DString& strColor)
+void ColorManager::SetDefaultDisabledTextColor(const DString &strColor)
 {
     m_defaultDisabledTextColor = strColor;
 }
 
-const DString& ColorManager::GetDefaultTextColor()
+const DString &ColorManager::GetDefaultTextColor()
 {
     return m_defaultTextColor;
 }
 
-void ColorManager::SetDefaultTextColor(const DString& strColor)
+void ColorManager::SetDefaultTextColor(const DString &strColor)
 {
     m_defaultTextColor = strColor;
 }
@@ -101,4 +98,3 @@ bool ColorManager::IsColorThemeDarkMode() const
 }
 
 } // namespace ui
-

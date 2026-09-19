@@ -4,18 +4,14 @@
 #include "duilib/duilib_defs.h"
 #include <cstdint>
 
-namespace ui 
-{
+namespace ui {
 /** 外边距的数据结构封装（不是矩形，没有宽高的概念）
 *   外边距：Margin是不包含控件的矩形区域内的。
 */
 class DUILIB_API UiMargin
 {
 public:
-    UiMargin()
-    {
-        left = top = right = bottom = 0;
-    }
+    UiMargin() { left = top = right = bottom = 0; }
     UiMargin(int32_t nLeft, int32_t nTop, int32_t nRight, int32_t nBottom)
     {
         left = nLeft;
@@ -25,16 +21,10 @@ public:
     }
     /** 清零
     */
-    void Clear()
-    {
-        left = top = right = bottom = 0;
-    }
+    void Clear() { left = top = right = bottom = 0; }
     /** 判断是否为空
     */
-    bool IsEmpty() const
-    {
-        return (left == 0) && (top == 0) && (right == 0) && (bottom == 0);
-    }
+    bool IsEmpty() const { return (left == 0) && (top == 0) && (right == 0) && (bottom == 0); }
 
     /** 检查各个值否为有效值（各个值不允许为赋值），并修正
     */
@@ -56,25 +46,18 @@ public:
 
     /** 判断与另外一个是否相同
     */
-    bool Equals(const UiMargin& r) const
+    bool Equals(const UiMargin &r) const
     {
-        return left == r.left && top == r.top &&
-               right == r.right && bottom == r.bottom;
+        return left == r.left && top == r.top && right == r.right && bottom == r.bottom;
     }
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiMargin& a, const UiMargin& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiMargin &a, const UiMargin &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiMargin& a, const UiMargin& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiMargin &a, const UiMargin &b) { return !a.Equals(b); }
 
 public:
     /** 矩形左侧的外边距
@@ -99,10 +82,7 @@ public:
 class DUILIB_API UiMargin16
 {
 public:
-    UiMargin16()
-    {
-        left = top = right = bottom = 0;
-    }
+    UiMargin16() { left = top = right = bottom = 0; }
     UiMargin16(uint16_t nLeft, uint16_t nTop, uint16_t nRight, uint16_t nBottom)
     {
         left = nLeft;
@@ -110,6 +90,7 @@ public:
         right = nRight;
         bottom = nBottom;
     }
+
 public:
     /** 矩形左侧的外边距
     */

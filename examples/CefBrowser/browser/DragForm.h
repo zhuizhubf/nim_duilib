@@ -6,9 +6,10 @@
 
 /** 标签拖出过程中，显示的小窗口
 */
-class DragForm: public ui::DragWindow
+class DragForm : public ui::DragWindow
 {
     typedef ui::DragWindow BaseClass;
+
 public:
     DragForm();
     virtual ~DragForm() override;

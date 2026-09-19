@@ -1,16 +1,15 @@
 #ifndef UI_CORE_EVENTARGS_H_
 #define UI_CORE_EVENTARGS_H_
 
-#include "duilib/Core/UiPoint.h"
 #include "duilib/Core/Keycode.h"
+#include "duilib/Core/UiPoint.h"
 #include <functional>
-#include <vector>
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
+#include <vector>
 
-namespace ui
-{
+namespace ui {
 class Control;
 class WeakFlag;
 
@@ -49,7 +48,7 @@ public:
 
     /** 消息关联的指针数据
     */
-    void* pEventData;
+    void *pEventData;
 
     /** ListCtrl控件专用数据，用于表示该事件对应的视图类型
     */
@@ -62,11 +61,11 @@ public:
 
     /** 设置发送事件的控件
     */
-    void SetSender(Control* pControl);
+    void SetSender(Control *pControl);
 
     /** 获取发送事件的控件
     */
-    Control* GetSender() const;
+    Control *GetSender() const;
 
     /** 设置发送事件的的WeakFlag（在不设置Sender时使用）
     */
@@ -79,7 +78,7 @@ public:
 private:
     /** 发送事件的控件
     */
-    Control* pSender;
+    Control *pSender;
 
     /** 控件的生命周期标志
     */
@@ -88,7 +87,7 @@ private:
 
 /** 事件回调函数的原型定义
 */
-typedef std::function<bool (const ui::EventArgs&)> EventCallback;
+typedef std::function<bool(const ui::EventArgs &)> EventCallback;
 
 /** 事件回调函数的ID
 */
@@ -103,7 +102,7 @@ public:
     * @param [in] callback 回调函数
     * @param [in] callbackID 该回调函数对应的ID（可以不唯一）
     */
-    void AddEventCallback(const EventCallback& callback, EventCallbackID callbackID);
+    void AddEventCallback(const EventCallback &callback, EventCallbackID callbackID);
 
     /** 删除回调函数（可能是对应多个回调函数）
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数），必须是大于0的值
@@ -123,7 +122,7 @@ public:
     /** 触发回调事件（对应于容器中的每个回调函数）
      * @param [in] args 回调函数的参数
      */
-    bool operator() (const ui::EventArgs& args) const;
+    bool operator()(const ui::EventArgs &args) const;
 
 private:
     /** 事件对应的数据
@@ -156,37 +155,39 @@ public:
     * @param [in] eventMap 需要操作的容器
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    static bool RemoveEventCallbackByID(EventMap& eventMap, EventCallbackID callbackID);
+    static bool RemoveEventCallbackByID(EventMap &eventMap, EventCallbackID callbackID);
 
     /** 从事件类型回调的map容器中删除指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] eventType 事件类型
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    static bool RemoveEventCallbackByID(EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
+    static bool RemoveEventCallbackByID(
+        EventMap &eventMap, EventType eventType, EventCallbackID callbackID);
 
     /** 判断事件类型回调的map容器中是否包含指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    static bool HasEventCallbackByID(const EventMap& eventMap, EventCallbackID callbackID);
+    static bool HasEventCallbackByID(const EventMap &eventMap, EventCallbackID callbackID);
 
     /** 判断事件类型回调的map容器中是否包含指定ID的事件回调函数
     * @param [in] eventMap 需要操作的容器
     * @param [in] eventType 事件类型
     * @param [in] callbackID 回调函数的ID，必须大于0
     */
-    static bool HasEventCallbackByID(const EventMap& eventMap, EventType eventType, EventCallbackID callbackID);
+    static bool HasEventCallbackByID(
+        const EventMap &eventMap, EventType eventType, EventCallbackID callbackID);
 
     /** 将字符串转换为事件类型
     */
-    static EventType StringToEventType(const DString& eventName);
+    static EventType StringToEventType(const DString &eventName);
 
     /** 将事件类型转换为字符串
     */
     static DString EventTypeToString(EventType eventType);
 };
 
-}// namespace ui
+} // namespace ui
 
 #endif // UI_CORE_EVENTARGS_H_

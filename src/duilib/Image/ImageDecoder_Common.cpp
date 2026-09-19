@@ -1,27 +1,22 @@
 #include "ImageDecoder_Common.h"
 #include "duilib/Image/ImageDecoderUtil.h"
-#include "duilib/Image/Image_Bitmap.h"
 #include "duilib/Image/ImageUtil.h"
+#include "duilib/Image/Image_Bitmap.h"
 #include "duilib/Utils/FilePathUtil.h"
 #include "duilib/Utils/StringUtil.h"
 #include <climits>
 
-namespace ui
-{
-ImageDecoder_Common::ImageDecoder_Common()
-{
-}
+namespace ui {
+ImageDecoder_Common::ImageDecoder_Common() {}
 
-ImageDecoder_Common::~ImageDecoder_Common()
-{
-}
+ImageDecoder_Common::~ImageDecoder_Common() {}
 
 DString ImageDecoder_Common::GetFormatName() const
 {
     return ImageDecoderUtil::GetSupportedFileExtentions();
 }
 
-bool ImageDecoder_Common::CanDecode(const DString& imageFilePath) const
+bool ImageDecoder_Common::CanDecode(const DString &imageFilePath) const
 {
     DString fileExtentions = ImageDecoderUtil::GetSupportedFileExtentions();
     if (fileExtentions.empty()) {
@@ -31,50 +26,54 @@ bool ImageDecoder_Common::CanDecode(const DString& imageFilePath) const
     StringUtil::MakeUpperString(fileExt);
 
     std::list<DString> fileExtList = StringUtil::Split(fileExtentions, _T(";"));
-    for (DString& ext : fileExtList) {
+    for (DString &ext : fileExtList) {
         StringUtil::MakeUpperString(ext);
         if (fileExt == ext) {
             return true;
         }
-    }    
+    }
     return false;
 }
 
-bool ImageDecoder_Common::CanDecode(const uint8_t* data, size_t dataLen) const
+bool ImageDecoder_Common::CanDecode(const uint8_t *data, size_t dataLen) const
 {
     return ImageDecoderUtil::CanDecode(data, dataLen);
 }
 
-std::unique_ptr<IImage> ImageDecoder_Common::LoadImageData(const ImageDecodeParam& decodeParam)
+std::unique_ptr<IImage> ImageDecoder_Common::LoadImageData(const ImageDecodeParam &decodeParam)
 {
     float fImageSizeScale = decodeParam.m_fImageSizeScale;
     std::unique_ptr<IImage> pImage;
     UiImageData imageData;
     bool bLoaded = false;
     if ((decodeParam.m_pFileData != nullptr) && !decodeParam.m_pFileData->empty()) {
-        std::vector<uint8_t>& fileData = *decodeParam.m_pFileData;
+        std::vector<uint8_t> &fileData = *decodeParam.m_pFileData;
         bLoaded = ImageDecoderUtil::LoadImageFromMemory(fileData, imageData);
-    }
-    else if (!decodeParam.m_imageFilePath.IsEmpty()) {
+    } else if (!decodeParam.m_imageFilePath.IsEmpty()) {
         bLoaded = ImageDecoderUtil::LoadImageFromFile(decodeParam.m_imageFilePath, imageData);
-    }
-    else {
+    } else {
         ASSERT(0);
     }
     if (bLoaded) {
         // 防止 uint32_t → int32_t 截断为负数
-        if ((imageData.m_imageWidth == 0) || (imageData.m_imageHeight == 0) ||
-            (imageData.m_imageWidth > (uint32_t)INT32_MAX) || (imageData.m_imageHeight > (uint32_t)INT32_MAX)) {
+        if ((imageData.m_imageWidth == 0) || (imageData.m_imageHeight == 0)
+            || (imageData.m_imageWidth > (uint32_t) INT32_MAX)
+            || (imageData.m_imageHeight > (uint32_t) INT32_MAX)) {
             ASSERT(!"ImageDecoder_Common: invalid image dimensions");
             return nullptr;
         }
-        int32_t nWidth = (int32_t)imageData.m_imageWidth;
-        int32_t nHeight = (int32_t)imageData.m_imageHeight;
+        int32_t nWidth = (int32_t) imageData.m_imageWidth;
+        int32_t nHeight = (int32_t) imageData.m_imageHeight;
         float fNewScale = fImageSizeScale;
-        if (!ImageUtil::GetBestImageScale(decodeParam.m_rcMaxDestRectSize, nWidth, nHeight, fImageSizeScale, fNewScale)) {
+        if (!ImageUtil::GetBestImageScale(
+                decodeParam.m_rcMaxDestRectSize, nWidth, nHeight, fImageSizeScale, fNewScale)) {
             fNewScale = fImageSizeScale;
         }
-        pImage = Image_Bitmap::MakeImage(imageData.m_imageWidth, imageData.m_imageHeight, imageData.m_imageData.data(), fNewScale);
+        pImage = Image_Bitmap::MakeImage(
+            imageData.m_imageWidth,
+            imageData.m_imageHeight,
+            imageData.m_imageData.data(),
+            fNewScale);
     }
     return pImage;
 }

@@ -8,7 +8,7 @@
 class AppDb
 {
 public:
-    static AppDb& GetInstance()
+    static AppDb &GetInstance()
     {
         static AppDb db;
         return db;
@@ -17,11 +17,10 @@ public:
     AppDb();
     ~AppDb();
 
-    bool LoadFromDb(std::vector<AppItem>& app_list);
-    bool SaveToDb(const AppItem& item);
+    bool LoadFromDb(std::vector<AppItem> &app_list);
+    bool SaveToDb(const AppItem &item);
 
 private:
-
 };
 
 #endif //EXAMPLES_APP_DB_H_

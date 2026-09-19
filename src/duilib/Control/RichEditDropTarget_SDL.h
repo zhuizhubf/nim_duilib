@@ -5,8 +5,7 @@
 
 #ifdef DUILIB_BUILD_FOR_SDL
 
-namespace ui 
-{
+namespace ui {
 
 class RichEdit2;
 
@@ -24,33 +23,34 @@ public:
     /** 构造函数
      * @param [in] pRichEdit 关联的RichEdit2控件指针
      */
-    explicit RichEditDropTarget_SDL(RichEdit2* pRichEdit);
+    explicit RichEditDropTarget_SDL(RichEdit2 *pRichEdit);
 
 public:
     /** SDL事件：拖放开始
      * @param [in] pt 客户区坐标（此参数在SDL版本中未使用）
      * @return 成功返回S_OK，失败返回S_FALSE
      */
-    virtual int32_t OnDropBegin(const UiPoint& pt) override;
+    virtual int32_t OnDropBegin(const UiPoint &pt) override;
 
     /** SDL事件：拖放位置改变
      * @param [in] pt 客户区坐标
      * @note 根据拖放位置更新光标位置，并检查是否需要自动滚动
      */
-    virtual void OnDropPosition(const UiPoint& pt) override;
+    virtual void OnDropPosition(const UiPoint &pt) override;
 
     /** SDL事件：拖放文本（OnDropTexts和OnDropFiles只会触发一个）
      * @param [in] textList 文本内容列表，每个元素代表一行文本
      * @param [in] pt 客户区坐标
      */
-    virtual void OnDropTexts(const std::vector<DString>& textList, const UiPoint& pt) override;
+    virtual void OnDropTexts(const std::vector<DString> &textList, const UiPoint &pt) override;
 
     /** SDL事件：拖放文件（OnDropTexts和OnDropFiles只会触发一个）
      * @param [in] source 拖放源路径
      * @param [in] fileList 文件路径列表
      * @param [in] pt 客户区坐标
      */
-    virtual void OnDropFiles(const DString& source, const std::vector<DString>& fileList, const UiPoint& pt) override;
+    virtual void OnDropFiles(
+        const DString &source, const std::vector<DString> &fileList, const UiPoint &pt) override;
 
     /** SDL事件：拖放离开
      * @note 拖放被取消或结束时调用，恢复原来的选择状态
@@ -63,17 +63,17 @@ private:
      * @return 文本有效返回true，否则返回false
      * @note 检查单行/多行模式、数字模式、限制字符等
      */
-    bool CheckDropText(const UiPoint& clientPt) const;
+    bool CheckDropText(const UiPoint &clientPt) const;
 
     /** 检查是否需要滚动视图，按需滚动
      * @param [in] clientPt 客户区坐标
      */
-    void CheckTextScroll(const UiPoint& clientPt);
+    void CheckTextScroll(const UiPoint &clientPt);
 
 private:
     /** 关联的RichEdit2控件指针
     */
-    RichEdit2* m_pRichEdit;
+    RichEdit2 *m_pRichEdit;
 
     /** 拖入的文本列表
     */

@@ -8,13 +8,13 @@
 #include <climits>
 #include <cstdint>
 
-namespace ui
-{
+namespace ui {
 //内存数据源结构体：存储内存中的 GIF 数据、总大小和当前读取位置
-typedef struct {
-    const unsigned char* data;  // 指向内存中的 GIF 原始数据
-    size_t size;                // 数据总字节数
-    size_t position;            // 当前读取偏移量（从 0 开始）
+typedef struct
+{
+    const unsigned char *data; // 指向内存中的 GIF 原始数据
+    size_t size;               // 数据总字节数
+    size_t position;           // 当前读取偏移量（从 0 开始）
 } UiGifMemorySource;
 
 /** 自定义内存读取函数
@@ -23,22 +23,23 @@ typedef struct {
 * @param len: 请求读取的字节数
 * @return: 实际读取的字节数（0 表示已读完）
 */
-static int UiGifMemoryReadFunc(GifFileType* gif, GifByteType* buf, int len)
+static int UiGifMemoryReadFunc(GifFileType *gif, GifByteType *buf, int len)
 {
     if (gif == nullptr || buf == nullptr || len <= 0) {
         return 0;
     }
 
     // 从 UserData 中获取内存数据源
-    UiGifMemorySource* source = (UiGifMemorySource*)gif->UserData;
+    UiGifMemorySource *source = (UiGifMemorySource *) gif->UserData;
     if (source == nullptr || source->data == nullptr || source->position >= source->size) {
-        return 0;  // 数据已耗尽
+        return 0; // 数据已耗尽
     }
 
     // 计算实际可读取的字节数（避免越界）
     // 防止 size_t -> int 截断（理论上的超大 GIF 才会触发）
     size_t bytes_available = source->size - source->position;
-    size_t bytes_to_read = (static_cast<size_t>(len) > bytes_available) ? bytes_available : static_cast<size_t>(len);
+    size_t bytes_to_read = (static_cast<size_t>(len) > bytes_available) ? bytes_available
+                                                                        : static_cast<size_t>(len);
     // 业务上 GIF 通常不会超过 INT_MAX，此处再 cast 一次
     if (bytes_to_read > static_cast<size_t>(INT_MAX)) {
         bytes_to_read = static_cast<size_t>(INT_MAX);
@@ -57,7 +58,7 @@ static int UiGifMemoryReadFunc(GifFileType* gif, GifByteType* buf, int len)
 * @param error_code: 输出错误码（参考 D_GIF_* 常量）
 * @return: 成功返回 GifFileType 句柄，失败返回 nullptr
 */
-static GifFileType* UiGifInitDecoder(const unsigned char* data, size_t size, int* error_code)
+static GifFileType *UiGifInitDecoder(const unsigned char *data, size_t size, int *error_code)
 {
     // 校验输入参数
     if (data == nullptr || size == 0 || error_code == nullptr) {
@@ -68,7 +69,7 @@ static GifFileType* UiGifInitDecoder(const unsigned char* data, size_t size, int
     }
 
     // 初始化内存数据源
-    UiGifMemorySource* source = (UiGifMemorySource*)malloc(sizeof(UiGifMemorySource));
+    UiGifMemorySource *source = (UiGifMemorySource *) malloc(sizeof(UiGifMemorySource));
     if (source == nullptr) {
         *error_code = D_GIF_ERR_NOT_ENOUGH_MEM;
         return nullptr;
@@ -78,7 +79,7 @@ static GifFileType* UiGifInitDecoder(const unsigned char* data, size_t size, int
     source->position = 0;
 
     // 调用 DGifOpen 创建解码句柄
-    GifFileType* gif = DGifOpen(source, UiGifMemoryReadFunc, error_code);
+    GifFileType *gif = DGifOpen(source, UiGifMemoryReadFunc, error_code);
     if (gif == nullptr) {
         free(source);
         return nullptr;
@@ -90,7 +91,7 @@ static GifFileType* UiGifInitDecoder(const unsigned char* data, size_t size, int
  * @param gif: 需释放的 GifFileType 句柄
  * @param error_code: 输出关闭时的错误码（可传 nullptr）
  */
-static void UiGifFreeDecoder(GifFileType* gif, int* error_code)
+static void UiGifFreeDecoder(GifFileType *gif, int *error_code)
 {
     if (gif == nullptr) {
         return;
@@ -107,7 +108,8 @@ static void UiGifFreeDecoder(GifFileType* gif, int* error_code)
 }
 
 // RGBA 像素结构体
-struct UiGifRGBA {
+struct UiGifRGBA
+{
     uint8_t r, g, b, a;
 };
 
@@ -119,11 +121,12 @@ struct UiGifRGBA {
  * @param nPrevFrameIndex 上一帧的索引号
  * @return 返回创建的帧数据
  */
-static AnimationFramePtr UiGifToRgbaFrames(FrameSequence_gif& gif,
-                                           int32_t nFrameIndex,
-                                           float fImageSizeScale,
-                                           std::vector<UiGifRGBA>& canvas,
-                                           int32_t& nPrevFrameIndex)
+static AnimationFramePtr UiGifToRgbaFrames(
+    FrameSequence_gif &gif,
+    int32_t nFrameIndex,
+    float fImageSizeScale,
+    std::vector<UiGifRGBA> &canvas,
+    int32_t &nPrevFrameIndex)
 {
     ASSERT((nFrameIndex >= 0) && (nFrameIndex < gif.GetFrameCount()));
     if ((nFrameIndex < 0) || (nFrameIndex >= gif.GetFrameCount())) {
@@ -142,7 +145,7 @@ static AnimationFramePtr UiGifToRgbaFrames(FrameSequence_gif& gif,
     }
 
     // 获取渲染工厂实例
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory == nullptr) {
         return nullptr;
@@ -154,12 +157,12 @@ static AnimationFramePtr UiGifToRgbaFrames(FrameSequence_gif& gif,
     if (nImageWidth <= 0 || nImageHeight <= 0) {
         return nullptr;
     }
-    if ((size_t)nImageWidth > (SIZE_MAX / (size_t)nImageHeight)) {
+    if ((size_t) nImageWidth > (SIZE_MAX / (size_t) nImageHeight)) {
         // 溢出保护：图片像素数超过 size_t 容量
         ASSERT(!"Image_GIF: canvas too large");
         return nullptr;
     }
-    const size_t canvas_pixel_count = (size_t)nImageWidth * (size_t)nImageHeight;
+    const size_t canvas_pixel_count = (size_t) nImageWidth * (size_t) nImageHeight;
     const int32_t outputPixelStride = nImageWidth;
     if (canvas.size() != canvas_pixel_count) {
         canvas.resize(canvas_pixel_count); // 初始化画布
@@ -179,7 +182,7 @@ static AnimationFramePtr UiGifToRgbaFrames(FrameSequence_gif& gif,
     pFrameData->m_pBitmap = pBitmap;
 
     // 获取当前帧的数据
-    gif.DrawFrame(nFrameIndex, (Color8888*)canvas.data(), outputPixelStride, nPrevFrameIndex);
+    gif.DrawFrame(nFrameIndex, (Color8888 *) canvas.data(), outputPixelStride, nPrevFrameIndex);
 
     // 更新位图数据
 #ifdef DUILIB_BUILD_FOR_WIN
@@ -187,7 +190,7 @@ static AnimationFramePtr UiGifToRgbaFrames(FrameSequence_gif& gif,
     //交换R和G，Windows平台使用ABGR格式
     for (int y = 0; y < nImageHeight; y++) {
         for (int x = 0; x < nImageWidth; x++) {
-            UiGifRGBA& pixelColor = canvasWin[y * outputPixelStride + x];
+            UiGifRGBA &pixelColor = canvasWin[y * outputPixelStride + x];
             std::swap(pixelColor.b, pixelColor.r);
         }
     }
@@ -249,7 +252,7 @@ public:
     std::atomic<bool> m_bAsyncDecoding = false;
 
     //加载后的句柄
-    GifFileType* m_gifDecoder = nullptr;
+    GifFileType *m_gifDecoder = nullptr;
 
     //gif解码的实现封装
     FrameSequence_gif m_gifFrameSequence;
@@ -262,12 +265,13 @@ public:
 
 public:
     //从已经打开的文件句柄，初始化
-    bool InitImageData(GifFileType* dec,
-                       std::vector<uint8_t>& fileData,
-                       bool bLoadAllFrames,
-                       bool bAsyncDecode,
-                       float fImageSizeScale,
-                       const UiSize& rcMaxDestRectSize)
+    bool InitImageData(
+        GifFileType *dec,
+        std::vector<uint8_t> &fileData,
+        bool bLoadAllFrames,
+        bool bAsyncDecode,
+        float fImageSizeScale,
+        const UiSize &rcMaxDestRectSize)
     {
         ASSERT(dec != nullptr);
         if (dec == nullptr) {
@@ -285,31 +289,30 @@ public:
         m_bLoadAllFrames = bLoadAllFrames;
         m_bAsyncDecode = bAsyncDecode;
 
-        m_nWidth = (uint32_t)m_gifFrameSequence.GetWidth();
-        m_nHeight = (uint32_t)m_gifFrameSequence.GetHeight();
-        m_nFrameCount = (int32_t)m_gifFrameSequence.GetFrameCount();
+        m_nWidth = (uint32_t) m_gifFrameSequence.GetWidth();
+        m_nHeight = (uint32_t) m_gifFrameSequence.GetHeight();
+        m_nFrameCount = (int32_t) m_gifFrameSequence.GetFrameCount();
 
         if (m_bAssertEnabled) {
             ASSERT(m_nWidth > 0);
             ASSERT(m_nHeight > 0);
             ASSERT(m_nFrameCount > 0);
         }
-        if ((m_nFrameCount <= 0) || ((int32_t)m_nWidth <= 0) || ((int32_t)m_nHeight <= 0)) {
+        if ((m_nFrameCount <= 0) || ((int32_t) m_nWidth <= 0) || ((int32_t) m_nHeight <= 0)) {
             //图片格式正确，但图片数据有错误(不还原图片数据)
             m_bDecodeError = true;
             UiGifFreeDecoder(dec, nullptr);
             m_gifFrameSequence.Clear();
             return false;
         }
-        
 
         float fScale = fImageSizeScale;
-        if (ImageUtil::GetBestImageScale(rcMaxDestRectSize, m_nWidth, m_nHeight, fImageSizeScale, fScale)) {
+        if (ImageUtil::GetBestImageScale(
+                rcMaxDestRectSize, m_nWidth, m_nHeight, fImageSizeScale, fScale)) {
             m_nWidth = ImageUtil::GetScaledImageSize(m_nWidth, fScale);
             m_nHeight = ImageUtil::GetScaledImageSize(m_nHeight, fScale);
             m_fImageSizeScale = fScale;
-        }
-        else {
+        } else {
             m_nWidth = ImageUtil::GetScaledImageSize(m_nWidth, fImageSizeScale);
             m_nHeight = ImageUtil::GetScaledImageSize(m_nHeight, fImageSizeScale);
         }
@@ -363,7 +366,7 @@ public:
     //解码是否完成
     bool IsDecodeFinished() const
     {
-        if (((int32_t)m_frames.size() == m_nFrameCount) || m_bDecodeError) {
+        if (((int32_t) m_frames.size() == m_nFrameCount) || m_bDecodeError) {
             return true;
         }
         return false;
@@ -380,13 +383,14 @@ Image_GIF::~Image_GIF()
     m_impl->ClearImageData();
 }
 
-bool Image_GIF::LoadImageFile(std::vector<uint8_t>& fileData,
-                              const FilePath& imageFilePath,
-                              bool bLoadAllFrames,
-                              bool bAsyncDecode,
-                              float fImageSizeScale,
-                              const UiSize& rcMaxDestRectSize,
-                              bool bAssertEnabled)
+bool Image_GIF::LoadImageFile(
+    std::vector<uint8_t> &fileData,
+    const FilePath &imageFilePath,
+    bool bLoadAllFrames,
+    bool bAsyncDecode,
+    float fImageSizeScale,
+    const UiSize &rcMaxDestRectSize,
+    bool bAssertEnabled)
 {
     ASSERT(!fileData.empty() || !imageFilePath.IsEmpty());
     if (fileData.empty() && imageFilePath.IsEmpty()) {
@@ -399,24 +403,26 @@ bool Image_GIF::LoadImageFile(std::vector<uint8_t>& fileData,
 
     if (!m_impl->m_fileData.empty()) {
         int nErrorCode = 0;
-        GifFileType* dec = UiGifInitDecoder(m_impl->m_fileData.data(), m_impl->m_fileData.size(), &nErrorCode);
+        GifFileType *dec
+            = UiGifInitDecoder(m_impl->m_fileData.data(), m_impl->m_fileData.size(), &nErrorCode);
         if (dec == nullptr) {
             //加载失败时，需要恢复原文件数据
             m_impl->m_fileData.swap(fileData);
             return false;
         }
-        return m_impl->InitImageData(dec, fileData, bLoadAllFrames, bAsyncDecode, fImageSizeScale, rcMaxDestRectSize);
-    }
-    else {
+        return m_impl->InitImageData(
+            dec, fileData, bLoadAllFrames, bAsyncDecode, fImageSizeScale, rcMaxDestRectSize);
+    } else {
         DStringA gifFileName = imageFilePath.NativePathA();
         ASSERT(!gifFileName.empty());
         int nErrorCode = 0;
-        GifFileType* dec = DGifOpenFileName(gifFileName.c_str(), &nErrorCode);
+        GifFileType *dec = DGifOpenFileName(gifFileName.c_str(), &nErrorCode);
         if (dec == nullptr) {
             return false;
         }
         std::vector<uint8_t> emptyFileData;
-        return m_impl->InitImageData(dec, emptyFileData, bLoadAllFrames, bAsyncDecode, fImageSizeScale, rcMaxDestRectSize);
+        return m_impl->InitImageData(
+            dec, emptyFileData, bLoadAllFrames, bAsyncDecode, fImageSizeScale, rcMaxDestRectSize);
     }
 }
 
@@ -437,23 +443,23 @@ bool Image_GIF::IsDelayDecodeFinished() const
         return true;
     }
     size_t totalSize = m_impl->m_frames.size() + m_impl->m_delayFrames.size();
-    if (totalSize > (size_t)INT32_MAX) {
+    if (totalSize > (size_t) INT32_MAX) {
         return true;
     }
-    return (int32_t)totalSize == m_impl->m_nFrameCount;
+    return (int32_t) totalSize == m_impl->m_nFrameCount;
 }
 
 uint32_t Image_GIF::GetDecodedFrameIndex() const
 {
     if (m_impl->m_frames.empty()) {
         return 0;
-    }
-    else {
-        return (uint32_t)m_impl->m_frames.size() - 1;
+    } else {
+        return (uint32_t) m_impl->m_frames.size() - 1;
     }
 }
 
-bool Image_GIF::DelayDecode(uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool* bDecodeError)
+bool Image_GIF::DelayDecode(
+    uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError)
 {
     if (!IsDelayDecodeEnabled()) {
         return false;
@@ -472,26 +478,27 @@ bool Image_GIF::DelayDecode(uint32_t nMinFrameIndex, std::function<bool(void)> I
         return false;
     }
     m_impl->m_bAsyncDecoding = true;
-    const size_t nFrameCount = (size_t)m_impl->m_nFrameCount;
+    const size_t nFrameCount = (size_t) m_impl->m_nFrameCount;
 
     bool bRet = true;
-    float fImageSizeScale = m_impl->m_fImageSizeScale;    
-    while (((IsAborted == nullptr) || !IsAborted()) &&
-           (nMinFrameIndex >= (m_impl->m_frames.size() + m_impl->m_delayFrames.size())) &&
-           ((m_impl->m_frames.size() + m_impl->m_delayFrames.size()) < nFrameCount)) {        
+    float fImageSizeScale = m_impl->m_fImageSizeScale;
+    while (((IsAborted == nullptr) || !IsAborted())
+           && (nMinFrameIndex >= (m_impl->m_frames.size() + m_impl->m_delayFrames.size()))
+           && ((m_impl->m_frames.size() + m_impl->m_delayFrames.size()) < nFrameCount)) {
         //每次解码一帧图片
-        const int32_t nFrameIndex = (int32_t)(m_impl->m_delayFrames.size() + m_impl->m_frames.size());
+        const int32_t nFrameIndex = (int32_t) (m_impl->m_delayFrames.size()
+                                               + m_impl->m_frames.size());
         AnimationFramePtr pNewAnimationFrame;
-        pNewAnimationFrame = UiGifToRgbaFrames(m_impl->m_gifFrameSequence,
-                                               nFrameIndex,
-                                               fImageSizeScale,
-                                               m_impl->m_gifCanvas,
-                                               m_impl->m_nLastFrameIndex);
+        pNewAnimationFrame = UiGifToRgbaFrames(
+            m_impl->m_gifFrameSequence,
+            nFrameIndex,
+            fImageSizeScale,
+            m_impl->m_gifCanvas,
+            m_impl->m_nLastFrameIndex);
         if (pNewAnimationFrame != nullptr) {
             pNewAnimationFrame->SetDelayMs(GetFrameDelayMs(nFrameIndex));
             m_impl->m_delayFrames.push_back(pNewAnimationFrame);
-        }
-        else {
+        } else {
             bRet = false;
             m_impl->m_bDecodeError = true;
             if (bDecodeError != nullptr) {
@@ -519,7 +526,7 @@ bool Image_GIF::MergeDelayDecodeData()
     }
     if (!m_impl->m_bAsyncDecoding) {
         //如果解码完成，则释放图片资源
-        bool bDecodeFinished = (int32_t)m_impl->m_frames.size() == m_impl->m_nFrameCount;
+        bool bDecodeFinished = (int32_t) m_impl->m_frames.size() == m_impl->m_nFrameCount;
         if (bDecodeFinished || m_impl->m_bDecodeError) {
             m_impl->ClearImageData();
         }
@@ -560,8 +567,7 @@ bool Image_GIF::IsFrameDataReady(uint32_t nFrameIndex)
             return true;
         }
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
@@ -582,7 +588,8 @@ int32_t Image_GIF::GetFrameDelayMs(uint32_t nFrameIndex)
     return IMAGE_ANIMATION_DELAY_MS;
 }
 
-bool Image_GIF::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSize*/, AnimationFrame* pAnimationFrame)
+bool Image_GIF::ReadFrameData(
+    int32_t nFrameIndex, const UiSize & /*szDestRectSize*/, AnimationFrame *pAnimationFrame)
 {
     GlobalManager::Instance().AssertUIThread();
     ASSERT(pAnimationFrame != nullptr);
@@ -608,25 +615,25 @@ bool Image_GIF::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
 
     if (!m_impl->m_bAsyncDecode) {
         //同步解码的情况, 解码所需要的帧
-        while ((nFrameIndex >= (int32_t)m_impl->m_frames.size()) &&
-               ((int32_t)m_impl->m_frames.size() < m_impl->m_nFrameCount)) {
+        while ((nFrameIndex >= (int32_t) m_impl->m_frames.size())
+               && ((int32_t) m_impl->m_frames.size() < m_impl->m_nFrameCount)) {
             ASSERT(m_impl->m_delayFrames.empty());
-            uint32_t nInitFrameIndex = (uint32_t)m_impl->m_frames.size();
+            uint32_t nInitFrameIndex = (uint32_t) m_impl->m_frames.size();
             float fImageSizeScale = m_impl->m_fImageSizeScale;
 
             //一次解码一帧图片
             AnimationFramePtr pNewAnimationFrame;
-            pNewAnimationFrame = UiGifToRgbaFrames(m_impl->m_gifFrameSequence,
-                                                   nInitFrameIndex,
-                                                   fImageSizeScale,
-                                                   m_impl->m_gifCanvas,
-                                                   m_impl->m_nLastFrameIndex);
+            pNewAnimationFrame = UiGifToRgbaFrames(
+                m_impl->m_gifFrameSequence,
+                nInitFrameIndex,
+                fImageSizeScale,
+                m_impl->m_gifCanvas,
+                m_impl->m_nLastFrameIndex);
 
             if (pNewAnimationFrame != nullptr) {
                 pNewAnimationFrame->SetDelayMs(GetFrameDelayMs(nFrameIndex));
                 m_impl->m_frames.push_back(pNewAnimationFrame);
-            }
-            else {
+            } else {
                 //图片解码错误
                 m_impl->m_bDecodeError = true;
                 pAnimationFrame->m_bDataError = true;
@@ -636,21 +643,19 @@ bool Image_GIF::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
 
         if (m_impl->IsDecodeFinished()) {
             m_impl->ClearImageData();
-        }
-        else if (!m_impl->m_bDecodeError) {
-            ASSERT((nFrameIndex < (int32_t)m_impl->m_frames.size()));
-            if ((nFrameIndex >= (int32_t)m_impl->m_frames.size())) {
+        } else if (!m_impl->m_bDecodeError) {
+            ASSERT((nFrameIndex < (int32_t) m_impl->m_frames.size()));
+            if ((nFrameIndex >= (int32_t) m_impl->m_frames.size())) {
                 pAnimationFrame->m_bDataError = true;
                 return false;
             }
         }
-    }
-    else {
+    } else {
         //合并数据
         MergeDelayDecodeData();
     }
     bool bRet = false;
-    if (nFrameIndex < (int32_t)m_impl->m_frames.size()) {
+    if (nFrameIndex < (int32_t) m_impl->m_frames.size()) {
         AnimationFramePtr pFrameData = m_impl->m_frames[nFrameIndex];
         if (pFrameData != nullptr) {
             ASSERT(pFrameData->m_nFrameIndex == nFrameIndex);
@@ -658,25 +663,21 @@ bool Image_GIF::ReadFrameData(int32_t nFrameIndex, const UiSize& /*szDestRectSiz
             pAnimationFrame->m_bDataPending = false;
             ASSERT(pAnimationFrame->m_pBitmap != nullptr);
             bRet = true;
-        }
-        else {
+        } else {
             m_impl->m_bDecodeError = true;
             pAnimationFrame->m_bDataError = true;
         }
-    }
-    else if (m_impl->m_bAsyncDecode) {
-        if ((int32_t)m_impl->m_frames.size() < m_impl->m_nFrameCount) {
+    } else if (m_impl->m_bAsyncDecode) {
+        if ((int32_t) m_impl->m_frames.size() < m_impl->m_nFrameCount) {
             //尚未完成多帧解码
             pAnimationFrame->m_bDataPending = true;
             pAnimationFrame->m_pBitmap.reset();
             bRet = true;
-        }
-        else {
+        } else {
             m_impl->m_bDecodeError = true;
             pAnimationFrame->m_bDataError = true;
         }
-    }
-    else {
+    } else {
         m_impl->m_bDecodeError = true;
         pAnimationFrame->m_bDataError = true;
     }

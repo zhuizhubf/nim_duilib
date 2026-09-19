@@ -3,8 +3,8 @@
 
 #include "duilib/Core/INativeWindow.h"
 #include "duilib/Core/NativeWindowShadow.h"
-#include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Core/WindowCreateAttributes.h"
+#include "duilib/Core/WindowCreateParam.h"
 #include "duilib/Utils/FilePath.h"
 
 #ifdef DUILIB_BUILD_FOR_SDL
@@ -31,20 +31,20 @@ class WindowDropTarget;
 class DUILIB_API NativeWindow_SDL
 {
 public:
-    explicit NativeWindow_SDL(INativeWindow* pOwner);
-    NativeWindow_SDL(const NativeWindow_SDL& r) = delete;
-    NativeWindow_SDL& operator=(const NativeWindow_SDL& r) = delete;
+    explicit NativeWindow_SDL(INativeWindow *pOwner);
+    NativeWindow_SDL(const NativeWindow_SDL &r) = delete;
+    NativeWindow_SDL &operator=(const NativeWindow_SDL &r) = delete;
     ~NativeWindow_SDL();
 
 public:
     /** 获取SDL事件关联的窗口ID
     * @return 如果无关联的窗口ID，返回0
     */
-    static SDL_WindowID GetWindowIdFromEvent(const SDL_Event& sdlEvent);
+    static SDL_WindowID GetWindowIdFromEvent(const SDL_Event &sdlEvent);
 
     /** 根据窗口ID获取窗口指针
     */
-    static NativeWindow_SDL* GetWindowFromID(SDL_WindowID id);
+    static NativeWindow_SDL *GetWindowFromID(SDL_WindowID id);
 
     /** 获取模拟的Hover消息ID
     */
@@ -54,7 +54,7 @@ public:
     * @param [in] sdlEvent 消息数据
     * @return 如果内部处理了该消息返回true，否则返回false
     */
-    bool OnSDLWindowEvent(const SDL_Event& sdlEvent);
+    bool OnSDLWindowEvent(const SDL_Event &sdlEvent);
 
 public:
     /** 创建窗口
@@ -62,9 +62,10 @@ public:
     * @param [in] createParam 创建窗口所需的参数
     * @param [in] createAttributes XML文件中Window的相关属性
     */
-    bool CreateWnd(NativeWindow_SDL* pParentWindow,
-                  const WindowCreateParam& createParam,
-                  const WindowCreateAttributes& createAttributes);
+    bool CreateWnd(
+        NativeWindow_SDL *pParentWindow,
+        const WindowCreateParam &createParam,
+        const WindowCreateAttributes &createAttributes);
 
     /** 显示模态窗口
     * @param [in] pParentWindow 父窗口
@@ -73,11 +74,12 @@ public:
     * @param [in] bCloseByEnter 按Enter键的时候，是否关闭窗口
     * @return 窗口退出时的返回值, 如果失败则返回-1
     */
-    int32_t DoModal(NativeWindow_SDL* pParentWindow,
-                    const WindowCreateParam& createParam,
-                    const WindowCreateAttributes& createAttributes,
-                    bool bCloseByEsc = true,
-                    bool bCloseByEnter = false);
+    int32_t DoModal(
+        NativeWindow_SDL *pParentWindow,
+        const WindowCreateParam &createParam,
+        const WindowCreateAttributes &createAttributes,
+        bool bCloseByEsc = true,
+        bool bCloseByEnter = false);
 
     /** 创建子窗口（非弹出式子窗口）
     * @param [in] pParentWindow 父窗口
@@ -86,11 +88,12 @@ public:
     * @param [in] nWidth 子窗口的宽度
     * @param [in] nHeight 子窗口的高度
     */
-    bool CreateChildWnd(NativeWindow_SDL* pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight);
+    bool CreateChildWnd(
+        NativeWindow_SDL *pParentWindow, int32_t nX, int32_t nY, int32_t nWidth, int32_t nHeight);
 
     /** 获取本地实现的窗口句柄
     */
-    void* GetWindowHandle() const;
+    void *GetWindowHandle() const;
 
     /** 获取当前窗口实现的驱动名称
     */
@@ -110,7 +113,7 @@ public:
 
     /** 设置或者修改父窗口
     */
-    bool SetParentWindow(NativeWindow_SDL* pParentWindow);
+    bool SetParentWindow(NativeWindow_SDL *pParentWindow);
 
 #ifdef DUILIB_BUILD_FOR_WIN
     /** 获取窗口句柄
@@ -126,7 +129,7 @@ public:
     HDC GetPaintDC() const;
 #endif
 
-#if defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
+#if defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
     /** 当前窗口后端引擎是否为X11
     */
     bool IsVideoDriverX11() const;
@@ -156,12 +159,12 @@ public:
 #if defined DUILIB_BUILD_FOR_MACOS
     /** 获取NSView*指针
     */
-    void* GetNSView() const;
+    void *GetNSView() const;
 
     /** 获取NSWindow*指针
     */
-    void* GetNSWindow() const;
-#endif 
+    void *GetNSWindow() const;
+#endif
 
 public:
     /** 关闭窗口, 异步关闭，当函数返回后，IsClosing() 状态为true
@@ -231,11 +234,11 @@ public:
 
     /** 显示模态对话框(父窗口在创建的时候指定)
     */
-    void ShowModalFake(NativeWindow_SDL* pParentWindow);
+    void ShowModalFake(NativeWindow_SDL *pParentWindow);
 
     /** 模态对话框关闭，同步状态
     */
-    void OnCloseModalFake(NativeWindow_SDL* pParentWindow);
+    void OnCloseModalFake(NativeWindow_SDL *pParentWindow);
 
     /** 是否是模拟的模态显示窗口（通过ShowModalFake函数显示的窗口）
     */
@@ -340,9 +343,14 @@ public:
     * @param [in] cy 窗口的高度
     * @param [in] uFlags 参考 enum WindowPosFlags 选项
     */
-    bool SetWindowPos(const NativeWindow_SDL* pInsertAfterWindow,
-                      InsertAfterFlag insertAfterFlag,
-                      int32_t X, int32_t Y, int32_t cx, int32_t cy, uint32_t uFlags);
+    bool SetWindowPos(
+        const NativeWindow_SDL *pInsertAfterWindow,
+        InsertAfterFlag insertAfterFlag,
+        int32_t X,
+        int32_t Y,
+        int32_t cx,
+        int32_t cy,
+        uint32_t uFlags);
 
     /** 设置窗口位置和大小
     * @param [in] X 窗口的X坐标
@@ -356,18 +364,18 @@ public:
     /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     *  @param [in] iconFilePath ico文件的路径（绝对路径）
     */
-    bool SetWindowIcon(const FilePath& iconFilePath);
+    bool SetWindowIcon(const FilePath &iconFilePath);
 
     /** 设置窗口图标（支持*.ico格式，其他格式也支持，但推荐ICO格式）
     *  @param [in] iconFileData 图标文件的数据
     *  @param [in] iconFileName 包含扩展名的文件名，用于识别图片类型
     */
-    bool SetWindowIcon(const std::vector<uint8_t>& iconFileData, const DString& iconFileName);
+    bool SetWindowIcon(const std::vector<uint8_t> &iconFileData, const DString &iconFileName);
 
     /** 设置窗口标题栏文本
     * @param [in] strText 窗口标题栏文本
     */
-    void SetText(const DString& strText);
+    void SetText(const DString &strText);
 
     /** 获取窗口标题栏文本
     */
@@ -376,20 +384,20 @@ public:
     /** 设置窗口大小的最小值（宽度和高度，内部不按DPI调整大小，DPI自适应需要调用方来做）
     * @param [in] szMaxWindow 窗口的最大宽度和最小高度，如果值为0，表示不做限制
     */
-    void SetWindowMaximumSize(const UiSize& szMaxWindow);
+    void SetWindowMaximumSize(const UiSize &szMaxWindow);
 
     /** 获取窗口大小的最小值（宽度和高度）
     */
-    const UiSize& GetWindowMaximumSize() const;
+    const UiSize &GetWindowMaximumSize() const;
 
     /** 设置窗口大小的最大值（宽度和高度，内部不按DPI调整大小，DPI自适应需要调用方来做）
     * @param [in] szMinWindow 窗口的最小宽度和最小高度，如果值为0，表示不做限制
     */
-    void SetWindowMinimumSize(const UiSize& szMinWindow);
+    void SetWindowMinimumSize(const UiSize &szMinWindow);
 
     /** 获取窗口大小的最大值（宽度和高度）
     */
-    const UiSize& GetWindowMinimumSize() const;
+    const UiSize &GetWindowMinimumSize() const;
 
 public:
     /** 设置当要捕获的鼠标窗口句柄为当前绘制窗口
@@ -411,13 +419,13 @@ public:
     * @param [in] ry 圆角的高度，其值不能为0
     * @param [in] bRedraw 是否重绘
     */
-    bool SetWindowRoundRectRgn(const UiRect& rcWnd, float rx, float ry, bool bRedraw);
+    bool SetWindowRoundRectRgn(const UiRect &rcWnd, float rx, float ry, bool bRedraw);
 
     /** 设置窗口的形状为直角矩形
     * @param [in] rcWnd 需要设置RGN的区域，坐标为屏幕坐标
     * @param [in] bRedraw 是否重绘
     */
-    bool SetWindowRectRgn(const UiRect& rcWnd, bool bRedraw);
+    bool SetWindowRectRgn(const UiRect &rcWnd, bool bRedraw);
 
     /** 清除窗口的形状设置, 恢复为系统默认形状
     * @param [in] bRedraw 是否重绘
@@ -427,7 +435,7 @@ public:
     /** 发出重绘消息
     * @param [in] rcItem 重绘范围，为客户区坐标
     */
-    void Invalidate(const UiRect& rcItem);
+    void Invalidate(const UiRect &rcItem);
 
     /** 更新窗口，执行重绘
     */
@@ -440,64 +448,64 @@ public:
     /** 获取当前窗口的客户区矩形
     * @param [out] rcClient 返回窗口的客户区坐标
     */
-    void GetClientRect(UiRect& rcClient) const;
+    void GetClientRect(UiRect &rcClient) const;
 
     /** 获取当前窗口的窗口区矩形
     * @param [out] rcWindow 返回窗口左上角和右下角的屏幕坐标
     */
-    void GetWindowRect(UiRect& rcWindow) const;
+    void GetWindowRect(UiRect &rcWindow) const;
 
     /** 将屏幕坐标转换为当前窗口的客户区坐标
     * @param [out] pt 返回客户区坐标
     */
-    void ScreenToClient(UiPoint& pt) const;
+    void ScreenToClient(UiPoint &pt) const;
 
     /** 将当前窗口的客户区坐标转换为屏幕坐标
     * @param [out] pt 返回屏幕坐标
     */
-    void ClientToScreen(UiPoint& pt) const;
+    void ClientToScreen(UiPoint &pt) const;
 
     /** 获取当前鼠标所在坐标
     * @param [out] pt 返回屏幕坐标
     */
-    void GetCursorPos(UiPoint& pt) const;
+    void GetCursorPos(UiPoint &pt) const;
 
     /** 获取指定窗口所在显示器的显示器矩形
     * @param [out] rcMonitor 显示器的矩形区域
     */
-    bool GetMonitorRect(UiRect& rcMonitor) const;
+    bool GetMonitorRect(UiRect &rcMonitor) const;
 
     /** 获取当前主显示器的工作区矩形
     * @param [out] rcWork 返回主屏幕坐标
     */
-    static bool GetPrimaryMonitorWorkRect(UiRect& rcWork);
+    static bool GetPrimaryMonitorWorkRect(UiRect &rcWork);
 
     /** 获取当前窗口所在显示器的工作区矩形，以虚拟屏幕坐标表示。
         请注意，如果显示器不是主显示器，则一些矩形的坐标可能是负值。
     * @param [out] rcWork 返回屏幕坐标
     */
-    bool GetMonitorWorkRect(UiRect& rcWork) const;
+    bool GetMonitorWorkRect(UiRect &rcWork) const;
 
     /** 获取指定点所在显示器的工作区矩形，以虚拟屏幕坐标表示。
         请注意，如果显示器不是主显示器，则一些矩形的坐标可能是负值。
     * @param [out] pt 输入为屏幕坐标
     * @param [out] rcWork 返回屏幕坐标
     */
-    bool GetMonitorWorkRect(const UiPoint& pt, UiRect& rcWork) const;
+    bool GetMonitorWorkRect(const UiPoint &pt, UiRect &rcWork) const;
 
     /** 获取鼠标最后的坐标
     */
-    const UiPoint& GetLastMousePos() const;
+    const UiPoint &GetLastMousePos() const;
 
     /** 设置鼠标最后的坐标
     */
-    void SetLastMousePos(const UiPoint& pt);
+    void SetLastMousePos(const UiPoint &pt);
 
     /** 获取一个点对应的窗口接口
     * @param [in] pt 屏幕坐标点
     * @param [in] bIgnoreChildWindow true表示忽略子窗口，false表示不忽略子窗口
     */
-    INativeWindow* WindowBaseFromPoint(const UiPoint& pt, bool bIgnoreChildWindow = false);
+    INativeWindow *WindowBaseFromPoint(const UiPoint &pt, bool bIgnoreChildWindow = false);
 
     /** 设置是否支持显示贴靠布局菜单（Windows 11新功能：通过将鼠标悬停在窗口的最大化按钮上或按 Win + Z，可以轻松访问对齐布局。）
     *   该功能默认是开启的。
@@ -536,7 +544,7 @@ public:
     * @param [out] wModifiers 热键组合键标志位，参见HotKeyModifiers枚举类型的值
     * @return 如果返回false表示没有注册窗口激活热键，否则表示有注册窗口激活热键
     */
-    bool GetWindowHotKey(uint8_t& wVirtualKeyCode, uint8_t& wModifiers) const;
+    bool GetWindowHotKey(uint8_t &wVirtualKeyCode, uint8_t &wModifiers) const;
 
     /** 注册系统全局热键，注册成功后，按此热键后，该窗口会收到WM_HOTKEY消息
     * @param [in] wVirtualKeyCode 虚拟键盘码，比如：kVK_DOWN等
@@ -566,7 +574,7 @@ public:
 
     /** SDL的Hit Test回调函数
     */
-    int32_t SDL_HitTest(SDL_Window* win, const SDL_Point* area, void* data);
+    int32_t SDL_HitTest(SDL_Window *win, const SDL_Point *area, void *data);
 
     /** 绘制窗口
     * @param [in] bPaintAll true表示消息由系统触发，需要全部绘制； false表示程序自己通过Invalidate函数触发，可支持局部绘制
@@ -575,7 +583,7 @@ public:
 
     /** 窗口更新的区域（需要绘制）
     */
-    const UiRect& GetUpdateRect() const;
+    const UiRect &GetUpdateRect() const;
 
     /** 设置输入法的开关状态（关闭再打开以后，能够保持原输入法状态）
     * @param [in] bOpen true标识打开输入法，false标识关闭输入法
@@ -586,7 +594,7 @@ public:
     * @param [in] rect 文本输入矩形区域
     * @param [in] nCursor 文本输入的位置(相对于rect.left的偏移)
     */
-    void SetTextInputArea(const UiRect* rect, int32_t nCursor);
+    void SetTextInputArea(const UiRect *rect, int32_t nCursor);
 
     /** 设置是否允许拖放操作
     * @param [in] bEnable true表示允许拖放操作，false表示禁止拖放操作
@@ -600,7 +608,7 @@ public:
     /** 获取指定坐标点的控件接口
     * @param [in] pt 客户区坐标点
     */
-    Control* FindControl(const UiPoint& pt) const;
+    Control *FindControl(const UiPoint &pt) const;
 
     /** 创建窗口时，是否需要居中窗口
     */
@@ -629,16 +637,18 @@ public:
 
 public:
     //几组支持高分屏的API接口
-    bool GetWindowSize(int32_t* w, int32_t* h) const;
-    bool GetWindowSizeInPixels(int32_t* w, int32_t* h) const;
-    float GetDisplayContentScale() const;   //获取窗口所在屏幕的内容显示比例
-    float GetWindowDisplayScale() const;    //获取该窗口的内容显示比例（与窗口所在屏幕的内容显示比例不一定相同）
-    float GetWindowPixelDensity() const;    //获取该窗口的像素密度值
+    bool GetWindowSize(int32_t *w, int32_t *h) const;
+    bool GetWindowSizeInPixels(int32_t *w, int32_t *h) const;
+    float GetDisplayContentScale() const; //获取窗口所在屏幕的内容显示比例
+    float GetWindowDisplayScale()
+        const; //获取该窗口的内容显示比例（与窗口所在屏幕的内容显示比例不一定相同）
+    float GetWindowPixelDensity() const; //获取该窗口的像素密度值
 
 private:
     /** 创建窗口和渲染接口
     */
-    bool CreateWindowAndRender(NativeWindow_SDL* pParentWindow, const WindowCreateAttributes& createAttributes);
+    bool CreateWindowAndRender(
+        NativeWindow_SDL *pParentWindow, const WindowCreateAttributes &createAttributes);
 
     /** 初始化窗口资源
     */
@@ -652,33 +662,36 @@ private:
     * @param [out] rcMonitor 显示器的矩形区域
     * @param [out] rcWork 显示器的工作区矩形
     */
-    bool GetMonitorRect(SDL_Window* sdlWindow, UiRect& rcMonitor, UiRect& rcWork) const;
+    bool GetMonitorRect(SDL_Window *sdlWindow, UiRect &rcMonitor, UiRect &rcWork) const;
 
     /** 获取当前窗口的窗口区矩形
     * @param [out] rcWindow 返回窗口左上角和右下角的屏幕坐标
     */
-    void GetWindowRect(SDL_Window* sdlWindow, UiRect& rcWindow) const;
+    void GetWindowRect(SDL_Window *sdlWindow, UiRect &rcWindow) const;
 
     /** 同步创建窗口的属性
     * @param [in] bSupportTransparent 是否支持透明，仅非Windows系统有效
     */
-    void SyncCreateWindowAttributes(const WindowCreateAttributes& createAttributes, bool bSupportTransparent);
+    void SyncCreateWindowAttributes(
+        const WindowCreateAttributes &createAttributes, bool bSupportTransparent);
 
     /** 根据创建窗口的输入参数，设置创建窗口的属性
     * @param [in] bUseOpenGL 是否使用OpenGL的渲染接口，仅非Windows系统有效
     */
-    void SetCreateWindowProperties(SDL_PropertiesID props,
-                                   NativeWindow_SDL* pParentWindow,
-                                   const WindowCreateAttributes& createAttributes,
-                                   bool bUseOpenGL);
+    void SetCreateWindowProperties(
+        SDL_PropertiesID props,
+        NativeWindow_SDL *pParentWindow,
+        const WindowCreateAttributes &createAttributes,
+        bool bUseOpenGL);
 
     /** 创建SDL窗口关联的Render
     */
-    SDL_Renderer* CreateSdlRenderer(const DString& sdlRenderName) const;
+    SDL_Renderer *CreateSdlRenderer(const DString &sdlRenderName) const;
 
     /** 获取Render名称列表（按优先级排列）
     */
-    void GetRenderNameList(const DString& externalRenderName, std::vector<DString>& renderNames) const;
+    void GetRenderNameList(
+        const DString &externalRenderName, std::vector<DString> &renderNames) const;
 
     /** 读取即将使用的Render属性
     * @param [in] 外部传入的Render名称
@@ -686,32 +699,37 @@ private:
     * @param [out] bOpenGLES2 是否支持OpenGL ES2
     * @param [out] bSupportTransparent 是否支持透明
     */
-    void QueryRenderProperties(const DString& externalRenderName, bool& bOpenGL, bool& bOpenGLES2, bool& bSupportTransparent) const;
+    void QueryRenderProperties(
+        const DString &externalRenderName,
+        bool &bOpenGL,
+        bool &bOpenGLES2,
+        bool &bSupportTransparent) const;
 
     /** 判断一个Render是否支持透明度
     */
-    bool IsRenderSupportTransparent(const DString& renderName) const;
+    bool IsRenderSupportTransparent(const DString &renderName) const;
 
     /** 创建SDL窗口
     */
-    SDL_Window* CreateSdlWindow(NativeWindow_SDL* pParentWindow, const WindowCreateAttributes& createAttributes);
+    SDL_Window *CreateSdlWindow(
+        NativeWindow_SDL *pParentWindow, const WindowCreateAttributes &createAttributes);
 
     /** 计算窗口居中的位置
     */
-    bool CalculateCenterWindowPos(SDL_Window* pCenterWindow, int32_t& xPos, int32_t& yPos) const;
+    bool CalculateCenterWindowPos(SDL_Window *pCenterWindow, int32_t &xPos, int32_t &yPos) const;
 
     /** 检查窗口贴边操作，并给应用层回调
     */
-    void CheckWindowSnap(SDL_Window* window);
+    void CheckWindowSnap(SDL_Window *window);
 
 private:
     /** 设置窗口ID与窗口指针的关系
     */
-    static void SetWindowFromID(SDL_WindowID id, NativeWindow_SDL* pNativeWindow);
+    static void SetWindowFromID(SDL_WindowID id, NativeWindow_SDL *pNativeWindow);
 
     /** 清除窗口ID与窗口指针的关系
     */
-    static void ClearWindowFromID(SDL_WindowID id, NativeWindow_SDL* pNativeWindow);
+    static void ClearWindowFromID(SDL_WindowID id, NativeWindow_SDL *pNativeWindow);
 
     /** 将SDL的Key 转换成内部的 ModifierKey
     */
@@ -730,20 +748,24 @@ private:
     * @param [in] pt 客户区坐标
     * @param [out] bHandled 如果返回true表示该事件已经处理，不再转发给界面中的其他UI控件处理
     */
-    void OnDropPosition(const UiPoint& pt, bool& bHandled);
+    void OnDropPosition(const UiPoint &pt, bool &bHandled);
 
     /** SDL_EVENT_DROP_TEXT
     * @param [in] textList 文本内容，容器中每个元素调用代表一行文本
     * @param [out] bHandled 如果返回true表示该事件已经处理，不再转发给界面中的其他UI控件处理
     */
-    void OnDropTexts(const std::vector<DString>& textList, const UiPoint& pt, bool& bHandled);
+    void OnDropTexts(const std::vector<DString> &textList, const UiPoint &pt, bool &bHandled);
 
     /** SDL_EVENT_DROP_FILE
     * @param [in] source 拖放源
     * @param [in] fileList 文件路径，容器中每个元素调用代表一个文件
     * @param [out] bHandled 如果返回true表示该事件已经处理，不再转发给界面中的其他UI控件处理
     */
-    void OnDropFiles(const DString& source, const std::vector<DString>& fileList, const UiPoint& pt, bool& bHandled);
+    void OnDropFiles(
+        const DString &source,
+        const std::vector<DString> &fileList,
+        const UiPoint &pt,
+        bool &bHandled);
 
     /** SDL_EVENT_DROP_COMPLETE 或者 其他导致离开的消息
     */
@@ -754,19 +776,19 @@ private:
 private:
     /** 窗口指针与SDL窗口ID的映射关系，用于转接消息
     */
-    static std::unordered_map<SDL_WindowID, NativeWindow_SDL*> s_windowIDMap;
+    static std::unordered_map<SDL_WindowID, NativeWindow_SDL *> s_windowIDMap;
 
     /** 接收窗口事件的接口
     */
-    INativeWindow* m_pOwner;
+    INativeWindow *m_pOwner;
 
     /** SDL窗口
     */
-    SDL_Window* m_sdlWindow;
+    SDL_Window *m_sdlWindow;
 
     /** SDL窗口渲染接口
     */
-    SDL_Renderer* m_sdlRenderer;
+    SDL_Renderer *m_sdlRenderer;
 
     /** 是否为子窗口
     */

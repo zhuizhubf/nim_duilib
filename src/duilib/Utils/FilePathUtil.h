@@ -3,8 +3,7 @@
 
 #include "duilib/Utils/FilePath.h"
 
-namespace ui
-{
+namespace ui {
 /** 路径操作的辅助类
 */
 class DUILIB_API FilePathUtil
@@ -15,31 +14,31 @@ public:
     * @param [in] path2 第二个路径
     * @return 返回拼接后的路径
     */
-    static FilePath JoinFilePath(const FilePath& path1, const FilePath& path2);
+    static FilePath JoinFilePath(const FilePath &path1, const FilePath &path2);
 
     /** 对路径中的分隔符/点（"/\\."）字符进行规范化处理（适用于文件, 支持绝对路径和相对路径）
     */
-    static FilePath NormalizeFilePath(const FilePath& filePath);
+    static FilePath NormalizeFilePath(const FilePath &filePath);
 
     /** 对路径中的分隔符/点（"/\\."）字符进行规范化处理（适用于文件, 支持绝对路径和相对路径）
     */
-    static DString NormalizeFilePath(const DString& filePath);
+    static DString NormalizeFilePath(const DString &filePath);
 
     /** 创建目录（不包含多级目录）
     * @param [in] filePath 需要创建的目录
     */
-    static bool CreateOneDirectory(const DString& filePath);
+    static bool CreateOneDirectory(const DString &filePath);
 
     /** 创建目录（包含多级子目录）
     * @param [in] filePath 需要创建的目录
     */
-    static bool CreateDirectories(const DString& filePath);
+    static bool CreateDirectories(const DString &filePath);
 
     /** 获取当前路径中的文件名的后缀部分(UTF16编码/UTF8编码)
     * @param [in] filePath 文件路径
     * @return 返回文件的扩展名部分，不包含"."
     */
-    static DString GetFileExtension(const DString& filePath);
+    static DString GetFileExtension(const DString &filePath);
 
     /** 获取当前进程的程序所在目录
     * @return 返回获取的目录

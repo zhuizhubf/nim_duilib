@@ -8,35 +8,34 @@
 class Item : public ui::ListBoxItem
 {
 public:
-    explicit Item(ui::Window* pWindow);
+    explicit Item(ui::Window *pWindow);
     virtual ~Item() override;
 
     /** 提供外部调用来初始化 item 数据
     */
-    void InitSubControls(const DString& img, const DString& title, size_t nDataIndex);
+    void InitSubControls(const DString &img, const DString &title, size_t nDataIndex);
 
 private:
-
     /** 删除事件
     */
-    bool OnRemove(const ui::EventArgs& args);
+    bool OnRemove(const ui::EventArgs &args);
 
 private:
     /** 图片
     */
-    ui::Control* m_pImageControl;
+    ui::Control *m_pImageControl;
 
     /** 文字标题
     */
-    ui::Label* m_pTitleLabel;
+    ui::Label *m_pTitleLabel;
 
     /** 进度条
     */
-    ui::Progress* m_pProgressControl;
+    ui::Progress *m_pProgressControl;
 
     /** 删除按钮
     */
-    ui::Button* m_pDelBtn;
+    ui::Button *m_pDelBtn;
 
     /** 时间戳
     */

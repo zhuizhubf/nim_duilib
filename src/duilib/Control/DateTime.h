@@ -1,12 +1,11 @@
 #ifndef _UI_CONTROL_DATETIME_H_
 #define _UI_CONTROL_DATETIME_H_
 
-#include "duilib/Control/Label.h"
 #include "duilib/Box/HBox.h"
+#include "duilib/Control/Label.h"
 #include <ctime>
 
-namespace ui
-{
+namespace ui {
 /** 日期时间选择控件
 */
 class DateTimeWnd;
@@ -14,10 +13,11 @@ class DUILIB_API DateTime : public LabelTemplate<HBox>
 {
     typedef LabelTemplate<HBox> BaseClass;
     friend class DateTimeWnd;
+
 public:
-    explicit DateTime(Window* pWindow);
-    DateTime(const DateTime& r) = delete;
-    DateTime& operator=(const DateTime& r) = delete;
+    explicit DateTime(Window *pWindow);
+    DateTime(const DateTime &r) = delete;
+    DateTime &operator=(const DateTime &r) = delete;
     virtual ~DateTime() override;
 
 public:
@@ -31,11 +31,11 @@ public:
 
     /** 获取日期时间值
     */
-    const struct tm& GetDateTime() const;
+    const struct tm &GetDateTime() const;
 
     /** 设置日期时间值
     */
-    void SetDateTime(const struct tm& dateTime);
+    void SetDateTime(const struct tm &dateTime);
 
     /** 当前日期时间值是否为有效的日期时间
     */
@@ -47,12 +47,12 @@ public:
 
     /** 设置日期时间字符串, 按照GetStringFormat()指定的格式, 更新日期时间值
     */
-    bool SetDateTimeString(const DString& dateTime);
+    bool SetDateTimeString(const DString &dateTime);
 
     /** 获取日期的字符串格式
     */
     DString GetStringFormat() const;
-    
+
     /** 设置日期格式，默认值取决于EditFormat的值
     * @param [in] sFormat 日期的格式，具体可参考：std::put_time 函数的说明：
         %a 星期几的简写
@@ -92,18 +92,17 @@ public:
         %z，%Z 时区名称，如果不能得到时区名称则返回空字符。
         %% 百分号
     */
-    void SetStringFormat(const DString& sFormat);
+    void SetStringFormat(const DString &sFormat);
 
     /** 日期时间的编辑格式
     */
-    enum class EditFormat
-    {
-        kDateCalendar,      //编辑时显示：年-月-日，通过下拉框展示月日历的方式来修改日期，不支持选择时间(SDL实现时，同kDateUpDown)
-        kDateUpDown,        //编辑时显示：年-月-日，通过控件的右侧放置一个向上-向下的控件以修改日期，不支持选择时间
-        kDateTimeUpDown,    //编辑时显示：年-月-日 时:分:秒，通过控件的右侧放置一个向上-向下的控件以修改日期和时间
-        kDateMinuteUpDown,  //编辑时显示：年-月-日 时:分，通过控件的右侧放置一个向上-向下的控件以修改日期和时间
-        kTimeUpDown,        //编辑时显示：时:分:秒，通过控件的右侧放置一个向上-向下的控件以修改时间，不支持修改日期
-        kMinuteUpDown,      //编辑时显示：时:分，通过控件的右侧放置一个向上-向下的控件以修改时间，不支持修改日期
+    enum class EditFormat {
+        kDateCalendar, //编辑时显示：年-月-日，通过下拉框展示月日历的方式来修改日期，不支持选择时间(SDL实现时，同kDateUpDown)
+        kDateUpDown, //编辑时显示：年-月-日，通过控件的右侧放置一个向上-向下的控件以修改日期，不支持选择时间
+        kDateTimeUpDown, //编辑时显示：年-月-日 时:分:秒，通过控件的右侧放置一个向上-向下的控件以修改日期和时间
+        kDateMinuteUpDown, //编辑时显示：年-月-日 时:分，通过控件的右侧放置一个向上-向下的控件以修改日期和时间
+        kTimeUpDown, //编辑时显示：时:分:秒，通过控件的右侧放置一个向上-向下的控件以修改时间，不支持修改日期
+        kMinuteUpDown, //编辑时显示：时:分，通过控件的右侧放置一个向上-向下的控件以修改时间，不支持修改日期
     };
 
     /** 设置编辑格式
@@ -124,7 +123,7 @@ public:
 
     /** 设置Spin功能的Class名称
     */
-    void SetSpinClass(const DString& spinClass);
+    void SetSpinClass(const DString &spinClass);
 
     /** 获取Spin功能的Class名称
     */
@@ -134,13 +133,16 @@ public:
     * @param [in] callback 要绑定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachTimeChanged(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventValueChanged, callback, callbackID); }
+    void AttachTimeChanged(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventValueChanged, callback, callbackID);
+    }
 
 public:
     //基类的虚函数
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     //用于初始化xml属性
     virtual void OnInit() override;
@@ -148,12 +150,12 @@ public:
     /** 将消息派发到消息处理函数
      * @param[in] msg 消息内容
      */
-    virtual void SendEventMsg(const EventArgs& msg) override;
+    virtual void SendEventMsg(const EventArgs &msg) override;
 
 private:
     /** 比较两个时间是否相同
     */
-    bool IsEqual(const struct tm& a, const struct tm& b) const;
+    bool IsEqual(const struct tm &a, const struct tm &b) const;
 
     /** 结束编辑
     */
@@ -178,13 +180,13 @@ private:
 
     /** 设置日期控件窗口接口
     */
-    DateTimeWnd* m_pDateWindow;
+    DateTimeWnd *m_pDateWindow;
 
     /** Spin功能的Class名称
     */
     UiString m_spinClass;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif // _UI_CONTROL_DATETIME_H_

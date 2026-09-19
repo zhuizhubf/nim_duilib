@@ -8,25 +8,25 @@
 #include "cef/internal/CefBrowserHandler.h"
 #include "cef/internal/CefMemoryBlock.h"
 
-#include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Box.h"
+#include "duilib/Core/GlobalManager.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    #include "cef/internal/Windows/util_win.h"
-    #include "cef/internal/Windows/osr_ime_handler_win.h"
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+#include "cef/internal/Windows/osr_ime_handler_win.h"
+#include "cef/internal/Windows/util_win.h"
 #endif
 
-#if defined (DUILIB_BUILD_FOR_SDL)
-    #include <SDL3/SDL.h>
+#if defined(DUILIB_BUILD_FOR_SDL)
+#include <SDL3/SDL.h>
 #endif
 
 namespace ui {
 
-CefControlOffScreen::CefControlOffScreen(Window* pWindow) :
-    CefControl(pWindow),
-    m_bHasFocusNode(false),
-    m_bFocusNodeEditable(false),
-    m_bInGotFocusEvent(false)
+CefControlOffScreen::CefControlOffScreen(Window *pWindow)
+    : CefControl(pWindow)
+    , m_bHasFocusNode(false)
+    , m_bFocusNodeEditable(false)
+    , m_bInGotFocusEvent(false)
 {
     m_pCefMemData = std::make_unique<CefMemoryBlock>();
     m_pCefPopupMemData = std::make_unique<CefMemoryBlock>();
@@ -41,7 +41,13 @@ CefControlOffScreen::~CefControlOffScreen(void)
     }
 }
 
-void CefControlOffScreen::OnPaint(CefRefPtr<CefBrowser> /*browser*/, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height)
+void CefControlOffScreen::OnPaint(
+    CefRefPtr<CefBrowser> /*browser*/,
+    CefRenderHandler::PaintElementType type,
+    const CefRenderHandler::RectList &dirtyRects,
+    const void *buffer,
+    int width,
+    int height)
 {
     ASSERT(CefCurrentlyOn(TID_UI));
     //只有离屏渲染才会走这个绘制接口
@@ -51,30 +57,31 @@ void CefControlOffScreen::OnPaint(CefRefPtr<CefBrowser> /*browser*/, CefRenderHa
     }
 
     std::vector<UiRect> dirtyRectList;
-    for (const CefRect& rect : dirtyRects) {
+    for (const CefRect &rect : dirtyRects) {
         dirtyRectList.push_back(UiRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height));
     }
     if (type == PET_VIEW) {
-        //页面的绘制数据        
+        //页面的绘制数据
         m_pCefMemData->Init(buffer, dirtyRectList, width, height);
-    }
-    else if (type == PET_POPUP) {
+    } else if (type == PET_POPUP) {
         ////页面弹出窗口的绘制数据
         m_pCefPopupMemData->Init(buffer, dirtyRectList, width, height);
     }
 
     //在UI线程中调用Invalidate，触发绘制
-    GlobalManager::Instance().Thread().PostTask(kThreadUI, UiBind(&CefControlOffScreen::Invalidate, this));
+    GlobalManager::Instance()
+        .Thread()
+        .PostTask(kThreadUI, UiBind(&CefControlOffScreen::Invalidate, this));
 }
 
-void CefControlOffScreen::ClientToControl(UiPoint& pt)
+void CefControlOffScreen::ClientToControl(UiPoint &pt)
 {
     auto offset = GetScrollOffsetInScrollBox();
     pt.x = pt.x + offset.x - GetRect().left;
     pt.y = pt.y + offset.y - GetRect().top;
 
     //传回的值，是未经DPI缩放的原始值(96 DPI)，然后CEF内部会进行DPI缩放
-    Dpi().UnscaleInt(pt.x);//TODO
+    Dpi().UnscaleInt(pt.x); //TODO
     Dpi().UnscaleInt(pt.y);
 }
 
@@ -90,7 +97,7 @@ void CefControlOffScreen::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
     }
 }
 
-void CefControlOffScreen::OnPopupSize(CefRefPtr<CefBrowser> /*browser*/, const CefRect& rect)
+void CefControlOffScreen::OnPopupSize(CefRefPtr<CefBrowser> /*browser*/, const CefRect &rect)
 {
     ASSERT(CefCurrentlyOn(TID_UI));
     if ((rect.width <= 0) || (rect.height <= 0)) {
@@ -108,7 +115,9 @@ void CefControlOffScreen::Init()
         m_pBrowserHandler->SetHandlerDelegate(this);
 
         //异步创建Browser对象, 避免阻塞主界面的解析和显示速度
-        GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, UiBind(&CefControlOffScreen::ReCreateBrowser, this));
+        GlobalManager::Instance()
+            .Thread()
+            .PostTask(ui::kThreadUI, UiBind(&CefControlOffScreen::ReCreateBrowser, this));
     }
 
     if (!m_jsBridge.get()) {
@@ -120,7 +129,7 @@ void CefControlOffScreen::Init()
 void CefControlOffScreen::ReCreateBrowser()
 {
     GlobalManager::Instance().AssertUIThread();
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     ASSERT(pWindow != nullptr);
     if (pWindow == nullptr) {
         return;
@@ -150,10 +159,10 @@ void CefControlOffScreen::ReCreateBrowser()
         // Don't activate the browser window on creation.
         window_info.ex_style |= WS_EX_NOACTIVATE;
     }
-#elif defined (DUILIB_BUILD_FOR_LINUX) || defined (DUILIB_BUILD_FOR_FREEBSD)
-    CefWindowHandle hParenWindow = (CefWindowHandle)pWindow->NativeWnd()->GetX11WindowNumber();
+#elif defined(DUILIB_BUILD_FOR_LINUX) || defined(DUILIB_BUILD_FOR_FREEBSD)
+    CefWindowHandle hParenWindow = (CefWindowHandle) pWindow->NativeWnd()->GetX11WindowNumber();
     if (pWindow->NativeWnd()->IsVideoDriverWayland()) {
-        hParenWindow = (CefWindowHandle)pWindow->NativeWnd()->GetWaylandDisplayPointer();
+        hParenWindow = (CefWindowHandle) pWindow->NativeWnd()->GetWaylandDisplayPointer();
     }
     window_info.SetAsWindowless(hParenWindow);
 #elif defined DUILIB_BUILD_FOR_MACOS
@@ -164,8 +173,9 @@ void CefControlOffScreen::ReCreateBrowser()
     browser_settings.background_color = CefColorSetARGB(255, 255, 255, 255);
     //browser_settings.file_access_from_file_urls = STATE_ENABLED;
     //browser_settings.universal_access_from_file_urls = STATE_ENABLED;
-    CefString url = GetInitURL();//创建成功后，立即加载的URL
-    CefBrowserHost::CreateBrowser(window_info, m_pBrowserHandler, url, browser_settings, nullptr, nullptr);
+    CefString url = GetInitURL(); //创建成功后，立即加载的URL
+    CefBrowserHost::CreateBrowser(
+        window_info, m_pBrowserHandler, url, browser_settings, nullptr, nullptr);
 }
 
 void CefControlOffScreen::SetPos(UiRect rc)
@@ -174,7 +184,7 @@ void CefControlOffScreen::SetPos(UiRect rc)
     BaseClass::SetPos(rc);
 
     if (m_pBrowserHandler.get()) {
-        m_pBrowserHandler->SetViewRect({ rc.left, rc.top, rc.right, rc.bottom });
+        m_pBrowserHandler->SetViewRect({rc.left, rc.top, rc.right, rc.bottom});
     }
 }
 
@@ -187,11 +197,12 @@ void CefControlOffScreen::OnSetVisible(bool bChanged)
     }
 }
 
-void CefControlOffScreen::Paint(IRender* pRender, const UiRect& rcPaint)
+void CefControlOffScreen::Paint(IRender *pRender, const UiRect &rcPaint)
 {
     GlobalManager::Instance().AssertUIThread();
     BaseClass::Paint(pRender, rcPaint);
-    if ((pRender == nullptr) || (m_pBrowserHandler == nullptr) || (m_pBrowserHandler->GetBrowser() == nullptr)) {
+    if ((pRender == nullptr) || (m_pBrowserHandler == nullptr)
+        || (m_pBrowserHandler->GetBrowser() == nullptr)) {
         return;
     }
 
@@ -199,7 +210,8 @@ void CefControlOffScreen::Paint(IRender* pRender, const UiRect& rcPaint)
         // 绘制cef PET_VIEW类型的位图
         const UiRect rect = GetRect();
         bool bRectValid = true;
-        if ((m_pCefMemData->GetWidth() != rect.Width()) || (m_pCefMemData->GetHeight() != rect.Height())) {            
+        if ((m_pCefMemData->GetWidth() != rect.Width())
+            || (m_pCefMemData->GetHeight() != rect.Height())) {
             bRectValid = false;
         }
 
@@ -207,8 +219,7 @@ void CefControlOffScreen::Paint(IRender* pRender, const UiRect& rcPaint)
             if (bRectValid) {
                 //区域匹配，与网页内容的大小刚好相同
                 m_pCefMemData->PaintData(pRender, rect);
-            }
-            else {
+            } else {
                 //如果区域不匹配，按图像数据实际大小绘制，然后再次触发一次绘制事件（避免绘制超出控件边界，覆盖其他控件）
                 UiRect rc = rect;
                 rc.right = std::min(rc.left + m_pCefMemData->GetWidth(), rect.right);
@@ -233,17 +244,17 @@ void CefControlOffScreen::Paint(IRender* pRender, const UiRect& rcPaint)
     }
 }
 
-void CefControlOffScreen::SetWindow(Window* pWindow)
+void CefControlOffScreen::SetWindow(Window *pWindow)
 {
     GlobalManager::Instance().AssertUIThread();
     BaseClass::SetWindow(pWindow);
     if (m_pBrowserHandler) {
         m_pBrowserHandler->SetHostWindow(pWindow);
         m_pBrowserHandler->SetHandlerDelegate(this);
-    }    
+    }
 }
 
-void CefControlOffScreen::AdaptDpiScale(CefMouseEvent& mouse_event)
+void CefControlOffScreen::AdaptDpiScale(CefMouseEvent &mouse_event)
 {
     if (CefManager::GetInstance()->IsEnableOffScreenRendering()) {
         //离屏渲染模式，需要传给原始宽度和高度，因为CEF内部会进一步做DPI自适应
@@ -260,37 +271,61 @@ void CefControlOffScreen::AdaptDpiScale(CefMouseEvent& mouse_event)
 static CursorType CefCursorTypeToUiCursor(cef_cursor_type_t cefCursor)
 {
     switch (cefCursor) {
-    case CT_POINTER:           return CursorType::kCursorArrow;          // 指针 -> 标准箭头
-    case CT_CROSS:             return CursorType::kCursorCross;          // 十字光标 -> 十字线
-    case CT_HAND:              return CursorType::kCursorHand;           // 手型光标 -> 手型
-    case CT_IBEAM:             return CursorType::kCursorIBeam;          // 文本光标 -> I型光标
-    case CT_WAIT:              return CursorType::kCursorWait;           // 等待光标 -> 沙漏
-    //case CT_HELP:              return IDC_HELP;           // 帮助光标 -> 帮助箭头
+    case CT_POINTER:
+        return CursorType::kCursorArrow; // 指针 -> 标准箭头
+    case CT_CROSS:
+        return CursorType::kCursorCross; // 十字光标 -> 十字线
+    case CT_HAND:
+        return CursorType::kCursorHand; // 手型光标 -> 手型
+    case CT_IBEAM:
+        return CursorType::kCursorIBeam; // 文本光标 -> I型光标
+    case CT_WAIT:
+        return CursorType::kCursorWait; // 等待光标 -> 沙漏
+        //case CT_HELP:              return IDC_HELP;           // 帮助光标 -> 帮助箭头
 
         // 方向调整光标
-    case CT_EASTRESIZE:        return CursorType::kCursorSizeWE;         // 东向调整 -> 水平调整
-    case CT_NORTHRESIZE:       return CursorType::kCursorSizeNS;         // 北向调整 -> 垂直调整
-    case CT_NORTHEASTRESIZE:   return CursorType::kCursorSizeNESW;       // 东北向调整
-    case CT_NORTHWESTRESIZE:   return CursorType::kCursorSizeNWSE;       // 西北向调整
-    case CT_SOUTHRESIZE:       return CursorType::kCursorSizeNS;         // 南向调整 -> 垂直调整
-    case CT_SOUTHEASTRESIZE:   return CursorType::kCursorSizeNWSE;       // 东南向调整
-    case CT_SOUTHWESTRESIZE:   return CursorType::kCursorSizeNESW;       // 西南向调整
-    case CT_WESTRESIZE:        return CursorType::kCursorSizeWE;         // 西向调整 -> 水平调整
+    case CT_EASTRESIZE:
+        return CursorType::kCursorSizeWE; // 东向调整 -> 水平调整
+    case CT_NORTHRESIZE:
+        return CursorType::kCursorSizeNS; // 北向调整 -> 垂直调整
+    case CT_NORTHEASTRESIZE:
+        return CursorType::kCursorSizeNESW; // 东北向调整
+    case CT_NORTHWESTRESIZE:
+        return CursorType::kCursorSizeNWSE; // 西北向调整
+    case CT_SOUTHRESIZE:
+        return CursorType::kCursorSizeNS; // 南向调整 -> 垂直调整
+    case CT_SOUTHEASTRESIZE:
+        return CursorType::kCursorSizeNWSE; // 东南向调整
+    case CT_SOUTHWESTRESIZE:
+        return CursorType::kCursorSizeNESW; // 西南向调整
+    case CT_WESTRESIZE:
+        return CursorType::kCursorSizeWE; // 西向调整 -> 水平调整
 
         // 双向调整光标
-    case CT_NORTHSOUTHRESIZE:  return CursorType::kCursorSizeNS;          // 南北调整 -> 垂直调整
-    case CT_EASTWESTRESIZE:    return CursorType::kCursorSizeWE;          // 东西调整 -> 水平调整
-    case CT_NORTHEASTSOUTHWESTRESIZE: return CursorType::kCursorSizeNESW; // 东北-西南调整
-    case CT_NORTHWESTSOUTHEASTRESIZE: return CursorType::kCursorSizeNWSE; // 西北-东南调整
+    case CT_NORTHSOUTHRESIZE:
+        return CursorType::kCursorSizeNS; // 南北调整 -> 垂直调整
+    case CT_EASTWESTRESIZE:
+        return CursorType::kCursorSizeWE; // 东西调整 -> 水平调整
+    case CT_NORTHEASTSOUTHWESTRESIZE:
+        return CursorType::kCursorSizeNESW; // 东北-西南调整
+    case CT_NORTHWESTSOUTHEASTRESIZE:
+        return CursorType::kCursorSizeNWSE; // 西北-东南调整
 
         // 其他可映射类型
-    case CT_COLUMNRESIZE:      return CursorType::kCursorSizeWE;         // 列调整 -> 水平调整
-    case CT_ROWRESIZE:         return CursorType::kCursorSizeNS;         // 行调整 -> 垂直调整
-    case CT_MOVE:              return CursorType::kCursorSizeAll;        // 移动 -> 四向调整
-    case CT_PROGRESS:          return CursorType::kCursorProgress;       // 进度 -> 应用启动光标
-    case CT_NODROP:            return CursorType::kCursorNo;             // 禁止放置 -> 禁止光标
-    case CT_NOTALLOWED:        return CursorType::kCursorNo;             // 不允许 -> 禁止光标
-    case CT_COPY:              return CursorType::kCursorArrow;          // 复制 -> 标准箭头（可自定义）
+    case CT_COLUMNRESIZE:
+        return CursorType::kCursorSizeWE; // 列调整 -> 水平调整
+    case CT_ROWRESIZE:
+        return CursorType::kCursorSizeNS; // 行调整 -> 垂直调整
+    case CT_MOVE:
+        return CursorType::kCursorSizeAll; // 移动 -> 四向调整
+    case CT_PROGRESS:
+        return CursorType::kCursorProgress; // 进度 -> 应用启动光标
+    case CT_NODROP:
+        return CursorType::kCursorNo; // 禁止放置 -> 禁止光标
+    case CT_NOTALLOWED:
+        return CursorType::kCursorNo; // 不允许 -> 禁止光标
+    case CT_COPY:
+        return CursorType::kCursorArrow; // 复制 -> 标准箭头（可自定义）
 
         // 以下类型无直接对应Windows标准光标，返回空
     case CT_MIDDLEPANNING:
@@ -333,23 +368,23 @@ void CefControlOffScreen::OnCursorChange(cef_cursor_type_t type)
     CursorType uiCursorType = CefCursorTypeToUiCursor(type);
     SetCursorType(uiCursorType);
 #else
-    (void)type;
+    (void) type;
 #endif
 }
 
-bool CefControlOffScreen::OnSetCursor(const EventArgs& msg)
+bool CefControlOffScreen::OnSetCursor(const EventArgs &msg)
 {
 #ifdef DUILIB_BUILD_FOR_SDL
     //使用SDL时，需要设置光标
     return BaseClass::OnSetCursor(msg);
 #else
     //离屏渲染时，控件本身不处理光标，由CEF模块内部处理光标，否则会影响Cef中的鼠标光标
-    (void)msg;
+    (void) msg;
     return true;
 #endif
 }
 
-bool CefControlOffScreen::OnCaptureChanged(const EventArgs& /*msg*/)
+bool CefControlOffScreen::OnCaptureChanged(const EventArgs & /*msg*/)
 {
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
@@ -361,7 +396,7 @@ bool CefControlOffScreen::OnCaptureChanged(const EventArgs& /*msg*/)
     return false;
 }
 
-int32_t CefControlOffScreen::GetCefMouseModifiers(const EventArgs& /*msg*/) const
+int32_t CefControlOffScreen::GetCefMouseModifiers(const EventArgs & /*msg*/) const
 {
     int32_t modifiers = 0;
     if (Keyboard::IsKeyDown(kVK_CONTROL)) {
@@ -393,14 +428,14 @@ int32_t CefControlOffScreen::GetCefMouseModifiers(const EventArgs& /*msg*/) cons
     return modifiers;
 }
 
-bool CefControlOffScreen::MouseMove(const EventArgs& msg)
+bool CefControlOffScreen::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
         host = m_pBrowserHandler->GetBrowserHost();
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if ((pWindow != nullptr) && (host != nullptr)) {
         UiPoint pt = msg.ptMouse;
         pt.Offset(GetScrollOffsetInScrollBox());
@@ -418,7 +453,7 @@ bool CefControlOffScreen::MouseMove(const EventArgs& msg)
     return bRet;
 }
 
-bool CefControlOffScreen::MouseLeave(const EventArgs& msg)
+bool CefControlOffScreen::MouseLeave(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseLeave(msg);
     CefRefPtr<CefBrowserHost> host;
@@ -444,7 +479,7 @@ bool CefControlOffScreen::MouseLeave(const EventArgs& msg)
     return bRet;
 }
 
-bool CefControlOffScreen::MouseWheel(const EventArgs& msg)
+bool CefControlOffScreen::MouseWheel(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseWheel(msg);
     CefRefPtr<CefBrowserHost> host;
@@ -454,13 +489,13 @@ bool CefControlOffScreen::MouseWheel(const EventArgs& msg)
     if (host == nullptr) {
         return bRet;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if (pWindow == nullptr) {
         return bRet;
     }
 
     UiPoint pt = msg.ptMouse;
-    Window* pScrolledWnd = pWindow->WindowFromPoint(pt);
+    Window *pScrolledWnd = pWindow->WindowFromPoint(pt);
     if (pScrolledWnd != pWindow) {
         return bRet;
     }
@@ -481,70 +516,70 @@ bool CefControlOffScreen::MouseWheel(const EventArgs& msg)
     return bRet;
 }
 
-bool CefControlOffScreen::ButtonDown(const EventArgs& msg)
+bool CefControlOffScreen::ButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     SendButtonDownEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::ButtonUp(const EventArgs& msg)
+bool CefControlOffScreen::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     SendButtonUpEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::ButtonDoubleClick(const EventArgs& msg)
+bool CefControlOffScreen::ButtonDoubleClick(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDoubleClick(msg);
     SendButtonDoubleClickEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::RButtonDown(const EventArgs& msg)
+bool CefControlOffScreen::RButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::RButtonDown(msg);
     SendButtonDownEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::RButtonUp(const EventArgs& msg)
+bool CefControlOffScreen::RButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::RButtonUp(msg);
     SendButtonUpEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::RButtonDoubleClick(const EventArgs& msg)
+bool CefControlOffScreen::RButtonDoubleClick(const EventArgs &msg)
 {
     bool bRet = BaseClass::RButtonDoubleClick(msg);
     SendButtonDoubleClickEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::MButtonDown(const EventArgs& msg)
+bool CefControlOffScreen::MButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::MButtonDown(msg);
     SendButtonDownEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::MButtonUp(const EventArgs& msg)
+bool CefControlOffScreen::MButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::MButtonUp(msg);
     SendButtonUpEvent(msg);
     return bRet;
 }
 
-bool CefControlOffScreen::MButtonDoubleClick(const EventArgs& msg)
+bool CefControlOffScreen::MButtonDoubleClick(const EventArgs &msg)
 {
     bool bRet = BaseClass::MButtonDoubleClick(msg);
     SendButtonDoubleClickEvent(msg);
     return bRet;
 }
 
-void CefControlOffScreen::SendButtonDownEvent(const EventArgs& msg)
+void CefControlOffScreen::SendButtonDownEvent(const EventArgs &msg)
 {
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
@@ -566,14 +601,15 @@ void CefControlOffScreen::SendButtonDownEvent(const EventArgs& msg)
     mouse_event.y = pt.y - GetRect().top;
     mouse_event.modifiers = GetCefMouseModifiers(msg);
 
-    CefBrowserHost::MouseButtonType btnType =
-        (msg.eventType == kEventMouseButtonDown ? MBT_LEFT : (
-            msg.eventType == kEventMouseRButtonDown ? MBT_RIGHT : MBT_MIDDLE));
+    CefBrowserHost::MouseButtonType btnType
+        = (msg.eventType == kEventMouseButtonDown
+               ? MBT_LEFT
+               : (msg.eventType == kEventMouseRButtonDown ? MBT_RIGHT : MBT_MIDDLE));
     AdaptDpiScale(mouse_event);
     host->SendMouseClickEvent(mouse_event, btnType, false, 1);
 }
 
-void CefControlOffScreen::SendButtonUpEvent(const EventArgs& msg)
+void CefControlOffScreen::SendButtonUpEvent(const EventArgs &msg)
 {
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
@@ -594,13 +630,14 @@ void CefControlOffScreen::SendButtonUpEvent(const EventArgs& msg)
     mouse_event.y = pt.y - GetRect().top;
     mouse_event.modifiers = GetCefMouseModifiers(msg);
     AdaptDpiScale(mouse_event);
-    CefBrowserHost::MouseButtonType btnType =
-        (msg.eventType == kEventMouseButtonUp ? MBT_LEFT : (
-            msg.eventType == kEventMouseRButtonUp ? MBT_RIGHT : MBT_MIDDLE));
+    CefBrowserHost::MouseButtonType btnType
+        = (msg.eventType == kEventMouseButtonUp
+               ? MBT_LEFT
+               : (msg.eventType == kEventMouseRButtonUp ? MBT_RIGHT : MBT_MIDDLE));
     host->SendMouseClickEvent(mouse_event, btnType, true, 1);
 }
 
-void CefControlOffScreen::SendButtonDoubleClickEvent(const EventArgs& msg)
+void CefControlOffScreen::SendButtonDoubleClickEvent(const EventArgs &msg)
 {
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
@@ -621,9 +658,10 @@ void CefControlOffScreen::SendButtonDoubleClickEvent(const EventArgs& msg)
     mouse_event.y = pt.y - GetRect().top;
     mouse_event.modifiers = GetCefMouseModifiers(msg);
     AdaptDpiScale(mouse_event);
-    CefBrowserHost::MouseButtonType btnType =
-        (msg.eventType == kEventMouseDoubleClick ? MBT_LEFT : (
-            msg.eventType == kEventMouseRDoubleClick ? MBT_RIGHT : MBT_MIDDLE));
+    CefBrowserHost::MouseButtonType btnType
+        = (msg.eventType == kEventMouseDoubleClick
+               ? MBT_LEFT
+               : (msg.eventType == kEventMouseRDoubleClick ? MBT_RIGHT : MBT_MIDDLE));
     host->SendMouseClickEvent(mouse_event, btnType, true, 2);
 }
 
@@ -640,7 +678,7 @@ void CefControlOffScreen::OnGotFocus()
     }
 }
 
-bool CefControlOffScreen::OnSetFocus(const EventArgs& /*msg*/)
+bool CefControlOffScreen::OnSetFocus(const EventArgs & /*msg*/)
 {
     //不调用基类的方法(基类的方法会关闭输入法)
     if (GetState() == kControlStateNormal) {
@@ -650,9 +688,8 @@ bool CefControlOffScreen::OnSetFocus(const EventArgs& /*msg*/)
     //设置输入法相关属性
     if (m_bHasFocusNode) {
         OnFocusedNodeChanged(m_bFocusNodeEditable, m_focusNodeRect);
-    }
-    else {
-        Window* pWindow = GetWindow();
+    } else {
+        Window *pWindow = GetWindow();
         if (pWindow != nullptr) {
             pWindow->NativeWnd()->SetTextInputArea(nullptr, 0);
             pWindow->NativeWnd()->SetImeOpenStatus(false);
@@ -670,7 +707,7 @@ bool CefControlOffScreen::OnSetFocus(const EventArgs& /*msg*/)
     return true;
 }
 
-bool CefControlOffScreen::OnKillFocus(const EventArgs& msg)
+bool CefControlOffScreen::OnKillFocus(const EventArgs &msg)
 {
     CefRefPtr<CefBrowserHost> browserHost = GetCefBrowserHost();
     if (browserHost != nullptr) {
@@ -679,19 +716,19 @@ bool CefControlOffScreen::OnKillFocus(const EventArgs& msg)
     return BaseClass::OnKillFocus(msg);
 }
 
-bool CefControlOffScreen::OnChar(const EventArgs& msg)
+bool CefControlOffScreen::OnChar(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnChar(msg);
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
-    ASSERT((msg.eventData == WM_CHAR) || (msg.eventData == WM_SYSCHAR) || (msg.eventData == WM_UNICHAR));
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
+    ASSERT(
+        (msg.eventData == WM_CHAR) || (msg.eventData == WM_SYSCHAR)
+        || (msg.eventData == WM_UNICHAR));
     bool bHandled = false;
     if (msg.modifierKey & ModifierKey::kIsSystemKey) {
         SendKeyEvent(WM_SYSCHAR, msg.wParam, msg.lParam, bHandled);
-    }
-    else if (msg.eventData == WM_CHAR) {
+    } else if (msg.eventData == WM_CHAR) {
         SendKeyEvent(WM_CHAR, msg.wParam, msg.lParam, bHandled);
-    }
-    else if (msg.eventData == WM_UNICHAR) {
+    } else if (msg.eventData == WM_UNICHAR) {
         SendKeyEvent(WM_UNICHAR, msg.wParam, msg.lParam, bHandled);
     }
     return bRet || bHandled;
@@ -701,15 +738,14 @@ bool CefControlOffScreen::OnChar(const EventArgs& msg)
 #endif
 }
 
-bool CefControlOffScreen::OnKeyDown(const EventArgs& msg)
+bool CefControlOffScreen::OnKeyDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnKeyDown(msg);
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     bool bHandled = false;
     if (msg.modifierKey & ModifierKey::kIsSystemKey) {
         SendKeyEvent(WM_SYSKEYDOWN, msg.wParam, msg.lParam, bHandled);
-    }
-    else {
+    } else {
         SendKeyEvent(WM_KEYDOWN, msg.wParam, msg.lParam, bHandled);
     }
     return bRet || bHandled;
@@ -719,15 +755,14 @@ bool CefControlOffScreen::OnKeyDown(const EventArgs& msg)
 #endif
 }
 
-bool CefControlOffScreen::OnKeyUp(const EventArgs& msg)
+bool CefControlOffScreen::OnKeyUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnKeyUp(msg);
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     bool bHandled = false;
     if (msg.modifierKey & ModifierKey::kIsSystemKey) {
         SendKeyEvent(WM_SYSKEYUP, msg.wParam, msg.lParam, bHandled);
-    }
-    else {
+    } else {
         SendKeyEvent(WM_KEYUP, msg.wParam, msg.lParam, bHandled);
     }
     return bRet || bHandled;
@@ -745,16 +780,16 @@ bool CefControlOffScreen::IsCefOSR() const
 bool CefControlOffScreen::IsCefOsrImeMode() const
 {
     //109版本的64位版本离屏渲染模式，输入法输入时，libcef.dll内部会崩溃，原因未知，现禁止输入法功能（副作用：中文输入法的候选框位置不正确）
-#if defined (_WIN64)
+#if defined(_WIN64)
     return (CEF_VERSION_MAJOR > 109) ? true : false;
 #else
     return true;
-#endif    
+#endif
 }
 
-bool CefControlOffScreen::OnImeSetContext(const EventArgs& msg)
+bool CefControlOffScreen::OnImeSetContext(const EventArgs &msg)
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     if (IsCefOsrImeMode()) {
         OnIMESetContext(WM_IME_SETCONTEXT, msg.wParam, msg.lParam);
     }
@@ -764,9 +799,9 @@ bool CefControlOffScreen::OnImeSetContext(const EventArgs& msg)
     return false;
 }
 
-bool CefControlOffScreen::OnImeStartComposition(const EventArgs& /*msg*/)
+bool CefControlOffScreen::OnImeStartComposition(const EventArgs & /*msg*/)
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     if (IsCefOsrImeMode()) {
         OnIMEStartComposition();
     }
@@ -774,9 +809,9 @@ bool CefControlOffScreen::OnImeStartComposition(const EventArgs& /*msg*/)
     return false;
 }
 
-bool CefControlOffScreen::OnImeComposition(const EventArgs& msg)
+bool CefControlOffScreen::OnImeComposition(const EventArgs &msg)
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     if (IsCefOsrImeMode()) {
         OnIMEComposition(WM_IME_COMPOSITION, msg.wParam, msg.lParam);
     }
@@ -786,9 +821,9 @@ bool CefControlOffScreen::OnImeComposition(const EventArgs& msg)
     return false;
 }
 
-bool CefControlOffScreen::OnImeEndComposition(const EventArgs& /*msg*/)
+bool CefControlOffScreen::OnImeEndComposition(const EventArgs & /*msg*/)
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     if (IsCefOsrImeMode()) {
         OnIMECancelCompositionEvent();
     }
@@ -796,7 +831,7 @@ bool CefControlOffScreen::OnImeEndComposition(const EventArgs& /*msg*/)
     return false;
 }
 
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
 
 /** 获取按键标志
 */
@@ -823,7 +858,7 @@ static uint32_t GetCefModifiers(SDL_Keymod mod)
 }
 
 //Linux平台
-void CefControlOffScreen::SendKeyEvent(const EventArgs& msg, cef_key_event_type_t type)
+void CefControlOffScreen::SendKeyEvent(const EventArgs &msg, cef_key_event_type_t type)
 {
     if (!IsVisible() || !IsEnabled()) {
         return;
@@ -836,15 +871,14 @@ void CefControlOffScreen::SendKeyEvent(const EventArgs& msg, cef_key_event_type_
         return;
     }
 
-    SDL_EventType eventType = (SDL_EventType)msg.wParam;
+    SDL_EventType eventType = (SDL_EventType) msg.wParam;
     if (type == KEYEVENT_KEYDOWN) {
         ASSERT(eventType == SDL_EVENT_KEY_DOWN);
         ASSERT(msg.lParam != 0);
         if ((eventType != SDL_EVENT_KEY_DOWN) || (msg.lParam == 0)) {
             return;
         }
-    }
-    else if (type == KEYEVENT_KEYUP) {
+    } else if (type == KEYEVENT_KEYUP) {
         ASSERT(eventType == SDL_EVENT_KEY_UP);
         ASSERT(msg.lParam != 0);
         if ((eventType != SDL_EVENT_KEY_UP) || (msg.lParam == 0)) {
@@ -852,7 +886,7 @@ void CefControlOffScreen::SendKeyEvent(const EventArgs& msg, cef_key_event_type_
         }
     }
     if ((type == KEYEVENT_KEYDOWN) || (type == KEYEVENT_KEYUP)) {
-        SDL_KeyboardEvent* key = (SDL_KeyboardEvent*)msg.lParam;
+        SDL_KeyboardEvent *key = (SDL_KeyboardEvent *) msg.lParam;
         CefKeyEvent event;
         event.type = (type == KEYEVENT_KEYDOWN) ? KEYEVENT_KEYDOWN : KEYEVENT_KEYUP;
         event.windows_key_code = msg.vkCode;
@@ -861,13 +895,12 @@ void CefControlOffScreen::SendKeyEvent(const EventArgs& msg, cef_key_event_type_
         event.modifiers = GetCefModifiers(key->mod);
 
         host->SendKeyEvent(event);
-    }
-    else if (type == KEYEVENT_CHAR) {
+    } else if (type == KEYEVENT_CHAR) {
         ASSERT(msg.eventData == SDL_EVENT_TEXT_INPUT);
         ASSERT(msg.vkCode == kVK_None);
         if ((msg.eventData == SDL_EVENT_TEXT_INPUT) && (msg.wParam != 0) && (msg.lParam > 0)) {
             //当前输入的字符或者字符串（比如中文输入时，候选词是一次输入，而不像Windows SDK那样按字符逐次输入）
-            DStringW text = (DStringW::value_type*)msg.wParam;
+            DStringW text = (DStringW::value_type *) msg.wParam;
             CefKeyEvent event;
             event.type = KEYEVENT_CHAR;
             event.modifiers = GetCefModifiers(SDL_GetModState());
@@ -885,25 +918,29 @@ void CefControlOffScreen::SendKeyEvent(const EventArgs& msg, cef_key_event_type_
 }
 #endif
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 static int LogicalToDevice(int value, float device_scale_factor)
 {
     float scaled_val = static_cast<float>(value) * device_scale_factor;
     return static_cast<int>(std::floor(scaled_val));
 }
 
-static CefRect LogicalToDevice(const CefRect& value, float device_scale_factor)
+static CefRect LogicalToDevice(const CefRect &value, float device_scale_factor)
 {
-    return CefRect(LogicalToDevice(value.x, device_scale_factor),
-                   LogicalToDevice(value.y, device_scale_factor),
-                   LogicalToDevice(value.width, device_scale_factor),
-                   LogicalToDevice(value.height, device_scale_factor));
+    return CefRect(
+        LogicalToDevice(value.x, device_scale_factor),
+        LogicalToDevice(value.y, device_scale_factor),
+        LogicalToDevice(value.width, device_scale_factor),
+        LogicalToDevice(value.height, device_scale_factor));
 }
 #endif
 
-void CefControlOffScreen::OnImeCompositionRangeChanged(CefRefPtr<CefBrowser> /*browser*/, const CefRange& selected_range, const std::vector<CefRect>& character_bounds)
+void CefControlOffScreen::OnImeCompositionRangeChanged(
+    CefRefPtr<CefBrowser> /*browser*/,
+    const CefRange &selected_range,
+    const std::vector<CefRect> &character_bounds)
 {
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
     CefCurrentlyOn(TID_UI);
     if (m_imeHandler != nullptr) {
         float device_scale_factor = Dpi().GetDisplayScale();
@@ -918,23 +955,24 @@ void CefControlOffScreen::OnImeCompositionRangeChanged(CefRefPtr<CefBrowser> /*b
         }
         m_imeHandler->ChangeCompositionRange(selected_range, device_bounds);
     }
-#else    
+#else
     UNUSED_VARIABLE(selected_range);
     UNUSED_VARIABLE(character_bounds);
 #endif
 }
 
-void CefControlOffScreen::OnFocusedNodeChanged(CefRefPtr<CefBrowser> /*browser*/,
-                                               CefRefPtr<CefFrame> /*frame*/,
-                                               CefDOMNode::Type /*type*/,
-                                               bool /*bText*/,
-                                               bool bEditable,
-                                               const CefRect& nodeRect)
+void CefControlOffScreen::OnFocusedNodeChanged(
+    CefRefPtr<CefBrowser> /*browser*/,
+    CefRefPtr<CefFrame> /*frame*/,
+    CefDOMNode::Type /*type*/,
+    bool /*bText*/,
+    bool bEditable,
+    const CefRect &nodeRect)
 {
     OnFocusedNodeChanged(bEditable, nodeRect);
 }
 
-void CefControlOffScreen::OnFocusedNodeChanged(bool bEditable, const CefRect& nodeRect)
+void CefControlOffScreen::OnFocusedNodeChanged(bool bEditable, const CefRect &nodeRect)
 {
     m_bHasFocusNode = true;
     m_bFocusNodeEditable = bEditable;
@@ -943,7 +981,7 @@ void CefControlOffScreen::OnFocusedNodeChanged(bool bEditable, const CefRect& no
     if (!IsVisible() || !IsEnabled() || !IsFocused()) {
         return;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if (pWindow == nullptr) {
         return;
     }
@@ -963,19 +1001,18 @@ void CefControlOffScreen::OnFocusedNodeChanged(bool bEditable, const CefRect& no
         inputRect.bottom = inputRect.top + nodeRect.height;
 
         pWindow->NativeWnd()->SetTextInputArea(&inputRect, 0);
-    }
-    else {
+    } else {
         pWindow->NativeWnd()->SetTextInputArea(nullptr, 0);
     }
 }
 
 std::shared_ptr<IBitmap> CefControlOffScreen::MakeImageSnapshot()
 {
-    if ((m_pCefMemData == nullptr) || (GetWindow() == nullptr)){
+    if ((m_pCefMemData == nullptr) || (GetWindow() == nullptr)) {
         return nullptr;
     }
     std::unique_ptr<IRender> render;
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory != nullptr) {
         render.reset(pRenderFactory->CreateRender(GetWindow()->GetRenderDpi()));
@@ -986,9 +1023,9 @@ std::shared_ptr<IBitmap> CefControlOffScreen::MakeImageSnapshot()
     return nullptr;
 }
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
-LRESULT CefControlOffScreen::SendKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+LRESULT CefControlOffScreen::SendKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam, bool &bHandled)
 {
     CefRefPtr<CefBrowserHost> host;
     if (m_pBrowserHandler != nullptr) {
@@ -1005,14 +1042,12 @@ LRESULT CefControlOffScreen::SendKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
 
     if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
         event.type = KEYEVENT_RAWKEYDOWN;
-    }
-    else if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) {
+    } else if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) {
         event.type = KEYEVENT_KEYUP;
-    }
-    else {
+    } else {
         event.type = KEYEVENT_CHAR;
         if (uMsg == WM_UNICHAR) {
-            event.character = (char16_t)wParam;
+            event.character = (char16_t) wParam;
             //下列值在Windows平台需要设置
             event.unmodified_character = event.character;
         }
@@ -1029,15 +1064,15 @@ void CefControlOffScreen::OnIMEStartComposition()
     HWND hWnd = nullptr;
     if (GetWindow() != nullptr) {
         ASSERT(GetWindow()->IsWindow());
-        hWnd = (HWND)GetWindow()->GetWindowHandle();
+        hWnd = (HWND) GetWindow()->GetWindowHandle();
     }
     ASSERT(hWnd != nullptr);
     if (hWnd == nullptr) {
         return;
     }
     if ((m_imeHandler == nullptr) || (m_imeHandler->GetHandlerHWND() != hWnd)) {
-        //创建IME管理器        
-        m_imeHandler = std::make_unique<client::OsrImeHandlerWin>(hWnd);        
+        //创建IME管理器
+        m_imeHandler = std::make_unique<client::OsrImeHandlerWin>(hWnd);
     }
     if (m_imeHandler) {
         m_imeHandler->SetInputLanguage();
@@ -1052,7 +1087,7 @@ void CefControlOffScreen::OnIMESetContext(UINT message, WPARAM wParam, LPARAM lP
     if (GetWindow() == nullptr) {
         return;
     }
-    HWND hWnd = (HWND)GetWindow()->GetWindowHandle();
+    HWND hWnd = (HWND) GetWindow()->GetWindowHandle();
     // We handle the IME Composition Window ourselves (but let the IME Candidates
     // Window be handled by IME through DefWindowProc()), so clear the
     // ISC_SHOWUICOMPOSITIONWINDOW flag:
@@ -1061,7 +1096,7 @@ void CefControlOffScreen::OnIMESetContext(UINT message, WPARAM wParam, LPARAM lP
 
     // Create Caret Window if required
     if ((m_imeHandler == nullptr) || (m_imeHandler->GetHandlerHWND() != hWnd)) {
-        //创建IME管理器        
+        //创建IME管理器
         m_imeHandler = std::make_unique<client::OsrImeHandlerWin>(hWnd);
         m_imeHandler->SetInputLanguage();
     }
@@ -1084,7 +1119,11 @@ void CefControlOffScreen::OnIMEComposition(UINT /*message*/, WPARAM /*wParam*/, 
             // Send the text to the browser. The |replacement_range| and
             // |relative_cursor_pos| params are not used on Windows, so provide
             // default invalid values.
-            browser->GetHost()->ImeCommitText(cTextStr, CefRange((std::numeric_limits<uint32_t>::max)(), (std::numeric_limits<uint32_t>::max)()), 0);
+            browser->GetHost()->ImeCommitText(
+                cTextStr,
+                CefRange(
+                    (std::numeric_limits<uint32_t>::max)(), (std::numeric_limits<uint32_t>::max)()),
+                0);
             m_imeHandler->ResetComposition();
             // Continue reading the composition string - Japanese IMEs send both
             // GCS_RESULTSTR and GCS_COMPSTR.
@@ -1093,22 +1132,22 @@ void CefControlOffScreen::OnIMEComposition(UINT /*message*/, WPARAM /*wParam*/, 
         std::vector<CefCompositionUnderline> underlines;
         int composition_start = 0;
 
-        if (m_imeHandler->GetComposition(lParam, cTextStr, underlines,
-            composition_start)) {
+        if (m_imeHandler->GetComposition(lParam, cTextStr, underlines, composition_start)) {
             // Send the composition string to the browser. The |replacement_range|
             // param is not used on Windows, so provide a default invalid value.
             browser->GetHost()->ImeSetComposition(
-                cTextStr, underlines, CefRange((std::numeric_limits<uint32_t>::max)(), (std::numeric_limits<uint32_t>::max)()),
-                CefRange(composition_start,
-                    static_cast<int>(composition_start + cTextStr.length())));
+                cTextStr,
+                underlines,
+                CefRange(
+                    (std::numeric_limits<uint32_t>::max)(), (std::numeric_limits<uint32_t>::max)()),
+                CefRange(composition_start, static_cast<int>(composition_start + cTextStr.length())));
 
             // Update the Candidate Window position. The cursor is at the end so
             // subtract 1. This is safe because IMM32 does not support non-zero-width
             // in a composition. Also,  negative values are safely ignored in
             // MoveImeWindow
             m_imeHandler->UpdateCaretPosition(composition_start - 1);
-        }
-        else {
+        } else {
             OnIMECancelCompositionEvent();
         }
     }
@@ -1128,7 +1167,6 @@ void CefControlOffScreen::OnIMECancelCompositionEvent()
         m_imeHandler->DestroyImeWindow();
     }
 }
-
 
 #endif //defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
 

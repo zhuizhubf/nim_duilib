@@ -1,23 +1,19 @@
 #ifndef UI_CORE_UISIZE_H_
 #define UI_CORE_UISIZE_H_
 
-#include "duilib/Core/UiSize64.h"
 #include "duilib/Core/UiSize16.h"
+#include "duilib/Core/UiSize64.h"
 
-namespace ui 
-{
+namespace ui {
 
 /** Size的封装
 */
 class DUILIB_API UiSize
 {
 public:
-    UiSize()
-    {
-        cx = cy = 0;
-    }
+    UiSize() { cx = cy = 0; }
 
-    UiSize(const UiSize& src)
+    UiSize(const UiSize &src)
     {
         cx = src.cx;
         cy = src.cy;
@@ -29,7 +25,7 @@ public:
         cy = cyValue;
     }
 
-    UiSize& operator=(const UiSize& src)
+    UiSize &operator=(const UiSize &src)
     {
         cx = src.cx;
         cy = src.cy;
@@ -82,39 +78,27 @@ public:
 
     /** cx和cy都设置为0
     */
-    void Clear() 
-    { 
-        cx = 0; 
-        cy = 0; 
+    void Clear()
+    {
+        cx = 0;
+        cy = 0;
     }
 
     /** 判断是否与另外一个Size相同
     */
-    bool Equals(int32_t cxValue, int32_t cyValue) const
-    {
-        return cx == cxValue && cy == cyValue;
-    }
+    bool Equals(int32_t cxValue, int32_t cyValue) const { return cx == cxValue && cy == cyValue; }
 
     /** 判断是否与另外一个Size相同
     */
-    bool Equals(const UiSize& dst) const
-    {
-        return cx == dst.cx && cy == dst.cy;
-    }
+    bool Equals(const UiSize &dst) const { return cx == dst.cx && cy == dst.cy; }
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiSize& a, const UiSize& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiSize &a, const UiSize &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiSize& a, const UiSize& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiSize &a, const UiSize &b) { return !a.Equals(b); }
 
 public:
     /** 宽度

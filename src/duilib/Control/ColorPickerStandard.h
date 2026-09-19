@@ -4,15 +4,15 @@
 #include "duilib/Core/Control.h"
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 /** 颜色选择器：标准颜色
 */
 class DUILIB_API ColorPickerStandard : public Control
 {
     typedef Control BaseClass;
+
 public:
-    explicit ColorPickerStandard(Window* pWindow);
+    explicit ColorPickerStandard(Window *pWindow);
 
     /** 获取控件类型
     */
@@ -20,7 +20,7 @@ public:
 
     /** 选择一个颜色
     */
-    void SelectColor(const UiColor& color);
+    void SelectColor(const UiColor &color);
 
     /**
     * @brief 绘制控件的入口函数
@@ -28,11 +28,11 @@ public:
     * @param[in] rcPaint 指定绘制坐标
     * @return 无
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
 
     /** 在一个矩形内绘制正六边形拼接的颜色地图, 尽量充满整个矩形
     */
-    void DrawColorMap(IRender* pRender, const UiRect& rect);
+    void DrawColorMap(IRender *pRender, const UiRect &rect);
 
     /** 绘制一个正六边形(采用多边形顶点的方式进行路径填充)
     * @param [in] pRender 渲染接口
@@ -42,24 +42,29 @@ public:
     * @param [in] penWidth 画笔的宽度，如果为0，则不绘制边框
     * @param [in] brushColor 画刷的颜色，如果为0，则填充颜色
     */
-    bool DrawRegularHexagon(IRender* pRender, const UiPointF& centerPt, int32_t radius,
-                            const UiColor& penColor, float penWidth, const UiColor& brushColor);
+    bool DrawRegularHexagon(
+        IRender *pRender,
+        const UiPointF &centerPt,
+        int32_t radius,
+        const UiColor &penColor,
+        float penWidth,
+        const UiColor &brushColor);
 
     /** 鼠标移动
     */
-    virtual bool MouseMove(const EventArgs& msg) override;
+    virtual bool MouseMove(const EventArgs &msg) override;
 
     /** 鼠标左键按下
     */
-    virtual bool ButtonDown(const EventArgs& msg) override;
+    virtual bool ButtonDown(const EventArgs &msg) override;
 
     /** 获取当前鼠标所在点的颜色信息
     */
-    bool GetColorInfo(const UiPoint& ptMouse, UiColor& ptColor, DString& colorNameId) const;
+    bool GetColorInfo(const UiPoint &ptMouse, UiColor &ptColor, DString &colorNameId) const;
 
     /** 计算两点之间的距离
     */
-    float GetPointsDistance(const UiPointF& pt1, const UiPointF& pt2) const;
+    float GetPointsDistance(const UiPointF &pt1, const UiPointF &pt2) const;
 
     /** 初始化颜色表
     */
@@ -72,7 +77,10 @@ public:
     *    wParam: 当前新选择的颜色值，可以用UiColor((uint32_t)wParam)生成颜色
     *    lParam: 原来旧选择的颜色值，可以用UiColor((uint32_t)lParam)生成颜色
     */
-    void AttachSelectColor(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventSelectColor, callback, callbackID); }
+    void AttachSelectColor(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventSelectColor, callback, callbackID);
+    }
 
 private:
     /** 颜色表
@@ -99,6 +107,6 @@ private:
     UiColor m_selectedColor;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_COLORPICKER_STANDARD_H_

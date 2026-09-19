@@ -2,20 +2,15 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include "duilib/Core/Window.h"
 #include "duilib/Core/Control.h"
+#include "duilib/Core/Window.h"
 
-namespace ui
-{
-ClickThrough::ClickThrough()
-{
-}
+namespace ui {
+ClickThrough::ClickThrough() {}
 
-ClickThrough::~ClickThrough()
-{
-}
+ClickThrough::~ClickThrough() {}
 
-bool ClickThrough::ClickThroughWindow(Window* pWindow, const UiPoint& ptMouse)
+bool ClickThrough::ClickThroughWindow(Window *pWindow, const UiPoint &ptMouse)
 {
     if (pWindow == nullptr) {
         return false;
@@ -48,6 +43,6 @@ bool ClickThrough::ClickThroughWindow(Window* pWindow, const UiPoint& ptMouse)
     return false;
 }
 
-}//namespace ui
+} //namespace ui
 
 #endif //DUILIB_BUILD_FOR_WIN

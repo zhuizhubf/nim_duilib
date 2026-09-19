@@ -3,22 +3,21 @@
 #ifdef DUILIB_BUILD_FOR_MACOS
 
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Utils/StringConvert.h"
-#include "duilib/Utils/StringUtil.h"
 #include "duilib/Utils/FilePath.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Utils/StringConvert.h"
+#include "duilib/Utils/StringUtil.h"
 
 #include <fstream>
-#include <sys/statvfs.h>
 #include <stdio.h>
+#include <sys/statvfs.h>
 
 #ifdef DUILIB_BIT_64
-    #define __USE_FILE_OFFSET64
+#define __USE_FILE_OFFSET64
 #endif
 #include <sys/stat.h>
 
-namespace ui
-{
+namespace ui {
 struct DirectoryTreeImpl::TImpl
 {
     /** 共享的文件夹图标(大图标)
@@ -38,8 +37,8 @@ struct DirectoryTreeImpl::TImpl
     uint32_t m_nSmallFileIconID = 0;
 };
 
-DirectoryTreeImpl::DirectoryTreeImpl(DirectoryTree* pTree):
-    m_pTree(pTree)
+DirectoryTreeImpl::DirectoryTreeImpl(DirectoryTree *pTree)
+    : m_pTree(pTree)
 {
     m_impl = new TImpl;
 }
@@ -68,7 +67,8 @@ DirectoryTreeImpl::~DirectoryTreeImpl()
 
 /** 获取图片属性字符串
 */
-DString DirectoryTreeImplGetImageString(DirectoryTree* pTree, bool bLargeFile, const DString& imageFileName)
+DString DirectoryTreeImplGetImageString(
+    DirectoryTree *pTree, bool bLargeFile, const DString &imageFileName)
 {
     if (imageFileName.empty()) {
         return DString();
@@ -86,11 +86,17 @@ DString DirectoryTreeImplGetImageString(DirectoryTree* pTree, bool bLargeFile, c
         nLargeIconSize = 32;
     }
     int32_t nIconSize = bLargeFile ? nLargeIconSize : nSmallIconSize;
-    DString imageString = StringUtil::Printf(_T("file='%s/filesystem/%s' width='%d' height='%d' valign='center'"), DUILIB_PUBLIC_RES_DIR, imageFileName.c_str(), nIconSize, nIconSize);
+    DString imageString = StringUtil::Printf(
+        _T("file='%s/filesystem/%s' width='%d' height='%d' valign='center'"),
+        DUILIB_PUBLIC_RES_DIR,
+        imageFileName.c_str(),
+        nIconSize,
+        nIconSize);
     return imageString;
 }
 
-bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FilePath& filePath, DString& displayName, uint32_t& nIconID)
+bool DirectoryTreeImpl::GetVirtualDirectoryInfo(
+    VirtualDirectoryType type, FilePath &filePath, DString &displayName, uint32_t &nIconID)
 {
     filePath.Clear();
     displayName.clear();
@@ -98,11 +104,10 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
 
     //用户的HOME目录
     FilePath userHomeDir;
-    const char* home = std::getenv("HOME");
+    const char *home = std::getenv("HOME");
     if (home != nullptr) {
         userHomeDir = FilePath(home);
-    }
-    else {
+    } else {
         userHomeDir = _T("/");
     }
 
@@ -110,7 +115,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
     switch (type) {
     case VirtualDirectoryType::kUserHome:
         filePath = userHomeDir;
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-home.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-home.svg")));
         break;
     case VirtualDirectoryType::kDesktop:
         filePath = userHomeDir;
@@ -122,7 +128,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-desktop.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-desktop.svg")));
         break;
     case VirtualDirectoryType::kDocuments:
         filePath = userHomeDir;
@@ -134,7 +141,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-documents.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-documents.svg")));
         break;
     case VirtualDirectoryType::kPictures:
         filePath = userHomeDir;
@@ -146,7 +154,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-pictures.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-pictures.svg")));
         break;
     case VirtualDirectoryType::kMusic:
         filePath = userHomeDir;
@@ -158,7 +167,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-music.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-music.svg")));
         break;
     case VirtualDirectoryType::kVideos:
         filePath = userHomeDir;
@@ -170,7 +180,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-videos.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-videos.svg")));
         break;
     case VirtualDirectoryType::kDownloads:
         filePath = userHomeDir;
@@ -182,7 +193,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
         if (!filePath.IsExistsDirectory()) {
             filePath = userHomeDir;
         }
-        nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-download.svg")));
+        nIconID = GlobalManager::Instance().Icon().AddIcon(
+            DirectoryTreeImplGetImageString(m_pTree, false, _T("folder-download.svg")));
         break;
     default:
         break;
@@ -190,7 +202,8 @@ bool DirectoryTreeImpl::GetVirtualDirectoryInfo(VirtualDirectoryType type, FileP
     return true;
 }
 
-void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<DirectoryTree::PathInfo>& pathInfoList)
+void DirectoryTreeImpl::GetRootPathInfoList(
+    bool bLargeIcon, std::vector<DirectoryTree::PathInfo> &pathInfoList)
 {
     pathInfoList.clear();
     const std::filesystem::path rootPath("/");
@@ -199,14 +212,15 @@ void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<Directo
     pathInfo.m_filePath = FilePath(rootPath.native());
     pathInfo.m_displayName = pathInfo.m_filePath.ToString();
     pathInfo.m_bIconShared = false;
-    pathInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk.svg")));
+    pathInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(
+        DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk.svg")));
     //文件系统根目录
     pathInfoList.push_back(pathInfo);
 
     std::weak_ptr<WeakFlag> weakFlag;
     std::vector<DirectoryTree::DiskInfo> diskInfoList;
     GetDiskInfoList(weakFlag, bLargeIcon, diskInfoList);
-    for (const DirectoryTree::DiskInfo& diskInfo : diskInfoList) {
+    for (const DirectoryTree::DiskInfo &diskInfo : diskInfoList) {
         if (diskInfo.m_filePath == FilePath(rootPath.native())) {
             continue;
         }
@@ -220,11 +234,12 @@ void DirectoryTreeImpl::GetRootPathInfoList(bool bLargeIcon, std::vector<Directo
     }
 }
 
-void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
-                                          const std::weak_ptr<WeakFlag>& weakFlag,
-                                          bool bLargeIcon,
-                                          std::vector<DirectoryTree::PathInfo>& folderList,
-                                          std::vector<DirectoryTree::PathInfo>* fileList)
+void DirectoryTreeImpl::GetFolderContents(
+    const FilePath &path,
+    const std::weak_ptr<WeakFlag> &weakFlag,
+    bool bLargeIcon,
+    std::vector<DirectoryTree::PathInfo> &folderList,
+    std::vector<DirectoryTree::PathInfo> *fileList)
 {
     folderList.clear();
     if (fileList != nullptr) {
@@ -232,7 +247,7 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
     }
     try {
         std::filesystem::path stdPath(path.NativePathA());
-        for (const auto& entry : std::filesystem::directory_iterator(stdPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(stdPath)) {
             if (weakFlag.expired()) {
                 //取消
                 break;
@@ -264,26 +279,28 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
 
                 if (bLargeIcon) {
                     if (m_impl->m_nLargeFolderIconID == 0) {
-                        m_impl->m_nLargeFolderIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("folder.svg")));
+                        m_impl->m_nLargeFolderIconID = GlobalManager::Instance().Icon().AddIcon(
+                            DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("folder.svg")));
                     }
                     pathInfo.m_nIconID = m_impl->m_nLargeFolderIconID;
-                }
-                else {
+                } else {
                     if (m_impl->m_nSmallFolderIconID == 0) {
-                        m_impl->m_nSmallFolderIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("folder.svg"))); 
+                        m_impl->m_nSmallFolderIconID = GlobalManager::Instance().Icon().AddIcon(
+                            DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("folder.svg")));
                     }
                     pathInfo.m_nIconID = m_impl->m_nSmallFolderIconID;
-                }                
+                }
                 pathInfo.m_bIconShared = true;
-                struct stat buf{0, };
+                struct stat buf{
+                    0,
+                };
                 int result = ::stat(entry.path().native().c_str(), &buf);
                 if (result == 0) {
                     //目录的最后修改时间
                     pathInfo.m_lastWriteTime.FromSecondsSinceEpoch(buf.st_mtime);
                 }
                 folderList.emplace_back(std::move(pathInfo));
-            }
-            else if (fileList != nullptr) {
+            } else if (fileList != nullptr) {
                 bool bRegularFile = entry.is_regular_file(errorCode);
                 if (bRegularFile) {
                     //普通文件
@@ -294,20 +311,23 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
 
                     if (bLargeIcon) {
                         if (m_impl->m_nLargeFileIconID == 0) {
-                            m_impl->m_nLargeFileIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("file.svg")));
+                            m_impl->m_nLargeFileIconID = GlobalManager::Instance().Icon().AddIcon(
+                                DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("file.svg")));
                         }
                         pathInfo.m_nIconID = m_impl->m_nLargeFileIconID;
-                    }
-                    else {
+                    } else {
                         if (m_impl->m_nSmallFileIconID == 0) {
-                            m_impl->m_nSmallFileIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("file.svg")));
+                            m_impl->m_nSmallFileIconID = GlobalManager::Instance().Icon().AddIcon(
+                                DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("file.svg")));
                         }
                         pathInfo.m_nIconID = m_impl->m_nSmallFileIconID;
                     }
                     pathInfo.m_bIconShared = true;
 
                     //文件的最后修改时间和文件大小
-                    struct stat buf{0, };
+                    struct stat buf{
+                        0,
+                    };
                     int result = ::stat(entry.path().native().c_str(), &buf);
                     if (result == 0) {
                         pathInfo.m_fileSize = buf.st_size;
@@ -317,13 +337,12 @@ void DirectoryTreeImpl::GetFolderContents(const FilePath& path,
                 }
             }
         }
-    }
-    catch (const std::filesystem::filesystem_error& /*e*/) {
+    } catch (const std::filesystem::filesystem_error & /*e*/) {
         ASSERT(0);
     }
 }
 
-bool DirectoryTreeImpl::NeedShowDirPath(const FilePath& path) const
+bool DirectoryTreeImpl::NeedShowDirPath(const FilePath &path) const
 {
     if ((m_pTree == nullptr) || path.IsEmpty()) {
         return false;
@@ -344,11 +363,12 @@ bool DirectoryTreeImpl::NeedShowDirPath(const FilePath& path) const
 
 uint32_t DirectoryTreeImpl::GetMyComputerIconID() const
 {
-    return GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, false, _T("computer.svg")));
+    return GlobalManager::Instance().Icon().AddIcon(
+        DirectoryTreeImplGetImageString(m_pTree, false, _T("computer.svg")));
 }
 
 // 从设备路径提取基础设备名（如 /dev/sda1 -> sda）
-static std::string get_base_device(const std::string& dev_path)
+static std::string get_base_device(const std::string &dev_path)
 {
     if (dev_path.find("/dev/") != 0) {
         if (dev_path.find(":/") != std::string::npos) {
@@ -358,10 +378,11 @@ static std::string get_base_device(const std::string& dev_path)
     }
 
     std::string dev_name = dev_path.substr(5); // 去掉"/dev/"
-    
+
     // 处理分区号（如sda1->sda, nvme0n1p1->nvme0n1）
     size_t pos = dev_name.find_first_of("0123456789", 0);
-    while ((pos != std::string::npos) && ((pos + 1) < dev_name.size()) && ::isdigit(dev_name[pos + 1])) {
+    while ((pos != std::string::npos) && ((pos + 1) < dev_name.size())
+           && ::isdigit(dev_name[pos + 1])) {
         ++pos;
     }
     if (pos != std::string::npos) {
@@ -371,21 +392,21 @@ static std::string get_base_device(const std::string& dev_path)
 }
 
 // 检测设备物理类型
-static DirectoryTree::DeviceType detect_device_type(const std::string& base_dev)
+static DirectoryTree::DeviceType detect_device_type(const std::string &base_dev)
 {
     // 网络文件系统
     if (base_dev == "nfs") {
         return DirectoryTree::DeviceType::NFS;
     }
-    
+
     // 虚拟设备
     if (base_dev.find("loop") == 0) {
         return DirectoryTree::DeviceType::LOOP;
     }
-    if ((base_dev.find("mapper") == 0) || (base_dev.find("dm-") == 0)){
+    if ((base_dev.find("mapper") == 0) || (base_dev.find("dm-") == 0)) {
         return DirectoryTree::DeviceType::VIRT_DISK;
     }
-    
+
     // 检查/sys/block下是否存在该设备
     std::filesystem::path sys_block = "/sys/block/" + base_dev;
     if (!std::filesystem::exists(sys_block)) {
@@ -432,29 +453,38 @@ static DirectoryTree::DeviceType detect_device_type(const std::string& base_dev)
     return DirectoryTree::DeviceType::UNKNOWN;
 }
 
-void DirectoryTreeImpl::GetDiskInfoList(const std::weak_ptr<WeakFlag>& /*weakFlag*/,
-                                        bool bLargeIcon,
-                                        std::vector<DirectoryTree::DiskInfo>& diskInfoList)
+void DirectoryTreeImpl::GetDiskInfoList(
+    const std::weak_ptr<WeakFlag> & /*weakFlag*/,
+    bool bLargeIcon,
+    std::vector<DirectoryTree::DiskInfo> &diskInfoList)
 {
-    FILE* fp = ::fopen("/proc/mounts", "r");
+    FILE *fp = ::fopen("/proc/mounts", "r");
     if (fp == nullptr) {
         return;
     }
 
-    char line[2048] = { 0 };
+    char line[2048] = {0};
     while (::fgets(line, sizeof(line) - 8, fp)) {
-        char device[256] = { 0, };
-        char mount_point[256] = { 0, };
-        char fs_type[256] = { 0, };
+        char device[256] = {
+            0,
+        };
+        char mount_point[256] = {
+            0,
+        };
+        char fs_type[256] = {
+            0,
+        };
         ::sscanf(line, "%255s %255s %255s", device, mount_point, fs_type);
 
         // 跳过虚拟文件系统（如proc、sysfs）
-        if (::strcmp(fs_type, "proc") == 0 || ::strcmp(fs_type, "sysfs") == 0 ||
-            ::strcmp(fs_type, "tmpfs") == 0 || ::strcmp(fs_type, "devtmpfs") == 0) {
+        if (::strcmp(fs_type, "proc") == 0 || ::strcmp(fs_type, "sysfs") == 0
+            || ::strcmp(fs_type, "tmpfs") == 0 || ::strcmp(fs_type, "devtmpfs") == 0) {
             continue;
         }
 
-        struct statvfs vfs = { 0, };
+        struct statvfs vfs = {
+            0,
+        };
         if (::statvfs(mount_point, &vfs) != 0) {
             continue; // 跳过无法访问的挂载点
         }
@@ -472,14 +502,13 @@ void DirectoryTreeImpl::GetDiskInfoList(const std::weak_ptr<WeakFlag>& /*weakFla
         if (deviceType == DirectoryTree::DeviceType::UNKNOWN) {
             if (strstr(device, "/dev/sr") || strstr(device, "/dev/cdrom")) {
                 deviceType = DirectoryTree::DeviceType::CDROM;
-            }
-            else if (std::string(device) == "vmhgfs-fuse") {
+            } else if (std::string(device) == "vmhgfs-fuse") {
                 deviceType = DirectoryTree::DeviceType::SHARE;
             }
         }
 
         DirectoryTree::DiskInfo diskInfo;
-        diskInfo.m_displayName = StringConvert::UTF8ToT(device);        
+        diskInfo.m_displayName = StringConvert::UTF8ToT(device);
         diskInfo.m_filePath = FilePath(StringConvert::UTF8ToT(mount_point));
 
         diskInfo.m_volumeName = diskInfo.m_displayName;
@@ -492,13 +521,14 @@ void DirectoryTreeImpl::GetDiskInfoList(const std::weak_ptr<WeakFlag>& /*weakFla
         diskInfo.m_bIconShared = false;
         diskInfo.m_nIconID = 0;
         if (diskInfo.m_deviceType == DirectoryTree::DeviceType::CDROM) {
-            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-cdrom.svg")));
-        }
-        else if (diskInfo.m_deviceType == DirectoryTree::DeviceType::USB) {
-            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk-usb.svg")));
-        }
-        else {
-            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk.svg")));
+            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(
+                DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-cdrom.svg")));
+        } else if (diskInfo.m_deviceType == DirectoryTree::DeviceType::USB) {
+            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(
+                DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk-usb.svg")));
+        } else {
+            diskInfo.m_nIconID = GlobalManager::Instance().Icon().AddIcon(
+                DirectoryTreeImplGetImageString(m_pTree, bLargeIcon, _T("drive-harddisk.svg")));
         }
 
         diskInfoList.emplace_back(std::move(diskInfo));

@@ -1,23 +1,21 @@
-#include "render/IRenderBackend.h"
 #include "duilib/Image/ImageDecoderFactory.h"
 #include "duilib/Image/ImageDecoder_LOTTIE.h"
+#include "render/IRenderBackend.h"
 
-namespace ui
-{
+namespace ui {
 
-namespace
-{
-class ImageDecoderModule_LottieSkia final: public IImageDecoderModule
+namespace {
+class ImageDecoderModule_LottieSkia final : public IImageDecoderModule
 {
 public:
-    virtual void RegisterImageDecoders(ImageDecoderFactory& imageDecoderFactory) const override
+    virtual void RegisterImageDecoders(ImageDecoderFactory &imageDecoderFactory) const override
     {
         imageDecoderFactory.AddImageDecoder(std::make_shared<ImageDecoder_LOTTIE>());
     }
 };
-}
+} // namespace
 
-const IImageDecoderModule* GetImageDecoderModule_LottieSkia()
+const IImageDecoderModule *GetImageDecoderModule_LottieSkia()
 {
     static const ImageDecoderModule_LottieSkia imageDecoderModule;
     return &imageDecoderModule;

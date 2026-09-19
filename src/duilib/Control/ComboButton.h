@@ -1,13 +1,12 @@
 #ifndef UI_CONTROL_COMBO_BUTTON_H_
 #define UI_CONTROL_COMBO_BUTTON_H_
 
-#include "duilib/Core/Box.h"
 #include "duilib/Box/VBox.h"
-#include "duilib/Control/TreeView.h"
 #include "duilib/Control/RichEdit.h"
+#include "duilib/Control/TreeView.h"
+#include "duilib/Core/Box.h"
 
-namespace ui 
-{
+namespace ui {
 typedef ButtonTemplate<VBox> ButtonVBox;
 class ComboButtonWnd;
 
@@ -17,15 +16,16 @@ class DUILIB_API ComboButton : public Box
 {
     typedef Box BaseClass;
     friend class ComboButtonWnd;
+
 public:
-    explicit ComboButton(Window* pWindow);
-    ComboButton(const ComboButton& r) = delete;
-    ComboButton& operator=(const ComboButton& r) = delete;
+    explicit ComboButton(Window *pWindow);
+    ComboButton(const ComboButton &r) = delete;
+    ComboButton &operator=(const ComboButton &r) = delete;
     virtual ~ComboButton() override;
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
     virtual bool CanPlaceCaptionBar() const override;
     virtual DString GetBorderColor(ControlStateType stateType) const override;
 
@@ -36,10 +36,9 @@ public:
     virtual void ChangeDpiScale(uint32_t nOldDpiScale, uint32_t nNewDpiScale) override;
 
 public:
-
     /** 获取下拉框列表大小(宽度和高度)
     */
-    const UiSize& GetDropBoxSize() const;
+    const UiSize &GetDropBoxSize() const;
 
     /** 设置下拉框列表大小(宽度和高度)
      * @param [in] szDropBox 要设置的大小信息
@@ -59,44 +58,44 @@ public:
 
     /** 设置左侧按钮控件的Class属性
     */
-    void SetLeftButtonClass(const DString& classValue);
+    void SetLeftButtonClass(const DString &classValue);
 
     /** 设置左侧按钮上侧的Label控件的Class属性
     */
-    void SetLeftButtonTopLabelClass(const DString& classValue);
+    void SetLeftButtonTopLabelClass(const DString &classValue);
 
     /** 设置左侧按钮下侧的Label控件的Class属性
     */
-    void SetLeftButtonBottomLabelClass(const DString& classValue);
+    void SetLeftButtonBottomLabelClass(const DString &classValue);
 
     /** 设置右侧按钮控件的Class属性
     */
-    void SetRightButtonClass(const DString& classValue);
+    void SetRightButtonClass(const DString &classValue);
 
     /** 设置下拉列表容器的Class属性
     */
-    void SetComboBoxClass(const DString& classValue);
+    void SetComboBoxClass(const DString &classValue);
 
 public:
     /** 获取下拉列表的容器接口
     */
-    Box* GetComboBox() const;
+    Box *GetComboBox() const;
 
     /** 获取按钮控件
     */
-    ButtonVBox* GetLeftButtonBox() const;
+    ButtonVBox *GetLeftButtonBox() const;
 
     /** 获取按钮控件上侧的文本控件
     */
-    Label* GetLabelTop() const;
+    Label *GetLabelTop() const;
 
     /** 获取按钮控件下侧的文本控件
     */
-    Label* GetLabelBottom() const;
+    Label *GetLabelBottom() const;
 
     /** 按钮控件
     */
-    Button* GetRightButton() const;
+    Button *GetRightButton() const;
 
     /** 更新下拉列表窗口的位置
     */
@@ -115,19 +114,28 @@ public:
      * @param [in] callback 触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventClick, callback, callbackID);}
+    void AttachClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventClick, callback, callbackID);
+    }
 
     /** 监听下拉窗创建事件
      * @param [in] callback 下拉窗关闭后触发的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowCreate(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowCreate, callback, callbackID); }
+    void AttachWindowCreate(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowCreate, callback, callbackID);
+    }
 
     /** 监听下拉窗关闭事件
      * @param [in] callback 下拉窗关闭后触发的回调函数，wParam 为1表示取消，为0表示正常关闭
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachWindowClose(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventWindowClose, callback, callbackID); }
+    void AttachWindowClose(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventWindowClose, callback, callbackID);
+    }
 
 protected:
     /** 显示下拉列表
@@ -151,31 +159,31 @@ protected:
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnLeftButtonClicked(const EventArgs& args);
+    virtual bool OnLeftButtonClicked(const EventArgs &args);
 
     /** 右侧按钮鼠标按下事件
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnRightButtonDown(const EventArgs& args);
+    virtual bool OnRightButtonDown(const EventArgs &args);
 
     /** 右侧按钮点击事件
      * @param[in] args 参数列表
      * @return 始终返回 true
      */
-    virtual bool OnRightButtonClicked(const EventArgs& args);
+    virtual bool OnRightButtonClicked(const EventArgs &args);
 
     /** 窗口失去焦点
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnWindowKillFocus(const EventArgs& args) override;
+    virtual bool OnWindowKillFocus(const EventArgs &args) override;
 
     /** 窗口移动
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    virtual bool OnWindowMove(const EventArgs& args);
+    virtual bool OnWindowMove(const EventArgs &args);
 
 protected:
     /** 初始化函数
@@ -185,22 +193,22 @@ protected:
 private:
     /** 设置控件的属性列表
     */
-    void SetAttributeList(Control* pControl, const DString& classValue);
+    void SetAttributeList(Control *pControl, const DString &classValue);
 
     /** 移除控件
     */
-    void RemoveControl(Control* pControl);
+    void RemoveControl(Control *pControl);
 
     /** 按钮的状态发生变化，同步状态
     * @param[in] args 参数列表
     * @return 始终返回 true
     */
-    bool OnButtonStateChanged(const EventArgs& args);
+    bool OnButtonStateChanged(const EventArgs &args);
 
 private:
     /** 下拉列表的窗口接口
     */
-    ComboButtonWnd* m_pWindow;
+    ComboButtonWnd *m_pWindow;
 
     /** 阴影类型
     */
@@ -217,23 +225,23 @@ private:
 private:
     /** 下拉列表表容器
     */
-    Box* m_pComboBox;
+    Box *m_pComboBox;
 
     /** 按钮容器控件ButtonVBox
     */
-    ButtonVBox* m_pLeftButton;
+    ButtonVBox *m_pLeftButton;
 
     /** 按钮容器中上侧的文本控件(位于ButtonVBox里面)
     */
-    Label* m_pLabelTop;
+    Label *m_pLabelTop;
 
     /** 按钮容器中下侧的文本控件(位于ButtonVBox里面)
     */
-    Label* m_pLabelBottom;
+    Label *m_pLabelBottom;
 
     /** 按钮控件（右侧下拉按钮）
     */
-    Button* m_pRightButton;
+    Button *m_pRightButton;
 
     /** 鼠标按下的时候，是否正在显示下拉列表
     */

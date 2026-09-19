@@ -3,8 +3,7 @@
 
 #include "duilib/Core/Control.h"
 
-namespace ui
-{
+namespace ui {
 class IBitmap;
 
 /** 用于显示图标的控件，适合小图标类的图片资源显示，功能较简单
@@ -17,11 +16,12 @@ class IBitmap;
 class DUILIB_API IconControl : public Control
 {
     typedef Control BaseClass;
+
 public:
-    explicit IconControl(Window* pWindow);
+    explicit IconControl(Window *pWindow);
     virtual ~IconControl() override;
-    IconControl(const IconControl&) = delete;
-    IconControl& operator=(const IconControl&) = delete;
+    IconControl(const IconControl &) = delete;
+    IconControl &operator=(const IconControl &) = delete;
 
     /** 获取控件类型
     */
@@ -34,7 +34,8 @@ public:
     * @param [in] pPixelBits 位图数据
     * @param [in] nPixelBitsSize 位图数据的长度（按字节）
     */
-    bool SetIconData(int32_t nWidth, int32_t nHeight, const uint8_t* pPixelBits, int32_t nPixelBitsSize);
+    bool SetIconData(
+        int32_t nWidth, int32_t nHeight, const uint8_t *pPixelBits, int32_t nPixelBitsSize);
 
     /** 清除图标数据
     */
@@ -47,7 +48,7 @@ public:
 protected:
     /** 重写父控件绘制函数
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
 
 private:
     /** 用于绘制的位图数据
@@ -55,6 +56,6 @@ private:
     std::unique_ptr<IBitmap> m_pBitmap;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_ICON_CONTROL_H_

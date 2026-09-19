@@ -29,7 +29,7 @@ public:
      * @param[in] strClass 控件名称
      * @return 返回一个自定义控件指针，一般情况下根据 strClass 参数创建自定义的控件
      */
-    virtual ui::Control* CreateControl(const DString& strClass) override;
+    virtual ui::Control *CreateControl(const DString &strClass) override;
 
 private:
     //测试PropertyGrid控件

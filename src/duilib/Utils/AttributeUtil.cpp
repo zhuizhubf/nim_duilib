@@ -1,13 +1,12 @@
 #include "AttributeUtil.h"
-#include "duilib/Utils/StringUtil.h"
-#include "duilib/Core/Window.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
+#include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
+namespace ui {
 
-void AttributeUtil::SkipSepChar(wchar_t*& pPtr)
+void AttributeUtil::SkipSepChar(wchar_t *&pPtr)
 {
     if ((pPtr != nullptr) && (*pPtr != L'\0')) {
         //跳过分隔字符，但避免跳过尾0，防止字符串越界
@@ -15,7 +14,7 @@ void AttributeUtil::SkipSepChar(wchar_t*& pPtr)
     }
 }
 
-void AttributeUtil::SkipSepChar(char*& pPtr)
+void AttributeUtil::SkipSepChar(char *&pPtr)
 {
     if ((pPtr != nullptr) && (*pPtr != '\0')) {
         //跳过分隔字符，但避免跳过尾0，防止字符串越界
@@ -23,35 +22,37 @@ void AttributeUtil::SkipSepChar(char*& pPtr)
     }
 }
 
-void AttributeUtil::ParseSizeValue(const wchar_t* strValue, UiSize& size)
+void AttributeUtil::ParseSizeValue(const wchar_t *strValue, UiSize &size)
 {
     size.Clear();
     if ((strValue == nullptr) || (*strValue == L'\0')) {
         return;
     }
-    wchar_t* pstr = nullptr;
-    int32_t cx = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    wchar_t *pstr = nullptr;
+    int32_t cx = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
     int32_t cy = StringUtil::StringToInt32(pstr, &pstr, 10);
     size.cx = cx;
     size.cy = cy;
 }
 
-void AttributeUtil::ParseSizeValue(const char* strValue, UiSize& size)
+void AttributeUtil::ParseSizeValue(const char *strValue, UiSize &size)
 {
     size.Clear();
     if ((strValue == nullptr) || (*strValue == '\0')) {
         return;
     }
-    char* pstr = nullptr;
-    int32_t cx = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    char *pstr = nullptr;
+    int32_t cx = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
     int32_t cy = StringUtil::StringToInt32(pstr, &pstr, 10);
     size.cx = cx;
     size.cy = cy;
 }
 
-void AttributeUtil::ParsePointValue(const wchar_t* strValue, UiPoint& pt)
+void AttributeUtil::ParsePointValue(const wchar_t *strValue, UiPoint &pt)
 {
     UiSize size;
     AttributeUtil::ParseSizeValue(strValue, size);
@@ -59,7 +60,7 @@ void AttributeUtil::ParsePointValue(const wchar_t* strValue, UiPoint& pt)
     pt.y = size.cy;
 }
 
-void AttributeUtil::ParsePointValue(const char* strValue, UiPoint& pt)
+void AttributeUtil::ParsePointValue(const char *strValue, UiPoint &pt)
 {
     UiSize size;
     AttributeUtil::ParseSizeValue(strValue, size);
@@ -67,126 +68,154 @@ void AttributeUtil::ParsePointValue(const char* strValue, UiPoint& pt)
     pt.y = size.cy;
 }
 
-void AttributeUtil::ParsePaddingValue(const wchar_t* strValue, UiPadding& padding)
+void AttributeUtil::ParsePaddingValue(const wchar_t *strValue, UiPadding &padding)
 {
     padding.Clear();
     if ((strValue == nullptr) || (*strValue == L'\0')) {
         return;
     }
-    wchar_t* pstr = nullptr;
-    padding.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    wchar_t *pstr = nullptr;
+    padding.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    padding.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    padding.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
-    ASSERT((padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
+    padding.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
+    ASSERT(
+        (padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
     padding.Validate();
 }
 
-void AttributeUtil::ParsePaddingValue(const char* strValue, UiPadding& padding)
+void AttributeUtil::ParsePaddingValue(const char *strValue, UiPadding &padding)
 {
     padding.Clear();
     if ((strValue == nullptr) || (*strValue == '\0')) {
         return;
     }
-    char* pstr = nullptr;
-    padding.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    char *pstr = nullptr;
+    padding.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    padding.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    padding.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    padding.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
-    ASSERT((padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
+    padding.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
+    ASSERT(
+        (padding.left >= 0) && (padding.top >= 0) && (padding.right >= 0) && (padding.bottom >= 0));
     padding.Validate();
 }
 
-void AttributeUtil::ParseMarginValue(const wchar_t* strValue, UiMargin& margin)
+void AttributeUtil::ParseMarginValue(const wchar_t *strValue, UiMargin &margin)
 {
     margin.Clear();
     if ((strValue == nullptr) || (*strValue == L'\0')) {
         return;
     }
-    wchar_t* pstr = nullptr;
-    margin.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    wchar_t *pstr = nullptr;
+    margin.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     ASSERT((margin.left >= 0) && (margin.top >= 0) && (margin.right >= 0) && (margin.bottom >= 0));
     margin.Validate();
 }
 
-void AttributeUtil::ParseMarginValue(const char* strValue, UiMargin& margin)
+void AttributeUtil::ParseMarginValue(const char *strValue, UiMargin &margin)
 {
     margin.Clear();
     if ((strValue == nullptr) || (*strValue == '\0')) {
         return;
     }
-    char* pstr = nullptr;
-    margin.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    char *pstr = nullptr;
+    margin.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    margin.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    margin.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     ASSERT((margin.left >= 0) && (margin.top >= 0) && (margin.right >= 0) && (margin.bottom >= 0));
     margin.Validate();
 }
 
-void AttributeUtil::ParseRectValue(const wchar_t* strValue, UiRect& rect, bool bCheckSize)
+void AttributeUtil::ParseRectValue(const wchar_t *strValue, UiRect &rect, bool bCheckSize)
 {
     rect.Clear();
     if ((strValue == nullptr) || (*strValue == L'\0')) {
         return;
     }
-    wchar_t* pstr = nullptr;
-    rect.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    wchar_t *pstr = nullptr;
+    rect.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     if (bCheckSize) {
         ASSERT((rect.Width() >= 0) && (rect.Height() >= 0));
-    }    
+    }
 }
 
-void AttributeUtil::ParseRectValue(const char* strValue, UiRect& rect, bool bCheckSize)
+void AttributeUtil::ParseRectValue(const char *strValue, UiRect &rect, bool bCheckSize)
 {
     rect.Clear();
     if ((strValue == nullptr) || (*strValue == '\0')) {
         return;
     }
-    char* pstr = nullptr;
-    rect.left = StringUtil::StringToInt32(strValue, &pstr, 10); ASSERT(pstr);
+    char *pstr = nullptr;
+    rect.left = StringUtil::StringToInt32(strValue, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.top = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.top = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.right = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.right = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     SkipSepChar(pstr);
-    rect.bottom = StringUtil::StringToInt32(pstr, &pstr, 10); ASSERT(pstr);
+    rect.bottom = StringUtil::StringToInt32(pstr, &pstr, 10);
+    ASSERT(pstr);
     if (bCheckSize) {
         ASSERT((rect.Width() >= 0) && (rect.Height() >= 0));
     }
 }
 
 // 辅助函数：查找字符在字符串中的位置，返回下标（未找到返回-1）
-static int32_t FindCharIndexInString(DString::value_type ch, const DString& str)
+static int32_t FindCharIndexInString(DString::value_type ch, const DString &str)
 {
     DString::size_type pos = str.find(ch);
     return (pos != DString::npos) ? static_cast<int>(pos) : -1;
 }
 
-bool AttributeUtil::ParseAttributeList(const DString& strList, std::vector<std::pair<DString, DString>>& attributeList,
-                                       const DString& seperateStartChars,
-                                       const DString& seperateEndChars)
+bool AttributeUtil::ParseAttributeList(
+    const DString &strList,
+    std::vector<std::pair<DString, DString>> &attributeList,
+    const DString &seperateStartChars,
+    const DString &seperateEndChars)
 {
     // 清空输出列表，避免残留数据
     attributeList.clear();
@@ -194,7 +223,7 @@ bool AttributeUtil::ParseAttributeList(const DString& strList, std::vector<std::
     // 示例：normal_image={file='public/button/window-minimize.svg' width='24'} hovered_color="AliceBlue" pressed_color='Lavender'
     DString sName;
     DString sValue;
-    const DString::value_type* pstrList = strList.c_str();
+    const DString::value_type *pstrList = strList.c_str();
 
     // 失败场景1：空指针/空字符串
     if (pstrList == nullptr || *pstrList == _T('\0')) {
@@ -279,9 +308,9 @@ bool AttributeUtil::ParseAttributeList(const DString& strList, std::vector<std::
     return hasValidAttribute;
 }
 
-std::tuple<int32_t, float> AttributeUtil::ParseString(const wchar_t* strValue, wchar_t** pEndPtr)
+std::tuple<int32_t, float> AttributeUtil::ParseString(const wchar_t *strValue, wchar_t **pEndPtr)
 {
-    wchar_t* pstr = nullptr;
+    wchar_t *pstr = nullptr;
     if ((strValue == nullptr) || (*strValue == L'\0')) {
         if (pEndPtr != nullptr) {
             *pEndPtr = pstr;
@@ -294,8 +323,7 @@ std::tuple<int32_t, float> AttributeUtil::ParseString(const wchar_t* strValue, w
     if ((pstr != nullptr) && (*pstr == L'%')) {
         //该值是百分比，跳过'%'字符
         pstr++;
-    }
-    else {
+    } else {
         //不是百分比, 而是整型值
         xPercent = 0.0f;
         xValue = StringUtil::StringToInt32(strValue, &pstr, 10);
@@ -307,9 +335,9 @@ std::tuple<int32_t, float> AttributeUtil::ParseString(const wchar_t* strValue, w
     return std::tuple<int32_t, float>(xValue, xPercent);
 }
 
-std::tuple<int32_t, float> AttributeUtil::ParseString(const char* strValue, char** pEndPtr)
+std::tuple<int32_t, float> AttributeUtil::ParseString(const char *strValue, char **pEndPtr)
 {
-    char* pstr = nullptr;
+    char *pstr = nullptr;
     if ((strValue == nullptr) || (*strValue == '\0')) {
         if (pEndPtr != nullptr) {
             *pEndPtr = pstr;
@@ -322,8 +350,7 @@ std::tuple<int32_t, float> AttributeUtil::ParseString(const char* strValue, char
     if ((pstr != nullptr) && (*pstr == '%')) {
         //该值是百分比，跳过'%'字符
         pstr++;
-    }
-    else {
+    } else {
         //不是百分比, 而是整型值
         xPercent = 0.0f;
         xValue = StringUtil::StringToInt32(strValue, &pstr, 10);
@@ -335,28 +362,31 @@ std::tuple<int32_t, float> AttributeUtil::ParseString(const char* strValue, char
     return std::tuple<int32_t, float>(xValue, xPercent);
 }
 
-void AttributeUtil::ParseWindowSize(const Window* pWindow, const DString::value_type* strValue,
-                                    UiSize& size,
-                                    bool* pScaledCX, bool* pScaledCY,
-                                    bool* pPercentCX, bool* pPercentCY)
+void AttributeUtil::ParseWindowSize(
+    const Window *pWindow,
+    const DString::value_type *strValue,
+    UiSize &size,
+    bool *pScaledCX,
+    bool *pScaledCY,
+    bool *pPercentCX,
+    bool *pPercentCY)
 {
     //支持的格式：size="1200,800",或者size="50%,50%",或者size="1200,50%",size="50%,800"
     //百分比是指屏幕宽度或者高度的百分比
     UiRect rcWork;
     if (pWindow != nullptr) {
         pWindow->GetMonitorWorkRect(rcWork);
-    }
-    else {
+    } else {
         WindowBase::GetPrimaryMonitorWorkRect(rcWork);
     }
-    
-    DString::value_type* pstr = nullptr;
+
+    DString::value_type *pstr = nullptr;
     std::tuple<int32_t, float> x = ParseString(strValue, &pstr);
     AttributeUtil::SkipSepChar(pstr);
     std::tuple<int32_t, float> y = ParseString(pstr, &pstr);
 
     //获取有效的百分比值
-    auto GetValidPercent = [](const std::tuple<int32_t, float>& xy) -> float {
+    auto GetValidPercent = [](const std::tuple<int32_t, float> &xy) -> float {
         float fPercent = std::get<1>(xy);
         fPercent /= 100.0f;
         ASSERT((fPercent >= 0.0001f) && (fPercent < 1.0001f));
@@ -378,7 +408,7 @@ void AttributeUtil::ParseWindowSize(const Window* pWindow, const DString::value_
     int cx = std::get<0>(x);
     if (cx <= 0) {
         float fPercent = GetValidPercent(x);
-        cx = (int)(rcWork.Width() * fPercent);
+        cx = (int) (rcWork.Width() * fPercent);
         needScaleCX = false;
         if (pPercentCX) {
             *pPercentCX = true;
@@ -387,7 +417,7 @@ void AttributeUtil::ParseWindowSize(const Window* pWindow, const DString::value_
     int cy = std::get<0>(y);
     if (cy <= 0) {
         float fPercent = GetValidPercent(y);
-        cy = (int)(rcWork.Height() * fPercent);
+        cy = (int) (rcWork.Height() * fPercent);
         needScaleCY = false;
         if (pPercentCY) {
             *pPercentCY = true;
@@ -425,22 +455,22 @@ void AttributeUtil::ParseWindowSize(const Window* pWindow, const DString::value_
     }
 }
 
-void AttributeUtil::ValidateWindowSize(const Window* pWindow, int32_t& nWindowWidth, int32_t& nWindowHeight)
+void AttributeUtil::ValidateWindowSize(
+    const Window *pWindow, int32_t &nWindowWidth, int32_t &nWindowHeight)
 {
     UiRect rcWork;
     if (pWindow != nullptr) {
         pWindow->GetMonitorWorkRect(rcWork);
-    }
-    else {
+    } else {
         WindowBase::GetPrimaryMonitorWorkRect(rcWork);
     }
     //如果超过宽度，就按屏幕的95%来确定大小（避免占满整个屏幕，导致该状态与最大化状态无法区分）
     if (nWindowWidth > rcWork.Width()) {
-        nWindowWidth = (int32_t)(rcWork.Width() * 0.95);
+        nWindowWidth = (int32_t) (rcWork.Width() * 0.95);
     }
     if (nWindowHeight > rcWork.Height()) {
-        nWindowHeight = (int32_t)(rcWork.Height() * 0.95);
+        nWindowHeight = (int32_t) (rcWork.Height() * 0.95);
     }
 }
 
-}//namespace ui
+} //namespace ui

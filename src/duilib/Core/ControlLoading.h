@@ -1,13 +1,12 @@
 #ifndef UI_CORE_CONTROL_LOADING_H_
 #define UI_CORE_CONTROL_LOADING_H_
 
-#include "duilib/Core/UiTypes.h"
 #include "duilib/Core/ControlPtrT.h"
-#include <memory>
+#include "duilib/Core/UiTypes.h"
 #include <chrono>
+#include <memory>
 
-namespace ui 
-{
+namespace ui {
 /** 控件加载中状态的逻辑封装
 */
 class Control;
@@ -35,23 +34,23 @@ struct ControlLoadingStatus
     bool m_bStopLoading = false;
 };
 
-class DUILIB_API ControlLoading: public SupportWeakCallback
+class DUILIB_API ControlLoading : public SupportWeakCallback
 {
 public:
-    explicit ControlLoading(Control* pControl);
+    explicit ControlLoading(Control *pControl);
     virtual ~ControlLoading() override;
-    ControlLoading(const ControlLoading&) = delete;
-    ControlLoading& operator = (const ControlLoading&) = delete;
+    ControlLoading(const ControlLoading &) = delete;
+    ControlLoading &operator=(const ControlLoading &) = delete;
 
 public:
     /** 设置loading的属性，根据属性中指定的XML文件创建显示界面，并设置界面属性
     * @param [in] loadingAttribute loading的属性字符串
     */
-    bool SetLoadingAttribute(const DString& loadingAttribute);
+    bool SetLoadingAttribute(const DString &loadingAttribute);
 
     /** 绘制"加载中"的状态
     */
-    void PaintLoading(IRender* pRender, const UiRect& rcPaint);
+    void PaintLoading(IRender *pRender, const UiRect &rcPaint);
 
     /** 开启loading状态
     * @param [in] nIntervalMs 回调的时间间隔（毫秒），最小值为10毫秒
@@ -70,7 +69,7 @@ public:
 
     /** 获取loading界面的根容器接口（在StartLoading成功以后才能够获取到, 在StopLoading结束以后也获取不到）
     */
-    Box* GetLoadingUiRootBox() const;
+    Box *GetLoadingUiRootBox() const;
 
     /** 更新loading控件的位置
     */
@@ -83,7 +82,7 @@ private:
 
     /** 解析loading属性
     */
-    bool InitAttribute(LoadingAttribute& loadingAttribute, const DString& loadingString);
+    bool InitAttribute(LoadingAttribute &loadingAttribute, const DString &loadingString);
 
 private:
     //Loading的属性
@@ -93,14 +92,14 @@ private:
     WeakCallbackFlag m_loadingFlag;
 
     //关联的Control对象
-    Control* m_pControl;
+    Control *m_pControl;
 
     //Loading界面的容器
     std::unique_ptr<Box> m_pLoadingBox;
 
     //动画图片所在的控件接口(需要正确配置XML属性)
     //手动播放动画的情况，可通过该接口的SetImageAnimationFrame来控制动画播放到哪一帧
-    Control* m_pAnimationControl;
+    Control *m_pAnimationControl;
 
     //开始时间
     std::chrono::steady_clock::time_point m_startTime;

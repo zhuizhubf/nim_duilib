@@ -2,13 +2,9 @@
 #include "MainThread.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
-TestApplication::TestApplication()
-{
-}
+TestApplication::TestApplication() {}
 
-TestApplication::~TestApplication()
-{
-}
+TestApplication::~TestApplication() {}
 
 void TestApplication::Run()
 {

@@ -3,11 +3,11 @@
 
 #include "WebView2Control.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_WEBVIEW2)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
 #ifdef DUILIB_COMPILER_MINGW
-    //使用"WebView2Loader.dll"
-    #define DUILIB_USE_WEBVIEW2_LOADER_DLL 1
+//使用"WebView2Loader.dll"
+#define DUILIB_USE_WEBVIEW2_LOADER_DLL 1
 #endif
 
 namespace ui {
@@ -20,27 +20,28 @@ class Control;
 class WebView2Control::Impl
 {
 public:
-    explicit Impl(Control* pControl);
+    explicit Impl(Control *pControl);
     ~Impl();
 
     // 初始化和生命周期管理
-    HRESULT InitializeAsync(const DString& userDataFolder, InitializeCompletedCallback callback);
+    HRESULT InitializeAsync(const DString &userDataFolder, InitializeCompletedCallback callback);
     void Cleanup();
 
     // 导航控制
-    HRESULT Navigate(const DString& url);
+    HRESULT Navigate(const DString &url);
     HRESULT NavigateBack();
     HRESULT NavigateForward();
     HRESULT Refresh();
     HRESULT Stop();
 
     // JavaScript交互
-    HRESULT ExecuteScript(const DString& script, std::function<void(const DString& result, HRESULT hr)> callback);
-    HRESULT PostWebMessageAsJson(const DString& json);
-    HRESULT PostWebMessageAsString(const DString& message);
+    HRESULT ExecuteScript(
+        const DString &script, std::function<void(const DString &result, HRESULT hr)> callback);
+    HRESULT PostWebMessageAsJson(const DString &json);
+    HRESULT PostWebMessageAsString(const DString &message);
 
     // 设置相关
-    HRESULT SetUserAgent(const DString& userAgent);
+    HRESULT SetUserAgent(const DString &userAgent);
     DString GetUserAgent() const;
 
     HRESULT SetZoomFactor(double zoomFactor);
@@ -82,8 +83,8 @@ public:
     void SetFavIconChangedCallback(FavIconChangedCallback callback);
 
     // 内容管理
-    HRESULT CapturePreview(const DString& filePath,
-                           std::function<void(const DString& filePath, HRESULT hr)> callback);
+    HRESULT CapturePreview(
+        const DString &filePath, std::function<void(const DString &filePath, HRESULT hr)> callback);
 
     // 访问器
     bool IsInitializing() const;
@@ -105,7 +106,7 @@ public:
 
     /** 设置关联窗口
     */
-    void SetWindow(Window* pWindow);
+    void SetWindow(Window *pWindow);
 
     /** 设置显示属性
     */
@@ -146,31 +147,37 @@ public:
 public:
     /** 获取ICoreWebView2Environment接口
     */
-    ui::ComPtr<ICoreWebView2Environment> GetWebView2Environment() const { return m_spWebView2Environment; }
+    ui::ComPtr<ICoreWebView2Environment> GetWebView2Environment() const
+    {
+        return m_spWebView2Environment;
+    }
 
     /** 获取ICoreWebView2Controller接口
     */
-    ui::ComPtr<ICoreWebView2Controller> GetWebView2Controller() const { return m_spWebView2Controller; }
+    ui::ComPtr<ICoreWebView2Controller> GetWebView2Controller() const
+    {
+        return m_spWebView2Controller;
+    }
 
     /** 获取ICoreWebView2接口
     */
     ui::ComPtr<ICoreWebView2> GetWebView2() const { return m_spWebView2; }
 
 private:
-
     //初始化流程
-    HRESULT CallCreateCoreWebView2EnvironmentWithOptions(PCWSTR browserExecutableFolder,
-                                                         PCWSTR userDataFolder,
-                                                         ICoreWebView2EnvironmentOptions* environmentOptions,
-                                                         ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler* environmentCreatedHandler);
+    HRESULT CallCreateCoreWebView2EnvironmentWithOptions(
+        PCWSTR browserExecutableFolder,
+        PCWSTR userDataFolder,
+        ICoreWebView2EnvironmentOptions *environmentOptions,
+        ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler *environmentCreatedHandler);
 
     ui::ComPtr<ICoreWebView2EnvironmentOptions> CreateCoreWebView2EnvironmentOptionsObj();
 
     HRESULT CreateEnvironmentAsync();
     HRESULT CreateControllerAsync();
     void InitializeSettings();
-    void InitializeFocusChanged();//焦点变化事件
-    void InitializeAcceleratorKeyPressed();//F11/F12/ESC快捷键的支持
+    void InitializeFocusChanged();          //焦点变化事件
+    void InitializeAcceleratorKeyPressed(); //F11/F12/ESC快捷键的支持
     void OnInitializationCompleted(HRESULT result);
 
     //添加新窗口回调函数
@@ -188,17 +195,17 @@ private:
     // 事件令牌
     EventRegistrationToken m_webMessageReceivedToken = {0};
     EventRegistrationToken m_documentTitleChangedToken = {0};
-    EventRegistrationToken m_navigationStartingToken = { 0 };
+    EventRegistrationToken m_navigationStartingToken = {0};
     EventRegistrationToken m_navigationCompletedToken = {0};
     EventRegistrationToken m_sourceChangedToken = {0};
     EventRegistrationToken m_newWindowRequestedToken = {0};
     EventRegistrationToken m_historyChangedToken = {0};
-    EventRegistrationToken m_zoomFactorChangedToken = { 0 };
-    EventRegistrationToken m_faviconChangedToken = { 0 };
-    EventRegistrationToken m_gotFocusToken = { 0 };
+    EventRegistrationToken m_zoomFactorChangedToken = {0};
+    EventRegistrationToken m_faviconChangedToken = {0};
+    EventRegistrationToken m_gotFocusToken = {0};
 
     // 事件令牌，内部使用
-    EventRegistrationToken m_myAcceleratorKeyPressedToken = { 0 };
+    EventRegistrationToken m_myAcceleratorKeyPressedToken = {0};
 
     // 回调函数
     InitializeCompletedCallback m_initializeCompletedCallback = nullptr;
@@ -218,7 +225,7 @@ private:
     DStringW m_favIconImageUrl;
 
     // 状态变量
-    Control* m_pControl;
+    Control *m_pControl;
     DString m_userDataFolder;
     DString m_userAgent;
 

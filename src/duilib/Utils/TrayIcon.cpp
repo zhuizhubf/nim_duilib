@@ -1,16 +1,12 @@
 #include "duilib/Utils/TrayIcon.h"
 
-namespace ui
-{
+namespace ui {
 
-TrayIcon::TrayIcon():
-    m_messageCallback(nullptr)
-{
-}
+TrayIcon::TrayIcon()
+    : m_messageCallback(nullptr)
+{}
 
-TrayIcon::~TrayIcon()
-{
-}
+TrayIcon::~TrayIcon() {}
 
 void TrayIcon::SetMessageCallback(TrayIconMessageCallback callback)
 {

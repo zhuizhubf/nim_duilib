@@ -1,26 +1,22 @@
 #include "CefManager_Linux.h"
 
-#if defined (DUILIB_BUILD_FOR_LINUX) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_LINUX) && defined(DUILIB_BUILD_FOR_CEF)
 
-#include "cef/internal/CefClientApp.h"
 #include "cef/internal/CefBrowserHandler.h"
+#include "cef/internal/CefClientApp.h"
 
-namespace ui
-{
-CefManager_Linux::CefManager_Linux()
-{
-}
+namespace ui {
+CefManager_Linux::CefManager_Linux() {}
 
-CefManager_Linux::~CefManager_Linux()
-{
-}
+CefManager_Linux::~CefManager_Linux() {}
 
-bool CefManager_Linux::Initialize(bool bEnableOffScreenRendering,
-                                  const DString& appName,
-                                  int argc,
-                                  char** argv,
-                                  OnCefSettingsEvent callback,
-                                  int32_t& nExitCode)
+bool CefManager_Linux::Initialize(
+    bool bEnableOffScreenRendering,
+    const DString &appName,
+    int argc,
+    char **argv,
+    OnCefSettingsEvent callback,
+    int32_t &nExitCode)
 {
     if (!BaseClass::Initialize(bEnableOffScreenRendering, appName, argc, argv, callback, nExitCode)) {
         return false;

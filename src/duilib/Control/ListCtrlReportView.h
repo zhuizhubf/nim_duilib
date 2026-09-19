@@ -3,8 +3,7 @@
 
 #include "duilib/Control/ListCtrlDefs.h"
 
-namespace ui
-{
+namespace ui {
 //包含类：ListCtrlReportView / ListCtrlReportLayout
 
 /** 列表数据显示和布局功能(Report类型)
@@ -22,21 +21,22 @@ class DUILIB_API ListCtrlReportView : public ListCtrlView, public IListCtrlView
 {
     typedef ListCtrlView BaseClass;
     friend class ListCtrlReportLayout;
+
 public:
-    explicit ListCtrlReportView(Window* pWindow);
+    explicit ListCtrlReportView(Window *pWindow);
     virtual ~ListCtrlReportView() override;
 
     virtual DString GetType() const override { return _T("ListCtrlReportView"); }
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 设置ListCtrl控件接口
     */
-    void SetListCtrl(ListCtrl* pListCtrl);
+    void SetListCtrl(ListCtrl *pListCtrl);
 
     /** 设置数据代理对象
     * @param[in] pProvider 数据代理对象
     */
-    virtual void SetDataProvider(VirtualListBoxElement* pProvider) override;
+    virtual void SetDataProvider(VirtualListBoxElement *pProvider) override;
 
     /** 刷新界面，保持数据与显示同步
     * @param [in] bSync true表示同步刷新，立即重绘当前视图; false表示异步刷新，刷新动作为异步重绘，标记为脏区域，交给系统重绘界面
@@ -58,12 +58,12 @@ public:
     /** 设置当前显示的数据项列表，顺序是从上到下
     * @param [in] itemIndexList 当前显示的数据项索引号列表
     */
-    void SetDisplayDataItems(const std::vector<size_t>& itemIndexList);
+    void SetDisplayDataItems(const std::vector<size_t> &itemIndexList);
 
     /** 获取当前显示的数据项列表，顺序是从上到下
     * @param [in] itemIndexList 当前显示的数据项索引号列表
     */
-    virtual void GetDisplayDataItems(std::vector<size_t>& itemIndexList) const override;
+    virtual void GetDisplayDataItems(std::vector<size_t> &itemIndexList) const override;
 
     /** 判断一个数据项是否可见
     * @param [in] itemIndex 数据项的索引号
@@ -90,8 +90,8 @@ public:
 
     struct ShowItemInfo
     {
-        size_t nItemIndex;      //元素索引
-        int32_t nItemHeight;    //元素的高度
+        size_t nItemIndex;   //元素索引
+        int32_t nItemHeight; //元素的高度
     };
 
     /** 获取需要展示的数据：置顶的优先，并且按顺序
@@ -101,10 +101,12 @@ public:
     @param [out] atTopItemIndexList 返回需要展示的元素序号(置顶的)
     @param [out] nPrevItemHeights 第一条可见元素之前所有元素的总高度（不含置顶元素）
     */
-    void GetDataItemsToShow(int64_t nScrollPosY, size_t maxCount, 
-                            std::vector<ShowItemInfo>& itemIndexList,
-                            std::vector<ShowItemInfo>& atTopItemIndexList,
-                            int64_t& nPrevItemHeights) const;
+    void GetDataItemsToShow(
+        int64_t nScrollPosY,
+        size_t maxCount,
+        std::vector<ShowItemInfo> &itemIndexList,
+        std::vector<ShowItemInfo> &atTopItemIndexList,
+        int64_t &nPrevItemHeights) const;
 
     /** 获取指定高度的区域，最多可以展示多少条数据
     @param [in] nScrollPosY 当前Y滚动条的位置
@@ -113,9 +115,11 @@ public:
     @param [out] pAtTopItemIndexList 置顶项的元素序号
     @return 返回可以展示的数据条数
     */
-    int32_t GetMaxDataItemsToShow(int64_t nScrollPosY, int32_t nRectHeight, 
-                                  std::vector<size_t>* pItemIndexList = nullptr,
-                                  std::vector<size_t>* pAtTopItemIndexList = nullptr) const;
+    int32_t GetMaxDataItemsToShow(
+        int64_t nScrollPosY,
+        int32_t nRectHeight,
+        std::vector<size_t> *pItemIndexList = nullptr,
+        std::vector<size_t> *pAtTopItemIndexList = nullptr) const;
 
     /** 获取指定元素的显示位置总高度值
     * @param [in] itemIndex 数据项的索引号
@@ -132,7 +136,10 @@ public:
      *   lParam: 关联的UI容器子项索引号对应的数据项索引号，有效范围：[0, GetDataItemCount())，如果值为Box::InvalidIndex，表示无关联的数据项
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlItem*指针，数据按行填充
      */
-    void AttachReportViewItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReportViewItemFilled, callback, callbackID); }
+    void AttachReportViewItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReportViewItemFilled, callback, callbackID);
+    }
 
     /** 监听Report视图数据项UI元素填充事件（虚表，填充某行某列数据）
      * @param [in] callback 要绑定的回调函数
@@ -143,7 +150,10 @@ public:
      *   pEventData: 关联的UI容器子项的界面控件接口指针，类型为：ListCtrlSubItem*指针，代表某行某列数据的UI元素控件
      *               通过该接口，可以获取数据项索引号、哪一列的数据
      */
-    void AttachReportViewSubItemFilled(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReportViewSubItemFilled, callback, callbackID); }
+    void AttachReportViewSubItemFilled(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReportViewSubItemFilled, callback, callbackID);
+    }
 
 public:
     /** 是否为标准模式（行高都为默认行高，无隐藏行，无置顶行）
@@ -152,7 +162,7 @@ public:
 
     /** 设置置顶的UI控件索引号
     */
-    void SetAtTopControlIndex(const std::vector<size_t>& atTopControlList);
+    void SetAtTopControlIndex(const std::vector<size_t> &atTopControlList);
 
     /** 调整UI控件个数，以确保足够显示出应显示的数据
     */
@@ -169,7 +179,7 @@ public:
     /** 横向网格线的颜色
     * @param [in] color 横向网格线的颜色
     */
-    void SetRowGridLineColor(const DString& color);
+    void SetRowGridLineColor(const DString &color);
     DString GetRowGridLineColor() const;
 
     /** 纵向网格线的宽度
@@ -182,28 +192,31 @@ public:
     /** 纵向网格线的颜色
     * @param [in] color 纵向网格线的颜色
     */
-    void SetColumnGridLineColor(const DString& color);
+    void SetColumnGridLineColor(const DString &color);
     DString GetColumnGridLineColor() const;
 
     /** 调整列的宽度: 数组中第1个值是列的序号，第2个值列宽度
     */
-    void AdjustSubItemWidth(const std::map<size_t, int32_t>& subItemWidths);
+    void AdjustSubItemWidth(const std::map<size_t, int32_t> &subItemWidths);
 
 protected:
     /** 绘制子控件
     */
-    virtual void PaintChild(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void PaintChild(IRender *pRender, const UiRect &rcPaint) override;
 
     /** 查找子控件
     */
-    virtual Control* FindControl(FINDCONTROLPROC Proc, void* pProcData, uint32_t uFlags,
-                                 const UiPoint& ptMouse = UiPoint(),
-                                 const UiPoint& scrollPos = UiPoint()) override;
+    virtual Control *FindControl(
+        FINDCONTROLPROC Proc,
+        void *pProcData,
+        uint32_t uFlags,
+        const UiPoint &ptMouse = UiPoint(),
+        const UiPoint &scrollPos = UiPoint()) override;
 
     /** 创建一个数据项
     * @return 返回创建后的数据项指针
     */
-    virtual Control* CreateDataItem() override;
+    virtual Control *CreateDataItem() override;
 
     /** 填充指定数据项
     * @param [in] pControl 数据项控件指针
@@ -211,17 +224,18 @@ protected:
     * @param [in] itemData 数据项（代表行的属性）
     * @param [in] subItemList 数据子项（代表每一列的数据, 第1个是列的ID，第2个是列的数据）
     */
-    virtual bool FillDataItem(Control* pControl,
-                              size_t nElementIndex,
-                              const ListCtrlItemData& itemData,
-                              const std::vector<ListCtrlSubItemData2Pair>& subItemList) override;
-
+    virtual bool FillDataItem(
+        Control *pControl,
+        size_t nElementIndex,
+        const ListCtrlItemData &itemData,
+        const std::vector<ListCtrlSubItemData2Pair> &subItemList) override;
 
     /** 获取某列的宽度最大值
     * @param [in] subItemList 数据子项（代表每一列的数据）
     * @return 返回该列宽度的最大值，返回的是DPI自适应后的值； 如果失败返回-1
     */
-    virtual int32_t GetMaxDataItemWidth(const std::vector<ListCtrlSubItemData2Ptr>& subItemList) override;
+    virtual int32_t GetMaxDataItemWidth(
+        const std::vector<ListCtrlSubItemData2Ptr> &subItemList) override;
 
     /** 计算本页里面显示几个子项
     * @param [in] bIsHorizontal 当前布局是否为水平布局
@@ -229,7 +243,8 @@ protected:
     * @param [out] nRows 返回行数
     * @return 返回可视区域显示的记录数
     */
-    virtual size_t GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t& nRows) const override;
+    virtual size_t GetDisplayItemCount(
+        bool bIsHorizontal, size_t &nColumns, size_t &nRows) const override;
 
     /** 判断一个数据元素是否为可选择项
     * @param [in] nElementIndex 元素索引号，有效范围：[0, GetElementCount())
@@ -246,13 +261,13 @@ protected:
     * @param [in] iIndex 子项目的ID，范围是：[0, GetItemCount())
     * @param [in] pListBoxItem 关联的列表项接口
     */
-    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem* pListBoxItem) override;
+    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem *pListBoxItem) override;
 
     /** 子项的勾选状态变化事件，用于状态同步
     * @param [in] iIndex 子项目的ID，范围是：[0, GetItemCount())
     * @param [in] pListBoxItem 关联的列表项接口
     */
-    virtual void OnItemCheckedChanged(size_t iIndex, IListBoxItem* pListBoxItem) override;
+    virtual void OnItemCheckedChanged(size_t iIndex, IListBoxItem *pListBoxItem) override;
 
     /** 选择状态发生变化
     */
@@ -260,7 +275,7 @@ protected:
 
     /** 获取滚动视图的滚动幅度
     */
-    virtual void GetScrollDeltaValue(int32_t& nHScrollValue, int32_t& nVScrollValue) const override;
+    virtual void GetScrollDeltaValue(int32_t &nHScrollValue, int32_t &nVScrollValue) const override;
 
     /** 执行了鼠标框选操作
     * @param [in] left 框选的X坐标left值
@@ -281,22 +296,22 @@ protected:
 private:
     /** 绘制网格线
     */
-    void PaintGridLines(IRender* pRender);
+    void PaintGridLines(IRender *pRender);
 
     /** 将header和置顶项放在最后
     * @param [in,out] items 需要移动的控件列表
     * @param [out] atTopItems 返回置顶的控件列表
     */
-    void MoveTopItemsToLast(std::vector<Control*>& items, std::vector<Control*>& atTopItems) const;
+    void MoveTopItemsToLast(std::vector<Control *> &items, std::vector<Control *> &atTopItems) const;
 
 private:
     /** ListCtrl 控件接口
     */
-    ListCtrl* m_pListCtrl;
+    ListCtrl *m_pListCtrl;
 
     /** 数据接口
     */
-    ListCtrlData* m_pData;
+    ListCtrlData *m_pData;
 
     /** 顶部元素的索引号(用于画网格线)
     */
@@ -333,6 +348,7 @@ private:
 class DUILIB_API ListCtrlReportLayout : public Layout, public VirtualLayout
 {
     typedef Layout BaseClass;
+
 public:
     ListCtrlReportLayout();
 
@@ -346,14 +362,16 @@ public:
      * @param [in] bEstimateOnly true表示仅评估不调整控件的位置，false表示调整控件的位置
      * @return 返回排列后最终布局的宽度和高度信息，包含Box容器的内边距，但不包含Box容器本身的外边距(当容器支持滚动条时使用该返回值)
      */
-    virtual UiSize64 ArrangeChildren(const std::vector<Control*>& items, UiRect rc, bool bEstimateOnly = false) override;
+    virtual UiSize64 ArrangeChildren(
+        const std::vector<Control *> &items, UiRect rc, bool bEstimateOnly = false) override;
 
     /** 根据内部子控件大小估算容器布局大小（用于评估宽度或者高度为"auto"类型的控件大小，拉伸类型的子控件不计入大小估算）
      * @param [in] items 子控件列表
      * @param [in] szAvailable 容器的可用宽度和高度，包含分配给该容器的内边距，但不包含分配给容器的外边距
      * @return 返回排列后最终布局的大小信息（宽度和高度），包含Box容器本身的内边距，但不包含Box容器本身的外边距；
      */
-    virtual UiSize64 EstimateLayoutSize(const std::vector<Control*>& items, UiSize szAvailable) override;
+    virtual UiSize64 EstimateLayoutSize(
+        const std::vector<Control *> &items, UiSize szAvailable) override;
 
 public:
     /** 延迟加载展示数据
@@ -387,7 +405,7 @@ public:
     * @param [in] rc 当前显示区域的矩形，不包含内边距
     * @param[out] collection 索引列表，范围是：[0, GetElementCount())
     */
-    virtual void GetDisplayElements(UiRect rc, std::vector<size_t>& collection) const override;
+    virtual void GetDisplayElements(UiRect rc, std::vector<size_t> &collection) const override;
 
     /** 让控件在可见范围内
     * @param [in] rc 当前显示区域的矩形，不包含内边距
@@ -399,12 +417,12 @@ public:
 public:
     /** 设置关联的Box接口
     */
-    void SetDataView(ListCtrlReportView* pDataView);
+    void SetDataView(ListCtrlReportView *pDataView);
 
 private:
     /** 获取关联的Box接口
     */
-    ListCtrlReportView* GetDataView() const { return m_pDataView; }
+    ListCtrlReportView *GetDataView() const { return m_pDataView; }
 
     /** 获取数据项的高度, 高度不包含表头
     * @param [in] nCount 数据项个数，如果为Box::InvalidIndex，则获取所有数据项的高度总和
@@ -441,8 +459,8 @@ private:
     * @param [in] rc 当前显示区域的矩形，不包含内边距
     * @param[out] collection 索引列表，范围是：[0, GetElementCount())
     */
-    void GetDisplayElements(UiRect rc, std::vector<size_t>& collection, 
-                            std::vector<size_t>* pAtTopItemIndexList) const;
+    void GetDisplayElements(
+        UiRect rc, std::vector<size_t> &collection, std::vector<size_t> *pAtTopItemIndexList) const;
 
     /** 底部预留的空间，确保滚动到最底部的时候，最后一条数据容易看完整
     */
@@ -451,13 +469,13 @@ private:
 private:
     /** 关联的ListBox接口
     */
-    ListCtrlReportView* m_pDataView;
+    ListCtrlReportView *m_pDataView;
 
     /** 是否设置了底部预留空间
     */
     bool m_bReserveSet;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_REPORT_VIEW_H_

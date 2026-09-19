@@ -9,8 +9,9 @@ class MainThread;
 class MainForm : public ui::WindowImplBase
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
-    explicit MainForm(MainThread* pMainThread);
+    explicit MainForm(MainThread *pMainThread);
     virtual ~MainForm() override;
 
     /** 资源相关接口
@@ -31,7 +32,7 @@ public:
 
     /** 输出日志(可以在子线程中调用)
     */
-    void PrintLog(const DString& log);
+    void PrintLog(const DString &log);
 
 private:
     /** 在子线程中执行任务
@@ -50,11 +51,11 @@ private:
 private:
     /** 日志显示控件
     */
-    ui::RichEdit* m_pLogEdit;
+    ui::RichEdit *m_pLogEdit;
 
     /** 运行时间显示
     */
-    ui::Label* m_pRunningTimeLabel;
+    ui::Label *m_pRunningTimeLabel;
 
     /** 开始时间
     */
@@ -66,7 +67,7 @@ private:
 
     /** 线程管理接口
     */
-    MainThread* m_pMainThread;
+    MainThread *m_pMainThread;
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_

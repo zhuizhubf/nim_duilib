@@ -3,8 +3,7 @@
 
 #include "duilib/Utils/FilePath.h"
 
-namespace ui
-{
+namespace ui {
 
 class DUILIB_API FileUtil
 {
@@ -13,34 +12,35 @@ public:
     * @param [in] filePath 本地文件路径(绝对路径)
     * @param [out] fileData 文件数据，按二进制数据读取
     */
-    static bool ReadFileData(const FilePath& filePath, std::vector<uint8_t>& fileData);
+    static bool ReadFileData(const FilePath &filePath, std::vector<uint8_t> &fileData);
 
     /** 读取文件头部分数据内容（部分内容）
     * @param [in] filePath 本地文件路径(绝对路径)
     * @param [in] nReadSize 读取的数据长度
     * @param [out] fileHeaderData 文件数据，按二进制数据读取
     */
-    static bool ReadFileHeaderData(const FilePath& filePath, uint32_t nReadSize, std::vector<uint8_t>& fileHeaderData);
+    static bool ReadFileHeaderData(
+        const FilePath &filePath, uint32_t nReadSize, std::vector<uint8_t> &fileHeaderData);
 
     /** 写入文件内容
     * @param [in] filePath 本地文件路径(绝对路径)
     * @param [in] fileData 文件数据
     */
-    static bool WriteFileData(const FilePath& filePath, const std::vector<uint8_t>& fileData);
+    static bool WriteFileData(const FilePath &filePath, const std::vector<uint8_t> &fileData);
 
     /** 写入文件内容
     * @param [in] filePath 本地文件路径(绝对路径)
     * @param [in] fileData 文件数据
     */
-    static bool WriteFileData(const FilePath& filePath, const DStringW& fileData);
+    static bool WriteFileData(const FilePath &filePath, const DStringW &fileData);
 
     /** 写入文件内容
     * @param [in] filePath 本地文件路径(绝对路径)
     * @param [in] fileData 文件数据
     */
-    static bool WriteFileData(const FilePath& filePath, const DStringA& fileData);
+    static bool WriteFileData(const FilePath &filePath, const DStringA &fileData);
 };
 
-}
+} // namespace ui
 
 #endif // UI_UTILS_FILEUTIL_H_

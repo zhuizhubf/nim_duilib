@@ -1,22 +1,24 @@
 #include "ColorControl.h"
 #include "ColorConvert.h"
-#include "duilib/Core/Window.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
 
-namespace ui
-{
+namespace ui {
 
-ColorControl::ColorControl(Window* pWindow):
-    Control(pWindow)
+ColorControl::ColorControl(Window *pWindow)
+    : Control(pWindow)
 {
     m_lastPt.x = -1;
     m_lastPt.y = -1;
     m_bMouseDown = false;
 }
 
-DString ColorControl::GetType() const { return DUI_CTR_COLOR_CONTROL; }
+DString ColorControl::GetType() const
+{
+    return DUI_CTR_COLOR_CONTROL;
+}
 
-void ColorControl::PaintBkImage(IRender* pRender)
+void ColorControl::PaintBkImage(IRender *pRender)
 {
     BaseClass::PaintBkImage(pRender);
     if (pRender == nullptr) {
@@ -24,7 +26,7 @@ void ColorControl::PaintBkImage(IRender* pRender)
     }
     UiRect rc = GetRect();
     UiRect rcPaint = GetPaintRect();
-    IBitmap* pBitmap = GetColorBitmap(rc);
+    IBitmap *pBitmap = GetColorBitmap(rc);
     UiRect rcDest = rc;
     UiRect rcSource;
     rcSource.left = 0;
@@ -32,7 +34,7 @@ void ColorControl::PaintBkImage(IRender* pRender)
     rcSource.right = rcSource.left + rc.Width();
     rcSource.bottom = rcSource.top + rc.Height();
     uint8_t uFade = 255;
-    IMatrix* pMatrix = nullptr;
+    IMatrix *pMatrix = nullptr;
 
     if (pBitmap != nullptr) {
         pRender->DrawImageRect(rcPaint, pBitmap, rcDest, rcSource, uFade, pMatrix);
@@ -45,10 +47,10 @@ void ColorControl::PaintBkImage(IRender* pRender)
         UiColor penColor = UiColor(UiColors::Brown);
         float fWidth = Dpi().GetScaleFloat(2);
         pRender->DrawCircle(UiPointF::MakeFromPoint(centerPt), fRadius, penColor, fWidth);
-    }        
+    }
 }
 
-bool ColorControl::ButtonDown(const EventArgs& msg)
+bool ColorControl::ButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -63,7 +65,7 @@ bool ColorControl::ButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool ColorControl::MouseMove(const EventArgs& msg)
+bool ColorControl::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     if (msg.IsSenderExpired()) {
@@ -76,14 +78,14 @@ bool ColorControl::MouseMove(const EventArgs& msg)
     return bRet;
 }
 
-bool ColorControl::ButtonUp(const EventArgs& msg)
+bool ColorControl::ButtonUp(const EventArgs &msg)
 {
     m_bMouseDown = false;
     SetMouseCapture(false);
     return BaseClass::ButtonUp(msg);
 }
 
-void ColorControl::SelectColor(const UiColor& selColor)
+void ColorControl::SelectColor(const UiColor &selColor)
 {
     m_lastPt.x = -1;
     m_lastPt.y = -1;
@@ -97,8 +99,13 @@ void ColorControl::SelectColor(const UiColor& selColor)
         double hue = 0;
         double sat = 0;
         double value = 0;
-        ColorConvert::RGB2HSV(selColor.GetR() / 255.0, selColor.GetG() / 255.0,
-                                selColor.GetB() / 255.0, &hue, &sat, &value);
+        ColorConvert::RGB2HSV(
+            selColor.GetR() / 255.0,
+            selColor.GetG() / 255.0,
+            selColor.GetB() / 255.0,
+            &hue,
+            &sat,
+            &value);
         m_lastPt.x = static_cast<int32_t>((hue / 360) * nWidth);
         m_lastPt.y = static_cast<int32_t>((1.0 - sat) * nHeight);
         if (m_lastPt.x >= nWidth) {
@@ -113,42 +120,41 @@ void ColorControl::SelectColor(const UiColor& selColor)
     Invalidate();
 }
 
-IBitmap* ColorControl::GetColorBitmap(const UiRect& rect)
-{        
+IBitmap *ColorControl::GetColorBitmap(const UiRect &rect)
+{
     const int32_t nHeight = rect.Height();
     const int32_t nWidth = rect.Width();
     if ((nHeight <= 0) || (nWidth <= 0)) {
         return nullptr;
     }
     if (m_spBitmap != nullptr) {
-        if (((int32_t)m_spBitmap->GetWidth() == nWidth) &&
-            ((int32_t)m_spBitmap->GetHeight() == nHeight)) {
+        if (((int32_t) m_spBitmap->GetWidth() == nWidth)
+            && ((int32_t) m_spBitmap->GetHeight() == nHeight)) {
             //宽度和高度没有变化，不需要重新生成
             return m_spBitmap.get();
-        }
-        else {
+        } else {
             m_spBitmap.reset();
         }
     }
 
-    IRenderFactory* pRenderFactory = GlobalManager::Instance().GetRenderFactory();
+    IRenderFactory *pRenderFactory = GlobalManager::Instance().GetRenderFactory();
     ASSERT(pRenderFactory != nullptr);
     if (pRenderFactory != nullptr) {
         m_spBitmap.reset(pRenderFactory->CreateBitmap());
     }
 
-    if (m_spBitmap != nullptr) {            
+    if (m_spBitmap != nullptr) {
         m_spBitmap->Init(nWidth, nHeight, nullptr, 1.0f, BitmapAlphaType::kOpaque_SkAlphaType);
-        void* pPixelBits = m_spBitmap->LockPixelBits();
+        void *pPixelBits = m_spBitmap->LockPixelBits();
         if (pPixelBits != nullptr) {
-            uint32_t* pData = (uint32_t*)pPixelBits;
+            uint32_t *pData = (uint32_t *) pPixelBits;
             double satStep = 1.0 / (nHeight - 1); //每增加一行，sat的增量值
-            double sat = 1.0;//第一个数值是1.0
-            for (int32_t nRow = 0; nRow < nHeight; ++nRow) {                    
+            double sat = 1.0;                     //第一个数值是1.0
+            for (int32_t nRow = 0; nRow < nHeight; ++nRow) {
                 ColorConvert::HSV_HUE(pData, nWidth, sat, 1.0);
                 pData += nWidth;
                 sat -= satStep;
-                if ((sat < 0.0) || (nRow == (nHeight - 2))){
+                if ((sat < 0.0) || (nRow == (nHeight - 2))) {
                     //最后一个数值是0.0
                     sat = 0.0;
                 }
@@ -159,7 +165,7 @@ IBitmap* ColorControl::GetColorBitmap(const UiRect& rect)
     return m_spBitmap.get();
 }
 
-void ColorControl::OnSelectPosChanged(const UiRect& rect, const UiPoint& pt)
+void ColorControl::OnSelectPosChanged(const UiRect &rect, const UiPoint &pt)
 {
     m_lastPt = pt;
     if (m_lastPt.x < rect.left) {
@@ -205,10 +211,10 @@ void ColorControl::OnSelectPosChanged(const UiRect& rect, const UiPoint& pt)
     if (m_spBitmap != nullptr) {
         int32_t nRow = m_lastPt.y - rect.top;
         int32_t nColumn = m_lastPt.x - rect.left;
-        int32_t colorXY = nWidth * nRow + nColumn; //颜色所在点的坐标位置    
+        int32_t colorXY = nWidth * nRow + nColumn; //颜色所在点的坐标位置
         ASSERT(colorXY < nWidth * nHeight);
-        void* pPixelBits = m_spBitmap->LockPixelBits();
-        uint32_t* pData = (uint32_t*)pPixelBits;
+        void *pPixelBits = m_spBitmap->LockPixelBits();
+        uint32_t *pData = (uint32_t *) pPixelBits;
         if (pData != nullptr) {
             uint32_t colorValue = pData[colorXY];
             UiColor newColor = UiColor(colorValue);
@@ -221,17 +227,15 @@ void ColorControl::OnSelectPosChanged(const UiRect& rect, const UiPoint& pt)
 
 void ColorControl::SetMouseCapture(bool bCapture)
 {
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if (pWindow == nullptr) {
         return;
     }
     if (bCapture) {
         pWindow->SetCapture();
-    }
-    else {
+    } else {
         pWindow->ReleaseCapture();
     }
 }
 
-}//namespace ui
-
+} //namespace ui

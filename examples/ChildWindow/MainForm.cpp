@@ -2,16 +2,15 @@
 #include "ChildWindowPaint.h"
 #include "MyChildWindowEvents.h"
 
-MainForm::MainForm():
-    m_pChildWindow(nullptr)
-{
-}
+MainForm::MainForm()
+    : m_pChildWindow(nullptr)
+{}
 
 MainForm::~MainForm()
 {
     if (!m_childWindowEvents.empty()) {
         CloseChildWindows();
-    }    
+    }
 }
 
 DString MainForm::GetSkinFolder()
@@ -42,9 +41,9 @@ void MainForm::OnLayeredWindowChanged()
 {
     BaseClass::OnLayeredWindowChanged();
     //将层窗口属性同步到子窗口
-    for (MyChildWindowEvents* pChildWindowEvents : m_childWindowEvents) {
+    for (MyChildWindowEvents *pChildWindowEvents : m_childWindowEvents) {
         if (pChildWindowEvents != nullptr) {
-            ui::ChildWindow* pChildWindow = pChildWindowEvents->GetChildWindow();
+            ui::ChildWindow *pChildWindow = pChildWindowEvents->GetChildWindow();
             if (pChildWindow != nullptr) {
                 pChildWindow->SetChildWindowLayered(IsLayeredWindow());
             }
@@ -54,13 +53,15 @@ void MainForm::OnLayeredWindowChanged()
 
 void MainForm::CreateChildWindows()
 {
-    ui::GridBox* pChildWindowBox = dynamic_cast<ui::GridBox*>(FindControl(_T("child_window_box")));
+    ui::GridBox *pChildWindowBox = dynamic_cast<ui::GridBox *>(FindControl(_T("child_window_box")));
     if (pChildWindowBox != nullptr) {
         size_t nCount = pChildWindowBox->GetItemCount();
         for (size_t nItem = 0; nItem < nCount; ++nItem) {
-            ui::ChildWindow* pChildWindow = dynamic_cast<ui::ChildWindow*>(pChildWindowBox->GetItemAt(nItem));
+            ui::ChildWindow *pChildWindow = dynamic_cast<ui::ChildWindow *>(
+                pChildWindowBox->GetItemAt(nItem));
             if (pChildWindow != nullptr) {
-                MyChildWindowEvents* pMyChildWindowEvents = new MyChildWindowEvents(pChildWindow, nItem, this);
+                MyChildWindowEvents *pMyChildWindowEvents
+                    = new MyChildWindowEvents(pChildWindow, nItem, this);
                 pChildWindow->CreateChildWindow(pMyChildWindowEvents);
                 m_childWindowEvents.push_back(pMyChildWindowEvents);
             }
@@ -70,11 +71,11 @@ void MainForm::CreateChildWindows()
 
 void MainForm::CloseChildWindows()
 {
-    std::vector<MyChildWindowEvents*> childWindowEvents;
+    std::vector<MyChildWindowEvents *> childWindowEvents;
     childWindowEvents.swap(m_childWindowEvents);
-    for (MyChildWindowEvents* pChildWindowEvents : childWindowEvents) {
+    for (MyChildWindowEvents *pChildWindowEvents : childWindowEvents) {
         if (pChildWindowEvents != nullptr) {
-            ui::ChildWindow* pChildWindow = pChildWindowEvents->GetChildWindow();
+            ui::ChildWindow *pChildWindow = pChildWindowEvents->GetChildWindow();
             if (pChildWindow != nullptr) {
                 //关闭子窗口（同步关闭）
                 pChildWindow->SetChildWindowEvents(nullptr);
@@ -86,7 +87,7 @@ void MainForm::CloseChildWindows()
     }
 }
 
-bool MainForm::PaintChildWindow(ui::ChildWindow* pChildWindow)
+bool MainForm::PaintChildWindow(ui::ChildWindow *pChildWindow)
 {
     if (pChildWindow != nullptr) {
         pChildWindow->InvalidateChildWindow();
@@ -95,7 +96,7 @@ bool MainForm::PaintChildWindow(ui::ChildWindow* pChildWindow)
     return false;
 }
 
-bool MainForm::PaintNextChildWindow(ui::ChildWindow* pChildWindow)
+bool MainForm::PaintNextChildWindow(ui::ChildWindow *pChildWindow)
 {
     //需要在idle函数中触发连续绘制，否则界面会卡死
     m_pChildWindow = pChildWindow;
@@ -107,7 +108,7 @@ bool MainForm::PaintNextChildWindow()
     return DoPaintNextChildWindow(m_pChildWindow);
 }
 
-bool MainForm::DoPaintNextChildWindow(ui::ChildWindow * pChildWindow)
+bool MainForm::DoPaintNextChildWindow(ui::ChildWindow *pChildWindow)
 {
     if (pChildWindow == nullptr) {
         return false;
@@ -118,18 +119,18 @@ bool MainForm::DoPaintNextChildWindow(ui::ChildWindow * pChildWindow)
     size_t nStartItemIndex = 0;
     const size_t nItemCount = m_childWindowEvents.size();
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        MyChildWindowEvents* pChildWindowEvents = m_childWindowEvents[nItemIndex];
-        if ((pChildWindowEvents != nullptr) && (pChildWindowEvents->GetChildWindow() == pChildWindow)) {
+        MyChildWindowEvents *pChildWindowEvents = m_childWindowEvents[nItemIndex];
+        if ((pChildWindowEvents != nullptr)
+            && (pChildWindowEvents->GetChildWindow() == pChildWindow)) {
             nStartItemIndex = nItemIndex;
             break;
         }
     }
     for (size_t nItemIndex = nStartItemIndex + 1; nItemIndex < nItemCount; ++nItemIndex) {
-        MyChildWindowEvents* pChildWindowEvents = m_childWindowEvents[nItemIndex];
-        if ((pChildWindowEvents != nullptr) &&
-            (pChildWindowEvents->GetChildWindow() != nullptr) &&
-            pChildWindowEvents->GetChildWindow()->IsVisible() &&
-            pChildWindowEvents->IsPaintFps()) {
+        MyChildWindowEvents *pChildWindowEvents = m_childWindowEvents[nItemIndex];
+        if ((pChildWindowEvents != nullptr) && (pChildWindowEvents->GetChildWindow() != nullptr)
+            && pChildWindowEvents->GetChildWindow()->IsVisible()
+            && pChildWindowEvents->IsPaintFps()) {
             //确定绘制该窗口
             return PaintChildWindow(pChildWindowEvents->GetChildWindow());
         }
@@ -138,11 +139,10 @@ bool MainForm::DoPaintNextChildWindow(ui::ChildWindow * pChildWindow)
         nStartItemIndex = m_childWindowEvents.size() - 1;
     }
     for (size_t nItemIndex = 0; nItemIndex <= nStartItemIndex; ++nItemIndex) {
-        MyChildWindowEvents* pChildWindowEvents = m_childWindowEvents[nItemIndex];
-        if ((pChildWindowEvents != nullptr) &&
-            (pChildWindowEvents->GetChildWindow() != nullptr) &&
-            pChildWindowEvents->GetChildWindow()->IsVisible() &&
-            pChildWindowEvents->IsPaintFps()) {
+        MyChildWindowEvents *pChildWindowEvents = m_childWindowEvents[nItemIndex];
+        if ((pChildWindowEvents != nullptr) && (pChildWindowEvents->GetChildWindow() != nullptr)
+            && pChildWindowEvents->GetChildWindow()->IsVisible()
+            && pChildWindowEvents->IsPaintFps()) {
             //确定绘制该窗口
             return PaintChildWindow(pChildWindowEvents->GetChildWindow());
         }

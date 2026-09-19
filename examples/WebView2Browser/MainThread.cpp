@@ -2,14 +2,11 @@
 #include "BrowserManager.h"
 #include "webview2/WebView2Manager.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -18,7 +15,8 @@ bool MainThread::OnInit()
     ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
 
     //初始化WebView2的基本配置
-    DString userDataFolder = ui::WebView2Manager::GetInstance().GetDefaultUserDataFolder(_T("Webview2Browser"));
+    DString userDataFolder = ui::WebView2Manager::GetInstance().GetDefaultUserDataFolder(
+        _T("Webview2Browser"));
     ui::WebView2Manager::GetInstance().Initialize(userDataFolder);
 
     //创建窗口, 显示默认页面
@@ -29,5 +27,5 @@ bool MainThread::OnInit()
 void MainThread::OnCleanup()
 {
     ui::WebView2Manager::GetInstance().UnInitialize();
-    ui::GlobalManager::Instance().Shutdown();    
+    ui::GlobalManager::Instance().Shutdown();
 }

@@ -30,4 +30,3 @@ public:
 };
 
 #endif //EXAMPLES_MAIN_FORM_H_
-

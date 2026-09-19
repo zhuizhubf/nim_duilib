@@ -14,12 +14,12 @@ public:
     /** 立即绘制该子窗口
     * @param [in] pChildWindow 子窗口的指针
     */
-    virtual bool PaintChildWindow(ui::ChildWindow* pChildWindow) = 0;
+    virtual bool PaintChildWindow(ui::ChildWindow *pChildWindow) = 0;
 
     /** 立即绘制该子窗口的下一个子窗口（按顺序依次绘制每个子窗口）
     * @param [in] pChildWindow 子窗口的指针
     */
-    virtual bool PaintNextChildWindow(ui::ChildWindow* pChildWindow) = 0;
+    virtual bool PaintNextChildWindow(ui::ChildWindow *pChildWindow) = 0;
 };
 
 #endif // EXAMPLES_CHILD_WINDOW_PAINT_SCHEDULER_H_

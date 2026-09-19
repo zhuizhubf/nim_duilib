@@ -4,8 +4,7 @@
 #include "duilib/Core/Box.h"
 #include <mutex>
 
-namespace ui
-{
+namespace ui {
 class IBitmap;
 
 /** 用于显示位图数据的控件，适合显示基于内存的位图数据，并且支持图片资源的各种属性
@@ -20,16 +19,17 @@ class IBitmap;
 class DUILIB_API BitmapControl : public Box
 {
     typedef Box BaseClass;
+
 public:
-    explicit BitmapControl(Window* pWindow);
+    explicit BitmapControl(Window *pWindow);
     virtual ~BitmapControl() override;
-    BitmapControl(const BitmapControl&) = delete;
-    BitmapControl& operator=(const BitmapControl&) = delete;
+    BitmapControl(const BitmapControl &) = delete;
+    BitmapControl &operator=(const BitmapControl &) = delete;
 
     /** 获取控件类型
     */
     virtual DString GetType() const override;
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** 计算图片区域大小（宽和高）
      *  @param [in] szAvailable 可用大小，不包含内边距，不包含外边距
@@ -51,12 +51,13 @@ public:
      * @param [in] pPixelBits 位图数据
      * @param [in] nPixelBitsSize 位图数据的长度（按字节）
      */
-    bool SetBitmapData(int32_t nWidth, int32_t nHeight, const uint8_t* pPixelBits, int32_t nPixelBitsSize);
+    bool SetBitmapData(
+        int32_t nWidth, int32_t nHeight, const uint8_t *pPixelBits, int32_t nPixelBitsSize);
 
     /** 设置位图数据，数据会被复制一份保存
      * @param [in] pBitmap 位图数据接口
      */
-    bool SetBitmapDataWithCopy(IBitmap* pBitmap);
+    bool SetBitmapDataWithCopy(IBitmap *pBitmap);
 
     /** 清除位图数据
     */
@@ -166,16 +167,16 @@ public:
 protected:
     /** 重写父控件绘制函数
     */
-    virtual void Paint(IRender* pRender, const UiRect& rcPaint) override;
+    virtual void Paint(IRender *pRender, const UiRect &rcPaint) override;
 
 private:
     /** 获取位图图片的宽度和高度
     */
-    void GetBitmapSize(int32_t& nImageWidth, int32_t& nImageHeight);
+    void GetBitmapSize(int32_t &nImageWidth, int32_t &nImageHeight);
 
     /** 绘制图片
     */
-    void PaintBitmap(IRender* pRender, const UiRect& rcPaint);
+    void PaintBitmap(IRender *pRender, const UiRect &rcPaint);
 
     /** 加载指定的图片
     */
@@ -219,6 +220,6 @@ private:
     bool m_bSupportMultiThread;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_BITMAP_CONTROL_H_

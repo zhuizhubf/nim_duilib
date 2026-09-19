@@ -1,18 +1,14 @@
 #include "DpiAwareness.h"
 
 //仅限非Windows平台, 不支持DpiAwareness的各种模式，非Windows平台无此概念
-#if defined (DUILIB_BUILD_FOR_SDL) && !defined (DUILIB_BUILD_FOR_WIN)
+#if defined(DUILIB_BUILD_FOR_SDL) && !defined(DUILIB_BUILD_FOR_WIN)
 
-namespace ui
-{
-DpiAwareness::DpiAwareness():
-    m_dpiAwarenessMode(DpiAwarenessMode::kPerMonitorDpiAware_V2)
-{
-}
+namespace ui {
+DpiAwareness::DpiAwareness()
+    : m_dpiAwarenessMode(DpiAwarenessMode::kPerMonitorDpiAware_V2)
+{}
 
-DpiAwareness::~DpiAwareness()
-{
-}
+DpiAwareness::~DpiAwareness() {}
 
 bool DpiAwareness::InitDpiAwareness(DpiAwarenessMode dpiAwarenessMode)
 {
@@ -38,6 +34,6 @@ DpiAwarenessMode DpiAwareness::GetDpiAwareness() const
     return m_dpiAwarenessMode;
 }
 
-}
+} // namespace ui
 
 #endif //DUILIB_BUILD_FOR_SDL

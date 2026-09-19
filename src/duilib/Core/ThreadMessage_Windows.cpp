@@ -1,11 +1,10 @@
 #include "ThreadMessage.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 #include "duilib/Core/GlobalManager.h"
 
-namespace ui
-{
+namespace ui {
 class ThreadMessage::TImpl
 {
 public:
@@ -34,7 +33,8 @@ public:
 LRESULT ThreadMessage::TImpl::WndProcThunk(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
     if (message > WM_USER) {
-        ThreadMessage* pThis = reinterpret_cast<ThreadMessage*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+        ThreadMessage *pThis = reinterpret_cast<ThreadMessage *>(
+            ::GetWindowLongPtr(hwnd, GWLP_USERDATA));
         if (pThis != nullptr) {
             pThis->OnUserMessage(message, wparam, lparam);
         }
@@ -60,21 +60,22 @@ ThreadMessage::~ThreadMessage()
 //窗口类的名称
 #define DUILIB_MESSAGING_WINDOW_CLASS L"duilib_messaging_window"
 
-void ThreadMessage::Initialize(void* platformData)
+void ThreadMessage::Initialize(void *platformData)
 {
     ASSERT(m_impl->m_hMessageWnd == nullptr);
     if (m_impl->m_hMessageWnd != nullptr) {
         return;
     }
-    auto hInstance = platformData != nullptr ? (HMODULE)platformData : ::GetModuleHandle(nullptr);
-    WNDCLASSEXW wc = { 0 };
+    auto hInstance = platformData != nullptr ? (HMODULE) platformData : ::GetModuleHandle(nullptr);
+    WNDCLASSEXW wc = {0};
     wc.cbSize = sizeof(wc);
     wc.lpfnWndProc = ThreadMessage::TImpl::WndProcThunk;
     wc.hInstance = hInstance;
     wc.lpszClassName = DUILIB_MESSAGING_WINDOW_CLASS;
     ATOM ret = ::RegisterClassExW(&wc);
     ASSERT_UNUSED_VARIABLE(ret != 0 || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
-    m_impl->m_hMessageWnd = ::CreateWindowW(wc.lpszClassName, 0, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
+    m_impl->m_hMessageWnd
+        = ::CreateWindowW(wc.lpszClassName, 0, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
     if (::IsWindow(m_impl->m_hMessageWnd)) {
         ::SetWindowLongPtr(m_impl->m_hMessageWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(this));
     }
@@ -83,13 +84,12 @@ void ThreadMessage::Initialize(void* platformData)
     static bool bAddAtExitFunction = false;
     if (!bAddAtExitFunction) {
         bAddAtExitFunction = true;
-        GlobalManager::Instance().AddAtExitFunction([hInstance]() {
-            ::UnregisterClassW(DUILIB_MESSAGING_WINDOW_CLASS, hInstance);
-            });
+        GlobalManager::Instance().AddAtExitFunction(
+            [hInstance]() { ::UnregisterClassW(DUILIB_MESSAGING_WINDOW_CLASS, hInstance); });
     }
 }
 
-bool ThreadMessage::PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t* nErrorCode)
+bool ThreadMessage::PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32_t *nErrorCode)
 {
     if (nErrorCode) {
         *nErrorCode = 0;
@@ -105,7 +105,7 @@ bool ThreadMessage::PostMsg(uint32_t msgId, WPARAM wParam, LPARAM lParam, uint32
         bRet = ::PostMessage(m_impl->m_hMessageWnd, m_impl->m_msgId, wParam, lParam) != FALSE;
         if (!bRet) {
             if (nErrorCode) {
-                *nErrorCode = (uint32_t)::GetLastError();
+                *nErrorCode = (uint32_t) ::GetLastError();
             }
         }
     }
@@ -119,20 +119,20 @@ void ThreadMessage::RemoveDuplicateMsg(uint32_t msgId)
     ASSERT(m_impl->m_hMessageWnd != nullptr);
     if ((m_impl->m_hMessageWnd != nullptr) && (msgId == m_impl->m_msgId)) {
         MSG msg;
-        while (::PeekMessage(&msg, m_impl->m_hMessageWnd, m_impl->m_msgId, m_impl->m_msgId, PM_REMOVE)) {
+        while (
+            ::PeekMessage(&msg, m_impl->m_hMessageWnd, m_impl->m_msgId, m_impl->m_msgId, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {
                 //检测到退出消息，重新放到消息队列中，避免进程退不出
                 ::PostQuitMessage(static_cast<int>(msg.wParam));
                 break;
-            }
-            else {
+            } else {
                 ASSERT(msg.message == m_impl->m_msgId);
             }
         }
     }
 }
 
-void ThreadMessage::SetMessageCallback(uint32_t msgId, const ThreadMessageCallback& callback)
+void ThreadMessage::SetMessageCallback(uint32_t msgId, const ThreadMessageCallback &callback)
 {
     m_impl->m_msgId = msgId;
     m_impl->m_callback = callback;

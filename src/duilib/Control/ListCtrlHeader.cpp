@@ -1,32 +1,31 @@
 #include "ListCtrlHeader.h"
 #include "duilib/Control/ListCtrl.h"
 
-namespace ui
-{
+namespace ui {
 
-ListCtrlHeader::ListCtrlHeader(Window* pWindow) :
-    ListBoxItemH(pWindow),
-    m_pListCtrl(nullptr),
-    m_nPaddingLeftValue(0),
-    m_bEnableCheckChangeEvent(true),
-    m_nIconSpacing(0)
+ListCtrlHeader::ListCtrlHeader(Window *pWindow)
+    : ListBoxItemH(pWindow)
+    , m_pListCtrl(nullptr)
+    , m_nPaddingLeftValue(0)
+    , m_bEnableCheckChangeEvent(true)
+    , m_nIconSpacing(0)
 {
     SetIconSpacing(4, true);
 }
 
-ListCtrlHeader::~ListCtrlHeader()
+ListCtrlHeader::~ListCtrlHeader() {}
+
+DString ListCtrlHeader::GetType() const
 {
+    return _T("ListCtrlHeader");
 }
 
-DString ListCtrlHeader::GetType() const { return _T("ListCtrlHeader"); }
-
-void ListCtrlHeader::SetAttribute(const DString& strName, const DString& strValue2)
+void ListCtrlHeader::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("icon_spacing")) {
         SetIconSpacing(StringUtil::StringToInt32(strValue), true);
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
@@ -70,7 +69,8 @@ bool ListCtrlHeader::IsSelectableType() const
     return false;
 }
 
-ListCtrlHeaderItem* ListCtrlHeader::InsertColumn(int32_t columnIndex, const ListCtrlColumn& columnInfo)
+ListCtrlHeaderItem *ListCtrlHeader::InsertColumn(
+    int32_t columnIndex, const ListCtrlColumn &columnInfo)
 {
     int32_t nColumnWidth = columnInfo.nColumnWidth;
     ASSERT(m_pListCtrl != nullptr);
@@ -84,17 +84,16 @@ ListCtrlHeaderItem* ListCtrlHeader::InsertColumn(int32_t columnIndex, const List
         nColumnWidth = 0;
     }
 
-    ListCtrlHeaderItem* pHeaderItem = new ListCtrlHeaderItem(GetWindow());
+    ListCtrlHeaderItem *pHeaderItem = new ListCtrlHeaderItem(GetWindow());
     pHeaderItem->SetHeaderCtrl(this);
-    SplitBox* pHeaderSplit = new SplitBox(GetWindow());
+    SplitBox *pHeaderSplit = new SplitBox(GetWindow());
     size_t nColumnCount = GetColumnCount();
-    if ((size_t)columnIndex >= nColumnCount) {
+    if ((size_t) columnIndex >= nColumnCount) {
         //放在最后
         AddItem(pHeaderItem);
         AddItem(pHeaderSplit);
-    }
-    else {
-        //插入在中间位置        
+    } else {
+        //插入在中间位置
         AddItemAt(pHeaderSplit, columnIndex);
         AddItemAt(pHeaderItem, columnIndex);
     }
@@ -105,7 +104,7 @@ ListCtrlHeaderItem* ListCtrlHeader::InsertColumn(int32_t columnIndex, const List
     }
 
     //SplitBox用于拖动功能的实现，而里面的这个Control用于确定其显示的形状
-    Control* pSplitCtrl = new Control(GetWindow());
+    Control *pSplitCtrl = new Control(GetWindow());
     pSplitCtrl->SetMouseEnabled(false);
     pSplitCtrl->SetMouseFocused(false);
     pSplitCtrl->SetNoFocus();
@@ -134,14 +133,13 @@ ListCtrlHeaderItem* ListCtrlHeader::InsertColumn(int32_t columnIndex, const List
 
     if (columnInfo.bSortable) {
         pHeaderItem->SetSortMode(ListCtrlHeaderItem::SortMode::kUp);
-    }
-    else {
+    } else {
         pHeaderItem->SetSortMode(ListCtrlHeaderItem::SortMode::kNone);
     }
     pHeaderItem->SetColumnResizeable(columnInfo.bResizeable);
 
     if (columnInfo.nTextFormat >= 0) {
-        uint32_t textStyle = Label::GetValidTextStyle((uint32_t)columnInfo.nTextFormat);
+        uint32_t textStyle = Label::GetValidTextStyle((uint32_t) columnInfo.nTextFormat);
         pHeaderItem->SetTextStyle(textStyle, true);
     }
 
@@ -152,32 +150,32 @@ ListCtrlHeaderItem* ListCtrlHeader::InsertColumn(int32_t columnIndex, const List
     pHeaderItem->SetShowCheckBox(columnInfo.bShowCheckBox);
 
     //挂载拖动响应事件
-    pHeaderSplit->AttachSplitDraged([this](const EventArgs& args) {
-        OnHeaderColumnResized((Control*)args.wParam, (Control*)args.lParam);
+    pHeaderSplit->AttachSplitDraged([this](const EventArgs &args) {
+        OnHeaderColumnResized((Control *) args.wParam, (Control *) args.lParam);
         return true;
-        });
+    });
 
     //挂载右键点击事件，进行转接
-    pHeaderItem->AttachRClick([this, pHeaderItem](const EventArgs& args) {
+    pHeaderItem->AttachRClick([this, pHeaderItem](const EventArgs &args) {
         EventArgs msg(args);
         msg.SetSender(this);
-        msg.wParam = (WPARAM)pHeaderItem;
+        msg.wParam = (WPARAM) pHeaderItem;
         SendEventMsg(msg);
         return true;
-        });
-    pHeaderSplit->AttachRClick([this, pHeaderItem](const EventArgs& args) {
+    });
+    pHeaderSplit->AttachRClick([this, pHeaderItem](const EventArgs &args) {
         EventArgs msg(args);
         msg.SetSender(this);
-        msg.wParam = (WPARAM)pHeaderItem;
+        msg.wParam = (WPARAM) pHeaderItem;
         SendEventMsg(msg);
         return true;
-        });
+    });
 
     //挂载鼠标双击事件
-    pHeaderSplit->AttachDoubleClick([this, pHeaderItem](const EventArgs& /*args*/) {
+    pHeaderSplit->AttachDoubleClick([this, pHeaderItem](const EventArgs & /*args*/) {
         OnHeaderColumnSplitDoubleClick(pHeaderItem);
         return true;
-        });
+    });
 
     m_pListCtrl->OnHeaderColumnAdded(pHeaderItem->GetColumnId());
     return pHeaderItem;
@@ -195,13 +193,13 @@ size_t ListCtrlHeader::GetColumnCount() const
     }
     const size_t nColumnCount = nItemCount / 2;
 #ifdef _DEBUG
-    //校验结构是否符合预期    
+    //校验结构是否符合预期
     for (size_t index = 0; index < nColumnCount; ++index) {
-        ASSERT(dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(index * 2)) != nullptr);
-        ASSERT(dynamic_cast<SplitBox*>(GetItemAt(index * 2 + 1)) != nullptr);
+        ASSERT(dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(index * 2)) != nullptr);
+        ASSERT(dynamic_cast<SplitBox *>(GetItemAt(index * 2 + 1)) != nullptr);
     }
-#endif // _DEBUG  
-    
+#endif // _DEBUG
+
     return nColumnCount;
 }
 
@@ -213,7 +211,7 @@ int32_t ListCtrlHeader::GetColumnWidth(size_t columnIndex) const
     if (columnIndex >= nColumnCount) {
         return nColumnWidth;
     }
-    ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(columnIndex * 2));
+    ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(columnIndex * 2));
     ASSERT(pHeaderItem != nullptr);
     if (pHeaderItem != nullptr) {
         nColumnWidth = pHeaderItem->GetColumnWidth();
@@ -224,7 +222,7 @@ int32_t ListCtrlHeader::GetColumnWidth(size_t columnIndex) const
 bool ListCtrlHeader::SetColumnWidth(size_t columnIndex, int32_t nWidth, bool bNeedDpiScale)
 {
     bool bRet = false;
-    ListCtrlHeaderItem* pHeaderItem = GetColumn(columnIndex);
+    ListCtrlHeaderItem *pHeaderItem = GetColumn(columnIndex);
     ASSERT(pHeaderItem != nullptr);
     if (pHeaderItem != nullptr) {
         pHeaderItem->SetColumnWidth(nWidth, bNeedDpiScale);
@@ -233,24 +231,24 @@ bool ListCtrlHeader::SetColumnWidth(size_t columnIndex, int32_t nWidth, bool bNe
     return bRet;
 }
 
-ListCtrlHeaderItem* ListCtrlHeader::GetColumn(size_t columnIndex) const
+ListCtrlHeaderItem *ListCtrlHeader::GetColumn(size_t columnIndex) const
 {
     size_t nColumnCount = GetColumnCount();
     ASSERT(columnIndex < nColumnCount);
     if (columnIndex >= nColumnCount) {
         return nullptr;
     }
-    ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(columnIndex * 2));
+    ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(columnIndex * 2));
     ASSERT(pHeaderItem != nullptr);
     return pHeaderItem;
 }
 
-ListCtrlHeaderItem* ListCtrlHeader::GetColumnById(size_t columnId) const
+ListCtrlHeaderItem *ListCtrlHeader::GetColumnById(size_t columnId) const
 {
-    ListCtrlHeaderItem* pFoundHeaderItem = nullptr;
+    ListCtrlHeaderItem *pFoundHeaderItem = nullptr;
     size_t nColumnCount = GetColumnCount();
     for (size_t index = 0; index < nColumnCount; ++index) {
-        ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(index * 2));
+        ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(index * 2));
         ASSERT(pHeaderItem != nullptr);
         if (pHeaderItem != nullptr) {
             if (pHeaderItem->GetColumnId() == columnId) {
@@ -262,14 +260,14 @@ ListCtrlHeaderItem* ListCtrlHeader::GetColumnById(size_t columnId) const
     return pFoundHeaderItem;
 }
 
-bool ListCtrlHeader::GetColumnInfo(size_t columnId, size_t& columnIndex, int32_t& nColumnWidth) const
+bool ListCtrlHeader::GetColumnInfo(size_t columnId, size_t &columnIndex, int32_t &nColumnWidth) const
 {
     bool bRet = false;
     columnIndex = Box::InvalidIndex;
     nColumnWidth = -1;
     size_t nColumnCount = GetColumnCount();
     for (size_t index = 0; index < nColumnCount; ++index) {
-        ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(index * 2));
+        ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(index * 2));
         ASSERT(pHeaderItem != nullptr);
         if (pHeaderItem != nullptr) {
             if (pHeaderItem->GetColumnId() == columnId) {
@@ -304,7 +302,7 @@ bool ListCtrlHeader::IsValidColumnIndex(size_t columnIndex) const
 size_t ListCtrlHeader::GetColumnId(size_t columnIndex) const
 {
     size_t columnId = Box::InvalidIndex;
-    ListCtrlHeaderItem* pHeaderItem = GetColumn(columnIndex);
+    ListCtrlHeaderItem *pHeaderItem = GetColumn(columnIndex);
     if (pHeaderItem != nullptr) {
         columnId = pHeaderItem->GetColumnId();
     }
@@ -317,12 +315,15 @@ bool ListCtrlHeader::DeleteColumn(size_t columnIndex)
     size_t columnId = Box::InvalidIndex;
     size_t nColumnCount = GetColumnCount();
     if (columnIndex < nColumnCount) {
-        ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(columnIndex * 2));
+        ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(
+            GetItemAt(columnIndex * 2));
         ASSERT(pHeaderItem != nullptr);
         if (pHeaderItem != nullptr) {
             columnId = pHeaderItem->GetColumnId();
             if (pHeaderItem->GetSplitBox() != nullptr) {
-                ASSERT(dynamic_cast<SplitBox*>(GetItemAt(columnIndex * 2 + 1)) == pHeaderItem->GetSplitBox());
+                ASSERT(
+                    dynamic_cast<SplitBox *>(GetItemAt(columnIndex * 2 + 1))
+                    == pHeaderItem->GetSplitBox());
                 RemoveItem(pHeaderItem->GetSplitBox());
             }
             RemoveItem(pHeaderItem);
@@ -344,12 +345,12 @@ bool ListCtrlHeader::DeleteColumnById(size_t columnId)
     return false;
 }
 
-void ListCtrlHeader::SetListCtrl(ListCtrl* pListCtrl)
+void ListCtrlHeader::SetListCtrl(ListCtrl *pListCtrl)
 {
     m_pListCtrl = pListCtrl;
 }
 
-ListCtrl* ListCtrlHeader::GetListCtrl() const
+ListCtrl *ListCtrlHeader::GetListCtrl() const
 {
     ASSERT(m_pListCtrl != nullptr);
     return m_pListCtrl;
@@ -363,11 +364,11 @@ bool ListCtrlHeader::IsEnableHeaderDragOrder() const
     return false;
 }
 
-void ListCtrlHeader::OnHeaderColumnResized(Control* pLeftHeaderItem, Control* pRightHeaderItem)
+void ListCtrlHeader::OnHeaderColumnResized(Control *pLeftHeaderItem, Control *pRightHeaderItem)
 {
     size_t nColumnId1 = Box::InvalidIndex;
     size_t nColumnId2 = Box::InvalidIndex;
-    ListCtrlHeaderItem* pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(pLeftHeaderItem);
+    ListCtrlHeaderItem *pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(pLeftHeaderItem);
     if (pHeaderItem != nullptr) {
         int32_t nSplitWidth = 0;
         if (pHeaderItem->GetSplitBox() != nullptr) {
@@ -378,7 +379,7 @@ void ListCtrlHeader::OnHeaderColumnResized(Control* pLeftHeaderItem, Control* pR
         pHeaderItem->SetColumnWidth(nColumnWidth, false);
         nColumnId1 = pHeaderItem->GetColumnId();
     }
-    pHeaderItem = dynamic_cast<ListCtrlHeaderItem*>(pRightHeaderItem);
+    pHeaderItem = dynamic_cast<ListCtrlHeaderItem *>(pRightHeaderItem);
     if (pHeaderItem != nullptr) {
         int32_t nSplitWidth = 0;
         if (pHeaderItem->GetSplitBox() != nullptr) {
@@ -388,7 +389,7 @@ void ListCtrlHeader::OnHeaderColumnResized(Control* pLeftHeaderItem, Control* pR
         int32_t nColumnWidth = nItemWidth + nSplitWidth;
         pHeaderItem->SetColumnWidth(nColumnWidth, false);
         nColumnId2 = pHeaderItem->GetColumnId();
-    } 
+    }
 
     if ((nColumnId1 != Box::InvalidIndex) || (nColumnId2 != Box::InvalidIndex)) {
         if (m_pListCtrl != nullptr) {
@@ -397,7 +398,7 @@ void ListCtrlHeader::OnHeaderColumnResized(Control* pLeftHeaderItem, Control* pR
     }
 }
 
-void ListCtrlHeader::OnHeaderColumnSorted(ListCtrlHeaderItem* pHeaderItem)
+void ListCtrlHeader::OnHeaderColumnSorted(ListCtrlHeaderItem *pHeaderItem)
 {
     if (pHeaderItem == nullptr) {
         return;
@@ -411,11 +412,10 @@ void ListCtrlHeader::OnHeaderColumnSorted(ListCtrlHeaderItem* pHeaderItem)
     //控制排序图标的显示：只有排序这一列显示，其他列不显示排序图标
     size_t nColumnCount = GetColumnCount();
     for (size_t columnIndex = 0; columnIndex < nColumnCount; ++columnIndex) {
-        ListCtrlHeaderItem* pItem = GetColumn(columnIndex);
+        ListCtrlHeaderItem *pItem = GetColumn(columnIndex);
         if (pItem == pHeaderItem) {
             pItem->SetShowSortImage(true);
-        }
-        else {
+        } else {
             pItem->SetShowSortImage(false);
         }
     }
@@ -433,7 +433,7 @@ void ListCtrlHeader::OnHeaderColumnOrderChanged()
     }
 }
 
-void ListCtrlHeader::OnHeaderColumnCheckStateChanged(ListCtrlHeaderItem* pHeaderItem, bool bChecked)
+void ListCtrlHeader::OnHeaderColumnCheckStateChanged(ListCtrlHeaderItem *pHeaderItem, bool bChecked)
 {
     if (pHeaderItem == nullptr) {
         return;
@@ -451,7 +451,7 @@ void ListCtrlHeader::OnHeaderColumnVisibleChanged()
     }
 }
 
-void ListCtrlHeader::OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem* pHeaderItem)
+void ListCtrlHeader::OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem *pHeaderItem)
 {
     if (m_pListCtrl != nullptr) {
         m_pListCtrl->OnHeaderColumnSplitDoubleClick(pHeaderItem);
@@ -482,7 +482,7 @@ bool ListCtrlHeader::SetShowCheckBox(bool bShow)
     }
     bool bRet = false;
     if (bShow) {
-        ListCtrl* pListCtrl = GetListCtrl();
+        ListCtrl *pListCtrl = GetListCtrl();
         if (pListCtrl != nullptr) {
             DString checkBoxClass = pListCtrl->GetCheckBoxClass();
             if (!checkBoxClass.empty()) {
@@ -490,8 +490,7 @@ bool ListCtrlHeader::SetShowCheckBox(bool bShow)
                 bRet = IsShowCheckBox();
             }
         }
-    }
-    else {
+    } else {
         //清除CheckBox图片资源，就不显示了
         ClearStateImages();
         ASSERT(!IsShowCheckBox());
@@ -499,10 +498,9 @@ bool ListCtrlHeader::SetShowCheckBox(bool bShow)
     }
     if (IsShowCheckBox() != bOldShow) {
         UpdatePaddingLeft();
-    }    
+    }
     return bRet;
 }
-
 
 void ListCtrlHeader::SetPaddingLeftValue(int32_t nPaddingLeft)
 {
@@ -512,7 +510,7 @@ void ListCtrlHeader::SetPaddingLeftValue(int32_t nPaddingLeft)
     if (m_nPaddingLeftValue != nPaddingLeft) {
         m_nPaddingLeftValue = nPaddingLeft;
         UpdatePaddingLeft();
-    }    
+    }
 }
 
 void ListCtrlHeader::UpdatePaddingLeft()
@@ -534,7 +532,8 @@ void ListCtrlHeader::UpdatePaddingLeft()
 bool ListCtrlHeader::IsShowCheckBox() const
 {
     //如果有CheckBox图片资源，则认为显示了CheckBox
-    return !GetStateImage(kControlStateNormal).empty() && !GetSelectedStateImage(kControlStateNormal).empty();
+    return !GetStateImage(kControlStateNormal).empty()
+           && !GetSelectedStateImage(kControlStateNormal).empty();
 }
 
 int32_t ListCtrlHeader::GetCheckBoxImageWidth()
@@ -562,20 +561,22 @@ void ListCtrlHeader::SetSortColumnId(size_t columnId, bool bSortUp, bool bTrigge
 {
     size_t nColumnCount = GetColumnCount();
     for (size_t nColumn = 0; nColumn < nColumnCount; ++nColumn) {
-        ListCtrlHeaderItem* pHeaderItem = GetColumn(nColumn);
+        ListCtrlHeaderItem *pHeaderItem = GetColumn(nColumn);
         if (pHeaderItem != nullptr) {
             if (pHeaderItem->GetColumnId() == columnId) {
                 pHeaderItem->SetShowSortImage(true);
-                pHeaderItem->SetSortMode(bSortUp ? ListCtrlHeaderItem::SortMode::kUp : ListCtrlHeaderItem::SortMode::kDown, bTriggerEvent);
-            }
-            else {
+                pHeaderItem->SetSortMode(
+                    bSortUp ? ListCtrlHeaderItem::SortMode::kUp
+                            : ListCtrlHeaderItem::SortMode::kDown,
+                    bTriggerEvent);
+            } else {
                 pHeaderItem->SetShowSortImage(false);
             }
         }
     }
 }
 
-void ListCtrlHeader::GetHeaderSplitControlRect(std::vector<UiRect>& rcSplitControls) const
+void ListCtrlHeader::GetHeaderSplitControlRect(std::vector<UiRect> &rcSplitControls) const
 {
     rcSplitControls.clear();
     size_t nItemCount = GetItemCount();
@@ -586,15 +587,15 @@ void ListCtrlHeader::GetHeaderSplitControlRect(std::vector<UiRect>& rcSplitContr
     if ((nItemCount % 2) != 0) {
         return;
     }
-    const size_t nColumnCount = nItemCount / 2;   
+    const size_t nColumnCount = nItemCount / 2;
     for (size_t index = 0; index < nColumnCount; ++index) {
-        ASSERT(dynamic_cast<ListCtrlHeaderItem*>(GetItemAt(index * 2)) != nullptr);
-        SplitBox* pSplitBox = dynamic_cast<SplitBox*>(GetItemAt(index * 2 + 1));
+        ASSERT(dynamic_cast<ListCtrlHeaderItem *>(GetItemAt(index * 2)) != nullptr);
+        SplitBox *pSplitBox = dynamic_cast<SplitBox *>(GetItemAt(index * 2 + 1));
         ASSERT(pSplitBox != nullptr);
-        if ((pSplitBox != nullptr) && pSplitBox->IsVisible()){
+        if ((pSplitBox != nullptr) && pSplitBox->IsVisible()) {
             ASSERT(pSplitBox->GetItemCount() == 1);
             if (pSplitBox->GetItemCount() > 0) {
-                Control* pSplitControl = pSplitBox->GetItemAt(0);
+                Control *pSplitControl = pSplitBox->GetItemAt(0);
                 if (pSplitControl != nullptr) {
                     UiPoint scrollBoxOffset = pSplitControl->GetScrollOffsetInScrollBox();
                     UiRect rcSplit = pSplitControl->GetRect();
@@ -606,4 +607,4 @@ void ListCtrlHeader::GetHeaderSplitControlRect(std::vector<UiRect>& rcSplitContr
     }
 }
 
-}//namespace ui
+} //namespace ui

@@ -23,7 +23,7 @@ public:
 
 private:
     //动画播放相关事件处理
-    void OnAnimationEvents(ui::EventType eventType, const ui::ImageAnimationStatus& status);
+    void OnAnimationEvents(ui::EventType eventType, const ui::ImageAnimationStatus &status);
 
 private:
     //是否正在播放中

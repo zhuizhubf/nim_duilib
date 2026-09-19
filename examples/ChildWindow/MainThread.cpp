@@ -1,14 +1,11 @@
 #include "MainThread.h"
 #include "MainForm.h"
 
-MainThread::MainThread() :
-    FrameworkThread(_T("MainThread"), ui::kThreadUI)
-{
-}
+MainThread::MainThread()
+    : FrameworkThread(_T("MainThread"), ui::kThreadUI)
+{}
 
-MainThread::~MainThread()
-{
-}
+MainThread::~MainThread() {}
 
 bool MainThread::OnInit()
 {
@@ -18,21 +15,19 @@ bool MainThread::OnInit()
         //使用本地文件夹作为资源
         ui::FilePath resourcePath = ui::GlobalManager::GetResourceRootPath(false);
         ui::GlobalManager::Instance().Startup(ui::LocalFilesResParam(resourcePath));
-    }
-    else if (resType == ui::ResourceType::kZipFile) {
-        //使用本地zip压缩包作为资源（压缩包位于exe相同目录）    
+    } else if (resType == ui::ResourceType::kZipFile) {
+        //使用本地zip压缩包作为资源（压缩包位于exe相同目录）
         ui::ZipFileResParam resParam;
         resParam.resourcePath = DUILIB_RESOURCE_DIR;
         resParam.zipFilePath = ui::GlobalManager::GetResourceZipPath();
         resParam.zipPassword = _T("");
         ui::GlobalManager::Instance().Startup(resParam);
-    }
-    else {
+    } else {
         return false;
     }
 
     // 创建一个默认带有阴影的居中窗口
-    MainForm* window = new MainForm();
+    MainForm *window = new MainForm();
     m_pMainForm = window;
     window->CreateWnd(nullptr, ui::WindowCreateParam(_T("ChildWindow"), true));
     window->PostQuitMsgWhenClosed(true);

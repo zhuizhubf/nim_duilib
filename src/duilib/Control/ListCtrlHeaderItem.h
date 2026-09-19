@@ -4,21 +4,20 @@
 #include "duilib/Control/Button.h"
 #include "duilib/Control/CheckBox.h"
 #include "duilib/Control/Split.h"
-#include "duilib/Image/Image.h"
 #include "duilib/Core/ControlDragable.h"
+#include "duilib/Image/Image.h"
 
-namespace ui
-{
+namespace ui {
 
 /** ListCtrl的表头控件的显示项
 */
 class ListCtrlHeader;
-class DUILIB_API ListCtrlHeaderItem:
-    public ControlDragableT<CheckBoxHBox>
+class DUILIB_API ListCtrlHeaderItem : public ControlDragableT<CheckBoxHBox>
 {
     typedef ControlDragableT<CheckBoxHBox> BaseClass;
+
 public:
-    explicit ListCtrlHeaderItem(Window* pWindow);
+    explicit ListCtrlHeaderItem(Window *pWindow);
     virtual ~ListCtrlHeaderItem() override;
 
     /** 获取控件类型
@@ -27,7 +26,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -37,17 +36,16 @@ public:
 
     /** 绘制文字
     */
-    virtual void PaintText(IRender* pRender) override;
+    virtual void PaintText(IRender *pRender) override;
 
     /** 按钮点击事件
     */
-    virtual void Activate(const EventArgs* pMsg) override;
+    virtual void Activate(const EventArgs *pMsg) override;
 
 public:
     /** 排序方式
     */
-    enum class SortMode: int8_t
-    {
+    enum class SortMode : int8_t {
         kNone, //不支持排序
         kUp,   //升序
         kDown  //降序
@@ -65,11 +63,11 @@ public:
 
     /** 设置排序图标：降序
     */
-    void SetSortedDownImage(const DString& sImageString);
+    void SetSortedDownImage(const DString &sImageString);
 
     /** 设置排序图标：升序
     */
-    void SetSortedUpImage(const DString& sImageString);
+    void SetSortedUpImage(const DString &sImageString);
 
     /** 设置是否显示排序图标（所有HeaderItem中，只有排序的那列显示，其他列不显示）
     * @param [in] bShowSortImage 是否显示排序图标
@@ -86,11 +84,11 @@ public:
 
     /** 设置关联的Split控件接口
     */
-    void SetSplitBox(SplitBox* pSplitBox);
+    void SetSplitBox(SplitBox *pSplitBox);
 
     /** 获取关联的Split控件接口
     */
-    SplitBox* GetSplitBox() const;
+    SplitBox *GetSplitBox() const;
 
     /** 设置是否允许调整列宽
     */
@@ -167,7 +165,7 @@ public:
     * @param [out] bChecked true表示勾选，false表示不勾选
     * @param [out] 如果bSelected和bPartSelect同时为true，表示部分选择
     */
-    bool GetCheckBoxCheck(bool& bChecked, bool& bPartChecked) const;
+    bool GetCheckBoxCheck(bool &bChecked, bool &bPartChecked) const;
 
     /** 显示/隐藏该列
     */
@@ -180,11 +178,11 @@ public:
 
     /** 设置关联的Header接口
     */
-    void SetHeaderCtrl(ListCtrlHeader* pHeaderCtrl);
+    void SetHeaderCtrl(ListCtrlHeader *pHeaderCtrl);
 
     /** 获取关联的Header接口
     */
-    ListCtrlHeader* GetHeaderCtrl() const;
+    ListCtrlHeader *GetHeaderCtrl() const;
 
 private:
     /** 同步列宽与UI控件宽度
@@ -193,7 +191,7 @@ private:
 
     /** 使得目标区域纵向对齐
     */
-    void VAlignRect(UiRect& rc, uint32_t textStyle, int32_t nImageHeight);
+    void VAlignRect(UiRect &rc, uint32_t textStyle, int32_t nImageHeight);
 
     /** 获取CheckBox的图片宽度
     */
@@ -207,8 +205,10 @@ protected:
     * @param [in] ptMouseDown 鼠标按下时的位置
     * @param [in] rcItemList 子控件的列表
     */
-    virtual void AdjustItemPos(const UiPoint& pt, const UiPoint& ptMouseDown,
-                               const std::vector<ItemStatus>& rcItemList) const override;
+    virtual void AdjustItemPos(
+        const UiPoint &pt,
+        const UiPoint &ptMouseDown,
+        const std::vector<ItemStatus> &rcItemList) const override;
 
     /** 交换两个控件的位置，完成顺序调整
     * @param [in] pt 当前鼠标的位置
@@ -217,10 +217,11 @@ protected:
     * @param [in] nNewItemIndex 最新的子项索引号
     * @return 如果有顺序调整，返回true；否则返回false
     */
-    virtual bool AdjustItemOrders(const UiPoint& pt,
-                                  const std::vector<ItemStatus>& rcItemList,
-                                  size_t& nOldItemIndex,
-                                  size_t& nNewItemIndex) override;
+    virtual bool AdjustItemOrders(
+        const UiPoint &pt,
+        const std::vector<ItemStatus> &rcItemList,
+        size_t &nOldItemIndex,
+        size_t &nNewItemIndex) override;
 
     /** 控件位置拖动完成事件
     * @param [in] nOldItemIndex 原来的子项索引号
@@ -245,19 +246,19 @@ protected:
 private:
     /** 关联的Header接口
     */
-    ListCtrlHeader* m_pHeaderCtrl;
+    ListCtrlHeader *m_pHeaderCtrl;
 
     /** 排序图标：降序
     */
-    Image* m_pSortedDownImage;
+    Image *m_pSortedDownImage;
 
     /** 排序图标：升序
     */
-    Image* m_pSortedUpImage;
+    Image *m_pSortedUpImage;
 
     /** 关联的Split控件接口
     */
-    SplitBox* m_pSplitBox;
+    SplitBox *m_pSplitBox;
 
     /** 列宽
     */
@@ -292,6 +293,6 @@ private:
     bool m_bShowSortImage;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_HEADER_ITEM_H_

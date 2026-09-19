@@ -4,18 +4,14 @@
 #include "duilib/duilib_defs.h"
 #include <cstdint>
 
-namespace ui 
-{
+namespace ui {
 
 /** 点的封装
 */
 class DUILIB_API UiPoint
 {
 public:
-    UiPoint()
-    {
-        x = y = 0;
-    }
+    UiPoint() { x = y = 0; }
 
     UiPoint(int32_t xValue, int32_t yValue)
     {
@@ -37,7 +33,7 @@ public:
 
     /** 设置新的Y值
     */
-    void SetY(int32_t yValue) { y = yValue;    }
+    void SetY(int32_t yValue) { y = yValue; }
 
     /** 偏移操作
     */
@@ -49,7 +45,7 @@ public:
 
     /** 偏移操作
     */
-    void Offset(const UiPoint& offsetPoint)
+    void Offset(const UiPoint &offsetPoint)
     {
         x += offsetPoint.x;
         y += offsetPoint.y;
@@ -65,38 +61,23 @@ public:
 
     /** 如果x和y都是0，返回true
     */
-    bool IsZero() const 
-    { 
-        return x == 0 && y == 0; 
-    }
+    bool IsZero() const { return x == 0 && y == 0; }
 
     /** 判断是否与另外一个点相同
     */
-    bool Equals(int32_t xValue, int32_t yValue) const 
-    {
-        return x == xValue && y == yValue;
-    }
+    bool Equals(int32_t xValue, int32_t yValue) const { return x == xValue && y == yValue; }
 
     /** 判断是否与另外一个点相同
     */
-    bool Equals(const UiPoint& dst) const
-    {
-        return x == dst.x && y == dst.y;
-    }
+    bool Equals(const UiPoint &dst) const { return x == dst.x && y == dst.y; }
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiPoint& a, const UiPoint& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiPoint &a, const UiPoint &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiPoint& a, const UiPoint& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiPoint &a, const UiPoint &b) { return !a.Equals(b); }
 
 public:
     /** X轴坐标

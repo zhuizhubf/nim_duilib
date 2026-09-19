@@ -2,15 +2,14 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include "render/IRenderBackend.h"
 #include "render-gdi/Render_GDI_Windows.h"
+#include "render/IRenderBackend.h"
 
 #include <gdiplus.h>
 
 #pragma comment(lib, "gdiplus.lib")
 
-namespace ui
-{
+namespace ui {
 
 RenderFactory_GDI::RenderFactory_GDI()
 {
@@ -32,73 +31,64 @@ RenderFactory_GDI::~RenderFactory_GDI()
     }
 }
 
-IFont* RenderFactory_GDI::CreateIFont()
+IFont *RenderFactory_GDI::CreateIFont()
 {
     return new Font_GDI(m_pFontMgr.get());
 }
 
-IPen* RenderFactory_GDI::CreatePen(UiColor color, float fWidth)
+IPen *RenderFactory_GDI::CreatePen(UiColor color, float fWidth)
 {
     return new Pen_GDI(color, fWidth);
 }
 
-IBrush* RenderFactory_GDI::CreateBrush(UiColor color)
+IBrush *RenderFactory_GDI::CreateBrush(UiColor color)
 {
     return new Brush_GDI(color);
 }
 
-IPath* RenderFactory_GDI::CreatePath()
+IPath *RenderFactory_GDI::CreatePath()
 {
     return new Path_GDI;
 }
 
-IMatrix* RenderFactory_GDI::CreateMatrix()
+IMatrix *RenderFactory_GDI::CreateMatrix()
 {
     return new Matrix_GDI;
 }
 
-IBitmap* RenderFactory_GDI::CreateBitmap()
+IBitmap *RenderFactory_GDI::CreateBitmap()
 {
     return new Bitmap_GDI;
 }
 
-IRender* RenderFactory_GDI::CreateRender(const IRenderDpiPtr& spRenderDpi, void* platformData, RenderBackendType /*backendType*/)
+IRender *RenderFactory_GDI::CreateRender(
+    const IRenderDpiPtr &spRenderDpi, void *platformData, RenderBackendType /*backendType*/)
 {
-    IRender* pRender = new Render_GDI_Windows((HWND)platformData);
+    IRender *pRender = new Render_GDI_Windows((HWND) platformData);
     if (pRender != nullptr) {
         pRender->SetRenderDpi(spRenderDpi);
     }
     return pRender;
 }
 
-IFontMgr* RenderFactory_GDI::GetFontMgr() const
+IFontMgr *RenderFactory_GDI::GetFontMgr() const
 {
     return m_pFontMgr.get();
 }
 
-namespace
-{
-class RenderBackend_GDI final: public IRenderBackend
+namespace {
+class RenderBackend_GDI final : public IRenderBackend
 {
 public:
-    virtual RenderType GetRenderType() const override
-    {
-        return RenderType::kRenderType_GDI;
-    }
+    virtual RenderType GetRenderType() const override { return RenderType::kRenderType_GDI; }
 
-    virtual const char* GetName() const override
-    {
-        return "GDI";
-    }
+    virtual const char *GetName() const override { return "GDI"; }
 
-    virtual IRenderFactory* CreateRenderFactory() const override
-    {
-        return new RenderFactory_GDI;
-    }
+    virtual IRenderFactory *CreateRenderFactory() const override { return new RenderFactory_GDI; }
 };
-}
+} // namespace
 
-const IRenderBackend* GetRenderBackend_GDI()
+const IRenderBackend *GetRenderBackend_GDI()
 {
     static const RenderBackend_GDI backend;
     return &backend;

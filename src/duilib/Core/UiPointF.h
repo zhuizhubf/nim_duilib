@@ -3,8 +3,7 @@
 
 #include "duilib/Core/UiPoint.h"
 
-namespace ui 
-{
+namespace ui {
 
 /** 点的封装
 */
@@ -13,16 +12,13 @@ class DUILIB_API UiPointF
 public:
     /** 从UiPoint构造
     */
-    static UiPointF MakeFromPoint(const UiPoint& pt)
+    static UiPointF MakeFromPoint(const UiPoint &pt)
     {
-        return UiPointF((float)pt.x, (float)pt.y);
+        return UiPointF((float) pt.x, (float) pt.y);
     }
 
 public:
-    UiPointF()
-    {
-        x = y = 0;
-    }
+    UiPointF() { x = y = 0; }
 
     UiPointF(float xValue, float yValue)
     {
@@ -32,8 +28,8 @@ public:
 
     UiPointF(int32_t xValue, int32_t yValue)
     {
-        x = (float)xValue;
-        y = (float)yValue;
+        x = (float) xValue;
+        y = (float) yValue;
     }
 
     /** 设置新的X和Y值
@@ -50,7 +46,7 @@ public:
 
     /** 设置新的Y值
     */
-    void SetY(float yValue) { y = yValue;    }
+    void SetY(float yValue) { y = yValue; }
 
     /** 偏移操作
     */
@@ -62,7 +58,7 @@ public:
 
     /** 偏移操作
     */
-    void Offset(const UiPointF& offsetPoint)
+    void Offset(const UiPointF &offsetPoint)
     {
         x += offsetPoint.x;
         y += offsetPoint.y;
@@ -78,38 +74,23 @@ public:
 
     /** 如果x和y都是0，返回true
     */
-    bool IsZero() const 
-    { 
-        return x == 0 && y == 0; 
-    }
+    bool IsZero() const { return x == 0 && y == 0; }
 
     /** 判断是否与另外一个点相同
     */
-    bool Equals(float xValue, float yValue) const
-    {
-        return x == xValue && y == yValue;
-    }
+    bool Equals(float xValue, float yValue) const { return x == xValue && y == yValue; }
 
     /** 判断是否与另外一个点相同
     */
-    bool Equals(const UiPointF& dst) const
-    {
-        return x == dst.x && y == dst.y;
-    }
+    bool Equals(const UiPointF &dst) const { return x == dst.x && y == dst.y; }
 
     /** 判断两个值是否相等
     */
-    friend bool operator == (const UiPointF& a, const UiPointF& b)
-    {
-        return a.Equals(b);
-    }
+    friend bool operator==(const UiPointF &a, const UiPointF &b) { return a.Equals(b); }
 
     /** 判断两个值是否不相等
     */
-    friend bool operator != (const UiPointF& a, const UiPointF& b)
-    {
-        return !a.Equals(b);
-    }
+    friend bool operator!=(const UiPointF &a, const UiPointF &b) { return !a.Equals(b); }
 
 public:
     /** X轴坐标

@@ -1,58 +1,52 @@
-#include "ListCtrlListView.h" 
+#include "ListCtrlListView.h"
 #include "duilib/Control/ListCtrl.h"
 #include "duilib/Control/ListCtrlData.h"
 
-namespace ui
+namespace ui {
+ListCtrlListView::ListCtrlListView(Window *pWindow)
+    : ListCtrlView(pWindow, new VirtualVTileLayout)
+    , m_pListCtrl(nullptr)
+    , m_pData(nullptr)
+    , m_bSingleLine(false)
+    , m_bSingleLineFlag(false)
 {
-ListCtrlListView::ListCtrlListView(Window* pWindow):
-    ListCtrlView(pWindow, new VirtualVTileLayout),
-    m_pListCtrl(nullptr),
-    m_pData(nullptr),
-    m_bSingleLine(false),
-    m_bSingleLineFlag(false)
-{
-    VirtualVTileLayout* pDataLayout = dynamic_cast<VirtualVTileLayout*>(GetLayout());
+    VirtualVTileLayout *pDataLayout = dynamic_cast<VirtualVTileLayout *>(GetLayout());
     ASSERT(pDataLayout != nullptr);
-    VirtualLayout* pVirtualLayout = pDataLayout;
+    VirtualLayout *pVirtualLayout = pDataLayout;
     SetVirtualLayout(pVirtualLayout);
 }
 
-ListCtrlListView::~ListCtrlListView()
-{
-}
+ListCtrlListView::~ListCtrlListView() {}
 
-void ListCtrlListView::SetAttribute(const DString& strName, const DString& strValue2)
+void ListCtrlListView::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("horizontal_layout")) {
         SetHorizontalLayout(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         BaseClass::SetAttribute(strName, strValue);
     }
 }
 
-void ListCtrlListViewItem::HandleEvent(const EventArgs& msg)
+void ListCtrlListViewItem::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
     if (m_pListCtrl != nullptr) {
         if ((msg.eventType > kEventKeyBegin) && (msg.eventType < kEventKeyEnd)) {
             m_pListCtrl->OnViewKeyboardEvents(msg);
-        }
-        else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
+        } else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
             m_pListCtrl->OnViewMouseEvents(msg);
         }
     }
 }
 
-void ListCtrlListView::HandleEvent(const EventArgs& msg)
+void ListCtrlListView::HandleEvent(const EventArgs &msg)
 {
     BaseClass::HandleEvent(msg);
     if (m_pListCtrl != nullptr) {
         if ((msg.eventType > kEventKeyBegin) && (msg.eventType < kEventKeyEnd)) {
             m_pListCtrl->OnViewKeyboardEvents(msg);
-        }
-        else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
+        } else if ((msg.eventType > kEventMouseBegin) && (msg.eventType < kEventMouseEnd)) {
             m_pListCtrl->OnViewMouseEvents(msg);
         }
     }
@@ -61,11 +55,11 @@ void ListCtrlListView::HandleEvent(const EventArgs& msg)
 void ListCtrlListView::SetHorizontalLayout(bool bHorizontal)
 {
     if (bHorizontal) {
-        //横向布局        
-        if (dynamic_cast<VirtualHTileLayout*>(GetLayout()) == nullptr) {
-            Layout* pLayout = GetLayout();
-            VirtualVTileLayout* pOldLayout = dynamic_cast<VirtualVTileLayout*>(pLayout);
-            VirtualHTileLayout* pNewLayout = new VirtualHTileLayout;
+        //横向布局
+        if (dynamic_cast<VirtualHTileLayout *>(GetLayout()) == nullptr) {
+            Layout *pLayout = GetLayout();
+            VirtualVTileLayout *pOldLayout = dynamic_cast<VirtualVTileLayout *>(pLayout);
+            VirtualHTileLayout *pNewLayout = new VirtualHTileLayout;
             ResetLayout(pNewLayout);
             SetVirtualLayout(pNewLayout);
             if (pOldLayout != nullptr) {
@@ -79,13 +73,12 @@ void ListCtrlListView::SetHorizontalLayout(bool bHorizontal)
             }
             FreeLayout(pLayout);
         }
-    }
-    else {
+    } else {
         //纵向布局
-        if (dynamic_cast<VirtualVTileLayout*>(GetLayout()) == nullptr) {
-            Layout* pLayout = GetLayout();
-            VirtualHTileLayout* pOldLayout = dynamic_cast<VirtualHTileLayout*>(pLayout);
-            VirtualVTileLayout* pNewLayout = new VirtualVTileLayout;
+        if (dynamic_cast<VirtualVTileLayout *>(GetLayout()) == nullptr) {
+            Layout *pLayout = GetLayout();
+            VirtualHTileLayout *pOldLayout = dynamic_cast<VirtualHTileLayout *>(pLayout);
+            VirtualVTileLayout *pNewLayout = new VirtualVTileLayout;
             ResetLayout(pNewLayout);
             SetVirtualLayout(pNewLayout);
             if (pOldLayout != nullptr) {
@@ -104,20 +97,19 @@ void ListCtrlListView::SetHorizontalLayout(bool bHorizontal)
 
 bool ListCtrlListView::IsHorizontalLayout() const
 {
-    VirtualHTileLayout* pDataLayout = dynamic_cast<VirtualHTileLayout*>(GetLayout());
+    VirtualHTileLayout *pDataLayout = dynamic_cast<VirtualHTileLayout *>(GetLayout());
     return pDataLayout != nullptr;
 }
 
 UiSize ListCtrlListView::GetItemSize() const
 {
     UiSize szItem;
-    Layout* pLayout = GetLayout();
-    VirtualVTileLayout* pVTileLayout = dynamic_cast<VirtualVTileLayout*>(pLayout);
+    Layout *pLayout = GetLayout();
+    VirtualVTileLayout *pVTileLayout = dynamic_cast<VirtualVTileLayout *>(pLayout);
     if (pVTileLayout != nullptr) {
         szItem = pVTileLayout->GetItemSize();
-    }
-    else {
-        VirtualHTileLayout* pHTileLayout = dynamic_cast<VirtualHTileLayout*>(pLayout);
+    } else {
+        VirtualHTileLayout *pHTileLayout = dynamic_cast<VirtualHTileLayout *>(pLayout);
         if (pHTileLayout != nullptr) {
             szItem = pHTileLayout->GetItemSize();
         }
@@ -125,15 +117,14 @@ UiSize ListCtrlListView::GetItemSize() const
     return szItem;
 }
 
-void ListCtrlListView::SetItemSize(const UiSize& szItem)
+void ListCtrlListView::SetItemSize(const UiSize &szItem)
 {
-    Layout* pLayout = GetLayout();
-    VirtualVTileLayout* pVTileLayout = dynamic_cast<VirtualVTileLayout*>(pLayout);
+    Layout *pLayout = GetLayout();
+    VirtualVTileLayout *pVTileLayout = dynamic_cast<VirtualVTileLayout *>(pLayout);
     if (pVTileLayout != nullptr) {
         pVTileLayout->SetItemSize(szItem);
-    }
-    else {
-        VirtualHTileLayout* pHTileLayout = dynamic_cast<VirtualHTileLayout*>(pLayout);
+    } else {
+        VirtualHTileLayout *pHTileLayout = dynamic_cast<VirtualHTileLayout *>(pLayout);
         if (pHTileLayout != nullptr) {
             pHTileLayout->SetItemSize(szItem);
         }
@@ -146,7 +137,7 @@ void ListCtrlListView::SetTextSingleLine(bool bSingleLine)
     m_bSingleLineFlag = true;
 }
 
-bool ListCtrlListView::IsTextSingleLine(bool& bSingleLine) const
+bool ListCtrlListView::IsTextSingleLine(bool &bSingleLine) const
 {
     if (m_bSingleLineFlag) {
         bSingleLine = m_bSingleLine;
@@ -154,15 +145,15 @@ bool ListCtrlListView::IsTextSingleLine(bool& bSingleLine) const
     return m_bSingleLineFlag;
 }
 
-void ListCtrlListView::SetListCtrl(ListCtrl* pListCtrl)
+void ListCtrlListView::SetListCtrl(ListCtrl *pListCtrl)
 {
     m_pListCtrl = pListCtrl;
 }
 
-void ListCtrlListView::SetDataProvider(VirtualListBoxElement* pProvider)
+void ListCtrlListView::SetDataProvider(VirtualListBoxElement *pProvider)
 {
     BaseClass::SetDataProvider(pProvider);
-    m_pData = dynamic_cast<ListCtrlData*>(GetDataProvider());
+    m_pData = dynamic_cast<ListCtrlData *>(GetDataProvider());
 }
 
 void ListCtrlListView::Refresh(bool bSync)
@@ -180,18 +171,18 @@ void ListCtrlListView::Refresh(bool bSync)
     BaseClass::Refresh(bSync);
 }
 
-Control* ListCtrlListView::CreateDataItem()
+Control *ListCtrlListView::CreateDataItem()
 {
     ASSERT(m_pListCtrl != nullptr);
     if (m_pListCtrl == nullptr) {
         return nullptr;
     }
     //列表视图
-    ListCtrlListViewItem* pItem = new ListCtrlListViewItem(GetWindow());
+    ListCtrlListViewItem *pItem = new ListCtrlListViewItem(GetWindow());
     pItem->SetListCtrl(m_pListCtrl);
     pItem->SetClass(m_pListCtrl->GetListViewItemClass());
-    ListCtrlIcon* pItemImage = new ListCtrlIcon(GetWindow());
-    ListCtrlLabel* pItemLabel = new ListCtrlLabel(GetWindow());
+    ListCtrlIcon *pItemImage = new ListCtrlIcon(GetWindow());
+    ListCtrlLabel *pItemLabel = new ListCtrlLabel(GetWindow());
     pItemImage->SetListBoxItem(pItem);
     pItemLabel->SetListBoxItem(pItem);
     pItem->AddItem(pItemImage);
@@ -199,10 +190,11 @@ Control* ListCtrlListView::CreateDataItem()
     return pItem;
 }
 
-bool ListCtrlListView::FillDataItem(Control* pControl,
-                                    size_t nElementIndex,
-                                    const ListCtrlItemData& itemData,
-                                    const std::vector<ListCtrlSubItemData2Pair>& subItemList)
+bool ListCtrlListView::FillDataItem(
+    Control *pControl,
+    size_t nElementIndex,
+    const ListCtrlItemData &itemData,
+    const std::vector<ListCtrlSubItemData2Pair> &subItemList)
 {
     ASSERT((pControl != nullptr) && (m_pListCtrl != nullptr));
     if ((pControl == nullptr) || (m_pListCtrl == nullptr)) {
@@ -211,7 +203,7 @@ bool ListCtrlListView::FillDataItem(Control* pControl,
     ListCtrlSubItemData2Ptr pSubItemData;
     int32_t nImageId = -1;
     size_t nColumnId = m_pListCtrl->GetColumnId(0); //取第一列的ID
-    for (const ListCtrlSubItemData2Pair& pair : subItemList) {
+    for (const ListCtrlSubItemData2Pair &pair : subItemList) {
         if (pair.nColumnId == nColumnId) {
             if (pair.pSubItemData != nullptr) {
                 nImageId = pair.pSubItemData->nImageId;
@@ -224,14 +216,14 @@ bool ListCtrlListView::FillDataItem(Control* pControl,
         //如果列没有设置图标，则取行的
         nImageId = itemData.nImageId;
     }
-    ListCtrlListViewItem* pViewItem = dynamic_cast<ListCtrlListViewItem*>(pControl);
+    ListCtrlListViewItem *pViewItem = dynamic_cast<ListCtrlListViewItem *>(pControl);
     ASSERT(pViewItem != nullptr);
     if (pViewItem == nullptr) {
         return false;
     }
 
-    ListCtrlIcon* pItemImage = dynamic_cast<ListCtrlIcon*>(pViewItem->GetItemAt(0));
-    ListCtrlLabel* pItemLabel = dynamic_cast<ListCtrlLabel*>(pViewItem->GetItemAt(1));
+    ListCtrlIcon *pItemImage = dynamic_cast<ListCtrlIcon *>(pViewItem->GetItemAt(0));
+    ListCtrlLabel *pItemLabel = dynamic_cast<ListCtrlLabel *>(pViewItem->GetItemAt(1));
     ASSERT((pItemImage != nullptr) && (pItemLabel != nullptr));
     if ((pItemImage == nullptr) || (pItemLabel == nullptr)) {
         return false;
@@ -266,8 +258,7 @@ bool ListCtrlListView::FillDataItem(Control* pControl,
     }
     if (pSubItemData != nullptr) {
         pItemLabel->SetText(pSubItemData->text.c_str());
-    }
-    else {
+    } else {
         pItemLabel->SetText(_T(""));
     }
 
@@ -276,34 +267,40 @@ bool ListCtrlListView::FillDataItem(Control* pControl,
     pItemLabel->SetNoFocus();
 
     //设置可编辑属性
-    const EventCallbackID callbackID = (EventCallbackID)this;
+    const EventCallbackID callbackID = (EventCallbackID) this;
     bool bEditable = (pSubItemData != nullptr) ? pSubItemData->bEditable : false;
     if (bEditable && m_pListCtrl->IsEnableItemEdit()) {
-        IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(pControl);
-        ListCtrlLabel* pSubItem = pItemLabel;
+        IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(pControl);
+        ListCtrlLabel *pSubItem = pItemLabel;
         ASSERT(pItem != nullptr);
         pItemLabel->SetEnableEdit(true);
         pItemLabel->DetachEventByID(kEventEnterEdit, callbackID);
-        pItemLabel->AttachEvent(kEventEnterEdit, [this, nElementIndex, nColumnId, pItem, pSubItem](const EventArgs& /*args*/) {
-            if (m_pListCtrl != nullptr) {
-                m_pListCtrl->OnItemEnterEditMode(nElementIndex, nColumnId, pItem, pSubItem);
-            }
-            return true;
-            }, callbackID);
-    }
-    else {
+        pItemLabel->AttachEvent(
+            kEventEnterEdit,
+            [this, nElementIndex, nColumnId, pItem, pSubItem](const EventArgs & /*args*/) {
+                if (m_pListCtrl != nullptr) {
+                    m_pListCtrl->OnItemEnterEditMode(nElementIndex, nColumnId, pItem, pSubItem);
+                }
+                return true;
+            },
+            callbackID);
+    } else {
         pItemLabel->SetEnableEdit(false);
         pItemLabel->DetachEventByID(kEventEnterEdit, callbackID);
     }
-    SendEvent(kEventListViewItemFilled, (WPARAM)pViewItem->GetListBoxIndex(), (LPARAM)pViewItem->GetDataItemIndex(), pViewItem);
+    SendEvent(
+        kEventListViewItemFilled,
+        (WPARAM) pViewItem->GetListBoxIndex(),
+        (LPARAM) pViewItem->GetDataItemIndex(),
+        pViewItem);
     return true;
 }
 
-int32_t ListCtrlListView::GetMaxDataItemWidth(const std::vector<ListCtrlSubItemData2Ptr>& /*subItemList*/)
+int32_t ListCtrlListView::GetMaxDataItemWidth(
+    const std::vector<ListCtrlSubItemData2Ptr> & /*subItemList*/)
 {
     //不需要实现
     return -1;
 }
 
-}//namespace ui
-
+} //namespace ui

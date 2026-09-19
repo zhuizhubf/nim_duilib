@@ -3,12 +3,11 @@
 
 #include "cef/CefManager.h"
 
-#if defined (DUILIB_BUILD_FOR_WIN) && defined (DUILIB_BUILD_FOR_CEF)
+#if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_CEF)
 
 #include <memory>
 
-namespace ui
-{
+namespace ui {
 //进程单例控制（CEF109）
 class ProcessSingleton;
 
@@ -21,8 +20,9 @@ class DUILIB_API CefManager_Windows : public CefManager
 
 protected:
     CefManager_Windows();
-    CefManager_Windows(const CefManager_Windows&) = delete;
-    CefManager_Windows& operator=(const CefManager_Windows&) = delete;
+    CefManager_Windows(const CefManager_Windows &) = delete;
+    CefManager_Windows &operator=(const CefManager_Windows &) = delete;
+
 protected:
     virtual ~CefManager_Windows() override;
 
@@ -44,12 +44,13 @@ public:
     * @param [in] nExitCode 当函数返回false时，进程的退出码
     * @return bool true 继续运行，false 应该结束程序
     */
-    virtual bool Initialize(bool bEnableOffScreenRendering,
-                            const DString& appName,
-                            int argc,
-                            char** argv,
-                            OnCefSettingsEvent callback,
-                            int32_t& nExitCode) override;
+    virtual bool Initialize(
+        bool bEnableOffScreenRendering,
+        const DString &appName,
+        int argc,
+        char **argv,
+        OnCefSettingsEvent callback,
+        int32_t &nExitCode) override;
 
     /** 清理cef组件
     */
@@ -59,7 +60,8 @@ public:
     /** 绑定一个回调函数用于监听Browser进程启动事件（仅在Windows + CEF109使用，其他情况不需要设置）
     * @param [in] callback 一个回调函数，参考 OnAlreadyRunningAppRelaunchEvent 声明
     */
-    virtual void SetAlreadyRunningAppRelaunch(const OnAlreadyRunningAppRelaunchEvent& callback) override;
+    virtual void SetAlreadyRunningAppRelaunch(
+        const OnAlreadyRunningAppRelaunchEvent &callback) override;
 
     /** 获取监听Browser进程启动事件的回调函数
     */
@@ -73,7 +75,7 @@ private:
 #if CEF_VERSION_MAJOR <= 109
     /** 浏览器单例控制回调函数
     */
-    static void OnBrowserAlreadyRunningAppRelaunch(const std::vector<DString>& argumentList);
+    static void OnBrowserAlreadyRunningAppRelaunch(const std::vector<DString> &argumentList);
 #endif
 
 private:

@@ -3,15 +3,13 @@
 
 #include "duilib/Core/UiTypes.h"
 
-namespace ui
-{
+namespace ui {
 /** DPI感知模式的定义（参照Windows平台的DPI感知功能定义，功能定义同时也兼容其他平台，其他平台最终只有支持DPI感知和不支持DPI感知两种结果）
  *  对于Linux/macOS/FreeBSD平台：
  *  1. 设置为 kDpiUnaware/kSystemDpiAware 具有相同的结果：都是不支持DPI感知，高DPI时，界面不会跟随DPI等比例放大，会出现模糊现象
  *  2. 设置为 kFromManifest/kPerMonitorDpiAware/kPerMonitorDpiAware_V2 具有相同的结果：支持DPI感知，高DPI时，界面会等比例放大，界面显示效果清晰
  */
-enum class DUILIB_API DpiAwarenessMode
-{
+enum class DUILIB_API DpiAwarenessMode {
     /** 设置根据平台设置不同的DPI感知模式：
     *   Windows平台：从可执行程序exe文件的manifest配置中读取，不需要使用代码设置，如果exe的manifest未配置，则不支持DPI感知
     *   Linux/macOS/FreeBSD平台：默认按支持DPI感知处理，会被设置为kPerMonitorDpiAware_V2
@@ -47,11 +45,11 @@ enum class DUILIB_API DpiAwarenessMode
 
 /** 界面显示比例的最小值
 */
-#define DUILIB_DISPLAY_SCALE_MIN    (0.60f)
+#define DUILIB_DISPLAY_SCALE_MIN (0.60f)
 
 /** 界面显示比例的最大值
 */
-#define DUILIB_DISPLAY_SCALE_MAX    (5.00f)
+#define DUILIB_DISPLAY_SCALE_MAX (5.00f)
 
 /** DPI感知功能初始化参数
 */
@@ -80,8 +78,8 @@ class DUILIB_API DpiAwareness
 public:
     DpiAwareness();
     ~DpiAwareness();
-    DpiAwareness(const DpiAwareness&) = delete;
-    DpiAwareness& operator = (const DpiAwareness&) = delete;
+    DpiAwareness(const DpiAwareness &) = delete;
+    DpiAwareness &operator=(const DpiAwareness &) = delete;
 
 public:
     /** 初始化DPI感知模式和DPI值（该函数只可调用一次，后续调用被忽略）
@@ -108,5 +106,5 @@ private:
     */
     DpiAwarenessMode m_dpiAwarenessMode;
 };
-}
+} // namespace ui
 #endif //UI_CORE_DPI_AWARENESS_H_

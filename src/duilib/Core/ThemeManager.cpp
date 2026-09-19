@@ -1,24 +1,23 @@
 #include "ThemeManager.h"
+#include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
 #include "duilib/Core/Window.h"
-#include "duilib/Core/Control.h"
-#include "duilib/Utils/PerformanceUtil.h"
 #include "duilib/Utils/FilePathUtil.h"
+#include "duilib/Utils/PerformanceUtil.h"
 #include "duilib/Utils/StringUtil.h"
 #include <unordered_set>
 
 #if defined DUILIB_BUILD_FOR_WIN && !defined DUILIB_BUILD_FOR_SDL
-    #include "duilib/Utils/ApiWrapper_Windows.h"
+#include "duilib/Utils/ApiWrapper_Windows.h"
 #else
-    #include "SDL3/SDL.h"
+#include "SDL3/SDL.h"
 #endif
 
-namespace ui 
-{
-ThemeManager::ThemeManager():
-    m_bSwitchingTheme(false),
-    m_lightColorPath(DUILIB_LIGHT_COLOR_PATH),
-    m_darkColorPath(DUILIB_DARK_COLOR_PATH)
+namespace ui {
+ThemeManager::ThemeManager()
+    : m_bSwitchingTheme(false)
+    , m_lightColorPath(DUILIB_LIGHT_COLOR_PATH)
+    , m_darkColorPath(DUILIB_DARK_COLOR_PATH)
 {
     m_defaultThemeInfo.m_bDefaultTheme = true;
     m_defaultThemeInfo.m_bSelectedTheme = false;
@@ -33,14 +32,11 @@ ThemeType ThemeManager::GetThemeTypeValue(DString themeType) const
     themeType = StringUtil::MakeLowerString(themeType);
     if (themeType == _T("color")) {
         return ThemeType::kColor;
-    }
-    else if (themeType == _T("icon")) {
+    } else if (themeType == _T("icon")) {
         return ThemeType::kIcon;
-    }
-    else if (themeType == _T("combined")) {
+    } else if (themeType == _T("combined")) {
         return ThemeType::kCombined;
-    }
-    else {
+    } else {
         return ThemeType::kUnknown;
     }
 }
@@ -50,21 +46,19 @@ ThemeStyle ThemeManager::GetThemeStyleValue(DString themeStyle) const
     themeStyle = StringUtil::MakeLowerString(themeStyle);
     if (themeStyle == _T("light")) {
         return ThemeStyle::kLight;
-    }
-    else if (themeStyle == _T("base")) {
+    } else if (themeStyle == _T("base")) {
         return ThemeStyle::kBase;
-    }
-    else if (themeStyle == _T("dark")) {
+    } else if (themeStyle == _T("dark")) {
         return ThemeStyle::kDark;
-    }
-    else {
+    } else {
         return ThemeStyle::kUnknown;
     }
 }
 
-bool ThemeManager::InitTheme(const FilePath& themeRootFullPath,
-                             const FilePath& defaultThemePath,
-                             const DString& globalXmlFileName)
+bool ThemeManager::InitTheme(
+    const FilePath &themeRootFullPath,
+    const FilePath &defaultThemePath,
+    const DString &globalXmlFileName)
 {
     ASSERT(!themeRootFullPath.IsEmpty());
     if (themeRootFullPath.IsEmpty()) {
@@ -83,10 +77,10 @@ bool ThemeManager::InitTheme(const FilePath& themeRootFullPath,
     m_defaultThemePath = defaultThemePath;
     m_globalXmlFileName = globalXmlFileName;
 
-    FilePath globalXmlFileNameFullPath = themeRootFullPath;    //主题根目录：resources/themes
-    globalXmlFileNameFullPath /= defaultThemePath;             //默认主题目录：default
-    globalXmlFileNameFullPath /= FilePath(globalXmlFileName);  //配置文件：global.xml
-    globalXmlFileNameFullPath.NormalizeFilePath();             //默认取值示例：resources/themes/default/global.xml
+    FilePath globalXmlFileNameFullPath = themeRootFullPath;   //主题根目录：resources/themes
+    globalXmlFileNameFullPath /= defaultThemePath;            //默认主题目录：default
+    globalXmlFileNameFullPath /= FilePath(globalXmlFileName); //配置文件：global.xml
+    globalXmlFileNameFullPath.NormalizeFilePath(); //默认取值示例：resources/themes/default/global.xml
 
     //解析全局资源信息(默认是"global.xml"文件)
     PerformanceUtil statPerformance(_T("ParseXml, ThemeManager::InitTheme load global.xml"));
@@ -112,17 +106,17 @@ bool ThemeManager::InitTheme(const FilePath& themeRootFullPath,
     return false;
 }
 
-bool ThemeManager::SwitchColorTheme(const FilePath& themePath)
+bool ThemeManager::SwitchColorTheme(const FilePath &themePath)
 {
     return SwitchTheme(themePath, ThemeType::kColor);
 }
 
-bool ThemeManager::SwitchIconTheme(const FilePath& themePath)
+bool ThemeManager::SwitchIconTheme(const FilePath &themePath)
 {
     return SwitchTheme(themePath, ThemeType::kIcon);
 }
 
-bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeType)
+bool ThemeManager::SwitchTheme(const FilePath &themePath, ThemeType destThemeType)
 {
     ASSERT(!themePath.IsEmpty());
     if (themePath.IsEmpty()) {
@@ -131,8 +125,7 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
     if ((m_defaultThemePath == themePath)) {
         //默认主题
         destThemeType = ThemeType::kCombined;
-    }
-    else {
+    } else {
         //颜色主题或者图标主题
         ASSERT((destThemeType == ThemeType::kColor) || (destThemeType == ThemeType::kIcon));
         if ((destThemeType != ThemeType::kColor) && (destThemeType != ThemeType::kIcon)) {
@@ -170,8 +163,7 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
         //颜色主题
         ThemeType readThemeType = GetThemeTypeValue(themeType);
         ASSERT((readThemeType == ThemeType::kColor) || (readThemeType == ThemeType::kCombined));
-        if ((readThemeType != ThemeType::kColor) &&
-            (readThemeType != ThemeType::kCombined)) {
+        if ((readThemeType != ThemeType::kColor) && (readThemeType != ThemeType::kCombined)) {
             return false;
         }
         m_colorThemeInfo.m_bDefaultTheme = false;
@@ -183,15 +175,15 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
 
         if (readThemeType == ThemeType::kCombined) {
             //覆盖图标主题
-            m_iconThemeInfo.m_bSelectedTheme = false;            
+            m_iconThemeInfo.m_bSelectedTheme = false;
         }
         m_defaultThemeInfo.m_bSelectedTheme = false;
         themeInfo = m_colorThemeInfo;
 
         //设置是否为深色主题
-        GlobalManager::Instance().Color().SetColorThemeDarkMode(m_colorThemeInfo.m_themeStyle == ThemeStyle::kDark);
-    }
-    else if (destThemeType == ThemeType::kIcon) {
+        GlobalManager::Instance().Color().SetColorThemeDarkMode(
+            m_colorThemeInfo.m_themeStyle == ThemeStyle::kDark);
+    } else if (destThemeType == ThemeType::kIcon) {
         //图标主题
         ThemeType readThemeType = GetThemeTypeValue(themeType);
         m_iconThemeInfo.m_bDefaultTheme = false;
@@ -203,19 +195,17 @@ bool ThemeManager::SwitchTheme(const FilePath& themePath, ThemeType destThemeTyp
 
         if (readThemeType == ThemeType::kCombined) {
             //覆盖颜色主题
-            m_colorThemeInfo.m_bSelectedTheme = false;            
+            m_colorThemeInfo.m_bSelectedTheme = false;
         }
         m_defaultThemeInfo.m_bSelectedTheme = false;
         themeInfo = m_iconThemeInfo;
-    }
-    else if (m_defaultThemePath == themePath) {
+    } else if (m_defaultThemePath == themePath) {
         //默认主题
         ASSERT(m_defaultThemePath == themePath);
         m_defaultThemeInfo.m_bSelectedTheme = true;
         m_colorThemeInfo.m_bSelectedTheme = false;
         m_iconThemeInfo.m_bSelectedTheme = false;
-    }
-    else {
+    } else {
         return false;
     }
     m_bSwitchingTheme = true;
@@ -237,9 +227,8 @@ bool ThemeManager::IsSwitchingTheme() const
     return m_bSwitchingTheme;
 }
 
-
-bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
-                                std::vector<ThemeInfo>& themeInfoList) const
+bool ThemeManager::GetAllThemes(
+    const std::vector<FilePath> &themePathList, std::vector<ThemeInfo> &themeInfoList) const
 {
     FilePath themeRootPath = GetThemeRootPath();
     ASSERT(!themeRootPath.IsEmpty());
@@ -256,12 +245,11 @@ bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
     if (GlobalManager::Instance().Zip().IsUseZip()) {
         //使用Zip压缩包作为资源文件
         GetZipThemePathList(themeRootPath, themePathList, destThemePathList);
-    }
-    else if (themeRootPath.IsAbsolutePath()) {
+    } else if (themeRootPath.IsAbsolutePath()) {
         //使用本地磁盘文件
         GetLocalThemePathList(themeRootPath, themePathList, destThemePathList);
     }
-    for (const FilePath& themePath : destThemePathList) {
+    for (const FilePath &themePath : destThemePathList) {
         if (themePath.IsEmpty()) {
             continue;
         }
@@ -283,18 +271,19 @@ bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
     }
     if (!themeInfoList.empty()) {
         //排序
-        std::sort(themeInfoList.begin(), themeInfoList.end(), [](const ThemeInfo& left, const ThemeInfo& right) {
-            if (left.m_themeStyle == right.m_themeStyle) {
-                if (left.m_themeType == right.m_themeType) {
-                    return left.m_themeName < right.m_themeName;
+        std::sort(
+            themeInfoList.begin(),
+            themeInfoList.end(),
+            [](const ThemeInfo &left, const ThemeInfo &right) {
+                if (left.m_themeStyle == right.m_themeStyle) {
+                    if (left.m_themeType == right.m_themeType) {
+                        return left.m_themeName < right.m_themeName;
+                    } else {
+                        return left.m_themeType < right.m_themeType;
+                    }
+                } else {
+                    return left.m_themeStyle < right.m_themeStyle;
                 }
-                else {
-                    return left.m_themeType < right.m_themeType;
-                }
-            }
-            else {
-                return left.m_themeStyle < right.m_themeStyle;
-            }
             });
     }
 
@@ -303,8 +292,7 @@ bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
     while (iter != themeInfoList.end()) {
         if (iter->m_themePath != m_defaultThemePath) {
             ++iter;
-        }
-        else {
+        } else {
             iter = themeInfoList.erase(iter);
         }
     }
@@ -312,12 +300,13 @@ bool ThemeManager::GetAllThemes(const std::vector<FilePath>& themePathList,
     return !themeInfoList.empty();
 }
 
-bool ThemeManager::ParseXmlThemeInfo(const FilePath& configXmlFile,
-                                     const std::vector<uint8_t>& configXmlData,
-                                     const FilePath& themePath,
-                                     ThemeInfo& themeInfo) const
+bool ThemeManager::ParseXmlThemeInfo(
+    const FilePath &configXmlFile,
+    const std::vector<uint8_t> &configXmlData,
+    const FilePath &themePath,
+    ThemeInfo &themeInfo) const
 {
-    WindowBuilder globalbuilder;    
+    WindowBuilder globalbuilder;
     if (configXmlData.empty()) {
         if (!configXmlFile.IsExistsFile()) {
             return false;
@@ -325,8 +314,7 @@ bool ThemeManager::ParseXmlThemeInfo(const FilePath& configXmlFile,
         if (!globalbuilder.ParseXmlFile(FilePath(configXmlFile))) {
             return false;
         }
-    }
-    else {
+    } else {
         if (!globalbuilder.ParseXmlData(configXmlData)) {
             return false;
         }
@@ -347,36 +335,36 @@ bool ThemeManager::ParseXmlThemeInfo(const FilePath& configXmlFile,
     themeInfo.m_themeStyle = GetThemeStyleValue(themeStyle);
     themeInfo.m_themeType = GetThemeTypeValue(themeType);
 
-    const ThemeInfo& defaultThemeInfo = GetDefaultThemeInfo();
+    const ThemeInfo &defaultThemeInfo = GetDefaultThemeInfo();
     if (defaultThemeInfo.m_themePath == themeInfo.m_themePath) {
         themeInfo.m_bDefaultTheme = true;
         themeInfo.m_bSelectedTheme = defaultThemeInfo.m_bSelectedTheme;
     }
-    const ThemeInfo& iconThemeInfo = GetCurrentIconThemeInfo();
-    if ((iconThemeInfo.m_bSelectedTheme) &&
-        (iconThemeInfo.m_themePath == themeInfo.m_themePath)) {
+    const ThemeInfo &iconThemeInfo = GetCurrentIconThemeInfo();
+    if ((iconThemeInfo.m_bSelectedTheme) && (iconThemeInfo.m_themePath == themeInfo.m_themePath)) {
         themeInfo.m_bDefaultTheme = false;
         themeInfo.m_bSelectedTheme = true;
     }
-    const ThemeInfo& colorThemeInfo = GetCurrentColorThemeInfo();
-    if ((colorThemeInfo.m_bSelectedTheme) &&
-        (colorThemeInfo.m_themePath == themeInfo.m_themePath)) {
+    const ThemeInfo &colorThemeInfo = GetCurrentColorThemeInfo();
+    if ((colorThemeInfo.m_bSelectedTheme) && (colorThemeInfo.m_themePath == themeInfo.m_themePath)) {
         themeInfo.m_bDefaultTheme = false;
         themeInfo.m_bSelectedTheme = true;
     }
     return true;
 }
 
-bool ThemeManager::GetLocalThemePathList(const FilePath& themeRootPath,
-                                         const std::vector<FilePath>& themePathList,
-                                         std::vector<FilePath>& localThemePathList) const
+bool ThemeManager::GetLocalThemePathList(
+    const FilePath &themeRootPath,
+    const std::vector<FilePath> &themePathList,
+    std::vector<FilePath> &localThemePathList) const
 {
     localThemePathList.clear();
-    if (themeRootPath.IsEmpty() || !themeRootPath.IsAbsolutePath() || !themeRootPath.IsExistsDirectory()) {
+    if (themeRootPath.IsEmpty() || !themeRootPath.IsAbsolutePath()
+        || !themeRootPath.IsExistsDirectory()) {
         return false;
     }
     std::unordered_set<DString> themePathSet;
-    for (const FilePath& inputPath : themePathList) {
+    for (const FilePath &inputPath : themePathList) {
         DString temp = inputPath.ToString();
         temp = StringUtil::MakeLowerString(temp);
         themePathSet.insert(temp);
@@ -387,7 +375,7 @@ bool ThemeManager::GetLocalThemePathList(const FilePath& themeRootPath,
 #else
         std::filesystem::path stdPath(themeRootPath.NativePathA());
 #endif
-        for (const auto& entry : std::filesystem::directory_iterator(stdPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(stdPath)) {
             std::error_code errorCode;
             bool bDirectory = entry.is_directory(errorCode);
             if (bDirectory) {
@@ -406,22 +394,22 @@ bool ThemeManager::GetLocalThemePathList(const FilePath& themeRootPath,
                 }
             }
         }
-    }
-    catch (const std::filesystem::filesystem_error& /*e*/) {
+    } catch (const std::filesystem::filesystem_error & /*e*/) {
         ASSERT(0);
     }
     return !localThemePathList.empty();
 }
 
-bool ThemeManager::GetZipThemePathList(const FilePath& themeRootPath,
-                                       const std::vector<FilePath>& themePathList,
-                                       std::vector<FilePath>& localThemePathList) const
+bool ThemeManager::GetZipThemePathList(
+    const FilePath &themeRootPath,
+    const std::vector<FilePath> &themePathList,
+    std::vector<FilePath> &localThemePathList) const
 {
     if (themeRootPath.IsEmpty()) {
         return false;
     }
     std::unordered_set<DString> themePathSet;
-    for (const FilePath& inputPath : themePathList) {
+    for (const FilePath &inputPath : themePathList) {
         DString temp = inputPath.ToString();
         temp = StringUtil::MakeLowerString(temp);
         themePathSet.insert(temp);
@@ -430,14 +418,14 @@ bool ThemeManager::GetZipThemePathList(const FilePath& themeRootPath,
     innerThemeRootPath.NormalizeDirectoryPath();
     std::vector<DString> dirList;
     GlobalManager::Instance().Zip().GetZipFileList(innerThemeRootPath, nullptr, &dirList);
-    for (DString& dirName : dirList) {
+    for (DString &dirName : dirList) {
         // 删除目录中的分隔符
         size_t nPos = dirName.find(_T("/"));
         if (nPos != DString::npos) {
             dirName = dirName.substr(0, nPos);
         }
     }
-    for (const DString& dirName : dirList) {
+    for (const DString &dirName : dirList) {
         FilePath localPath(dirName);
         if (!themePathSet.empty()) {
             DString temp = localPath.ToString();
@@ -458,50 +446,52 @@ ThemeStyle ThemeManager::GetCurrentThemeStyle() const
 {
     if (m_colorThemeInfo.m_bSelectedTheme) {
         return m_colorThemeInfo.m_themeStyle;
-    }
-    else if ((m_iconThemeInfo.m_bSelectedTheme) &&
-             (m_iconThemeInfo.m_themeType == ThemeType::kCombined)) {
+    } else if (
+        (m_iconThemeInfo.m_bSelectedTheme)
+        && (m_iconThemeInfo.m_themeType == ThemeType::kCombined)) {
         return m_iconThemeInfo.m_themeStyle;
-    }
-    else if ((m_defaultThemeInfo.m_bSelectedTheme) &&
-             (m_defaultThemeInfo.m_themeType == ThemeType::kCombined)) {
+    } else if (
+        (m_defaultThemeInfo.m_bSelectedTheme)
+        && (m_defaultThemeInfo.m_themeType == ThemeType::kCombined)) {
         return m_defaultThemeInfo.m_themeStyle;
     }
     return ThemeStyle::kLight;
 }
 
-const ThemeInfo& ThemeManager::GetDefaultThemeInfo() const
+const ThemeInfo &ThemeManager::GetDefaultThemeInfo() const
 {
     return m_defaultThemeInfo;
 }
 
-const ThemeInfo& ThemeManager::GetCurrentColorThemeInfo() const
+const ThemeInfo &ThemeManager::GetCurrentColorThemeInfo() const
 {
     return m_colorThemeInfo;
 }
 
-const ThemeInfo& ThemeManager::GetCurrentIconThemeInfo() const
+const ThemeInfo &ThemeManager::GetCurrentIconThemeInfo() const
 {
     return m_iconThemeInfo;
 }
 
-bool ThemeManager::GetResFile(const FilePath& resFilePath,
-                              const FilePath& windowResPath,
-                              FilePath& resFileFullPath,
-                              std::vector<uint8_t>& resFileData) const
+bool ThemeManager::GetResFile(
+    const FilePath &resFilePath,
+    const FilePath &windowResPath,
+    FilePath &resFileFullPath,
+    std::vector<uint8_t> &resFileData) const
 {
     return GetResFileData(resFilePath, windowResPath, &resFileFullPath, &resFileData);
 }
 
-bool ThemeManager::IsResFileExists(const FilePath& resFilePath, const FilePath& windowResPath) const
+bool ThemeManager::IsResFileExists(const FilePath &resFilePath, const FilePath &windowResPath) const
 {
     return GetResFileData(resFilePath, windowResPath, nullptr, nullptr);
 }
 
-bool ThemeManager::GetResFileData(const FilePath& resFilePath,
-                                  const FilePath& windowResPath,
-                                  FilePath* pResFileFullPath,
-                                  std::vector<uint8_t>* pResFileData) const
+bool ThemeManager::GetResFileData(
+    const FilePath &resFilePath,
+    const FilePath &windowResPath,
+    FilePath *pResFileFullPath,
+    std::vector<uint8_t> *pResFileData) const
 {
     ASSERT(!resFilePath.IsEmpty() && _T("resFilePath is empty!"));
     if (resFilePath.IsEmpty()) {
@@ -514,7 +504,7 @@ bool ThemeManager::GetResFileData(const FilePath& resFilePath,
         pResFileData->clear();
     }
     // 缓存 ZipManager 引用，避免频繁获取单例
-    ZipManager& zipMgr = GlobalManager::Instance().Zip();
+    ZipManager &zipMgr = GlobalManager::Instance().Zip();
     const bool bUseZip = zipMgr.IsUseZip();
     // 如果启用 ZIP 模式，且传入的本身就是 ZIP 内完整有效路径
     if (bUseZip && zipMgr.IsZipResExist(resFilePath)) {
@@ -531,25 +521,23 @@ bool ThemeManager::GetResFileData(const FilePath& resFilePath,
     FilePath sFile;
     std::vector<FilePath> resFileSearchPathList;
     GetResFileSearchPath(windowResPath, resFileSearchPathList);
-    for (const FilePath& resFileSearchPath : resFileSearchPathList) {
+    for (const FilePath &resFileSearchPath : resFileSearchPathList) {
         if (GlobalManager::Instance().Zip().IsUseZip()) {
             sFile = FilePathUtil::JoinFilePath(resFileSearchPath, resFilePath);
             if (GlobalManager::Instance().Zip().IsZipResExist(sFile)) {
-                bFileExists = true;                
+                bFileExists = true;
                 if (pResFileData != nullptr) {
                     if (!GlobalManager::Instance().Zip().GetZipData(sFile, *pResFileData)) {
                         bFileExists = false;
                     }
                 }
-            }            
-        }
-        else {
+            }
+        } else {
             sFile.Clear();
             if (resFilePath.IsRelativePath()) {
                 //相对路径
                 sFile = FilePathUtil::JoinFilePath(resFileSearchPath, resFilePath);
-            }
-            else {
+            } else {
                 //绝对路径
                 sFile = resFilePath;
             }
@@ -565,7 +553,8 @@ bool ThemeManager::GetResFileData(const FilePath& resFilePath,
     return bFileExists;
 }
 
-void ThemeManager::GetResFileSearchPath(const FilePath& windowResPath, std::vector<FilePath>& resFileSearchPathList) const
+void ThemeManager::GetResFileSearchPath(
+    const FilePath &windowResPath, std::vector<FilePath> &resFileSearchPathList) const
 {
     // 资源查找顺序：
     // 1. 首先在窗口对应的资源目录下查找（windowResPath目录）
@@ -573,12 +562,12 @@ void ThemeManager::GetResFileSearchPath(const FilePath& windowResPath, std::vect
     // 3. 在图标主题目录查找
     // 4. 在默认主题目录查找
     std::vector<FilePath> themeDirList;
-    if (GetCurrentColorThemeInfo().m_bSelectedTheme &&
-        !GetCurrentColorThemeInfo().m_themePath.IsEmpty()) {
+    if (GetCurrentColorThemeInfo().m_bSelectedTheme
+        && !GetCurrentColorThemeInfo().m_themePath.IsEmpty()) {
         themeDirList.push_back(GetCurrentColorThemeInfo().m_themePath);
     }
-    if (GetCurrentIconThemeInfo().m_bSelectedTheme &&
-        !GetCurrentIconThemeInfo().m_themePath.IsEmpty()) {
+    if (GetCurrentIconThemeInfo().m_bSelectedTheme
+        && !GetCurrentIconThemeInfo().m_themePath.IsEmpty()) {
         themeDirList.push_back(GetCurrentIconThemeInfo().m_themePath);
     }
     if (!GetDefaultThemePath().IsEmpty()) {
@@ -588,14 +577,14 @@ void ThemeManager::GetResFileSearchPath(const FilePath& windowResPath, std::vect
     FilePath tempPath;
     const FilePath themeRootPath = GetThemeRootPath();
     if (!windowResPath.IsEmpty()) {
-        for (const FilePath& themeDir : themeDirList) {
+        for (const FilePath &themeDir : themeDirList) {
             tempPath = themeRootPath;
             tempPath /= themeDir;
             tempPath /= windowResPath;
             resFileSearchPathList.push_back(tempPath);
         }
     }
-    for (const FilePath& themeDir : themeDirList) {
+    for (const FilePath &themeDir : themeDirList) {
         tempPath = themeRootPath;
         tempPath /= themeDir;
         resFileSearchPathList.push_back(tempPath);
@@ -605,18 +594,19 @@ void ThemeManager::GetResFileSearchPath(const FilePath& windowResPath, std::vect
     CheckResSearchPathList(resFileSearchPathList);
 }
 
-void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
-                                          const FilePath& windowXmlPath,
-                                          bool bPublicFirst,
-                                          std::vector<FilePath>& resFileSearchPathList) const
+void ThemeManager::GetResFileSearchPathEx(
+    const FilePath &windowResPath,
+    const FilePath &windowXmlPath,
+    bool bPublicFirst,
+    std::vector<FilePath> &resFileSearchPathList) const
 {
     std::vector<FilePath> themeDirList;
-    if (GetCurrentColorThemeInfo().m_bSelectedTheme &&
-        !GetCurrentColorThemeInfo().m_themePath.IsEmpty()) {
+    if (GetCurrentColorThemeInfo().m_bSelectedTheme
+        && !GetCurrentColorThemeInfo().m_themePath.IsEmpty()) {
         themeDirList.push_back(GetCurrentColorThemeInfo().m_themePath);
     }
-    if (GetCurrentIconThemeInfo().m_bSelectedTheme &&
-        !GetCurrentIconThemeInfo().m_themePath.IsEmpty()) {
+    if (GetCurrentIconThemeInfo().m_bSelectedTheme
+        && !GetCurrentIconThemeInfo().m_themePath.IsEmpty()) {
         themeDirList.push_back(GetCurrentIconThemeInfo().m_themePath);
     }
     if (!GetDefaultThemePath().IsEmpty()) {
@@ -632,29 +622,28 @@ void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
         // 3. 在默认主题目录查找
         // 4. 在窗口XML对应的资源目录下查找（windowXmlPath目录）
         // 5. 在窗口对应的资源目录下查找（windowResPath目录）
-        for (const FilePath& themeDir : themeDirList) {
+        for (const FilePath &themeDir : themeDirList) {
             tempPath = themeRootPath;
             tempPath /= themeDir;
             resFileSearchPathList.push_back(tempPath);
         }
         if (!windowXmlPath.IsEmpty()) {
             if (windowXmlPath.ToString().find(windowResPath.ToString()) == 0) {
-                for (const FilePath& themeDir : themeDirList) {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowXmlPath;
                     resFileSearchPathList.push_back(tempPath);
                 }
-            }
-            else {
-                for (const FilePath& themeDir : themeDirList) {
+            } else {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowResPath;
                     tempPath /= windowXmlPath;
                     resFileSearchPathList.push_back(tempPath);
                 }
-                for (const FilePath& themeDir : themeDirList) {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowXmlPath;
@@ -663,15 +652,14 @@ void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
             }
         }
         if (!windowResPath.IsEmpty()) {
-            for (const FilePath& themeDir : themeDirList) {
+            for (const FilePath &themeDir : themeDirList) {
                 tempPath = themeRootPath;
                 tempPath /= themeDir;
                 tempPath /= windowResPath;
                 resFileSearchPathList.push_back(tempPath);
             }
         }
-    }
-    else {
+    } else {
         // 资源查找顺序：
         // 1. 在窗口XML对应的资源目录下查找（windowXmlPath目录）
         // 2. 在窗口对应的资源目录下查找（windowResPath目录）
@@ -680,22 +668,21 @@ void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
         // 5. 在默认主题目录查找
         if (!windowXmlPath.IsEmpty()) {
             if (windowXmlPath.ToString().find(windowResPath.ToString()) == 0) {
-                for (const FilePath& themeDir : themeDirList) {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowXmlPath;
                     resFileSearchPathList.push_back(tempPath);
                 }
-            }
-            else {
-                for (const FilePath& themeDir : themeDirList) {
+            } else {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowResPath;
                     tempPath /= windowXmlPath;
                     resFileSearchPathList.push_back(tempPath);
                 }
-                for (const FilePath& themeDir : themeDirList) {
+                for (const FilePath &themeDir : themeDirList) {
                     tempPath = themeRootPath;
                     tempPath /= themeDir;
                     tempPath /= windowXmlPath;
@@ -704,14 +691,14 @@ void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
             }
         }
         if (!windowResPath.IsEmpty()) {
-            for (const FilePath& themeDir : themeDirList) {
+            for (const FilePath &themeDir : themeDirList) {
                 tempPath = themeRootPath;
                 tempPath /= themeDir;
                 tempPath /= windowResPath;
                 resFileSearchPathList.push_back(tempPath);
             }
         }
-        for (const FilePath& themeDir : themeDirList) {
+        for (const FilePath &themeDir : themeDirList) {
             tempPath = themeRootPath;
             tempPath /= themeDir;
             resFileSearchPathList.push_back(tempPath);
@@ -722,7 +709,7 @@ void ThemeManager::GetResFileSearchPathEx(const FilePath& windowResPath,
     CheckResSearchPathList(resFileSearchPathList);
 }
 
-void ThemeManager::CheckResSearchPathList(std::vector<FilePath>& resFileSearchPathList) const
+void ThemeManager::CheckResSearchPathList(std::vector<FilePath> &resFileSearchPathList) const
 {
     // 需要检查目录是否存在
     auto iter = resFileSearchPathList.begin();
@@ -733,25 +720,24 @@ void ThemeManager::CheckResSearchPathList(std::vector<FilePath>& resFileSearchPa
             FilePath innerDirName = *iter;
             innerDirName.NormalizeDirectoryPath();
             bExistsDirectory = GlobalManager::Instance().Zip().IsZipResExist(innerDirName);
-        }
-        else {
+        } else {
             // 使用本地文件系统时
             bExistsDirectory = iter->IsExistsDirectory();
         }
         if (bExistsDirectory) {
             ++iter;
-        }
-        else {
+        } else {
             iter = resFileSearchPathList.erase(iter);
         }
     }
 }
 
-FilePath ThemeManager::FindExistsResFullPath(const FilePath& windowResPath,
-                                             const FilePath& windowXmlPath,
-                                             const FilePath& resPath,
-                                             bool& bLocalPath,
-                                             bool& bResPath) const
+FilePath ThemeManager::FindExistsResFullPath(
+    const FilePath &windowResPath,
+    const FilePath &windowXmlPath,
+    const FilePath &resPath,
+    bool &bLocalPath,
+    bool &bResPath) const
 {
     bLocalPath = true;
     bResPath = true;
@@ -766,7 +752,7 @@ FilePath ThemeManager::FindExistsResFullPath(const FilePath& windowResPath,
     const bool bOSWindows = false;
 #endif
 
-    bool bWindows = bOSWindows;//避免编译警告
+    bool bWindows = bOSWindows; //避免编译警告
     if (bWindows && resPath.IsAbsolutePath()) {
         //Windows平台的绝对路径: 外部文件
         imageFullPath = resPath;
@@ -774,23 +760,21 @@ FilePath ThemeManager::FindExistsResFullPath(const FilePath& windowResPath,
         if (imageFullPath.IsExistsFile()) {
             bLocalPath = true;
             bResPath = false;
-        }
-        else {
+        } else {
             //如果文件不存在，返回空
             imageFullPath.Clear();
         }
-    }
-    else {
+    } else {
         const bool bResInPublic = IsResInPublicPath(resPath);
         std::vector<FilePath> resFileSearchPathList;
         GetResFileSearchPathEx(windowResPath, windowXmlPath, bResInPublic, resFileSearchPathList);
-        for (const FilePath& resFileSearchPath : resFileSearchPathList) {
+        for (const FilePath &resFileSearchPath : resFileSearchPathList) {
             imageFullPath = FilePathUtil::JoinFilePath(resFileSearchPath, resPath);
-            CheckImagePath(imageFullPath, bLocalPath);            
+            CheckImagePath(imageFullPath, bLocalPath);
             if (!imageFullPath.IsEmpty()) {
                 break;
             }
-        }        
+        }
     }
     if (!bWindows && imageFullPath.IsEmpty() && resPath.IsAbsolutePath()) {
         //注意：非Windows的绝对路径与相对路径形式相同，都是以'/'开头，所以放在最后判断
@@ -799,8 +783,7 @@ FilePath ThemeManager::FindExistsResFullPath(const FilePath& windowResPath,
         if (imageFullPath.IsExistsFile()) {
             bLocalPath = true;
             bResPath = false;
-        }
-        else {
+        } else {
             //如果文件不存在，返回空
             imageFullPath.Clear();
         }
@@ -808,22 +791,20 @@ FilePath ThemeManager::FindExistsResFullPath(const FilePath& windowResPath,
     return imageFullPath;
 }
 
-void ThemeManager::CheckImagePath(FilePath& imageFullPath, bool& bLocalPath) const
+void ThemeManager::CheckImagePath(FilePath &imageFullPath, bool &bLocalPath) const
 {
     imageFullPath.NormalizeFilePath();
     if (GlobalManager::Instance().Zip().IsZipResExist(imageFullPath)) {
         bLocalPath = false;
-    }
-    else if (imageFullPath.IsExistsFile()) {
+    } else if (imageFullPath.IsExistsFile()) {
         bLocalPath = true;
-    }
-    else {
+    } else {
         //如果文件不存在，返回空
         imageFullPath.Clear();
     }
 }
 
-bool ThemeManager::IsResInPublicPath(const FilePath& resPath) const
+bool ThemeManager::IsResInPublicPath(const FilePath &resPath) const
 {
     DString resPathString = resPath.ToString();
     StringUtil::ReplaceAll(_T("\\"), _T("/"), resPathString);
@@ -835,17 +816,17 @@ bool ThemeManager::IsResInPublicPath(const FilePath& resPath) const
     return false;
 }
 
-const FilePath& ThemeManager::GetThemeRootPath() const
+const FilePath &ThemeManager::GetThemeRootPath() const
 {
     return m_themeRootPath;
 }
 
-const FilePath& ThemeManager::GetDefaultThemePath() const
+const FilePath &ThemeManager::GetDefaultThemePath() const
 {
     return m_defaultThemePath;
 }
 
-const DString& ThemeManager::GetGlobalXmlFileName() const
+const DString &ThemeManager::GetGlobalXmlFileName() const
 {
     return m_globalXmlFileName;
 }
@@ -857,7 +838,8 @@ void ThemeManager::AddThemeChangeCallback(ThemeChangedCallback callback, size_t 
         callbackData.m_callback = callback;
         callbackData.m_callbackId = callbackId;
         if (!m_themeChangedCallbacks.empty() && (callbackId != 0)) {
-            auto iter = std::find(m_themeChangedCallbacks.begin(), m_themeChangedCallbacks.end(), callbackData);
+            auto iter = std::find(
+                m_themeChangedCallbacks.begin(), m_themeChangedCallbacks.end(), callbackData);
             if (iter != m_themeChangedCallbacks.end()) {
                 //避免重复添加
                 return;
@@ -873,7 +855,8 @@ void ThemeManager::RemoveThemeChangeCallback(ThemeChangedCallback callback, size
         ThemeChangedEventData callbackData;
         callbackData.m_callback = callback;
         callbackData.m_callbackId = callbackId;
-        auto iter = std::find(m_themeChangedCallbacks.begin(), m_themeChangedCallbacks.end(), callbackData);
+        auto iter
+            = std::find(m_themeChangedCallbacks.begin(), m_themeChangedCallbacks.end(), callbackData);
         if (iter != m_themeChangedCallbacks.end()) {
             m_themeChangedCallbacks.erase(iter);
         }
@@ -885,12 +868,12 @@ void ThemeManager::Clear()
     m_themeChangedCallbacks.clear();
 }
 
-void ThemeManager::SetLightColorPath(const DString& lightColorPath)
+void ThemeManager::SetLightColorPath(const DString &lightColorPath)
 {
     m_lightColorPath = lightColorPath;
 }
 
-void ThemeManager::SetDarkColorPath(const DString& darkColorPath)
+void ThemeManager::SetDarkColorPath(const DString &darkColorPath)
 {
     m_darkColorPath = darkColorPath;
 }
@@ -907,8 +890,7 @@ FilePath ThemeManager::GetSystemColorThemePath()
 #endif
     if (bDarkMode) {
         return FilePath(m_darkColorPath);
-    }
-    else {
+    } else {
         return FilePath(m_lightColorPath);
     }
 }

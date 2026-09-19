@@ -7,6 +7,7 @@
 class ControlForm : public ui::WindowImplBase
 {
     typedef ui::WindowImplBase BaseClass;
+
 public:
     ControlForm();
     virtual ~ControlForm() override;
@@ -27,15 +28,14 @@ public:
     virtual void OnCloseWindow() override;
 
 private:
-
     /** 显示菜单
     * @param [in] point 显示位置坐标，屏幕坐标
     */
-    void ShowPopupMenu(const ui::UiPoint& point, ui::Control* pRelatedControl);
+    void ShowPopupMenu(const ui::UiPoint &point, ui::Control *pRelatedControl);
 
     /** 注册编辑框的事件
     */
-    void AttachRichEditEvents(ui::Control* edit);
+    void AttachRichEditEvents(ui::Control *edit);
 
     /**
      * 被投递到杂事线程读取 xml 数据的任务函数
@@ -45,7 +45,7 @@ private:
     /**
      * 用于在杂事线程读取 xml 完成后更新 UI 内容的接口
      */
-    void OnResourceFileLoaded(const DString& xml);
+    void OnResourceFileLoaded(const DString &xml);
 
     /**
      * 动态更新进度条接口
@@ -78,7 +78,12 @@ private:
     * @param [out] bHandled 消息是否已经处理，返回 true 表明已经成功处理消息，不需要再传递给窗口过程；返回 false 表示将消息继续传递给窗口过程处理
     * @return 返回消息的处理结果，如果应用程序处理此消息，应返回零
     */
-    virtual LRESULT OnHotKeyMsg(int32_t hotkeyId, ui::VirtualKeyCode vkCode, uint32_t modifierKey, const ui::NativeMsg& nativeMsg, bool& bHandled) override;
+    virtual LRESULT OnHotKeyMsg(
+        int32_t hotkeyId,
+        ui::VirtualKeyCode vkCode,
+        uint32_t modifierKey,
+        const ui::NativeMsg &nativeMsg,
+        bool &bHandled) override;
 
 private:
     /** 显示/隐藏托盘图标

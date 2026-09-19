@@ -13,7 +13,7 @@ public:
     virtual ~MainThread() override;
 
     //开启DPI感知功能设置参数
-    const ui::DpiInitParam& GetDpiInitParam() const;
+    const ui::DpiInitParam &GetDpiInitParam() const;
 
 private:
     /** 运行前初始化，在进入消息循环前调用，如果初始化失败则不进入消息循环

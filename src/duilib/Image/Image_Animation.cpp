@@ -1,16 +1,12 @@
 #include "Image_Animation.h"
 
-namespace ui
-{
-Image_Animation::Image_Animation(const std::shared_ptr<IAnimationImage>& pAnimationImage):
-    m_pAnimationImage(pAnimationImage),
-    m_nAsyncDecodeTaskId(0)
-{
-}
+namespace ui {
+Image_Animation::Image_Animation(const std::shared_ptr<IAnimationImage> &pAnimationImage)
+    : m_pAnimationImage(pAnimationImage)
+    , m_nAsyncDecodeTaskId(0)
+{}
 
-Image_Animation::~Image_Animation()
-{
-}
+Image_Animation::~Image_Animation() {}
 
 int32_t Image_Animation::GetWidth() const
 {
@@ -80,7 +76,8 @@ size_t Image_Animation::GetAsyncDecodeTaskId() const
     return m_nAsyncDecodeTaskId;
 }
 
-bool Image_Animation::AsyncDecode(uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool* bDecodeError)
+bool Image_Animation::AsyncDecode(
+    uint32_t nMinFrameIndex, std::function<bool(void)> IsAborted, bool *bDecodeError)
 {
     ASSERT(m_pAnimationImage != nullptr);
     if (m_pAnimationImage != nullptr) {

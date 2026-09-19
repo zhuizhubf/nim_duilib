@@ -1,33 +1,32 @@
 #include "FrameworkThread.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Core/WindowMessage.h"
 #include "duilib/Core/ScopedLock.h"
+#include "duilib/Core/WindowMessage.h"
 
-#if defined (DUILIB_BUILD_FOR_SDL)
-    #include "duilib/Core/MessageLoop_SDL.h"
-    #include <SDL3/SDL.h>
-#elif defined (DUILIB_BUILD_FOR_WIN)
-    #include "duilib/Core/MessageLoop_Windows.h"
+#if defined(DUILIB_BUILD_FOR_SDL)
+#include "duilib/Core/MessageLoop_SDL.h"
+#include <SDL3/SDL.h>
+#elif defined(DUILIB_BUILD_FOR_WIN)
+#include "duilib/Core/MessageLoop_Windows.h"
 #endif
 
 #include <sstream>
 
 /** 用户自定义消息
 */
-#if defined (DUILIB_BUILD_FOR_SDL)
-    #define WM_USER_DEFINED_MSG     (SDL_EVENT_USER + 1)
+#if defined(DUILIB_BUILD_FOR_SDL)
+#define WM_USER_DEFINED_MSG (SDL_EVENT_USER + 1)
 #else
-    #define WM_USER_DEFINED_MSG     (kWM_USER + 568)
+#define WM_USER_DEFINED_MSG (kWM_USER + 568)
 #endif
 
-namespace ui 
-{
-FrameworkThread::FrameworkThread(const DString& threadName, int32_t nThreadIdentifier):
-    m_bThreadUI(false),
-    m_bRunning(false),
-    m_bSupportIdle(false),
-    m_threadName(threadName),
-    m_nThreadIdentifier(nThreadIdentifier)
+namespace ui {
+FrameworkThread::FrameworkThread(const DString &threadName, int32_t nThreadIdentifier)
+    : m_bThreadUI(false)
+    , m_bRunning(false)
+    , m_bSupportIdle(false)
+    , m_threadName(threadName)
+    , m_nThreadIdentifier(nThreadIdentifier)
 {
     if (m_nThreadIdentifier == kThreadUI) {
         //主线程在构造时，完成必要的初始化
@@ -40,7 +39,14 @@ FrameworkThread::FrameworkThread(const DString& threadName, int32_t nThreadIdent
 #endif
         //初始化与主线程通信的机制
         m_threadMsg.Initialize(GlobalManager::Instance().GetPlatformData());
-        m_threadMsg.SetMessageCallback(WM_USER_DEFINED_MSG, UiBind(&FrameworkThread::OnTaskMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        m_threadMsg.SetMessageCallback(
+            WM_USER_DEFINED_MSG,
+            UiBind(
+                &FrameworkThread::OnTaskMessage,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3));
     }
 }
 
@@ -59,8 +65,7 @@ FrameworkThread::~FrameworkThread()
         if (m_bRunning.load(std::memory_order_acquire)) {
             // 正常运行中 -> 走正常停止流程（Stop 内部会 join + reset）
             Stop();
-        }
-        else {
+        } else {
             // worker 已自行退出（如 OnInit 失败）-> 仅 join + reset 即可
             m_pWorkerThread->join();
             m_pWorkerThread.reset();
@@ -94,9 +99,7 @@ bool FrameworkThread::RunMessageLoop(bool bSupportIdle)
     return true;
 }
 
-void FrameworkThread::OnMainThreadInited()
-{
-}
+void FrameworkThread::OnMainThreadInited() {}
 
 void FrameworkThread::OnMainThreadExit()
 {
@@ -143,8 +146,7 @@ bool FrameworkThread::Stop()
         m_cv.notify_all();
         m_pWorkerThread->join();
         m_pWorkerThread.reset();
-    }
-    else {
+    } else {
         m_bRunning.store(false, std::memory_order_release);
     }
     return true;
@@ -165,10 +167,10 @@ std::thread::id FrameworkThread::GetThreadId() const
     return m_nThisThreadId;
 }
 
-DString FrameworkThread::ThreadIdToString(const std::thread::id& threadId)
+DString FrameworkThread::ThreadIdToString(const std::thread::id &threadId)
 {
     // 转为字符串
-#ifdef DUILIB_UNICODE    
+#ifdef DUILIB_UNICODE
     std::wstringstream ss;
     ss << threadId;
     std::wstring thread_id_str = ss.str();
@@ -186,7 +188,7 @@ int32_t FrameworkThread::GetThreadIdentifier() const
     return m_nThreadIdentifier;
 }
 
-const DString& FrameworkThread::GetThreadName() const
+const DString &FrameworkThread::GetThreadName() const
 {
     return m_threadName;
 }
@@ -197,7 +199,7 @@ size_t FrameworkThread::GetNextTaskId() const
     return GlobalManager::Instance().Thread().GetNextTaskId();
 }
 
-size_t FrameworkThread::PostTask(const StdClosure& task, const StdClosure& unlockClosure)
+size_t FrameworkThread::PostTask(const StdClosure &task, const StdClosure &unlockClosure)
 {
     ASSERT(task != nullptr);
     if (task == nullptr) {
@@ -205,7 +207,7 @@ size_t FrameworkThread::PostTask(const StdClosure& task, const StdClosure& unloc
     }
     ScopedLock threadGuard(m_taskMutex);
     size_t nTaskId = GetNextTaskId();
-    TaskInfo& taskInfo = m_taskMap[nTaskId];
+    TaskInfo &taskInfo = m_taskMap[nTaskId];
     taskInfo.m_taskType = TaskType::kTask;
     taskInfo.m_task = task;
     taskInfo.m_nIntervalMs = 0;
@@ -214,15 +216,13 @@ size_t FrameworkThread::PostTask(const StdClosure& task, const StdClosure& unloc
     taskInfo.m_startTime = std::chrono::steady_clock::now();
     taskInfo.m_nTotalExecTimes = 0;
 
-    StdClosure unlockClosure1 = [&threadGuard]() {
-            threadGuard.Unlock();
-        };
+    StdClosure unlockClosure1 = [&threadGuard]() { threadGuard.Unlock(); };
     bool bAdded = NotifyExecTask(nTaskId, unlockClosure1, unlockClosure);
     ASSERT_UNUSED_VARIABLE(bAdded);
     return nTaskId;
 }
 
-size_t FrameworkThread::PostDelayedTask(const StdClosure& task, int32_t nDelayMs)
+size_t FrameworkThread::PostDelayedTask(const StdClosure &task, int32_t nDelayMs)
 {
     ASSERT(task != nullptr);
     if (task == nullptr) {
@@ -230,7 +230,7 @@ size_t FrameworkThread::PostDelayedTask(const StdClosure& task, int32_t nDelayMs
     }
     ScopedLock threadGuard(m_taskMutex);
     size_t nTaskId = GetNextTaskId();
-    TaskInfo& taskInfo = m_taskMap[nTaskId];
+    TaskInfo &taskInfo = m_taskMap[nTaskId];
     taskInfo.m_taskType = TaskType::kDelayedTask;
     taskInfo.m_task = task;
     taskInfo.m_nIntervalMs = nDelayMs;
@@ -245,12 +245,13 @@ size_t FrameworkThread::PostDelayedTask(const StdClosure& task, int32_t nDelayMs
     }
     //生成一个定时器，用来触发任务执行(只执行1次)
     auto timerCallback = UiBind(&FrameworkThread::NotifyExecTask, this, nTaskId, nullptr, nullptr);
-    taskInfo.m_nTimerId = GlobalManager::Instance().Timer().AddTimer(GetWeakFlag(), timerCallback, nDelayMs, 1);
+    taskInfo.m_nTimerId
+        = GlobalManager::Instance().Timer().AddTimer(GetWeakFlag(), timerCallback, nDelayMs, 1);
     ASSERT_UNUSED_VARIABLE(taskInfo.m_nTimerId > 0);
     return nTaskId;
 }
 
-size_t FrameworkThread::PostRepeatedTask(const StdClosure& task, int32_t nIntervalMs, int32_t nTimes)
+size_t FrameworkThread::PostRepeatedTask(const StdClosure &task, int32_t nIntervalMs, int32_t nTimes)
 {
     ASSERT((task != nullptr) && (nIntervalMs > 0) && (nTimes != 0));
     if ((task == nullptr) || (nIntervalMs <= 0) || (nTimes == 0)) {
@@ -258,7 +259,7 @@ size_t FrameworkThread::PostRepeatedTask(const StdClosure& task, int32_t nInterv
     }
     ScopedLock threadGuard(m_taskMutex);
     size_t nTaskId = GetNextTaskId();
-    TaskInfo& taskInfo = m_taskMap[nTaskId];
+    TaskInfo &taskInfo = m_taskMap[nTaskId];
     taskInfo.m_taskType = TaskType::kRepeatedTask;
     taskInfo.m_task = task;
     taskInfo.m_nIntervalMs = nIntervalMs;
@@ -273,7 +274,9 @@ size_t FrameworkThread::PostRepeatedTask(const StdClosure& task, int32_t nInterv
     }
     //生成一个定时器，用来触发任务执行
     auto timerCallback = UiBind(&FrameworkThread::NotifyExecTask, this, nTaskId, nullptr, nullptr);
-    taskInfo.m_nTimerId = GlobalManager::Instance().Timer().AddTimer(GetWeakFlag(), timerCallback, nIntervalMs, nTimes);
+    taskInfo.m_nTimerId = GlobalManager::Instance()
+                              .Timer()
+                              .AddTimer(GetWeakFlag(), timerCallback, nIntervalMs, nTimes);
     ASSERT_UNUSED_VARIABLE(taskInfo.m_nTimerId > 0);
     return nTaskId;
 }
@@ -302,9 +305,8 @@ bool FrameworkThread::CancelTask(size_t nTaskId)
     return bDeleted;
 }
 
-bool FrameworkThread::NotifyExecTask(size_t nTaskId,
-                                     const StdClosure& unlockClosure1,
-                                     const StdClosure& unlockClosure2)
+bool FrameworkThread::NotifyExecTask(
+    size_t nTaskId, const StdClosure &unlockClosure1, const StdClosure &unlockClosure2)
 {
     if (IsUIThread()) {
         //UI线程: 异步执行
@@ -313,7 +315,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
         if (unlockClosure1) {
             unlockClosure1();
         }
-        if (unlockClosure2) {            
+        if (unlockClosure2) {
             unlockClosure2();
         }
 #else
@@ -321,7 +323,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
         UNUSED_VARIABLE(unlockClosure2);
 #endif
 
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
         //优先处理延迟发送的消息
         std::vector<size_t> winTaskIds;
         {
@@ -334,8 +336,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
                 bool bRet = m_threadMsg.PostMsg(WM_USER_DEFINED_MSG, *iter, 0, nullptr);
                 if (bRet) {
                     iter = winTaskIds.erase(iter);
-                }
-                else {
+                } else {
                     ++iter;
                 }
             }
@@ -344,7 +345,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
 
         uint32_t nErrorCode = 0;
         bool bRet = m_threadMsg.PostMsg(WM_USER_DEFINED_MSG, nTaskId, 0, &nErrorCode);
-#if defined (DUILIB_BUILD_FOR_WIN) && !defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
         if (!bRet) {
             if (nErrorCode == ERROR_NOT_ENOUGH_QUOTA) {
                 if (!GlobalManager::Instance().IsInUIThread()) { //在子线程中执行
@@ -376,7 +377,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
                     ScopedLock threadGuard(m_winTaskMutex);
                     for (size_t nPenddingTaskId : winTaskIds) {
                         m_winTaskIds.push_back(nPenddingTaskId);
-                    }                    
+                    }
                 }
             }
             ASSERT_UNUSED_VARIABLE(bRet);
@@ -385,8 +386,7 @@ bool FrameworkThread::NotifyExecTask(size_t nTaskId,
         ASSERT_UNUSED_VARIABLE(bRet);
 #endif
         return bRet;
-    }
-    else {
+    } else {
         //后台工作线程
         // 关键修复：Stop() 之后停止接收新任务，避免 m_penddingTaskIds 残留。
         // worker 线程已经退出（或即将退出）的情况下，这里推入的任务不会被消费。
@@ -410,24 +410,23 @@ void FrameworkThread::ExecTask(size_t nTaskId)
         ScopedLock threadGuard(m_taskMutex);
         auto iter = m_taskMap.find(nTaskId);
         if (iter != m_taskMap.end()) {
-            TaskInfo& taskInfo = iter->second;
+            TaskInfo &taskInfo = iter->second;
             if (taskInfo.m_task != nullptr) {
                 if (taskInfo.m_taskType == TaskType::kTask) {
                     //只执行一次
                     task = taskInfo.m_task;
                     m_taskMap.erase(iter);
-                }
-                else if (taskInfo.m_taskType == TaskType::kDelayedTask) {
+                } else if (taskInfo.m_taskType == TaskType::kDelayedTask) {
                     //只执行一次
                     task = taskInfo.m_task;
                     m_taskMap.erase(iter);
-                }
-                else if (taskInfo.m_taskType == TaskType::kRepeatedTask) {
+                } else if (taskInfo.m_taskType == TaskType::kRepeatedTask) {
                     //定时执行
                     task = taskInfo.m_task;
                     taskInfo.m_nTotalExecTimes++;
                     taskInfo.m_lastExecTime = std::chrono::steady_clock::now();
-                    if ((taskInfo.m_nTimes >= 0) && (taskInfo.m_nTotalExecTimes >= taskInfo.m_nTimes)) {
+                    if ((taskInfo.m_nTimes >= 0)
+                        && (taskInfo.m_nTotalExecTimes >= taskInfo.m_nTimes)) {
                         //已经执行完成
                         m_taskMap.erase(iter);
                     }
@@ -445,7 +444,7 @@ void FrameworkThread::OnTaskMessage(uint32_t msgId, WPARAM wParam, LPARAM /*lPar
 {
     ASSERT(msgId == WM_USER_DEFINED_MSG);
     if (msgId == WM_USER_DEFINED_MSG) {
-        ExecTask((size_t)wParam);
+        ExecTask((size_t) wParam);
     }
 }
 
@@ -475,7 +474,7 @@ void FrameworkThread::WorkerThreadProc()
         if (m_penddingTaskIds.empty()) {
             m_cv.wait(lk, [this] {
                 return !m_penddingTaskIds.empty() || !m_bRunning.load(std::memory_order_acquire);
-                });
+            });
         }
         if (!m_penddingTaskIds.empty()) {
             penddingTaskIds.swap(m_penddingTaskIds);
@@ -501,10 +500,10 @@ bool FrameworkThread::OnInit()
 
 void FrameworkThread::OnRunMessageLoop()
 {
-#if defined (DUILIB_BUILD_FOR_SDL)
+#if defined(DUILIB_BUILD_FOR_SDL)
     MessageLoop_SDL msgLoop;
     MessageLoop_SDL::CheckInitSDL();
-#elif defined (DUILIB_BUILD_FOR_WIN)
+#elif defined(DUILIB_BUILD_FOR_WIN)
     MessageLoop_Windows msgLoop;
 #else
     ASSERT(0);
@@ -514,23 +513,16 @@ void FrameworkThread::OnRunMessageLoop()
     OnMainThreadInited();
     if (m_bSupportIdle) {
         //支持Idle函数
-        msgLoop.Run([this]() {
-            return OnMessageLoopIdle();
-            });
-    }
-    else {
+        msgLoop.Run([this]() { return OnMessageLoopIdle(); });
+    } else {
         //不支持Idle函数
         msgLoop.Run(nullptr);
     }
     OnMainThreadExit();
 }
 
-void FrameworkThread::OnCleanup()
-{
-}
+void FrameworkThread::OnCleanup() {}
 
-void FrameworkThread::OnMessageLoopIdle()
-{
-}
+void FrameworkThread::OnMessageLoopIdle() {}
 
-}//namespace ui 
+} //namespace ui

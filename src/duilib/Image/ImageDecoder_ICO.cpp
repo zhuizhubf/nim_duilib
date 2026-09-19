@@ -1,28 +1,23 @@
 #include "ImageDecoder_ICO.h"
 #include "duilib/Core/GlobalManager.h"
-#include "duilib/Image/Image_Bitmap.h"
 #include "duilib/Image/ImageDecoderUtil.h"
 #include "duilib/Image/ImageUtil.h"
-#include "duilib/Image/Image_ICO.h"
 #include "duilib/Image/Image_Animation.h"
+#include "duilib/Image/Image_Bitmap.h"
+#include "duilib/Image/Image_ICO.h"
 #include "duilib/Utils/FilePathUtil.h"
 
-namespace ui
-{
-ImageDecoder_ICO::ImageDecoder_ICO()
-{
-}
+namespace ui {
+ImageDecoder_ICO::ImageDecoder_ICO() {}
 
-ImageDecoder_ICO::~ImageDecoder_ICO()
-{
-}
+ImageDecoder_ICO::~ImageDecoder_ICO() {}
 
 DString ImageDecoder_ICO::GetFormatName() const
 {
     return _T("ICO/CUR");
 }
 
-bool ImageDecoder_ICO::CanDecode(const DString& imageFilePath) const
+bool ImageDecoder_ICO::CanDecode(const DString &imageFilePath) const
 {
     DString fileExt = FilePathUtil::GetFileExtension(imageFilePath);
     StringUtil::MakeUpperString(fileExt);
@@ -32,12 +27,12 @@ bool ImageDecoder_ICO::CanDecode(const DString& imageFilePath) const
     return false;
 }
 
-bool ImageDecoder_ICO::CanDecode(const uint8_t* data, size_t dataLen) const
+bool ImageDecoder_ICO::CanDecode(const uint8_t *data, size_t dataLen) const
 {
     //ICO格式签名
     bool bICO = false;
     bool bCur = false;
-    std::vector<uint8_t> icoSignature = { 0x00, 0x00, 0x01, 0x00 };
+    std::vector<uint8_t> icoSignature = {0x00, 0x00, 0x01, 0x00};
     if ((dataLen > icoSignature.size()) && (data != nullptr)) {
         bICO = true;
         for (size_t i = 0; i < icoSignature.size(); ++i) {
@@ -49,7 +44,7 @@ bool ImageDecoder_ICO::CanDecode(const uint8_t* data, size_t dataLen) const
     }
     if (!bICO) {
         //CUR格式签名
-        std::vector<uint8_t> curSignature = { 0x00, 0x00, 0x02, 0x00 };
+        std::vector<uint8_t> curSignature = {0x00, 0x00, 0x02, 0x00};
         if ((dataLen > curSignature.size()) && (data != nullptr)) {
             bCur = true;
             for (size_t i = 0; i < curSignature.size(); ++i) {
@@ -63,7 +58,7 @@ bool ImageDecoder_ICO::CanDecode(const uint8_t* data, size_t dataLen) const
     return bICO || bCur;
 }
 
-std::unique_ptr<IImage> ImageDecoder_ICO::LoadImageData(const ImageDecodeParam& decodeParam)
+std::unique_ptr<IImage> ImageDecoder_ICO::LoadImageData(const ImageDecodeParam &decodeParam)
 {
     float fImageSizeScale = decodeParam.m_fImageSizeScale;
     uint32_t nIconSize = decodeParam.m_nIconSize;
@@ -80,32 +75,39 @@ std::unique_ptr<IImage> ImageDecoder_ICO::LoadImageData(const ImageDecodeParam& 
 
     bool bLoaded = false;
     if ((decodeParam.m_pFileData != nullptr) && !decodeParam.m_pFileData->empty()) {
-        std::vector<uint8_t>& fileData = *decodeParam.m_pFileData;
-        bLoaded = ImageDecoderUtil::LoadIcoFromMemory(fileData, bIconAsAnimation, nIconSizeScaled, imageData);
-    }
-    else if (!decodeParam.m_imageFilePath.IsEmpty()) {
-        bLoaded = ImageDecoderUtil::LoadIcoFromFile(decodeParam.m_imageFilePath, bIconAsAnimation, nIconSizeScaled, imageData);
-    }
-    else {
+        std::vector<uint8_t> &fileData = *decodeParam.m_pFileData;
+        bLoaded = ImageDecoderUtil::LoadIcoFromMemory(
+            fileData, bIconAsAnimation, nIconSizeScaled, imageData);
+    } else if (!decodeParam.m_imageFilePath.IsEmpty()) {
+        bLoaded = ImageDecoderUtil::LoadIcoFromFile(
+            decodeParam.m_imageFilePath, bIconAsAnimation, nIconSizeScaled, imageData);
+    } else {
         ASSERT(0);
     }
-    
+
     if (bLoaded) {
-        ASSERT(!imageData.empty());        
+        ASSERT(!imageData.empty());
         if (imageData.size() == 1) {
-            UiImageData& bitmapData = imageData[0];
+            UiImageData &bitmapData = imageData[0];
             ASSERT(bitmapData.m_imageHeight > 0);
             ASSERT(bitmapData.m_imageWidth > 0);
             ASSERT(bitmapData.m_imageWidth == bitmapData.m_imageHeight);
-            ASSERT(bitmapData.m_imageData.size() == bitmapData.m_imageHeight* bitmapData.m_imageWidth*4);
-            if ((bitmapData.m_imageHeight > 0) && (bitmapData.m_imageWidth > 0) &&
-                (bitmapData.m_imageData.size() == bitmapData.m_imageHeight * bitmapData.m_imageWidth * 4)) {
-                float fNewImageSizeScale = static_cast<float>(nIconSizeScaled) / bitmapData.m_imageWidth;
-                pImage = Image_Bitmap::MakeImage(bitmapData.m_imageWidth, bitmapData.m_imageHeight, bitmapData.m_imageData.data(), fNewImageSizeScale);
+            ASSERT(
+                bitmapData.m_imageData.size()
+                == bitmapData.m_imageHeight * bitmapData.m_imageWidth * 4);
+            if ((bitmapData.m_imageHeight > 0) && (bitmapData.m_imageWidth > 0)
+                && (bitmapData.m_imageData.size()
+                    == bitmapData.m_imageHeight * bitmapData.m_imageWidth * 4)) {
+                float fNewImageSizeScale = static_cast<float>(nIconSizeScaled)
+                                           / bitmapData.m_imageWidth;
+                pImage = Image_Bitmap::MakeImage(
+                    bitmapData.m_imageWidth,
+                    bitmapData.m_imageHeight,
+                    bitmapData.m_imageData.data(),
+                    fNewImageSizeScale);
             }
-        }
-        else {
-            Image_ICO* pImageICO = new Image_ICO;
+        } else {
+            Image_ICO *pImageICO = new Image_ICO;
             std::shared_ptr<IAnimationImage> pAnimationImage(pImageICO);
             if (pImageICO->LoadImageFromMemory(imageData, fImageSizeScale, nIconSize, nFrameDelayMs)) {
                 pImage.reset(new Image_Animation(pAnimationImage));

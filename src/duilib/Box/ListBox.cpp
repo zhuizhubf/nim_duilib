@@ -1,93 +1,82 @@
 #include "ListBox.h"
 #include "ListBoxHelper.h"
-#include "duilib/Core/ScrollBar.h"
 #include "duilib/Core/Keyboard.h"
+#include "duilib/Core/ScrollBar.h"
 #include "duilib/Layout/VirtualHTileLayout.h"
 #include "duilib/Layout/VirtualVTileLayout.h"
 
-namespace ui 
-{
+namespace ui {
 
 //多选的时候，是否显示选择背景色: 0 - 默认规则; 1 - 显示背景色; 2: 不显示背景色
-enum ePaintSelectedColors
-{
+enum ePaintSelectedColors {
     PAINT_SELECTED_COLORS_DEFAULT = 0,
     PAINT_SELECTED_COLORS_YES = 1,
     PAINT_SELECTED_COLORS_NO = 2
 };
 
-ListBox::ListBox(Window* pWindow, Layout* pLayout) :
-    ScrollBox(pWindow, pLayout),
-    m_iCurSel(Box::InvalidIndex),
+ListBox::ListBox(Window *pWindow, Layout *pLayout)
+    : ScrollBox(pWindow, pLayout)
+    , m_iCurSel(Box::InvalidIndex)
+    ,
     // m_nLastNoShiftItem：没按Shift键时的最后一次选中项的索引（用于Shift多选范围的起点），
     // 默认为0，使用时通过 nLastNoShiftItem >= nItemCount 兜底修正
-    m_nLastNoShiftItem(0),
-    m_pCompareFunc(nullptr),
-    m_pCompareContext(nullptr),
-    m_uPaintSelectedColors(PAINT_SELECTED_COLORS_DEFAULT),
-    m_bScrollSelect(false),
-    m_bSelectNextWhenActiveRemoved(false),
-    m_bMultiSelect(false),
-    m_bSelectLikeListCtrl(false),
-    m_bSelectNoneWhenClickBlank(true)
-{
-}
+    m_nLastNoShiftItem(0)
+    , m_pCompareFunc(nullptr)
+    , m_pCompareContext(nullptr)
+    , m_uPaintSelectedColors(PAINT_SELECTED_COLORS_DEFAULT)
+    , m_bScrollSelect(false)
+    , m_bSelectNextWhenActiveRemoved(false)
+    , m_bMultiSelect(false)
+    , m_bSelectLikeListCtrl(false)
+    , m_bSelectNoneWhenClickBlank(true)
+{}
 
 ListBox::~ListBox()
 {
     if (!IsAutoDestroyChild()) {
         const size_t itemCount = GetItemCount();
         for (size_t i = 0; i < itemCount; ++i) {
-            Control* p = GetItemAt(i);
+            Control *p = GetItemAt(i);
             OnListBoxItemRemoved(p);
         }
     }
 }
 
-DString ListBox::GetType() const { return _T("ListBox"); }
+DString ListBox::GetType() const
+{
+    return _T("ListBox");
+}
 
-void ListBox::SetAttribute(const DString& strName, const DString& strValue2)
+void ListBox::SetAttribute(const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
     if (strName == _T("multi_select")) {
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("paint_selected_colors")) {
+    } else if (strName == _T("paint_selected_colors")) {
         if (StringUtil::IsValueTrue(strValue)) {
             m_uPaintSelectedColors = PAINT_SELECTED_COLORS_YES;
-        }
-        else {
+        } else {
             m_uPaintSelectedColors = PAINT_SELECTED_COLORS_NO;
         }
-    }
-    else if ((strName == _T("scroll_select")) || (strName == _T("scrollselect"))) {
+    } else if ((strName == _T("scroll_select")) || (strName == _T("scrollselect"))) {
         SetScrollSelect(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("select_next_when_active_removed")) {
+    } else if (strName == _T("select_next_when_active_removed")) {
         SetSelectNextWhenActiveRemoved(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("frame_selection")) {
+    } else if (strName == _T("frame_selection")) {
         SetEnableFrameSelection(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("frame_selection_color")) {
+    } else if (strName == _T("frame_selection_color")) {
         SetFrameSelectionColor(strValue);
-    }
-    else if (strName == _T("frame_selection_alpha")) {
-        SetFrameSelectionAlpha((uint8_t)StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("frame_selection_border_size")) {
+    } else if (strName == _T("frame_selection_alpha")) {
+        SetFrameSelectionAlpha((uint8_t) StringUtil::StringToInt32(strValue));
+    } else if (strName == _T("frame_selection_border_size")) {
         SetFrameSelectionBorderSize(StringUtil::StringToInt32(strValue));
-    }
-    else if (strName == _T("frame_selection_border_color")) {
+    } else if (strName == _T("frame_selection_border_color")) {
         SetFrameSelectionBorderColor(strValue);
-    }
-    else if (strName == _T("select_none_when_click_blank")) {
+    } else if (strName == _T("select_none_when_click_blank")) {
         SetSelectNoneWhenClickBlank(StringUtil::IsValueTrue(strValue));
-    }
-    else if (strName == _T("select_like_list_ctrl")) {
+    } else if (strName == _T("select_like_list_ctrl")) {
         SetSelectLikeListCtrl(StringUtil::IsValueTrue(strValue));
-    }
-    else {
+    } else {
         ScrollBox::SetAttribute(strName, strValue);
     }
 }
@@ -108,7 +97,7 @@ bool ListBox::IsEnableFrameSelection() const
     return false;
 }
 
-void ListBox::SetFrameSelectionColor(const DString& frameSelectionColor)
+void ListBox::SetFrameSelectionColor(const DString &frameSelectionColor)
 {
     if (m_pHelper == nullptr) {
         m_pHelper = std::make_unique<ListBoxHelper>(this);
@@ -140,7 +129,7 @@ uint8_t ListBox::GetFrameSelectionAlpha() const
     return 255;
 }
 
-void ListBox::SetFrameSelectionBorderColor(const DString& frameSelectionBorderColor)
+void ListBox::SetFrameSelectionBorderColor(const DString &frameSelectionBorderColor)
 {
     if (m_pHelper == nullptr) {
         m_pHelper = std::make_unique<ListBoxHelper>(this);
@@ -208,15 +197,14 @@ bool ListBox::IsSelectLikeListCtrl() const
     return m_bSelectLikeListCtrl;
 }
 
-void ListBox::HandleEvent(const EventArgs& msg)
+void ListBox::HandleEvent(const EventArgs &msg)
 {
     if (IsDisabledEvents(msg)) {
         //如果是鼠标键盘消息，并且控件是Disabled的，转发给上层控件
-        Box* pParent = GetParent();
+        Box *pParent = GetParent();
         if (pParent != nullptr) {
             pParent->SendEventMsg(msg);
-        }
-        else {
+        } else {
             BaseClass::HandleEvent(msg);
         }
         return;
@@ -226,28 +214,27 @@ void ListBox::HandleEvent(const EventArgs& msg)
         if (IsSelectLikeListCtrl()) {
             //优先使用ListCtrl风格的快捷逻辑
             bHandled = OnListCtrlKeyDown(msg);
-        }        
+        }
         if (!bHandled) {
             bHandled = OnListBoxKeyDown(msg);
-        }        
-    }
-    else if (msg.eventType == kEventMouseWheel) {
+        }
+    } else if (msg.eventType == kEventMouseWheel) {
         bHandled = OnListBoxMouseWheel(msg);
-    }    
-    if(!bHandled) {
+    }
+    if (!bHandled) {
         BaseClass::HandleEvent(msg);
     }
 }
 
-bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
+bool ListBox::OnListBoxKeyDown(const EventArgs &msg)
 {
     ASSERT(msg.eventType == kEventKeyDown);
     bool bHandled = false;
-    bool bArrowKeyDown = (msg.eventType == kEventKeyDown) &&
-                          ((msg.vkCode == kVK_UP)    || (msg.vkCode == kVK_DOWN) ||
-                           (msg.vkCode == kVK_LEFT)  || (msg.vkCode == kVK_RIGHT) ||
-                           (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT) ||
-                           (msg.vkCode == kVK_HOME)  || (msg.vkCode == kVK_END));
+    bool bArrowKeyDown = (msg.eventType == kEventKeyDown)
+                         && ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN)
+                             || (msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT)
+                             || (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT)
+                             || (msg.vkCode == kVK_HOME) || (msg.vkCode == kVK_END));
     if (!bArrowKeyDown) {
         return bHandled;
     }
@@ -266,17 +253,14 @@ bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
         if (msg.vkCode == kVK_HOME) {
             if (IsHorizontalScrollBar()) {
                 HomeLeft();
-            }
-            else {
+            } else {
                 HomeUp();
             }
             bHandled = true;
-        }
-        else if (msg.vkCode == kVK_END) {
+        } else if (msg.vkCode == kVK_END) {
             if (IsHorizontalScrollBar()) {
                 EndRight();
-            }
-            else {
+            } else {
                 EndDown(false);
             }
             bHandled = true;
@@ -291,34 +275,31 @@ bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
         if (IsHorizontalScrollBar()) {
             //横向滚动条，向上1条
             SelectItemPrevious(true, true);
-        }
-        else {
+        } else {
             //不是横向滚动条，向上1行
             size_t nColumns = 0;
             size_t nRows = 0;
             GetDisplayItemCount(false, nColumns, nRows);
-            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel) &&
-                (GetItemCountBefore(m_iCurSel) >= nColumns)) {
+            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel)
+                && (GetItemCountBefore(m_iCurSel) >= nColumns)) {
                 //可以向上滚动1行
                 SelectItemCountN(true, true, false, nColumns);
             }
-        }        
+        }
         break;
     case kVK_DOWN:
         if (IsHorizontalScrollBar()) {
             //横向滚动条，向下1条
             SelectItemNext(true, true);
-        }
-        else {
+        } else {
             //不是横向滚动条，向下1行
             size_t nColumns = 0;
             size_t nRows = 0;
             GetDisplayItemCount(false, nColumns, nRows);
-            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel) &&
-                (GetItemCountAfter(m_iCurSel) >= nColumns)) {
+            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel)
+                && (GetItemCountAfter(m_iCurSel) >= nColumns)) {
                 SelectItemCountN(true, true, true, nColumns);
-            }
-            else {
+            } else {
                 PageDown();
                 SelectItem(m_iCurSel, true, false);
             }
@@ -330,12 +311,11 @@ bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
             size_t nColumns = 0;
             size_t nRows = 0;
             GetDisplayItemCount(false, nColumns, nRows);
-            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel) &&
-                (GetItemCountBefore(m_iCurSel) >= nRows)) {
+            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel)
+                && (GetItemCountBefore(m_iCurSel) >= nRows)) {
                 SelectItemCountN(true, true, false, nRows);
             }
-        }
-        else {
+        } else {
             //不是横向滚动条，向上1条
             SelectItemPrevious(true, true);
         }
@@ -346,16 +326,14 @@ bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
             size_t nColumns = 0;
             size_t nRows = 0;
             GetDisplayItemCount(false, nColumns, nRows);
-            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel) &&
-                (GetItemCountAfter(m_iCurSel) >= nRows)) {
+            if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel)
+                && (GetItemCountAfter(m_iCurSel) >= nRows)) {
                 SelectItemCountN(true, true, true, nRows);
-            }
-            else {
+            } else {
                 PageRight();
                 SelectItem(m_iCurSel, true, false);
             }
-        }
-        else {
+        } else {
             //不是横向滚动条，向下1条
             SelectItemNext(true, true);
         }
@@ -384,49 +362,50 @@ bool ListBox::OnListBoxKeyDown(const EventArgs& msg)
 
 int32_t ListBox::CalcRows() const
 {
-    HLayout* pHLayout = dynamic_cast<HLayout*>(GetLayout());
+    HLayout *pHLayout = dynamic_cast<HLayout *>(GetLayout());
     if (pHLayout != nullptr) {
         //此布局固定1行
         return 1;
     }
-    HTileLayout* pHTileLayout = dynamic_cast<HTileLayout*>(GetLayout());
+    HTileLayout *pHTileLayout = dynamic_cast<HTileLayout *>(GetLayout());
     return CalcHTileRows(pHTileLayout);
 }
 
 int32_t ListBox::CalcColumns() const
 {
-    VLayout* pVLayout = dynamic_cast<VLayout*>(GetLayout());
+    VLayout *pVLayout = dynamic_cast<VLayout *>(GetLayout());
     if (pVLayout != nullptr) {
         //此布局固定1列
         return 1;
     }
-    VTileLayout* pVTileLayout = dynamic_cast<VTileLayout*>(GetLayout());
+    VTileLayout *pVTileLayout = dynamic_cast<VTileLayout *>(GetLayout());
     return CalcVTileColumns(pVTileLayout);
 }
 
-bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
+bool ListBox::OnListCtrlKeyDown(const EventArgs &msg)
 {
     //该函数只实现非虚表情况下的快捷键逻辑，虚表模式下的相应逻辑在子类中实现
     ASSERT(msg.eventType == kEventKeyDown);
     bool bHandled = false;
-    bool bCtrlADown = (msg.eventType == kEventKeyDown) && ((msg.vkCode == _T('A')) || (msg.vkCode == _T('a')));
+    bool bCtrlADown = (msg.eventType == kEventKeyDown)
+                      && ((msg.vkCode == _T('A')) || (msg.vkCode == _T('a')));
     if (bCtrlADown) {
         //Ctrl + A 全选操作
         bHandled = true;
         bool bRet = SetSelectAll();
         if (bRet) {
             OnSelectStatusChanged();
-            SendEvent(kEventSelChanged);//bRet返回true表示有变化
+            SendEvent(kEventSelChanged); //bRet返回true表示有变化
         }
         return bHandled;
     }
 
     //方向键操作
-    bool bArrowKeyDown = (msg.eventType == kEventKeyDown) &&
-                         ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN) ||
-                          (msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT) ||
-                          (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT) ||
-                          (msg.vkCode == kVK_HOME) || (msg.vkCode == kVK_END));
+    bool bArrowKeyDown = (msg.eventType == kEventKeyDown)
+                         && ((msg.vkCode == kVK_UP) || (msg.vkCode == kVK_DOWN)
+                             || (msg.vkCode == kVK_LEFT) || (msg.vkCode == kVK_RIGHT)
+                             || (msg.vkCode == kVK_PRIOR) || (msg.vkCode == kVK_NEXT)
+                             || (msg.vkCode == kVK_HOME) || (msg.vkCode == kVK_END));
     const size_t nItemCount = GetItemCount();
     if (!bArrowKeyDown || !IsMultiSelect() || (nItemCount == 0)) {
         //在方向键按下消息、无数据、不支持多选的情况下，走默认处理流程
@@ -444,32 +423,31 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
 
     // 以下流程处理方向键操作
     // 处理多选情况下的方向键操作，基本与单选流程相似，多选的情况下GetCurSel()值不一定正确，需要校准
-   // size_t nCurSel = GetCurSel();
-    const bool bForward = (msg.vkCode == kVK_DOWN) || (msg.vkCode == kVK_RIGHT) ||
-                          (msg.vkCode == kVK_NEXT) || (msg.vkCode == kVK_END);
+    // size_t nCurSel = GetCurSel();
+    const bool bForward = (msg.vkCode == kVK_DOWN) || (msg.vkCode == kVK_RIGHT)
+                          || (msg.vkCode == kVK_NEXT) || (msg.vkCode == kVK_END);
     size_t nIndexCurSel = Box::InvalidIndex;
     if (bForward) {
         //查找当前视图内选择区域内的最后一个可选择的项目，作为起始点
-        for (int32_t index = (int32_t)nItemCount - 1; index >= 0; --index) {
-            Control* pControl = GetItemAt(index);
+        for (int32_t index = (int32_t) nItemCount - 1; index >= 0; --index) {
+            Control *pControl = GetItemAt(index);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsSelectableType()) {
                 continue;
             }
-            IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(pControl);
             if ((pItem != nullptr) && pItem->IsSelected()) {
                 nIndexCurSel = index;
                 break;
             }
         }
-    }
-    else {
+    } else {
         //查找当前视图内选择区域内的第一个可选择的项目，作为起始点
         for (size_t index = 0; index < nItemCount; ++index) {
-            Control* pControl = GetItemAt(index);
+            Control *pControl = GetItemAt(index);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsSelectableType()) {
                 continue;
             }
-            IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(pControl);
             if ((pItem != nullptr) && pItem->IsSelected()) {
                 nIndexCurSel = index;
                 break;
@@ -479,12 +457,11 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
     if (nIndexCurSel >= nItemCount) {
         if (bForward) {
             nIndexCurSel = 0;
-        }
-        else {
+        } else {
             nIndexCurSel = nItemCount - 1;
         }
     }
-    
+
     if (nIndexCurSel < nItemCount) {
         //匹配可选择项
         nIndexCurSel = FindSelectable(nIndexCurSel, bForward);
@@ -506,17 +483,14 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if (nIndexCurSel >= 1) {
                 nIndexEnd = nIndexCurSel - 1;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
-        }
-        else {
+        } else {
             //纵向布局
-            if ((int32_t)nIndexCurSel >= nColumns) {
+            if ((int32_t) nIndexCurSel >= nColumns) {
                 nIndexEnd = nIndexCurSel - nColumns;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
         }
@@ -526,17 +500,14 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if ((nIndexCurSel + 1) < nItemCount) {
                 nIndexEnd = nIndexCurSel + 1;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nItemCount - 1;
             }
-        }
-        else {
+        } else {
             //纵向布局
             if ((nIndexCurSel + nColumns) < nItemCount) {
                 nIndexEnd = nIndexCurSel + nColumns;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nItemCount - 1;
             }
         }
@@ -544,25 +515,21 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
     case kVK_LEFT:
         if (IsHorizontalLayout()) {
             //横向布局
-            if ((int32_t)nIndexCurSel >= nRows) {
+            if ((int32_t) nIndexCurSel >= nRows) {
                 nIndexEnd = nIndexCurSel - nRows;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = 0;
             }
-        }
-        else {
+        } else {
             //纵向布局
             if (nColumns <= 1) {
                 //只有1列的时候，按滚动处理
                 LineLeft();
                 bHandled = true;
-            }
-            else {
+            } else {
                 if (nIndexCurSel >= 1) {
                     nIndexEnd = nIndexCurSel - 1;
-                }
-                else {
+                } else {
                     nIndexEnsureVisible = 0;
                 }
             }
@@ -573,58 +540,50 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
             //横向布局
             if ((nIndexCurSel + nRows) < nItemCount) {
                 nIndexEnd = nIndexCurSel + nRows;
-            }
-            else {
+            } else {
                 nIndexEnsureVisible = nItemCount - 1;
             }
-        }
-        else {
+        } else {
             if (nColumns <= 1) {
                 //只有1列的时候，按滚动处理
                 LineRight();
                 bHandled = true;
-            }
-            else {
+            } else {
                 //纵向布局
                 if ((nIndexCurSel + 1) < nItemCount) {
                     nIndexEnd = nIndexCurSel + 1;
-                }
-                else {
+                } else {
                     nIndexEnsureVisible = nItemCount - 1;
                 }
             }
         }
         break;
-    case kVK_PRIOR:
-    {
+    case kVK_PRIOR: {
         size_t nShowColumns = 0;
         size_t nShowRows = 0;
         if (IsHorizontalLayout()) {
             //横向布局
             GetDisplayItemCount(true, nShowColumns, nShowRows);
-        }
-        else {
-            //纵向布局            
+        } else {
+            //纵向布局
             GetDisplayItemCount(false, nShowColumns, nShowRows);
         }
         size_t nScrollCount = nShowColumns * nShowRows;
         if (nIndexCurSel >= nScrollCount) {
             nIndexEnd = nIndexCurSel - nScrollCount;
-        }
-        else {
+        } else {
             if (IsHorizontalLayout()) {
-                for (int32_t nColumn = (int32_t)nShowColumns - 1; nColumn >= 0; --nColumn) {
-                    nScrollCount = (size_t)nColumn * nShowRows;
+                for (int32_t nColumn = (int32_t) nShowColumns - 1; nColumn >= 0; --nColumn) {
+                    nScrollCount = (size_t) nColumn * nShowRows;
                     if (nIndexCurSel >= nScrollCount) {
                         //跳转到第一列，同行的位置
                         nIndexEnd = nIndexCurSel - nScrollCount;
                         break;
                     }
                 }
-            }
-            else {
-                for (int32_t nRow = (int32_t)nShowRows - 1; nRow >= 0; --nRow) {
-                    nScrollCount = nShowColumns * (size_t)nRow;
+            } else {
+                for (int32_t nRow = (int32_t) nShowRows - 1; nRow >= 0; --nRow) {
+                    nScrollCount = nShowColumns * (size_t) nRow;
                     if (nIndexCurSel >= nScrollCount) {
                         //跳转到第一行，同列的位置
                         nIndexEnd = nIndexCurSel - nScrollCount;
@@ -633,28 +592,24 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 }
             }
         }
-    }
-    break;
-    case kVK_NEXT:
-    {
+    } break;
+    case kVK_NEXT: {
         size_t nShowColumns = 0;
         size_t nShowRows = 0;
         if (IsHorizontalLayout()) {
             //横向布局
             GetDisplayItemCount(true, nShowColumns, nShowRows);
-        }
-        else {
-            //纵向布局            
+        } else {
+            //纵向布局
             GetDisplayItemCount(false, nShowColumns, nShowRows);
         }
         size_t nScrollCount = nShowColumns * nShowRows;
         if ((nIndexCurSel + nScrollCount) < nItemCount) {
             nIndexEnd = nIndexCurSel + nScrollCount;
-        }
-        else {
+        } else {
             if (IsHorizontalLayout()) {
-                for (int32_t nColumn = (int32_t)nShowColumns - 1; nColumn >= 0; --nColumn) {
-                    nScrollCount = (size_t)nColumn * nShowRows;
+                for (int32_t nColumn = (int32_t) nShowColumns - 1; nColumn >= 0; --nColumn) {
+                    nScrollCount = (size_t) nColumn * nShowRows;
                     if ((nIndexCurSel + nScrollCount) < nItemCount) {
                         //跳转到最后一列，同行的位置
                         nIndexEnd = nIndexCurSel + nScrollCount;
@@ -662,10 +617,9 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
                         break;
                     }
                 }
-            }
-            else {
-                for (int32_t nRow = (int32_t)nShowRows - 1; nRow >= 0; --nRow) {
-                    nScrollCount = nShowColumns * (size_t)nRow;
+            } else {
+                for (int32_t nRow = (int32_t) nShowRows - 1; nRow >= 0; --nRow) {
+                    nScrollCount = nShowColumns * (size_t) nRow;
                     if ((nIndexCurSel + nScrollCount) < nItemCount) {
                         //跳转到最后一行，同列的位置
                         nIndexEnd = nIndexCurSel + nScrollCount;
@@ -675,8 +629,7 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 }
             }
         }
-    }
-    break;
+    } break;
     case kVK_HOME:
         nIndexEnd = 0;
         break;
@@ -704,7 +657,7 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
     std::set<size_t> selectedIndexs; //需要选择的列表
     if (bShiftDown) {
         //按住Shift键：选择范围内的所有数据
-        size_t nLastNoShiftItem = GetLastNoShiftItem();//起始的元素索引号
+        size_t nLastNoShiftItem = GetLastNoShiftItem(); //起始的元素索引号
         if (nLastNoShiftItem >= nItemCount) {
             nLastNoShiftItem = 0;
         }
@@ -715,19 +668,18 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 selectedIndexs.insert(i);
             }
         }
-    }
-    else {
+    } else {
         //没有按住Shift键：只选择最后一个数据
         selectedIndexs.insert(nIndexEnd);
     }
 
     //选择这个范围内的所有元素
     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-        Control* pControl = GetItemAt(nItemIndex);
+        Control *pControl = GetItemAt(nItemIndex);
         if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
             continue;
         }
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListItem == nullptr) {
             continue;
         }
@@ -737,8 +689,7 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
                 //如果原来是非选择状态，更新为选择状态
                 pListItem->OptionSelected(true, false);
             }
-        }
-        else {
+        } else {
             //取消其他
             if (pListItem->IsSelected()) {
                 //如果原来是选择状态，更新为非选择状态
@@ -748,8 +699,7 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
     }
     if (nIndexEnsureVisible != Box::InvalidIndex) {
         EnsureVisible(nIndexEnsureVisible);
-    }
-    else {
+    } else {
         EnsureVisible(nIndexEnd);
     }
     size_t nCurSel = nIndexEnd;
@@ -771,7 +721,7 @@ bool ListBox::OnListCtrlKeyDown(const EventArgs& msg)
     return bHandled;
 }
 
-bool ListBox::OnListBoxMouseWheel(const EventArgs& msg)
+bool ListBox::OnListBoxMouseWheel(const EventArgs &msg)
 {
     ASSERT(msg.eventType == kEventMouseWheel);
     bool bHandled = false;
@@ -822,7 +772,7 @@ size_t ListBox::SelectItemHome(bool bTakeFocus, bool bTriggerEvent)
         iIndex = nDestItemIndex;
     }
     size_t itemIndex = FindSelectable(iIndex, true);
-    if (Box::IsValidItemIndex(itemIndex)) {        
+    if (Box::IsValidItemIndex(itemIndex)) {
         SelectItem(itemIndex, false, bTriggerEvent);
         itemIndex = SelectEnsureVisible(itemIndex, bTakeFocus);
         if (bTriggerEvent) {
@@ -853,7 +803,8 @@ size_t ListBox::SelectItemEnd(bool bTakeFocus, bool bTriggerEvent)
     return itemIndex;
 }
 
-size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForward, int32_t nDeltaValue)
+size_t ListBox::SelectItemPage(
+    bool bTakeFocus, bool bTriggerEvent, bool bForward, int32_t nDeltaValue)
 {
     //Page Up / Page Down 键的翻页逻辑
     size_t itemIndex = Box::InvalidIndex;
@@ -893,8 +844,7 @@ size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForwar
                     if (GetItemCountAfter(m_iCurSel) >= nCountPerPage) {
                         break;
                     }
-                }
-                else {
+                } else {
                     if (GetItemCountBefore(m_iCurSel) >= nCountPerPage) {
                         break;
                     }
@@ -902,8 +852,7 @@ size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForwar
                 nCountPerPage -= nRows;
             }
         }
-    }
-    else {
+    } else {
         //其他情况，按纵向滚动处理
         nCountPerPage = nTotalDisplayCount * std::abs(nDeltaValue) / GetRect().Height();
         if (nCountPerPage > nColumns) {
@@ -916,8 +865,7 @@ size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForwar
                     if (GetItemCountAfter(m_iCurSel) >= nCountPerPage) {
                         break;
                     }
-                }
-                else {
+                } else {
                     if (GetItemCountBefore(m_iCurSel) >= nCountPerPage) {
                         break;
                     }
@@ -929,15 +877,14 @@ size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForwar
     if (nCountPerPage < 1) {
         nCountPerPage = 1;
     }
-    
+
     itemIndex = Box::InvalidIndex;
     if ((m_iCurSel < GetItemCount()) && IsSelectableItem(m_iCurSel)) {
         if (bForward) {
             if (GetItemCountAfter(m_iCurSel) >= nCountPerPage) {
                 itemIndex = SelectItemCountN(bTakeFocus, bTriggerEvent, bForward, nCountPerPage);
             }
-        }
-        else {
+        } else {
             if (GetItemCountBefore(m_iCurSel) >= nCountPerPage) {
                 itemIndex = SelectItemCountN(bTakeFocus, bTriggerEvent, bForward, nCountPerPage);
             }
@@ -947,16 +894,13 @@ size_t ListBox::SelectItemPage(bool bTakeFocus, bool bTriggerEvent, bool bForwar
         if (IsHorizontalScrollBar()) {
             if (bForward) {
                 PageRight();
-            }
-            else {
+            } else {
                 PageLeft();
-            }            
-        }
-        else {
+            }
+        } else {
             if (bForward) {
                 PageDown();
-            }
-            else {
+            } else {
                 PageUp();
             }
         }
@@ -975,7 +919,7 @@ size_t ListBox::SelectItemCountN(bool bTakeFocus, bool bTriggerEvent, bool bForw
         //如果当前选中项为不可选择项，无法操作
         return Box::InvalidIndex;
     }
-    if ((nCount == 0) || (nCount == Box::InvalidIndex)){
+    if ((nCount == 0) || (nCount == Box::InvalidIndex)) {
         nCount = 1;
     }
     bool bExceedFirst = false; //已经到达第1条
@@ -984,12 +928,10 @@ size_t ListBox::SelectItemCountN(bool bTakeFocus, bool bTriggerEvent, bool bForw
         //Page Up
         if (m_iCurSel > nCount) {
             iIndex = m_iCurSel - nCount;
-        }
-        else {
+        } else {
             bExceedFirst = true;
         }
-    }
-    else {
+    } else {
         //Page Down
         iIndex = m_iCurSel + nCount;
     }
@@ -1015,8 +957,7 @@ size_t ListBox::SelectItemCountN(bool bTakeFocus, bool bTriggerEvent, bool bForw
         if (iIndex >= GetItemCount()) {
             return Box::InvalidIndex;
         }
-    }
-    else {
+    } else {
         if (bExceedFirst) {
             iIndex = 0;
         }
@@ -1024,9 +965,9 @@ size_t ListBox::SelectItemCountN(bool bTakeFocus, bool bTriggerEvent, bool bForw
     const size_t itemCount = GetItemCount();
     if (iIndex >= itemCount) {
         iIndex = itemCount - 1;
-    }    
+    }
     size_t itemIndex = FindSelectable(iIndex, bForward);
-    if (itemIndex < itemCount) {        
+    if (itemIndex < itemCount) {
         SelectItem(itemIndex, false, bTriggerEvent);
         itemIndex = SelectEnsureVisible(itemIndex, bTakeFocus);
         if (bTriggerEvent) {
@@ -1040,7 +981,7 @@ size_t ListBox::SelectEnsureVisible(size_t itemIndex, bool bTakeFocus)
 {
     itemIndex = EnsureVisible(itemIndex);
     if (bTakeFocus) {
-        Control* pSelectedControl = GetItemAt(itemIndex);
+        Control *pSelectedControl = GetItemAt(itemIndex);
         if ((pSelectedControl != nullptr) && pSelectedControl->IsVisible()) {
             pSelectedControl->SetFocus();
         }
@@ -1054,11 +995,9 @@ size_t ListBox::SelectEnsureVisible(size_t itemIndex, bool bTakeFocus)
 bool ListBox::IsSelectableItem(size_t itemIndex) const
 {
     bool bSelectable = false;
-    Control* pControl = GetItemAt(itemIndex);
-    if ((pControl != nullptr) &&
-        pControl->IsSelectableType() &&
-        pControl->IsVisible() &&
-        pControl->IsEnabled()) {
+    Control *pControl = GetItemAt(itemIndex);
+    if ((pControl != nullptr) && pControl->IsSelectableType() && pControl->IsVisible()
+        && pControl->IsEnabled()) {
         bSelectable = true;
     }
     return bSelectable;
@@ -1067,27 +1006,27 @@ bool ListBox::IsSelectableItem(size_t itemIndex) const
 bool ListBox::IsItemSelected(size_t nIndex) const
 {
     bool bSelected = false;
-    Control* pControl = GetItemAt(nIndex);
+    Control *pControl = GetItemAt(nIndex);
     if (pControl != nullptr) {
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
         if ((pListItem != nullptr) && pListItem->IsSelected()) {
             bSelected = true;
         }
-    }    
+    }
     return bSelected;
 }
 
-size_t ListBox::GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t& nRows) const
+size_t ListBox::GetDisplayItemCount(bool bIsHorizontal, size_t &nColumns, size_t &nRows) const
 {
     nColumns = 1;
     nRows = 1;
     size_t nCount = 1;
     bool bRet = false;
-    HTileLayout* pHTileLayout = dynamic_cast<HTileLayout*>(GetLayout());
+    HTileLayout *pHTileLayout = dynamic_cast<HTileLayout *>(GetLayout());
     if ((pHTileLayout != nullptr) && pHTileLayout->IsFreeLayout()) {
         pHTileLayout = nullptr;
     }
-    VTileLayout* pVTileLayout = dynamic_cast<VTileLayout*>(GetLayout());
+    VTileLayout *pVTileLayout = dynamic_cast<VTileLayout *>(GetLayout());
     if ((pVTileLayout != nullptr) && pVTileLayout->IsFreeLayout()) {
         pVTileLayout = nullptr;
     }
@@ -1096,44 +1035,38 @@ size_t ListBox::GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t
         nColumns = CalcHTileColumns(pHTileLayout);
         nCount = nColumns * nRows;
         bRet = true;
-    }
-    else if (pVTileLayout != nullptr) {        
+    } else if (pVTileLayout != nullptr) {
         nRows = CalcVTileRows(pVTileLayout);
         nColumns = CalcVTileColumns(pVTileLayout);
         nCount = nColumns * nRows;
         bRet = true;
     }
-    if(!bRet) {
+    if (!bRet) {
         std::map<int32_t, int32_t> rows;
-        std::map<int32_t, int32_t> columns;        
+        std::map<int32_t, int32_t> columns;
         UiRect boxRect = GetRect();
         const size_t nItemCount = GetItemCount();
         for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-            Control* pControl = GetItemAt(nItemIndex);
+            Control *pControl = GetItemAt(nItemIndex);
             if ((pControl == nullptr) || !pControl->IsVisible() || pControl->IsFloat()) {
                 continue;
             }
 
             bool bDisplayItem = false;
-            const UiRect& rc = pControl->GetRect();
+            const UiRect &rc = pControl->GetRect();
             if (bIsHorizontal) {
-                if ((rc.left >= boxRect.left) &&
-                    (rc.right <= boxRect.right)) {
+                if ((rc.left >= boxRect.left) && (rc.right <= boxRect.right)) {
                     if ((rc.top >= boxRect.top) && (rc.top < boxRect.bottom)) {
                         bDisplayItem = true;
-                    }
-                    else if ((rc.bottom >= boxRect.top) && (rc.top < boxRect.bottom)) {
+                    } else if ((rc.bottom >= boxRect.top) && (rc.top < boxRect.bottom)) {
                         bDisplayItem = true;
                     }
                 }
-            }
-            else {
-                if ((rc.top >= boxRect.top) &&
-                    (rc.bottom <= boxRect.bottom)) {
+            } else {
+                if ((rc.top >= boxRect.top) && (rc.bottom <= boxRect.bottom)) {
                     if ((rc.left >= boxRect.left) && (rc.left < boxRect.right)) {
                         bDisplayItem = true;
-                    }
-                    else if ((rc.right >= boxRect.left) && (rc.right < boxRect.right)) {
+                    } else if ((rc.right >= boxRect.left) && (rc.right < boxRect.right)) {
                         bDisplayItem = true;
                     }
                 }
@@ -1153,7 +1086,7 @@ size_t ListBox::GetDisplayItemCount(bool bIsHorizontal, size_t& nColumns, size_t
     return nCount;
 }
 
-int32_t ListBox::CalcHTileRows(HTileLayout* pHTileLayout) const
+int32_t ListBox::CalcHTileRows(HTileLayout *pHTileLayout) const
 {
     int32_t nRows = 1;
     if (pHTileLayout == nullptr) {
@@ -1193,7 +1126,7 @@ int32_t ListBox::CalcHTileRows(HTileLayout* pHTileLayout) const
     return nRows;
 }
 
-int32_t ListBox::CalcHTileColumns(HTileLayout* pHTileLayout) const
+int32_t ListBox::CalcHTileColumns(HTileLayout *pHTileLayout) const
 {
     int32_t nColumns = 1;
     if (pHTileLayout == nullptr) {
@@ -1226,13 +1159,13 @@ int32_t ListBox::CalcHTileColumns(HTileLayout* pHTileLayout) const
     return nColumns;
 }
 
-int32_t ListBox::CalcVTileColumns(VTileLayout* pVTileLayout) const
+int32_t ListBox::CalcVTileColumns(VTileLayout *pVTileLayout) const
 {
     int32_t nColumns = 1;
     if (pVTileLayout == nullptr) {
         return nColumns;
     }
-    
+
     nColumns = pVTileLayout->GetColumns();
     bool bAutoColumns = pVTileLayout->IsAutoCalcColumns();
     if (bAutoColumns) {
@@ -1267,7 +1200,7 @@ int32_t ListBox::CalcVTileColumns(VTileLayout* pVTileLayout) const
     return nColumns;
 }
 
-int32_t ListBox::CalcVTileRows(VTileLayout* pVTileLayout) const
+int32_t ListBox::CalcVTileRows(VTileLayout *pVTileLayout) const
 {
     int32_t nRows = 1;
     if (pVTileLayout == nullptr) {
@@ -1300,11 +1233,12 @@ int32_t ListBox::CalcVTileRows(VTileLayout* pVTileLayout) const
     return nRows;
 }
 
-void ListBox::SendEventMsg(const EventArgs& msg)
+void ListBox::SendEventMsg(const EventArgs &msg)
 {
     auto msgFlag = GetWeakFlag();
     ScrollBox::SendEventMsg(msg);
-    if (!msgFlag.expired() && ((msg.eventType == kEventSelect) || (msg.eventType == kEventUnSelect))) {
+    if (!msgFlag.expired()
+        && ((msg.eventType == kEventSelect) || (msg.eventType == kEventUnSelect))) {
         //触发选择变化事件
         SendEvent(kEventSelChanged);
     }
@@ -1322,7 +1256,7 @@ void ListBox::SetCurSel(size_t iIndex)
         if (iIndex > GetItemCount()) {
             return;
         }
-    }    
+    }
     m_iCurSel = iIndex;
 }
 
@@ -1346,16 +1280,16 @@ void ListBox::SetSelectNextWhenActiveRemoved(bool bSelectNextItem)
     m_bSelectNextWhenActiveRemoved = bSelectNextItem;
 }
 
-void ListBox::GetSelectedItems(std::vector<size_t>& selectedIndexs) const
+void ListBox::GetSelectedItems(std::vector<size_t> &selectedIndexs) const
 {
     selectedIndexs.clear();
     const size_t itemCount = GetItemCount();
     for (size_t iIndex = 0; iIndex < itemCount; ++iIndex) {
-        Control* pControl = m_items[iIndex];
+        Control *pControl = m_items[iIndex];
         if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
             continue;
         }
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
         if (pListItem != nullptr) {
             if (pListItem->IsSelected()) {
                 selectedIndexs.push_back(iIndex);
@@ -1369,8 +1303,8 @@ size_t ListBox::FindSelectable(size_t iIndex, bool bForward) const
     return BaseClass::FindSelectable(iIndex, bForward);
 }
 
-bool ListBox::OnFindSelectable(size_t /*nCurSel*/, SelectableMode /*mode*/,
-                               size_t /*nCount*/, size_t& /*nDestItemIndex*/)
+bool ListBox::OnFindSelectable(
+    size_t /*nCurSel*/, SelectableMode /*mode*/, size_t /*nCount*/, size_t & /*nDestItemIndex*/)
 {
     return false;
 }
@@ -1379,8 +1313,7 @@ size_t ListBox::GetItemCountBefore(size_t nCurSel)
 {
     if (nCurSel < GetItemCount()) {
         return nCurSel;
-    }
-    else {
+    } else {
         return 0;
     }
 }
@@ -1402,23 +1335,20 @@ bool ListBox::SelectItem(size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uin
         if (IsMultiSelect()) {
             //多选
             bRet = SelectItemMulti(iIndex, bTakeFocus, bTriggerEvent);
-        }
-        else {
+        } else {
             //单选
             bRet = SelectItemSingle(iIndex, bTakeFocus, bTriggerEvent);
         }
         if (bRet) {
             OnSelectStatusChanged();
         }
-    }
-    else {
+    } else {
         return ListCtrlSelectItem(iIndex, bTakeFocus, bTriggerEvent, vkFlag);
     }
     return bRet;
 }
 
-bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
-                                 bool bTriggerEvent, uint64_t vkFlag)
+bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag)
 {
     if (!IsVisible()) {
         //隐藏状态时，避免获取焦点
@@ -1429,9 +1359,8 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
             //iIndex的值无效，或者当前子项不可选择
             return false;
         }
-    }
-    else {
-        Control* pControl = GetItemAt(iIndex);
+    } else {
+        Control *pControl = GetItemAt(iIndex);
         if ((pControl == nullptr) || !pControl->IsSelectableType() || !pControl->IsEnabled()) {
             //iIndex的值无效，或者当前子项不可选择
             return false;
@@ -1442,7 +1371,7 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
     bool bSelectStatusChanged = false;
     bool bRet = false;
     if (IsMultiSelect()) {
-        //多选模式        
+        //多选模式
         bool bRbuttonDown = vkFlag & kVkRButton;
         bool bShiftDown = vkFlag & kVkShift;
         bool bControlDown = vkFlag & kVkControl;
@@ -1454,22 +1383,21 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
         if (bRbuttonDown || (!bShiftDown && !bControlDown)) {
             //按右键的时候：如果当前项没选择，按单选逻辑实现，只保留一个选项；
             //            如果已经选择，则保持原选择，所有项选择状态不变（以提供右键菜单，对所选项操作的机会）
-            //在没有按下Control键也没有按Shift键：按单选逻辑实现，只保留一个选项            
+            //在没有按下Control键也没有按Shift键：按单选逻辑实现，只保留一个选项
             if (bRbuttonDown && IsItemSelected(iIndex)) {
                 bRet = true;
-            }
-            else {                             
+            } else {
                 //取消其他选择项
                 size_t nItemCount = GetItemCount();
                 for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
                     if (nItemIndex == iIndex) {
                         continue;
                     }
-                    Control* pControl = GetItemAt(nItemIndex);
+                    Control *pControl = GetItemAt(nItemIndex);
                     if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
                         continue;
                     }
-                    IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+                    IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
                     if (pListItem == nullptr) {
                         continue;
                     }
@@ -1483,8 +1411,7 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                 bRet = SelectItemSingle(iIndex, bTakeFocus, false);
                 bSelectStatusChanged = true;
             }
-        }
-        else {
+        } else {
             if (bShiftDown) {
                 //按左键: 同时按下了Shift键
                 size_t nIndexStart = GetLastNoShiftItem();
@@ -1502,11 +1429,12 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                     }
                     size_t nItemCount = GetItemCount();
                     for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-                        Control* pControl = GetItemAt(nItemIndex);
-                        if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
+                        Control *pControl = GetItemAt(nItemIndex);
+                        if ((pControl == nullptr) || !pControl->IsVisible()
+                            || !pControl->IsEnabled()) {
                             continue;
                         }
-                        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+                        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
                         if (pListItem == nullptr) {
                             continue;
                         }
@@ -1516,8 +1444,7 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                                 //如果原来是非选择状态，更新为选择状态
                                 pListItem->OptionSelected(true, false);
                             }
-                        }
-                        else {
+                        } else {
                             //取消其他
                             if (pListItem->IsSelected()) {
                                 //如果原来是选择状态，更新为非选择状态
@@ -1528,13 +1455,11 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                     SetCurSel(iIndex);
                     bRet = SelectItemSingle(iIndex, bTakeFocus, false);
                     bSelectStatusChanged = true;
-                }
-                else {
+                } else {
                     //未知情况，正常无法走到这里
                     bRet = SelectItemMulti(iIndex, bTakeFocus, false);
                 }
-            }
-            else {
+            } else {
                 //按左键: 同时按下了Control键，保持多选
                 bRet = SelectItemMulti(iIndex, bTakeFocus, false);
                 if (bRet) {
@@ -1542,8 +1467,7 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
                 }
             }
         }
-    }
-    else {
+    } else {
         //单选
         bRet = SelectItemSingle(iIndex, bTakeFocus, false);
     }
@@ -1559,12 +1483,12 @@ bool ListBox::ListCtrlSelectItem(size_t iIndex, bool bTakeFocus,
 bool ListBox::UnSelectItem(size_t iIndex, bool bTriggerEvent)
 {
     bool bHasEvent = false;
-    Control* pControl = GetItemAt(iIndex);
+    Control *pControl = GetItemAt(iIndex);
     if (pControl != nullptr) {
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
         if ((pListItem != nullptr) && pListItem->IsSelected()) {
             pListItem->OptionSelected(false, bTriggerEvent);
-            bHasEvent = true;            
+            bHasEvent = true;
             //仅在状态变化时重绘
             Invalidate();
         }
@@ -1579,13 +1503,9 @@ bool ListBox::UnSelectItem(size_t iIndex, bool bTriggerEvent)
     return bHasEvent;
 }
 
-void ListBox::OnItemSelectedChanged(size_t /*iIndex*/, IListBoxItem* /*pListBoxItem*/)
-{
-}
+void ListBox::OnItemSelectedChanged(size_t /*iIndex*/, IListBoxItem * /*pListBoxItem*/) {}
 
-void ListBox::OnItemCheckedChanged(size_t /*iIndex*/, IListBoxItem* /*pListBoxItem*/)
-{
-}
+void ListBox::OnItemCheckedChanged(size_t /*iIndex*/, IListBoxItem * /*pListBoxItem*/) {}
 
 bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEvent)
 {
@@ -1595,17 +1515,17 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
     }
     //单选
     if (iIndex == m_iCurSel) {
-        Control* pControl = GetItemAt(iIndex);
+        Control *pControl = GetItemAt(iIndex);
         if (pControl == nullptr) {
             m_iCurSel = Box::InvalidIndex;
             return false;
-        }        
-        //确保可见，然后返回        
+        }
+        //确保可见，然后返回
         if (bTakeFocus) {
             pControl->SetFocus();
         }
         bool bChanged = false;
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
         if ((pListItem != nullptr) && !pListItem->IsSelected()) {
             bChanged = true;
             pListItem->OptionSelected(true, bTriggerEvent);
@@ -1620,12 +1540,12 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
     const size_t iOldSel = m_iCurSel;
     if (Box::IsValidItemIndex(iOldSel)) {
         //取消旧选择项的选择状态
-        Control* pControl = GetItemAt(iOldSel);
+        Control *pControl = GetItemAt(iOldSel);
         if (pControl != nullptr) {
-            IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
             if ((pListItem != nullptr) && pListItem->IsSelected()) {
                 pListItem->OptionSelected(false, bTriggerEvent);
-                hasUnSelectEvent = true;                
+                hasUnSelectEvent = true;
             }
         }
         m_iCurSel = Box::InvalidIndex;
@@ -1638,7 +1558,7 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
         return hasUnSelectEvent;
     }
 
-    Control* pControl = GetItemAt(iIndex);
+    Control *pControl = GetItemAt(iIndex);
     if ((pControl == nullptr) || (IsVisible() && !pControl->IsVisible()) || !pControl->IsEnabled()) {
         Invalidate();
         if (hasUnSelectEvent && bTriggerEvent) {
@@ -1646,7 +1566,7 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
         }
         return hasUnSelectEvent;
     }
-    IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+    IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
     if (pListItem == nullptr) {
         Invalidate();
         if (hasUnSelectEvent && bTriggerEvent) {
@@ -1658,7 +1578,7 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
     //设置选择状态
     pListItem->OptionSelected(true, bTriggerEvent);
     pControl = GetItemAt(m_iCurSel);
-    if (pControl != nullptr) {        
+    if (pControl != nullptr) {
         if (bTakeFocus) {
             pControl->SetFocus();
         }
@@ -1670,7 +1590,7 @@ bool ListBox::SelectItemSingle(size_t iIndex, bool bTakeFocus, bool bTriggerEven
     }
     if (bTriggerEvent) {
         SendEvent(kEventSelect, m_iCurSel, iOldSel);
-    }    
+    }
     return true;
 }
 
@@ -1687,17 +1607,17 @@ bool ListBox::SelectItemMulti(size_t iIndex, bool bTakeFocus, bool bTriggerEvent
         Invalidate();
         return false;
     }
-    Control* pControl = GetItemAt(iIndex);
-    if ((pControl == nullptr) || (IsVisible() && !pControl->IsVisible()) || !pControl->IsEnabled()){
+    Control *pControl = GetItemAt(iIndex);
+    if ((pControl == nullptr) || (IsVisible() && !pControl->IsVisible()) || !pControl->IsEnabled()) {
         Invalidate();
         return false;
     }
-    IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+    IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
     if (pListItem == nullptr) {
         Invalidate();
         return false;
     }
-    
+
     if (pListItem->IsSelected()) {
         //多选时，再次选择时，按取消选择处理
         pListItem->OptionSelected(false, false);
@@ -1705,25 +1625,23 @@ bool ListBox::SelectItemMulti(size_t iIndex, bool bTakeFocus, bool bTriggerEvent
         if (bTriggerEvent) {
             SendEvent(kEventUnSelect, iIndex, Box::InvalidIndex);
         }
-    }
-    else {
+    } else {
         //如果原来是非选择状态，更新为选择状态
         m_iCurSel = iIndex;
-        pListItem->OptionSelected(true, false);        
-        if (bTakeFocus) {            
+        pListItem->OptionSelected(true, false);
+        if (bTakeFocus) {
             pControl->SetFocus();
         }
         Invalidate();
         if (bTriggerEvent) {
             SendEvent(kEventSelect, iIndex, iOldSel);
         }
-    }    
+    }
     return true;
 }
 
-void ListBox::EnsureVisible(const UiRect& rcItem,
-                            ListBoxVerVisible vVisibleType,
-                            ListBoxHorVisible hVisibleType)
+void ListBox::EnsureVisible(
+    const UiRect &rcItem, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
 {
     UiRect rcNewItem = rcItem;
     UiSize scrollOffset = GetScrollOffset();
@@ -1731,34 +1649,33 @@ void ListBox::EnsureVisible(const UiRect& rcItem,
     UiRect rcList = GetPos();
     rcList.Deflate(GetPadding());
 
-    ScrollBar* pVScrollBar = GetVScrollBar();
+    ScrollBar *pVScrollBar = GetVScrollBar();
     if (pVScrollBar && pVScrollBar->IsValid()) {
         if (IsVScrollBarAtLeft()) {
             ASSERT(pVScrollBar->GetFixedWidth().GetInt32() > 0);
             rcList.left += pVScrollBar->GetFixedWidth().GetInt32();
-        }
-        else {
+        } else {
             ASSERT(pVScrollBar->GetFixedWidth().GetInt32() > 0);
             rcList.right -= pVScrollBar->GetFixedWidth().GetInt32();
         }
     }
 
-    ScrollBar* pHScrollBar = GetHScrollBar();
+    ScrollBar *pHScrollBar = GetHScrollBar();
     if (pHScrollBar && pHScrollBar->IsValid()) {
         ASSERT(pHScrollBar->GetFixedHeight().GetInt32() > 0);
         rcList.bottom -= pHScrollBar->GetFixedHeight().GetInt32();
     }
 
-    if ((rcNewItem.left >= rcList.left) && (rcNewItem.top >= rcList.top) && 
-        (rcNewItem.right <= rcList.right) && (rcNewItem.bottom <= rcList.bottom)) {
-        IListBoxItem* listBoxElement = dynamic_cast<IListBoxItem*>(GetParent());
-        IListBoxOwner* lisBoxOwner = nullptr;
+    if ((rcNewItem.left >= rcList.left) && (rcNewItem.top >= rcList.top)
+        && (rcNewItem.right <= rcList.right) && (rcNewItem.bottom <= rcList.bottom)) {
+        IListBoxItem *listBoxElement = dynamic_cast<IListBoxItem *>(GetParent());
+        IListBoxOwner *lisBoxOwner = nullptr;
         if (listBoxElement != nullptr) {
             lisBoxOwner = listBoxElement->GetOwner();
         }
         if (lisBoxOwner != nullptr) {
             lisBoxOwner->EnsureVisible(rcNewItem, vVisibleType, hVisibleType);
-        }        
+        }
         return;
     }
     //水平滚动条
@@ -1771,16 +1688,13 @@ void ListBox::EnsureVisible(const UiRect& rcItem,
         if (rcNewItem.right > rcList.CenterX()) {
             dx = rcNewItem.right - rcList.CenterX();
         }
-    }
-    else if (hVisibleType == ListBoxHorVisible::kVisibleAtLeft) {
+    } else if (hVisibleType == ListBoxHorVisible::kVisibleAtLeft) {
         //靠左显示
         dx = rcNewItem.left - rcList.left;
-    }
-    else if (hVisibleType == ListBoxHorVisible::kVisibleAtRight) {
+    } else if (hVisibleType == ListBoxHorVisible::kVisibleAtRight) {
         //靠右显示
         dx = rcNewItem.right - rcList.right;
-    }
-    else {
+    } else {
         if (rcNewItem.left < rcList.left) {
             dx = rcNewItem.left - rcList.left;
         }
@@ -1805,16 +1719,13 @@ void ListBox::EnsureVisible(const UiRect& rcItem,
         if (rcNewItem.bottom > rcList.CenterY()) {
             dy = rcNewItem.bottom - rcList.CenterY();
         }
-    }
-    else if (vVisibleType == ListBoxVerVisible::kVisibleAtTop) {
+    } else if (vVisibleType == ListBoxVerVisible::kVisibleAtTop) {
         //顶部对齐
         dy = rcNewItem.top - rcList.top;
-    }
-    else if (vVisibleType == ListBoxVerVisible::kVisibleAtBottom) {
+    } else if (vVisibleType == ListBoxVerVisible::kVisibleAtBottom) {
         //底部对齐
         dy = rcNewItem.bottom - rcList.bottom;
-    }
-    else {
+    } else {
         //只要可见即可
         if (rcNewItem.top < rcList.top) {
             dy = rcNewItem.top - rcList.top;
@@ -1837,16 +1748,13 @@ void ListBox::EnsureVisible(const UiRect& rcItem,
     }
 }
 
-void ListBox::StopScroll()
-{
-}
+void ListBox::StopScroll() {}
 
 bool ListBox::CanPaintSelectedColors(bool bHasStateImages) const
 {
     if (m_uPaintSelectedColors == PAINT_SELECTED_COLORS_YES) {
         return true;
-    }
-    else if (m_uPaintSelectedColors == PAINT_SELECTED_COLORS_NO) {
+    } else if (m_uPaintSelectedColors == PAINT_SELECTED_COLORS_NO) {
         return false;
     }
     if (bHasStateImages && IsMultiSelect()) {
@@ -1864,13 +1772,13 @@ bool ListBox::IsHorizontalLayout() const
 bool ListBox::IsHorizontalScrollBar() const
 {
     bool bHasVScrollBar = false;
-    ScrollBar* pVScrollBar = GetVScrollBar();
+    ScrollBar *pVScrollBar = GetVScrollBar();
     if (pVScrollBar && pVScrollBar->IsValid()) {
         bHasVScrollBar = true;
     }
 
     bool bHasHScrollBar = false;
-    ScrollBar* pHScrollBar = GetHScrollBar();
+    ScrollBar *pHScrollBar = GetHScrollBar();
     if (pHScrollBar && pHScrollBar->IsValid()) {
         bHasHScrollBar = true;
     }
@@ -1879,8 +1787,7 @@ bool ListBox::IsHorizontalScrollBar() const
     if (GetLayout()->IsHLayout()) {
         //确定是横向布局
         bIsHorizontal = true;
-    }
-    else if (GetLayout()->IsVLayout()) {
+    } else if (GetLayout()->IsVLayout()) {
         bIsHorizontal = false;
     }
     return bIsHorizontal;
@@ -1888,7 +1795,7 @@ bool ListBox::IsHorizontalScrollBar() const
 
 bool ListBox::ScrollItemToTop(size_t iIndex)
 {
-    Control* pControl = GetItemAt(iIndex);
+    Control *pControl = GetItemAt(iIndex);
     if ((pControl == nullptr) || !pControl->IsVisible()) {
         return false;
     }
@@ -1896,18 +1803,17 @@ bool ListBox::ScrollItemToTop(size_t iIndex)
         //横向布局
         if (GetScrollRange().cx != 0) {
             UiSize64 scrollPos = GetScrollPos();
-            scrollPos.cx = (int64_t)pControl->GetPos().left - GetPosWithoutPadding().left;
+            scrollPos.cx = (int64_t) pControl->GetPos().left - GetPosWithoutPadding().left;
             if (scrollPos.cx >= 0) {
                 SetScrollPos(scrollPos);
                 return true;
             }
         }
-    }
-    else {
+    } else {
         //纵向布局
         if (GetScrollRange().cy != 0) {
             UiSize64 scrollPos = GetScrollPos();
-            scrollPos.cy = (int64_t)pControl->GetPos().top - GetPosWithoutPadding().top;
+            scrollPos.cy = (int64_t) pControl->GetPos().top - GetPosWithoutPadding().top;
             if (scrollPos.cy >= 0) {
                 SetScrollPos(scrollPos);
                 return true;
@@ -1917,11 +1823,11 @@ bool ListBox::ScrollItemToTop(size_t iIndex)
     return false;
 }
 
-bool ListBox::ScrollItemToTop(const DString& itemName)
+bool ListBox::ScrollItemToTop(const DString &itemName)
 {
     const size_t itemCount = m_items.size();
     for (size_t iIndex = 0; iIndex < itemCount; ++iIndex) {
-        Control* pControl = m_items[iIndex];
+        Control *pControl = m_items[iIndex];
         if ((pControl == nullptr) || !pControl->IsVisible()) {
             continue;
         }
@@ -1932,24 +1838,25 @@ bool ListBox::ScrollItemToTop(const DString& itemName)
     return false;
 }
 
-Control* ListBox::GetTopItem() const
+Control *ListBox::GetTopItem() const
 {
     if (IsHorizontalLayout()) {
         //横向布局
         int32_t listLeft = GetPos().left + GetPadding().left + GetScrollOffset().cx;
-        for (Control* pControl : m_items) {
+        for (Control *pControl : m_items) {
             ASSERT(pControl != nullptr);
-            if (pControl->IsVisible() && !pControl->IsFloat() && pControl->GetPos().right >= listLeft) {
+            if (pControl->IsVisible() && !pControl->IsFloat()
+                && pControl->GetPos().right >= listLeft) {
                 return pControl;
             }
         }
-    }
-    else {
+    } else {
         //纵向布局
         int32_t listTop = GetPos().top + GetPadding().top + GetScrollOffset().cy;
-        for (Control* pControl : m_items) {
+        for (Control *pControl : m_items) {
             ASSERT(pControl != nullptr);
-            if (pControl->IsVisible() && !pControl->IsFloat() && pControl->GetPos().bottom >= listTop) {
+            if (pControl->IsVisible() && !pControl->IsFloat()
+                && pControl->GetPos().bottom >= listTop) {
                 return pControl;
             }
         }
@@ -1957,7 +1864,7 @@ Control* ListBox::GetTopItem() const
     return nullptr;
 }
 
-bool ListBox::SetItemIndex(Control* pControl, size_t iIndex)
+bool ListBox::SetItemIndex(Control *pControl, size_t iIndex)
 {
     size_t iOrginIndex = GetItemIndex(pControl);
     if (!Box::IsValidItemIndex(iOrginIndex)) {
@@ -1967,19 +1874,19 @@ bool ListBox::SetItemIndex(Control* pControl, size_t iIndex)
         return true;
     }
 
-    IListBoxItem* pSelectedListItem = nullptr;
+    IListBoxItem *pSelectedListItem = nullptr;
     if (Box::IsValidItemIndex(m_iCurSel)) {
-        pSelectedListItem = dynamic_cast<IListBoxItem*>(GetItemAt(m_iCurSel));
+        pSelectedListItem = dynamic_cast<IListBoxItem *>(GetItemAt(m_iCurSel));
     }
     if (!ScrollBox::SetItemIndex(pControl, iIndex)) {
         return false;
     }
     size_t iMinIndex = std::min(iOrginIndex, iIndex);
     size_t iMaxIndex = std::max(iOrginIndex, iIndex);
-    for(size_t i = iMinIndex; i < iMaxIndex + 1; ++i) {
-        Control* pItemControl = GetItemAt(i);
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pItemControl);
-        if( pListItem != nullptr ) {
+    for (size_t i = iMinIndex; i < iMaxIndex + 1; ++i) {
+        Control *pItemControl = GetItemAt(i);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pItemControl);
+        if (pListItem != nullptr) {
             pListItem->SetListBoxIndex(i);
         }
     }
@@ -1989,9 +1896,10 @@ bool ListBox::SetItemIndex(Control* pControl, size_t iIndex)
     return true;
 }
 
-size_t ListBox::EnsureVisible(size_t iIndex, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
+size_t ListBox::EnsureVisible(
+    size_t iIndex, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType)
 {
-    Control* pControl = GetItemAt(iIndex);
+    Control *pControl = GetItemAt(iIndex);
     ASSERT(pControl != nullptr);
     if (pControl != nullptr) {
         UiRect rcItem = pControl->GetPos();
@@ -2001,10 +1909,10 @@ size_t ListBox::EnsureVisible(size_t iIndex, ListBoxVerVisible vVisibleType, Lis
     return iIndex;
 }
 
-bool ListBox::AddItem(Control* pControl)
+bool ListBox::AddItem(Control *pControl)
 {
-    IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
-    if( pListItem != nullptr) {
+    IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
+    if (pListItem != nullptr) {
         pListItem->SetOwner(this);
         pListItem->SetListBoxIndex(GetItemCount());
         if (!IsMultiSelect()) {
@@ -2016,14 +1924,14 @@ bool ListBox::AddItem(Control* pControl)
     return bRet;
 }
 
-bool ListBox::AddItemAt(Control* pControl, size_t iIndex)
+bool ListBox::AddItemAt(Control *pControl, size_t iIndex)
 {
     if (!ScrollBox::AddItemAt(pControl, iIndex)) {
         return false;
     }
 
-    IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
-    if( pListItem != nullptr ) {
+    IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
+    if (pListItem != nullptr) {
         pListItem->SetOwner(this);
         pListItem->SetListBoxIndex(iIndex);
         if (!IsMultiSelect()) {
@@ -2032,10 +1940,10 @@ bool ListBox::AddItemAt(Control* pControl, size_t iIndex)
     }
 
     const size_t itemCount = GetItemCount();
-    for(size_t i = iIndex + 1; i < itemCount; ++i) {
-        Control* p = GetItemAt(i);
-        pListItem = dynamic_cast<IListBoxItem*>(p);
-        if( pListItem != nullptr ) {
+    for (size_t i = iIndex + 1; i < itemCount; ++i) {
+        Control *p = GetItemAt(i);
+        pListItem = dynamic_cast<IListBoxItem *>(p);
+        if (pListItem != nullptr) {
             pListItem->SetListBoxIndex(i);
         }
     }
@@ -2046,7 +1954,7 @@ bool ListBox::AddItemAt(Control* pControl, size_t iIndex)
     return true;
 }
 
-bool ListBox::RemoveItem(Control* pControl)
+bool ListBox::RemoveItem(Control *pControl)
 {
     size_t iIndex = GetItemIndex(pControl);
     if (!Box::IsValidItemIndex(iIndex)) {
@@ -2058,8 +1966,8 @@ bool ListBox::RemoveItem(Control* pControl)
 bool ListBox::RemoveItemAt(size_t iIndex)
 {
     if (!IsAutoDestroyChild()) {
-        Control* p = GetItemAt(iIndex);
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(p);
+        Control *p = GetItemAt(iIndex);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(p);
         if (pListItem != nullptr) {
             pListItem->SetOwner(nullptr);
         }
@@ -2071,9 +1979,9 @@ bool ListBox::RemoveItemAt(size_t iIndex)
         return false;
     }
     const size_t itemCount = GetItemCount();
-    for(size_t i = iIndex; i < itemCount; ++i) {
-        Control* p = GetItemAt(i);
-        IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(p);
+    for (size_t i = iIndex; i < itemCount; ++i) {
+        Control *p = GetItemAt(i);
+        IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(p);
         if (pListItem != nullptr) {
             pListItem->SetListBoxIndex(i);
         }
@@ -2083,15 +1991,13 @@ bool ListBox::RemoveItemAt(size_t iIndex)
         if (iIndex == m_iCurSel) {
             if (!IsMultiSelect() && m_bSelectNextWhenActiveRemoved) {
                 SelectItem(FindSelectable(m_iCurSel--, false));
-            }
-            else {
+            } else {
                 m_iCurSel = Box::InvalidIndex;
             }
-        }
-        else if (iIndex < m_iCurSel) {
+        } else if (iIndex < m_iCurSel) {
             m_iCurSel -= 1;
         }
-    }    
+    }
     return true;
 }
 
@@ -2100,8 +2006,8 @@ void ListBox::RemoveAllItems()
     if (!IsAutoDestroyChild()) {
         const size_t itemCount = GetItemCount();
         for (size_t i = 0; i < itemCount; ++i) {
-            Control* p = GetItemAt(i);
-            IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(p);
+            Control *p = GetItemAt(i);
+            IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(p);
             if (pListItem != nullptr) {
                 pListItem->SetOwner(nullptr);
             }
@@ -2112,31 +2018,34 @@ void ListBox::RemoveAllItems()
     ScrollBox::RemoveAllItems();
 }
 
-bool ListBox::SortItems(PFNCompareFunc pfnCompare, void* pCompareContext)
+bool ListBox::SortItems(PFNCompareFunc pfnCompare, void *pCompareContext)
 {
     if (pfnCompare == nullptr) {
         return false;
-    }        
+    }
     if (m_items.empty()) {
         return true;
     }
 
     m_pCompareFunc = pfnCompare;
     m_pCompareContext = pCompareContext;
-#if defined (_WIN32) || defined (_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
     //Windows系统
-    qsort_s(&(*m_items.begin()), m_items.size(), sizeof(Control*), ListBox::ItemComareFuncWindows, this);
+    qsort_s(
+        &(*m_items.begin()), m_items.size(), sizeof(Control *), ListBox::ItemComareFuncWindows, this);
 #elif defined(__APPLE__)
     // macOS
-    qsort_r(&(*m_items.begin()), m_items.size(), sizeof(Control*), this, ListBox::ItemComareFuncMacOS);   
+    qsort_r(
+        &(*m_items.begin()), m_items.size(), sizeof(Control *), this, ListBox::ItemComareFuncMacOS);
 #else
     //Linux 系统
-    qsort_r(&(*m_items.begin()), m_items.size(), sizeof(Control*), ListBox::ItemComareFuncLinux, this);
-#endif    
-    IListBoxItem* pItem = nullptr;
+    qsort_r(
+        &(*m_items.begin()), m_items.size(), sizeof(Control *), ListBox::ItemComareFuncLinux, this);
+#endif
+    IListBoxItem *pItem = nullptr;
     const size_t itemCount = m_items.size();
     for (size_t i = 0; i < itemCount; ++i) {
-        pItem = dynamic_cast<IListBoxItem*>(m_items[i]);
+        pItem = dynamic_cast<IListBoxItem *>(m_items[i]);
         if (pItem != nullptr) {
             pItem->SetListBoxIndex(i);
             //取消界面上所有的选择项
@@ -2149,27 +2058,27 @@ bool ListBox::SortItems(PFNCompareFunc pfnCompare, void* pCompareContext)
     return true;
 }
 
-int ListBox::ItemComareFuncWindows(void* pvlocale, const void* item1, const void* item2)
+int ListBox::ItemComareFuncWindows(void *pvlocale, const void *item1, const void *item2)
 {
-    ListBox* pThis = (ListBox*)pvlocale;
+    ListBox *pThis = (ListBox *) pvlocale;
     if (!pThis || !item1 || !item2) {
         return 0;
     }
     return pThis->ItemComareFunc(item1, item2);
 }
 
-int ListBox::ItemComareFuncLinux(const void *item1, const void *item2, void* pvlocale)
+int ListBox::ItemComareFuncLinux(const void *item1, const void *item2, void *pvlocale)
 {
-    ListBox *pThis = (ListBox*)pvlocale;
+    ListBox *pThis = (ListBox *) pvlocale;
     if (!pThis || !item1 || !item2) {
         return 0;
     }
     return pThis->ItemComareFunc(item1, item2);
 }
 
-int ListBox::ItemComareFuncMacOS(void* context, const void* item1, const void* item2)
+int ListBox::ItemComareFuncMacOS(void *context, const void *item1, const void *item2)
 {
-    ListBox* pThis = (ListBox*)context;
+    ListBox *pThis = (ListBox *) context;
     if (!pThis || !item1 || !item2) {
         return 0;
     }
@@ -2181,8 +2090,8 @@ int ListBox::ItemComareFunc(const void *item1, const void *item2)
     if (!item1 || !item2) {
         return 0;
     }
-    Control *pControl1 = *(Control**)item1;
-    Control *pControl2 = *(Control**)item2;
+    Control *pControl1 = *(Control **) item1;
+    Control *pControl2 = *(Control **) item2;
     return m_pCompareFunc(pControl1, pControl2, m_pCompareContext);
 }
 
@@ -2207,18 +2116,18 @@ void ListBox::EnsureSingleSelection()
 {
     if (!IsMultiSelect()) {
         OnSwitchToSingleSelect();
-    }    
+    }
 }
 
 bool ListBox::OnSwitchToSingleSelect()
 {
     bool bChanged = false;
-    IListBoxItem* pItem = nullptr;
+    IListBoxItem *pItem = nullptr;
     const size_t itemCount = m_items.size();
-    if (m_iCurSel > itemCount) { 
+    if (m_iCurSel > itemCount) {
         //如果单选状态不同步，使用第一个选择的作为最终单选的选择项
         for (size_t i = 0; i < itemCount; ++i) {
-            pItem = dynamic_cast<IListBoxItem*>(m_items[i]);
+            pItem = dynamic_cast<IListBoxItem *>(m_items[i]);
             if ((pItem != nullptr) && pItem->IsSelected()) {
                 m_iCurSel = i;
                 break;
@@ -2226,7 +2135,7 @@ bool ListBox::OnSwitchToSingleSelect()
         }
     }
     for (size_t i = 0; i < itemCount; ++i) {
-        pItem = dynamic_cast<IListBoxItem*>(m_items[i]);
+        pItem = dynamic_cast<IListBoxItem *>(m_items[i]);
         if ((pItem != nullptr) && pItem->IsSelected()) {
             if (m_iCurSel != i) {
                 pItem->OptionSelected(false, false); //不触发Select事件
@@ -2247,7 +2156,7 @@ bool ListBox::UpdateCurSelItemSelectStatus()
     size_t curSelIndex = GetCurSel();
     if (Box::IsValidItemIndex(curSelIndex)) {
         bool bSelectItem = false;
-        IListBoxItem* pItem = dynamic_cast<IListBoxItem*>(GetItemAt(curSelIndex));
+        IListBoxItem *pItem = dynamic_cast<IListBoxItem *>(GetItemAt(curSelIndex));
         if (pItem != nullptr) {
             bSelectItem = pItem->IsSelected();
         }
@@ -2259,7 +2168,7 @@ bool ListBox::UpdateCurSelItemSelectStatus()
     return bChanged;
 }
 
-bool ListBox::ButtonDown(const EventArgs& msg)
+bool ListBox::ButtonDown(const EventArgs &msg)
 {
     bool ret = BaseClass::ButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -2269,23 +2178,22 @@ bool ListBox::ButtonDown(const EventArgs& msg)
     StopScroll();
     if (m_pHelper != nullptr) {
         m_pHelper->OnButtonDown(msg.ptMouse, msg.GetSender());
-    }    
+    }
     return ret;
 }
 
-bool ListBox::ButtonUp(const EventArgs& msg)
+bool ListBox::ButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::ButtonUp(msg);
     if (msg.IsSenderExpired()) {
         return false;
     }
-    Control* pSender = msg.GetSender();
+    Control *pSender = msg.GetSender();
     if (IsEnableFrameSelection()) {
         //按住Ctrl或者Shift的时候，不触发清空选择操作，避免误操作
         if (IsKeyDown(msg, ModifierKey::kControl)) {
             pSender = nullptr;
-        }
-        else if (this->IsKeyDown(msg, ModifierKey::kShift)) {
+        } else if (this->IsKeyDown(msg, ModifierKey::kShift)) {
             pSender = nullptr;
         }
     }
@@ -2295,7 +2203,7 @@ bool ListBox::ButtonUp(const EventArgs& msg)
     return bRet;
 }
 
-bool ListBox::RButtonDown(const EventArgs& msg)
+bool ListBox::RButtonDown(const EventArgs &msg)
 {
     bool bRet = BaseClass::RButtonDown(msg);
     if (msg.IsSenderExpired()) {
@@ -2307,7 +2215,7 @@ bool ListBox::RButtonDown(const EventArgs& msg)
     return bRet;
 }
 
-bool ListBox::RButtonUp(const EventArgs& msg)
+bool ListBox::RButtonUp(const EventArgs &msg)
 {
     bool bRet = BaseClass::RButtonUp(msg);
     if (msg.IsSenderExpired()) {
@@ -2319,7 +2227,7 @@ bool ListBox::RButtonUp(const EventArgs& msg)
     return bRet;
 }
 
-bool ListBox::MouseMove(const EventArgs& msg)
+bool ListBox::MouseMove(const EventArgs &msg)
 {
     bool bRet = BaseClass::MouseMove(msg);
     if (msg.IsSenderExpired()) {
@@ -2331,7 +2239,7 @@ bool ListBox::MouseMove(const EventArgs& msg)
     return bRet;
 }
 
-bool ListBox::OnWindowKillFocus(const EventArgs& msg)
+bool ListBox::OnWindowKillFocus(const EventArgs &msg)
 {
     bool bRet = BaseClass::OnWindowKillFocus(msg);
     if (msg.IsSenderExpired()) {
@@ -2343,22 +2251,18 @@ bool ListBox::OnWindowKillFocus(const EventArgs& msg)
     return bRet;
 }
 
-bool ListBox::OnListBoxItemMouseEvent(const EventArgs& msg)
+bool ListBox::OnListBoxItemMouseEvent(const EventArgs &msg)
 {
     if (m_pHelper != nullptr) {
         if (msg.eventType == kEventMouseButtonDown) {
             m_pHelper->OnButtonDown(msg.ptMouse, msg.GetSender());
-        }
-        else if (msg.eventType == kEventMouseButtonUp) {
+        } else if (msg.eventType == kEventMouseButtonUp) {
             m_pHelper->OnButtonUp(msg.ptMouse, msg.GetSender());
-        }
-        else if (msg.eventType == kEventMouseRButtonDown) {
+        } else if (msg.eventType == kEventMouseRButtonDown) {
             m_pHelper->OnRButtonDown(msg.ptMouse, msg.GetSender());
-        }
-        else if (msg.eventType == kEventMouseRButtonUp) {
+        } else if (msg.eventType == kEventMouseRButtonUp) {
             m_pHelper->OnRButtonUp(msg.ptMouse, msg.GetSender());
-        }
-        else if (msg.eventType == kEventMouseMove) {
+        } else if (msg.eventType == kEventMouseMove) {
             m_pHelper->OnMouseMove(msg.ptMouse, msg.GetSender());
         }
     }
@@ -2373,31 +2277,31 @@ void ListBox::OnListBoxItemWindowKillFocus()
     }
 }
 
-void ListBox::PaintChild(IRender* pRender, const UiRect& rcPaint)
+void ListBox::PaintChild(IRender *pRender, const UiRect &rcPaint)
 {
     BaseClass::PaintChild(pRender, rcPaint);
     PaintFrameSelection(pRender);
 }
 
-void ListBox::PaintFrameSelection(IRender* pRender)
+void ListBox::PaintFrameSelection(IRender *pRender)
 {
     if (m_pHelper != nullptr) {
         m_pHelper->PaintFrameSelection(pRender);
     }
 }
 
-void ListBox::GetScrollDeltaValue(int32_t& nHScrollValue, int32_t& nVScrollValue) const
+void ListBox::GetScrollDeltaValue(int32_t &nHScrollValue, int32_t &nVScrollValue) const
 {
     nHScrollValue = DUI_NOSET_VALUE;
     nVScrollValue = DUI_NOSET_VALUE;
     if (IsHorizontalLayout()) {
         //横向布局
         int32_t deltaValue = 0;
-        VirtualHTileLayout* pVirtualHTileLayout = dynamic_cast<VirtualHTileLayout*>(GetLayout());
+        VirtualHTileLayout *pVirtualHTileLayout = dynamic_cast<VirtualHTileLayout *>(GetLayout());
         if (pVirtualHTileLayout != nullptr) {
             deltaValue = pVirtualHTileLayout->GetItemSize().cx * 2;
         }
-        HTileLayout* pHTileLayout = dynamic_cast<HTileLayout*>(GetLayout());
+        HTileLayout *pHTileLayout = dynamic_cast<HTileLayout *>(GetLayout());
         if (pHTileLayout != nullptr) {
             deltaValue = pHTileLayout->GetItemSize().cx * 2;
         }
@@ -2405,15 +2309,14 @@ void ListBox::GetScrollDeltaValue(int32_t& nHScrollValue, int32_t& nVScrollValue
             deltaValue = std::max(GetRect().Width() / 3, deltaValue);
             nHScrollValue = deltaValue;
         }
-    }
-    else {
+    } else {
         //纵向布局
         int32_t deltaValue = 0;
-        VirtualVTileLayout* pVirtualVTileLayout = dynamic_cast<VirtualVTileLayout*>(GetLayout());
+        VirtualVTileLayout *pVirtualVTileLayout = dynamic_cast<VirtualVTileLayout *>(GetLayout());
         if (pVirtualVTileLayout != nullptr) {
-            deltaValue = pVirtualVTileLayout->GetItemSize().cy * 2;            
+            deltaValue = pVirtualVTileLayout->GetItemSize().cy * 2;
         }
-        VTileLayout* pVTileLayout = dynamic_cast<VirtualVTileLayout*>(GetLayout());
+        VTileLayout *pVTileLayout = dynamic_cast<VirtualVTileLayout *>(GetLayout());
         if (pVTileLayout != nullptr) {
             deltaValue = pVTileLayout->GetItemSize().cy * 2;
         }
@@ -2452,11 +2355,11 @@ bool ListBox::SetSelectAll()
     if (IsMultiSelect()) {
         size_t nItemCount = GetItemCount();
         for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-            Control* pControl = GetItemAt(nItemIndex);
+            Control *pControl = GetItemAt(nItemIndex);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
                 continue;
             }
-            IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
             if (pListItem == nullptr) {
                 continue;
             }
@@ -2479,11 +2382,11 @@ bool ListBox::SetSelectNone()
     if (IsMultiSelect()) {
         size_t nItemCount = GetItemCount();
         for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-            Control* pControl = GetItemAt(nItemIndex);
+            Control *pControl = GetItemAt(nItemIndex);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
                 continue;
             }
-            IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
             if (pListItem == nullptr) {
                 continue;
             }
@@ -2501,9 +2404,7 @@ bool ListBox::SetSelectNone()
     return bChanged;
 }
 
-void ListBox::OnSelectStatusChanged()
-{
-}
+void ListBox::OnSelectStatusChanged() {}
 
 bool ListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, int64_t bottom)
 {
@@ -2512,20 +2413,20 @@ bool ListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, int64_t
         UiRect rcListBox = GetRect();
         size_t nItemCount = GetItemCount();
         for (size_t nItemIndex = 0; nItemIndex < nItemCount; ++nItemIndex) {
-            Control* pControl = GetItemAt(nItemIndex);
+            Control *pControl = GetItemAt(nItemIndex);
             if ((pControl == nullptr) || !pControl->IsVisible() || !pControl->IsEnabled()) {
                 continue;
             }
-            IListBoxItem* pListItem = dynamic_cast<IListBoxItem*>(pControl);
+            IListBoxItem *pListItem = dynamic_cast<IListBoxItem *>(pControl);
             if (pListItem == nullptr) {
                 continue;
             }
             UiRect rc = pControl->GetRect();
             rc.Offset(-rcListBox.left, -rcListBox.top);
-            int64_t nNewLeft = (std::max)(left, (int64_t)rc.left);
-            int64_t nNewTop = (std::max)(top, (int64_t)rc.top);
-            int64_t nNewRight = (std::min)(right, (int64_t)rc.right);
-            int64_t nNewBottom = (std::min)(bottom, (int64_t)rc.bottom);
+            int64_t nNewLeft = (std::max) (left, (int64_t) rc.left);
+            int64_t nNewTop = (std::max) (top, (int64_t) rc.top);
+            int64_t nNewRight = (std::min) (right, (int64_t) rc.right);
+            int64_t nNewBottom = (std::min) (bottom, (int64_t) rc.bottom);
             bool bContains = (nNewBottom > nNewTop) && (nNewRight > nNewLeft);
             if (bContains) {
                 //如果原来是非选择状态，更新为选择状态
@@ -2533,8 +2434,7 @@ bool ListBox::OnFrameSelection(int64_t left, int64_t right, int64_t top, int64_t
                     pListItem->OptionSelected(true, false);
                     bChanged = true;
                 }
-            }
-            else {
+            } else {
                 //如果原来是选择状态，更新为非选择状态
                 if (pListItem->IsSelected()) {
                     pListItem->OptionSelected(false, false);
@@ -2556,65 +2456,84 @@ size_t ListBox::GetLastNoShiftItem() const
     return m_nLastNoShiftItem;
 }
 
-void ListBox::OnListBoxItemAdded(Control* pControl)
+void ListBox::OnListBoxItemAdded(Control *pControl)
 {
     if (pControl == nullptr) {
         return;
     }
-    if (dynamic_cast<IListBoxItem*>(pControl) == nullptr) {
+    if (dynamic_cast<IListBoxItem *>(pControl) == nullptr) {
         return;
     }
-    const EventCallbackID callbackID = (EventCallbackID)(Control*)this;
-    Control* pListBoxItem = pControl;
+    const EventCallbackID callbackID = (EventCallbackID) (Control *) this;
+    Control *pListBoxItem = pControl;
 
     //挂载鼠标事件，转接给ListBox本身，将事件分发到应用层
-    pListBoxItem->AttachMouseEnter([this](const EventArgs& args) {
-        ListBoxFireMouseEnterLeaveEvent(args);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachMouseLeave([this](const EventArgs& args) {
-        ListBoxFireMouseEnterLeaveEvent(args);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachDoubleClick([this](const EventArgs& args) {
-        ListBoxSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachClick([this](const EventArgs& args) {
-        ListBoxSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachRClick([this](const EventArgs& args) {
-        ListBoxSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventReturn, [this](const EventArgs& args) {
-        ListBoxSendEvent(args, true);
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventKeyDown, [this](const EventArgs& args) {
-        ListBoxSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
-        return true;
-        }, callbackID);
-    pListBoxItem->AttachEvent(kEventKeyUp, [this](const EventArgs& args) {
-        ListBoxSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
-        return true;
-        }, callbackID);
+    pListBoxItem->AttachMouseEnter(
+        [this](const EventArgs &args) {
+            ListBoxFireMouseEnterLeaveEvent(args);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachMouseLeave(
+        [this](const EventArgs &args) {
+            ListBoxFireMouseEnterLeaveEvent(args);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachDoubleClick(
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachClick(
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachRClick(
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventReturn,
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true);
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventKeyDown,
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
+            return true;
+        },
+        callbackID);
+    pListBoxItem->AttachEvent(
+        kEventKeyUp,
+        [this](const EventArgs &args) {
+            ListBoxSendEvent(args, true, true); //键盘消息只触发消息事件，但不处理该事件，避免重复处理
+            return true;
+        },
+        callbackID);
 }
 
-void ListBox::OnListBoxItemRemoved(Control* pControl)
+void ListBox::OnListBoxItemRemoved(Control *pControl)
 {
     if (pControl == nullptr) {
         return;
     }
-    if (dynamic_cast<IListBoxItem*>(pControl) == nullptr) {
+    if (dynamic_cast<IListBoxItem *>(pControl) == nullptr) {
         return;
     }
-    const EventCallbackID callbackID = (EventCallbackID)(Control*)this;
+    const EventCallbackID callbackID = (EventCallbackID) (Control *) this;
     pControl->DetachEventByID(callbackID);
 }
 
-void ListBox::ListBoxSendEvent(const EventArgs& msg, bool bFromItem, bool bFireEventOnly)
+void ListBox::ListBoxSendEvent(const EventArgs &msg, bool bFromItem, bool bFireEventOnly)
 {
     EventArgs newMsg = msg;
     if (bFromItem) {
@@ -2623,17 +2542,14 @@ void ListBox::ListBoxSendEvent(const EventArgs& msg, bool bFromItem, bool bFireE
         if (nItemIndex < GetItemCount()) {
             newMsg.wParam = nItemIndex;
             newMsg.lParam = 0;
-        }
-        else {
+        } else {
             newMsg.wParam = Box::InvalidIndex;
             newMsg.lParam = 0;
         }
-    }
-    else if ((msg.eventType == kEventMouseDoubleClick) ||
-             (msg.eventType == kEventClick) ||
-             (msg.eventType == kEventRClick) ||
-             (msg.eventType == kEventKeyDown) ||
-             (msg.eventType == kEventKeyUp)) {
+    } else if (
+        (msg.eventType == kEventMouseDoubleClick) || (msg.eventType == kEventClick)
+        || (msg.eventType == kEventRClick) || (msg.eventType == kEventKeyDown)
+        || (msg.eventType == kEventKeyUp)) {
         //需要设置wParam和lParam，按接口对应的Attach函数，设置这两个参数值
         if (msg.GetSender() == this) {
             newMsg.wParam = Box::InvalidIndex;
@@ -2642,23 +2558,20 @@ void ListBox::ListBoxSendEvent(const EventArgs& msg, bool bFromItem, bool bFireE
     }
     if (bFireEventOnly) {
         BaseClass::FireAllEvents(newMsg);
-    }
-    else {
+    } else {
         BaseClass::SendEventMsg(newMsg);
     }
 }
 
-void ListBox::ListBoxFireMouseEnterLeaveEvent(const EventArgs& msg)
+void ListBox::ListBoxFireMouseEnterLeaveEvent(const EventArgs &msg)
 {
     EventArgs newMsg = msg;
     newMsg.SetSender(this);
     if (msg.eventType == kEventMouseEnter) {
         newMsg.eventType = kEventItemMouseEnter;
-    }
-    else if (msg.eventType == kEventMouseLeave) {
+    } else if (msg.eventType == kEventMouseLeave) {
         newMsg.eventType = kEventItemMouseLeave;
-    }
-    else {
+    } else {
         ASSERT(0);
         return;
     }
@@ -2666,8 +2579,7 @@ void ListBox::ListBoxFireMouseEnterLeaveEvent(const EventArgs& msg)
     if (nItemIndex < GetItemCount()) {
         newMsg.wParam = nItemIndex;
         newMsg.lParam = 0;
-    }
-    else {
+    } else {
         newMsg.wParam = Box::InvalidIndex;
         newMsg.lParam = 0;
     }

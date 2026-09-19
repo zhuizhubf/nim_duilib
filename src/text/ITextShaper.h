@@ -3,8 +3,7 @@
 
 #include "render/IRender.h"
 
-namespace ui
-{
+namespace ui {
 
 /** 字体度量信息
 */
@@ -21,7 +20,7 @@ struct TextGlyphInfo
 {
     /** 实际使用的字体（可能是回退字体）
     */
-    IFont* m_pFont = nullptr;
+    IFont *m_pFont = nullptr;
 
     /** 字形索引
     */
@@ -53,19 +52,24 @@ public:
 
     /** 根据字体描述创建或获取缓存的字体对象
     */
-    virtual IFont* CreateFont(const UiFont& fontInfo) = 0;
+    virtual IFont *CreateFont(const UiFont &fontInfo) = 0;
 
     /** 获取字体度量
     */
-    virtual bool GetFontMetrics(const IFont* pFont, TextFontMetrics& metrics) = 0;
+    virtual bool GetFontMetrics(const IFont *pFont, TextFontMetrics &metrics) = 0;
 
     /** 解析一个 Unicode 字符对应的字形（包含字体回退）
     */
-    virtual bool ResolveGlyph(const IFont* pFont, uint32_t unicodeChar, TextGlyphInfo& glyph, bool bUseDefaultCharWhenFailed) = 0;
+    virtual bool ResolveGlyph(
+        const IFont *pFont,
+        uint32_t unicodeChar,
+        TextGlyphInfo &glyph,
+        bool bUseDefaultCharWhenFailed) = 0;
 
     /** 绘制一个已经解析好的字形
     */
-    virtual void DrawGlyph(const TextGlyphInfo& glyph, float x, float y, UiColor textColor, uint8_t uFade) = 0;
+    virtual void DrawGlyph(
+        const TextGlyphInfo &glyph, float x, float y, UiColor textColor, uint8_t uFade) = 0;
 };
 
 } // namespace ui

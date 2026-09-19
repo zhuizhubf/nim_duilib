@@ -3,16 +3,15 @@
 
 #include "duilib/Core/Callback.h"
 #include "duilib/Core/ThreadMessage.h"
-#include <queue>
-#include <set>
-#include <chrono>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <set>
+#include <thread>
+#include <queue>
 
-namespace ui 
-{
+namespace ui {
 
 /** 定时器回调函数原型：void FunctionName();
 */
@@ -21,20 +20,20 @@ class TimerInfo;
 
 /** 定时器管理器
 */
-class DUILIB_API TimerManager: public SupportWeakCallback
+class DUILIB_API TimerManager : public SupportWeakCallback
 {
 public:
     TimerManager();
     virtual ~TimerManager() override;
-    TimerManager(const TimerManager&) = delete;
-    TimerManager& operator = (const TimerManager&) = delete;
+    TimerManager(const TimerManager &) = delete;
+    TimerManager &operator=(const TimerManager &) = delete;
 
 public:
     /** 初始化
     * @param [in] platformData 平台相关数据（可选参数，如不填写则使用默认值：nullptr）
     * Windows平台：是资源所在模块句柄（HMODULE），如果为nullptr，则使用所在exe的句柄（可选参数）
     */
-    void Initialize(void* platformData);
+    void Initialize(void *platformData);
 
     /** 添加一个可取消的定时器
     * @param [in] weakFlag 定时器取消机制，如果weakFlag.expired()为true表示定时器已经取消，不会在继续派发定时器回调
@@ -43,10 +42,11 @@ public:
     * @param [in] iRepeatTime 定时器回调次数限制，如果为 -1 表示不停重复回调
     * @param [in] 成功返回定时器ID（其值大于0），失败则返回0
     */
-    size_t AddTimer(const std::weak_ptr<WeakFlag>& weakFlag,
-                    const TimerCallback& callback,
-                    uint32_t uElapseMs,
-                    int32_t iRepeatTime = -1);
+    size_t AddTimer(
+        const std::weak_ptr<WeakFlag> &weakFlag,
+        const TimerCallback &callback,
+        uint32_t uElapseMs,
+        int32_t iRepeatTime = -1);
 
     /** 删除一个定时器任务
     * @param [in] nTimerId 定时器任务ID，即AddTimer的返回值

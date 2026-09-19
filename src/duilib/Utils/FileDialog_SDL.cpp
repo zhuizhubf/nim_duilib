@@ -2,17 +2,16 @@
 
 #ifdef DUILIB_BUILD_FOR_SDL
 
-#include "duilib/Core/Window.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Core/Window.h"
 #include "duilib/Utils/StringConvert.h"
 #include "duilib/Utils/StringUtil.h"
 
 #include "duilib/Core/MessageLoop_SDL.h"
 #include <SDL3/SDL.h>
 
-namespace ui
-{
+namespace ui {
 struct DialogFileCallbackData
 {
 public:
@@ -35,10 +34,7 @@ public:
 public:
     /** 增加引用计数
     */
-    int32_t AddRef(void)
-    {
-        return ++m_nRefs;
-    }
+    int32_t AddRef(void) { return ++m_nRefs; }
 
     /** 减少引用计数
     */
@@ -52,9 +48,9 @@ public:
     }
 };
 
-static void SDLCALL DialogFileCallback(void* userdata, const char* const* filelist, int /*filter*/)
+static void SDLCALL DialogFileCallback(void *userdata, const char *const *filelist, int /*filter*/)
 {
-    DialogFileCallbackData* pUserData = (DialogFileCallbackData*)userdata;
+    DialogFileCallbackData *pUserData = (DialogFileCallbackData *) userdata;
     if (pUserData == nullptr) {
         return;
     }
@@ -67,8 +63,7 @@ static void SDLCALL DialogFileCallback(void* userdata, const char* const* fileli
                 pUserData->m_filePaths.push_back(filelist[nIndex]);
                 ++nIndex;
             }
-        }
-        else if (filelist[0] != nullptr){
+        } else if (filelist[0] != nullptr) {
             //单选
             pUserData->m_filePaths.push_back(filelist[0]);
         }
@@ -81,24 +76,25 @@ static void SDLCALL DialogFileCallback(void* userdata, const char* const* fileli
     pUserData->Release();
 }
 
-bool FileDialog::BrowseForFolder(Window* pWindow, FilePath& folderPath, const FilePath& defaultLocation)
+bool FileDialog::BrowseForFolder(
+    Window *pWindow, FilePath &folderPath, const FilePath &defaultLocation)
 {
     folderPath.Clear();
-    SDL_Window* sdlWindow = nullptr;
+    SDL_Window *sdlWindow = nullptr;
     if (pWindow != nullptr) {
-        sdlWindow = (SDL_Window*)pWindow->NativeWnd()->GetWindowHandle();
+        sdlWindow = (SDL_Window *) pWindow->NativeWnd()->GetWindowHandle();
     }
     //用于同步的数据
-    DialogFileCallbackData* pUserData = new DialogFileCallbackData;
+    DialogFileCallbackData *pUserData = new DialogFileCallbackData;
     pUserData->AddRef();
     pUserData->m_bAllowMany = false;
 
     //初始选择的文件夹
     DStringA defaultFolder = defaultLocation.ToStringA();
     SDL_DialogFileCallback callback = DialogFileCallback;
-    void* userdata = pUserData;
+    void *userdata = pUserData;
     pUserData->AddRef(); //增加一个引用计数，保护数据
-    const char* default_location = nullptr;
+    const char *default_location = nullptr;
     if (!defaultFolder.empty()) {
         default_location = defaultFolder.c_str();
     }
@@ -118,24 +114,25 @@ bool FileDialog::BrowseForFolder(Window* pWindow, FilePath& folderPath, const Fi
     return !folderPath.IsEmpty();
 }
 
-bool FileDialog::BrowseForFolders(Window* pWindow, std::vector<FilePath>& folderPaths, const FilePath& defaultLocation)
+bool FileDialog::BrowseForFolders(
+    Window *pWindow, std::vector<FilePath> &folderPaths, const FilePath &defaultLocation)
 {
     folderPaths.clear();
-    SDL_Window* sdlWindow = nullptr;
+    SDL_Window *sdlWindow = nullptr;
     if (pWindow != nullptr) {
-        sdlWindow = (SDL_Window*)pWindow->NativeWnd()->GetWindowHandle();
+        sdlWindow = (SDL_Window *) pWindow->NativeWnd()->GetWindowHandle();
     }
     //用于同步的数据
-    DialogFileCallbackData* pUserData = new DialogFileCallbackData;
+    DialogFileCallbackData *pUserData = new DialogFileCallbackData;
     pUserData->AddRef();
     pUserData->m_bAllowMany = true;
 
     //初始选择的文件夹
     DStringA defaultFolder = defaultLocation.ToStringA();
     SDL_DialogFileCallback callback = DialogFileCallback;
-    void* userdata = pUserData;
+    void *userdata = pUserData;
     pUserData->AddRef(); //增加一个引用计数，保护数据
-    const char* default_location = nullptr;
+    const char *default_location = nullptr;
     if (!defaultFolder.empty()) {
         default_location = defaultFolder.c_str();
     }
@@ -146,41 +143,43 @@ bool FileDialog::BrowseForFolders(Window* pWindow, std::vector<FilePath>& folder
     MessageLoop_SDL messageLoop;
     messageLoop.RunUserLoop(pUserData->m_bTerminate);
 
-    //读取数据    
+    //读取数据
     const size_t nCount = pUserData->m_filePaths.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        folderPaths.push_back(FilePath(StringConvert::UTF8ToWString(pUserData->m_filePaths.at(nIndex))));
+        folderPaths.push_back(
+            FilePath(StringConvert::UTF8ToWString(pUserData->m_filePaths.at(nIndex))));
     }
 
     pUserData->Release();
     return !folderPaths.empty();
 }
 
-bool FileDialog::BrowseForFile(Window* pWindow, 
-                               FilePath& filePath,                               
-                               bool bOpenFileDialog,
-                               const std::vector<FileType>& fileTypes,
-                               int32_t /*nFileTypeIndex*/,
-                               const DString& /*defaultExt*/,
-                               const DString& fileName,
-                               const FilePath& /*defaultLocation*/)
+bool FileDialog::BrowseForFile(
+    Window *pWindow,
+    FilePath &filePath,
+    bool bOpenFileDialog,
+    const std::vector<FileType> &fileTypes,
+    int32_t /*nFileTypeIndex*/,
+    const DString & /*defaultExt*/,
+    const DString &fileName,
+    const FilePath & /*defaultLocation*/)
 {
     filePath.Clear();
-    SDL_Window* sdlWindow = nullptr;
+    SDL_Window *sdlWindow = nullptr;
     if (pWindow != nullptr) {
-        sdlWindow = (SDL_Window*)pWindow->NativeWnd()->GetWindowHandle();
+        sdlWindow = (SDL_Window *) pWindow->NativeWnd()->GetWindowHandle();
     }
     //用于同步的数据
-    DialogFileCallbackData* pUserData = new DialogFileCallbackData;
+    DialogFileCallbackData *pUserData = new DialogFileCallbackData;
     pUserData->AddRef();
     pUserData->m_bAllowMany = false;
 
     //初始选择的文件夹
     DStringA defaultFileName = StringConvert::TToUTF8(fileName);
     SDL_DialogFileCallback callback = DialogFileCallback;
-    void* userdata = pUserData;
+    void *userdata = pUserData;
     pUserData->AddRef(); //增加一个引用计数，保护数据
-    const char* default_location = nullptr;
+    const char *default_location = nullptr;
     if (!defaultFileName.empty()) {
         default_location = defaultFileName.c_str();
     }
@@ -194,7 +193,7 @@ bool FileDialog::BrowseForFile(Window* pWindow,
     std::vector<FileTypeA> fileTypesA;
     if (!fileTypes.empty()) {
         FileTypeA fileTypeA;
-        for (const FileType& fileType : fileTypes) {
+        for (const FileType &fileType : fileTypes) {
             DString name = fileType.szName;
             if (!fileType.szNameId.empty()) {
                 name = GlobalManager::GetTextById(fileType.szNameId);
@@ -212,24 +211,24 @@ bool FileDialog::BrowseForFile(Window* pWindow,
     std::vector<SDL_DialogFileFilter> dlgFileFilters;
     if (!fileTypesA.empty()) {
         SDL_DialogFileFilter dlgFileFilter;
-        for (const FileTypeA& fileTypeA : fileTypesA) {
+        for (const FileTypeA &fileTypeA : fileTypesA) {
             dlgFileFilter.name = fileTypeA.szNameA.c_str();
             dlgFileFilter.pattern = fileTypeA.szExtA.c_str();
             dlgFileFilters.push_back(dlgFileFilter);
         }
     }
 
-    const SDL_DialogFileFilter* filters = nullptr;
+    const SDL_DialogFileFilter *filters = nullptr;
     int nfilters = 0;
     if (!dlgFileFilters.empty()) {
         filters = dlgFileFilters.data();
-        nfilters = (int)dlgFileFilters.size();
+        nfilters = (int) dlgFileFilters.size();
     }
 
     if (bOpenFileDialog) {
-        SDL_ShowOpenFileDialog(callback, userdata, sdlWindow, filters, nfilters, default_location, allow_many);
-    }
-    else {
+        SDL_ShowOpenFileDialog(
+            callback, userdata, sdlWindow, filters, nfilters, default_location, allow_many);
+    } else {
         SDL_ShowSaveFileDialog(callback, userdata, sdlWindow, filters, nfilters, default_location);
     }
 
@@ -246,29 +245,30 @@ bool FileDialog::BrowseForFile(Window* pWindow,
     return !filePath.IsEmpty();
 }
 
-bool FileDialog::BrowseForFiles(Window* pWindow, 
-                                std::vector<FilePath>& filePaths,                                
-                                const std::vector<FileType>& fileTypes,
-                                int32_t /*nFileTypeIndex*/,
-                                const DString& /*defaultExt*/,
-                                const FilePath& /*defaultLocation*/)
+bool FileDialog::BrowseForFiles(
+    Window *pWindow,
+    std::vector<FilePath> &filePaths,
+    const std::vector<FileType> &fileTypes,
+    int32_t /*nFileTypeIndex*/,
+    const DString & /*defaultExt*/,
+    const FilePath & /*defaultLocation*/)
 {
     filePaths.clear();
-    SDL_Window* sdlWindow = nullptr;
+    SDL_Window *sdlWindow = nullptr;
     if (pWindow != nullptr) {
-        sdlWindow = (SDL_Window*)pWindow->NativeWnd()->GetWindowHandle();
+        sdlWindow = (SDL_Window *) pWindow->NativeWnd()->GetWindowHandle();
     }
     //用于同步的数据
-    DialogFileCallbackData* pUserData = new DialogFileCallbackData;
+    DialogFileCallbackData *pUserData = new DialogFileCallbackData;
     pUserData->AddRef();
     pUserData->m_bAllowMany = true;
 
     //初始选择的文件夹
     DStringA defaultFileName;
     SDL_DialogFileCallback callback = DialogFileCallback;
-    void* userdata = pUserData;
+    void *userdata = pUserData;
     pUserData->AddRef(); //增加一个引用计数，保护数据
-    const char* default_location = nullptr;
+    const char *default_location = nullptr;
     if (!defaultFileName.empty()) {
         default_location = defaultFileName.c_str();
     }
@@ -282,7 +282,7 @@ bool FileDialog::BrowseForFiles(Window* pWindow,
     std::vector<FileTypeA> fileTypesA;
     if (!fileTypes.empty()) {
         FileTypeA fileTypeA;
-        for (const FileType& fileType : fileTypes) {
+        for (const FileType &fileType : fileTypes) {
             DString name = fileType.szName;
             if (!fileType.szNameId.empty()) {
                 name = GlobalManager::GetTextById(fileType.szNameId);
@@ -300,30 +300,32 @@ bool FileDialog::BrowseForFiles(Window* pWindow,
     std::vector<SDL_DialogFileFilter> dlgFileFilters;
     if (!fileTypesA.empty()) {
         SDL_DialogFileFilter dlgFileFilter;
-        for (const FileTypeA& fileTypeA : fileTypesA) {
+        for (const FileTypeA &fileTypeA : fileTypesA) {
             dlgFileFilter.name = fileTypeA.szNameA.c_str();
             dlgFileFilter.pattern = fileTypeA.szExtA.c_str();
             dlgFileFilters.push_back(dlgFileFilter);
         }
     }
 
-    const SDL_DialogFileFilter* filters = nullptr;
+    const SDL_DialogFileFilter *filters = nullptr;
     int nfilters = 0;
     if (!dlgFileFilters.empty()) {
         filters = dlgFileFilters.data();
-        nfilters = (int)dlgFileFilters.size();
+        nfilters = (int) dlgFileFilters.size();
     }
 
-    SDL_ShowOpenFileDialog(callback, userdata, sdlWindow, filters, nfilters, default_location, allow_many);
+    SDL_ShowOpenFileDialog(
+        callback, userdata, sdlWindow, filters, nfilters, default_location, allow_many);
 
     //运行消息循环，等待退出
     MessageLoop_SDL messageLoop;
     messageLoop.RunUserLoop(pUserData->m_bTerminate);
 
-    //读取数据    
+    //读取数据
     const size_t nCount = pUserData->m_filePaths.size();
     for (size_t nIndex = 0; nIndex < nCount; ++nIndex) {
-        filePaths.push_back(FilePath(StringConvert::UTF8ToWString(pUserData->m_filePaths.at(nIndex))));
+        filePaths.push_back(
+            FilePath(StringConvert::UTF8ToWString(pUserData->m_filePaths.at(nIndex))));
     }
 
     //TODO: 多选的情况下，SDL 3.0目前返回的值不对，有Bug，待修复。
@@ -331,6 +333,6 @@ bool FileDialog::BrowseForFiles(Window* pWindow,
     return !filePaths.empty();
 }
 
-}//namespace ui
+} //namespace ui
 
 #endif //DUILIB_BUILD_FOR_SDL

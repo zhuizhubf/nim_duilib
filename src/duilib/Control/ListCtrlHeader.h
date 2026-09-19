@@ -3,8 +3,7 @@
 
 #include "duilib/Box/ListBoxItem.h"
 
-namespace ui
-{
+namespace ui {
 
 /** ListCtrl的表头控件
 */
@@ -25,8 +24,9 @@ class DUILIB_API ListCtrlHeader : public ListBoxItemH
 {
     typedef ListBoxItemH BaseClass;
     friend class ListCtrlHeaderItem;
+
 public:
-    explicit ListCtrlHeader(Window* pWindow);
+    explicit ListCtrlHeader(Window *pWindow);
     virtual ~ListCtrlHeader() override;
 
     /** 获取控件类型
@@ -35,7 +35,7 @@ public:
 
     /** 设置属性
     */
-    virtual void SetAttribute(const DString& strName, const DString& strValue) override;
+    virtual void SetAttribute(const DString &strName, const DString &strValue) override;
 
     /** DPI发生变化，更新控件大小和布局
     * @param [in] nOldDpiScale 旧的DPI缩放百分比
@@ -54,7 +54,7 @@ public:
     * @param [in] columnInfo 列的基本属性
     * @return 返回这一列的表头控件接口
     */
-    ListCtrlHeaderItem* InsertColumn(int32_t columnIndex, const ListCtrlColumn& columnInfo);
+    ListCtrlHeaderItem *InsertColumn(int32_t columnIndex, const ListCtrlColumn &columnInfo);
 
     /** 获取列的个数
     */
@@ -75,19 +75,19 @@ public:
     /** 获取列表头的控件接口
     * @param [in] columnIndex 列索引序号：[0, GetColumnCount())
     */
-    ListCtrlHeaderItem* GetColumn(size_t columnIndex) const;
+    ListCtrlHeaderItem *GetColumn(size_t columnIndex) const;
 
     /** 获取列表头的控件接口
     * @param [in] columnId 列的ID值，通过ListCtrlHeaderItem::GetColumnId()函数获取
     */
-    ListCtrlHeaderItem* GetColumnById(size_t columnId) const;
+    ListCtrlHeaderItem *GetColumnById(size_t columnId) const;
 
     /** 获取列宽度和列索引序号
     * @param [in] columnId 列的ID值，通过ListCtrlHeaderItem::GetColumnId()函数获取
     * @param [out] columnIndex 列的序号：[0, GetColumnCount())，代表第几列
     * @param [out] nColumnWidth 列的宽度值
     */
-    bool GetColumnInfo(size_t columnId, size_t& columnIndex, int32_t& nColumnWidth) const;
+    bool GetColumnInfo(size_t columnId, size_t &columnIndex, int32_t &nColumnWidth) const;
 
     /** 判断列的ID是否有效
     * @param [in] columnId 列的ID值，通过ListCtrlHeaderItem::GetColumnId()函数获取
@@ -160,17 +160,16 @@ public:
 
     /** 获取列分割控件，在客户区坐标内的矩形范围
     */
-    void GetHeaderSplitControlRect(std::vector<UiRect>& rcSplitControls) const;
+    void GetHeaderSplitControlRect(std::vector<UiRect> &rcSplitControls) const;
 
 public:
-
     /** 设置关联的ListCtrl接口
     */
-    void SetListCtrl(ListCtrl* pListCtrl);
+    void SetListCtrl(ListCtrl *pListCtrl);
 
     /** 获取关联的ListCtrl接口
     */
-    ListCtrl* GetListCtrl() const;
+    ListCtrl *GetListCtrl() const;
 
 public:
     /** 列表头鼠标右键点击处理函数
@@ -180,7 +179,10 @@ public:
     *           可以通过 ListCtrlHeaderItem* pHeaderItem = (ListCtrlHeaderItem*)wParam; 获取到点击在哪列了
     *           如果wParam如果为0，说明是点击到了ListCtrlHeader自身空白处，没有点击到任何列
     */
-    void AttachRClick(const EventCallback& callback, EventCallbackID callbackID = 0) { AttachEvent(kEventRClick, callback, callbackID); }
+    void AttachRClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        AttachEvent(kEventRClick, callback, callbackID);
+    }
 
 protected:
     /** 是否支持列表头拖动改变列的顺序
@@ -191,12 +193,12 @@ protected:
     * @param [in] pLeftHeaderItem 左侧的列表头控件接口
     * @param [in] pRightHeaderItem 右侧的列表头控件接口
     */
-    void OnHeaderColumnResized(Control* pLeftHeaderItem, Control* pRightHeaderItem);
+    void OnHeaderColumnResized(Control *pLeftHeaderItem, Control *pRightHeaderItem);
 
     /** 点击列表头触发排序的事件响应函数
     * @param [in] pHeaderItem 列表头控件接口
     */
-    void OnHeaderColumnSorted(ListCtrlHeaderItem* pHeaderItem);
+    void OnHeaderColumnSorted(ListCtrlHeaderItem *pHeaderItem);
 
     /** 通过拖动列表头，调整了列的顺序
     */
@@ -206,7 +208,7 @@ protected:
     * @param [in] pHeaderItem 列表头控件接口
     * @param [in] bChecked true表示勾选（Checked状态），false表示取消勾选（UnChecked状态）
     */
-    void OnHeaderColumnCheckStateChanged(ListCtrlHeaderItem* pHeaderItem, bool bChecked);
+    void OnHeaderColumnCheckStateChanged(ListCtrlHeaderItem *pHeaderItem, bool bChecked);
 
     /** 表头列的显示属性发生变化
     */
@@ -215,7 +217,7 @@ protected:
     /** 列表头列的分割条双击事件
     * @param [in] pHeaderItem 列表头控件接口
     */
-    void OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem* pHeaderItem);
+    void OnHeaderColumnSplitDoubleClick(ListCtrlHeaderItem *pHeaderItem);
 
     /** 是否支持勾选模式（目前是TreeView/ListCtrl在使用这个模式）
         勾选模式是指：
@@ -239,7 +241,7 @@ protected:
 private:
     /** 关联的ListCtrl接口
     */
-    ListCtrl* m_pListCtrl;
+    ListCtrl *m_pListCtrl;
 
     /** 左侧的Padding值，用于与数据行对齐显示
     */
@@ -254,6 +256,6 @@ private:
     bool m_bEnableCheckChangeEvent;
 };
 
-}//namespace ui
+} //namespace ui
 
 #endif //UI_CONTROL_LIST_CTRL_HEADER_H_

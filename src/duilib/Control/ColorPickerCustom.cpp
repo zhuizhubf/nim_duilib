@@ -3,21 +3,22 @@
 #include "duilib/Control/ColorPickerRegular.h"
 #include "duilib/Utils/Clipboard.h"
 
-namespace ui
-{
+namespace ui {
 
-ColorPickerCustom::ColorPickerCustom(Window* pWindow) :
-    Box(pWindow),
-    m_bPickerInited(false),
-    m_pRegularPicker(nullptr),
-    m_pSpectrumControl(nullptr),
-    m_pNewColorEdit(nullptr)
+ColorPickerCustom::ColorPickerCustom(Window *pWindow)
+    : Box(pWindow)
+    , m_bPickerInited(false)
+    , m_pRegularPicker(nullptr)
+    , m_pSpectrumControl(nullptr)
+    , m_pNewColorEdit(nullptr)
+{}
+
+DString ColorPickerCustom::GetType() const
 {
+    return DUI_CTR_COLOR_PICKER_CUSTOM;
 }
 
-DString ColorPickerCustom::GetType() const { return DUI_CTR_COLOR_PICKER_CUSTOM; }
-
-void ColorPickerCustom::SelectColor(const UiColor& color)
+void ColorPickerCustom::SelectColor(const UiColor &color)
 {
     if (!m_bPickerInited) {
         m_oldColor = color;
@@ -37,49 +38,53 @@ void ColorPickerCustom::InitPicker()
     if (m_bPickerInited) {
         return;
     }
-    Window* pWindow = GetWindow();
+    Window *pWindow = GetWindow();
     if (pWindow == nullptr) {
         return;
     }
-            
-    m_pRegularPicker = dynamic_cast<ColorPickerRegular*>(pWindow->FindControl(_T("color_picker_custom_regular")));
+
+    m_pRegularPicker = dynamic_cast<ColorPickerRegular *>(
+        pWindow->FindControl(_T("color_picker_custom_regular")));
     if (m_pRegularPicker != nullptr) {
-        m_pRegularPicker->AttachSelectColor([this](const ui::EventArgs& args) {
+        m_pRegularPicker->AttachSelectColor([this](const ui::EventArgs &args) {
             //转发该事件给上层
             OnColorChanged(args.wParam, args.lParam, ChangeReason::ColorRegular);
             return true;
-            });
+        });
     }
 
-    m_pSpectrumControl = dynamic_cast<ColorControl*>(pWindow->FindControl(_T("color_picker_custom_spectrum")));
+    m_pSpectrumControl = dynamic_cast<ColorControl *>(
+        pWindow->FindControl(_T("color_picker_custom_spectrum")));
     if (m_pSpectrumControl != nullptr) {
-        m_pSpectrumControl->AttachSelectColor([this](const ui::EventArgs& args) {
+        m_pSpectrumControl->AttachSelectColor([this](const ui::EventArgs &args) {
             //转发该事件给上层
             OnColorChanged(args.wParam, args.lParam, ChangeReason::ColorSpectrum);
             return true;
-            });
+        });
     }
-        
-    m_pNewColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_new_color_edit")));
+
+    m_pNewColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_new_color_edit")));
     if (m_pNewColorEdit != nullptr) {
-        m_pNewColorEdit->AttachTextChanged([this](const ui::EventArgs& /*args*/) {
+        m_pNewColorEdit->AttachTextChanged([this](const ui::EventArgs & /*args*/) {
             //转发该事件给上层
             DString colorText = m_pNewColorEdit->GetText();
             if (IsValidColorString(colorText)) {
                 UiColor newColor = m_pNewColorEdit->GetUiColor(colorText);
                 if ((newColor.GetARGB() != 0) && (newColor != m_oldColor)) {
-                    OnColorChanged(newColor.GetARGB(), m_oldColor.GetARGB(), ChangeReason::NewColorEdit);
+                    OnColorChanged(
+                        newColor.GetARGB(), m_oldColor.GetARGB(), ChangeReason::NewColorEdit);
                 }
             }
             return true;
-            });
+        });
     }
 
     //复制颜色值
-    ui::Button* pCopyBtn = dynamic_cast<Button*>(pWindow->FindControl(_T("color_picker_copy")));
+    ui::Button *pCopyBtn = dynamic_cast<Button *>(pWindow->FindControl(_T("color_picker_copy")));
     if (pCopyBtn != nullptr) {
         ControlPtrT<RichEdit> pNewColorEdit = m_pNewColorEdit;
-        pCopyBtn->AttachClick([pNewColorEdit](const ui::EventArgs&) {
+        pCopyBtn->AttachClick([pNewColorEdit](const ui::EventArgs &) {
             if (pNewColorEdit != nullptr) {
                 DString colorValue = pNewColorEdit->GetText();
                 if (!colorValue.empty()) {
@@ -87,38 +92,58 @@ void ColorPickerCustom::InitPicker()
                 }
             }
             return true;
-            });
+        });
     }
 
-    m_rgbA.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_RGB_A")));
-    m_rgbA.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_RGB_A")));
-    m_rgbR.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_RGB_R")));
-    m_rgbR.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_RGB_R")));
-    m_rgbG.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_RGB_G")));
-    m_rgbG.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_RGB_G")));
-    m_rgbB.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_RGB_B")));
-    m_rgbB.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_RGB_B")));
+    m_rgbA.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_RGB_A")));
+    m_rgbA.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_RGB_A")));
+    m_rgbR.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_RGB_R")));
+    m_rgbR.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_RGB_R")));
+    m_rgbG.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_RGB_G")));
+    m_rgbG.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_RGB_G")));
+    m_rgbB.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_RGB_B")));
+    m_rgbB.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_RGB_B")));
     InitRGB(m_rgbA, ChangeReason::ColorARGB_A);
     InitRGB(m_rgbR, ChangeReason::ColorARGB_R);
     InitRGB(m_rgbG, ChangeReason::ColorARGB_G);
     InitRGB(m_rgbB, ChangeReason::ColorARGB_B);
 
-    m_hsvH.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSV_H")));
-    m_hsvH.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSV_H")));
-    m_hsvS.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSV_S")));
-    m_hsvS.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSV_S")));
-    m_hsvV.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSV_V")));
-    m_hsvV.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSV_V")));
+    m_hsvH.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSV_H")));
+    m_hsvH.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSV_H")));
+    m_hsvS.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSV_S")));
+    m_hsvS.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSV_S")));
+    m_hsvV.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSV_V")));
+    m_hsvV.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSV_V")));
     InitHSV(m_hsvH, 359, ChangeReason::ColorHSV_H);
     InitHSV(m_hsvS, 100, ChangeReason::ColorHSV_S);
     InitHSV(m_hsvV, 100, ChangeReason::ColorHSV_V);
 
-    m_hslH.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSL_H")));
-    m_hslH.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSL_H")));
-    m_hslS.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSL_S")));
-    m_hslS.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSL_S")));
-    m_hslL.m_pColorEdit = dynamic_cast<RichEdit*>(pWindow->FindControl(_T("color_picker_edit_HSL_L")));
-    m_hslL.m_pColorSlider = dynamic_cast<ColorSlider*>(pWindow->FindControl(_T("color_picker_slider_HSL_L")));
+    m_hslH.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSL_H")));
+    m_hslH.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSL_H")));
+    m_hslS.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSL_S")));
+    m_hslS.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSL_S")));
+    m_hslL.m_pColorEdit = dynamic_cast<RichEdit *>(
+        pWindow->FindControl(_T("color_picker_edit_HSL_L")));
+    m_hslL.m_pColorSlider = dynamic_cast<ColorSlider *>(
+        pWindow->FindControl(_T("color_picker_slider_HSL_L")));
     InitHSL(m_hslH, 359, ChangeReason::ColorHSL_H);
     InitHSL(m_hslS, 100, ChangeReason::ColorHSL_S);
     InitHSL(m_hslL, 100, ChangeReason::ColorHSL_L);
@@ -129,14 +154,14 @@ void ColorPickerCustom::InitPicker()
     }
 }
 
-bool ColorPickerCustom::IsValidColorString(const DString& colorText) const
+bool ColorPickerCustom::IsValidColorString(const DString &colorText) const
 {
     if ((colorText.size() == 9) && (colorText.front() == _T('#'))) {
         for (size_t i = 1; i < colorText.size(); ++i) {
             DString::value_type ch = colorText.at(i);
-            bool isValid = (((ch >= _T('0')) && (ch <= _T('9'))) ||
-                            ((ch >= _T('a')) && (ch <= _T('f'))) ||
-                            ((ch >= _T('A')) && (ch <= _T('F'))));
+            bool isValid
+                = (((ch >= _T('0')) && (ch <= _T('9'))) || ((ch >= _T('a')) && (ch <= _T('f')))
+                   || ((ch >= _T('A')) && (ch <= _T('F'))));
             if (!isValid) {
                 return false;
             }
@@ -148,11 +173,15 @@ bool ColorPickerCustom::IsValidColorString(const DString& colorText) const
 
 void ColorPickerCustom::OnColorChanged(WPARAM wParam, LPARAM lParam, ChangeReason reason)
 {
-    UiColor newColor((uint32_t)wParam);
+    UiColor newColor((uint32_t) wParam);
     if (reason != ChangeReason::NewColorEdit) {
         if (m_pNewColorEdit != nullptr) {
-            DString strColor = StringUtil::Printf(_T("#%02X%02X%02X%02X"),
-                newColor.GetA(), newColor.GetR(), newColor.GetG(), newColor.GetB());
+            DString strColor = StringUtil::Printf(
+                _T("#%02X%02X%02X%02X"),
+                newColor.GetA(),
+                newColor.GetR(),
+                newColor.GetG(),
+                newColor.GetB());
             if (strColor != m_pNewColorEdit->GetText()) {
                 m_pNewColorEdit->SetTextNoEvent(strColor);
             }
@@ -178,7 +207,7 @@ void ColorPickerCustom::OnColorChanged(WPARAM wParam, LPARAM lParam, ChangeReaso
 
     //更新RGB
     if (reason != ChangeReason::ColorARGB_A) {
-        UpdateRGB(m_rgbA, newColor, 0);            
+        UpdateRGB(m_rgbA, newColor, 0);
     }
     if (reason != ChangeReason::ColorARGB_R) {
         UpdateRGB(m_rgbR, newColor, 1);
@@ -200,23 +229,23 @@ void ColorPickerCustom::OnColorChanged(WPARAM wParam, LPARAM lParam, ChangeReaso
     m_oldColor = newColor;
 }
 
-void ColorPickerCustom::InitRGB(const ColorUI& colorUI, ChangeReason reason)
+void ColorPickerCustom::InitRGB(const ColorUI &colorUI, ChangeReason reason)
 {
     ASSERT(colorUI.m_pColorEdit != nullptr);
     ASSERT(colorUI.m_pColorSlider != nullptr);
-    RichEdit* pRichEdit = colorUI.m_pColorEdit;
-    ColorSlider* pColorSlider = colorUI.m_pColorSlider;
+    RichEdit *pRichEdit = colorUI.m_pColorEdit;
+    ColorSlider *pColorSlider = colorUI.m_pColorSlider;
     if (colorUI.m_pColorEdit != nullptr) {
         colorUI.m_pColorEdit->SetTextNoEvent(_T(""));
-        colorUI.m_pColorEdit->AttachTextChanged([this, pRichEdit, pColorSlider, reason](const ui::EventArgs& /*args*/) {
+        colorUI.m_pColorEdit->AttachTextChanged(
+            [this, pRichEdit, pColorSlider, reason](const ui::EventArgs & /*args*/) {
                 if (pRichEdit != nullptr) {
                     DString text = pRichEdit->GetText();
                     int32_t nValue = StringUtil::StringToInt32(text);
                     if (nValue < 0) {
                         nValue = 0;
                         pRichEdit->SetTextNoEvent(_T("0"));
-                    }
-                    else if (nValue > 255) {
+                    } else if (nValue > 255) {
                         nValue = 255;
                         pRichEdit->SetTextNoEvent(_T("255"));
                     }
@@ -233,8 +262,9 @@ void ColorPickerCustom::InitRGB(const ColorUI& colorUI, ChangeReason reason)
         colorUI.m_pColorSlider->SetMinValue(0);
         colorUI.m_pColorSlider->SetMaxValue(255);
         colorUI.m_pColorSlider->SetValue(0);
-        colorUI.m_pColorSlider->AttachValueChanged([this, pRichEdit, reason](const ui::EventArgs& args) {
-                int32_t value = (int32_t)args.wParam;
+        colorUI.m_pColorSlider->AttachValueChanged(
+            [this, pRichEdit, reason](const ui::EventArgs &args) {
+                int32_t value = (int32_t) args.wParam;
                 if (pRichEdit != nullptr) {
                     DString text = StringUtil::Printf(_T("%d"), value);
                     if (pRichEdit->GetText() != text) {
@@ -248,30 +278,29 @@ void ColorPickerCustom::InitRGB(const ColorUI& colorUI, ChangeReason reason)
     }
 }
 
-void ColorPickerCustom::InitHSV(const ColorUI& colorUI, int32_t maxValue, ChangeReason reason)
+void ColorPickerCustom::InitHSV(const ColorUI &colorUI, int32_t maxValue, ChangeReason reason)
 {
     ASSERT(colorUI.m_pColorEdit != nullptr);
     ASSERT(colorUI.m_pColorSlider != nullptr);
-    RichEdit* pRichEdit = colorUI.m_pColorEdit;
-    ColorSlider* pColorSlider = colorUI.m_pColorSlider;
+    RichEdit *pRichEdit = colorUI.m_pColorEdit;
+    ColorSlider *pColorSlider = colorUI.m_pColorSlider;
     if (colorUI.m_pColorEdit != nullptr) {
         colorUI.m_pColorEdit->SetTextNoEvent(_T(""));
-        colorUI.m_pColorEdit->AttachTextChanged([this, pRichEdit, pColorSlider, reason](const ui::EventArgs& /*args*/) {
+        colorUI.m_pColorEdit->AttachTextChanged(
+            [this, pRichEdit, pColorSlider, reason](const ui::EventArgs & /*args*/) {
                 if (pRichEdit != nullptr) {
                     DString text = pRichEdit->GetText();
                     int32_t nValue = StringUtil::StringToInt32(text);
                     if (nValue < 0) {
                         nValue = 0;
                         pRichEdit->SetTextNoEvent(_T("0"));
-                    }
-                    else {
+                    } else {
                         if (reason == ChangeReason::ColorHSV_H) {
                             if (nValue > 359) {
                                 nValue = 359;
                                 pRichEdit->SetTextNoEvent(_T("359"));
                             }
-                        }
-                        else {
+                        } else {
                             if (nValue > 100) {
                                 nValue = 100;
                                 pRichEdit->SetTextNoEvent(_T("100"));
@@ -291,45 +320,45 @@ void ColorPickerCustom::InitHSV(const ColorUI& colorUI, int32_t maxValue, Change
         colorUI.m_pColorSlider->SetMinValue(0);
         colorUI.m_pColorSlider->SetMaxValue(maxValue);
         colorUI.m_pColorSlider->SetValue(0);
-        colorUI.m_pColorSlider->AttachValueChanged([this, pRichEdit, reason](const ui::EventArgs& args) {
-            int32_t value = (int32_t)args.wParam;
-            if (pRichEdit != nullptr) {
-                DString text = StringUtil::Printf(_T("%d"), value);
-                if (pRichEdit->GetText() != text) {
-                    pRichEdit->SetTextNoEvent(text);
+        colorUI.m_pColorSlider->AttachValueChanged(
+            [this, pRichEdit, reason](const ui::EventArgs &args) {
+                int32_t value = (int32_t) args.wParam;
+                if (pRichEdit != nullptr) {
+                    DString text = StringUtil::Printf(_T("%d"), value);
+                    if (pRichEdit->GetText() != text) {
+                        pRichEdit->SetTextNoEvent(text);
+                    }
                 }
-            }
-            //触发HSV颜色变化事件
-            OnHSVChanged(reason);
-            return true;
+                //触发HSV颜色变化事件
+                OnHSVChanged(reason);
+                return true;
             });
     }
 }
 
-void ColorPickerCustom::InitHSL(const ColorUI& colorUI, int32_t maxValue, ChangeReason reason)
+void ColorPickerCustom::InitHSL(const ColorUI &colorUI, int32_t maxValue, ChangeReason reason)
 {
     ASSERT(colorUI.m_pColorEdit != nullptr);
     ASSERT(colorUI.m_pColorSlider != nullptr);
-    RichEdit* pRichEdit = colorUI.m_pColorEdit;
-    ColorSlider* pColorSlider = colorUI.m_pColorSlider;
+    RichEdit *pRichEdit = colorUI.m_pColorEdit;
+    ColorSlider *pColorSlider = colorUI.m_pColorSlider;
     if (colorUI.m_pColorEdit != nullptr) {
         colorUI.m_pColorEdit->SetTextNoEvent(_T(""));
-        colorUI.m_pColorEdit->AttachTextChanged([this, pRichEdit, pColorSlider, reason](const ui::EventArgs& /*args*/) {
+        colorUI.m_pColorEdit->AttachTextChanged(
+            [this, pRichEdit, pColorSlider, reason](const ui::EventArgs & /*args*/) {
                 if (pRichEdit != nullptr) {
                     DString text = pRichEdit->GetText();
                     int32_t nValue = StringUtil::StringToInt32(text);
                     if (nValue < 0) {
                         nValue = 0;
                         pRichEdit->SetTextNoEvent(_T("0"));
-                    }
-                    else {
+                    } else {
                         if (reason == ChangeReason::ColorHSL_H) {
                             if (nValue > 359) {
                                 nValue = 359;
                                 pRichEdit->SetTextNoEvent(_T("359"));
                             }
-                        }
-                        else {
+                        } else {
                             if (nValue > 100) {
                                 nValue = 100;
                                 pRichEdit->SetTextNoEvent(_T("100"));
@@ -349,36 +378,34 @@ void ColorPickerCustom::InitHSL(const ColorUI& colorUI, int32_t maxValue, Change
         colorUI.m_pColorSlider->SetMinValue(0);
         colorUI.m_pColorSlider->SetMaxValue(maxValue);
         colorUI.m_pColorSlider->SetValue(0);
-        colorUI.m_pColorSlider->AttachValueChanged([this, pRichEdit, reason](const ui::EventArgs& args) {
-            int32_t value = (int32_t)args.wParam;
-            if (pRichEdit != nullptr) {
-                DString text = StringUtil::Printf(_T("%d"), value);
-                if (pRichEdit->GetText() != text) {
-                    pRichEdit->SetTextNoEvent(text);
+        colorUI.m_pColorSlider->AttachValueChanged(
+            [this, pRichEdit, reason](const ui::EventArgs &args) {
+                int32_t value = (int32_t) args.wParam;
+                if (pRichEdit != nullptr) {
+                    DString text = StringUtil::Printf(_T("%d"), value);
+                    if (pRichEdit->GetText() != text) {
+                        pRichEdit->SetTextNoEvent(text);
+                    }
                 }
-            }
-            //触发HSL颜色变化事件
-            OnHSLChanged(reason);
-            return true;
+                //触发HSL颜色变化事件
+                OnHSLChanged(reason);
+                return true;
             });
     }
 }
 
-void ColorPickerCustom::UpdateRGB(const ColorUI& colorUI, const UiColor& color, int32_t flag)
+void ColorPickerCustom::UpdateRGB(const ColorUI &colorUI, const UiColor &color, int32_t flag)
 {
     ASSERT(colorUI.m_pColorEdit != nullptr);
     ASSERT(colorUI.m_pColorSlider != nullptr);
     int32_t colorValue = 0;
     if (flag == 0) {
         colorValue = color.GetA();
-    }
-    else if (flag == 1) {
+    } else if (flag == 1) {
         colorValue = color.GetR();
-    }
-    else if (flag == 2) {
+    } else if (flag == 2) {
         colorValue = color.GetG();
-    }
-    else {
+    } else {
         colorValue = color.GetB();
     }
     if (colorUI.m_pColorEdit != nullptr) {
@@ -390,23 +417,25 @@ void ColorPickerCustom::UpdateRGB(const ColorUI& colorUI, const UiColor& color, 
         if (flag == 0) {
             //A
             colorUI.m_pColorSlider->SetColorInfo(color, ColorAdjustMode::kMode_ARGB_A);
-        }
-        else if (flag == 1) {
+        } else if (flag == 1) {
             //R
             colorUI.m_pColorSlider->SetColorInfo(color, ColorAdjustMode::kMode_ARGB_R);
-        }
-        else if (flag == 2) {
+        } else if (flag == 2) {
             //G
             colorUI.m_pColorSlider->SetColorInfo(color, ColorAdjustMode::kMode_ARGB_G);
-        }
-        else {
+        } else {
             //B
             colorUI.m_pColorSlider->SetColorInfo(color, ColorAdjustMode::kMode_ARGB_B);
         }
     }
 }
 
-void ColorPickerCustom::UpdateHSV(const ColorUI& colorUIH, const ColorUI& colorUIS, const ColorUI& colorUIV, const UiColor& color, ChangeReason reason)
+void ColorPickerCustom::UpdateHSV(
+    const ColorUI &colorUIH,
+    const ColorUI &colorUIS,
+    const ColorUI &colorUIV,
+    const UiColor &color,
+    ChangeReason reason)
 {
     double red = 1.0 * color.GetR() / 255;
     double green = 1.0 * color.GetG() / 255;
@@ -419,9 +448,8 @@ void ColorPickerCustom::UpdateHSV(const ColorUI& colorUIH, const ColorUI& colorU
     }
 
     bool needUpdate = true;
-    if ((reason == ChangeReason::ColorHSV_H) ||
-        (reason == ChangeReason::ColorHSV_S) ||
-        (reason == ChangeReason::ColorHSV_V)) {
+    if ((reason == ChangeReason::ColorHSV_H) || (reason == ChangeReason::ColorHSV_S)
+        || (reason == ChangeReason::ColorHSV_V)) {
         //从控件获取颜色值
         if (colorUIH.m_pColorSlider != nullptr) {
             hue = colorUIH.m_pColorSlider->GetValue();
@@ -439,31 +467,31 @@ void ColorPickerCustom::UpdateHSV(const ColorUI& colorUIH, const ColorUI& colorU
     }
     if (needUpdate) {
         if (colorUIH.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)hue);
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) hue);
             colorUIH.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIH.m_pColorSlider != nullptr) {
-            colorUIH.m_pColorSlider->SetValue((int32_t)hue);
+            colorUIH.m_pColorSlider->SetValue((int32_t) hue);
         }
     }
 
     if (needUpdate) {
         if (colorUIS.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)(sat * 100));
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) (sat * 100));
             colorUIS.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIS.m_pColorSlider != nullptr) {
-            colorUIS.m_pColorSlider->SetValue((int32_t)(sat * 100));
+            colorUIS.m_pColorSlider->SetValue((int32_t) (sat * 100));
         }
     }
 
     if (needUpdate) {
         if (colorUIV.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)(value * 100));
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) (value * 100));
             colorUIV.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIV.m_pColorSlider != nullptr) {
-            colorUIV.m_pColorSlider->SetValue((int32_t)(value * 100));
+            colorUIV.m_pColorSlider->SetValue((int32_t) (value * 100));
         }
     }
 
@@ -483,7 +511,12 @@ void ColorPickerCustom::UpdateHSV(const ColorUI& colorUIH, const ColorUI& colorU
     }
 }
 
-void ColorPickerCustom::UpdateHSL(const ColorUI& colorUIH, const ColorUI& colorUIS, const ColorUI& colorUIL, const UiColor& color, ChangeReason reason)
+void ColorPickerCustom::UpdateHSL(
+    const ColorUI &colorUIH,
+    const ColorUI &colorUIS,
+    const ColorUI &colorUIL,
+    const UiColor &color,
+    ChangeReason reason)
 {
     double red = 1.0 * color.GetR() / 255;
     double green = 1.0 * color.GetG() / 255;
@@ -496,9 +529,8 @@ void ColorPickerCustom::UpdateHSL(const ColorUI& colorUIH, const ColorUI& colorU
     }
 
     bool needUpdate = true;
-    if ((reason == ChangeReason::ColorHSL_H) ||
-        (reason == ChangeReason::ColorHSL_S) ||
-        (reason == ChangeReason::ColorHSL_L)) {
+    if ((reason == ChangeReason::ColorHSL_H) || (reason == ChangeReason::ColorHSL_S)
+        || (reason == ChangeReason::ColorHSL_L)) {
         //从控件获取颜色值
         if (colorUIH.m_pColorSlider != nullptr) {
             hue = colorUIH.m_pColorSlider->GetValue();
@@ -517,31 +549,31 @@ void ColorPickerCustom::UpdateHSL(const ColorUI& colorUIH, const ColorUI& colorU
 
     if (needUpdate) {
         if (colorUIH.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)hue);
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) hue);
             colorUIH.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIH.m_pColorSlider != nullptr) {
-            colorUIH.m_pColorSlider->SetValue((int32_t)hue);
+            colorUIH.m_pColorSlider->SetValue((int32_t) hue);
         }
     }
 
     if (needUpdate) {
         if (colorUIS.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)(sat * 100));
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) (sat * 100));
             colorUIS.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIS.m_pColorSlider != nullptr) {
-            colorUIS.m_pColorSlider->SetValue((int32_t)(sat * 100));
+            colorUIS.m_pColorSlider->SetValue((int32_t) (sat * 100));
         }
     }
 
     if (needUpdate) {
         if (colorUIL.m_pColorEdit != nullptr) {
-            DString text = StringUtil::Printf(_T("%d"), (int32_t)(lightness * 100));
+            DString text = StringUtil::Printf(_T("%d"), (int32_t) (lightness * 100));
             colorUIL.m_pColorEdit->SetTextNoEvent(text);
         }
         if (colorUIL.m_pColorSlider != nullptr) {
-            colorUIL.m_pColorSlider->SetValue((int32_t)(lightness * 100));
+            colorUIL.m_pColorSlider->SetValue((int32_t) (lightness * 100));
         }
     }
 
@@ -648,5 +680,4 @@ void ColorPickerCustom::OnHSLChanged(ChangeReason reason)
     OnColorChanged(newColor.GetARGB(), m_oldColor.GetARGB(), reason);
 }
 
-}//namespace ui
-
+} //namespace ui

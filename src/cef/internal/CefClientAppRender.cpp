@@ -2,16 +2,15 @@
 
 #ifdef DUILIB_BUILD_FOR_CEF
 
-#include "cef/internal/CefJsHandler.h"
 #include "cef/internal/CefIPCStringDefs.h"
 #include "cef/internal/CefJSBridge.h"
+#include "cef/internal/CefJsHandler.h"
 #include "duilib/Utils/StringUtil.h"
 
-namespace ui
-{
+namespace ui {
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void CefClientApp::OnWebKitInitialized() 
+void CefClientApp::OnWebKitInitialized()
 {
     /**
      * JavaScript 扩展代码，这里定义一个 NimCefWebFunction 对象提供 call 方法来让 Web 端触发 native 的 CefV8Handler 处理代码
@@ -48,31 +47,34 @@ void CefClientApp::OnWebKitInitialized()
         m_renderJsBridge.reset(new CefJSBridge);
     }
     handler->AttachJSBridge(m_renderJsBridge);
-     CefRegisterExtension("v8/extern", extensionCode, handler);
+    CefRegisterExtension("v8/extern", extensionCode, handler);
 }
 
-void CefClientApp::OnBrowserCreated(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefDictionaryValue> /*extra_info*/)
+void CefClientApp::OnBrowserCreated(
+    CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefDictionaryValue> /*extra_info*/)
 {
     if (!m_renderJsBridge.get()) {
         m_renderJsBridge.reset(new CefJSBridge);
     }
 }
 
-void CefClientApp::OnBrowserDestroyed(CefRefPtr<CefBrowser> /*browser*/) 
-{
-}
+void CefClientApp::OnBrowserDestroyed(CefRefPtr<CefBrowser> /*browser*/) {}
 
 CefRefPtr<CefLoadHandler> CefClientApp::GetLoadHandler()
 {
     return nullptr;
 }
 
-void CefClientApp::OnContextCreated(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, CefRefPtr<CefV8Context> /*context*/)
-{
+void CefClientApp::OnContextCreated(
+    CefRefPtr<CefBrowser> /*browser*/,
+    CefRefPtr<CefFrame> /*frame*/,
+    CefRefPtr<CefV8Context> /*context*/)
+{}
 
-}
-
-void CefClientApp::OnContextReleased(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> /*context*/)
+void CefClientApp::OnContextReleased(
+    CefRefPtr<CefBrowser> /*browser*/,
+    CefRefPtr<CefFrame> frame,
+    CefRefPtr<CefV8Context> /*context*/)
 {
     if (m_renderJsBridge != nullptr) {
         m_renderJsBridge->RemoveCallbackFuncWithFrame(frame);
@@ -80,29 +82,29 @@ void CefClientApp::OnContextReleased(CefRefPtr<CefBrowser> /*browser*/, CefRefPt
     }
 }
 
-void CefClientApp::OnUncaughtException(CefRefPtr<CefBrowser> /*browser*/,
-                                       CefRefPtr<CefFrame> /*frame*/,
-                                       CefRefPtr<CefV8Context> /*context*/,
-                                       CefRefPtr<CefV8Exception> /*exception*/,
-                                       CefRefPtr<CefV8StackTrace> /*stackTrace*/)
-{
-}
+void CefClientApp::OnUncaughtException(
+    CefRefPtr<CefBrowser> /*browser*/,
+    CefRefPtr<CefFrame> /*frame*/,
+    CefRefPtr<CefV8Context> /*context*/,
+    CefRefPtr<CefV8Exception> /*exception*/,
+    CefRefPtr<CefV8StackTrace> /*stackTrace*/)
+{}
 
-void CefClientApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> /*browser*/,
-                                        CefRefPtr<CefFrame> frame,
-                                        CefRefPtr<CefDOMNode> node) 
+void CefClientApp::OnFocusedNodeChanged(
+    CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node)
 {
-    if (frame == nullptr){
+    if (frame == nullptr) {
         return;
     }
-    CefDOMNode::Type type = (node != nullptr) ? node->GetType() : CefDOMNode::Type::DOM_NODE_TYPE_UNSUPPORTED;
+    CefDOMNode::Type type = (node != nullptr) ? node->GetType()
+                                              : CefDOMNode::Type::DOM_NODE_TYPE_UNSUPPORTED;
     bool bText = (node != nullptr) ? node->IsText() : false;
     bool bEditable = (node != nullptr) ? node->IsEditable() : false;
     CefRect nodeRect = (node != nullptr) ? node->GetElementBounds() : CefRect();
 
     CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create(kFocusedNodeChangedMessage);
     if (message != nullptr) {
-        message->GetArgumentList()->SetInt(0, (int)type);
+        message->GetArgumentList()->SetInt(0, (int) type);
         message->GetArgumentList()->SetBool(1, bText);
         message->GetArgumentList()->SetBool(2, bEditable);
 
@@ -115,12 +117,13 @@ void CefClientApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> /*browser*/,
     }
 }
 
-bool CefClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                            CefRefPtr<CefFrame> /*frame*/,
-                                            CefProcessId source_process,
-                                            CefRefPtr<CefProcessMessage> message)
+bool CefClientApp::OnProcessMessageReceived(
+    CefRefPtr<CefBrowser> browser,
+    CefRefPtr<CefFrame> /*frame*/,
+    CefProcessId source_process,
+    CefRefPtr<CefProcessMessage> message)
 {
-    (void)source_process;
+    (void) source_process;
     ASSERT(source_process == PID_BROWSER);
     ASSERT(message != nullptr);
     if (message == nullptr) {
@@ -132,7 +135,7 @@ bool CefClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
     }
 
     // 收到 browser 的消息回复
-    const CefString& message_name = message->GetName();
+    const CefString &message_name = message->GetName();
     if (message_name == kExecuteJsCallbackMessage) {
         int callback_id = message->GetArgumentList()->GetInt(0);
         bool has_error = message->GetArgumentList()->GetBool(1);
@@ -140,8 +143,7 @@ bool CefClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
         // 将收到的参数通过管理器传递给调用时传递的回调函数
         m_renderJsBridge->ExecuteJSCallbackFunc(callback_id, has_error, json_string);
-    }
-    else if (message_name == kCallJsFunctionMessage) {
+    } else if (message_name == kCallJsFunctionMessage) {
         CefString function_name = message->GetArgumentList()->GetString(0);
         CefString json_string = message->GetArgumentList()->GetString(1);
         int cpp_callback_id = message->GetArgumentList()->GetInt(2);
@@ -150,8 +152,7 @@ bool CefClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
         CefRefPtr<CefFrame> jsFrame;
         if (frame_id_string.empty()) {
             jsFrame = browser->GetMainFrame();
-        }
-        else {
+        } else {
 #if CEF_VERSION_MAJOR <= 109
             //CEF 109版本
             jsFrame = browser->GetFrame(StringUtil::StringToInt64(frame_id_string.c_str()));

@@ -1,33 +1,30 @@
 #ifndef UI_BOX_LISTBOX_ITEM_H_
 #define UI_BOX_LISTBOX_ITEM_H_
 
-#include "duilib/Box/VBox.h"
 #include "duilib/Box/HBox.h"
+#include "duilib/Box/VBox.h"
 #include "duilib/Control/Option.h"
 #include "duilib/Core/Keyboard.h"
 
-namespace ui 
-{
+namespace ui {
 class IListBoxItem;
 
 /** 确保可见的附加标志(垂直方向，垂直滚动条)
 */
-enum class ListBoxVerVisible
-{
-    kVisible,           //保证显示在可见区域
-    kVisibleAtTop,      //保证显示在可见区域的顶部
-    kVisibleAtCenter,   //保证显示在可见区域的中间
-    kVisibleAtBottom,   //保证显示在可见区域的低部
+enum class ListBoxVerVisible {
+    kVisible,         //保证显示在可见区域
+    kVisibleAtTop,    //保证显示在可见区域的顶部
+    kVisibleAtCenter, //保证显示在可见区域的中间
+    kVisibleAtBottom, //保证显示在可见区域的低部
 };
 
 /** 确保可见的附加标志(水平方向，水平滚动条)
 */
-enum class ListBoxHorVisible
-{
-    kVisible,           //保证显示在可见区域
-    kVisibleAtLeft,     //保证显示在可见区域的左侧
-    kVisibleAtCenter,   //保证显示在可见区域的中间
-    kVisibleAtRight,    //保证显示在可见区域的右侧
+enum class ListBoxHorVisible {
+    kVisible,         //保证显示在可见区域
+    kVisibleAtLeft,   //保证显示在可见区域的左侧
+    kVisibleAtCenter, //保证显示在可见区域的中间
+    kVisibleAtRight,  //保证显示在可见区域的右侧
 };
 
 /** ListBox所有者接口
@@ -37,12 +34,12 @@ class DUILIB_API IListBoxOwner
 public:
     /** 触发事件
     */
-    virtual void SendEventMsg(const EventArgs& msg) = 0;
+    virtual void SendEventMsg(const EventArgs &msg) = 0;
 
     /** 列表项的子项收到鼠标事件
     * @return true表示截获该消息，子项不再处理该消息；返回false表示子项继续处理该消息
     */
-    virtual bool OnListBoxItemMouseEvent(const EventArgs& msg) = 0;
+    virtual bool OnListBoxItemMouseEvent(const EventArgs &msg) = 0;
 
     /** 列表项的子项收到窗口失去焦点事件
     */
@@ -64,8 +61,8 @@ public:
     * @param [in] vkFlag 按键标志, 取值范围参见 enum VKFlag 的定义
     * @return 返回true代表内部选择状态发生变化，返回false代表内部状态无变化
     */
-    virtual bool SelectItem(size_t iIndex, bool bTakeFocus,
-                            bool bTriggerEvent, uint64_t vkFlag = 0) = 0;
+    virtual bool SelectItem(size_t iIndex, bool bTakeFocus, bool bTriggerEvent, uint64_t vkFlag = 0)
+        = 0;
 
     /** 取消选择子项
     * @param [in] iIndex 子项目的ID
@@ -78,22 +75,21 @@ public:
     * @param [in] iIndex 子项目的ID，范围是：[0, GetItemCount())
     * @param [in] pListBoxItem 关联的列表项接口
     */
-    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem* pListBoxItem) = 0;
+    virtual void OnItemSelectedChanged(size_t iIndex, IListBoxItem *pListBoxItem) = 0;
 
     /** 子项的勾选状态变化事件，用于状态同步
     * @param [in] iIndex 子项目的ID，范围是：[0, GetItemCount())
     * @param [in] pListBoxItem 关联的列表项接口
     */
-    virtual void OnItemCheckedChanged(size_t iIndex, IListBoxItem* pListBoxItem) = 0;
+    virtual void OnItemCheckedChanged(size_t iIndex, IListBoxItem *pListBoxItem) = 0;
 
     /** 确保矩形区域可见
     * @param [in] rcItem 可见区域的矩形范围
     * @param [in] vVisibleType 垂直方向可见的附加标志
     * @param [in] hVisibleType 水平方向可见的附加标志
     */
-    virtual void EnsureVisible(const UiRect& rcItem,
-                               ListBoxVerVisible vVisibleType,
-                               ListBoxHorVisible hVisibleType) = 0;
+    virtual void EnsureVisible(
+        const UiRect &rcItem, ListBoxVerVisible vVisibleType, ListBoxHorVisible hVisibleType) = 0;
 
     /** 停止滚动条动画
     */
@@ -138,12 +134,12 @@ public:
 
     /** 获取父容器
      */
-    virtual IListBoxOwner* GetOwner() = 0;
+    virtual IListBoxOwner *GetOwner() = 0;
 
     /** 设置父容器
      * @param[in] pOwner 父容器指针
      */
-    virtual void SetOwner(IListBoxOwner* pOwner) = 0;
+    virtual void SetOwner(IListBoxOwner *pOwner) = 0;
 
     /** 获取容器索引号，范围：[0, GetItemCount())
      */
@@ -167,17 +163,16 @@ public:
 /** 列表项的数据子项，用于在列表中展示数据的子项
 */
 template<typename InheritType = Box>
-class ListBoxItemTemplate:
-    public OptionTemplate<InheritType>,
-    public IListBoxItem
+class ListBoxItemTemplate : public OptionTemplate<InheritType>, public IListBoxItem
 {
     typedef OptionTemplate<InheritType> BaseClass;
+
 public:
-    explicit ListBoxItemTemplate(Window* pWindow);
+    explicit ListBoxItemTemplate(Window *pWindow);
 
     /// 重写父类方法，提供个性化功能，请参考父类声明
-    virtual DString GetType() const override;    
-    virtual void HandleEvent(const EventArgs& msg) override;
+    virtual DString GetType() const override;
+    virtual void HandleEvent(const EventArgs &msg) override;
 
     /** 是否绘制选择状态下的背景色，提供虚函数作为可选项
        （比如ListBox/TreeView节点在多选时，由于有勾选项，并不需要绘制选择状态的背景色）
@@ -213,12 +208,12 @@ public:
 
     /** 获取父容器
      */
-    virtual IListBoxOwner* GetOwner() override;
+    virtual IListBoxOwner *GetOwner() override;
 
     /** 设置父容器
      * @param[in] pOwner 父容器指针
      */
-    virtual void SetOwner(IListBoxOwner* pOwner) override;
+    virtual void SetOwner(IListBoxOwner *pOwner) override;
 
     /** 获取容器索引号，范围：[0, GetItemCount())
      */
@@ -243,25 +238,37 @@ public:
     * @param [in] callback 要绑定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachClick(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventClick, callback, callbackID); }
+    void AttachClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventClick, callback, callbackID);
+    }
 
     /** 绑定鼠标右键点击处理函数
     * @param [in] callback 要绑定的回调函数
     * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
     */
-    void AttachRClick(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventRClick, callback, callbackID); }
+    void AttachRClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventRClick, callback, callbackID);
+    }
 
     /** 监听控件双击事件
      * @param [in] callback 收到双击消息时的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachDoubleClick(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventMouseDoubleClick, callback, callbackID); }
+    void AttachDoubleClick(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventMouseDoubleClick, callback, callbackID);
+    }
 
     /** 监听回车事件
      * @param [in] callback 收到回车时的回调函数
      * @param [in] callbackID 该回调函数对应的ID（用于删除回调函数）
      */
-    void AttachReturn(const EventCallback& callback, EventCallbackID callbackID = 0) { this->AttachEvent(kEventReturn, callback, callbackID); }
+    void AttachReturn(const EventCallback &callback, EventCallbackID callbackID = 0)
+    {
+        this->AttachEvent(kEventReturn, callback, callbackID);
+    }
 
 protected:
     /** 选择状态变化事件(m_bSelected变量发生变化)
@@ -283,23 +290,27 @@ private:
 
     /** 在ListBox容器接口
     */
-    IListBoxOwner* m_pOwner;
+    IListBoxOwner *m_pOwner;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 template<typename InheritType>
-ListBoxItemTemplate<InheritType>::ListBoxItemTemplate(Window* pWindow):
-    OptionTemplate<InheritType>(pWindow),
-    m_iListBoxIndex(Box::InvalidIndex),
-    m_iElementIndex(Box::InvalidIndex),
-    m_pOwner(nullptr)
+ListBoxItemTemplate<InheritType>::ListBoxItemTemplate(Window *pWindow)
+    : OptionTemplate<InheritType>(pWindow)
+    , m_iListBoxIndex(Box::InvalidIndex)
+    , m_iElementIndex(Box::InvalidIndex)
+    , m_pOwner(nullptr)
 {
-    this->SetTextStyle(TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_NOCLIP | TEXT_SINGLELINE, false);
+    this->SetTextStyle(
+        TEXT_LEFT | TEXT_VCENTER | TEXT_END_ELLIPSIS | TEXT_NOCLIP | TEXT_SINGLELINE, false);
 }
 
 template<typename InheritType>
-DString ListBoxItemTemplate<InheritType>::GetType() const { return DUI_CTR_LISTBOX_ITEM; }
+DString ListBoxItemTemplate<InheritType>::GetType() const
+{
+    return DUI_CTR_LISTBOX_ITEM;
+}
 
 template<typename InheritType>
 void ListBoxItemTemplate<InheritType>::SetItemSelected(bool bSelected)
@@ -318,8 +329,7 @@ void ListBoxItemTemplate<InheritType>::SetItemSelected(bool bSelected)
     if (bSelected) {
         m_pOwner->SetCurSel(m_iListBoxIndex);
         bChanged = true;
-    }
-    else {
+    } else {
         if (m_pOwner->GetCurSel() == m_iListBoxIndex) {
             m_pOwner->SetCurSel(Box::InvalidIndex);
             bChanged = true;
@@ -348,8 +358,7 @@ void ListBoxItemTemplate<InheritType>::Selected(bool bSelected, bool bTriggerEve
     if (m_pOwner != nullptr) {
         if (bSelected) {
             m_pOwner->SelectItem(m_iListBoxIndex, false, bTriggerEvent, vkFlag);
-        }
-        else {
+        } else {
             m_pOwner->UnSelectItem(m_iListBoxIndex, bTriggerEvent);
         }
     }
@@ -388,14 +397,13 @@ bool ListBoxItemTemplate<InheritType>::CanPaintSelectedColors() const
 }
 
 template<typename InheritType>
-void ListBoxItemTemplate<InheritType>::HandleEvent(const EventArgs& msg)
+void ListBoxItemTemplate<InheritType>::HandleEvent(const EventArgs &msg)
 {
     if (this->IsDisabledEvents(msg)) {
         //如果是鼠标键盘消息，并且控件是Disabled的，转发给Owner控件
         if (m_pOwner != nullptr) {
             m_pOwner->SendEventMsg(msg);
-        }
-        else {
+        } else {
             BaseClass::HandleEvent(msg);
         }
         return;
@@ -405,8 +413,7 @@ void ListBoxItemTemplate<InheritType>::HandleEvent(const EventArgs& msg)
         if ((m_pOwner != nullptr) && m_pOwner->OnListBoxItemMouseEvent(msg)) {
             return;
         }
-    }
-    else if (msg.eventType == kEventWindowKillFocus) {
+    } else if (msg.eventType == kEventWindowKillFocus) {
         if (m_pOwner != nullptr) {
             m_pOwner->OnListBoxItemWindowKillFocus();
         }
@@ -416,8 +423,7 @@ void ListBoxItemTemplate<InheritType>::HandleEvent(const EventArgs& msg)
         if (!this->IsActivatable()) {
             return;
         }
-    }
-    else if (msg.eventType == kEventKeyDown && this->IsEnabled()) {
+    } else if (msg.eventType == kEventKeyDown && this->IsEnabled()) {
         if (msg.vkCode == kVK_RETURN) {
             if (this->IsActivatable()) {
                 this->SendEvent(kEventReturn);
@@ -429,13 +435,13 @@ void ListBoxItemTemplate<InheritType>::HandleEvent(const EventArgs& msg)
 }
 
 template<typename InheritType>
-IListBoxOwner* ListBoxItemTemplate<InheritType>::GetOwner()
+IListBoxOwner *ListBoxItemTemplate<InheritType>::GetOwner()
 {
     return m_pOwner;
 }
 
 template<typename InheritType>
-void ListBoxItemTemplate<InheritType>::SetOwner(IListBoxOwner* pOwner)
+void ListBoxItemTemplate<InheritType>::SetOwner(IListBoxOwner *pOwner)
 {
     m_pOwner = pOwner;
 }

@@ -6,11 +6,10 @@
 //Skia相关类的前置声明
 class SkBitmap;
 
-namespace ui
-{
+namespace ui {
 /** 位图的实现：Skia绘制引擎
 */
-class Bitmap_Skia: public IBitmap
+class Bitmap_Skia : public IBitmap
 {
 public:
     Bitmap_Skia();
@@ -24,9 +23,12 @@ public:
     @param [in] fImageSizeScale 图片的缩放比例，1.0f表示原值
     @param [in] alphaType 位图的Alpha类型，只有Skia引擎需要此参数
     */
-    virtual bool Init(uint32_t nWidth, uint32_t nHeight,
-                      const void* pPixelBits, float fImageSizeScale = 1.0f,
-                      BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType) override;
+    virtual bool Init(
+        uint32_t nWidth,
+        uint32_t nHeight,
+        const void *pPixelBits,
+        float fImageSizeScale = 1.0f,
+        BitmapAlphaType alphaType = BitmapAlphaType::kPremul_SkAlphaType) override;
 
     /** 获取图片宽度
     */
@@ -43,7 +45,7 @@ public:
 
     /** 锁定位图数据，数据长度 = GetWidth() * GetHeight() * 4
     */
-    virtual void* LockPixelBits() override;
+    virtual void *LockPixelBits() override;
 
     /** 释放位图数据
     */
@@ -52,21 +54,22 @@ public:
     /** 克隆生成新的的位图
     *@return 返回新生成的位图接口，由调用方释放资源
     */
-    virtual IBitmap* Clone() override;
+    virtual IBitmap *Clone() override;
 
 public:
     /** 获取Skia 位图
     */
-    const SkBitmap& GetSkBitmap() const;
+    const SkBitmap &GetSkBitmap() const;
 
 private:
     /** 更新图片的透明通道标志
     */
-    void UpdateAlphaFlag(uint8_t* pPixelBits);
+    void UpdateAlphaFlag(uint8_t *pPixelBits);
 
     /** 执行数据初始化
     */
-    bool InitImage(uint32_t nWidth, uint32_t nHeight, const void* pPixelBits, BitmapAlphaType alphaType);
+    bool InitImage(
+        uint32_t nWidth, uint32_t nHeight, const void *pPixelBits, BitmapAlphaType alphaType);
 
 private:
     /** Skia 位图

@@ -23,8 +23,8 @@ class DUILIB_API MessageLoop_SDL
 {
 public:
     MessageLoop_SDL();
-    MessageLoop_SDL(const MessageLoop_SDL& r) = delete;
-    MessageLoop_SDL& operator = (const MessageLoop_SDL& r) = delete;
+    MessageLoop_SDL(const MessageLoop_SDL &r) = delete;
+    MessageLoop_SDL &operator=(const MessageLoop_SDL &r) = delete;
     ~MessageLoop_SDL();
 
 public:
@@ -45,12 +45,13 @@ public:
     * @param [in] bCloseByEsc 按ESC键的时候，是否关闭窗口
     * @param [in] bCloseByEnter 按Enter键的时候，是否关闭窗口
     */
-    void RunDoModal(NativeWindow_SDL& nativeWindow, bool bCloseByEsc = true, bool bCloseByEnter = false);
+    void RunDoModal(
+        NativeWindow_SDL &nativeWindow, bool bCloseByEsc = true, bool bCloseByEnter = false);
 
     /** 运行一个用户消息循环，直到达到退出条件
     * @param [in] bTerminate 为true表示退出消息循环，为false表示一直运行消息循环，初始值应为false
     */
-    void RunUserLoop(bool& bTerminate);
+    void RunUserLoop(bool &bTerminate);
 
 public:
     /** 从消息队列里面移除多余的消息
@@ -69,7 +70,7 @@ public:
     * @param [in] msgId 消息ID
     * @param [in] callback 回调函数
     */
-    static void AddUserMessageCallback(uint32_t msgId, const SDLUserMessageCallback& callback);
+    static void AddUserMessageCallback(uint32_t msgId, const SDLUserMessageCallback &callback);
 
     /** 删除自定义消息回调函数
     * @param [in] msgId 消息ID
@@ -85,7 +86,7 @@ public:
       Windows平台："windows"
       Linux平台："X11" 或者 "wayland" 或者 "wayland,X11" 或者 "X11,wayland"
     */
-    static bool CheckInitSDL(const DString& videoDriverName = _T(""));
+    static bool CheckInitSDL(const DString &videoDriverName = _T(""));
 
     /** 返回当前的VideoDriver名称
     */
@@ -98,15 +99,15 @@ public:
 private:
     /** 处理一条队列中的SDL事件(消息循环中的一个子功能)
     */
-    static void ProcessSDLEvent(const SDL_Event& sdlEvent, bool& bKeepGoing);
+    static void ProcessSDLEvent(const SDL_Event &sdlEvent, bool &bKeepGoing);
 
     /** 派发SDL事件
     */
-    static void DispatchSDLEvent(const SDL_Event& sdlEvent);
+    static void DispatchSDLEvent(const SDL_Event &sdlEvent);
 
     /** 处理用户自定义消息
     */
-    static void OnUserEvent(const SDL_Event& sdlEvent);
+    static void OnUserEvent(const SDL_Event &sdlEvent);
 
 private:
     /** 自定义消息映射

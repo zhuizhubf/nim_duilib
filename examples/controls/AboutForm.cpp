@@ -1,12 +1,8 @@
 #include "AboutForm.h"
 
-AboutForm::AboutForm()
-{
-}
+AboutForm::AboutForm() {}
 
-AboutForm::~AboutForm()
-{
-}
+AboutForm::~AboutForm() {}
 
 DString AboutForm::GetSkinFolder()
 {
@@ -20,12 +16,11 @@ DString AboutForm::GetSkinFile()
 
 void AboutForm::OnInitWindow()
 {
-    ui::Label* link = static_cast<ui::Label*>(FindControl(_T("link")));
+    ui::Label *link = static_cast<ui::Label *>(FindControl(_T("link")));
     if (link != nullptr) {
-        link->AttachButtonUp([link](const ui::EventArgs& args) {
+        link->AttachButtonUp([link](const ui::EventArgs &args) {
             ui::SystemUtil::OpenUrl(link->GetText());
             return true;
         });
     }
 }
-

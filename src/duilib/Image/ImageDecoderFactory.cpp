@@ -1,17 +1,12 @@
 #include "ImageDecoderFactory.h"
 #include "duilib/Utils/PerformanceUtil.h"
 
-namespace ui 
-{
-ImageDecoderFactory::ImageDecoderFactory()
-{
-}
+namespace ui {
+ImageDecoderFactory::ImageDecoderFactory() {}
 
-ImageDecoderFactory::~ImageDecoderFactory()
-{
-}
+ImageDecoderFactory::~ImageDecoderFactory() {}
 
-bool ImageDecoderFactory::AddImageDecoder(const std::shared_ptr<IImageDecoder>& pImageDecoder)
+bool ImageDecoderFactory::AddImageDecoder(const std::shared_ptr<IImageDecoder> &pImageDecoder)
 {
     ASSERT(pImageDecoder != nullptr);
     if (pImageDecoder == nullptr) {
@@ -24,7 +19,7 @@ bool ImageDecoderFactory::AddImageDecoder(const std::shared_ptr<IImageDecoder>& 
     return false;
 }
 
-bool ImageDecoderFactory::RemoveImageDecoder(const std::shared_ptr<IImageDecoder>& pImageDecoder)
+bool ImageDecoderFactory::RemoveImageDecoder(const std::shared_ptr<IImageDecoder> &pImageDecoder)
 {
     ASSERT(pImageDecoder != nullptr);
     if (pImageDecoder == nullptr) {
@@ -43,10 +38,11 @@ void ImageDecoderFactory::Clear()
     m_imageDecoders.clear();
 }
 
-std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodeParam& decodeParam)
+std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodeParam &decodeParam)
 {
     PerformanceUtil statPerformance(_T("ImageDecoderFactory::LoadImageData"));
-    const bool bHasFileData = (decodeParam.m_pFileData != nullptr) && !decodeParam.m_pFileData->empty(); //图片文件数据
+    const bool bHasFileData = (decodeParam.m_pFileData != nullptr)
+                              && !decodeParam.m_pFileData->empty();         //图片文件数据
     const DString imageFilePath = decodeParam.m_imageFilePath.NativePath(); //图片文件路径
     ASSERT(!imageFilePath.empty() || bHasFileData);
     if (imageFilePath.empty() && !bHasFileData) {
@@ -54,8 +50,9 @@ std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodePara
     }
 
     //文件头数据，用做图片格式的签名校验
-    const std::vector<uint8_t>& signatureData = bHasFileData ? *decodeParam.m_pFileData : decodeParam.m_fileHeaderData; 
-    std::vector<std::shared_ptr<IImageDecoder>> untriedDecoders;//未尝试的解码器
+    const std::vector<uint8_t> &signatureData = bHasFileData ? *decodeParam.m_pFileData
+                                                             : decodeParam.m_fileHeaderData;
+    std::vector<std::shared_ptr<IImageDecoder>> untriedDecoders; //未尝试的解码器
 
     std::unique_ptr<IImage> pImageData;
     for (std::shared_ptr<IImageDecoder> pImageDecoder : m_imageDecoders) {
@@ -69,13 +66,11 @@ std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodePara
             if (pImageDecoder->CanDecode(imageFilePath)) {
                 if (signatureData.empty()) {
                     bCanDecode = true;
-                }
-                else if (pImageDecoder->CanDecode(signatureData.data(), signatureData.size())) {                    
+                } else if (pImageDecoder->CanDecode(signatureData.data(), signatureData.size())) {
                     bCanDecode = true;
                 }
             }
-        }
-        else if (!signatureData.empty()) {
+        } else if (!signatureData.empty()) {
             //文件名为空，按文件数据签名匹配解码器
             if (pImageDecoder->CanDecode(signatureData.data(), signatureData.size())) {
                 bCanDecode = true;
@@ -85,13 +80,11 @@ std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodePara
             pImageData = pImageDecoder->LoadImageData(decodeParam);
             if (pImageData != nullptr) {
                 break;
-            }
-            else if (bHasFileData && decodeParam.m_pFileData->empty()) {
+            } else if (bHasFileData && decodeParam.m_pFileData->empty()) {
                 //使用文件数据加载图片文件时出错，不再尝试（一般是图片文件数据有问题）
                 return nullptr;
             }
-        }
-        else {
+        } else {
             untriedDecoders.push_back(pImageDecoder);
         }
     }
@@ -102,8 +95,7 @@ std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodePara
                 pImageData = pImageDecoder->LoadImageData(decodeParam);
                 if (pImageData != nullptr) {
                     break;
-                }
-                else if (bHasFileData && decodeParam.m_pFileData->empty()) {
+                } else if (bHasFileData && decodeParam.m_pFileData->empty()) {
                     //使用文件数据加载图片文件时出错，不再尝试（一般是图片文件数据有问题）
                     break;
                 }
@@ -113,40 +105,43 @@ std::unique_ptr<IImage> ImageDecoderFactory::LoadImageData(const ImageDecodePara
     return pImageData;
 }
 
-std::shared_ptr<IBitmap> ImageDecoderFactory::DecodeImageData(const ImageDecodeParam& decodeParam)
+std::shared_ptr<IBitmap> ImageDecoderFactory::DecodeImageData(const ImageDecodeParam &decodeParam)
 {
     std::shared_ptr<IBitmap> pBitmap;
     ImageDecodeParam newDecodeParam = decodeParam;
-    newDecodeParam.m_bLoadAllFrames = false;//只加载单帧图片，不支持多帧
-    newDecodeParam.m_bAsyncDecode = false;  //不支持异步线程解码
+    newDecodeParam.m_bLoadAllFrames = false; //只加载单帧图片，不支持多帧
+    newDecodeParam.m_bAsyncDecode = false;   //不支持异步线程解码
     std::shared_ptr<IImage> pImage = LoadImageData(newDecodeParam);
     ASSERT(pImage != nullptr);
     if (pImage != nullptr) {
-        ASSERT((pImage->GetImageType() == ImageType::kImageBitmap) || (pImage->GetImageType() == ImageType::kImageSvg));
+        ASSERT(
+            (pImage->GetImageType() == ImageType::kImageBitmap)
+            || (pImage->GetImageType() == ImageType::kImageSvg));
         if (pImage->GetImageType() == ImageType::kImageBitmap) {
             std::shared_ptr<IBitmapImage> pBitmapImage = pImage->GetImageBitmap();
             ASSERT(pBitmapImage != nullptr);
             if (pBitmapImage != nullptr) {
                 pBitmap = pBitmapImage->GetBitmap(nullptr);
             }
-        }
-        else if (pImage->GetImageType() == ImageType::kImageSvg) {
+        } else if (pImage->GetImageType() == ImageType::kImageSvg) {
             std::shared_ptr<ISvgImage> pSvgImage = pImage->GetImageSvg();
             ASSERT(pSvgImage != nullptr);
             if (pSvgImage != nullptr) {
-                UiSize szImageSize(pImage->GetWidth(), pImage->GetHeight());                
+                UiSize szImageSize(pImage->GetWidth(), pImage->GetHeight());
                 float fRealScaleX = 1.0f;
                 float fRealScaleY = 1.0f;
                 if ((newDecodeParam.m_rcMaxDestRectSize.cx > 0) && (pImage->GetWidth() > 0)) {
-                    fRealScaleX = (float)newDecodeParam.m_rcMaxDestRectSize.cx / (float)pImage->GetWidth();
+                    fRealScaleX = (float) newDecodeParam.m_rcMaxDestRectSize.cx
+                                  / (float) pImage->GetWidth();
                 }
                 if (newDecodeParam.m_rcMaxDestRectSize.cy > 0) {
-                    fRealScaleY = (float)newDecodeParam.m_rcMaxDestRectSize.cy / (float)pImage->GetHeight();
+                    fRealScaleY = (float) newDecodeParam.m_rcMaxDestRectSize.cy
+                                  / (float) pImage->GetHeight();
                 }
                 float fRealScale = std::max(fRealScaleX, fRealScaleY);
                 if (!ui::IsFloatEqual(fRealScale, 1.0f)) {
-                    szImageSize.cx = (int32_t)std::round(szImageSize.cx * fRealScale);
-                    szImageSize.cy = (int32_t)std::round(szImageSize.cy * fRealScale);
+                    szImageSize.cx = (int32_t) std::round(szImageSize.cx * fRealScale);
+                    szImageSize.cy = (int32_t) std::round(szImageSize.cy * fRealScale);
                 }
                 pBitmap = pSvgImage->GetBitmap(szImageSize, decodeParam.m_svgReplaceColorCallback);
             }
