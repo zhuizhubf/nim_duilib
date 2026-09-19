@@ -2,6 +2,7 @@
 #include "duilib/Core/Box.h"
 #include "duilib/Core/Control.h"
 #include "duilib/Core/GlobalManager.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 #include "duilib/Utils/StringUtil.h"
 
@@ -18,19 +19,29 @@ bool Layout::SetAttribute(
     const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    if ((strName == _T("child_margin")) || (strName == _T("childmargin"))) {
+    switch (attr::layout::IdOf(strName)) {
+    case attr::layout::kChildMargin:
+    case attr::layout::kChildmargin: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMargin(iMargin);
-    } else if ((strName == _T("child_margin_x")) || (strName == _T("childmarginx"))) {
+        break;
+    }
+    case attr::layout::kChildMarginX:
+    case attr::layout::kChildmarginx: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginX(iMargin);
-    } else if ((strName == _T("child_margin_y")) || (strName == _T("childmarginy"))) {
+        break;
+    }
+    case attr::layout::kChildMarginY:
+    case attr::layout::kChildmarginy: {
         int32_t iMargin = StringUtil::StringToInt32(strValue);
         dpiManager.ScaleInt(iMargin);
         SetChildMarginY(iMargin);
-    } else if (strName == _T("child_valign")) {
+        break;
+    }
+    case attr::layout::kChildValign: {
         //垂直对齐方式
         if (strValue == _T("top")) {
             SetChildVAlignType(VerAlignType::kAlignTop);
@@ -41,7 +52,9 @@ bool Layout::SetAttribute(
         } else {
             ASSERT(0);
         }
-    } else if (strName == _T("child_halign")) {
+        break;
+    }
+    case attr::layout::kChildHalign: {
         //水平对齐方式
         if (strValue == _T("left")) {
             SetChildHAlignType(HorAlignType::kAlignLeft);
@@ -52,7 +65,9 @@ bool Layout::SetAttribute(
         } else {
             ASSERT(0);
         }
-    } else if (strName == _T("child_align")) {
+        break;
+    }
+    case attr::layout::kChildAlign: {
         //水平对齐
         if (strValue.find(_T("left")) != DString::npos) {
             SetChildHAlignType(HorAlignType::kAlignLeft);
@@ -70,8 +85,12 @@ bool Layout::SetAttribute(
         } else if (strValue.find(_T("bottom")) != DString::npos) {
             SetChildVAlignType(VerAlignType::kAlignBottom);
         }
-    } else {
+        break;
+    }
+    default: {
         hasAttribute = false;
+        break;
+    }
     }
     return hasAttribute;
 }

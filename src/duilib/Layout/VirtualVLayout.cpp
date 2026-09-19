@@ -1,5 +1,6 @@
 #include "VirtualVLayout.h"
 #include "duilib/Box/VirtualListBox.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/AttributeUtil.h"
 
 namespace ui {
@@ -15,15 +16,23 @@ bool VirtualVLayout::SetAttribute(
     const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    if ((strName == _T("item_size")) || (strName == _T("itemsize"))) {
+    switch (attr::layout::IdOf(strName)) {
+    case attr::layout::kItemSize:
+    case attr::layout::kItemsize: {
         UiSize szItem;
         AttributeUtil::ParseSizeValue(strValue.c_str(), szItem);
         dpiManager.ScaleSize(szItem);
         SetItemSize(szItem);
-    } else if (strName == _T("auto_calc_item_size")) {
+        break;
+    }
+    case attr::layout::kAutoCalcItemSize: {
         SetAutoCalcItemWidth(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
+        break;
+    }
     }
     return hasAttribute;
 }

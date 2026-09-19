@@ -1,6 +1,7 @@
 #include "GridLayout.h"
 #include "duilib/Box/ScrollBox.h"
 #include "duilib/Core/DpiManager.h"
+#include "duilib/Utils/AttributeIds.g.h"
 
 namespace ui {
 
@@ -22,21 +23,26 @@ bool GridLayout::SetAttribute(
     const DString &strName, const DString &strValue, const DpiManager &dpiManager)
 {
     bool hasAttribute = true;
-    if (strName == _T("rows")) {
+    switch (attr::layout::IdOf(strName)) {
+    case attr::layout::kRows: {
         if (strValue == _T("auto")) {
             //自动计算
             SetRows(0);
         } else {
             SetRows(StringUtil::StringToInt32(strValue));
         }
-    } else if (strName == _T("columns")) {
+        break;
+    }
+    case attr::layout::kColumns: {
         if (strValue == _T("auto")) {
             //自动计算
             SetColumns(0);
         } else {
             SetColumns(StringUtil::StringToInt32(strValue));
         }
-    } else if (strName == _T("grid_width")) {
+        break;
+    }
+    case attr::layout::kGridWidth: {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridWidth(0, false);
@@ -45,7 +51,9 @@ bool GridLayout::SetAttribute(
             dpiManager.ScaleInt(nGridWidth);
             SetGridWidth(nGridWidth, false);
         }
-    } else if (strName == _T("grid_height")) {
+        break;
+    }
+    case attr::layout::kGridHeight: {
         if (strValue == _T("auto")) {
             //自动计算
             SetGridHeight(0, false);
@@ -54,10 +62,16 @@ bool GridLayout::SetAttribute(
             dpiManager.ScaleInt(nGridHeight);
             SetGridHeight(nGridHeight, false);
         }
-    } else if (strName == _T("scale_down")) {
+        break;
+    }
+    case attr::layout::kScaleDown: {
         SetScaleDown(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         hasAttribute = BaseClass::SetAttribute(strName, strValue, dpiManager);
+        break;
+    }
     }
     return hasAttribute;
 }
