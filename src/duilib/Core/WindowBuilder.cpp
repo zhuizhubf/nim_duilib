@@ -8,6 +8,7 @@
 #include "duilib/Core/ScrollBar.h"
 #include "duilib/Core/Window.h"
 #include "duilib/Core/WindowCreateAttributes.h"
+#include "duilib/Utils/AttributeIds.g.h"
 
 #include "duilib/Control/CheckCombo.h"
 #include "duilib/Control/CircleProgress.h"
@@ -336,15 +337,23 @@ Control *WindowBuilder::CreateControls(
         DString strName;
         DString strValue;
         strClass = root.name();
-        if (strClass == _T("Window")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kWindow: {
             if (!pWindow->IsWindowAttributesApplied()) {
                 //窗口的属性，只设置一次，避免XML中的包含的XML文件（Include标签）再次设置窗口属性，导致混乱
                 ParseWindowAttributes(pWindow, root);
                 pWindow->SetWindowAttributesApplied(true);
             }
             ParseWindowShareAttributes(pWindow, root);
-        } else if (strClass == _T("Global")) {
+            break;
+        }
+        case ui::attr::node::kGlobal: {
             ParseGlobalAttributes(root);
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
 
@@ -382,8 +391,9 @@ bool WindowBuilder::ParseWindowCreateAttributes(
         return false;
     }
     DString strClass = root.name();
-    ASSERT(strClass == _T("Window"));
-    if (strClass != _T("Window")) {
+    const ui::attr::node::Id nodeId = ui::attr::node::IdOf(strClass);
+    ASSERT(nodeId == ui::attr::node::kWindow);
+    if (nodeId != ui::attr::node::kWindow) {
         return false;
     }
 
@@ -895,7 +905,8 @@ void WindowBuilder::ParseWindowShareAttributes(Window *pWindow, const pugi::xml_
     //解析该窗口下的共享资源
     for (pugi::xml_node node : root.children()) {
         strClass = node.name();
-        if (strClass == _T("Class")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kClass: {
             DString strClassName;
             DString strAttribute;
             for (pugi::xml_attribute attr : node.attributes()) {
@@ -916,7 +927,10 @@ void WindowBuilder::ParseWindowShareAttributes(Window *pWindow, const pugi::xml_
                 pWindow->AddClass(strClassName, strAttribute);
                 m_windowClassList.push_back(strClassName);
             }
-        } else if ((strClass == _T("ThemeColor")) || (strClass == _T("TextColor"))) {
+            break;
+        }
+        case ui::attr::node::kThemeColor:
+        case ui::attr::node::kTextColor: {
             DString strColorName;
             DString strColor;
             for (pugi::xml_attribute attr : node.attributes()) {
@@ -933,9 +947,16 @@ void WindowBuilder::ParseWindowShareAttributes(Window *pWindow, const pugi::xml_
                 pWindow->AddThemeColor(strColorName, strColor);
                 m_windowThemeColorList.push_back(strColorName);
             }
-        } else if (strClass == _T("Font")) {
+            break;
+        }
+        case ui::attr::node::kFont: {
             //Window节点下，允许定义字体
             ParseFontXmlNode(node);
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
 }
@@ -965,7 +986,8 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
     DString strValue;
     for (pugi::xml_node node : root.children()) {
         strClass = node.name();
-        if (strClass == _T("DefaultFontFamilyNames")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kDefaultFontFamilyNames: {
             DString defaultFontFamilyNames;
             for (pugi::xml_attribute attr : node.attributes()) {
                 strName = attr.name();
@@ -979,7 +1001,9 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
             if (!defaultFontFamilyNames.empty()) {
                 GlobalManager::Instance().Font().SetDefaultFontFamilyNames(defaultFontFamilyNames);
             }
-        } else if (strClass == _T("FallbackFontFamilyNames")) {
+            break;
+        }
+        case ui::attr::node::kFallbackFontFamilyNames: {
             DString fallbackFontFamilyNames;
             for (pugi::xml_attribute attr : node.attributes()) {
                 strName = attr.name();
@@ -992,7 +1016,9 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
             if (!fallbackFontFamilyNames.empty()) {
                 GlobalManager::Instance().Font().SetFallbackFontFamilyNames(fallbackFontFamilyNames);
             }
-        } else if (strClass == _T("FontFile")) {
+            break;
+        }
+        case ui::attr::node::kFontFile: {
             //字体文件
             DString strFontFile;
             DString strFontDesc;
@@ -1009,9 +1035,13 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
                 strFontFile = GlobalManager::Instance().ExpandVarStrings(strFontFile);
                 GlobalManager::Instance().Font().AddFontFile(strFontFile, strFontDesc);
             }
-        } else if (strClass == _T("Font")) {
+            break;
+        }
+        case ui::attr::node::kFont: {
             ParseFontXmlNode(node);
-        } else if (strClass == _T("Class")) {
+            break;
+        }
+        case ui::attr::node::kClass: {
             DString strClassName;
             DString strAttribute;
             for (pugi::xml_attribute attr : node.attributes()) {
@@ -1029,7 +1059,10 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
                 StringUtil::TrimLeft(strAttribute);
                 GlobalManager::Instance().AddClass(strClassName, strAttribute);
             }
-        } else if ((strClass == _T("ThemeColor")) || (strClass == _T("TextColor"))) {
+            break;
+        }
+        case ui::attr::node::kThemeColor:
+        case ui::attr::node::kTextColor: {
             DString colorName = node.attribute(_T("name")).as_string();
             DString colorValue = node.attribute(_T("value")).as_string();
             if (!colorName.empty() && !colorValue.empty()) {
@@ -1043,16 +1076,27 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
                     colorManager.SetDefaultDisabledTextColor(colorName);
                 }
             }
-        } else if (strClass == _T("Alias")) {
+            break;
+        }
+        case ui::attr::node::kAlias: {
             DString aliasName = node.attribute(_T("name")).as_string();
             DString aliasValue = node.attribute(_T("value")).as_string();
             GlobalManager::Instance().AddAlias(aliasName, aliasValue);
-        } else if (strClass == _T("Var")) {
+            break;
+        }
+        case ui::attr::node::kVar: {
             DString defineName = node.attribute(_T("name")).as_string();
             DString defineValue = node.attribute(_T("value")).as_string();
             GlobalManager::Instance().AddVar(defineName, defineValue);
-        } else if (strClass == _T("Theme")) {
+            break;
+        }
+        case ui::attr::node::kTheme: {
             //跳过(主题名称，在其他地方解析)
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
 }
@@ -1060,13 +1104,22 @@ void WindowBuilder::ParseGlobalAttributes(const pugi::xml_node &root)
 bool WindowBuilder::IsIgnoreNodeName(const DString &nodeName) const
 {
     //这些是公共资源的标签名字，有些是旧名（已废弃）
-    if ((nodeName == _T("DefaultFontFamilyNames")) || (nodeName == _T("FallbackFontFamilyNames"))
-        || (nodeName == _T("Font")) || (nodeName == _T("FontFile"))
-        || (nodeName == _T("FontResource")) || (nodeName == _T("Class"))
-        || (nodeName == _T("TextColor")) || (nodeName == _T("ThemeColor"))
-        || (nodeName == _T("ThemeMeta")) || (nodeName == _T("Theme")) || (nodeName == _T("Alias"))
-        || (nodeName == _T("Var"))) {
+    switch (ui::attr::node::IdOf(nodeName)) {
+    case ui::attr::node::kDefaultFontFamilyNames:
+    case ui::attr::node::kFallbackFontFamilyNames:
+    case ui::attr::node::kFont:
+    case ui::attr::node::kFontFile:
+    case ui::attr::node::kFontResource:
+    case ui::attr::node::kClass:
+    case ui::attr::node::kTextColor:
+    case ui::attr::node::kThemeColor:
+    case ui::attr::node::kThemeMeta:
+    case ui::attr::node::kTheme:
+    case ui::attr::node::kAlias:
+    case ui::attr::node::kVar:
         return true;
+    default:
+        break;
     }
     return false;
 }
@@ -1083,11 +1136,17 @@ bool WindowBuilder::ParseThemeInfo(DString &themeName, DString &themeType, DStri
     }
     for (pugi::xml_node node : root.children()) {
         strClass = node.name();
-        if (strClass == _T("Theme")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kTheme: {
             themeName = node.attribute(_T("name")).as_string();
             themeType = node.attribute(_T("type")).as_string();
             themeStyle = node.attribute(_T("style")).as_string();
             return true;
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
     return false;
@@ -1106,7 +1165,8 @@ bool WindowBuilder::ParseThemeColor(ColorManager &colorManager) const
     bool bRet = false;
     for (pugi::xml_node node : root.children()) {
         strClass = node.name();
-        if (strClass == _T("ThemeColor")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kThemeColor: {
             DString colorName = node.attribute(_T("name")).as_string();
             DString colorValue = node.attribute(_T("value")).as_string();
             if (!colorName.empty() && !colorValue.empty()) {
@@ -1120,6 +1180,11 @@ bool WindowBuilder::ParseThemeColor(ColorManager &colorManager) const
                 }
                 bRet = true;
             }
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
     return bRet;
@@ -1185,39 +1250,49 @@ Control *WindowBuilder::ParseXmlNodeChildren(
         if (IsIgnoreNodeName(strClass)) {
             //需要忽略的节点名称（一些全局属性等）
             continue;
-        } else if (strClass == _T("Include")) {
-            //Include节点
-            Control *pNewControl = ParseIncludeXmlNode(node, pParent, pWindow);
-            if ((pNewControl != nullptr) && (pReturn == nullptr)) {
-                pReturn = pNewControl;
-            }
-            continue;
         } else if (strClass == DUI_CTR_MENU_BAR_ITEM) {
             //MenuBarItem节点
             ParseMenuBarItemXmlNode(node, pParent, pWindow);
             continue;
-        } else if (strClass == _T("PropertyGridGroup")) {
-            //PropertyGridGroup节点
-            ParsePropertyGridGroupXmlNode(node, pParent, pWindow);
-            continue;
-        } else if (strClass == _T("CheckComboText")) {
-            //CheckComboText节点
-            ParseCheckComboTextXmlNode(node, pParent, pWindow);
-            continue;
-        } else if (
-            (strClass == _T("ListCtrlHeaderItem")) || (strClass == _T("ListCtrlItem"))
-            || (strClass == _T("ListCtrlSubItem"))) {
-            //ListCtrlHeaderItem/ListCtrlItem/ListCtrlSubItem节点
-            ParseListCtrlXmlNode(node, pParent, pWindow);
-            continue;
+        } else {
+            switch (ui::attr::node::IdOf(strClass)) {
+            case ui::attr::node::kInclude: {
+                //Include节点
+                Control *pNewControl = ParseIncludeXmlNode(node, pParent, pWindow);
+                if ((pNewControl != nullptr) && (pReturn == nullptr)) {
+                    pReturn = pNewControl;
+                }
+                continue;
+            }
+            case ui::attr::node::kPropertyGridGroup: {
+                //PropertyGridGroup节点
+                ParsePropertyGridGroupXmlNode(node, pParent, pWindow);
+                continue;
+            }
+            case ui::attr::node::kCheckComboText: {
+                //CheckComboText节点
+                ParseCheckComboTextXmlNode(node, pParent, pWindow);
+                continue;
+            }
+            case ui::attr::node::kListCtrlHeaderItem:
+            case ui::attr::node::kListCtrlItem:
+            case ui::attr::node::kListCtrlSubItem: {
+                //ListCtrlHeaderItem/ListCtrlItem/ListCtrlSubItem节点
+                ParseListCtrlXmlNode(node, pParent, pWindow);
+                continue;
+            }
+            default:
+                break;
+            }
         }
 
         //根据Class名称直接窗口标准控件
         Control *pControl = CreateControlByClass(strClass, pWindow);
         if (pControl == nullptr) {
-            if ((strClass == _T("Event")) || (strClass == _T("BubbledEvent"))) {
+            const ui::attr::node::Id eventId = ui::attr::node::IdOf(strClass);
+            if ((eventId == ui::attr::node::kEvent) || (eventId == ui::attr::node::kBubbledEvent)) {
                 //挂载XML事件
-                bool bBubbled = (strClass == _T("BubbledEvent"));
+                bool bBubbled = (eventId == ui::attr::node::kBubbledEvent);
                 AttachXmlEvent(bBubbled, node, pParent);
                 continue;
             }
@@ -1478,7 +1553,8 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
         DString propMargin = childNode.attribute(_T("margin")).as_string();
         DString propPadding = childNode.attribute(_T("padding")).as_string();
         PropertyGridProperty *pProperty = nullptr;
-        if (strClass == _T("PropertyGridTextProperty")) {
+        switch (ui::attr::node::IdOf(strClass)) {
+        case ui::attr::node::kPropertyGridTextProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddTextPropertyById(
                     pPropertyGridGroup,
@@ -1491,7 +1567,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddTextProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridComboProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridComboProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddComboPropertyById(
                     pPropertyGridGroup,
@@ -1504,7 +1582,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddComboProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridFontProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridFontProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddFontPropertyById(
                     pPropertyGridGroup,
@@ -1517,7 +1597,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddFontProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridFontSizeProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridFontSizeProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddFontSizePropertyById(
                     pPropertyGridGroup,
@@ -1530,7 +1612,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddFontSizeProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridColorProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridColorProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddColorPropertyById(
                     pPropertyGridGroup,
@@ -1543,7 +1627,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddColorProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridDateTimeProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridDateTimeProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddDateTimePropertyById(
                     pPropertyGridGroup,
@@ -1556,7 +1642,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddDateTimeProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridIPAddressProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridIPAddressProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddIPAddressPropertyById(
                     pPropertyGridGroup,
@@ -1569,7 +1657,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddIPAddressProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridHotKeyProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridHotKeyProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddHotKeyPropertyById(
                     pPropertyGridGroup,
@@ -1582,7 +1672,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddHotKeyProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridFileProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridFileProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddFilePropertyById(
                     pPropertyGridGroup,
@@ -1595,7 +1687,9 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddFileProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
-        } else if (strClass == _T("PropertyGridDirectoryProperty")) {
+            break;
+        }
+        case ui::attr::node::kPropertyGridDirectoryProperty: {
             if (!propNameId.empty()) {
                 pProperty = pPropertyGrid->AddDirectoryPropertyById(
                     pPropertyGridGroup,
@@ -1608,6 +1702,11 @@ void WindowBuilder::ParsePropertyGridGroupXmlNode(
                 pProperty = pPropertyGrid->AddDirectoryProperty(
                     pPropertyGridGroup, propName, propValue, propDescription);
             }
+            break;
+        }
+        default: {
+            break;
+        }
         }
         if (pProperty != nullptr) {
             if (!propName.empty()) {
@@ -1661,7 +1760,8 @@ void WindowBuilder::ParseListCtrlXmlNode(
     }
 
     DString strClass = node.name();
-    if (strClass == _T("ListCtrlHeaderItem")) {
+    switch (ui::attr::node::IdOf(strClass)) {
+    case ui::attr::node::kListCtrlHeaderItem: {
         //ListCtrlHeaderItem节点
         ListCtrlColumn column;
         column.text = node.attribute(_T("text")).as_string();
@@ -1671,18 +1771,27 @@ void WindowBuilder::ParseListCtrlXmlNode(
             column.nColumnWidth = 100;
         }
         pListCtrl->InsertColumn(-1, column);
-    } else if (strClass == _T("ListCtrlItem")) {
+        break;
+    }
+    case ui::attr::node::kListCtrlItem: {
         //ListCtrlItem节点: 添加一行
         ListCtrlSubItemData dataItem;
         dataItem.text = node.attribute(_T("text")).as_string();
         pListCtrl->AddDataItem(dataItem);
-    } else if (strClass == _T("ListCtrlSubItem")) {
+        break;
+    }
+    case ui::attr::node::kListCtrlSubItem: {
         //ListCtrlSubItem节点
         int32_t nItemIndex = node.attribute(_T("item_index")).as_int();
         int32_t nColumnIndex = node.attribute(_T("column_index")).as_int();
         ListCtrlSubItemData subItem;
         subItem.text = node.attribute(_T("text")).as_string();
         pListCtrl->SetSubItemData((size_t) nItemIndex, (size_t) nColumnIndex, subItem);
+        break;
+    }
+    default: {
+        break;
+    }
     }
 }
 
@@ -1775,45 +1884,69 @@ bool WindowBuilder::ParseRichTextXmlNode(
             textSlice.m_text = StringConvert::UTF8ToWString(pRichTextImpl->TrimText(node.value()));
 #endif
             bParseChildren = false;
-        } else if (nodeName == _T("a")) {
-#ifdef DUILIB_UNICODE
-            textSlice.m_text = pRichTextImpl->TrimText(node.first_child().value());
-#else
-            textSlice.m_text = StringConvert::UTF8ToWString(
-                pRichTextImpl->TrimText(node.first_child().value()));
-#endif
-            textSlice.m_linkUrl = StringUtil::Trim(node.attribute(_T("href")).as_string());
-            //超级链接节点, 不需要递归遍历子节点
-            bParseChildren = false;
-        } else if (nodeName == _T("b")) {
-            //粗体字
-            textSlice.m_fontInfo.m_bBold = true;
-        } else if (nodeName == _T("i")) {
-            //斜体字
-            textSlice.m_fontInfo.m_bItalic = true;
-        } else if ((nodeName == _T("del")) || (nodeName == _T("s")) || (nodeName == _T("strike"))) {
-            //删除字
-            textSlice.m_fontInfo.m_bStrikeOut = true;
-        } else if ((nodeName == _T("ins")) || (nodeName == _T("u"))) {
-            //下划线
-            textSlice.m_fontInfo.m_bUnderline = true;
-        } else if (nodeName == _T("bgcolor")) {
-            //背景颜色
-            textSlice.m_bgColor = StringUtil::Trim(node.attribute(_T("color")).as_string());
-        } else if (nodeName == _T("font")) {
-            //字体设置：文本颜色
-            textSlice.m_textColor = node.attribute(_T("color")).as_string();
-            textSlice.m_fontInfo.m_fontName = node.attribute(_T("face")).as_string();
-            //字号不需要进行DPI缩放，绘制的时候，会根据当时的DPI进行缩放
-            textSlice.m_fontInfo.m_fontSize = node.attribute(_T("size")).as_int();
-        } else if (nodeName == _T("br")) {
-            textSlice.m_text = L"\n";
-            //换行节点, 不需要递归遍历子节点
-            bParseChildren = false;
         } else {
-            //遇到不认识的节点，忽略
-            ASSERT(!"Found unknown xml node name!");
-            continue;
+            switch (ui::attr::node::IdOf(nodeName)) {
+            case ui::attr::node::kA: {
+#ifdef DUILIB_UNICODE
+                textSlice.m_text = pRichTextImpl->TrimText(node.first_child().value());
+#else
+                textSlice.m_text = StringConvert::UTF8ToWString(
+                    pRichTextImpl->TrimText(node.first_child().value()));
+#endif
+                textSlice.m_linkUrl = StringUtil::Trim(node.attribute(_T("href")).as_string());
+                //超级链接节点, 不需要递归遍历子节点
+                bParseChildren = false;
+                break;
+            }
+            case ui::attr::node::kB: {
+                //粗体字
+                textSlice.m_fontInfo.m_bBold = true;
+                break;
+            }
+            case ui::attr::node::kI: {
+                //斜体字
+                textSlice.m_fontInfo.m_bItalic = true;
+                break;
+            }
+            case ui::attr::node::kDel:
+            case ui::attr::node::kS:
+            case ui::attr::node::kStrike: {
+                //删除字
+                textSlice.m_fontInfo.m_bStrikeOut = true;
+                break;
+            }
+            case ui::attr::node::kIns:
+            case ui::attr::node::kU: {
+                //下划线
+                textSlice.m_fontInfo.m_bUnderline = true;
+                break;
+            }
+            case ui::attr::node::kBgcolor: {
+                //背景颜色
+                textSlice.m_bgColor = StringUtil::Trim(node.attribute(_T("color")).as_string());
+                break;
+            }
+            case ui::attr::node::kFont: {
+                //字体设置：文本颜色
+                textSlice.m_textColor = node.attribute(_T("color")).as_string();
+                textSlice.m_fontInfo.m_fontName = node.attribute(_T("face")).as_string();
+                //字号不需要进行DPI缩放，绘制的时候，会根据当时的DPI进行缩放
+                textSlice.m_fontInfo.m_fontSize = node.attribute(_T("size")).as_int();
+                break;
+            }
+            case ui::attr::node::kBr: {
+                textSlice.m_text = L"\n";
+                //换行节点, 不需要递归遍历子节点
+                bParseChildren = false;
+                break;
+            }
+            default: {
+                //遇到不认识的节点，忽略
+                ASSERT(!"Found unknown xml node name!");
+                continue;
+                break;
+            }
+            }
         }
         if (bParseChildren) {
             //递归子节点
@@ -1908,11 +2041,17 @@ bool WindowBuilder::ParseWindowAttributes(std::map<DString, DString> &windowAttr
     }
 
     DString strClass = root.name();
-    if (strClass == _T("Window")) {
+    switch (ui::attr::node::IdOf(strClass)) {
+    case ui::attr::node::kWindow: {
         for (pugi::xml_attribute attr : root.attributes()) {
             windowAttributes[attr.name()] = attr.value();
         }
         return true;
+        break;
+    }
+    default: {
+        break;
+    }
     }
     return false;
 }

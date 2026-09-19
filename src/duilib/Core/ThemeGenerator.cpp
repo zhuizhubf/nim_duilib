@@ -1,4 +1,5 @@
 #include "ThemeGenerator.h"
+#include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/Utils/StringConvert.h"
 
 #include "third_party/xml/pugixml.hpp"
@@ -792,14 +793,17 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string &inputXml)
     for (pugi::xml_node child : root.children()) {
         DString nodeName = child.name();
 
-        if (nodeName == _T("Theme")) {
+        switch (ui::attr::node::IdOf(nodeName)) {
+        case ui::attr::node::kTheme: {
             m_themeMeta.properties["theme_name"] = StringConvert::TToUTF8(
                 child.attribute(_T("name")).as_string());
             m_themeMeta.properties["theme_type"] = StringConvert::TToUTF8(
                 child.attribute(_T("type")).as_string());
             m_themeMeta.properties["theme_style"] = StringConvert::TToUTF8(
                 child.attribute(_T("style")).as_string());
-        } else if (nodeName == _T("ThemeMeta")) {
+            break;
+        }
+        case ui::attr::node::kThemeMeta: {
             for (pugi::xml_node prop : child.children()) {
                 if (DString(prop.name()) == _T("Property")) {
                     std::string propName = StringConvert::TToUTF8(
@@ -809,7 +813,9 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string &inputXml)
                     m_themeMeta.properties[propName] = propValue;
                 }
             }
-        } else if (nodeName == _T("ThemeColor")) {
+            break;
+        }
+        case ui::attr::node::kThemeColor: {
             ThemeColorConfig config;
             config.name = StringConvert::TToUTF8(child.attribute(_T("name")).as_string());
             config.value = StringConvert::TToUTF8(child.attribute(_T("value")).as_string());
@@ -841,6 +847,11 @@ bool ThemeGenerator::LoadConfigFromXml(const std::string &inputXml)
             if (!config.name.empty()) {
                 m_loadedConfigs[config.name] = config;
             }
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
     return true;
