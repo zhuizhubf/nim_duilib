@@ -78,7 +78,7 @@ for _, name in ipairs(examples) do
                                        duilib_arch_name() == "x86" and "duilib.x86.manifest" or "duilib.x64.manifest")
             add_ldflags("/subsystem:windows", {force = true})
             if os.isfile(manifest) then
-                add_ldflags("/MANIFEST:EMBED", "/MANIFESTINPUT:\"" .. manifest .. "\"", {force = true})
+                add_ldflags("/MANIFEST:EMBED", "/MANIFESTINPUT:" .. manifest, {force = true})
             end
             -- 系统库
             -- 说明：MSVC 链接时不会自动带上 gdi32/oleaut32 等系统库，这里按需显式列出
