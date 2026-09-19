@@ -2,11 +2,14 @@
 #define UI_IMAGE_APNG_DECODER_H_
 
 #include "duilib/Core/UiTypes.h"
-#include "third_party/libpng/png.h"
-#include "third_party/libpng/pnginfo.h"
+// clang-format off
+// libpng 内部头有强制包含顺序（pngpriv.h 必须在 pnginfo.h 之前），禁止自动排序
+#include "third_party/zlib/zlib.h"
 #include "third_party/libpng/pngpriv.h"
 #include "third_party/libpng/pngstruct.h"
-#include "third_party/zlib/zlib.h"
+#include "third_party/libpng/pnginfo.h"
+#include "third_party/libpng/png.h"
+// clang-format on
 
 #include <cstddef>
 #include <cstdint>

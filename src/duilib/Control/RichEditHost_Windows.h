@@ -6,9 +6,12 @@
 #if defined(DUILIB_BUILD_FOR_WIN) && !defined(DUILIB_BUILD_FOR_SDL)
 
 //使用Windows的ITextHost实现
-#include <RichOle.h>
+// clang-format off
+// RichOle.h 依赖 Richedit.h 中的 CHARRANGE，必须以 <Richedit.h> 开头，禁止自动排序
 #include <Richedit.h>
 #include <TextServ.h>
+#include <RichOle.h>
+// clang-format on
 
 namespace ui {
 

@@ -4,6 +4,7 @@
 #include <cstddef> // size_t
 #include <cstdlib> // malloc, free
 #include <cstring> // memcpy
+#include <utility> // std::swap
 
 namespace ui {
 // 极致性能的通用模板容器，替代 std::vector
