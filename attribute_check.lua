@@ -279,6 +279,58 @@ local function check_xml()
     return (#sorted_keys(attrMiss) == 0) and (#sorted_keys(nodeMiss) == 0), table.concat(lines, "\n")
 end
 
+-- 控件类名域（ctrl）：数据表必须与 duilib_defs.h 的 DUI_CTR_* 宏完全一致，且不再有宏形式的类名比较
+local function check_ctrl()
+    local defs = get_defs()
+    local expected = {}
+    for _, name in ipairs(defs["ctrl"] or {}) do
+        expected[name] = true
+    end
+    local allOk = true
+    local lines = {}
+    local defsText = io.readfile(path.join(g_repoRoot, "src", "duilib", "duilib_defs.h")) or ""
+    local actual = {}
+    for name in defsText:gmatch("#define%s+DUI_CTR_[A-Z0-9_]+%s+%(_T%(\"([^\"]+)\"%)%)") do
+        actual[name] = true
+    end
+    local missing, extra = {}, {}
+    for name in pairs(actual) do
+        if not expected[name] then
+            missing[#missing + 1] = name
+        end
+    end
+    for name in pairs(expected) do
+        if not actual[name] then
+            extra[#extra + 1] = name
+        end
+    end
+    lines[#lines + 1] = string.format("  DUI_CTR_* 宏=%d 数据表=%d 缺失=%d 多余=%d", #sorted_keys(actual),
+                                      #sorted_keys(expected), #missing, #extra)
+    if (#missing > 0) or (#extra > 0) then
+        allOk = false
+        lines[#lines + 1] = "  [缺失]" .. table.concat(missing, ",") .. " [多余]" .. table.concat(extra, ",")
+    end
+    local residue, samples = 0, {}
+    for _, pat in ipairs({ "src/**/*.cpp", "src/**/*.h" }) do
+        for _, f in ipairs(os.files(pat) or {}) do
+            local text = io.readfile(f) or ""
+            local _, n1 = text:gsub("==%s*DUI_CTR_", "")
+            local _, n2 = text:gsub("!=%s*DUI_CTR_", "")
+            if (n1 + n2) > 0 then
+                residue = residue + n1 + n2
+                if #samples < 3 then
+                    samples[#samples + 1] = norm(f)
+                end
+            end
+        end
+    end
+    lines[#lines + 1] = string.format("  宏形式的类名比较残留: %d %s", residue, table.concat(samples, " | "))
+    if residue > 0 then
+        allOk = false
+    end
+    return allOk, table.concat(lines, "\n")
+end
+
 local function dump_data(pathOut)
     local lines = {}
     lines[#lines + 1] = "-- 属性名登记表：唯一手写输入。"
@@ -373,6 +425,13 @@ function main(...)
     local okD, detailD = check_xml()
     print(detailD)
     if not okD then
+        failed = true
+    end
+
+    print("[E] 控件类名域（ctrl）")
+    local okE, detailE = check_ctrl()
+    print(detailE)
+    if not okE then
         failed = true
     end
 

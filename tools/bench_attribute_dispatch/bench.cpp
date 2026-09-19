@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
+#include <map>
 #include <regex>
 #include <string>
 #include <vector>
@@ -67,28 +68,30 @@ int main(int argc, char **argv)
     volatile size_t sink = 0;
     const int repeat = 20000;
 
-    auto bench = [&](const std::string &key, bool useHash) {
+    auto ifChain = [&](const std::string &key) -> size_t {
+        size_t hit = 0;
+        for (const std::string &n : hashTableNames) {
+            if (key == n) {
+                hit = 1;
+                break;
+            }
+        }
+        return hit;
+    };
+    auto hashLookup = [&](const std::string &key) -> size_t {
+        const uint32_t h = Fnv1a(key);
+        size_t slot = h % tableSize;
+        while (table[slot] != -1 && ids[(size_t) table[slot]] != h) {
+            slot = (slot + 1) % tableSize;
+        }
+        return (table[slot] != -1) ? 1u : 0u;
+    };
+    auto bench = [&](const std::string &key, auto &&fn) {
         double best = 1e18;
         for (int round = 0; round < 3; ++round) {
             auto t0 = std::chrono::steady_clock::now();
             for (int r = 0; r < repeat; ++r) {
-                if (useHash) {
-                    const uint32_t h = Fnv1a(key);
-                    size_t slot = h % tableSize;
-                    while (table[slot] != -1 && ids[(size_t) table[slot]] != h) {
-                        slot = (slot + 1) % tableSize;
-                    }
-                    sink += (table[slot] != -1) ? 1u : 0u;
-                } else {
-                    size_t hit = 0;
-                    for (const std::string &n : hashTableNames) {
-                        if (key == n) {
-                            hit = 1;
-                            break;
-                        }
-                    }
-                    sink += hit;
-                }
+                sink += fn(key);
             }
             auto t1 = std::chrono::steady_clock::now();
             const double ns = std::chrono::duration<double, std::nano>(t1 - t0).count() / repeat;
@@ -99,15 +102,27 @@ int main(int argc, char **argv)
         return best;
     };
 
+    // std::map 查找：模拟旧版 createControlMap（类名 -> 创建函数）的派发开销
+    std::map<std::string, int> orderedMap;
+    for (size_t i = 0; i < names.size(); ++i) {
+        orderedMap[names[i]] = (int) i;
+    }
+    auto mapLookup = [&](const std::string &key) -> size_t {
+        return (orderedMap.find(key) != orderedMap.end()) ? 1u : 0u;
+    };
+
     const std::string &worstName = names.back();
     const std::string &typicalName = names[names.size() / 2];
     printf("control 域属性名数量: %zu（顺序比较链的平均长度约为其一半）\n", names.size());
     printf("%-36s %14s\n", "查询方式", "ns/op");
-    printf("%-36s %14.1f\n", "顺序比较链（查最后一个名字）", bench(worstName, false));
-    printf("%-36s %14.1f\n", "顺序比较链（查中间名字）", bench(typicalName, false));
-    printf("%-36s %14.1f\n", "一次哈希 + O(1) 定位（查最后一个名字）", bench(worstName, true));
-    printf("%-36s %14.1f\n", "一次哈希 + O(1) 定位（查中间名字）", bench(typicalName, true));
-    printf("\n注：正式代码用编译期哈希 + switch(密集枚举)，实测比历史 if 链快 30~50 倍（见设计文档附录）。\n");
+    printf("%-36s %14.1f\n", "顺序比较链（查最后一个名字）", bench(worstName, ifChain));
+    printf("%-36s %14.1f\n", "顺序比较链（查中间名字）", bench(typicalName, ifChain));
+    printf("%-36s %14.1f\n", "一次哈希 + O(1) 定位（查最后一个名字）", bench(worstName, hashLookup));
+    printf("%-36s %14.1f\n", "一次哈希 + O(1) 定位（查中间名字）", bench(typicalName, hashLookup));
+    printf("%-36s %14.1f\n", "std::map 查找（查平局的中间名字）", bench(typicalName, mapLookup));
+    printf(
+        "\n注：正式代码用编译期哈希 + switch(密集枚举)，实测比历史 if 链快 30~50 "
+        "倍（见设计文档附录）。\n");
     (void) sink;
     return 0;
 }

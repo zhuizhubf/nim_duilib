@@ -78,125 +78,402 @@ WindowBuilder::~WindowBuilder()
 
 Control *WindowBuilder::CreateControlByClass(const DString &strControlClass, Window *pWindow)
 {
-    typedef std::function<Control *(Window * pWindow)> CreateControlFunction;
-    static std::map<DString, CreateControlFunction> createControlMap = {
-        {DUI_CTR_BOX, [](Window *pWindow) { return new Box(pWindow); }},
-        {DUI_CTR_HBOX, [](Window *pWindow) { return new HBox(pWindow); }},
-        {DUI_CTR_VBOX, [](Window *pWindow) { return new VBox(pWindow); }},
-        {DUI_CTR_HFLOWBOX, [](Window *pWindow) { return new HFlowBox(pWindow); }},
-        {DUI_CTR_VFLOWBOX, [](Window *pWindow) { return new VFlowBox(pWindow); }},
-        {DUI_CTR_XMLBOX, [](Window *pWindow) { return new XmlBox(pWindow); }},
-        {DUI_CTR_VTILE_BOX, [](Window *pWindow) { return new VTileBox(pWindow); }},
-        {DUI_CTR_HTILE_BOX, [](Window *pWindow) { return new HTileBox(pWindow); }},
-        {DUI_CTR_TABBOX, [](Window *pWindow) { return new TabBox(pWindow); }},
-        {DUI_CTR_GRIDBOX, [](Window *pWindow) { return new GridBox(pWindow); }},
-        {DUI_CTR_GRID_SCROLLBOX, [](Window *pWindow) { return new GridScrollBox(pWindow); }},
-
-        {DUI_CTR_SCROLLBOX, [](Window *pWindow) { return new ScrollBox(pWindow); }},
-        {DUI_CTR_HSCROLLBOX, [](Window *pWindow) { return new HScrollBox(pWindow); }},
-        {DUI_CTR_VSCROLLBOX, [](Window *pWindow) { return new VScrollBox(pWindow); }},
-        {DUI_CTR_HFLOW_SCROLLBOX, [](Window *pWindow) { return new HFlowScrollBox(pWindow); }},
-        {DUI_CTR_VFLOW_SCROLLBOX, [](Window *pWindow) { return new VFlowScrollBox(pWindow); }},
-        {DUI_CTR_HTILE_SCROLLBOX, [](Window *pWindow) { return new HTileScrollBox(pWindow); }},
-        {DUI_CTR_VTILE_SCROLLBOX, [](Window *pWindow) { return new VTileScrollBox(pWindow); }},
-
-        {DUI_CTR_LISTBOX_ITEM, [](Window *pWindow) { return new ListBoxItem(pWindow); }},
-        {DUI_CTR_LISTBOX_ITEM_HBOX, [](Window *pWindow) { return new ListBoxItemH(pWindow); }},
-        {DUI_CTR_LISTBOX_ITEM_VBOX, [](Window *pWindow) { return new ListBoxItemV(pWindow); }},
-        {DUI_CTR_HLISTBOX, [](Window *pWindow) { return new HListBox(pWindow); }},
-        {DUI_CTR_VLISTBOX, [](Window *pWindow) { return new VListBox(pWindow); }},
-        {DUI_CTR_HTILE_LISTBOX, [](Window *pWindow) { return new HTileListBox(pWindow); }},
-        {DUI_CTR_VTILE_LISTBOX, [](Window *pWindow) { return new VTileListBox(pWindow); }},
-        {DUI_CTR_LISTCTRL, [](Window *pWindow) { return new ListCtrl(pWindow); }},
-        {DUI_CTR_PROPERTY_GRID, [](Window *pWindow) { return new PropertyGrid(pWindow); }},
-
-        {DUI_CTR_VIRTUAL_HTILE_LISTBOX,
-         [](Window *pWindow) { return new VirtualHTileListBox(pWindow); }},
-        {DUI_CTR_VIRTUAL_VTILE_LISTBOX,
-         [](Window *pWindow) { return new VirtualVTileListBox(pWindow); }},
-        {DUI_CTR_VIRTUAL_VLISTBOX, [](Window *pWindow) { return new VirtualVListBox(pWindow); }},
-        {DUI_CTR_VIRTUAL_HLISTBOX, [](Window *pWindow) { return new VirtualHListBox(pWindow); }},
-
-        {DUI_CTR_CONTROL, [](Window *pWindow) { return new Control(pWindow); }},
-        {DUI_CTR_CONTROL_DRAGABLE, [](Window *pWindow) { return new ControlDragable(pWindow); }},
-        {DUI_CTR_CONTROL_MOVABLE, [](Window *pWindow) { return new ControlMovable(pWindow); }},
-        {DUI_CTR_CONTROL_RESIZABLE, [](Window *pWindow) { return new ControlResizable(pWindow); }},
-        {DUI_CTR_SCROLLBAR, [](Window *pWindow) { return new ScrollBar(pWindow); }},
-        {DUI_CTR_LABEL, [](Window *pWindow) { return new Label(pWindow); }},
-        {DUI_CTR_LABELBOX, [](Window *pWindow) { return new LabelBox(pWindow); }},
-        {DUI_CTR_LABELHBOX, [](Window *pWindow) { return new LabelHBox(pWindow); }},
-        {DUI_CTR_LABELVBOX, [](Window *pWindow) { return new LabelVBox(pWindow); }},
-        {DUI_CTR_BUTTON, [](Window *pWindow) { return new Button(pWindow); }},
-        {DUI_CTR_BUTTONBOX, [](Window *pWindow) { return new ButtonBox(pWindow); }},
-        {DUI_CTR_BUTTONHBOX, [](Window *pWindow) { return new ButtonHBox(pWindow); }},
-        {DUI_CTR_BUTTONVBOX, [](Window *pWindow) { return new ButtonVBox(pWindow); }},
-        {DUI_CTR_OPTION, [](Window *pWindow) { return new Option(pWindow); }},
-        {DUI_CTR_OPTIONBOX, [](Window *pWindow) { return new OptionBox(pWindow); }},
-        {DUI_CTR_CHECKBOX, [](Window *pWindow) { return new CheckBox(pWindow); }},
-        {DUI_CTR_CHECKBOXBOX, [](Window *pWindow) { return new CheckBoxBox(pWindow); }},
-        {DUI_CTR_CHECKBOXHBOX, [](Window *pWindow) { return new CheckBoxHBox(pWindow); }},
-        {DUI_CTR_CHECKBOXVBOX, [](Window *pWindow) { return new CheckBoxVBox(pWindow); }},
-        {DUI_CTR_TREEVIEW, [](Window *pWindow) { return new TreeView(pWindow); }},
-        {DUI_CTR_DIRECTORY_TREE, [](Window *pWindow) { return new DirectoryTree(pWindow); }},
-        {DUI_CTR_TREENODE, [](Window *pWindow) { return new TreeNode(pWindow); }},
-        {DUI_CTR_COMBO, [](Window *pWindow) { return new Combo(pWindow); }},
-        {DUI_CTR_COMBO_BUTTON, [](Window *pWindow) { return new ComboButton(pWindow); }},
-        {DUI_CTR_FILTER_COMBO, [](Window *pWindow) { return new FilterCombo(pWindow); }},
-        {DUI_CTR_CHECK_COMBO, [](Window *pWindow) { return new CheckCombo(pWindow); }},
-        {DUI_CTR_SLIDER, [](Window *pWindow) { return new Slider(pWindow); }},
-        {DUI_CTR_PROGRESS, [](Window *pWindow) { return new Progress(pWindow); }},
-        {DUI_CTR_CIRCLEPROGRESS, [](Window *pWindow) { return new CircleProgress(pWindow); }},
-        {DUI_CTR_RICHTEXT, [](Window *pWindow) { return new RichText(pWindow); }},
-        {DUI_CTR_RICHTEXT_BOX, [](Window *pWindow) { return new RichTextBox(pWindow); }},
-        {DUI_CTR_RICHTEXT_HBOX, [](Window *pWindow) { return new RichTextHBox(pWindow); }},
-        {DUI_CTR_RICHTEXT_VBOX, [](Window *pWindow) { return new RichTextVBox(pWindow); }},
-        {DUI_CTR_RICHEDIT, [](Window *pWindow) { return new RichEdit(pWindow); }},
-        {DUI_CTR_RICHEDIT2, [](Window *pWindow) { return new RichEdit2(pWindow); }},
-        {DUI_CTR_DATETIME, [](Window *pWindow) { return new DateTime(pWindow); }},
-        {DUI_CTR_COLOR_CONTROL, [](Window *pWindow) { return new ColorControl(pWindow); }},
-        {DUI_CTR_COLOR_SLIDER, [](Window *pWindow) { return new ColorSlider(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_REGULAR,
-         [](Window *pWindow) { return new ColorPickerRegular(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_STANDARD,
-         [](Window *pWindow) { return new ColorPickerStandard(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_STANDARD_GRAY,
-         [](Window *pWindow) { return new ColorPickerStandardGray(pWindow); }},
-        {DUI_CTR_COLOR_PICKER_CUSTOM,
-         [](Window *pWindow) { return new ColorPickerCustom(pWindow); }},
-        {DUI_CTR_LINE, [](Window *pWindow) { return new Line(pWindow); }},
-        {DUI_CTR_IPADDRESS, [](Window *pWindow) { return new IPAddress(pWindow); }},
-        {DUI_CTR_HOTKEY, [](Window *pWindow) { return new HotKey(pWindow); }},
-        {DUI_CTR_HYPER_LINK, [](Window *pWindow) { return new HyperLink(pWindow); }},
-        {DUI_CTR_TAB_CTRL, [](Window *pWindow) { return new TabCtrl(pWindow); }},
-        {DUI_CTR_TAB_CTRL_ITEM, [](Window *pWindow) { return new TabCtrlItem(pWindow); }},
-        {DUI_CTR_ICON_CONTROL, [](Window *pWindow) { return new IconControl(pWindow); }},
-        {DUI_CTR_BITMAP_CONTROL, [](Window *pWindow) { return new BitmapControl(pWindow); }},
-        {DUI_CTR_ADDRESS_BAR, [](Window *pWindow) { return new AddressBar(pWindow); }},
-        {DUI_CTR_MENU_BAR, [](Window *pWindow) { return new MenuBar(pWindow); }},
-        {DUI_CTR_CHILD_WINDOW, [](Window *pWindow) { return new ChildWindow(pWindow); }},
-
-        {DUI_CTR_SPLIT, [](Window *pWindow) { return new Split(pWindow); }},
-        {DUI_CTR_SPLITBOX, [](Window *pWindow) { return new SplitBox(pWindow); }},
-        {DUI_CTR_GROUP_BOX, [](Window *pWindow) { return new GroupBox(pWindow); }},
-        {DUI_CTR_GROUP_HBOX, [](Window *pWindow) { return new GroupHBox(pWindow); }},
-        {DUI_CTR_GROUP_VBOX, [](Window *pWindow) { return new GroupVBox(pWindow); }},
-
-        {DUI_CTR_BOX_DRAGABLE, [](Window *pWindow) { return new BoxDragable(pWindow); }},
-        {DUI_CTR_HBOX_DRAGABLE, [](Window *pWindow) { return new HBoxDragable(pWindow); }},
-        {DUI_CTR_VBOX_DRAGABLE, [](Window *pWindow) { return new VBoxDragable(pWindow); }},
-
-        {DUI_CTR_BOX_MOVABLE, [](Window *pWindow) { return new BoxMovable(pWindow); }},
-        {DUI_CTR_HBOX_MOVABLE, [](Window *pWindow) { return new HBoxMovable(pWindow); }},
-        {DUI_CTR_VBOX_MOVABLE, [](Window *pWindow) { return new VBoxMovable(pWindow); }},
-
-        {DUI_CTR_BOX_RESIZABLE, [](Window *pWindow) { return new BoxResizable(pWindow); }},
-        {DUI_CTR_HBOX_RESIZABLE, [](Window *pWindow) { return new HBoxResizable(pWindow); }},
-        {DUI_CTR_VBOX_RESIZABLE, [](Window *pWindow) { return new VBoxResizable(pWindow); }},
-    };
     Control *pControl = nullptr;
-    auto iter = createControlMap.find(strControlClass);
-    if (iter != createControlMap.end()) {
-        pControl = iter->second(pWindow);
+    switch (ui::attr::ctrl::IdOf(strControlClass)) {
+    case ui::attr::ctrl::kBox: {
+        pControl = new Box(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHBox: {
+        pControl = new HBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVBox: {
+        pControl = new VBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHFlowBox: {
+        pControl = new HFlowBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVFlowBox: {
+        pControl = new VFlowBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kXmlBox: {
+        pControl = new XmlBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVTileBox: {
+        pControl = new VTileBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHTileBox: {
+        pControl = new HTileBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kTabBox: {
+        pControl = new TabBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kGridBox: {
+        pControl = new GridBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kGridScrollBox: {
+        pControl = new GridScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kScrollBox: {
+        pControl = new ScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHScrollBox: {
+        pControl = new HScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVScrollBox: {
+        pControl = new VScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHFlowScrollBox: {
+        pControl = new HFlowScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVFlowScrollBox: {
+        pControl = new VFlowScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHTileScrollBox: {
+        pControl = new HTileScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVTileScrollBox: {
+        pControl = new VTileScrollBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kListBoxItem: {
+        pControl = new ListBoxItem(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kListBoxItemH: {
+        pControl = new ListBoxItemH(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kListBoxItemV: {
+        pControl = new ListBoxItemV(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHListBox: {
+        pControl = new HListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVListBox: {
+        pControl = new VListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHTileListBox: {
+        pControl = new HTileListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVTileListBox: {
+        pControl = new VTileListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kListCtrl: {
+        pControl = new ListCtrl(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kPropertyGrid: {
+        pControl = new PropertyGrid(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVirtualHTileListBox: {
+        pControl = new VirtualHTileListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVirtualVTileListBox: {
+        pControl = new VirtualVTileListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVirtualVListBox: {
+        pControl = new VirtualVListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVirtualHListBox: {
+        pControl = new VirtualHListBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kControl: {
+        pControl = new Control(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kControlDragable: {
+        pControl = new ControlDragable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kControlMovable: {
+        pControl = new ControlMovable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kControlResizable: {
+        pControl = new ControlResizable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kScrollBar: {
+        pControl = new ScrollBar(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kLabel: {
+        pControl = new Label(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kLabelBox: {
+        pControl = new LabelBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kLabelHBox: {
+        pControl = new LabelHBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kLabelVBox: {
+        pControl = new LabelVBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kButton: {
+        pControl = new Button(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kButtonBox: {
+        pControl = new ButtonBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kButtonHBox: {
+        pControl = new ButtonHBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kButtonVBox: {
+        pControl = new ButtonVBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kOption: {
+        pControl = new Option(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kOptionBox: {
+        pControl = new OptionBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCheckBox: {
+        pControl = new CheckBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCheckBoxBox: {
+        pControl = new CheckBoxBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCheckBoxHBox: {
+        pControl = new CheckBoxHBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCheckBoxVBox: {
+        pControl = new CheckBoxVBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kTreeView: {
+        pControl = new TreeView(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kDirectoryTree: {
+        pControl = new DirectoryTree(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kTreeNode: {
+        pControl = new TreeNode(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCombo: {
+        pControl = new Combo(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kComboButton: {
+        pControl = new ComboButton(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kFilterCombo: {
+        pControl = new FilterCombo(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCheckCombo: {
+        pControl = new CheckCombo(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kSlider: {
+        pControl = new Slider(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kProgress: {
+        pControl = new Progress(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kCircleProgress: {
+        pControl = new CircleProgress(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichText: {
+        pControl = new RichText(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichTextBox: {
+        pControl = new RichTextBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichTextHBox: {
+        pControl = new RichTextHBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichTextVBox: {
+        pControl = new RichTextVBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichEdit: {
+        pControl = new RichEdit(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kRichEdit2: {
+        pControl = new RichEdit2(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kDateTime: {
+        pControl = new DateTime(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorControl: {
+        pControl = new ColorControl(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorSlider: {
+        pControl = new ColorSlider(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorPickerRegular: {
+        pControl = new ColorPickerRegular(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorPickerStandard: {
+        pControl = new ColorPickerStandard(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorPickerStandardGray: {
+        pControl = new ColorPickerStandardGray(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kColorPickerCustom: {
+        pControl = new ColorPickerCustom(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kLine: {
+        pControl = new Line(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kIPAddress: {
+        pControl = new IPAddress(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHotKey: {
+        pControl = new HotKey(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHyperLink: {
+        pControl = new HyperLink(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kTabCtrl: {
+        pControl = new TabCtrl(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kTabCtrlItem: {
+        pControl = new TabCtrlItem(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kIconControl: {
+        pControl = new IconControl(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kBitmapControl: {
+        pControl = new BitmapControl(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kAddressBar: {
+        pControl = new AddressBar(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kMenuBar: {
+        pControl = new MenuBar(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kChildWindow: {
+        pControl = new ChildWindow(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kSplit: {
+        pControl = new Split(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kSplitBox: {
+        pControl = new SplitBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kGroupBox: {
+        pControl = new GroupBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kGroupHBox: {
+        pControl = new GroupHBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kGroupVBox: {
+        pControl = new GroupVBox(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kBoxDragable: {
+        pControl = new BoxDragable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHBoxDragable: {
+        pControl = new HBoxDragable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVBoxDragable: {
+        pControl = new VBoxDragable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kBoxMovable: {
+        pControl = new BoxMovable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHBoxMovable: {
+        pControl = new HBoxMovable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVBoxMovable: {
+        pControl = new VBoxMovable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kBoxResizable: {
+        pControl = new BoxResizable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kHBoxResizable: {
+        pControl = new HBoxResizable(pWindow);
+        break;
+    }
+    case ui::attr::ctrl::kVBoxResizable: {
+        pControl = new VBoxResizable(pWindow);
+        break;
+    }
+    default:
+        break;
     }
     return pControl;
 }
@@ -1396,7 +1673,7 @@ Control *WindowBuilder::ParseXmlNodeChildren(
         if (IsIgnoreNodeName(strClass)) {
             //需要忽略的节点名称（一些全局属性等）
             continue;
-        } else if (strClass == DUI_CTR_MENU_BAR_ITEM) {
+        } else if (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kMenuBarItem) {
             //MenuBarItem节点
             ParseMenuBarItemXmlNode(node, pParent, pWindow);
             continue;
@@ -1459,7 +1736,7 @@ Control *WindowBuilder::ParseXmlNodeChildren(
             }
         }
 
-        if ((pControl == nullptr) && (strClass == DUI_CTR_MENU)) {
+        if ((pControl == nullptr) && (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kMenu)) {
             //菜单容器
             pControl = new MenuListBox(pWindow);
         }
@@ -1472,7 +1749,7 @@ Control *WindowBuilder::ParseXmlNodeChildren(
 
         // TreeView相关必须先添加到容器，然后再解析子节点
         bool bAddedToParentBox = false;
-        if (strClass == DUI_CTR_TREENODE) {
+        if (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kTreeNode) {
             TreeNode *pNode = dynamic_cast<TreeNode *>(pControl);
             ASSERT(pNode != nullptr);
             TreeView *pTreeView = dynamic_cast<TreeView *>(pParent);
@@ -1497,7 +1774,9 @@ Control *WindowBuilder::ParseXmlNodeChildren(
                 }
             }
             ASSERT(bAddedToParentBox);
-        } else if ((strClass == DUI_CTR_PROPERTY_GRID) || (strClass == DUI_CTR_LISTCTRL)) {
+        } else if (
+            (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kPropertyGrid)
+            || (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kListCtrl)) {
             //PropertyGrid/ListCtrl控件必须先添加到容器，然后再解析子节点
             if (pParent != nullptr) {
                 Box *pContainer = dynamic_cast<Box *>(pParent);
@@ -1522,7 +1801,7 @@ Control *WindowBuilder::ParseXmlNodeChildren(
                 pControl->SetAttribute(attr.name(), attr.value());
             }
         }
-        if (strClass == DUI_CTR_RICHTEXT) {
+        if (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kRichText) {
             //节点为：<RichText></RichText>，解析其子节点为RichText内容
             ParseRichTextXmlNode(node, pControl);
         } else if (!node.children().empty()) {
@@ -1540,8 +1819,9 @@ Control *WindowBuilder::ParseXmlNodeChildren(
                     pControl = nullptr;
                     continue;
                 } else if (
-                    (strClass == DUI_CTR_LISTBOX_ITEM) || (strClass == DUI_CTR_LISTBOX_ITEM_HBOX)
-                    || (strClass == DUI_CTR_LISTBOX_ITEM_VBOX)) {
+                    (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kListBoxItem)
+                    || (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kListBoxItemH)
+                    || (ui::attr::ctrl::IdOf(strClass) == ui::attr::ctrl::kListBoxItemV)) {
                     //检查ListBoxItem
                     if (!node.attributes().empty()
                         && StringUtil::IsValueTrue(node.attribute(_T("selected")).as_string())) {
@@ -1965,8 +2245,8 @@ bool WindowBuilder::ParseRichTextXmlText(const DString &xmlText, Control *pContr
         root = doc.root().first_child();
     }
     rootName = root.name();
-    ASSERT(rootName == DUI_CTR_RICHTEXT);
-    if (rootName != DUI_CTR_RICHTEXT) {
+    ASSERT(ui::attr::ctrl::IdOf(rootName) == ui::attr::ctrl::kRichText);
+    if (ui::attr::ctrl::IdOf(rootName) != ui::attr::ctrl::kRichText) {
         return false;
     }
     return ParseRichTextXmlNode(root, pControl, nullptr);

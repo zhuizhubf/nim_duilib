@@ -30,11 +30,11 @@ public:
 
 ui::Control *Menu::CreateControl(const DString &pstrClass)
 {
-    if (pstrClass == DUI_CTR_MENU_ITEM) {
+    if (ui::attr::ctrl::IdOf(pstrClass) == ui::attr::ctrl::kMenuItem) {
         return new MenuItem(this);
-    } else if (pstrClass == DUI_CTR_SUB_MENU) {
+    } else if (ui::attr::ctrl::IdOf(pstrClass) == ui::attr::ctrl::kSubMenu) {
         return new SubMenu(this);
-    } else if (pstrClass == DUI_CTR_MENU_LISTBOX) {
+    } else if (ui::attr::ctrl::IdOf(pstrClass) == ui::attr::ctrl::kMenuListBox) {
         return new MenuListBox(this);
     }
     return nullptr;

@@ -33,7 +33,7 @@ void WindowImplBase::PreInitWindow()
     //关闭按钮
     Control *pControl = GetBtnWindowClose();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
             if ((pButton != nullptr) && !IsUseSystemCaption()) {
@@ -46,7 +46,7 @@ void WindowImplBase::PreInitWindow()
     //最小化按钮
     pControl = GetBtnWindowMin();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         m_pMinButton = pControl;
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
@@ -60,7 +60,7 @@ void WindowImplBase::PreInitWindow()
     //最大化按钮
     pControl = GetBtnWindowMax();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         m_pMaxButton = pControl;
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
@@ -74,7 +74,7 @@ void WindowImplBase::PreInitWindow()
     //还原按钮
     pControl = GetBtnWindowRestore();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         m_pRestoreButton = pControl;
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
@@ -88,7 +88,7 @@ void WindowImplBase::PreInitWindow()
     //全屏按钮
     pControl = GetBtnWindowFullscreen();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
             if ((pButton != nullptr) && !IsUseSystemCaption()) {
@@ -101,7 +101,7 @@ void WindowImplBase::PreInitWindow()
     //选择语言按钮
     pControl = GetBtnSelectLanguage();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
             if ((pButton != nullptr) && !IsUseSystemCaption()) {
@@ -114,7 +114,7 @@ void WindowImplBase::PreInitWindow()
     //选择主题按钮
     pControl = GetBtnSelectTheme();
     if (pControl) {
-        ASSERT(pControl->GetType() == DUI_CTR_BUTTON);
+        ASSERT(ui::attr::ctrl::IdOf(pControl->GetType()) == ui::attr::ctrl::kButton);
         ControlPtr pButton(pControl);
         pControl->AttachClick([this, pButton](const ui::EventArgs & /*args*/) {
             if ((pButton != nullptr) && !IsUseSystemCaption()) {

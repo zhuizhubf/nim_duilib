@@ -2670,6 +2670,486 @@ DString IdToString(Id id)
 }
 } //namespace control
 
+namespace ctrl {
+Id IdOf(const DString &strName)
+{
+    switch (Hash(strName)) {
+    case 0x8347BF3Eu: //Control
+        return Id::kControl;
+    case 0x54047E30u: //ControlDragable
+        return Id::kControlDragable;
+    case 0x41390E74u: //ControlMovable
+        return Id::kControlMovable;
+    case 0xDAC3CD9Fu: //ControlResizable
+        return Id::kControlResizable;
+    case 0x9ECCF29Du: //Label
+        return Id::kLabel;
+    case 0x641DAC20u: //RichText
+        return Id::kRichText;
+    case 0x013F0DADu: //HyperLink
+        return Id::kHyperLink;
+    case 0x33881A91u: //Button
+        return Id::kButton;
+    case 0x17245CB4u: //Option
+        return Id::kOption;
+    case 0x9D7F5B98u: //CheckBox
+        return Id::kCheckBox;
+    case 0x16A15383u: //Split
+        return Id::kSplit;
+    case 0xA109AC9Au: //LabelBox
+        return Id::kLabelBox;
+    case 0xDD94BF10u: //LabelHBox
+        return Id::kLabelHBox;
+    case 0xC402517Eu: //LabelVBox
+        return Id::kLabelVBox;
+    case 0xC9FECC89u: //RichTextBox
+        return Id::kRichTextBox;
+    case 0xB78E1A11u: //RichTextHBox
+        return Id::kRichTextHBox;
+    case 0xC34A649Fu: //RichTextVBox
+        return Id::kRichTextVBox;
+    case 0xDD7B687Eu: //ButtonBox
+        return Id::kButtonBox;
+    case 0x12AD9B6Cu: //ButtonHBox
+        return Id::kButtonHBox;
+    case 0x3FEF4752u: //ButtonVBox
+        return Id::kButtonVBox;
+    case 0x2D942DB1u: //CheckBoxBox
+        return Id::kCheckBoxBox;
+    case 0xD3450A59u: //CheckBoxHBox
+        return Id::kCheckBoxHBox;
+    case 0xAFE5BF57u: //CheckBoxVBox
+        return Id::kCheckBoxVBox;
+    case 0x0776F47Du: //OptionBox
+        return Id::kOptionBox;
+    case 0x28E2207Du: //OptionHBox
+        return Id::kOptionHBox;
+    case 0x0D3E6633u: //OptionVBox
+        return Id::kOptionVBox;
+    case 0x99FFD964u: //SplitBox
+        return Id::kSplitBox;
+    case 0xD5CB7ED2u: //Box
+        return Id::kBox;
+    case 0x875B9968u: //HBox
+        return Id::kHBox;
+    case 0x9D80FF26u: //VBox
+        return Id::kVBox;
+    case 0x281E36F4u: //HFlowBox
+        return Id::kHFlowBox;
+    case 0x9D3B7BC6u: //VFlowBox
+        return Id::kVFlowBox;
+    case 0xC1BE0443u: //XmlBox
+        return Id::kXmlBox;
+    case 0x629420C2u: //VTileBox
+        return Id::kVTileBox;
+    case 0xB5258824u: //HTileBox
+        return Id::kHTileBox;
+    case 0x4C89B034u: //BoxDragable
+        return Id::kBoxDragable;
+    case 0x0005D45Eu: //HBoxDragable
+        return Id::kHBoxDragable;
+    case 0x3CC3CCA8u: //VBoxDragable
+        return Id::kVBoxDragable;
+    case 0xC22053D8u: //BoxMovable
+        return Id::kBoxMovable;
+    case 0x0940F646u: //HBoxMovable
+        return Id::kHBoxMovable;
+    case 0xE4D4523Cu: //VBoxMovable
+        return Id::kVBoxMovable;
+    case 0xD8B33073u: //BoxResizable
+        return Id::kBoxResizable;
+    case 0x389E7975u: //HBoxResizable
+        return Id::kHBoxResizable;
+    case 0x919AD8A7u: //VBoxResizable
+        return Id::kVBoxResizable;
+    case 0xCB3A94A5u: //GroupBox
+        return Id::kGroupBox;
+    case 0xAA9C22E5u: //GroupHBox
+        return Id::kGroupHBox;
+    case 0x5F843ACBu: //GroupVBox
+        return Id::kGroupVBox;
+    case 0x1881EB85u: //ScrollBox
+        return Id::kScrollBox;
+    case 0x69DE0C73u: //HScrollBox
+        return Id::kHScrollBox;
+    case 0x4A3BF581u: //VScrollBox
+        return Id::kVScrollBox;
+    case 0x6623F1D7u: //HFlowScrollBox
+        return Id::kHFlowScrollBox;
+    case 0x8F06DD61u: //VFlowScrollBox
+        return Id::kVFlowScrollBox;
+    case 0x71D089C7u: //HTileScrollBox
+        return Id::kHTileScrollBox;
+    case 0xF284FF35u: //VTileScrollBox
+        return Id::kVTileScrollBox;
+    case 0xCFB2280Du: //ListBoxItem
+        return Id::kListBoxItem;
+    case 0x3A75649Fu: //ListBoxItemH
+        return Id::kListBoxItemH;
+    case 0x50758741u: //ListBoxItemV
+        return Id::kListBoxItemV;
+    case 0xBD1880E0u: //HListBox
+        return Id::kHListBox;
+    case 0x6380F3A2u: //VListBox
+        return Id::kVListBox;
+    case 0xBAD0D5FCu: //HTileListBox
+        return Id::kHTileListBox;
+    case 0x367F1ABEu: //VTileListBox
+        return Id::kVTileListBox;
+    case 0x3D728820u: //ListCtrl
+        return Id::kListCtrl;
+    case 0xAA7EC5E8u: //PropertyGrid
+        return Id::kPropertyGrid;
+    case 0x25FE29F7u: //VirtualVListBox
+        return Id::kVirtualVListBox;
+    case 0x2BF812CDu: //VirtualHListBox
+        return Id::kVirtualHListBox;
+    case 0x418A8459u: //VirtualHTileListBox
+        return Id::kVirtualHTileListBox;
+    case 0x8D30DE43u: //VirtualVTileListBox
+        return Id::kVirtualVTileListBox;
+    case 0x1FD60165u: //TabBox
+        return Id::kTabBox;
+    case 0xE9C414DEu: //GridBox
+        return Id::kGridBox;
+    case 0x623E2129u: //GridScrollBox
+        return Id::kGridScrollBox;
+    case 0x1B2D7B5Du: //TreeNode
+        return Id::kTreeNode;
+    case 0x04FF2448u: //TreeView
+        return Id::kTreeView;
+    case 0xE16143B0u: //DirectoryTree
+        return Id::kDirectoryTree;
+    case 0x92130E4Bu: //RichEdit
+        return Id::kRichEdit;
+    case 0x6CFFC87Bu: //RichEdit2
+        return Id::kRichEdit2;
+    case 0x83CD7FA1u: //Combo
+        return Id::kCombo;
+    case 0xDF76ACF5u: //ComboButton
+        return Id::kComboButton;
+    case 0xB256479Fu: //FilterCombo
+        return Id::kFilterCombo;
+    case 0x0F4085CFu: //CheckCombo
+        return Id::kCheckCombo;
+    case 0x9B74C01Cu: //Slider
+        return Id::kSlider;
+    case 0x1A36A166u: //Progress
+        return Id::kProgress;
+    case 0x4A4C6722u: //CircleProgress
+        return Id::kCircleProgress;
+    case 0x0690D9B9u: //ScrollBar
+        return Id::kScrollBar;
+    case 0x00C6075Au: //Menu
+        return Id::kMenu;
+    case 0x7487F36Au: //SubMenu
+        return Id::kSubMenu;
+    case 0xEAED44D1u: //MenuItem
+        return Id::kMenuItem;
+    case 0xCEF80263u: //MenuListBox
+        return Id::kMenuListBox;
+    case 0xB43DB67Bu: //MenuBar
+        return Id::kMenuBar;
+    case 0x7362A2BCu: //MenuBarItem
+        return Id::kMenuBarItem;
+    case 0x9BEC7490u: //DateTime
+        return Id::kDateTime;
+    case 0x5E3580C2u: //CefControl
+        return Id::kCefControl;
+    case 0xEA3FC8FFu: //WebView2Control
+        return Id::kWebView2Control;
+    case 0x68FF0BCDu: //ColorControl
+        return Id::kColorControl;
+    case 0xF376D9FDu: //ColorSlider
+        return Id::kColorSlider;
+    case 0xAC14FC3Eu: //ColorPickerRegular
+        return Id::kColorPickerRegular;
+    case 0x1857C9ABu: //ColorPickerStandard
+        return Id::kColorPickerStandard;
+    case 0x5C84F120u: //ColorPickerStandardGray
+        return Id::kColorPickerStandardGray;
+    case 0x96FBC991u: //ColorPickerCustom
+        return Id::kColorPickerCustom;
+    case 0x9808F547u: //Line
+        return Id::kLine;
+    case 0x8A17D3ECu: //IPAddress
+        return Id::kIPAddress;
+    case 0x180226F3u: //HotKey
+        return Id::kHotKey;
+    case 0xA4894655u: //TabCtrl
+        return Id::kTabCtrl;
+    case 0x0007F9F6u: //TabCtrlItem
+        return Id::kTabCtrlItem;
+    case 0x9981687Cu: //AddressBar
+        return Id::kAddressBar;
+    case 0xB189E975u: //IconControl
+        return Id::kIconControl;
+    case 0x782BB2ABu: //BitmapControl
+        return Id::kBitmapControl;
+    case 0x29BA0125u: //ChildWindow
+        return Id::kChildWindow;
+    case 0x7F16C2A2u: //window_title_bar
+        return Id::kWindowTitleBar;
+    case 0xB8037C4Fu: //btn_window_close
+        return Id::kBtnWindowClose;
+    case 0x176500FBu: //btn_window_min
+        return Id::kBtnWindowMin;
+    case 0x0D4FD685u: //btn_window_max
+        return Id::kBtnWindowMax;
+    case 0x21EC6B55u: //btn_window_restore
+        return Id::kBtnWindowRestore;
+    case 0x3EC82B7Cu: //btn_window_fullscreen
+        return Id::kBtnWindowFullscreen;
+    case 0x76E493D7u: //btn_window_language
+        return Id::kBtnWindowLanguage;
+    case 0x3945BAD6u: //btn_window_theme
+        return Id::kBtnWindowTheme;
+    default:
+        break;
+    }
+    return Id::kInvalidId;
+}
+
+DString IdToString(Id id)
+{
+    switch (id) {
+    case Id::kControl:
+        return _T("Control");
+    case Id::kControlDragable:
+        return _T("ControlDragable");
+    case Id::kControlMovable:
+        return _T("ControlMovable");
+    case Id::kControlResizable:
+        return _T("ControlResizable");
+    case Id::kLabel:
+        return _T("Label");
+    case Id::kRichText:
+        return _T("RichText");
+    case Id::kHyperLink:
+        return _T("HyperLink");
+    case Id::kButton:
+        return _T("Button");
+    case Id::kOption:
+        return _T("Option");
+    case Id::kCheckBox:
+        return _T("CheckBox");
+    case Id::kSplit:
+        return _T("Split");
+    case Id::kLabelBox:
+        return _T("LabelBox");
+    case Id::kLabelHBox:
+        return _T("LabelHBox");
+    case Id::kLabelVBox:
+        return _T("LabelVBox");
+    case Id::kRichTextBox:
+        return _T("RichTextBox");
+    case Id::kRichTextHBox:
+        return _T("RichTextHBox");
+    case Id::kRichTextVBox:
+        return _T("RichTextVBox");
+    case Id::kButtonBox:
+        return _T("ButtonBox");
+    case Id::kButtonHBox:
+        return _T("ButtonHBox");
+    case Id::kButtonVBox:
+        return _T("ButtonVBox");
+    case Id::kCheckBoxBox:
+        return _T("CheckBoxBox");
+    case Id::kCheckBoxHBox:
+        return _T("CheckBoxHBox");
+    case Id::kCheckBoxVBox:
+        return _T("CheckBoxVBox");
+    case Id::kOptionBox:
+        return _T("OptionBox");
+    case Id::kOptionHBox:
+        return _T("OptionHBox");
+    case Id::kOptionVBox:
+        return _T("OptionVBox");
+    case Id::kSplitBox:
+        return _T("SplitBox");
+    case Id::kBox:
+        return _T("Box");
+    case Id::kHBox:
+        return _T("HBox");
+    case Id::kVBox:
+        return _T("VBox");
+    case Id::kHFlowBox:
+        return _T("HFlowBox");
+    case Id::kVFlowBox:
+        return _T("VFlowBox");
+    case Id::kXmlBox:
+        return _T("XmlBox");
+    case Id::kVTileBox:
+        return _T("VTileBox");
+    case Id::kHTileBox:
+        return _T("HTileBox");
+    case Id::kBoxDragable:
+        return _T("BoxDragable");
+    case Id::kHBoxDragable:
+        return _T("HBoxDragable");
+    case Id::kVBoxDragable:
+        return _T("VBoxDragable");
+    case Id::kBoxMovable:
+        return _T("BoxMovable");
+    case Id::kHBoxMovable:
+        return _T("HBoxMovable");
+    case Id::kVBoxMovable:
+        return _T("VBoxMovable");
+    case Id::kBoxResizable:
+        return _T("BoxResizable");
+    case Id::kHBoxResizable:
+        return _T("HBoxResizable");
+    case Id::kVBoxResizable:
+        return _T("VBoxResizable");
+    case Id::kGroupBox:
+        return _T("GroupBox");
+    case Id::kGroupHBox:
+        return _T("GroupHBox");
+    case Id::kGroupVBox:
+        return _T("GroupVBox");
+    case Id::kScrollBox:
+        return _T("ScrollBox");
+    case Id::kHScrollBox:
+        return _T("HScrollBox");
+    case Id::kVScrollBox:
+        return _T("VScrollBox");
+    case Id::kHFlowScrollBox:
+        return _T("HFlowScrollBox");
+    case Id::kVFlowScrollBox:
+        return _T("VFlowScrollBox");
+    case Id::kHTileScrollBox:
+        return _T("HTileScrollBox");
+    case Id::kVTileScrollBox:
+        return _T("VTileScrollBox");
+    case Id::kListBoxItem:
+        return _T("ListBoxItem");
+    case Id::kListBoxItemH:
+        return _T("ListBoxItemH");
+    case Id::kListBoxItemV:
+        return _T("ListBoxItemV");
+    case Id::kHListBox:
+        return _T("HListBox");
+    case Id::kVListBox:
+        return _T("VListBox");
+    case Id::kHTileListBox:
+        return _T("HTileListBox");
+    case Id::kVTileListBox:
+        return _T("VTileListBox");
+    case Id::kListCtrl:
+        return _T("ListCtrl");
+    case Id::kPropertyGrid:
+        return _T("PropertyGrid");
+    case Id::kVirtualVListBox:
+        return _T("VirtualVListBox");
+    case Id::kVirtualHListBox:
+        return _T("VirtualHListBox");
+    case Id::kVirtualHTileListBox:
+        return _T("VirtualHTileListBox");
+    case Id::kVirtualVTileListBox:
+        return _T("VirtualVTileListBox");
+    case Id::kTabBox:
+        return _T("TabBox");
+    case Id::kGridBox:
+        return _T("GridBox");
+    case Id::kGridScrollBox:
+        return _T("GridScrollBox");
+    case Id::kTreeNode:
+        return _T("TreeNode");
+    case Id::kTreeView:
+        return _T("TreeView");
+    case Id::kDirectoryTree:
+        return _T("DirectoryTree");
+    case Id::kRichEdit:
+        return _T("RichEdit");
+    case Id::kRichEdit2:
+        return _T("RichEdit2");
+    case Id::kCombo:
+        return _T("Combo");
+    case Id::kComboButton:
+        return _T("ComboButton");
+    case Id::kFilterCombo:
+        return _T("FilterCombo");
+    case Id::kCheckCombo:
+        return _T("CheckCombo");
+    case Id::kSlider:
+        return _T("Slider");
+    case Id::kProgress:
+        return _T("Progress");
+    case Id::kCircleProgress:
+        return _T("CircleProgress");
+    case Id::kScrollBar:
+        return _T("ScrollBar");
+    case Id::kMenu:
+        return _T("Menu");
+    case Id::kSubMenu:
+        return _T("SubMenu");
+    case Id::kMenuItem:
+        return _T("MenuItem");
+    case Id::kMenuListBox:
+        return _T("MenuListBox");
+    case Id::kMenuBar:
+        return _T("MenuBar");
+    case Id::kMenuBarItem:
+        return _T("MenuBarItem");
+    case Id::kDateTime:
+        return _T("DateTime");
+    case Id::kCefControl:
+        return _T("CefControl");
+    case Id::kWebView2Control:
+        return _T("WebView2Control");
+    case Id::kColorControl:
+        return _T("ColorControl");
+    case Id::kColorSlider:
+        return _T("ColorSlider");
+    case Id::kColorPickerRegular:
+        return _T("ColorPickerRegular");
+    case Id::kColorPickerStandard:
+        return _T("ColorPickerStandard");
+    case Id::kColorPickerStandardGray:
+        return _T("ColorPickerStandardGray");
+    case Id::kColorPickerCustom:
+        return _T("ColorPickerCustom");
+    case Id::kLine:
+        return _T("Line");
+    case Id::kIPAddress:
+        return _T("IPAddress");
+    case Id::kHotKey:
+        return _T("HotKey");
+    case Id::kTabCtrl:
+        return _T("TabCtrl");
+    case Id::kTabCtrlItem:
+        return _T("TabCtrlItem");
+    case Id::kAddressBar:
+        return _T("AddressBar");
+    case Id::kIconControl:
+        return _T("IconControl");
+    case Id::kBitmapControl:
+        return _T("BitmapControl");
+    case Id::kChildWindow:
+        return _T("ChildWindow");
+    case Id::kWindowTitleBar:
+        return _T("window_title_bar");
+    case Id::kBtnWindowClose:
+        return _T("btn_window_close");
+    case Id::kBtnWindowMin:
+        return _T("btn_window_min");
+    case Id::kBtnWindowMax:
+        return _T("btn_window_max");
+    case Id::kBtnWindowRestore:
+        return _T("btn_window_restore");
+    case Id::kBtnWindowFullscreen:
+        return _T("btn_window_fullscreen");
+    case Id::kBtnWindowLanguage:
+        return _T("btn_window_language");
+    case Id::kBtnWindowTheme:
+        return _T("btn_window_theme");
+    default:
+        break;
+    }
+    return DString();
+}
+} //namespace ctrl
+
 namespace image {
 Id IdOf(const DString &strName)
 {
