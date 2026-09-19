@@ -401,10 +401,17 @@ RichEdit::~RichEdit()
     m_pLimitChars.reset();
 }
 
-void RichEdit::SetAttribute(const DString &strName, const DString &strValue2)
+void RichEdit::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("vscrollbar")) {
+    switch (ui::attr::control::IdOf(strName)) {
+#ifdef DUILIB_RICHEDIT_SUPPORT_RICHTEXT
+#else
+#endif
+
+    //几个SDL版本支持但该版本不支持的属性，需要跳过
+    case ui::attr::control::kVscrollbar: {
         //纵向滚动条
         if (StringUtil::IsValueTrue(strValue)) {
             EnableScrollBar(true, GetHScrollBar() != nullptr);
@@ -417,7 +424,9 @@ void RichEdit::SetAttribute(const DString &strName, const DString &strValue2)
                 m_pRichHost->SetVScrollBar(false);
             }
         }
-    } else if (strName == _T("hscrollbar")) {
+        break;
+    }
+    case ui::attr::control::kHscrollbar: {
         //横向滚动条
         if (StringUtil::IsValueTrue(strValue)) {
             EnableScrollBar(GetVScrollBar() != nullptr, true);
@@ -430,31 +439,50 @@ void RichEdit::SetAttribute(const DString &strName, const DString &strValue2)
                 m_pRichHost->SetHScrollBar(false);
             }
         }
-    } else if ((strName == _T("single_line")) || (strName == _T("singleline"))) {
-        SetMultiLine(strValue != _T("true"));
-    } else if ((strName == _T("multi_line")) || (strName == _T("multiline"))) {
-        SetMultiLine(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("readonly")) {
+        break;
+    }
+    case ui::attr::control::kSingleLine:
+    case ui::attr::control::kMultiLine:
+    case ui::attr::control::kReadonly: {
         SetReadOnly(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("password")) {
+        break;
+    }
+    case ui::attr::control::kPassword: {
         SetPasswordMode(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("show_password")) {
+        break;
+    }
+    case ui::attr::control::kShowPassword: {
         SetShowPassword(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("password_char")) {
+        break;
+    }
+    case ui::attr::control::kPasswordChar: {
         if (!strValue.empty()) {
             SetPasswordChar(strValue.front());
         }
-    } else if (strName == _T("flash_password_char")) {
+        break;
+    }
+    case ui::attr::control::kFlashPasswordChar: {
         SetFlashPasswordChar(StringUtil::IsValueTrue(strValue));
-    } else if ((strName == _T("number_only")) || (strName == _T("number"))) {
+        break;
+    }
+    case ui::attr::control::kNumberOnly:
+    case ui::attr::control::kNumber: {
         SetNumberOnly(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("max_number")) {
+        break;
+    }
+    case ui::attr::control::kMaxNumber: {
         SetMaxNumber(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("min_number")) {
+        break;
+    }
+    case ui::attr::control::kMinNumber: {
         SetMinNumber(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("number_format")) {
+        break;
+    }
+    case ui::attr::control::kNumberFormat: {
         SetNumberFormat64(strValue);
-    } else if (strName == _T("text_align")) {
+        break;
+    }
+    case ui::attr::control::kTextAlign: {
         //水平方向对齐方式
         if (strValue.find(_T("left")) != DString::npos) {
             SetTextHAlignType(HorAlignType::kAlignLeft);
@@ -472,113 +500,116 @@ void RichEdit::SetAttribute(const DString &strName, const DString &strValue2)
         } else if (strValue.find(_T("bottom")) != DString::npos) {
             SetTextVAlignType(VerAlignType::kAlignBottom);
         }
-    } else if ((strName == _T("text_padding")) || (strName == _T("textpadding"))) {
-        UiPadding rcTextPadding;
-        AttributeUtil::ParsePaddingValue(strValue.c_str(), rcTextPadding);
-        SetTextPadding(rcTextPadding, true);
-    } else if (
-        (strName == _T("text_color")) || (strName == _T("normal_text_color"))
-        || (strName == _T("normaltextcolor"))) {
-        SetTextColor(strValue);
-    } else if ((strName == _T("disabled_text_color")) || (strName == _T("disabledtextcolor"))) {
-        SetDisabledTextColor(strValue);
-    } else if ((strName == _T("caret_color")) || (strName == _T("caretcolor"))) {
-        //设置光标的颜色
-        SetCaretColor(strValue);
-    } else if ((strName == _T("prompt_mode")) || (strName == _T("promptmode"))) {
-        //提示模式
-        m_bAllowPrompt = (StringUtil::IsValueTrue(strValue)) ? true : false;
-    } else if ((strName == _T("prompt_color")) || (strName == _T("promptcolor"))) {
-        //提示文字的颜色
-        m_sPromptColor = strValue;
-    } else if ((strName == _T("prompt_text")) || (strName == _T("prompttext"))) {
-        //提示文字
-        SetPromptText(strValue);
-    } else if (
-        (strName == _T("prompt_text_id")) || (strName == _T("prompt_textid"))
-        || (strName == _T("prompttextid"))) {
-        //提示文字ID
-        SetPromptTextId(strValue);
-    } else if ((strName == _T("focused_image")) || (strName == _T("focusedimage"))) {
-        SetFocusedImage(strValue);
-    } else if (strName == _T("font")) {
+        break;
+    }
+    case ui::attr::control::kTextPadding:
+    case ui::attr::control::kTextColor:
+    case ui::attr::control::kNormalTextColor:
+    case ui::attr::control::kDisabledTextColor:
+    case ui::attr::control::kCaretColor:
+    case ui::attr::control::kPromptMode:
+    case ui::attr::control::kPromptColor:
+    case ui::attr::control::kPromptText:
+    case ui::attr::control::kPromptTextId:
+    case ui::attr::control::kFocusedImage:
+    case ui::attr::control::kFont: {
         SetFontId(strValue);
-    } else if (strName == _T("text")) {
+        break;
+    }
+    case ui::attr::control::kText: {
         if (IsReplaceNewline()) {
             //将反斜杠+n这两个字符替换成换行符
             StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strValue);
         }
         SetText(strValue);
-    } else if ((strName == _T("text_id")) || (strName == _T("textid"))) {
-        DString strText = GlobalManager::Instance().Lang().GetStringByID(strValue);
-        if (IsReplaceNewline()) {
-            //将反斜杠+n这两个字符替换成换行符
-            StringUtil::ReplaceAll(_T("\\n"), _T("\n"), strText);
-        }
-        SetText(strText);
-    } else if ((strName == _T("want_tab")) || (strName == _T("wanttab"))) {
-        SetWantTab(StringUtil::IsValueTrue(strValue));
-    } else if (
-        (strName == _T("want_return")) || (strName == _T("want_return_msg"))
-        || (strName == _T("wantreturnmsg"))) {
-        SetWantReturn(StringUtil::IsValueTrue(strValue));
-    } else if (
-        (strName == _T("want_ctrl_return")) || (strName == _T("return_msg_want_ctrl"))
-        || (strName == _T("returnmsgwantctrl"))) {
-        SetWantCtrlReturn(StringUtil::IsValueTrue(strValue));
-    } else if (
-        (strName == _T("limit_text")) || (strName == _T("max_char")) || (strName == _T("maxchar"))) {
-        //限制最多字符数
-        SetLimitText(StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("limit_chars")) {
+        break;
+    }
+    case ui::attr::control::kTextId:
+    case ui::attr::control::kWantTab:
+    case ui::attr::control::kWantReturn:
+    case ui::attr::control::kWantReturnMsg:
+    case ui::attr::control::kWantCtrlReturn:
+    case ui::attr::control::kReturnMsgWantCtrl:
+    case ui::attr::control::kLimitText:
+    case ui::attr::control::kMaxChar:
+    case ui::attr::control::kLimitChars: {
         //限制允许输入哪些字符
         SetLimitChars(strValue);
-    } else if (strName == _T("word_wrap")) {
+        break;
+    }
+    case ui::attr::control::kWordWrap: {
         //是否自动换行
         SetWordWrap(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("no_caret_readonly")) {
+        break;
+    }
+    case ui::attr::control::kNoCaretReadonly: {
         //只读模式，不显示光标
         SetNoCaretReadonly();
-    } else if (strName == _T("default_context_menu")) {
+        break;
+    }
+    case ui::attr::control::kDefaultContextMenu: {
         //是否使用默认的右键菜单
         SetEnableDefaultContextMenu(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("spin_class")) {
+        break;
+    }
+    case ui::attr::control::kSpinClass: {
         SetSpinClass(strValue);
-    } else if (strName == _T("clear_btn_class")) {
+        break;
+    }
+    case ui::attr::control::kClearBtnClass: {
         SetClearBtnClass(strValue);
-    } else if (strName == _T("show_password_btn_class")) {
+        break;
+    }
+    case ui::attr::control::kShowPasswordBtnClass: {
         SetShowPasswordBtnClass(strValue);
-    } else if (strName == _T("wheel_zoom")) {
+        break;
+    }
+    case ui::attr::control::kWheelZoom: {
         //设置是否允许Ctrl + 滚轮来调整缩放比例
         SetEnableWheelZoom(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("hide_selection")) {
+        break;
+    }
+    case ui::attr::control::kHideSelection: {
         //是否隐藏选择内容
         SetHideSelection(StringUtil::IsValueTrue(strValue));
-    } else if (
-        (strName == _T("focused_bottom_border_size"))
-        || (strName == _T("focus_bottom_border_size"))) {
+        break;
+    }
+    case ui::attr::control::kFocusedBottomBorderSize:
+    case ui::attr::control::kFocusBottomBorderSize: {
         //焦点状态时，底部边框的大小
         SetFocusedBottomBorderSize(StringUtil::StringToInt32(strValue));
-    } else if (
-        (strName == _T("focused_bottom_border_color"))
-        || (strName == _T("focus_bottom_border_color"))) {
+        break;
+    }
+    case ui::attr::control::kFocusedBottomBorderColor:
+    case ui::attr::control::kFocusBottomBorderColor: {
         //焦点状态时，底部边框的颜色
         SetFocusedBottomBorderColor(strValue);
-    } else if ((strName == _T("select_all_on_focused")) || (strName == _T("select_all_on_focus"))) {
+        break;
+    }
+    case ui::attr::control::kSelectAllOnFocused:
+    case ui::attr::control::kSelectAllOnFocus: {
         //获取焦点的时候，是否全选
         SetSelAllOnFocus(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("row_spacing_mul")) {
+        break;
+    }
+    case ui::attr::control::kRowSpacingMul: {
         SetRowSpacingMul(StringUtil::StringToFloat(strValue.c_str(), nullptr));
-    } else if (strName == _T("row_spacing_add")) {
+        break;
+    }
+    case ui::attr::control::kRowSpacingAdd: {
         //不支持该属性，忽略
-    } else if (strName == _T("enable_drag_out")) {
+        break;
+    }
+    case ui::attr::control::kEnableDragOut: {
         //不支持该属性，忽略
-    } else if (strName == _T("replace_newline")) {
+        break;
+    }
+    case ui::attr::control::kReplaceNewline: {
         // 设置是否替换换行符(将字符串"\\n"替换为换行符"\n"
         SetReplaceNewline(StringUtil::IsValueTrue(strValue));
+        break;
     }
-#ifdef DUILIB_RICHEDIT_SUPPORT_RICHTEXT
-    else if (strName == _T("zoom")) {
+    case ui::attr::control::kZoom: {
         //缩放比例：
         //设置缩放比例：设 wParam：缩放比例的分子，lParam：缩放比例的分母，
         // "wParam,lParam" 表示按缩放比例分子/分母显示的缩放，取值范围：1/64 < (wParam / lParam) < 64。
@@ -589,77 +620,48 @@ void RichEdit::SetAttribute(const DString &strName, const DString &strValue2)
             && (zoomValue.cy <= 64)) {
             m_richCtrl.SetZoom(zoomValue.cx, zoomValue.cy);
         }
-    } else if ((strName == _T("auto_vscroll")) || (strName == _T("autovscroll"))) {
-        //当用户在最后一行按 ENTER 时，自动将文本向上滚动一页。
-        if (m_pRichHost != nullptr) {
-            m_pRichHost->SetAutoVScroll(StringUtil::IsValueTrue(strValue));
-        }
-    } else if ((strName == _T("auto_hscroll")) || (strName == _T("autohscroll"))) {
-        //当用户在行尾键入一个字符时，自动将文本向右滚动 10 个字符。
-        //当用户按 Enter 时，控件会将所有文本滚动回零位置。
-        if (m_pRichHost != nullptr) {
-            m_pRichHost->SetAutoHScroll(StringUtil::IsValueTrue(strValue));
-        }
-    } else if ((strName == _T("rich_text")) || (strName == _T("rich"))) {
+        break;
+    }
+    case ui::attr::control::kAutoVscroll:
+    case ui::attr::control::kAutoHscroll:
+    case ui::attr::control::kRichText:
+    case ui::attr::control::kRich: {
         //是否为富文本属性
         SetRichText(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("auto_detect_url")) {
+        break;
+    }
+    case ui::attr::control::kAutoDetectUrl: {
         //是否自动检测URL，如果是URL则显示为超链接
         SetAutoURLDetect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("allow_beep")) {
+        break;
+    }
+    case ui::attr::control::kAllowBeep: {
         //是否允许发出Beep声音
         SetAllowBeep(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("save_selection")) {
+        break;
+    }
+    case ui::attr::control::kSaveSelection: {
         //如果 为 TRUE，则当控件处于非活动状态时，应保存所选内容的边界。
         //如果 为 FALSE，则当控件再次处于活动状态时，可以选择边界重置为 start = 0，length = 0。
         SetSaveSelection(StringUtil::IsValueTrue(strValue));
+        break;
     }
-#else
-    else if (strName == _T("zoom")) {
-        //缩放比例：
-        //设置缩放比例：设 wParam：缩放比例的分子，lParam：缩放比例的分母，
-        // "wParam,lParam" 表示按缩放比例分子/分母显示的缩放，取值范围：1/64 < (wParam / lParam) < 64。
-        // 举例：则："0,0"表示关闭缩放功能，"2,1"表示放大到200%，"1,2"表示缩小到50%
-        //UiSize zoomValue;
-        //AttributeUtil::ParseSizeValue(strValue.c_str(), zoomValue);
-        //if ((zoomValue.cx >= 0) && (zoomValue.cx <= 64) &&
-        //    (zoomValue.cy >= 0) && (zoomValue.cy <= 64)) {
-        //    m_richCtrl.SetZoom(zoomValue.cx, zoomValue.cy);
-        //}
-    } else if ((strName == _T("auto_vscroll")) || (strName == _T("autovscroll"))) {
-        //当用户在最后一行按 ENTER 时，自动将文本向上滚动一页。
-        //if (m_pRichHost != nullptr) {
-        //    m_pRichHost->SetAutoVScroll(StringUtil::IsValueTrue(strValue));
-        //}
-    } else if ((strName == _T("auto_hscroll")) || (strName == _T("autohscroll"))) {
-        //当用户在行尾键入一个字符时，自动将文本向右滚动 10 个字符。
-        //当用户按 Enter 时，控件会将所有文本滚动回零位置。
-        //if (m_pRichHost != nullptr) {
-        //    m_pRichHost->SetAutoHScroll(StringUtil::IsValueTrue(strValue));
-        //}
-    } else if ((strName == _T("rich_text")) || (strName == _T("rich"))) {
-        //是否为富文本属性
-        //SetRichText(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("auto_detect_url")) {
-        //是否自动检测URL，如果是URL则显示为超链接
-        //SetAutoURLDetect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("allow_beep")) {
-        //是否允许发出Beep声音
-        //SetAllowBeep(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("save_selection")) {
-        //如果 为 TRUE，则当控件处于非活动状态时，应保存所选内容的边界。
-        //如果 为 FALSE，则当控件再次处于活动状态时，可以选择边界重置为 start = 0，length = 0。
-        //SetSaveSelection(StringUtil::IsValueTrue(strValue));
+    case ui::attr::control::kSelectionBkcolor: {
+        break;
     }
-#endif
-
-    //几个SDL版本支持但该版本不支持的属性，需要跳过
-    else if (strName == _T("selection_bkcolor")) {
-    } else if (strName == _T("inactive_selection_bkcolor")) {
-    } else if (strName == _T("current_row_bkcolor")) {
-    } else if (strName == _T("inactive_current_row_bkcolor")) {
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+    case ui::attr::control::kInactiveSelectionBkcolor: {
+        break;
+    }
+    case ui::attr::control::kCurrentRowBkcolor: {
+        break;
+    }
+    case ui::attr::control::kInactiveCurrentRowBkcolor: {
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
