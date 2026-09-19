@@ -1154,23 +1154,36 @@ void TreeView::SetAttributeById(
 {
     DString strValue = GetExpandVarStrings(strValue2);
     //支持的属性列表: 基类实现的直接转发
-    if (strName == _T("indent")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kIndent: {
         //树节点的缩进（每层节点缩进一个indent单位）
         SetIndent(StringUtil::StringToInt32(strValue), true);
-    } else if (strName == _T("multi_select")) {
+        break;
+    }
+    case ui::attr::control::kMultiSelect: {
         //多选，默认是单选，在基类实现
         SetMultiSelect(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("check_box_class")) {
+        break;
+    }
+    case ui::attr::control::kCheckBoxClass: {
         //是否显示CheckBox
         SetCheckBoxClass(strValue);
-    } else if (strName == _T("expand_image_class")) {
+        break;
+    }
+    case ui::attr::control::kExpandImageClass: {
         //是否显示[展开/收起]图标
         SetExpandImageClass(strValue);
-    } else if (strName == _T("show_icon")) {
+        break;
+    }
+    case ui::attr::control::kShowIcon: {
         //是否显示图标
         SetEnableIcon(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

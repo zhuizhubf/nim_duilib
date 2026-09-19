@@ -352,38 +352,67 @@ void TabCtrlItem::SetAttributeById(
     ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("tab_box_item_index")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kTabBoxItemIndex: {
         SetTabBoxItemIndex((size_t) StringUtil::StringToInt32(strValue));
-    } else if (strName == _T("title")) {
+        break;
+    }
+    case ui::attr::control::kTitle: {
         SetTitle(strValue);
-    } else if (strName == _T("title_id")) {
+        break;
+    }
+    case ui::attr::control::kTitleId: {
         SetTitleId(strValue);
-    } else if (strName == _T("icon")) {
+        break;
+    }
+    case ui::attr::control::kIcon: {
         SetIcon(strValue);
-    } else if (strName == _T("icon_class")) {
+        break;
+    }
+    case ui::attr::control::kIconClass: {
         SetIconClass(strValue);
-    } else if (strName == _T("title_class")) {
+        break;
+    }
+    case ui::attr::control::kTitleClass: {
         SetTitleClass(strValue);
-    } else if (strName == _T("close_button_class")) {
+        break;
+    }
+    case ui::attr::control::kCloseButtonClass: {
         SetCloseButtonClass(strValue);
-    } else if (strName == _T("line_class")) {
+        break;
+    }
+    case ui::attr::control::kLineClass: {
         SetLineClass(strValue);
-    } else if (strName == _T("selected_round_corner")) {
+        break;
+    }
+    case ui::attr::control::kSelectedRoundCorner: {
         UiSize sz;
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetSelectedRoundCorner(sz, true);
-    } else if ((strName == _T("hovered_round_corner")) || (strName == _T("hot_round_corner"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredRoundCorner:
+    case ui::attr::control::kHotRoundCorner: {
         UiSize sz;
         AttributeUtil::ParseSizeValue(strValue.c_str(), sz);
         SetHoveredRoundCorner(sz, true);
-    } else if ((strName == _T("hovered_padding")) || (strName == _T("hot_padding"))) {
+        break;
+    }
+    case ui::attr::control::kHoveredPadding:
+    case ui::attr::control::kHotPadding: {
         UiPadding rcPadding;
         AttributeUtil::ParsePaddingValue(strValue.c_str(), rcPadding);
         SetHoveredPadding(rcPadding, true);
-    } else if (strName == _T("auto_hide_close_button")) {
+        break;
+    }
+    case ui::attr::control::kAutoHideCloseButton: {
         SetAutoHideCloseButton(StringUtil::IsValueTrue(strValue));
-    } else {
+        break;
+    }
+    default: {
         BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 

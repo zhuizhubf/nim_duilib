@@ -38,26 +38,40 @@ DString CefControl::GetType() const
     return DUI_CTR_CEF;
 }
 
-void CefControl::SetAttribute(const DString &strName, const DString &strValue2)
+void CefControl::SetAttributeById(
+    ui::attr::control::Id id, const DString &strName, const DString &strValue2)
 {
     DString strValue = GetExpandVarStrings(strValue2);
-    if (strName == _T("url")) {
+    switch (ui::attr::control::IdOf(strName)) {
+    case ui::attr::control::kUrl: {
         //初始化加载的URL
         SetInitURL(strValue);
-    } else if (strName == _T("url_is_local_file")) {
+        break;
+    }
+    case ui::attr::control::kUrlIsLocalFile: {
         //初始化加载的URL是否为本地文件
         SetInitUrlIsLocalFile(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("F12")) {
+        break;
+    }
+    case ui::attr::control::kF12: {
         //是否允许按F12打开开发者工具
         SetEnableF12(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("F11")) {
+        break;
+    }
+    case ui::attr::control::kF11: {
         //是否允许F11快捷键(页面全屏/页面退出全屏)
         SetEnableF11(StringUtil::IsValueTrue(strValue));
-    } else if (strName == _T("download_favicon_image")) {
+        break;
+    }
+    case ui::attr::control::kDownloadFaviconImage: {
         //是否下载网站的FavIcon图标
         SetDownloadFaviconImage(StringUtil::IsValueTrue(strValue));
-    } else {
-        BaseClass::SetAttribute(strName, strValue);
+        break;
+    }
+    default: {
+        BaseClass::SetAttributeById(id, strName, strValue);
+        break;
+    }
     }
 }
 
