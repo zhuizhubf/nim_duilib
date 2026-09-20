@@ -129,6 +129,39 @@ target("duilib-text")
 target_end()
 
 -- -----------------------------------------------------------------------------
+-- duilib-scintilla：DUI 原生 Scintilla 编辑器扩展（可选，--scintilla=y）
+-- -----------------------------------------------------------------------------
+if duilib_scintilla_enabled() then
+    local extroot = DUILIB_EXT_SCINTILLA_DIR
+    local scroot = path.join(extroot, "third_party", "scintilla")
+    local lxroot = path.join(extroot, "third_party", "lexilla")
+
+    target("duilib-scintilla")
+        set_kind("static")
+        set_targetdir(DUILIB_LIB_DIR)
+        duilib_target_settings()
+        duilib_common_defines()
+        set_languages("c++17")
+        add_defines("SCINTILLA_QT=1")
+        add_includedirs(
+            DUILIB_SRC_DIR,
+            DUILIB_ROOT,
+            path.join(extroot, "src"),
+            path.join(scroot, "include"),
+            path.join(scroot, "src"),
+            path.join(lxroot, "include"),
+            path.join(lxroot, "lexlib")
+        )
+        add_files(path.join(extroot, "src", "*.cpp"))
+        add_files(path.join(scroot, "src", "*.cxx"))
+        add_files(path.join(lxroot, "lexlib", "*.cxx"))
+        add_files(path.join(lxroot, "lexers", "*.cxx"))
+        add_files(path.join(lxroot, "src", "Lexilla.cxx"))
+        add_deps("duilib", "duilib-text")
+    target_end()
+end
+
+-- -----------------------------------------------------------------------------
 -- duilib-skia-base：Skia 字体和公共基础封装
 -- -----------------------------------------------------------------------------
 if duilib_skia_base_enabled() then

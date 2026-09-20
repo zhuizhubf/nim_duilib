@@ -1,0 +1,11 @@
+#pragma code_page(65001)
+
+#include "resource.h"
+
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+IDR_THEME THEME "..\\..\\bin\\resources.zip"

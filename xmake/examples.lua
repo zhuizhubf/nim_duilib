@@ -32,6 +32,9 @@ if duilib_webview2_enabled() then
         table.insert(examples, name)
     end
 end
+if duilib_scintilla_enabled() then
+    table.insert(examples, "ScintillaDemo")
+end
 
 for _, name in ipairs(examples) do
     local exdir = path.join(exroot, name)
@@ -51,6 +54,9 @@ for _, name in ipairs(examples) do
 
         -- 头文件目录：仓库根目录（duilib/duilib.h 等）、示例自己的目录
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT, exdir)
+        if name == "ScintillaDemo" then
+            add_includedirs(duilib_scintilla_includedirs())
+        end
 
         -- CefBrowser 示例的额外源码目录
         if name == "CefBrowser" then

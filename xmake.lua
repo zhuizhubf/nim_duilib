@@ -58,6 +58,7 @@ DUILIB_SRC_DIR   = path.join(DUILIB_ROOT, "src")
 DUILIB_CORE_DIR  = path.join(DUILIB_SRC_DIR, "duilib")
 -- 第三方依赖目录（含 prebuilt/ 预编译 SDK）
 DUILIB_THIRD_DIR = path.join(DUILIB_ROOT, "third_party")
+DUILIB_EXT_SCINTILLA_DIR = path.join(DUILIB_ROOT, "extensions", "scintilla")
 DUILIB_LIB_DIR   = path.join(DUILIB_ROOT, "lib")
 DUILIB_BIN_DIR   = path.join(DUILIB_ROOT, "bin")
 DUILIB_SKIA_LIBS = {"svg", "skshaper", "skottie", "sksg", "jsonreader", "skia"}
@@ -115,6 +116,12 @@ option("examples")
     set_default(true)
     set_showmenu(true)
     set_description("编译 examples 目录下的示例程序")
+option_end()
+
+option("scintilla")
+    set_default(false)
+    set_showmenu(true)
+    set_description("启用 duilib-scintilla DUI 原生编辑器扩展")
 option_end()
 
 option("render")

@@ -20,6 +20,7 @@ local g_nodeAllowlist = {
     ["ScreenColorPreview"]  = "ColorPicker 窗口自定义控件类（ColorPicker::CreateControlClass 创建）",
     ["RenderTest1"]         = "示例自定义控件类（examples/render）",
     ["RenderTest2"]         = "示例自定义控件类（examples/render）",
+    ["ScintillaControl"]    = "扩展自定义控件类（extensions/scintilla，运行时通过 AddCreateControlCallback 注册）",
     ["ChildWindowTemplate"] = "模板片段根节点，由代码显式加载，非控件类名",
     ["Loading"]             = "模板片段根节点，由代码显式加载，非控件类名",
     ["Property"]            = "ThemeMeta 子节点，属全局/主题解析范围，不在本登记表的 7 个名字域内",

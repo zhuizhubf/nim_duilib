@@ -212,11 +212,39 @@ function duilib_webview2_targets()
     return targets
 end
 
+-- Scintilla 扩展（可选，默认关闭）
+function duilib_scintilla_enabled()
+    return get_config("scintilla") == true
+end
+
+function duilib_scintilla_targets()
+    local targets = {}
+    if duilib_scintilla_enabled() then
+        table.insert(targets, "duilib-scintilla")
+    end
+    return targets
+end
+
+-- Scintilla 扩展的源码头文件目录（扩展自身 + 上游 Scintilla/Lexilla）
+function duilib_scintilla_includedirs()
+    local extroot = DUILIB_EXT_SCINTILLA_DIR
+    local scroot = path.join(extroot, "third_party", "scintilla")
+    local lxroot = path.join(extroot, "third_party", "lexilla")
+    return {
+        path.join(extroot, "src"),
+        path.join(scroot, "include"),
+        path.join(scroot, "src"),
+        path.join(lxroot, "include"),
+        path.join(lxroot, "lexlib")
+    }
+end
+
 -- 全部可选模块：渲染 + 图片解码 + 可选控件
 function duilib_module_targets()
     local targets = {}
     for _, group in ipairs({duilib_render_targets(), duilib_image_targets(),
-                            duilib_cef_targets(), duilib_webview2_targets()}) do
+                            duilib_cef_targets(), duilib_webview2_targets(),
+                            duilib_scintilla_targets()}) do
         for _, name in ipairs(group) do
             table.insert(targets, name)
         end
@@ -254,6 +282,7 @@ function duilib_common_defines()
     add_defines("DUILIB_IMAGE_SVG_SKIA=" .. (duilib_svg_skia_enabled() and "1" or "0"))
     add_defines("DUILIB_IMAGE_LOTTIE_SKIA=" .. (duilib_lottie_skia_enabled() and "1" or "0"))
     add_defines("DUILIB_COMMON_TEXT_LAYOUT=" .. (get_config("common_text_layout") and "1" or "0"))
+    add_defines("DUILIB_SCINTILLA=" .. (duilib_scintilla_enabled() and "1" or "0"))
     if duilib_is_windows() then
         add_defines("DUILIB_WEBVIEW2=" .. (duilib_webview2_enabled() and "1" or "0"))
     end
