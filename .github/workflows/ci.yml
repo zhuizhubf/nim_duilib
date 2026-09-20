@@ -81,6 +81,18 @@ jobs:
             cache_mode: none
             cache_id: x64-mt
             smoke: false
+          - name: windows-x64-cef
+            runner: windows-2022
+            xmake_arch: x64
+            xmake_flags: '--cef=y'
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: cef
+            min_examples: 20
+            cache_mode: read-only
+            cache_id: x64-mt
+            smoke: false
+            package: false
           - name: linux-x64
             runner: ubuntu-22.04
             xmake_arch: x64
@@ -188,6 +200,7 @@ jobs:
           exit ${failed}
 
       - name: Package build outputs
+        if: matrix.package != false
         shell: bash
         run: |
           set -euo pipefail
@@ -202,6 +215,7 @@ jobs:
           ls -l dist
 
       - name: Upload package
+        if: matrix.package != false
         uses: actions/upload-artifact@v4
         with:
           name: nim_duilib-${{ matrix.pkg_platform }}-${{ matrix.pkg_arch }}-${{ matrix.variant }}
