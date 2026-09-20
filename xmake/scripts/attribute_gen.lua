@@ -2,8 +2,8 @@
 -- 属性名 ID 层生成器：读取 attribute_defs.lua，生成 AttributeIds.g.h / .g.cpp
 --
 -- 用法（仓库根目录）：
---     xmake attribute-gen                    -- 输出到 src/duilib/Utils
---     xmake l attribute_gen.lua <输出目录>    -- 输出到指定目录
+--     xmake attribute-gen                            -- 输出到 src/duilib/Utils
+--     xmake l xmake/scripts/attribute_gen.lua <输出目录>   -- 输出到指定目录
 --
 -- 约定：
 --   1. attribute_defs.lua 是唯一手写输入，本文件不含任何属性名数据。
@@ -120,8 +120,8 @@ end
 local function emit_header(domains, data)
     local h = {}
     local function add(line) h[#h + 1] = line end
-    add("// 本文件由 tools/attribute_gen.lua 生成，请勿手改。")
-    add("// 数据来源：tools/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）")
+    add("// 本文件由 xmake/scripts/attribute_gen.lua 生成，请勿手改。")
+    add("// 数据来源：xmake/scripts/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）")
     add("")
     add("#ifndef UI_UTILS_ATTRIBUTE_IDS_G_H_")
     add("#define UI_UTILS_ATTRIBUTE_IDS_G_H_")
@@ -158,8 +158,8 @@ end
 local function emit_source(domains, data)
     local c = {}
     local function add(line) c[#c + 1] = line end
-    add("// 本文件由 tools/attribute_gen.lua 生成，请勿手改。")
-    add("// 数据来源：tools/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）")
+    add("// 本文件由 xmake/scripts/attribute_gen.lua 生成，请勿手改。")
+    add("// 数据来源：xmake/scripts/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）")
     add("")
     add("#include \"duilib/Utils/AttributeIds.g.h\"")
     add("#include \"duilib/duilib_config.h\"")
@@ -241,7 +241,8 @@ function main(...)
 
     local outDir = args[1]
     if (outDir == nil) or (outDir == "") then
-        outDir = path.join(os.scriptdir(), "src", "duilib", "Utils")
+        -- 默认输出到仓库内的生成目录（本脚本位于 xmake/scripts/，不能用 os.scriptdir()）
+        outDir = path.join(os.projectdir(), "src", "duilib", "Utils")
     end
     os.mkdir(outDir)
     io.writefile(path.join(outDir, "AttributeIds.g.h"), table.concat(emit_header(domains, data), "\n") .. "\n")
@@ -259,8 +260,8 @@ function main(...)
         local function madd(line)
             m[#m + 1] = line
         end
-        madd("// 本文件由 tools/attribute_gen.lua 生成，请勿手改。")
-        madd("// 数据来源：tools/attribute_defs.lua 的 ctrl 域（控件类名宏，保持公开 API 兼容）")
+        madd("// 本文件由 xmake/scripts/attribute_gen.lua 生成，请勿手改。")
+        madd("// 数据来源：xmake/scripts/attribute_defs.lua 的 ctrl 域（控件类名宏，保持公开 API 兼容）")
         madd("")
         madd("#ifndef UI_DUILIB_CTRL_DEFS_G_H_")
         madd("#define UI_DUILIB_CTRL_DEFS_G_H_")

@@ -292,6 +292,10 @@ bool MainThread::OnInit()
 
 ## 关于工程配置（xmake）
 项目的编译配置位于仓库根目录的 `xmake.lua` 和 `xmake` 目录：`xmake/duilib.lua`（duilib 主库）、`xmake/third_party.lua`（第三方库）、`xmake/examples.lua`（示例程序）、`xmake/common.lua`（公共设置）；Skia 由 `xmake/repos` 中的本地包自动下载并编译。
+
+仓库根目录只保留 `xmake.lua` 入口，辅助脚本统一放在 `xmake` 目录下：
+- `xmake/tasks.lua`：注册 `xmake format`、`xmake format-check`、`xmake attribute-gen`、`xmake attribute-check` 四个任务；
+- `xmake/scripts/`：任务脚本（`format_apply.lua`、`format_check.lua`）与属性名登记表（`attribute_defs.lua`、`attribute_gen.lua`、`attribute_check.lua`）。
     
 ## 如何设置项目中使用的源代码文件编码为UTF-8格式
 1. 在项目根目录创建一个格式配置文件，文件名为：.editorconfig

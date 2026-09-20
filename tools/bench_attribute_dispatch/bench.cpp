@@ -1,5 +1,5 @@
 // 属性名派发基准：对比历史顺序比较链 与 顶层一次哈希后 O(1) 定位
-// 数据来源：仓库根目录的 attribute_defs.lua（control 域真实属性名）
+// 数据来源：仓库的 xmake/scripts/attribute_defs.lua（control 域真实属性名）
 //
 // 用法（仓库根目录）：xmake -P tools/bench_attribute_dispatch && xmake run -P tools/bench_attribute_dispatch
 #include <chrono>
@@ -42,10 +42,10 @@ static std::vector<std::string> LoadNames(const std::string &file, const std::st
 
 int main(int argc, char **argv)
 {
-    const std::string dataFile = (argc > 1) ? argv[1] : "attribute_defs.lua";
+    const std::string dataFile = (argc > 1) ? argv[1] : "xmake/scripts/attribute_defs.lua";
     const std::vector<std::string> names = LoadNames(dataFile, "control");
     if (names.empty()) {
-        printf("未读取到属性名（请在仓库根目录运行，或把 attribute_defs.lua 路径作为参数传入）\n");
+        printf("未读取到属性名（请在仓库根目录运行，或把 xmake/scripts/attribute_defs.lua 路径作为参数传入）\n");
         return 1;
     }
     const std::vector<std::string> hashTableNames = names;

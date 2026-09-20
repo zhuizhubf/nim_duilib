@@ -31,7 +31,7 @@
 | docs          | 项目的说明文档，包括各个控件的功能介绍与属性列表说明文档|
 | bin           | 各个示例程序输出目录，包含预设的皮肤和语言文件以及 CEF 依赖|
 | licenses      | 引用的其他开源代码对应的licenses文件|
-| xmake         | xmake编译脚本（第三方库、duilib主库、示例程序以及Skia的本地包定义）|
+| xmake         | xmake编译脚本（第三方库、duilib主库、示例程序以及Skia的本地包定义）、任务注册（`xmake/tasks.lua`）与任务脚本（`xmake/scripts/`）|
 | build         | 编译的临时目录（build/build_temp，可清理）|
 | examples      | 项目的示例程序源代码，涵盖所有控件的基本用法示例（示例程序，详见 [docs/Examples.md](docs/Examples.md)）|
 | third_party   | 项目代码依赖的第三方库（`prebuilt/` 下为预编译 SDK），详细内容见后续文档|

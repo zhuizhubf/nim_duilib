@@ -190,41 +190,8 @@ if get_config("jpeg_turbo") and duilib_plat() ~= "windows" then
     add_requires("libjpeg-turbo")
 end
 
-
-task("format")
-    on_run("format_apply")
-    set_menu {
-        usage = "xmake format",
-        description = "按 .clang-format 就地格式化本地 C++ 源码（并行，跳过 3rd/tools）",
-    }
-task_end()
-
-task("format-check")
-    on_run("format_check")
-    set_menu {
-        usage = "xmake format-check",
-        description = "检查本地 C++ 源码是否符合 .clang-format（不符则非零退出）",
-    }
-task_end()
-
-task("attribute-gen")
-    on_run("attribute_gen")
-    set_menu {
-        usage = "xmake attribute-gen",
-        description = "由 attribute_defs.lua 生成 src/duilib/Utils/AttributeIds.g.h 与 .g.cpp",
-    }
-task_end()
-
-task("attribute-check")
-    on_run("attribute_check")
-    set_menu {
-        usage = "xmake attribute-check [options]",
-        description = "检查属性名登记表：生成物同步、裸字面量残留、XML 语料覆盖（--baseline=<迁移前revision> 再比对名字集合）",
-        options = {
-            {'b', "baseline", "kv", nil, "与指定 revision（迁移前的提交）比对名字集合，例如 --baseline=6cfce0f4"},
-        }
-    }
-task_end()
+-- 构建辅助任务（xmake format / format-check / attribute-gen / attribute-check）
+includes("xmake/tasks.lua")
 
 includes("xmake/third_party.lua")
 includes("xmake/duilib.lua")

@@ -1,5 +1,5 @@
-// 本文件由 tools/attribute_gen.lua 生成，请勿手改。
-// 数据来源：tools/attribute_defs.lua 的 ctrl 域（控件类名宏，保持公开 API 兼容）
+// 本文件由 xmake/scripts/attribute_gen.lua 生成，请勿手改。
+// 数据来源：xmake/scripts/attribute_defs.lua 的 ctrl 域（控件类名宏，保持公开 API 兼容）
 
 #ifndef UI_DUILIB_CTRL_DEFS_G_H_
 #define UI_DUILIB_CTRL_DEFS_G_H_

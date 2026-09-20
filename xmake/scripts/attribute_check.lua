@@ -4,13 +4,16 @@
 -- 用法（仓库根目录）：
 --     xmake attribute-check                     -- 常规：裸字面量残留 + XML 语料覆盖 + 生成物同步
 --     xmake attribute-check --baseline          -- 追加：数据表名字集合 与 git HEAD 逐域完全相等
---     xmake l attribute_check.lua --dump <path> -- 按源码抽取顺序导出 attribute_defs.lua（仅初版用）
+--     xmake l xmake/scripts/attribute_check.lua --dump <path>  -- 按源码抽取顺序导出数据表（仅初版用）
 --
 -- 说明：xmake 内建 Lua 不含 pcall，且 | 交替模式不生效、** 需要至少一层目录，
 --       因此本脚本统一采用"变量集合过滤 + 多段 glob"的写法。
 -- =============================================================================
 
-local g_repoRoot = os.curdir()
+-- 仓库根：由 xmake 提供（无论从哪个目录调用都指向工程根）
+local g_repoRoot = os.projectdir()
+-- 本脚本所在目录（xmake/scripts）：属性数据表、生成器都在这里
+local g_scriptsDir = os.scriptdir()
 
 -- XML 节点名白名单：不属于"控件类名 / 已登记节点名"但确实合法的节点，逐条注明原因。
 -- 节点名若来自运行时注册的自定义控件（AddCreateControlCallback）或窗口自定义工厂，静态无法判定。
@@ -160,7 +163,7 @@ local function sorted_keys(set)
 end
 
 local function check_generated()
-    local genScript = path.join(g_repoRoot, "attribute_gen.lua")
+    local genScript = path.join(g_scriptsDir, "attribute_gen.lua")
     if not os.isfile(genScript) then
         return true, "跳过（attribute_gen.lua 未落地仓库）"
     end
@@ -476,10 +479,8 @@ function main(...)
     }
 
     print("检查仓库: " .. g_repoRoot)
-    if os.isfile(path.join(g_repoRoot, "attribute_defs.lua")) then
-        g_dataDir = g_repoRoot
-    else
-        g_dataDir = os.scriptdir()
+    g_dataDir = g_scriptsDir
+    if not os.isfile(path.join(g_scriptsDir, "attribute_defs.lua")) then
         print("  （attribute_defs.lua 未落地仓库，数据来源: " .. g_dataDir .. "）")
     end
 

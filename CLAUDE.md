@@ -23,7 +23,11 @@ nim_duilib/
 ├── examples/            # 示例程序
 ├── docs/                # 完整文档
 ├── bin/resources/       # 主题资源（XML布局、图片、字体）
-├── xmake/               # xmake构建脚本（第三方库、duilib、示例、Skia本地包）
+├── xmake/               # xmake构建脚本
+│   ├── tasks.lua        # xmake任务注册（format / format-check / attribute-gen / attribute-check）
+│   ├── scripts/         # 任务脚本与属性名数据表（attribute_defs.lua 等）
+│   ├── manifest/        # Windows清单文件
+│   └── repos/           # 本地包仓库（Skia自动下载并编译）
 └── build/               # 编译临时目录（build/build_temp，可清理）
 ```
 
@@ -88,11 +92,12 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - XML属性值中内嵌引号用单引号`'`或花括号`{}`代替双引号
 - 控件类支持模板变体: `Label`(Control基)、`LabelBox`(Box基)、`LabelHBox`(HBox基)、`LabelVBox`(VBox基)
 - 窗口析构由框架管理，使用 `new` 创建，不需要手动 `delete`
-- **属性名统一登记表**：新增/修改 XML 属性只在 `attribute_defs.lua` 对应域列表**末尾**追加名字，然后运行 `xmake attribute-gen`；历史书写变体写进 `alias`（如 `{ name = "scroll_select", alias = { "scrollselect" } }`），别名在 `IdOf` 中归一到规范名，链上每个属性只需一个 `case`
+- **属性名统一登记表**：新增/修改 XML 属性只在 `xmake/scripts/attribute_defs.lua` 对应域列表**末尾**追加名字，然后运行 `xmake attribute-gen`；历史书写变体写进 `alias`（如 `{ name = "scroll_select", alias = { "scrollselect" } }`），别名在 `IdOf` 中归一到规范名，链上每个属性只需一个 `case`
 - `src/duilib/Utils/AttributeIds.g.h`、`AttributeIds.g.cpp`、`CtrlDefs.g.h` 是生成文件，**禁止手改**；CI 用 `xmake attribute-check` 校验生成物同步与 XML 语料覆盖
 - 属性派发一律用枚举：链上写 `switch (id)` + `case ui::attr::control::kXxx`，禁止再引入字符串比较；链上签名是 `SetAttributeById(attr::control::Id id, const DString &strValue)`，**不传名字**
 - 代码内设置属性用 `SetAttributeById(ui::attr::control::kXxx, _T("xxx"), value)`，避免重复的字符串→枚举转换
-- **控件类名域**：`ui::attr::ctrl` 覆盖全部控件类名（115 个，含宏名），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；`DUI_CTR_*` 宏由 `attribute_defs.lua` 的 `ctrl` 域生成到 `CtrlDefs.g.h`（不再手写），类名比较不再直接用宏比较
+- **控件类名域**：`ui::attr::ctrl` 覆盖全部控件类名（115 个，含宏名），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；`DUI_CTR_*` 宏由 `xmake/scripts/attribute_defs.lua` 的 `ctrl` 域生成到 `CtrlDefs.g.h`（不再手写），类名比较不再直接用宏比较
+- **脚本位置约定**：xmake 任务的注册统一写在 `xmake/tasks.lua`，任务脚本与数据表统一放 `xmake/scripts/`，仓库根目录只保留 `xmake.lua` 入口
 
 ## 构建
 - 配置: `xmake f -o build/build_temp/xmake -c`（首次会自动下载并编译 Skia，默认用 MSVC，无需 LLVM）

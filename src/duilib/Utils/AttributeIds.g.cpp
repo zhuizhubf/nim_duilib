@@ -1,5 +1,5 @@
-// 本文件由 tools/attribute_gen.lua 生成，请勿手改。
-// 数据来源：tools/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）
+// 本文件由 xmake/scripts/attribute_gen.lua 生成，请勿手改。
+// 数据来源：xmake/scripts/attribute_defs.lua（新增属性请改数据表后运行 xmake attribute-gen）
 
 #include "duilib/Utils/AttributeIds.g.h"
 #include "duilib/duilib_config.h"

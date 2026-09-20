@@ -7,9 +7,9 @@
 --   * 并行执行、按批调用，并在应用后复查，只对残留文件再应用（最多 N 轮，默认 3）；
 --   * 支持只处理指定路径（见下方"用法"）。
 --
--- 在 xmake.lua 中注册任务（脚本放项目根目录即可）：
+-- 在 xmake.lua 中注册任务（脚本与本文件放在同一目录，模块名按该目录解析）：
 --     task("format")
---         on_run("format_apply")
+--         on_run("scripts.format_apply")
 --         set_menu { usage = "xmake format", description = "..." }
 --     task_end()
 --
@@ -17,7 +17,7 @@
 --     xmake format                       -- 格式化整个项目
 --     XMAKE_FORMAT_PATHS=src,examples xmake format
 --                                        -- 只处理指定目录/文件（xmake 任务不接受位置参数）
---     xmake l format_apply.lua src       -- 脚本直跑形式，可带路径参数
+--     xmake l xmake/scripts/format_apply.lua src       -- 脚本直跑形式，可带路径参数
 --
 -- 环境变量（全部可选）：
 --   XMAKE_FORMAT_BIN         clang-format 可执行文件路径
