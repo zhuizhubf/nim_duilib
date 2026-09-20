@@ -32,16 +32,19 @@ jobs:
         include:
           - name: windows-x64-skia
             runner: windows-2022
+            plat: windows
             arch: x64
             render: skia
             runtime: MT
           - name: windows-x64-gdi
             runner: windows-2022
+            plat: windows
             arch: x64
             render: gdi
             runtime: MT
           - name: linux-x64-skia
             runner: ubuntu-22.04
+            plat: linux
             arch: x64
             render: skia
             runtime: MT
@@ -69,7 +72,8 @@ jobs:
       - name: Build core + extension + demo (root build)
         shell: bash
         run: |
-          xmake f -y -c -m release -a ${{ matrix.arch }} \
+          # Windows 上运行在 MSYS/Git Bash 中，需显式指定平台，避免 xmake 识别为 mingw。
+          xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} \
             --render=${{ matrix.render }} --scintilla=y --examples=y
           xmake -y
 
@@ -82,5 +86,5 @@ jobs:
       - name: Build core without extension
         shell: bash
         run: |
-          xmake f -y -c -m release -a ${{ matrix.arch }} --render=${{ matrix.render }} --examples=y
+          xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} --render=${{ matrix.render }} --examples=y
           xmake -y

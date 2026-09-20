@@ -68,7 +68,8 @@ bool ClickThrough::ClickThroughWindow(Window* pWindow, const UiPoint& ptMouse)
     }
     
     // 获取原生窗口句柄
-    NSWindow* pNSWindow = (NSWindow*)pWindow->NativeWnd()->GetNSWindow();
+    // xmake 的 macOS 工具链默认开启 ARC（-fobjc-arc），C 指针与 Objective-C 指针之间必须使用 __bridge 转换
+    NSWindow* pNSWindow = (__bridge NSWindow*)pWindow->NativeWnd()->GetNSWindow();
     if (pNSWindow == nullptr) {
         return false;
     }

@@ -14,12 +14,13 @@ void* GetSDLWindowContentView(SDL_Window* sdlWindow)
         return nullptr;
     }
     SDL_PropertiesID propID = ::SDL_GetWindowProperties(sdlWindow);
-    NSWindow* pNSWindow = (NSWindow*)::SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
+    // xmake 的 macOS 工具链默认开启 ARC（-fobjc-arc），C 指针与 Objective-C 指针之间必须使用 __bridge 转换
+    NSWindow* pNSWindow = (__bridge NSWindow*)::SDL_GetPointerProperty(propID, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
     NSView* pNSView = nullptr;
     if (pNSWindow != nullptr) {
         pNSView = [pNSWindow contentView] ;
     }
-    return (void*)pNSView;
+    return (__bridge void*)pNSView;
 }
 
 bool SetFocus_MacOS(void* /*pNSWindow*/)

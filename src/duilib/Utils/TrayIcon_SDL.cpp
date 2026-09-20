@@ -282,6 +282,8 @@ bool TrayIconImpl::Show()
     if (m_sdlTray == nullptr) {
         std::string tooltipUTF8 = StringConvert::TToUTF8(m_tooltip);
 
+#if defined(SDL_PROP_TRAY_CREATE_ICON_POINTER)
+        // SDL 3.5 及以上版本：支持属性方式创建托盘，并支持注册图标点击回调
         SDL_PropertiesID props = SDL_CreateProperties();
         SDL_SetPointerProperty(props, SDL_PROP_TRAY_CREATE_ICON_POINTER, m_iconSurface.m_pIconSurface);
         SDL_SetStringProperty(props, SDL_PROP_TRAY_CREATE_TOOLTIP_STRING, tooltipUTF8.c_str());
@@ -300,6 +302,11 @@ bool TrayIconImpl::Show()
             (void *) &TrayIconImpl::OnSDLTrayMiddleClickCallback);
         m_sdlTray = SDL_CreateTrayWithProperties(props);
         SDL_DestroyProperties(props);
+#else
+        // SDL 3.4 及更早版本：没有属性形式的创建接口，托盘图标本身也不支持点击回调，
+        // 只能创建图标和提示文本（xmake 官方包仓库提供的 SDL 目前属于此类版本）
+        m_sdlTray = SDL_CreateTray(m_iconSurface.m_pIconSurface, tooltipUTF8.c_str());
+#endif
     }
     m_bHidden = false;
     return m_sdlTray != nullptr;

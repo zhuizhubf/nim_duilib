@@ -28,6 +28,7 @@ jobs:
         include:
           - name: windows-x64
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x64
             xmake_flags: ''
             pkg_platform: windows
@@ -39,6 +40,7 @@ jobs:
             smoke: false
           - name: windows-x86
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x86
             xmake_flags: ''
             pkg_platform: windows
@@ -50,6 +52,7 @@ jobs:
             smoke: false
           - name: windows-x64-sdl
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x64
             xmake_flags: '--sdl=y'
             pkg_platform: windows
@@ -61,6 +64,7 @@ jobs:
             smoke: false
           - name: windows-x64-md
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x64
             xmake_flags: '--md=y'
             pkg_platform: windows
@@ -72,6 +76,7 @@ jobs:
             smoke: false
           - name: windows-x64-gdi
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x64
             xmake_flags: '--render=gdi'
             pkg_platform: windows
@@ -83,6 +88,7 @@ jobs:
             smoke: false
           - name: windows-x64-cef
             runner: windows-2022
+            xmake_plat: windows
             xmake_arch: x64
             xmake_flags: '--cef=y'
             pkg_platform: windows
@@ -95,6 +101,7 @@ jobs:
             package: false
           - name: linux-x64
             runner: ubuntu-22.04
+            xmake_plat: linux
             xmake_arch: x64
             xmake_flags: ''
             pkg_platform: linux
@@ -106,6 +113,7 @@ jobs:
             smoke: true
           - name: macos-arm64
             runner: macos-15
+            xmake_plat: macosx
             xmake_arch: arm64
             xmake_flags: ''
             pkg_platform: macos
@@ -169,7 +177,9 @@ jobs:
           XMAKE_BUILD_FLAGS: ${{ matrix.xmake_flags }}
         run: |
           set -euo pipefail
-          xmake f -y -o build/build_temp/xmake -c -m release -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}
+          # Windows 上的 shell 是 MSYS/Git Bash，xmake 会据此把平台识别为 mingw，
+          # 导致 duilib-skia 等仅支持 windows/linux/macosx 的包被判为不支持，这里显式指定平台。
+          xmake f -y -o build/build_temp/xmake -c -m release -p ${{ matrix.xmake_plat }} -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}
           xmake -y
 
       - name: Check attribute registry

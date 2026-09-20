@@ -50,7 +50,11 @@ for _, name in ipairs(examples) do
 
         add_files(path.join(exdir, "*.cpp"))
         if duilib_is_macos() then
-            add_files(path.join(exdir, "*.mm"))
+            -- 只有部分示例提供 .mm 源码，先探测再添加，避免 xmake 报 "cannot match add_files" 警告
+            local mmfiles = os.files(path.join(exdir, "*.mm"))
+            if #mmfiles > 0 then
+                add_files(mmfiles)
+            end
         end
 
         -- 头文件目录：仓库根目录（duilib/duilib.h 等）、示例自己的目录
@@ -76,6 +80,12 @@ for _, name in ipairs(examples) do
         for _, dep in ipairs(duilib_module_targets()) do
             add_deps(dep)
             add_linkorders("duilib", dep)
+        end
+
+        -- SDL3：部分示例直接调用 SDL API（如 ChildWindow 的 SDL 绘制），
+        -- 需要显式引用包，才能拿到 SDL3 的头文件目录和链接库
+        if duilib_sdl_enabled() then
+            add_packages("libsdl3")
         end
 
         if is_cef_example and get_config("cef") then
