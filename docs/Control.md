@@ -780,7 +780,8 @@ ControlDragable 控件继承了 `Control` 属性，更多可用属性请参考`C
 | F12 | true | bool | 是否允许F12快捷键(显示/隐藏开发者工具) |
 | download_favicon_image | false | bool | 是否下载网站的FavIcon图标 |
 
-CefControl 控件继承了 `Control` 属性，更多可用属性请参考`Control`的属性
+CefControl 控件继承了 `Control` 属性，更多可用属性请参考`Control`的属性。
+该控件由扩展 [extensions/cef](../extensions/cef/README.md) 提供，构建与应用接入方式见扩展文档。
 
 ## WebView2Control 控件（继承 Control 属性）
 | 属性名称 | 默认值 | 参数类型 | 用途 |
@@ -791,7 +792,8 @@ CefControl 控件继承了 `Control` 属性，更多可用属性请参考`Contro
 | F12 | true | bool | 是否允许F12快捷键(显示/隐藏开发者工具) |
 | devtools_enabled | true | bool | 是否允许打开开发者工具 |
 
-WebView2Control 控件继承了 `Control` 属性，更多可用属性请参考`Control`的属性
+WebView2Control 控件继承了 `Control` 属性，更多可用属性请参考`Control`的属性。
+该控件由扩展 [extensions/webview2](../extensions/webview2/README.md) 提供，构建与应用接入方式见扩展文档。
 
 ## IconControl 控件（继承 Control 属性）
 IconControl 控件继承了 `Control` 属性，更多可用属性请参考`Control`的属性

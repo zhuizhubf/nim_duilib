@@ -26,7 +26,8 @@
 ## 目录结构
 | 目录          | 说明 |
 | :---          | :--- |
-| src           | 所有库的源代码：核心库 `src/duilib`，以及 `src/render`、`src/render-skia`、`src/render-gdi`、`src/text`、`src/cef`、`src/webview2` 等模块|
+| src           | 库的源代码：核心库 `src/duilib`，以及 `src/render`、`src/render-skia`、`src/render-gdi`、`src/text` 等模块|
+| extensions    | 可选控件扩展：`extensions/cef`（CEF 浏览器控件）、`extensions/webview2`（WebView2 控件）、`extensions/scintilla`（Scintilla 编辑器控件），详见 [extensions/README.md](extensions/README.md)|
 | docs          | 项目的说明文档，包括各个控件的功能介绍与属性列表说明文档|
 | bin           | 各个示例程序输出目录，包含预设的皮肤和语言文件以及 CEF 依赖|
 | licenses      | 引用的其他开源代码对应的licenses文件|
@@ -159,9 +160,9 @@
 |SDL       |项目未包含SDL源码           | 跨平台窗口管理                     |[SDL.LICENSE.txt](licenses/SDL.LICENSE.txt)|zlib 许可协议|
 |duilib    |                            | NIM_Duilib_Framework<br>是基于duilib开发  |[duilib.LICENSE.txt](licenses/duilib.LICENSE.txt)|BSD 2条款许可协议|
 |NIM_Duilib<br>Framework|               | 本项目是基于<br>NIM_Duilib_Framework开发   |[NIM_Duilib_Framework.LICENSE.txt](licenses/NIM_Duilib_Framework.LICENSE.txt)|MIT 许可协议|
-|libcef    |third_party/prebuilt/libcef   | 用于加载CEF模块|[libcef.LICENSE.txt](licenses/libcef.LICENSE.txt)|BSD 3条款许可协议|
+|libcef    |extensions/cef/third_party/prebuilt/libcef   | 用于加载CEF模块|[libcef.LICENSE.txt](extensions/cef/licenses/libcef.LICENSE.txt)|BSD 3条款许可协议|
 |udis86    |third_party/libudis86| 反汇编计算完整性指令最短长度         |[udis86.LICENSE.txt](licenses/udis86.LICENSE.txt)|BSD 2条款许可协议|
-|WebView2  |third_party/<br>Microsoft.Web.WebView2| 支持WebView2控件 |[Microsoft.Web.WebView2.LICENSE.txt](licenses/Microsoft.Web.WebView2.LICENSE.txt)|BSD 3条款许可协议|
+|WebView2  |extensions/webview2/third_party/<br>prebuilt/Microsoft.Web.WebView2| 支持WebView2控件 |[Microsoft.Web.WebView2.LICENSE.txt](extensions/webview2/licenses/Microsoft.Web.WebView2.LICENSE.txt)|BSD 3条款许可协议|
 |libpag    |third_party/prebuilt/libpag   | 支持PAG动画文件<br>（该功能默认未启用，详见后续文档） |[libpag.LICENSE.txt](licenses/libpag.LICENSE.txt)|Apache License Version 2.0(主体)<br>libpag依赖的第三方组件的<br>授权协议很多，详见目录:<br>`third_party/prebuilt/libpag/licenses`<br>中的文件。如果介意libpag的授权协议<br>（包括主体协议/第三方组件协议），<br>可以不启用libpag。|
 
 ## 界面效果预览
@@ -217,9 +218,9 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | `-a x86` / `-a x64` | 32 位/64 位（Windows 支持；Linux/macOS/FreeBSD 只支持 64 位）|
 | `--examples=n` | 只编译库，不编译示例程序 |
 | `--sdl=y` | 启用 SDL3（Windows 默认关闭，Linux/macOS/FreeBSD 始终启用）|
-| `--cef=y` | 启用 CEF：编译 libcef_dll_wrapper 及 cef/CefBrowser 示例 |
+| `--cef=y` | 启用 CEF 扩展（extensions/cef）：编译 libcef_dll_wrapper 及 cef/CefBrowser 示例 |
 | `--cef109=y` | 使用 CEF 109 版本（兼容 Win7）|
-| `--webview2=n` | 关闭 WebView2 控件（Windows，默认开启）|
+| `--webview2=n` | 关闭 WebView2 扩展（extensions/webview2，Windows 默认开启）|
 | `--pag=y` | 启用 libpag（需要先自行编译 libpag.lib 和 libpag.dll）|
 | `--jpeg_turbo=y` | 启用 libjpeg-turbo 解码 JPEG 图片 |
 | `--md=y` | MSVC 运行库使用 /MD（默认 /MT）|
@@ -240,8 +241,8 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | SDL3 | xmake 官方包仓库自动获取 |
 | zlib、libpng(含APNG)、giflib、libwebp、cximage | 使用仓库内源码编译 |
 | libjpeg-turbo | 使用仓库内预编译库（Windows），其他平台使用 xmake 包 |
-| CEF | 可选：需要自行下载 CEF 运行库，详见 [docs/CEF.md](docs/CEF.md) |
-| WebView2 | 可选：使用仓库内的 WebView2 SDK（Windows 默认开启）|
+| CEF | 可选扩展（`extensions/cef`）：SDK 在扩展内，需要自行下载 CEF 运行库，详见 [extensions/cef/README.md](extensions/cef/README.md) 与 [docs/CEF.md](docs/CEF.md) |
+| WebView2 | 可选扩展（`extensions/webview2`）：使用扩展内自带的 WebView2 SDK（Windows 默认开启），详见 [extensions/webview2/README.md](extensions/webview2/README.md) |
 | libpag | 可选：需要自行编译 libpag.lib/libpag.dll，详见 [third_party/prebuilt/libpag/windows/libpag-build.md](third_party/prebuilt/libpag/windows/libpag-build.md) |
 
 ### 六、平台说明
@@ -255,7 +256,8 @@ xmake run basic                          # 运行示例程序（可执行文件�
 
 | 构建任务 | 运行环境 | 说明 |
 | :--- | :--- | :--- |
-| windows-x64 / windows-x86 | Windows Server 2022 + MSVC | 默认配置（Skia 渲染、/MT 运行库、WebView2） |
+| windows-x64 / windows-x86 | Windows Server 2022 + MSVC | 默认配置（Skia 渲染、/MT 运行库、WebView2 扩展） |
+| windows-x64-cef | Windows Server 2022 + MSVC | 启用 CEF 扩展（`--cef=y`）：libcef_dll_wrapper、duilib-cef 与 CEF 示例 |
 | windows-x64-sdl / windows-x64-md / windows-x64-gdi | Windows Server 2022 + MSVC | 可选配置：SDL3 窗口、/MD 运行库、GDI 渲染 |
 | linux-x64 | Ubuntu 22.04 | SDL3 窗口；在虚拟显示（Xvfb）下运行示例做冒烟验证 |
 | macos-arm64 | macOS 15（Apple Silicon） | SDL3 窗口 |

@@ -82,8 +82,8 @@
 | ColorPickerStandard | "ColorPickerStandard"| [duilib/Control/ColorPickerStandard.h](../src/duilib/Control/ColorPickerStandard.h) | |
 | ColorPickerStandardGray | "ColorPickerStandardGray"| [duilib/Control/ColorPickerStandardGray.h](../src/duilib/Control/ColorPickerStandardGray.h) | |
 | ColorPickerCustom | "ColorPickerCustom"| [duilib/Control/ColorPickerCustom.h](../src/duilib/Control/ColorPickerCustom.h) | |
-| CefControl | "CefControl"| [cef/CefControl.h](../src/cef/CefControl.h) | |
-| WebView2Control | "WebView2Control"| [webview2/WebView2Control.h](../src/webview2/WebView2Control.h) | |
+| CefControl | "CefControl"| [cef/CefControl.h](../extensions/cef/src/cef/CefControl.h) | 扩展控件（extensions/cef） |
+| WebView2Control | "WebView2Control"| [webview2/WebView2Control.h](../extensions/webview2/src/webview2/WebView2Control.h) | 扩展控件（extensions/webview2） |
 
 ## XML文件中各窗口相关控件的节点名称
 | 类名称 | XML节点名称 |关联头文件| 备注 |

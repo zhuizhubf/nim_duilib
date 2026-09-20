@@ -14,6 +14,8 @@
 * [XML文件中直接响应控件的事件](XmlEvents.md)
 * [主题参考文档](Theme.md)
 * [CEF控件](CEF.md)
+* [扩展说明：CEF 控件（extensions/cef）](../extensions/cef/README.md)
+* [扩展说明：WebView2 控件（extensions/webview2）](../extensions/webview2/README.md)
 * [编译方式（xmake）](../README.md#编译xmake)
 
 ## 项目中主要类的简表
@@ -268,8 +270,8 @@
 
 | 类名称 | 关联头文件| 用途 |
 | :--- | :--- | :--- |
-| CefManager | [cef/CefManager.h](../src/cef/CefManager.h) | CEF控件管理器，负责CEF模块的初始化和反初始化相关工作 |
-| CefControl | [cef/CefControl.h](../src/cef/CefControl.h) | CEF控件接口，提供网页浏览相关的基本功能及事件的接受等功能 |
-| CefControlEvent | [cef/CefControlEvent.h](../src/cef/CefControlEvent.h) | CEF控件的网页浏览相关事件接收接口 |
-| CefControlNative | [cef/CefControlNative.h](../src/cef/CefControlNative.h) | CEF控件窗口模式的封装 |
-| CefControlOffScreen | [cef/CefControlOffScreen.h](../src/cef/CefControlOffScreen.h) | CEF控件离屏渲染模式的封装 |
+| CefManager | [cef/CefManager.h](../extensions/cef/src/cef/CefManager.h) | CEF控件管理器，负责CEF模块的初始化和反初始化相关工作 |
+| CefControl | [cef/CefControl.h](../extensions/cef/src/cef/CefControl.h) | CEF控件接口，提供网页浏览相关的基本功能及事件的接受等功能 |
+| CefControlEvent | [cef/CefControlEvent.h](../extensions/cef/src/cef/CefControlEvent.h) | CEF控件的网页浏览相关事件接收接口 |
+| CefControlNative | [cef/CefControlNative.h](../extensions/cef/src/cef/CefControlNative.h) | CEF控件窗口模式的封装 |
+| CefControlOffScreen | [cef/CefControlOffScreen.h](../extensions/cef/src/cef/CefControlOffScreen.h) | CEF控件离屏渲染模式的封装 |

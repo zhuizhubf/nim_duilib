@@ -1,6 +1,10 @@
 # CEF控件（CefControl）    
 nim_duilib的CEF控件（CefControl）是对libcef的集成封装，将CEF组件相关的功能封装成为duilib的一个控件，使得网页浏览功能能够与界面库整合在一起使用。libcef（Chromium Embedded Framework，简称CEF）‌是一个开源框架，允许开发者在其应用程序中嵌入Chromium（Google Chrome浏览器的开源基础）浏览器功能。通过libcef，开发者可以将网页渲染、JavaScript执行及HTML5支持等功能集成到自己的应用中，而无需用户单独安装浏览器‌。  
 
+> 说明：CEF 控件已经迁移到扩展目录 `extensions/cef/`（源码、libcef SDK 与许可均在扩展内），
+> 通过仓库根目录的构建入口 `--cef=y`（或 `--cef109=y`）启用；扩展的目录结构、
+> 构建方式与应用接入步骤见 [extensions/cef/README.md](../extensions/cef/README.md)。
+
 ## 一、libcef的核心功能与架构
 ### 功能定义
 libcef.dll/libcef.so是CEF的核心动态链接库，提供Chromium的浏览器内核功能，包括：    
@@ -16,11 +20,11 @@ libcef.dll/libcef.so是CEF的核心动态链接库，提供Chromium的浏览器�
 | 类名称 | 关联头文件| 用途 |
 | :--- | :--- | :--- |
 | 接口类 | [duilib/duilib_cef.h](../src/duilib/duilib_cef.h) | CEF控件的接口类，应用程序需要包含这个头文件`#include "duilib/duilib_cef.h"` |
-| CefManager | [cef/CefManager.h](../src/cef/CefManager.h) | CEF控件管理器，负责CEF模块的初始化和反初始化相关工作 |
-| CefControl | [cef/CefControl.h](../src/cef/CefControl.h) | CEF控件接口，提供网页浏览相关的基本功能及事件的接受等功能 |
-| CefControlEvent | [cef/CefControlEvent.h](../src/cef/CefControlEvent.h) | CEF控件的网页浏览相关事件接收接口 |
-| CefControlNative | [cef/CefControlNative.h](../src/cef/CefControlNative.h) | CEF控件窗口模式的封装 |
-| CefControlOffScreen | [cef/CefControlOffScreen.h](../src/cef/CefControlOffScreen.h) | CEF控件离屏渲染模式的封装 |
+| CefManager | [cef/CefManager.h](../extensions/cef/src/cef/CefManager.h) | CEF控件管理器，负责CEF模块的初始化和反初始化相关工作 |
+| CefControl | [cef/CefControl.h](../extensions/cef/src/cef/CefControl.h) | CEF控件接口，提供网页浏览相关的基本功能及事件的接受等功能 |
+| CefControlEvent | [cef/CefControlEvent.h](../extensions/cef/src/cef/CefControlEvent.h) | CEF控件的网页浏览相关事件接收接口 |
+| CefControlNative | [cef/CefControlNative.h](../extensions/cef/src/cef/CefControlNative.h) | CEF控件窗口模式的封装 |
+| CefControlOffScreen | [cef/CefControlOffScreen.h](../extensions/cef/src/cef/CefControlOffScreen.h) | CEF控件离屏渲染模式的封装 |
 
 ## 三、CEF控件（CefControl）相关的示例程序
 | 示例程序 | 说明 |
@@ -136,7 +140,7 @@ resources.pak
 locales（目录，里面包含zh-CN.pak、en-US.pak等语言包）
 ```
 ### 3. 程序的Makefile或者CMakeLists.txt里面需要添加的内容
-* 头文件包含路径中，添加`third_party/prebuilt/libcef/libcef_linux`    
+* 头文件包含路径中，添加`extensions/cef/third_party/prebuilt/libcef/libcef_linux`    
 * 库文件包含路径中，添加`bin/libcef_linux`（这个目录包含了libcef的动态库文件：libcef.so等）    
 * 设置链接依赖的库，添加` libcef.so cef_dll_wrapper X11`    
 * 将libcef的二进制文件和资源文件（libcef.so等）放在以下目录`bin/libcef_linux`中。    

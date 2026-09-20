@@ -6,7 +6,7 @@
 
 保留 `duilib` 作为核心库名称。使用库的工程需要额外链接所需的渲染后端和图片解码模块。
 
-所有库源码位于 `src/` 下（核心库为 `src/duilib`），包含根为 `<repo>/src` 与仓库根 `<repo>`（后者用于 `third_party/...`）。核心库的公开包含路径 `duilib/...` 保持不变。
+核心库与渲染/文本模块的源码位于 `src/` 下（核心库为 `src/duilib`），包含根为 `<repo>/src` 与仓库根 `<repo>`（后者用于 `third_party/...`）。可选控件扩展的源码位于 `extensions/` 下（`extensions/cef`、`extensions/webview2`、`extensions/scintilla`）。核心库的公开包含路径 `duilib/...` 保持不变。
 
 ## 静态库
 
@@ -20,12 +20,12 @@
 | `duilib-image-svg-nanosvg` | 基于 nanosvg 的独立 SVG 解码模块，不依赖渲染后端 |
 | `duilib-image-svg-skia` | 基于 Skia 的 SVG 解码模块 |
 | `duilib-image-lottie-skia` | 基于 Skia 的 Lottie 解码模块，不依赖 `duilib-render-skia` |
-| `duilib-cef` | CEF 控件模块（可选，`--cef=y` 时编译并链接；源码位于 `src/cef`） |
-| `duilib-webview2` | WebView2 控件模块（可选，Windows + `--webview2=y` 时编译并链接；源码位于 `src/webview2`） |
+| `duilib-cef` | CEF 控件扩展（可选，`--cef=y` 时编译并链接；源码位于 `extensions/cef`） |
+| `duilib-webview2` | WebView2 控件扩展（可选，Windows + `--webview2=y` 时编译并链接；源码位于 `extensions/webview2`） |
 
 图片解码模块通过 `IRenderFactory::CreateBitmap` 创建 `IBitmap`，因此可以配合任意当前渲染后端使用。
 
-CEF 与 WebView2 控件通过 `GlobalManager::AddCreateControlCallback` 自注册，核心库不包含这两个模块的源码与头文件。**使用这两个控件的工程需要额外链接 `duilib-cef` / `duilib-webview2`**，并照常调用 `CefManager::Initialize` / `WebView2Manager::Initialize` 注册控件。
+CEF 与 WebView2 控件通过 `GlobalManager::AddCreateControlCallback` 自注册，核心库既不包含这两个模块的源码，也不包含它们的 SDK；源码与 SDK 分别位于 `extensions/cef`、`extensions/webview2`。**使用这两个控件的工程需要额外链接 `duilib-cef` / `duilib-webview2`**，把扩展的 `src` 根与 SDK 目录加入头文件包含目录，并照常调用 `CefManager::Initialize` / `WebView2Manager::Initialize` 注册控件。详见 [extensions/cef/README.md](../extensions/cef/README.md) 与 [extensions/webview2/README.md](../extensions/webview2/README.md)。
 
 ## 构建配置
 

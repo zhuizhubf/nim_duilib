@@ -10,18 +10,16 @@ nim_duilib 是基于 Skia 渲染引擎的跨平台 C++ UI 框架，采用 XML �
 ## 项目结构
 ```
 nim_duilib/
-├── duilib/              # 核心库源码
-│   ├── Core/            # 窗口、控件基类、事件、管理器
-│   ├── Control/         # UI控件（Button, Label, RichEdit, TreeView...）
-│   ├── Box/             # 容器控件（VBox, HBox, ListBox, TabBox...）
-│   ├── Layout/          # 布局引擎（HLayout, VLayout, GridLayout...）
-│   ├── Animation/       # 动画系统
-│   ├── Image/           # 图片处理（PNG/SVG/GIF/WEBP/APNG/Lottie/PAG）
-│   ├── Render/          # 渲染接口
-│   ├── RenderSkia/      # Skia渲染实现
-│   ├── Utils/           # 工具类（WindowImplBase, FilePath...）
-│   ├── CEFControl/      # CEF浏览器集成
-│   └── WebView2/        # WebView2控件
+├── src/                 # 所有库源码
+│   ├── duilib/          # 核心库（含 Core/ Control/ Box/ Layout/ Animation/ Image/ Utils/）
+│   ├── text/            # 后端无关的文本布局（duilib-text）
+│   ├── render/          # 渲染接口
+│   ├── render-skia/     # Skia渲染实现
+│   └── render-gdi/      # Windows GDI/GDI+ 渲染实现
+├── extensions/          # 可选控件扩展（cef / webview2 / scintilla）
+│   ├── cef/             # CEF浏览器控件扩展（--cef=y）
+│   ├── webview2/        # WebView2控件扩展（Windows默认启用）
+│   └── scintilla/       # DUI 原生 Scintilla 编辑控件扩展（--scintilla=y）
 ├── examples/            # 示例程序
 ├── docs/                # 完整文档
 ├── bin/resources/       # 主题资源（XML布局、图片、字体）
