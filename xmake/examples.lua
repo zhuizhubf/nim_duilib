@@ -39,6 +39,7 @@ end
 for _, name in ipairs(examples) do
     local exdir = path.join(exroot, name)
     local is_cef_example = (name == "cef") or (name == "CefBrowser")
+    local is_webview2_example = (name == "WebView2") or (name == "WebView2Browser")
 
     target(name)
         set_kind("binary")
@@ -57,6 +58,12 @@ for _, name in ipairs(examples) do
         if name == "ScintillaDemo" then
             add_includedirs(duilib_scintilla_includedirs())
         end
+        if is_cef_example then
+            add_includedirs(duilib_cef_includedirs())
+        end
+        if is_webview2_example then
+            add_includedirs(duilib_webview2_includedirs())
+        end
 
         -- CefBrowser 示例的额外源码目录
         if name == "CefBrowser" then
@@ -73,7 +80,6 @@ for _, name in ipairs(examples) do
 
         if is_cef_example and get_config("cef") then
             add_deps(duilib_cef_wrapper_name())
-            add_includedirs(path.join(DUILIB_THIRD_DIR, "prebuilt/libcef", duilib_cef_src_dir()))
         end
 
         if duilib_is_windows() then
@@ -103,6 +109,8 @@ for _, name in ipairs(examples) do
             end
             if is_cef_example then
                 add_ldflags("/DELAYLOAD:libcef.dll", {force = true})
+                -- 使用 /DELAYLOAD 时需要延迟加载助手（__delayLoadHelper2）
+                add_syslinks("delayimp")
             end
         elseif duilib_is_linux() then
             add_links("X11", "freetype", "fontconfig")

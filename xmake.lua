@@ -52,13 +52,16 @@ add_repositories("duilib-repo xmake/repos")
 
 -- 公共变量（xmake/ 目录下的脚本可以直接使用）
 DUILIB_ROOT      = os.projectdir()
--- 库源码根目录，同时作为包含根：duilib/、render/、render-skia/、render-gdi/、text/、cef/、webview2/
+-- 库源码根目录，同时作为包含根：duilib/、render/、render-skia/、render-gdi/、text/
 DUILIB_SRC_DIR   = path.join(DUILIB_ROOT, "src")
 -- 核心库源码目录（保持 duilib/ 名称，公开包含路径不变）
 DUILIB_CORE_DIR  = path.join(DUILIB_SRC_DIR, "duilib")
 -- 第三方依赖目录（含 prebuilt/ 预编译 SDK）
 DUILIB_THIRD_DIR = path.join(DUILIB_ROOT, "third_party")
+-- 扩展目录（可选控件扩展，拥有自己的源码、第三方依赖、文档与许可）
 DUILIB_EXT_SCINTILLA_DIR = path.join(DUILIB_ROOT, "extensions", "scintilla")
+DUILIB_EXT_CEF_DIR       = path.join(DUILIB_ROOT, "extensions", "cef")
+DUILIB_EXT_WEBVIEW2_DIR  = path.join(DUILIB_ROOT, "extensions", "webview2")
 DUILIB_LIB_DIR   = path.join(DUILIB_ROOT, "lib")
 DUILIB_BIN_DIR   = path.join(DUILIB_ROOT, "bin")
 DUILIB_SKIA_LIBS = {"svg", "skshaper", "skottie", "sksg", "jsonreader", "skia"}

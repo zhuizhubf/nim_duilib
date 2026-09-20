@@ -250,17 +250,20 @@ if get_config("cef") and not duilib_is_freebsd() then
         set_languages("c++17")
         add_deps("duilib")
         add_files(
-            path.join(DUILIB_SRC_DIR, "cef", "*.cpp"),
-            path.join(DUILIB_SRC_DIR, "cef", "internal", "*.cpp")
+            path.join(DUILIB_EXT_CEF_DIR, "src", "cef", "*.cpp"),
+            path.join(DUILIB_EXT_CEF_DIR, "src", "cef", "internal", "*.cpp")
         )
         if duilib_is_windows() then
-            add_files(path.join(DUILIB_SRC_DIR, "cef", "internal/Windows", "*.cc"))
+            add_files(
+                path.join(DUILIB_EXT_CEF_DIR, "src", "cef", "internal/Windows", "*.cpp"),
+                path.join(DUILIB_EXT_CEF_DIR, "src", "cef", "internal/Windows", "*.cc")
+            )
         end
         if duilib_is_macos() then
-            add_files(path.join(DUILIB_SRC_DIR, "cef", "*.mm"))
+            add_files(path.join(DUILIB_EXT_CEF_DIR, "src", "cef", "*.mm"))
         end
-        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
-                        path.join(DUILIB_THIRD_DIR, "prebuilt/libcef", duilib_cef_src_dir()))
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
+        add_includedirs(duilib_cef_includedirs())
     target_end()
 end
 
@@ -274,10 +277,10 @@ if duilib_webview2_enabled() then
         duilib_target_settings()
         duilib_common_defines()
         add_deps("duilib")
-        add_files(path.join(DUILIB_SRC_DIR, "webview2", "*.cpp"))
-        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT,
-                        path.join(DUILIB_THIRD_DIR, "prebuilt/Microsoft.Web.WebView2/build/native/include"))
-        add_linkdirs(path.join(DUILIB_THIRD_DIR, "prebuilt/Microsoft.Web.WebView2/build/native", duilib_arch_name()))
+        add_files(path.join(DUILIB_EXT_WEBVIEW2_DIR, "src", "webview2", "*.cpp"))
+        add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
+        add_includedirs(duilib_webview2_includedirs())
+        add_linkdirs(path.join(duilib_webview2_sdk_dir(), "build/native", duilib_arch_name()))
         add_links("WebView2LoaderStatic")
         add_syslinks("advapi32", "ole32", "shell32", "version", "wininet")
     target_end()

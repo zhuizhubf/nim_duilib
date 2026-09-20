@@ -212,6 +212,34 @@ function duilib_webview2_targets()
     return targets
 end
 
+-- CEF 扩展（extensions/cef）：源码/头文件目录与预编译 SDK 目录
+function duilib_cef_sdk_dir()
+    return path.join(DUILIB_EXT_CEF_DIR, "third_party", "prebuilt", "libcef", duilib_cef_src_dir())
+end
+
+-- CEF 扩展的包含目录：扩展 src 根解析 "cef/..."，扩展根解析 "third_party/prebuilt/..."，
+-- SDK 根解析 CEF 自身的 "include/cef_*.h"
+function duilib_cef_includedirs()
+    return {
+        path.join(DUILIB_EXT_CEF_DIR, "src"),
+        DUILIB_EXT_CEF_DIR,
+        duilib_cef_sdk_dir()
+    }
+end
+
+-- WebView2 扩展（extensions/webview2）：源码/头文件目录与预编译 SDK 目录
+function duilib_webview2_sdk_dir()
+    return path.join(DUILIB_EXT_WEBVIEW2_DIR, "third_party", "prebuilt", "Microsoft.Web.WebView2")
+end
+
+-- WebView2 扩展的包含目录：扩展 src 根解析 "webview2/..."，扩展根解析 "third_party/prebuilt/..."
+function duilib_webview2_includedirs()
+    return {
+        path.join(DUILIB_EXT_WEBVIEW2_DIR, "src"),
+        DUILIB_EXT_WEBVIEW2_DIR
+    }
+end
+
 -- Scintilla 扩展（可选，默认关闭）
 function duilib_scintilla_enabled()
     return get_config("scintilla") == true

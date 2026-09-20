@@ -18,15 +18,14 @@
 | xml         | 2025-03-11 |v1.15（2025-01-11）  |无 |https://github.com/zeux/pugixml| pugixml|
 | convert_utf | 2025-03-11 |v20.1.0|无 |https://releases.llvm.org      | 下载最新版的源码包，解压后找到这两个文件  |
 | udis86      | 2025-04-11 |v1.7.2 |有 |https://sourceforge.net/projects/udis86/      |  udint.h 有修改|
-| libcef/libcef_win_109|2025-03-10|<div style="width: 160px">cef_binary 109.1.18+gf1c41e4<br>chromium-109.0.5414.120</div>|有 |<div style="width: 360px">x64版本：https://cef-builds.spotifycdn.com/index.html#windows64:109 <br> Win32版本：https://cef-builds.spotifycdn.com/index.html#windows32:109</div>| <div style="width: 360px">x64版本：https://cef-builds.spotifycdn.com/cef_binary_109.1.18%2Bgf1c41e4%2Bchromium-109.0.5414.120_windows64.tar.bz2 <br> Win32版本：https://cef-builds.spotifycdn.com/cef_binary_109.1.18%2Bgf1c41e4%2Bchromium-109.0.5414.120_windows32.tar.bz2</div>|
-| libcef/libcef_win    |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">x64版本：https://cef-builds.spotifycdn.com/index.html#windows64:142</div>     | <div style="width: 360px">x64版本：  https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_windows64.tar.bz2 </div>|
-| libcef/libcef_win    |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">Win32版本：https://cef-builds.spotifycdn.com/index.html#windows32:142</div>   | <div style="width: 360px">Win32版本：https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_windows32.tar.bz2 </div>|
-| libcef/libcef_linux  |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">x64版本：https://cef-builds.spotifycdn.com/index.html#linux64:142</div>       | <div style="width: 360px">x64版本：  https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_linux64.tar.bz2 </div>|
-| libcef/libcef_linux  |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">ARM64版本：https://cef-builds.spotifycdn.com/index.html#linuxarm64:142</div>  | <div style="width: 360px">ARM64版本：https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_linuxarm64.tar.bz2 </div>|
-| libcef/libcef_macos  |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">x64版本：https://cef-builds.spotifycdn.com/index.html#macosx64:142</div>      | <div style="width: 360px">x64版本：  https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_macosx64.tar.bz2 </div>|
-| libcef/libcef_macos  |2025-11-11|<div style="width: 160px">cef_binary_142.0.10+g29548e2+chromium-142.0.7444.135</div> |有 |<div style="width: 360px">ARM64版本：https://cef-builds.spotifycdn.com/index.html#macosarm64:142</div>  | <div style="width: 360px">ARM64版本：https://cef-builds.spotifycdn.com/cef_binary_142.0.10%2Bg29548e2%2Bchromium-142.0.7444.135_macosarm64.tar.bz2 </div>|
-| WebView2      |2025-06-28|1.0.3296.44 |无 | 通过 NuGet 安装 WebView2 SDK: <br>Microsoft.Web.WebView2| |
 | libpag        |2025-11-13|main分支 |无 | https://github.com/Tencent/libpag| 无修改 |
+
+> 说明：libcef 与 Microsoft.Web.WebView2 已随 CEF / WebView2 控件迁移到扩展目录，
+> 不再位于 `third_party/`：
+> - libcef：[extensions/cef/third_party/prebuilt/libcef](../extensions/cef/third_party/prebuilt/libcef)
+>   版本与更新说明见 [extensions/cef/README.md](../extensions/cef/README.md)
+> - WebView2：[extensions/webview2/third_party/prebuilt/Microsoft.Web.WebView2](../extensions/webview2/third_party/prebuilt/Microsoft.Web.WebView2)
+>   版本与许可见 [extensions/webview2/README.md](../extensions/webview2/README.md)
 ## libpng 库更新说明
 1. 下载最新版本的压缩包：https://github.com/pnggroup/libpng/ 或者 https://sourceforge.net/projects/libpng/
 2. 下载压缩包后，解压，进入解压后的目录，按照INSTALL的说明，使用VS的命令行模式，运行：`nmake -f scripts\makefile.vcwin32`，会生成`pnglibconf.h`文件
@@ -43,20 +42,5 @@
 8. 修改`duilib\third_party\libpng\pngstruct.h`，同步修改内容；
 
 ## libcef 库更新说明
-1. libcef对CMakeLists.txt文件和VC工程文件是有修改的，详情如下：    
- - libcef/libcef_win/include/cef_config.h（修改内容：CEF_V8_ENABLE_SANDBOX 这个宏，只有64位系统定义，32位系统不需要定义）
- - libcef/libcef_win/CMakeLists.txt    
- - libcef/libcef_win/libcef_dll_wrapper.vcxproj    
- - libcef/libcef_win/libcef_dll_wrapper.vcxproj.filters    
- - libcef/libcef_win_109/CMakeLists.txt    
- - libcef/libcef_win_109/libcef_dll_wrapper_109.vcxproj   
- - libcef/libcef_win_109/libcef_dll_wrapper_109.vcxproj.filters     
- - libcef/libcef_linux/CMakeLists.txt    
- - libcef/libcef_macos/CMakeLists.txt    
-
-以上文件有修改，更新的时候注意对比。
-
-2. 项目中其他需要修改的内容
- - `README.md` CEF版本号需要修改    
- - `docs\CEF.md`    
- - `xmake.lua` 与 `xmake\` 目录（CEF 相关的编译配置）    
+libcef SDK 已迁移到扩展目录，更新说明随 SDK 一并迁移到
+[extensions/cef/README.md](../extensions/cef/README.md) 的“SDK 更新说明”章节。

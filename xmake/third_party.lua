@@ -81,7 +81,7 @@ target_end()
 -- CEF 封装库（libcef_dll_wrapper，仅 Windows + --cef=y 时编译）
 -- -----------------------------------------------------------------------------
 if get_config("cef") then
-    local cefroot = path.join(thirdroot, "prebuilt/libcef", duilib_cef_src_dir())
+    local cefroot = duilib_cef_sdk_dir()
     local wraproot = path.join(cefroot, "libcef_dll")
     local cefarch = (duilib_arch_name() == "x86") and "Win32" or "x64"
 
