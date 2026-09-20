@@ -126,8 +126,8 @@ DPI：`LogPixelsY()` 返回 `96 * 显示缩放百分比 / 100`，Scintilla 通�
 
 - 主工程：`xmake f --scintilla=y` → `xmake`，同时构建扩展与 `ScintillaDemo`；
   默认关闭时核心构建完全不变。
-- 独立构建：`extensions/scintilla/xmake.lua`，要求 `--duilib_dir` 指向已构建的
-  核心仓库，并校验平台的渲染后端/运行库是否与核心一致。
+- 构建入口：扩展只通过仓库根目录的构建入口启用，与 `extensions/cef`、
+  `extensions/webview2` 一致；扩展目录内不提供独立构建入口。
 - 回归检查：核心 `xmake`、现有示例、`xmake attribute-check`、
   `xmake format-check` 不因扩展而变化；核心 `lib/` 不新增 Scintilla 相关库。
 

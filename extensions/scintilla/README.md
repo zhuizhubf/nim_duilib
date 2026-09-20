@@ -23,7 +23,6 @@
 
 ```text
 extensions/scintilla/
-├─ xmake.lua                 # 扩展独立构建入口（可选，用于单独构建扩展）
 ├─ src/                      # 移植层源码 + 对外头文件（同目录，无独立 include 目录）
 │   ├─ duilib_scintilla.h    # 对外聚合头
 │   ├─ ScintillaControl.h    # DUI 控件
@@ -43,9 +42,8 @@ extensions/scintilla/
 
 ## 构建
 
-### 方式一：与主工程一起构建（推荐）
-
-在 nim_duilib 根目录启用 `--scintilla=y`：
+扩展通过主工程的构建入口启用（不提供扩展独立构建入口），在 nim_duilib 根目录
+启用 `--scintilla=y`：
 
 ```powershell
 cd E:\LS\nim_duilib
@@ -54,40 +52,6 @@ xmake                       # 构建核心库 + duilib-scintilla + ScintillaDemo
 ```
 
 默认（不传 `--scintilla`）不会构建任何扩展目标，核心构建保持不变。
-
-### 方式二：扩展目录独立构建
-
-先构建核心库，再进入扩展目录：
-
-```powershell
-cd E:\LS\nim_duilib
-xmake f -c -m release
-xmake
-
-cd E:\LS\nim_duilib\extensions\scintilla
-xmake f -c --duilib_dir=E:\LS\nim_duilib --duilib_render=skia --duilib_runtime=MT
-xmake
-```
-
-也可以不切换目录，在仓库根目录用 `-P` 指定扩展工程：
-
-```powershell
-xmake f -P extensions/scintilla -c --duilib_dir=E:\LS\nim_duilib --duilib_render=skia --duilib_runtime=MT
-xmake build -P extensions/scintilla
-```
-
-独立构建参数：
-
-| 参数 | 取值 | 说明 |
-| :--- | :--- | :--- |
-| `--duilib_dir` | 路径 | 核心仓库根目录（默认 `../..`） |
-| `--duilib_render` | `skia` / `gdi` / `both` | 必须与核心库的渲染后端一致 |
-| `--duilib_runtime` | `MT` / `MD` | 必须与核心库的运行库一致 |
-| `--duilib_sdl` | `y` / `n` | Windows 下核心库是否使用 SDL3 |
-| `--examples` | `y` / `n` | 是否构建 `ScintillaDemo`（默认 y） |
-
-独立构建时产物输出到 `extensions/scintilla/lib` 与 `extensions/scintilla/bin`，
-不写入核心的 `lib/`、`bin/`。
 
 ## 应用接入
 

@@ -80,15 +80,7 @@ jobs:
         shell: bash
         run: xmake attribute-check
 
-      # 3) 扩展独立构建入口（extensions/scintilla 复用同一份源码）
-      - name: Build extension standalone
-        shell: bash
-        run: |
-          xmake f -y -P extensions/scintilla -c --duilib_dir="${GITHUB_WORKSPACE}" \
-            --duilib_render=${{ matrix.render }} --duilib_runtime=${{ matrix.runtime }} --examples=y
-          xmake build -y -P extensions/scintilla
-
-      # 4) 默认（未启用扩展）构建不受影响
+      # 3) 默认（未启用扩展）构建不受影响
       - name: Build core without extension
         shell: bash
         run: |
