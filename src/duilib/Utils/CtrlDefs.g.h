@@ -94,8 +94,6 @@
 #define DUI_CTR_MENU_BAR (_T("MenuBar"))
 #define DUI_CTR_MENU_BAR_ITEM (_T("MenuBarItem"))
 #define DUI_CTR_DATETIME (_T("DateTime"))
-#define DUI_CTR_CEF (_T("CefControl"))
-#define DUI_CTR_WEBVIEW2 (_T("WebView2Control"))
 #define DUI_CTR_COLOR_CONTROL (_T("ColorControl"))
 #define DUI_CTR_COLOR_SLIDER (_T("ColorSlider"))
 #define DUI_CTR_COLOR_PICKER_REGULAR (_T("ColorPickerRegular"))

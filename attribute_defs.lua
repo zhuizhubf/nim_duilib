@@ -100,8 +100,8 @@ function get_defs()
             { name = "MenuBar", macro = "DUI_CTR_MENU_BAR" },
             { name = "MenuBarItem", macro = "DUI_CTR_MENU_BAR_ITEM" },
             { name = "DateTime", macro = "DUI_CTR_DATETIME" },
-            { name = "CefControl", macro = "DUI_CTR_CEF" },
-            { name = "WebView2Control", macro = "DUI_CTR_WEBVIEW2" },
+            -- 扩展控件类名（CefControl/WebView2Control 等）不进入核心表：
+            -- 它们由扩展通过 AddCreateControlCallback 自注册，登记在 attribute_check.lua 的白名单中。
             { name = "ColorControl", macro = "DUI_CTR_COLOR_CONTROL" },
             { name = "ColorSlider", macro = "DUI_CTR_COLOR_SLIDER" },
             { name = "ColorPickerRegular", macro = "DUI_CTR_COLOR_PICKER_REGULAR" },

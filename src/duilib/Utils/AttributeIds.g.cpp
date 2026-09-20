@@ -2660,10 +2660,6 @@ Id IdOf(const DString &strName)
         return Id::kMenuBarItem;
     case 0x9BEC7490u: //DateTime
         return Id::kDateTime;
-    case 0x5E3580C2u: //CefControl
-        return Id::kCefControl;
-    case 0xEA3FC8FFu: //WebView2Control
-        return Id::kWebView2Control;
     case 0x68FF0BCDu: //ColorControl
         return Id::kColorControl;
     case 0xF376D9FDu: //ColorSlider
@@ -2899,10 +2895,6 @@ DString IdToString(Id id)
         return _T("MenuBarItem");
     case Id::kDateTime:
         return _T("DateTime");
-    case Id::kCefControl:
-        return _T("CefControl");
-    case Id::kWebView2Control:
-        return _T("WebView2Control");
     case Id::kColorControl:
         return _T("ColorControl");
     case Id::kColorSlider:

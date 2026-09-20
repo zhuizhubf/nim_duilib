@@ -21,15 +21,24 @@ local g_nodeAllowlist = {
     ["RenderTest1"]         = "示例自定义控件类（examples/render）",
     ["RenderTest2"]         = "示例自定义控件类（examples/render）",
     ["ScintillaControl"]    = "扩展自定义控件类（extensions/scintilla，运行时通过 AddCreateControlCallback 注册）",
+    ["CefControl"]          = "扩展自定义控件类（extensions/cef，运行时通过 AddCreateControlCallback 注册）",
+    ["WebView2Control"]     = "扩展自定义控件类（extensions/webview2，运行时通过 AddCreateControlCallback 注册）",
     ["ChildWindowTemplate"] = "模板片段根节点，由代码显式加载，非控件类名",
     ["Loading"]             = "模板片段根节点，由代码显式加载，非控件类名",
     ["Property"]            = "ThemeMeta 子节点，属全局/主题解析范围，不在本登记表的 7 个名字域内",
+}
+
+-- 扩展控件类：类名来自扩展（不在核心控件类名表中），但 XML 属性名仍使用核心属性表登记的名字
+-- （属性表内保留了这些扩展控件的属性），因此继续参与 XML 属性名校验。
+local g_extCtrlClasses = {
+    ["CefControl"]      = "extensions/cef",
+    ["WebView2Control"] = "extensions/webview2",
 }
 local g_dataDir = nil
 local g_baselineRev = "HEAD"
 
 local g_domains = {
-    { name = "control", roots = { "src/duilib", "src/cef", "src/webview2" },
+    { name = "control", roots = { "src/duilib", "extensions/cef/src", "extensions/webview2/src" },
       excludeFiles = { "Window.cpp", "WindowBuilder.cpp", "ImageAttribute.cpp", "Shadow.cpp", "ControlLoading.cpp", "ThemeGenerator.cpp" },
       vars = { "strName", "srName" } },
     { name = "window", roots = { "src/duilib/Core/Window.cpp", "src/duilib/Core/WindowBuilder.cpp" }, vars = { "strName" } },
@@ -274,7 +283,7 @@ local function check_xml()
             end
         end
         for nodeName, attrText in text:gmatch("<([%a_][%w_]*)([^>]*)>") do
-            if ctrlClasses[nodeName] or (nodeName == "Class") or (nodeName == "Window") then
+            if ctrlClasses[nodeName] or g_extCtrlClasses[nodeName] or (nodeName == "Class") or (nodeName == "Window") then
                 for attrName in attrText:gmatch("([%a_][%w_]*)%s*=") do
                     if not known[attrName] then
                         attrMiss[attrName] = true

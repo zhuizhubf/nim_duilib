@@ -35,7 +35,7 @@ CefControl::~CefControl(void) {}
 
 DString CefControl::GetType() const
 {
-    return DUI_CTR_CEF;
+    return _T("CefControl");
 }
 
 void CefControl::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)

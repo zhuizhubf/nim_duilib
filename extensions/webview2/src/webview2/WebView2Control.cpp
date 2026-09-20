@@ -21,7 +21,7 @@ WebView2Control::~WebView2Control() {}
 
 DString WebView2Control::GetType() const
 {
-    return DUI_CTR_WEBVIEW2;
+    return _T("WebView2Control");
 }
 
 void WebView2Control::SetAttributeById(ui::attr::control::Id id, const DString &strValue2)
