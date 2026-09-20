@@ -13,7 +13,7 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 #include "SDL3/SDL.h"
-#include "WindowRgn_Windows.h"
+#include "render/WindowRgn_Windows.h"
 #endif
 
 namespace ui {

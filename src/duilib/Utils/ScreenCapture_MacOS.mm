@@ -111,7 +111,8 @@ std::shared_ptr<IBitmap> ScreenCapture::CaptureBitmap(const Window* pWindow)
     std::vector<uint8_t> bitmap;
     int32_t width = 0;
     int32_t height = 0;
-    if (!CaptureScreenBitmap_MacOS(pNSWindow, bitmap, width, height)) {
+    // 该辅助函数的参数是 void*，ARC 下 ObjC 指针不能隐式转换为 C 指针，需要 __bridge
+    if (!CaptureScreenBitmap_MacOS((__bridge void*)pNSWindow, bitmap, width, height)) {
         return nullptr;
     }
     if ((width > 0) && (height > 0) && ((int32_t)bitmap.size() == (width * height * 4))) {

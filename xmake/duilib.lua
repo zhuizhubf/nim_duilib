@@ -202,6 +202,13 @@ if duilib_render_skia_enabled() then
         add_includedirs(DUILIB_SRC_DIR, DUILIB_ROOT)
         duilib_add_skia_window_sources()
 
+        -- 渲染后端的 SDL 窗口实现（render-skia/Render_Skia_SDL.cpp、
+        -- render-skia/SkRasterWindowContext_SDL.cpp）直接调用 SDL3 API 把绘制结果输出到窗口，
+        -- 需要显式引用包才能拿到 SDL3 的头文件与链接库（非 Windows 平台默认启用 SDL）
+        if duilib_sdl_enabled() then
+            add_packages("libsdl3")
+        end
+
         on_load(function (target)
             local pkg = target:pkg("duilib-skia")
             if pkg then
