@@ -189,12 +189,35 @@ for _, name in ipairs(env.example_names()) do
         end
 
         add_deps("duilib")
+        if env.skia_base_enabled() then
+            add_deps("duilib-skia-base")
+        end
         for _, dep in ipairs(env.module_targets()) do
             add_deps(dep)
             -- 静态库链接顺序：渲染/图片/扩展模块引用了核心库（duilib）与文本布局（duilib-text）的符号，
             -- GNU ld 是单遍扫描（Linux/FreeBSD），必须"引用方在前、被引用方在后"，否则会报
             -- BitmapAlpha/Image_Svg 等未定义符号；Windows(MSVC)/macOS(ld64) 对顺序不敏感。
             add_linkorders(dep, "duilib-text", "duilib")
+        end
+
+        -- Linux/FreeBSD 的 GNU ld 单遍扫描下还存在反向引用：核心库 duilib（GlobalManager）调用模块入口
+        -- GetRenderBackend_Skia / GetImageDecoderModule_*Skia，而上面的顺序把核心库排在模块之后，
+        -- 线性顺序无法同时满足两个方向。链接组（--start-group/--end-group）让 ld 反复扫描这组静态库，
+        -- 从而解析循环依赖。
+        -- 说明：xmake 只为 GNU 工具链（Linux/FreeBSD）生成组参数，MSVC/macOS/MinGW 平台不生成
+        -- （这些平台自身能处理循环引用），因此这里只在 Linux/FreeBSD 上启用链接组；
+        -- skia-base 是渲染/图片模块的公共依赖、同样处在循环里，用 add_deps 声明为直接依赖参与链接。
+        if is_plat("linux", "freebsd") then
+            local grouped = {}
+            for _, dep in ipairs(env.module_targets()) do
+                table.insert(grouped, dep)
+            end
+            if env.skia_base_enabled() then
+                table.insert(grouped, "duilib-skia-base")
+            end
+            table.insert(grouped, "duilib-text")
+            table.insert(grouped, "duilib")
+            add_linkgroups(table.unpack(grouped), {group = true})
         end
 
         -- SDL3：部分示例直接调用 SDL API（如 ChildWindow 的 SDL 绘制），
