@@ -16,6 +16,11 @@ local function duilib_apply_skia_package()
         add_packages("duilib-skia")
     end
     duilib_skia_defines()
+    if duilib_is_linux() or duilib_is_freebsd() then
+        -- Skia 的字体后端在这些平台依赖系统 freetype/fontconfig，
+        -- 声明为 syslinks 会随静态库依赖传递到最终可执行文件并排在最后
+        add_syslinks("freetype", "fontconfig")
+    end
 end
 
 -- 添加 Skia 窗口层源码（仅 render-skia 需要）

@@ -79,7 +79,10 @@ for _, name in ipairs(examples) do
         add_deps("duilib")
         for _, dep in ipairs(duilib_module_targets()) do
             add_deps(dep)
-            add_linkorders("duilib", dep)
+            -- 静态库链接顺序：渲染/图片/扩展模块引用了核心库（duilib）与文本布局（duilib-text）的符号，
+            -- GNU ld 是单遍扫描（Linux/FreeBSD），必须"引用方在前、被引用方在后"，否则会报
+            -- BitmapAlpha/Image_Svg 等未定义符号；Windows(MSVC)/macOS(ld64) 对顺序不敏感。
+            add_linkorders(dep, "duilib-text", "duilib")
         end
 
         -- SDL3：部分示例直接调用 SDL API（如 ChildWindow 的 SDL 绘制），
@@ -123,14 +126,14 @@ for _, name in ipairs(examples) do
                 add_syslinks("delayimp")
             end
         elseif duilib_is_linux() then
-            add_links("X11", "freetype", "fontconfig")
-            add_syslinks("pthread", "dl")
+            -- 系统库放在最后（syslinks）：Skia 静态库引用了 freetype/fontconfig，
+            -- 必须排在 Skia 的静态库之后，否则 GNU ld 会报 FT_* 未定义符号
+            add_syslinks("X11", "freetype", "fontconfig", "pthread", "dl")
         elseif duilib_is_macos() then
             add_frameworks("AppKit", "Foundation", "Metal", "Cocoa", "CoreText", "CoreGraphics", "CoreFoundation", "Accelerate")
             add_syslinks("pthread")
         elseif duilib_is_freebsd() then
-            add_links("X11", "freetype", "fontconfig")
-            add_syslinks("pthread", "dl")
+            add_syslinks("X11", "freetype", "fontconfig", "pthread", "dl")
         end
     target_end()
 end
