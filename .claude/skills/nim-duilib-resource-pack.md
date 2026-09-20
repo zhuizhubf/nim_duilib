@@ -111,7 +111,7 @@ void MainThread::OnInit()
 ```
 
 ### 步骤 5：添加 .rc 到工程
-- 使用 xmake 编译时，示例程序目录下的 `.rc` 文件会被自动加入（见 `xmake/examples.lua`），无需手工配置。
+- 使用 xmake 编译时，示例程序目录下的 `.rc` 文件会被自动加入（见 `xmake/targets/examples.lua`），无需手工配置。
 ```
 
 ## 打包清单：应该包含什么

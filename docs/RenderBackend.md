@@ -20,8 +20,8 @@
 | `duilib-image-svg-nanosvg` | 基于 nanosvg 的独立 SVG 解码模块，不依赖渲染后端 |
 | `duilib-image-svg-skia` | 基于 Skia 的 SVG 解码模块 |
 | `duilib-image-lottie-skia` | 基于 Skia 的 Lottie 解码模块，不依赖 `duilib-render-skia` |
-| `duilib-cef` | CEF 控件扩展（可选，`--cef=y` 时编译并链接；源码位于 `extensions/cef`） |
-| `duilib-webview2` | WebView2 控件扩展（可选，Windows + `--webview2=y` 时编译并链接；源码位于 `extensions/webview2`） |
+| `duilib-cef` | CEF 控件扩展（可选，`--with_cef=latest` 时编译并链接；源码位于 `extensions/cef`） |
+| `duilib-webview2` | WebView2 控件扩展（可选，Windows + `--enable_webview2=y` 时编译并链接；源码位于 `extensions/webview2`） |
 
 图片解码模块通过 `IRenderFactory::CreateBitmap` 创建 `IBitmap`，因此可以配合任意当前渲染后端使用。
 
@@ -33,42 +33,42 @@ CEF 与 WebView2 控件通过 `GlobalManager::AddCreateControlCallback` 自注�
 
 ```sh
 # 默认：Skia 渲染，SVG/Lottie 使用 Skia 解码
-xmake f -c --render=skia
+xmake f -c --render_backend=skia
 
 # Windows：GDI/GDI+ 渲染，默认使用 nanosvg 解码 SVG，关闭 Lottie
-xmake f -c --render=gdi
+xmake f -c --render_backend=gdi
 
 # Windows：同时链接 Skia 和 GDI 后端，运行时可在 Startup 前选择
-xmake f -c --render=both
+xmake f -c --render_backend=both
 ```
 
 图片解码模块选项：
 
 ```sh
---svg=auto       # 默认；有 Skia 基础层时优先 Skia，否则使用 nanosvg
---svg=nanosvg    # 强制使用 nanosvg
---svg=skia       # 使用 Skia SVG 解码模块
---svg=off        # 不注册 SVG 解码器
+--svg_decoder=auto       # 默认；有 Skia 基础层时优先 Skia，否则使用 nanosvg
+--svg_decoder=nanosvg    # 强制使用 nanosvg
+--svg_decoder=skia       # 使用 Skia SVG 解码模块
+--svg_decoder=off        # 不注册 SVG 解码器
 
---lottie=auto    # Skia/双后端默认 skia；GDI-only 默认 off
---lottie=off     # 不注册 Lottie 解码器
---lottie=skia    # 链接 Skia Lottie 解码模块（可配合 GDI 渲染使用）
+--lottie_decoder=auto    # Skia/双后端默认 skia；GDI-only 默认 off
+--lottie_decoder=off     # 不注册 Lottie 解码器
+--lottie_decoder=skia    # 链接 Skia Lottie 解码模块（可配合 GDI 渲染使用）
 ```
 
 Skia 文本迁移过渡选项：
 
 ```sh
---common_text_layout=y   # 默认开启：Skia 文本走 duilib-text 公共布局
---common_text_layout=n   # 回退到 RenderSkia 旧的文本布局实现
+--enable_common_text_layout=y   # 默认开启：Skia 文本走 duilib-text 公共布局
+--enable_common_text_layout=n   # 回退到 RenderSkia 旧的文本布局实现
 ```
 
-公共文本布局覆盖普通横排/竖排字符串和 RichText 绘制/测量/缓存接口。若遇到视觉回归，可通过 `--common_text_layout=n` 暂时回退。
+公共文本布局覆盖普通横排/竖排字符串和 RichText 绘制/测量/缓存接口。若遇到视觉回归，可通过 `--enable_common_text_layout=n` 暂时回退。
 
-`--render=gdi` 和 `--render=both` 仅支持 Windows。
+`--render_backend=gdi` 和 `--render_backend=both` 仅支持 Windows。
 
 ## 运行期选择
 
-`--render=both` 时会同时链接两个渲染后端。可以在 `GlobalManager::Startup` 之前选择：
+`--render_backend=both` 时会同时链接两个渲染后端。可以在 `GlobalManager::Startup` 之前选择：
 
 ```cpp
 ui::GlobalManager::Instance().SetRenderType(ui::RenderType::kRenderType_GDI);
@@ -94,6 +94,6 @@ GDI 后端使用 32bpp DIB + 内存 DC 绘制，普通窗口通过 `BitBlt` 提�
 
 ## 兼容性说明
 
-- 默认 `--render=skia` 行为保持不变。
+- 默认 `--render_backend=skia` 行为保持不变。
 - 外部工程升级后需要显式链接所选渲染后端和图片解码模块。
-- GDI 配置下不再注册 SVG-Skia 和 Lottie-Skia；需要这些格式时可使用 `--svg=skia`、`--lottie=skia`，或使用 `--svg=nanosvg`。
+- GDI 配置下不再注册 SVG-Skia 和 Lottie-Skia；需要这些格式时可使用 `--svg_decoder=skia`、`--lottie_decoder=skia`，或使用 `--svg_decoder=nanosvg`。

@@ -43,7 +43,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 ```
 
-2. 在 [xmake/examples.lua](../xmake/examples.lua) 的 `common_examples` 列表中登记新的示例名称；
+2. 在 [xmake/env.lua](../xmake/env.lua) 的 `common_examples` 列表中登记新的示例名称；
 3. 重新配置并编译：
 
 ```bash
@@ -52,7 +52,7 @@ xmake build MyDuilibApp
 xmake run MyDuilibApp
 ```
 
-示例程序的工程配置（头文件路径、系统库、manifest、资源文件、duilib 依赖等）由 [xmake/examples.lua](../xmake/examples.lua) 统一设置，不需要手工配置工程。
+示例程序的工程配置（头文件路径、系统库、manifest、资源文件、duilib 依赖等）由 [xmake/targets/examples.lua](../xmake/targets/examples.lua) 与 `duilib.app` 规则统一设置，不需要手工配置工程。
 
 ## 引入线程库
 
@@ -291,10 +291,14 @@ bool MainThread::OnInit()
 可以参考相关的文档[CEF.md](CEF.md)
 
 ## 关于工程配置（xmake）
-项目的编译配置位于仓库根目录的 `xmake.lua` 和 `xmake` 目录：`xmake/duilib.lua`（duilib 主库）、`xmake/third_party.lua`（第三方库）、`xmake/examples.lua`（示例程序）、`xmake/common.lua`（公共设置）；Skia 由 `xmake/repos` 中的本地包自动下载并编译。
+项目的编译配置位于仓库根目录的 `xmake.lua` 和 `xmake` 目录；Skia 由 `xmake/repos` 中的本地包自动下载并编译。
 
-仓库根目录只保留 `xmake.lua` 入口，辅助脚本统一放在 `xmake` 目录下：
-- `xmake/tasks.lua`：注册 `xmake format`、`xmake format-check`、`xmake attribute-gen`、`xmake attribute-check` 四个任务；
+仓库根目录只保留 `xmake.lua` 入口，其余脚本按职责分目录：
+- `xmake/options.lua`：全部命令行选项（`--enable_*`、`--with_*`、`--render_backend` 等）；
+- `xmake/env.lua`：公共路径与配置判定（描述域全局表 `DUILIB`）；
+- `xmake/rules/`：项目规则（`duilib.config`、`duilib.features`、`duilib.app`、`duilib.skia`、`duilib.log`）；
+- `xmake/targets/`：目标定义（`third_party.lua`、`duilib.lua`、`render.lua`、`image.lua`、`extensions.lua`、`examples.lua`、`bench.lua`）；每个目标的 `add_files` 都逐个列出具体源文件（不使用通配符），新增/删除源文件时在此登记；
+- `xmake/tasks/register.lua`：注册 `xmake format`、`xmake format-check`、`xmake attribute-gen`、`xmake attribute-check` 四个任务；
 - `xmake/scripts/`：任务脚本（`format_apply.lua`、`format_check.lua`）与属性名登记表（`attribute_defs.lua`、`attribute_gen.lua`、`attribute_check.lua`）。
     
 ## 如何设置项目中使用的源代码文件编码为UTF-8格式

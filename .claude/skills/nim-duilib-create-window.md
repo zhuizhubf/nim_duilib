@@ -118,4 +118,4 @@ window->ShowWindow(ui::kSW_SHOW_NORMAL);
 - [ ] .h 和 .cpp 文件已放在对应的源码目录中（xmake 自动收录目录下的源码文件）
 - [ ] XML 文件编码为 UTF-8
 - [ ] XML 文件路径与 GetSkinFolder()/GetSkinFile() 返回值一致
-- [ ] 如果是新增示例，需要在 `xmake/examples.lua` 的示例列表中登记
+- [ ] 如果是新增示例，需要在 `xmake/env.lua` 的 `common_examples` 列表中登记

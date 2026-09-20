@@ -31,7 +31,7 @@
 | docs          | 项目的说明文档，包括各个控件的功能介绍与属性列表说明文档|
 | bin           | 各个示例程序输出目录，包含预设的皮肤和语言文件以及 CEF 依赖|
 | licenses      | 引用的其他开源代码对应的licenses文件|
-| xmake         | xmake编译脚本（第三方库、duilib主库、示例程序以及Skia的本地包定义）、任务注册（`xmake/tasks.lua`）与任务脚本（`xmake/scripts/`）|
+| xmake         | xmake编译脚本（入口 `xmake.lua`；选项、规则、目标与任务按职责分目录，见下方“编译（xmake）”章节）、本地包仓库（`xmake/repos`：Skia 自动下载并编译）|
 | build         | 编译的临时目录（build/build_temp，可清理）|
 | examples      | 项目的示例程序源代码，涵盖所有控件的基本用法示例（示例程序，详见 [docs/Examples.md](docs/Examples.md)）|
 | third_party   | 项目代码依赖的第三方库（`prebuilt/` 下为预编译 SDK），详细内容见后续文档|
@@ -172,7 +172,7 @@
 * 目前PAG动画文件格式仅在Window平台支持，其他平台暂未支持
 * 支持PAG动画文件格式功能默认关闭（因为需要自己编译libpag.lib和libpag.dll，放进项目才能正常编译运行）
 * 支持PAG动画格式的开启方法：    
-（1）编译前使用配置项开启：`xmake f --pag=y`（默认关闭）    
+（1）编译前使用配置项开启：`xmake f --enable_pag=y`（默认关闭）    
 （2）参照以下文档编译libpag库：[`third_party/prebuilt/libpag/windows/libpag-build.md`](third_party/prebuilt/libpag/windows/libpag-build.md)     
 * 编译nim_duilib的时候，直接使用xmake编译即可（`xmake`），编译产物在 bin 目录中。
 * libpag库的主体授权协议为Apache License Version 2.0，其依赖的第三方组件的授权协议很多，<br>详见目录:`third_party/prebuilt/libpag/licenses`中的文件。<br>如果介意libpag的授权协议（包括主体协议/第三方组件协议），可以不启用libpag。
@@ -189,7 +189,7 @@
 
 ## 支持的编译器
 - Visual Studio 2022/2026（Windows，MSVC，默认用它编译Skia，无需安装LLVM）
-- LLVM/Clang（Windows，可选：`xmake f --skia_clang=y` 时使用）
+- LLVM/Clang（Windows，可选：`xmake f --with_skia_clang=y` 时使用）
 - gcc/g++（Linux、FreeBSD）
 - clang/clang++（Linux、macOS、FreeBSD）
 
@@ -200,7 +200,7 @@
 1. 安装 [xmake](https://xmake.io/#/guide/installation)（v2.9 及以上版本）
 2. Windows：安装 Visual Studio 2022/2026（勾选“使用 C++ 的桌面开发”工作负载）
 3. Linux/macOS/FreeBSD：安装 gcc 或 clang，以及系统依赖（X11、freetype、fontconfig 等）
-4. 可选：安装 LLVM/Clang（仅当需要改用 clang 编译 Skia 时使用，配置 `--skia_clang=y`）
+4. 可选：安装 LLVM/Clang（仅当需要改用 clang 编译 Skia 时使用，配置 `--with_skia_clang=y`）
 
 > 编译 Skia 需要 Python：xmake 会自动获取并使用自带的 Python 包，无需手工安装或配置。
 
@@ -216,18 +216,28 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | :--- | :--- |
 | `-m debug` / `-m release` | Debug/Release 编译（默认 Release）|
 | `-a x86` / `-a x64` | 32 位/64 位（Windows 支持；Linux/macOS/FreeBSD 只支持 64 位）|
-| `--examples=n` | 只编译库，不编译示例程序 |
-| `--sdl=y` | 启用 SDL3（Windows 默认关闭，Linux/macOS/FreeBSD 始终启用）|
-| `--cef=y` | 启用 CEF 扩展（extensions/cef）：编译 libcef_dll_wrapper 及 cef/CefBrowser 示例 |
-| `--cef109=y` | 使用 CEF 109 版本（兼容 Win7）|
-| `--webview2=n` | 关闭 WebView2 扩展（extensions/webview2，Windows 默认开启）|
-| `--pag=y` | 启用 libpag（需要先自行编译 libpag.lib 和 libpag.dll）|
-| `--jpeg_turbo=y` | 启用 libjpeg-turbo 解码 JPEG 图片 |
-| `--md=y` | MSVC 运行库使用 /MD（默认 /MT）|
-| `--log=y` | 输出详细的编译配置信息 |
-| `--skia_clang=y` | Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC）|
-| `--skia_clang_dir=D:/LLVM` | 使用 clang 编译 Skia 时的 clang 目录（默认 `C:/LLVM`）|
-| `--skia_dir=../skia` | 直接使用已有的 Skia 源码树，跳过自动下载编译 |
+| `--enable_examples=n` | 只编译库，不编译示例程序 |
+| `--enable_sdl=y` | 启用 SDL3（Windows 默认关闭，Linux/macOS/FreeBSD 始终启用）|
+| `--with_cef=latest` | 启用 CEF 扩展（extensions/cef）：编译 libcef_dll_wrapper 及 cef/CefBrowser 示例 |
+| `--with_cef=109` | 使用 CEF 109 版本（兼容 Win7）|
+| `--enable_webview2=n` | 关闭 WebView2 扩展（extensions/webview2，Windows 默认开启）|
+| `--enable_pag=y` | 启用 libpag（需要先自行编译 libpag.lib 和 libpag.dll）|
+| `--enable_jpeg_turbo=y` | 启用 libjpeg-turbo 解码 JPEG 图片 |
+| `--enable_scintilla=y` | 启用 duilib-scintilla 编辑器扩展与 ScintillaDemo 示例 |
+| `--runtimes=MD` | MSVC 运行库（xmake 内置选项）：默认 `MT`，可指定 `MTd`/`MD`/`MDd` |
+| `--render_backend=gdi` | 渲染后端：`skia`（默认）/`gdi`/`both`（gdi/both 仅 Windows）|
+| `--svg_decoder=nanosvg` | SVG 解码模块：`auto`（默认）/`nanosvg`/`skia`/`off` |
+| `--lottie_decoder=off` | Lottie 解码模块：`auto`（默认）/`off`/`skia` |
+| `--enable_common_text_layout=n` | 关闭 Skia 后端的公共文本布局（默认开启）|
+| `--enable_log=y` | 输出详细的编译配置信息 |
+| `--enable_bench=y` | 额外编译属性名派发基准（tools/bench_attribute_dispatch）|
+| `--with_skia_clang=y` | Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC）|
+| `--with_skia_clang_dir=D:/LLVM` | 使用 clang 编译 Skia 时的 clang 目录（默认 `C:/LLVM`）|
+| `--with_skia_dir=../skia` | 直接使用已有的 Skia 源码树，跳过自动下载编译 |
+
+选项名按 xmake 规范统一前缀：功能开关 `enable_*`、可选依赖与外部路径 `with_*`、
+渲染/解码后端 `render_backend`、`svg_decoder`、`lottie_decoder`；
+完整列表见 `xmake f --menu` 或 [xmake/options.lua](xmake/options.lua)。
 
 ### 四、编译产物
 - `lib` 目录：duilib 主库与第三方静态库（duilib-zlib、duilib-png、duilib-webp、duilib-cximage）
@@ -237,7 +247,7 @@ xmake run basic                          # 运行示例程序（可执行文件�
 ### 五、依赖的获取方式
 | 依赖 | 获取方式 |
 | :--- | :--- |
-| Skia | 项目内置的本地包（`xmake/repos`）：自动下载指定快照 + 补丁并编译，仅编译当前配置；也可用 `--skia_dir` 复用已有的 Skia |
+| Skia | 项目内置的本地包（`xmake/repos`）：自动下载指定快照 + 补丁并编译，仅编译当前配置；也可用 `--with_skia_dir` 复用已有的 Skia |
 | SDL3 | xmake 官方包仓库自动获取 |
 | zlib、libpng(含APNG)、giflib、libwebp、cximage | 使用仓库内源码编译 |
 | libjpeg-turbo | 使用仓库内预编译库（Windows），其他平台使用 xmake 包 |
@@ -246,8 +256,8 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | libpag | 可选：需要自行编译 libpag.lib/libpag.dll，详见 [third_party/prebuilt/libpag/windows/libpag-build.md](third_party/prebuilt/libpag/windows/libpag-build.md) |
 
 ### 六、平台说明
-- Windows：使用 MSVC 编译；`--cef=y` 可启用 CEF（需自行准备 CEF 运行库）；WebView2 默认开启
-- Linux/macOS/FreeBSD：SDL3 自动启用（窗口系统基于 SDL3）；CEF 暂不支持，配置 `--cef=y` 会给出明确错误提示
+- Windows：使用 MSVC 编译；`--with_cef=latest` 可启用 CEF（需自行准备 CEF 运行库）；WebView2 默认开启
+- Linux/macOS/FreeBSD：SDL3 自动启用（窗口系统基于 SDL3）；CEF 暂不支持，配置 `--with_cef=latest` 会给出明确错误提示
 - 重新配置与重编：`xmake f -c` 清除配置重新配置；`xmake -r` 重新编译全部目标
 
 ### 七、持续集成（GitHub Actions）
@@ -257,7 +267,7 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | 构建任务 | 运行环境 | 说明 |
 | :--- | :--- | :--- |
 | windows-x64 / windows-x86 | Windows Server 2022 + MSVC | 默认配置（Skia 渲染、/MT 运行库、WebView2 扩展） |
-| windows-x64-cef | Windows Server 2022 + MSVC | 启用 CEF 扩展（`--cef=y`）：libcef_dll_wrapper、duilib-cef 与 CEF 示例 |
+| windows-x64-cef | Windows Server 2022 + MSVC | 启用 CEF 扩展（`--with_cef=latest`）：libcef_dll_wrapper、duilib-cef 与 CEF 示例 |
 | windows-x64-sdl / windows-x64-md / windows-x64-gdi | Windows Server 2022 + MSVC | 可选配置：SDL3 窗口、/MD 运行库、GDI 渲染 |
 | linux-x64 | Ubuntu 22.04 | SDL3 窗口；在虚拟显示（Xvfb）下运行示例做冒烟验证 |
 | macos-arm64 | macOS 15（Apple Silicon） | SDL3 窗口 |

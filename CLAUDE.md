@@ -17,14 +17,18 @@ nim_duilib/
 │   ├── render-skia/     # Skia渲染实现
 │   └── render-gdi/      # Windows GDI/GDI+ 渲染实现
 ├── extensions/          # 可选控件扩展（cef / webview2 / scintilla）
-│   ├── cef/             # CEF浏览器控件扩展（--cef=y）
+│   ├── cef/             # CEF浏览器控件扩展（--with_cef=latest）
 │   ├── webview2/        # WebView2控件扩展（Windows默认启用）
-│   └── scintilla/       # DUI 原生 Scintilla 编辑控件扩展（--scintilla=y）
+│   └── scintilla/       # DUI 原生 Scintilla 编辑控件扩展（--enable_scintilla=y）
 ├── examples/            # 示例程序
 ├── docs/                # 完整文档
 ├── bin/resources/       # 主题资源（XML布局、图片、字体）
 ├── xmake/               # xmake构建脚本
-│   ├── tasks.lua        # xmake任务注册（format / format-check / attribute-gen / attribute-check）
+│   ├── options.lua      # 命令行选项（enable_* / with_* / render_backend 等）
+│   ├── env.lua          # 公共路径与配置判定（描述域全局表 DUILIB）
+│   ├── rules/           # 项目规则（duilib.config / features / app / skia / log）
+│   ├── targets/         # 目标定义（third_party / duilib / render / image / extensions / examples / bench）
+│   ├── tasks/           # xmake任务注册（format / format-check / attribute-gen / attribute-check）
 │   ├── scripts/         # 任务脚本与属性名数据表（attribute_defs.lua 等）
 │   ├── manifest/        # Windows清单文件
 │   └── repos/           # 本地包仓库（Skia自动下载并编译）
@@ -97,10 +101,11 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - 属性派发一律用枚举：链上写 `switch (id)` + `case ui::attr::control::kXxx`，禁止再引入字符串比较；链上签名是 `SetAttributeById(attr::control::Id id, const DString &strValue)`，**不传名字**
 - 代码内设置属性用 `SetAttributeById(ui::attr::control::kXxx, _T("xxx"), value)`，避免重复的字符串→枚举转换
 - **控件类名域**：`ui::attr::ctrl` 覆盖全部控件类名（115 个，含宏名），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；`DUI_CTR_*` 宏由 `xmake/scripts/attribute_defs.lua` 的 `ctrl` 域生成到 `CtrlDefs.g.h`（不再手写），类名比较不再直接用宏比较
-- **脚本位置约定**：xmake 任务的注册统一写在 `xmake/tasks.lua`，任务脚本与数据表统一放 `xmake/scripts/`，仓库根目录只保留 `xmake.lua` 入口
+- **脚本位置约定**：仓库根目录只保留 `xmake.lua` 入口；选项在 `xmake/options.lua`，公共配置在 `xmake/env.lua`，规则在 `xmake/rules/`，目标在 `xmake/targets/`，任务注册在 `xmake/tasks/register.lua`，任务脚本与数据表统一放 `xmake/scripts/`
+- **源文件清单约定**：所有 `add_files` 逐个列出具体文件，**不使用通配符**（如 `*.cpp`）；新增/删除源文件时同步修改 `xmake/targets/` 下对应文件，避免构建结果随目录内容变化
 
 ## 构建
 - 配置: `xmake f -o build/build_temp/xmake -c`（首次会自动下载并编译 Skia，默认用 MSVC，无需 LLVM）
-- 编译: `xmake`（库 + 全部示例）；只编库用 `xmake f --examples=n` 后再 `xmake`
+- 编译: `xmake`（库 + 全部示例）；只编库用 `xmake f --enable_examples=n` 后再 `xmake`
 - 运行: `xmake run basic`，或直接运行 `bin` 目录下的示例程序
-- 可选: `--cef=y`、`--pag=y`、`--jpeg_turbo=y`、`--sdl=y`(Windows)、`--skia_clang=y` 等
+- 可选: `--with_cef=latest`、`--enable_pag=y`、`--enable_jpeg_turbo=y`、`--enable_sdl=y`(Windows)、`--enable_scintilla=y`、`--with_skia_clang=y`、`--render_backend=gdi`、`--runtimes=MD`（xmake 内置，默认 MT）等

@@ -34,13 +34,13 @@ extensions/cef/
 
 ```powershell
 cd E:\LS\nim_duilib
-xmake f -c -m release --cef=y                # 使用 libcef 142（默认）
-# xmake f -c -m release --cef=y --cef109=y   # 使用 libcef 109（兼容 Win7）
+xmake f -c -m release --with_cef=latest      # 使用 libcef 142（默认）
+# xmake f -c -m release --with_cef=109       # 使用 libcef 109（兼容 Win7）
 xmake                                        # 核心库 + libcef_dll_wrapper + duilib-cef + 示例
 ```
 
-不传 `--cef` 时（默认）不会构建任何 CEF 相关目标。CEF 目前只支持在 Windows
-平台上通过 xmake 构建，其他平台配置 `--cef=y` 会在配置阶段给出明确错误提示。
+不传 `--with_cef`（即默认 `--with_cef=off`）时不会构建任何 CEF 相关目标。CEF 目前只支持在 Windows
+平台上通过 xmake 构建，其他平台配置 `--with_cef=latest` 会在配置阶段给出明确错误提示。
 
 ## 应用接入
 

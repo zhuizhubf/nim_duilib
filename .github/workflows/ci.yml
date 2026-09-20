@@ -54,7 +54,7 @@ jobs:
             runner: windows-2022
             xmake_plat: windows
             xmake_arch: x64
-            xmake_flags: '--sdl=y'
+            xmake_flags: '--enable_sdl=y'
             pkg_platform: windows
             pkg_arch: x64
             variant: sdl
@@ -66,7 +66,7 @@ jobs:
             runner: windows-2022
             xmake_plat: windows
             xmake_arch: x64
-            xmake_flags: '--md=y'
+            xmake_flags: '--runtimes=MD'
             pkg_platform: windows
             pkg_arch: x64
             variant: md
@@ -78,7 +78,7 @@ jobs:
             runner: windows-2022
             xmake_plat: windows
             xmake_arch: x64
-            xmake_flags: '--render=gdi'
+            xmake_flags: '--render_backend=gdi'
             pkg_platform: windows
             pkg_arch: x64
             variant: gdi
@@ -90,7 +90,7 @@ jobs:
             runner: windows-2022
             xmake_plat: windows
             xmake_arch: x64
-            xmake_flags: '--cef=y'
+            xmake_flags: '--with_cef=latest'
             pkg_platform: windows
             pkg_arch: x64
             variant: cef

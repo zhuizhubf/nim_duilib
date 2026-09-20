@@ -4,16 +4,16 @@
 
 当前扩展：
 
-- `scintilla/`：DUI 原生 Scintilla 编辑控件扩展，通过 `--scintilla=y` 启用。
-- `cef/`：CEF 浏览器控件扩展（`CefControl`），通过 `--cef=y` 启用
-  （`--cef109=y` 使用兼容 Win7 的 libcef 109）。
+- `scintilla/`：DUI 原生 Scintilla 编辑控件扩展，通过 `--enable_scintilla=y` 启用。
+- `cef/`：CEF 浏览器控件扩展（`CefControl`），通过 `--with_cef=latest` 启用
+  （`--with_cef=109` 使用兼容 Win7 的 libcef 109）。
 - `webview2/`：WebView2 浏览器控件扩展（`WebView2Control`），Windows 默认启用，
-  可用 `--webview2=n` 关闭。
+  可用 `--enable_webview2=n` 关闭。
 
 扩展拥有自己的源码、第三方依赖、示例、文档和许可证，使用核心库已经构建好的
 静态库与公开头文件；核心 `src/` 与核心 `third_party/` 不包含扩展的源码与 SDK，
 核心构建 target 也不依赖扩展。
 
 构建方式：三个扩展都只通过仓库根目录的构建入口启用
-（`xmake f --scintilla=y`、`--cef=y`、`--webview2=n` 等），
+（`xmake f --enable_scintilla=y`、`--with_cef=latest`、`--enable_webview2=n` 等），
 扩展目录内不提供独立构建入口，产物统一输出到核心的 `lib/` 与 `bin/`。

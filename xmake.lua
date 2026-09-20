@@ -13,22 +13,33 @@
     常用配置（执行 xmake f 配置后生效）：
         xmake f -m debug                             # Debug 编译
         xmake f -a x86                               # 32 位编译
-        xmake f --examples=n                         # 只编译库，不编译示例
-        xmake f --sdl=y                              # 启用 SDL3（Windows 默认关闭，其他平台默认开启）
-        xmake f --cef=y                              # 启用 CEF（编译 cef / CefBrowser 示例）
-        xmake f --cef109=y                           # 使用 CEF 109 版本（兼容 Win7）
-        xmake f --webview2=n                         # 关闭 WebView2 控件（Windows，默认开启）
-        xmake f --pag=y                              # 启用 libpag（需按文档自行编译 libpag.lib/libpag.dll）
-        xmake f --jpeg_turbo=y                       # 启用 libjpeg-turbo 解码
-        xmake f --md=y                               # MSVC 运行库使用 /MD（默认 /MT）
-        xmake f --log=y                              # 输出详细的编译配置信息
-        xmake f --skia_clang=y                       # Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC，无需安装 LLVM）
-        xmake f --skia_clang_dir=D:/LLVM             # 使用 clang 编译 Skia 时的 clang 目录（默认 C:/LLVM）
-        xmake f --skia_dir=../skia                   # 直接使用已有的 Skia 源码树（跳过自动下载编译）
+        xmake f --enable_examples=n                  # 只编译库，不编译示例
+        xmake f --enable_sdl=y                       # 启用 SDL3（Windows 默认关闭，其他平台默认开启）
+        xmake f --with_cef=latest                    # 启用 CEF（编译 cef / CefBrowser 示例）
+        xmake f --with_cef=109                       # 使用 CEF 109 版本（兼容 Win7）
+        xmake f --enable_webview2=n                  # 关闭 WebView2 控件（Windows，默认开启）
+        xmake f --enable_pag=y                       # 启用 libpag（需按文档自行编译 libpag.lib/libpag.dll）
+        xmake f --enable_jpeg_turbo=y                # 启用 libjpeg-turbo 解码
+        xmake f --runtimes=MD                        # MSVC 运行库使用 /MD（xmake 内置选项，默认 MT）
+        xmake f --enable_log=y                       # 输出详细的编译配置信息
+        xmake f --enable_bench=y                     # 额外编译属性名派发基准（tools/bench_attribute_dispatch）
+        xmake f --with_skia_clang=y                  # Windows 下改用 LLVM/Clang 编译 Skia（默认用 MSVC，无需安装 LLVM）
+        xmake f --with_skia_clang_dir=D:/LLVM        # 使用 clang 编译 Skia 时的 clang 目录（默认 C:/LLVM）
+        xmake f --with_skia_dir=../skia              # 直接使用已有的 Skia 源码树（跳过自动下载编译）
+
+    脚本结构（仓库根目录只保留本文件，其余脚本按职责分目录）：
+        xmake/options.lua           选项声明（feature / backend / dependency / develop）
+        xmake/env.lua               公共路径与配置判定（描述域全局表 DUILIB）
+        xmake/rules/                项目规则（duilib.config / duilib.features / duilib.app /
+                                    duilib.skia / duilib.log）
+        xmake/targets/              目标定义（第三方库、duilib、渲染、图片、扩展、示例、基准）
+        xmake/tasks/register.lua    任务注册（任务脚本与数据表在 xmake/scripts/）
+        xmake/manifest/             Windows 清单文件
+        xmake/repos/                本地包仓库（duilib-skia 自动下载并编译）
 
     说明：
         1. Skia 由项目内的本地包（xmake/repos 下的 duilib-skia）自动下载并编译，只编译当前配置；
-           Windows 下默认使用 MSVC（cl.exe）编译，不需要安装 LLVM；如需改用 clang，配置 --skia_clang=y；
+           Windows 下默认使用 MSVC（cl.exe）编译，不需要安装 LLVM；如需改用 clang，配置 --with_skia_clang=y；
         2. SDL3 由 xmake 官方包仓库自动获取；
         3. 其他第三方库使用仓库内的源码/预编译库，编译方式与原构建方式保持一致；
         4. 库文件输出到 lib/，可执行文件输出到 bin/，与现有脚本一致。
@@ -50,163 +61,52 @@ add_rules("mode.debug", "mode.release")
 -- 项目内的本地包仓库（Skia 自动下载并编译）
 add_repositories("duilib-repo xmake/repos")
 
--- 公共变量（xmake/ 目录下的脚本可以直接使用）
-DUILIB_ROOT      = os.projectdir()
--- 库源码根目录，同时作为包含根：duilib/、render/、render-skia/、render-gdi/、text/
-DUILIB_SRC_DIR   = path.join(DUILIB_ROOT, "src")
--- 核心库源码目录（保持 duilib/ 名称，公开包含路径不变）
-DUILIB_CORE_DIR  = path.join(DUILIB_SRC_DIR, "duilib")
--- 第三方依赖目录（含 prebuilt/ 预编译 SDK）
-DUILIB_THIRD_DIR = path.join(DUILIB_ROOT, "third_party")
--- 扩展目录（可选控件扩展，拥有自己的源码、第三方依赖、文档与许可）
-DUILIB_EXT_SCINTILLA_DIR = path.join(DUILIB_ROOT, "extensions", "scintilla")
-DUILIB_EXT_CEF_DIR       = path.join(DUILIB_ROOT, "extensions", "cef")
-DUILIB_EXT_WEBVIEW2_DIR  = path.join(DUILIB_ROOT, "extensions", "webview2")
-DUILIB_LIB_DIR   = path.join(DUILIB_ROOT, "lib")
-DUILIB_BIN_DIR   = path.join(DUILIB_ROOT, "bin")
-DUILIB_SKIA_LIBS = {"svg", "skshaper", "skottie", "sksg", "jsonreader", "skia"}
+-- 选项与公共配置：选项必须先声明，xmake/env.lua 提供的 DUILIB 表供后续脚本使用
+includes("xmake/options.lua")
+includes("xmake/env.lua")
 
--- 公共选项
-option("sdl")
-    set_default(false)
-    set_showmenu(true)
-    set_description("启用 SDL3 支持（非 Windows 平台始终启用）")
-option_end()
-
-option("cef")
-    set_default(false)
-    set_showmenu(true)
-    set_description("启用 CEF：编译 libcef_dll_wrapper，并编译 cef/CefBrowser 示例")
-option_end()
-
-option("cef109")
-    set_default(false)
-    set_showmenu(true)
-    set_description("使用 CEF 109 版本（兼容 Win7）")
-option_end()
-
-option("webview2")
-    set_default(true)
-    set_showmenu(true)
-    set_description("启用 WebView2 控件（仅 Windows 有效，默认开启）")
-option_end()
-
-option("pag")
-    set_default(false)
-    set_showmenu(true)
-    set_description("启用 libpag（需要先编译好 libpag.lib 和 libpag.dll）")
-option_end()
-
-option("jpeg_turbo")
-    set_default(false)
-    set_showmenu(true)
-    set_description("启用 libjpeg-turbo 解码 JPEG 图片")
-option_end()
-
-option("md")
-    set_default(false)
-    set_showmenu(true)
-    set_description("MSVC 运行库使用 /MD（默认使用 /MT）")
-option_end()
-
-option("log")
-    set_default(false)
-    set_showmenu(true)
-    set_description("输出详细的编译配置信息")
-option_end()
-
-option("examples")
-    set_default(true)
-    set_showmenu(true)
-    set_description("编译 examples 目录下的示例程序")
-option_end()
-
-option("scintilla")
-    set_default(false)
-    set_showmenu(true)
-    set_description("启用 duilib-scintilla DUI 原生编辑器扩展")
-option_end()
-
-option("render")
-    set_default("skia")
-    set_showmenu(true)
-    set_values("skia", "gdi", "both")
-    set_description("渲染后端：skia、gdi 或 both（gdi/both 仅 Windows）")
-option_end()
-
-option("svg")
-    set_default("auto")
-    set_showmenu(true)
-    set_values("auto", "nanosvg", "skia", "off")
-    set_description("SVG 解码模块：auto、nanosvg、skia 或 off")
-option_end()
-
-option("lottie")
-    set_default("auto")
-    set_showmenu(true)
-    set_values("auto", "off", "skia")
-    set_description("Lottie 解码模块：auto、off 或 skia")
-option_end()
-
-option("common_text_layout")
-    set_default(true)
-    set_showmenu(true)
-    set_description("Skia 后端使用 duilib-text 的公共文本布局（默认开启）")
-option_end()
-
-option("skia_dir")
-    set_default("")
-    set_showmenu(true)
-    set_description("已有的 Skia 源码树目录（设置后不再自动下载/编译 Skia）")
-option_end()
-
-option("skia_clang_dir")
-    set_default("")
-    set_showmenu(true)
-    set_description("使用 clang 编译 Skia 时的 clang 目录（默认 C:/LLVM）")
-option_end()
-
-option("skia_clang")
-    set_default(false)
-    set_showmenu(true)
-    set_description("Windows 下使用 LLVM/Clang 编译 Skia（默认使用 MSVC，无需安装 LLVM）")
-option_end()
-
--- 构建脚本
-includes("xmake/common.lua")
-
--- check_cincludes 等编译期探测宏（与 xmake 官方包保持一致，例如 zlib 的头文件探测）
-includes("@builtin/check")
-
--- 运行库设置：必须在根作用域设置，xmake 才会用同样的运行库去下载/编译依赖包；
--- 只在 target 里设置（duilib_target_settings）只会影响本工程目标，依赖包会退回默认的 /MD，
--- 与本工程默认的 /MT 不一致，链接时会报 __imp_itoa/__imp_lround 之类的未解析符号
--- （例如 xmake 预编译的 SDL3 静态库就是 /MD 构建的）。
-if duilib_is_windows() then
-    set_runtimes(get_config("md") and "MD" or "MT")
+-- 运行库设置：项目默认使用静态运行库 MT，用 xmake 内置选项 --runtimes 覆盖
+-- （MT/MTd/MD/MDd）；在根作用域设置会应用到本工程的全部 target。
+-- 说明：依赖包各自的运行库由 add_requires 的 configs 决定（例如 duilib-skia 的 runtime 参数），
+-- 与本工程的 /MT 不一致时会在链接期报 __imp_itoa/__imp_lround 之类的未解析符号。
+if is_plat("windows") then
+    set_runtimes(get_config("runtimes") or "MT")
 end
 
 -- 依赖包（xmake 要求在根作用域声明，target 中只使用 add_packages 引用）
-if duilib_sdl_enabled() then
+if DUILIB.sdl_enabled() then
     add_requires("libsdl3", {configs = {shared = false}})
 end
-if duilib_skia_base_enabled() and not duilib_skia_dir() then
+if DUILIB.skia_base_enabled() and not DUILIB.skia_dir() then
     add_requires("duilib-skia", {configs = {
-        clang = (get_config("skia_clang") == true),
-        clang_dir = duilib_skia_clang_dir(),
-        runtime = (get_config("md") and "MD" or "MT")
+        clang = DUILIB.skia_clang_enabled(),
+        clang_dir = DUILIB.skia_clang_dir(),
+        runtime = DUILIB.runtime()
     }})
 end
-if get_config("jpeg_turbo") and duilib_plat() ~= "windows" then
+if has_config("enable_jpeg_turbo") and not is_plat("windows") then
     add_requires("libjpeg-turbo")
 end
 
 -- 构建辅助任务（xmake format / format-check / attribute-gen / attribute-check）
-includes("xmake/tasks.lua")
+includes("xmake/tasks/register.lua")
 
-includes("xmake/third_party.lua")
-includes("xmake/duilib.lua")
+-- 项目规则（必须在 target 之前注册）
+includes("xmake/rules/config.lua")
+includes("xmake/rules/features.lua")
+includes("xmake/rules/app.lua")
+includes("xmake/rules/skia.lua")
+includes("xmake/rules/log.lua")
 
-if get_config("examples") then
-    includes("xmake/examples.lua")
+-- 目标
+includes("xmake/targets/third_party.lua")
+includes("xmake/targets/duilib.lua")
+includes("xmake/targets/render.lua")
+includes("xmake/targets/image.lua")
+includes("xmake/targets/extensions.lua")
+if DUILIB.examples_enabled() then
+    includes("xmake/targets/examples.lua")
+end
+if has_config("enable_bench") then
+    includes("xmake/targets/bench.lua")
 end

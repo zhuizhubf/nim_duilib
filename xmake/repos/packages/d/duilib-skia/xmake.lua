@@ -20,6 +20,8 @@ package("duilib-skia")
                   "https://github.com/rhett-lee/skia_compile/raw/main/skia.2026-02-10.src.zip",
                   "09124c01076e38297252737df63ff92605604e311ffa032bc1fe04f279d5bbf9")
 
+    -- 编译配置：由项目的 add_requires("duilib-skia", {configs = {...}}) 传入
+    -- （对应 xmake f --with_skia_clang / --with_skia_clang_dir / --with_md）
     add_configs("clang", {description = "使用 LLVM/Clang 编译 Skia（默认使用 MSVC）", default = false, type = "boolean"})
     add_configs("clang_dir", {description = "使用 clang 编译 Skia 时，clang 的安装目录（默认 C:/LLVM）", default = "C:/LLVM", type = "string"})
     add_configs("runtime", {description = "编译 Skia 使用的 MSVC 运行库（MT/MD）", default = "MT", type = "string"})
@@ -100,7 +102,7 @@ package("duilib-skia")
                 local clangdir = package:config("clang_dir")
                 if not os.isfile(path.join(clangdir, "bin", "clang.exe")) then
                     raise("未找到 %s，请先安装 LLVM/Clang（例如安装到 C:/LLVM），" ..
-                          "或者通过 xmake f --skia_clang_dir=<clang目录> 指定正确的目录",
+                          "或者通过 xmake f --with_skia_clang_dir=<clang目录> 指定正确的目录",
                           path.join(clangdir, "bin", "clang.exe"))
                 end
                 table.insert(args, 'cc="clang"')

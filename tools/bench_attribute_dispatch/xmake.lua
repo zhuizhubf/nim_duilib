@@ -1,6 +1,0 @@
-target("bench_attribute_dispatch")
-    set_kind("binary")
-    set_languages("c++17")
-    set_optimize("fastest")
-    set_encodings("utf-8")
-    add_files("bench.cpp")

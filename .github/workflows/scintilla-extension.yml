@@ -35,19 +35,16 @@ jobs:
             plat: windows
             arch: x64
             render: skia
-            runtime: MT
           - name: windows-x64-gdi
             runner: windows-2022
             plat: windows
             arch: x64
             render: gdi
-            runtime: MT
           - name: linux-x64-skia
             runner: ubuntu-22.04
             plat: linux
             arch: x64
             render: skia
-            runtime: MT
 
     steps:
       - name: Checkout
@@ -77,7 +74,7 @@ jobs:
           # 配置阶段会下载第三方源码，偶发下载失败时重试。
           for attempt in 1 2 3; do
             if xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} \
-                 --render=${{ matrix.render }} --scintilla=y --examples=y; then
+                 --render_backend=${{ matrix.render }} --enable_scintilla=y --enable_examples=y; then
               break
             fi
             if [ "${attempt}" -eq 3 ]; then
@@ -99,5 +96,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} --render=${{ matrix.render }} --examples=y
+          xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} --render_backend=${{ matrix.render }} --enable_examples=y
           xmake -y

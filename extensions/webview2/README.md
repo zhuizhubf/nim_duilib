@@ -37,7 +37,7 @@ WebView2 扩展默认开启，如需关闭：
 ```powershell
 cd E:\LS\nim_duilib
 xmake f -c -m release                  # Windows 默认构建 WebView2 扩展
-# xmake f -c -m release --webview2=n   # 关闭 WebView2 扩展
+# xmake f -c -m release --enable_webview2=n   # 关闭 WebView2 扩展
 xmake                                  # 核心库 + duilib-webview2 + 全部示例
 ```
 

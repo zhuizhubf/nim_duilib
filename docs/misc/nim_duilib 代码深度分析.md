@@ -97,7 +97,7 @@ nim_duilib的第三方依赖均放在`duilib/third_party`目录（部分核心�
 
 ### 2. 依赖管理亮点
 1. **协议统一管理**：所有依赖的开源协议文件放在licenses目录，便于开发者查阅和合规使用；
-2. **可选功能解耦**：如PAG动画支持默认关闭，通过`xmake f --pag=y`手动开启，避免无用依赖增加库体积；
+2. **可选功能解耦**：如PAG动画支持默认关闭，通过`xmake f --enable_pag=y`手动开启，避免无用依赖增加库体积；
 3. **版本适配**：对CEF/WebView2等依赖做了多版本适配，兼顾兼容性（Win7）和新特性（Win10+）；
 4. **轻量级封装**：对所有第三方依赖做了轻量级封装，暴露统一的上层接口，开发者无需关注底层依赖的实现细节。
 
@@ -111,7 +111,7 @@ nim_duilib使用xmake作为唯一的构建方式，构建脚本位于仓库根�
 
 ### 2. 编译脚本设计
 - **一键编译**：`xmake f -o build/build_temp/xmake -c` 配置后执行 `xmake`，自动下载并编译Skia（默认使用MSVC，无需LLVM）、获取SDL3等依赖，并编译duilib库与全部示例程序；
-- **可配置裁剪**：通过 `xmake f --cef=y --pag=y --jpeg_turbo=y --sdl=y` 等开关控制功能，`--examples=n` 可只编译库；
+- **可配置裁剪**：通过 `xmake f --with_cef=latest --enable_pag=y --enable_jpeg_turbo=y --enable_sdl=y` 等开关控制功能，`--enable_examples=n` 可只编译库；
 - **平台适配**：Windows使用MSVC（可选LLVM/Clang编译Skia）；Linux/macOS/FreeBSD使用gcc/clang，窗口系统基于SDL3；FreeBSD暂不支持CEF。
 
 ### 3. 编译产物

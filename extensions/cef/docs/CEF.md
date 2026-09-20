@@ -37,8 +37,8 @@ extensions/cef/
 扩展通过仓库根目录的构建入口启用，不提供扩展目录内的独立构建入口：
 
 ```powershell
-xmake f -c -m release --cef=y              # libcef 142（默认）
-xmake f -c -m release --cef=y --cef109=y   # libcef 109（兼容 Win7）
+xmake f -c -m release --with_cef=latest    # libcef 142（默认）
+xmake f -c -m release --with_cef=109       # libcef 109（兼容 Win7）
 xmake                                      # 构建核心库 + libcef_dll_wrapper + duilib-cef + 示例
 ```
 
@@ -50,7 +50,7 @@ xmake                                      # 构建核心库 + libcef_dll_wrappe
 | `libcef_dll_wrapper` / `libcef_dll_wrapper_109` | CEF 官方 C++ 封装库，源码取自扩展内的 SDK |
 | `cef` / `CefBrowser` | 示例程序（窗口模式 / 离屏渲染多标签浏览器） |
 
-CEF 目前只在 Windows 平台接入 xmake 构建；其他平台配置 `--cef=y` 会在配置阶段
+CEF 目前只在 Windows 平台接入 xmake 构建；其他平台配置 `--with_cef=latest` 会在配置阶段
 给出明确错误提示，Linux/macOS 的 SDK 工程文件随扩展保留。
 
 ## 四、接入要点

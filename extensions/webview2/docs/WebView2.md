@@ -32,11 +32,11 @@ extensions/webview2/
 ## 三、构建
 
 扩展通过仓库根目录的构建入口启用，不提供扩展目录内的独立构建入口；
-Windows 平台默认启用，可用 `--webview2=n` 关闭：
+Windows 平台默认启用，可用 `--enable_webview2=n` 关闭：
 
 ```powershell
 xmake f -c -m release                  # Windows：同时构建 duilib-webview2 与示例
-xmake f -c -m release --webview2=n     # 关闭 WebView2 扩展
+xmake f -c -m release --enable_webview2=n     # 关闭 WebView2 扩展
 xmake                                  # 核心库 + duilib-webview2 + 全部示例
 ```
 
