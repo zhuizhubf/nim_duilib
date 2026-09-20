@@ -103,6 +103,7 @@ btn->AttachClick([this](const ui::EventArgs& args) {
 - **控件类名域**：`ui::attr::ctrl` 覆盖全部控件类名（115 个，含宏名），`WindowBuilder::CreateControlByClass` 用 `switch (ui::attr::ctrl::IdOf(name))` 跳表派发；`DUI_CTR_*` 宏由 `xmake/scripts/attribute_defs.lua` 的 `ctrl` 域生成到 `CtrlDefs.g.h`（不再手写），类名比较不再直接用宏比较
 - **脚本位置约定**：仓库根目录只保留 `xmake.lua` 入口；选项在 `xmake/options.lua`，公共配置在 `xmake/env.lua`，规则在 `xmake/rules/`，目标在 `xmake/targets/`，任务注册在 `xmake/tasks/register.lua`，任务脚本与数据表统一放 `xmake/scripts/`
 - **源文件清单约定**：所有 `add_files` 逐个列出具体文件，**不使用通配符**（如 `*.cpp`）；新增/删除源文件时同步修改 `xmake/targets/` 下对应文件，避免构建结果随目录内容变化
+- **`add_*` 参数约定**：不要把 `table.unpack(...)` 放进 `add_links` / `add_linkgroups` / `add_linkorders` 等接口的参数列表——xmake 脚本沙箱调用宿主 API 时只展开第一个返回值（`table.unpack(t)` 会退化成 `t[1]`），要传多个值时直接传表（如 `add_linkgroups(grouped, {group = true})`），由接口自身扁平化
 
 ## 构建
 - 配置: `xmake f -o build/build_temp/xmake -c`（首次会自动下载并编译 Skia，默认用 MSVC，无需 LLVM）

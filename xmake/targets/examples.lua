@@ -217,7 +217,11 @@ for _, name in ipairs(env.example_names()) do
             end
             table.insert(grouped, "duilib-text")
             table.insert(grouped, "duilib")
-            add_linkgroups(table.unpack(grouped), {group = true})
+            -- 必须整表传入：交给 add_linkgroups 自己展开（xmake 的 "groups" 系列 API 会扁平化表参数）。
+            -- 不能写成 add_linkgroups(table.unpack(grouped), {group = true})：xmake 脚本沙箱在调用宿主 API
+            -- 时只展开 table.unpack 的第一个返回值，链接组会退化成只包含第一个模块库，其余库落在组外，
+            -- GNU ld 单遍扫描下依旧报 GetRenderBackend_Skia / GetImageDecoderModule_*Skia 未定义符号。
+            add_linkgroups(grouped, {group = true})
         end
 
         -- SDL3：部分示例直接调用 SDL API（如 ChildWindow 的 SDL 绘制），

@@ -99,6 +99,22 @@ jobs:
             cache_id: x64-mt
             smoke: false
             package: false
+          # scintilla 扩展覆盖（原 scintilla-extension.yml 合并进主 CI）：
+          # 只有打开 --enable_scintilla 才会编译 duilib-scintilla 与 ScintillaDemo，
+          # 这里不打包、不跑 smoke，复用 x64-mt 的包缓存（linux-x64 / windows-x64 负责写入）。
+          - name: windows-x64-scintilla
+            runner: windows-2022
+            xmake_plat: windows
+            xmake_arch: x64
+            xmake_flags: '--enable_scintilla=y'
+            pkg_platform: windows
+            pkg_arch: x64
+            variant: scintilla
+            min_examples: 21
+            cache_mode: read-only
+            cache_id: x64-mt
+            smoke: false
+            package: false
           - name: linux-x64
             runner: ubuntu-22.04
             xmake_plat: linux
@@ -111,6 +127,19 @@ jobs:
             cache_mode: read-write
             cache_id: x64-mt
             smoke: true
+          - name: linux-x64-scintilla
+            runner: ubuntu-22.04
+            xmake_plat: linux
+            xmake_arch: x64
+            xmake_flags: '--enable_scintilla=y'
+            pkg_platform: linux
+            pkg_arch: x64
+            variant: scintilla
+            min_examples: 19
+            cache_mode: read-only
+            cache_id: x64-mt
+            smoke: false
+            package: false
           - name: macos-arm64
             runner: macos-15
             xmake_plat: macosx

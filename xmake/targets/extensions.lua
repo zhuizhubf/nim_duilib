@@ -220,6 +220,13 @@ if env.scintilla_enabled() then
             path.join(lxroot, "src", "Lexilla.cxx")
         )
 
+        -- ScintillaControl.cpp 在 DUILIB_BUILD_FOR_SDL 下直接调用 SDL3 API（文本输入事件），
+        -- 非 Windows 平台始终成立、Windows 上由 --enable_sdl=y 决定，需要显式引用包
+        -- 才能拿到 SDL3 的头文件（否则报 SDL3/SDL_events.h 找不到）
+        if env.sdl_enabled() then
+            add_packages("libsdl3")
+        end
+
         add_deps("duilib", "duilib-text")
     target_end()
 end

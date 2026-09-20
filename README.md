@@ -269,6 +269,7 @@ xmake run basic                          # 运行示例程序（可执行文件�
 | windows-x64 / windows-x86 | Windows Server 2022 + MSVC | 默认配置（Skia 渲染、/MT 运行库、WebView2 扩展） |
 | windows-x64-cef | Windows Server 2022 + MSVC | 启用 CEF 扩展（`--with_cef=latest`）：libcef_dll_wrapper、duilib-cef 与 CEF 示例 |
 | windows-x64-sdl / windows-x64-md / windows-x64-gdi | Windows Server 2022 + MSVC | 可选配置：SDL3 窗口、/MD 运行库、GDI 渲染 |
+| windows-x64-scintilla / linux-x64-scintilla | Windows Server 2022 + MSVC / Ubuntu 22.04 | 启用 Scintilla 扩展（`--enable_scintilla=y`）：编译 duilib-scintilla 与 ScintillaDemo（不打包、不跑冒烟） |
 | linux-x64 | Ubuntu 22.04 | SDL3 窗口；在虚拟显示（Xvfb）下运行示例做冒烟验证 |
 | macos-arm64 | macOS 15（Apple Silicon） | SDL3 窗口 |
 
