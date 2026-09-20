@@ -5,6 +5,9 @@
 
 #if defined(DUILIB_BUILD_FOR_WIN) && defined(DUILIB_BUILD_FOR_WEBVIEW2)
 
+// 说明：duilib 定义了 WIN32_LEAN_AND_MEAN，windows.h 不会包含 ole2.h，
+// 而 WebView2 SDK 头文件依赖 ole2.h 提供的 interface 宏，这里显式包含 objbase.h。
+#include <objbase.h>
 #include "third_party/prebuilt/Microsoft.Web.WebView2/build/native/include/WebView2.h"
 #include <combaseapi.h>
 
