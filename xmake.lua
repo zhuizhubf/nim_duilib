@@ -175,6 +175,14 @@ option_end()
 -- 构建脚本
 includes("xmake/common.lua")
 
+-- 运行库设置：必须在根作用域设置，xmake 才会用同样的运行库去下载/编译依赖包；
+-- 只在 target 里设置（duilib_target_settings）只会影响本工程目标，依赖包会退回默认的 /MD，
+-- 与本工程默认的 /MT 不一致，链接时会报 __imp_itoa/__imp_lround 之类的未解析符号
+-- （例如 xmake 预编译的 SDL3 静态库就是 /MD 构建的）。
+if duilib_is_windows() then
+    set_runtimes(get_config("md") and "MD" or "MT")
+end
+
 -- 依赖包（xmake 要求在根作用域声明，target 中只使用 add_packages 引用）
 if duilib_sdl_enabled() then
     add_requires("libsdl3", {configs = {shared = false}})

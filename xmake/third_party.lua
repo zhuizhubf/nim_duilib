@@ -12,6 +12,12 @@ target("duilib-zlib")
     duilib_target_settings()
     add_files(path.join(thirdroot, "zlib", "*.c"))
     add_includedirs(path.join(thirdroot, "zlib"))
+    if not duilib_is_windows() then
+        -- zlib 的 zconf.h 通过 Z_HAVE_UNISTD_H 决定是否包含 <unistd.h>（gzread.c 等要用 read/close），
+        -- 官方构建脚本由 configure/cmake 生成该宏；这里直接编译源码，需要显式定义，
+        -- 否则 macOS（clang，C99 起隐式函数声明为错误）会报 read/close 未声明。
+        add_defines("Z_HAVE_UNISTD_H")
+    end
 target_end()
 
 -- -----------------------------------------------------------------------------

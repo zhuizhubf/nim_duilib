@@ -28,11 +28,16 @@ struct LayoutLine
     float m_fHeight = 0.0f;
 };
 
-std::vector<uint32_t> ToUTF32(const DString &strText)
+/** 把字符串转换为UTF32编码的码点列表
+*   说明：模板参数为字符串类型，兼顾 DString（Windows下为wchar_t，Linux下为char）
+*         以及 DStringW（wchar_t）两种类型；按 wchar_t/char 的宽度分别处理UTF16/UTF8/UTF32
+*/
+template <typename TString>
+std::vector<uint32_t> ToUTF32(const TString &strText)
 {
     std::vector<uint32_t> text;
     text.reserve(strText.size());
-    using CharType = DString::value_type;
+    using CharType = typename TString::value_type;
     if (sizeof(CharType) == 1) {
         const uint8_t *pData = (const uint8_t *) strText.c_str();
         const size_t nLen = strText.size();
@@ -445,8 +450,10 @@ void BuildRichLayout(
         const float fRunLineHeight = metrics.m_fHeight * data.m_fRowSpacingMul
                                      + data.m_fRowSpacingAdd;
         result.m_fLineHeight = std::max(result.m_fLineHeight, fRunLineHeight);
-        const std::vector<uint32_t> text = ToUTF32(
-            DString(data.m_textView.data(), data.m_textView.size()));
+        // m_textView 是宽字符视图（Windows为UTF16，Linux/macOS为UTF32），
+        // 而 DString 在非 Windows 平台是窄字符类型，不能直接用它构造，这里统一用 DStringW
+        const DStringW runText(data.m_textView.data(), data.m_textView.size());
+        const std::vector<uint32_t> text = ToUTF32(runText);
         for (uint32_t ch : text) {
             if (IsLineBreakChar(ch)) {
                 LayoutGlyph glyph;
