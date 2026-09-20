@@ -11,12 +11,23 @@ target("duilib-zlib")
     set_targetdir(DUILIB_LIB_DIR)
     duilib_target_settings()
     add_files(path.join(thirdroot, "zlib", "*.c"))
+    -- 与 xmake 官方 zlib 包（xmake-repo/packages/z/zlib）保持一致：只编译库源码，
+    -- 示例程序（minigzip.c 里有 main 函数）不参与静态库编译
+    remove_files(path.join(thirdroot, "zlib", "example.c"),
+                 path.join(thirdroot, "zlib", "minigzip.c"))
     add_includedirs(path.join(thirdroot, "zlib"))
-    if not duilib_is_windows() then
-        -- zlib 的 zconf.h 通过 Z_HAVE_UNISTD_H 决定是否包含 <unistd.h>（gzread.c 等要用 read/close），
-        -- 官方构建脚本由 configure/cmake 生成该宏；这里直接编译源码，需要显式定义，
-        -- 否则 macOS（clang，C99 起隐式函数声明为错误）会报 read/close 未声明。
-        add_defines("Z_HAVE_UNISTD_H")
+    -- zconf.h 依据这些宏决定是否包含 <unistd.h>/<sys/types.h>/<stdint.h>/<stddef.h>
+    -- （gzread.c 等需要 read/close）。官方包是用 check_cincludes 检测后再定义，这里保持一致，
+    -- 避免硬编码平台假设：macOS（clang，C99 起隐式函数声明为错误）缺少该宏时会报 read/close 未声明。
+    check_cincludes("Z_HAVE_UNISTD_H", "unistd.h")
+    check_cincludes("HAVE_SYS_TYPES_H", "sys/types.h")
+    check_cincludes("HAVE_STDINT_H", "stdint.h")
+    check_cincludes("HAVE_STDDEF_H", "stddef.h")
+    if duilib_is_windows() then
+        add_defines("_CRT_SECURE_NO_DEPRECATE", "_CRT_NONSTDC_NO_DEPRECATE")
+    else
+        -- 与官方包一致：启用大文件接口（64 位文件偏移）
+        add_defines("_LARGEFILE64_SOURCE=1")
     end
 target_end()
 

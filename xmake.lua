@@ -175,6 +175,9 @@ option_end()
 -- 构建脚本
 includes("xmake/common.lua")
 
+-- check_cincludes 等编译期探测宏（与 xmake 官方包保持一致，例如 zlib 的头文件探测）
+includes("@builtin/check")
+
 -- 运行库设置：必须在根作用域设置，xmake 才会用同样的运行库去下载/编译依赖包；
 -- 只在 target 里设置（duilib_target_settings）只会影响本工程目标，依赖包会退回默认的 /MD，
 -- 与本工程默认的 /MT 不一致，链接时会报 __imp_itoa/__imp_lround 之类的未解析符号
