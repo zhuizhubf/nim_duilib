@@ -110,6 +110,13 @@ package("duilib-skia")
             else
                 -- 默认：使用 MSVC（cl.exe）编译，不需要安装 LLVM；
                 -- win_vc / win_toolchain_version / win_sdk_version 由 GN 自动检测（gn/find_msvc.py）
+                --
+                -- 显式指定 cc/cxx 为 cl：GN 会用 `cc --version` 的结果判断是否 MinGW 编译器
+                -- （gn/is_mingw.py），在 MSYS/Git Bash 环境（如 CI）中 PATH 里的 cc 可能是 MinGW 的
+                -- gcc，会被误判为 MinGW 并切到 gcc_like 工具链，从而用 g++ 编译 Skia 导致失败；
+                -- 指定 cc="cl" 后该判断直接返回否，实际编译器仍由 MSVC 工具链决定。
+                table.insert(args, 'cc="cl"')
+                table.insert(args, 'cxx="cl"')
                 outdir = "out/msvc." .. cpu .. "." .. buildtype
             end
             -- 运行库必须与 duilib/示例保持一致（默认 /MT）

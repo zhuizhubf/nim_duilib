@@ -6,10 +6,13 @@
 
 #ifdef DUILIB_BUILD_FOR_WIN
 
-#include <gdiplus.h>
+#include <windows.h>
+// 说明：gdiplus.h（GdiplusImaging.h 等）依赖 Windows/COM 头提供的 MIDL_INTERFACE、IStream、
+//       PROPVARIANT 等定义，必须放在 gdiplus.h 之前包含，否则直接包含时会报
+//       "'IImageBytes': missing type specifier" 之类的编译错误（原 VS 工程有预编译头未暴露此问题）
 #include <objidl.h>
 #include <propidl.h>
-#include <windows.h>
+#include <gdiplus.h>
 
 #include <array>
 #include <memory>

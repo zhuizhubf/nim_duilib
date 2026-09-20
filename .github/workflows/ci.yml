@@ -179,7 +179,18 @@ jobs:
           set -euo pipefail
           # Windows 上的 shell 是 MSYS/Git Bash，xmake 会据此把平台识别为 mingw，
           # 导致 duilib-skia 等仅支持 windows/linux/macosx 的包被判为不支持，这里显式指定平台。
-          xmake f -y -o build/build_temp/xmake -c -m release -p ${{ matrix.xmake_plat }} -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}
+          # 配置阶段会下载第三方源码（如 x.org 上的 X11 库、Skia 源码），偶发下载失败时重试。
+          for attempt in 1 2 3; do
+            if xmake f -y -o build/build_temp/xmake -c -m release -p ${{ matrix.xmake_plat }} -a ${{ matrix.xmake_arch }} ${XMAKE_BUILD_FLAGS}; then
+              break
+            fi
+            if [ "${attempt}" -eq 3 ]; then
+              echo "::error::xmake configure failed after ${attempt} attempts"
+              exit 1
+            fi
+            echo "xmake configure failed (attempt ${attempt}), retrying ..."
+            sleep 10
+          done
           xmake -y
 
       - name: Check attribute registry

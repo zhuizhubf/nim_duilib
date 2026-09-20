@@ -72,9 +72,21 @@ jobs:
       - name: Build core + extension + demo (root build)
         shell: bash
         run: |
+          set -euo pipefail
           # Windows 上运行在 MSYS/Git Bash 中，需显式指定平台，避免 xmake 识别为 mingw。
-          xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} \
-            --render=${{ matrix.render }} --scintilla=y --examples=y
+          # 配置阶段会下载第三方源码，偶发下载失败时重试。
+          for attempt in 1 2 3; do
+            if xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} \
+                 --render=${{ matrix.render }} --scintilla=y --examples=y; then
+              break
+            fi
+            if [ "${attempt}" -eq 3 ]; then
+              echo "::error::xmake configure failed after ${attempt} attempts"
+              exit 1
+            fi
+            echo "xmake configure failed (attempt ${attempt}), retrying ..."
+            sleep 10
+          done
           xmake -y
 
       # 2) 核心回归：属性登记表检查不受扩展影响
@@ -86,5 +98,6 @@ jobs:
       - name: Build core without extension
         shell: bash
         run: |
+          set -euo pipefail
           xmake f -y -c -m release -p ${{ matrix.plat }} -a ${{ matrix.arch }} --render=${{ matrix.render }} --examples=y
           xmake -y
